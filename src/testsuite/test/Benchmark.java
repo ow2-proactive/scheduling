@@ -30,12 +30,11 @@
  */
 package testsuite.test;
 
+import java.io.Serializable;
+
 import testsuite.result.BenchmarkResult;
 import testsuite.result.TestResult;
-
 import testsuite.timer.Timeable;
-
-import java.io.Serializable;
 
 
 /**

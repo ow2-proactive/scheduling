@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.core.runtime.http;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -53,20 +58,12 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.net.UnknownHostException;
-
-import java.util.ArrayList;
-
 
 /**
  * An HTTP adapter for a ProActiveRuntime to be able to receive remote calls with HTTP. This helps isolate
  * HTTP specific code into a small set of specific classes.
  * @author ProActiveTeam
- * @version 1.0, 9 août 2005
+ * @version 1.0, 9 ao?t 2005
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */

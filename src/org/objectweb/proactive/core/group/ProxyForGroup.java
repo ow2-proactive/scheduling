@@ -59,9 +59,8 @@ import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 
 
-public class ProxyForGroup extends AbstractProxy
-    implements Proxy, Group,
-        java.io.Serializable {
+public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
+    java.io.Serializable {
 
     /** The logger for the Class */
     protected static Logger logger = Logger.getLogger(ProxyForGroup.class.getName());
@@ -301,7 +300,8 @@ public class ProxyForGroup extends AbstractProxy
                 this.threadpool.addAJob(new ProcessForAsyncCall(this,
                         this.memberList, memberListOfResultGroup, index,
                         new MethodCall(mc.getReifiedMethod(),
-                            individualEffectiveArguments, mc.getMetadata()), body));
+                            individualEffectiveArguments, mc.getMetadata()),
+                        body));
             }
         }
 
@@ -329,7 +329,8 @@ public class ProxyForGroup extends AbstractProxy
      * Launchs the threads for OneWay call of each member of the Group.
      * @param mc the MethodCall to be applied on each member of the Group.
      */
-    protected void oneWayCallOnGroup(MethodCall mc, ExceptionListException exceptionList) {
+    protected void oneWayCallOnGroup(MethodCall mc,
+        ExceptionListException exceptionList) {
         Body body = ProActive.getBodyOnThis();
         if (Profiling.GROUP) {
             timer.setTimer("oneWayCallOnGroup." + mc.getName());
@@ -359,7 +360,8 @@ public class ProxyForGroup extends AbstractProxy
                 this.threadpool.addAJob(new ProcessForOneWayCall(this,
                         this.memberList, index,
                         new MethodCall(mc.getReifiedMethod(),
-                            individualEffectiveArguments, mc.getMetadata()), body, exceptionList));
+                            individualEffectiveArguments, mc.getMetadata()),
+                        body, exceptionList));
             }
         }
 

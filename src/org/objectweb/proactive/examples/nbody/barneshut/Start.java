@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.group.Group;
@@ -41,8 +43,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
-
-import java.util.Vector;
 
 
 /**
@@ -57,9 +57,8 @@ import java.util.Vector;
  * @since   ProActive 2.2
  */
 public class Start {
-
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    
+
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }

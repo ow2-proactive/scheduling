@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.IOException;
+import java.io.Serializable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -61,9 +64,6 @@ import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-
-import java.io.IOException;
-import java.io.Serializable;
 
 
 /**

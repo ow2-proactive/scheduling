@@ -1,12 +1,11 @@
 package migration.bench2;
 
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
-
 import java.io.Serializable;
-
 import java.util.Random;
 import java.util.Vector;
+
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 
 
 public class Agent implements org.objectweb.proactive.RunActive, Serializable {

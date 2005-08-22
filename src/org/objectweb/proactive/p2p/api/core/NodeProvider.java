@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.p2p.api.core;
 
+import java.io.Serializable;
+import java.util.Vector;
+
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
-
-import java.io.Serializable;
-import java.util.Vector;
 
 
 /**
@@ -44,8 +44,8 @@ import java.util.Vector;
  * Created on May 31, 2005
  */
 public class NodeProvider implements Serializable, NodeCreationEventListener {
-	private Vector availableNodes = new Vector();
-	
+    private Vector availableNodes = new Vector();
+
     /**
      * The empty and no args constructor for activing the object.
      */
@@ -61,7 +61,8 @@ public class NodeProvider implements Serializable, NodeCreationEventListener {
      * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
      */
     public void nodeCreated(NodeCreationEvent event) {
-    	Node node = event.getNode();
+        Node node = event.getNode();
+
         // TODO Auto-generated method stub
     }
 }

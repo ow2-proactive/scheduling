@@ -104,7 +104,7 @@ public class ProActiveComponentGroup {
         } catch (InterfaceGenerationFailedException e) {
             logger.error("**** Interface could not be generated **** " +
                 e.getMessage());
-        } 
+        }
         return null;
     }
 

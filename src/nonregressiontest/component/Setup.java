@@ -1,6 +1,7 @@
 package nonregressiontest.component;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -10,14 +11,12 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.type.Composite;
 
-import java.util.HashMap;
-import java.util.Map;
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 
 /**
@@ -143,8 +142,9 @@ public class Setup {
             new ContentDescription(PrimitiveComponentB.class.getName(),
                 new Object[] {  }, TestNodes.getLocalVMNode()));
     }
-    
-    public static Component createRemoteSlowPrimitiveB() throws Exception {
+
+    public static Component createRemoteSlowPrimitiveB()
+        throws Exception {
         createTypeB();
         return CF.newFcInstance(B_TYPE,
             new ControllerDescription("slowPrimitiveB1", Constants.PRIMITIVE),
@@ -159,7 +159,7 @@ public class Setup {
             new ContentDescription(PrimitiveComponentA.class.getName(),
                 new Object[] {  }));
     }
-    
+
     public static Component createSlowPrimitiveA() throws Exception {
         createTypeA();
         return CF.newFcInstance(A_TYPE,
@@ -182,7 +182,8 @@ public class Setup {
         return createCompositeOfTypeB("compositeB1");
     }
 
-    public static Component createCompositeOfTypeA(String name) throws Exception {
+    public static Component createCompositeOfTypeA(String name)
+        throws Exception {
         createTypeA();
         Component composite = CF.newFcInstance(A_TYPE,
                 new ControllerDescription(name, Constants.COMPOSITE),
@@ -191,7 +192,8 @@ public class Setup {
         return composite;
     }
 
-    public static Component createCompositeOfTypeB(String name) throws Exception {
+    public static Component createCompositeOfTypeB(String name)
+        throws Exception {
         createTypeB();
         Component composite = CF.newFcInstance(B_TYPE,
                 new ControllerDescription(name, Constants.COMPOSITE),
@@ -199,22 +201,24 @@ public class Setup {
                     new Object[] {  }));
         return composite;
     }
-    
 
-
-    public static Component createSynchronousCompositeOfTypeB(String name) throws Exception {
+    public static Component createSynchronousCompositeOfTypeB(String name)
+        throws Exception {
         createTypeB();
         Component composite = CF.newFcInstance(B_TYPE,
-                new ControllerDescription(name, Constants.COMPOSITE, Constants.SYNCHRONOUS),
+                new ControllerDescription(name, Constants.COMPOSITE,
+                    Constants.SYNCHRONOUS),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));
         return composite;
     }
 
-    public static Component createSynchronousCompositeOfTypeA(String name) throws Exception {
+    public static Component createSynchronousCompositeOfTypeA(String name)
+        throws Exception {
         createTypeA();
         Component composite = CF.newFcInstance(A_TYPE,
-                new ControllerDescription(name, Constants.COMPOSITE, Constants.SYNCHRONOUS),
+                new ControllerDescription(name, Constants.COMPOSITE,
+                    Constants.SYNCHRONOUS),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));
         return composite;

@@ -30,14 +30,12 @@
  */
 package org.objectweb.proactive.core.component;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-
 import org.objectweb.proactive.core.component.type.ProActiveComponentType;
-
-import java.io.Serializable;
-
-import java.util.ArrayList;
 
 
 /** Contains the configuration of a component. <ul>

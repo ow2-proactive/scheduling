@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.core.component;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -41,7 +44,6 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -64,10 +66,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
 
 
 /**
@@ -398,7 +396,7 @@ public class Fractive implements GenericFactory, Component, Factory {
         return (InterfaceType[]) client_interfaces.toArray(new InterfaceType[client_interfaces.size()]);
     }
 
-     /**
+    /**
      * Returns a component representative pointing to the component associated to the component
      * whose active thread is calling this method. It can be used for a component to pass callback references to itself.
      * @return a component representative for the component in which the current thread is running

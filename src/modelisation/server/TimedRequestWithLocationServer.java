@@ -19,7 +19,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 public class TimedRequestWithLocationServer extends RequestImpl
     implements java.io.Serializable {
-	//transient, will be set to false after a migration
+    //transient, will be set to false after a migration
     private transient boolean shouldMesureTime = false;
     private static final int MAX_TRIES = 30;
 
@@ -160,12 +160,13 @@ public class TimedRequestWithLocationServer extends RequestImpl
         ProActive.waitFor(mobile);
         return mobile;
     }
-    
-    public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException {
-    	if (hasBeenForwarded()) {
-    		System.out.println("TimedRequest: the request has been forwarded " + (sendCounter - 1));
-    	}
-    	super.notifyReception(bodyReceiver);
+
+    public void notifyReception(UniversalBody bodyReceiver)
+        throws java.io.IOException {
+        if (hasBeenForwarded()) {
+            System.out.println("TimedRequest: the request has been forwarded " +
+                (sendCounter - 1));
+        }
+        super.notifyReception(bodyReceiver);
     }
-    
 }

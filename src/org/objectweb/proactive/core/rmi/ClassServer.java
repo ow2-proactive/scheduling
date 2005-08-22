@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.osgi.OsgiParameters;
-
-import java.net.UnknownHostException;
 
 
 public class ClassServer implements Runnable {
@@ -82,7 +81,7 @@ public class ClassServer implements Runnable {
         }
 
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
-//        System.out.println("URL du classServer : " + hostname + ":" + port);
+        //        System.out.println("URL du classServer : " + hostname + ":" + port);
         newListener();
         //        if (logger.isInfoEnabled()) {
         //            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);

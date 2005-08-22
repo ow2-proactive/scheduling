@@ -30,11 +30,10 @@
  */
 package org.objectweb.proactive.core.process;
 
-import org.objectweb.proactive.core.util.MessageLogger;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
+
+import org.objectweb.proactive.core.util.MessageLogger;
 
 
 /**
@@ -75,7 +74,7 @@ public abstract class AbstractListProcessDecorator
         this.domain = domain;
         this.padding = padding;
         this.list = list.replaceAll("\\s", "");
-        setAllIndex(this.list);  
+        setAllIndex(this.list);
         for (int i = Integer.parseInt(beginIndex);
                 i <= Integer.parseInt(endIndex); i = i + step) {
             tmp = "" + i; //we change as String to check the array
@@ -138,14 +137,16 @@ public abstract class AbstractListProcessDecorator
             ((ExternalProcessDecorator) processes.get(i)).setCompositionType(compositionType);
         }
     }
+
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
      */
-    public void closeStream(){
+    public void closeStream() {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcessDecorator) processes.get(i)).closeStream();
         }
     }
+
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getInputMessageLogger()
      */
@@ -374,16 +375,18 @@ public abstract class AbstractListProcessDecorator
             String[] listexclude = list.substring(list.lastIndexOf('[') + 1,
                     list.lastIndexOf(']')).split(",");
             for (int i = 0; i < listexclude.length; i++) {
-                if(listexclude[i].indexOf("-")< 0){
+                if (listexclude[i].indexOf("-") < 0) {
                     excludeArray.add(listexclude[i]);
-                }else{
-                    String init = listexclude[i].substring(0,listexclude[i].indexOf("-"));
-                    String end = listexclude[i].substring(listexclude[i].indexOf("-")+1, listexclude[i].length());
-                    for (int j = Integer.parseInt(init);j<=Integer.parseInt(end);j++ ){
+                } else {
+                    String init = listexclude[i].substring(0,
+                            listexclude[i].indexOf("-"));
+                    String end = listexclude[i].substring(listexclude[i].indexOf(
+                                "-") + 1, listexclude[i].length());
+                    for (int j = Integer.parseInt(init);
+                            j <= Integer.parseInt(end); j++) {
                         excludeArray.add(new Integer(j).toString());
                     }
                 }
-                
             }
         }
     }

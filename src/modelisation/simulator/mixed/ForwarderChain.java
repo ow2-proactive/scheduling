@@ -1,18 +1,18 @@
 package modelisation.simulator.mixed;
 
-import modelisation.simulator.common.Averagator;
-import modelisation.simulator.common.SimulatorElement;
 import org.apache.log4j.Logger;
 
+import modelisation.simulator.common.Averagator;
+import modelisation.simulator.common.SimulatorElement;
+
+
 public class ForwarderChain extends SimulatorElement {
-
-protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName());
-
-
+    protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName());
     public static final int IDLE = 0;
     public static final int COMMUNICATING = 1;
     public static final int WAITING_AGENT = 2;
     public static final int TENSIONING = 3;
+
     //    protected LinkedList list;
     protected Forwarder[] list;
     protected int listSize;
@@ -59,15 +59,13 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
     public void add(Forwarder f) {
         f.setLifeTime(this.simulator.generateForwarderLifeTime());
         if (log) {
-            this.simulator.log(
-                    "ForwarderChain.add with lifetime " + 
-                    f.getRemainingTime() + " with number " + 
-                    f.migrationCounter);
+            this.simulator.log("ForwarderChain.add with lifetime " +
+                f.getRemainingTime() + " with number " + f.migrationCounter);
         }
+
         //        f.setLifeTime(10);
         //        this.list.add(f);
         if (this.listSize == this.list.length) {
-
             Forwarder[] tmp = new Forwarder[listSize];
             System.arraycopy(this.list, 0, tmp, 0, this.list.length);
             this.list = new Forwarder[2 * listSize];
@@ -78,7 +76,6 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
     }
 
     public int length() {
-
         int size = 0;
         for (int i = 0; i < list.length; i++) {
             if (list[i] != null) {
@@ -104,9 +101,8 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
     public void reachElement() {
         this.position = getPositionFromNumber(objectNumber);
         if (log) {
-            this.simulator.log(
-                    "reachElement " + objectNumber + " at position " + 
-                    this.position);
+            this.simulator.log("reachElement " + objectNumber +
+                " at position " + this.position);
         }
         if (this.position < 0) {
             //the element we are looking for in not in the
@@ -114,12 +110,12 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
             if (this.agent.getNumber() == objectNumber) {
                 if (log) {
                     this.simulator.log(
-                            "ForwarderChain.reachElement agent reached");
+                        "ForwarderChain.reachElement agent reached");
                 }
                 if (log) {
                     this.simulator.log(
-                            "ForwarderChain.reachElement hasBeenForwarded " + 
-                            this.hasBeenForwarded);
+                        "ForwarderChain.reachElement hasBeenForwarded " +
+                        this.hasBeenForwarded);
                 }
                 this.reachElementAgent(agent);
             } else {
@@ -131,50 +127,47 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
     }
 
     protected void reachElementAgent(Agent a) {
-
         int returnValue = a.receiveMessage();
         switch (returnValue) {
-            case Agent.WAITING:
-                if (this.hasBeenForwarded) {
-                    this.startTensioning();
-                } else {
-                    this.endOfCommunication();
-                }
-                break;
-            case Agent.REFUSED:
-                this.communicationFailed();
-                break;
-            case Agent.BLOCKED:
-                this.state = WAITING_AGENT;
-                this.setRemainingTime(a.getRemainingTime());
-                if (log) {
-                    this.simulator.log(
-                            " Source: waiting for the agent will last " + 
-                            this.remainingTime);
-                }
-                this.averagatorWaitTimeAgent.add(this.remainingTime);
-                break;
+        case Agent.WAITING:
+            if (this.hasBeenForwarded) {
+                this.startTensioning();
+            } else {
+                this.endOfCommunication();
+            }
+            break;
+        case Agent.REFUSED:
+            this.communicationFailed();
+            break;
+        case Agent.BLOCKED:
+            this.state = WAITING_AGENT;
+            this.setRemainingTime(a.getRemainingTime());
+            if (log) {
+                this.simulator.log(" Source: waiting for the agent will last " +
+                    this.remainingTime);
+            }
+            this.averagatorWaitTimeAgent.add(this.remainingTime);
+            break;
         }
     }
 
     protected void reachElementForwarder(Forwarder f) {
-
         double tmp;
         int returnValue = f.receiveMessage();
         switch (returnValue) {
-            case Forwarder.ACTIF:
-                this.hasBeenForwarded = true;
-                this.objectNumber++;
-                tmp = this.communicationLength();
-                this.setRemainingTime(tmp);
-                this.averagatorGamma1.add(tmp);
-                this.averagatorRemainingLifeTime.add(f.getRemainingTime());
-                // this.averagatorForwarderCount.add(1);
-                this.forwarderCount++;
-                break;
-            default:
-                this.communicationFailed();
-                break;
+        case Forwarder.ACTIF:
+            this.hasBeenForwarded = true;
+            this.objectNumber++;
+            tmp = this.communicationLength();
+            this.setRemainingTime(tmp);
+            this.averagatorGamma1.add(tmp);
+            this.averagatorRemainingLifeTime.add(f.getRemainingTime());
+            // this.averagatorForwarderCount.add(1);
+            this.forwarderCount++;
+            break;
+        default:
+            this.communicationFailed();
+            break;
         }
     }
 
@@ -182,7 +175,6 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
      * Called by a source to init a communication
      */
     public void startCommunication(int forwarderNumber) {
-
         double tmp;
         this.objectNumber = forwarderNumber;
         this.hasBeenForwarded = false;
@@ -195,21 +187,19 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
         this.setRemainingTime(tmp);
         this.averagatorGamma1.add(tmp);
         if (log) {
-            this.simulator.log(
-                    "ForwarderChain.startCommunication will last " + 
-                    this.remainingTime);
+            this.simulator.log("ForwarderChain.startCommunication will last " +
+                this.remainingTime);
             //            this.simulator.log(
             //                    "ForwarderChain.startCommunication length of the chain is " +
             //                    this.list.size());
             this.simulator.log(
-                    "ForwarderChain.startCommunication looking for object " + 
-                    forwarderNumber);
+                "ForwarderChain.startCommunication looking for object " +
+                forwarderNumber);
         }
         this.position = this.getPositionFromNumber(forwarderNumber);
         if (log) {
-            this.simulator.log(
-                    "ForwarderChain.startCommunication position " + 
-                    this.position);
+            this.simulator.log("ForwarderChain.startCommunication position " +
+                this.position);
         }
         this.state = COMMUNICATING;
     }
@@ -223,13 +213,12 @@ protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName()
         this.source.communicationFailed();
         this.state = IDLE;
         if (log) {
-            this.simulator.log(
-                    "Communication failed after " + this.forwarderCount + 
-                    " forwarders");
+            this.simulator.log("Communication failed after " +
+                this.forwarderCount + " forwarders");
         }
-if (logger.isDebugEnabled()) {
-        //            logger.debug("FFF " + this.forwarderCount);
-}
+        if (logger.isDebugEnabled()) {
+            //            logger.debug("FFF " + this.forwarderCount);
+        }
     }
 
     protected void endOfCommunication() {
@@ -239,13 +228,12 @@ if (logger.isDebugEnabled()) {
         this.list = new Forwarder[10];
         this.source.agentReached(this.agent.getNumber());
         if (log) {
-            this.simulator.log(
-                    "Communication succeeded after " + this.forwarderCount + 
-                    " forwarders");
+            this.simulator.log("Communication succeeded after " +
+                this.forwarderCount + " forwarders");
         }
-if (logger.isDebugEnabled()) {
-        //        logger.debug("FFF " + this.forwarderCount);
-}
+        if (logger.isDebugEnabled()) {
+            //        logger.debug("FFF " + this.forwarderCount);
+        }
         this.averagatorForwarderCount.add(this.forwarderCount);
     }
 
@@ -263,7 +251,6 @@ if (logger.isDebugEnabled()) {
     }
 
     public double getRemainingTime() {
-
         double minTime = this.remainingTime;
         for (int i = 0; i < this.listSize; i++) {
             minTime = Math.min(this.list[i].getRemainingTime(), minTime);
@@ -278,21 +265,21 @@ if (logger.isDebugEnabled()) {
         this.updateForwarders(time);
         if (this.remainingTime == 0) {
             switch (this.state) {
-                case COMMUNICATING:
+            case COMMUNICATING:
+                this.reachElement();
+                break;
+            case WAITING_AGENT:
+                if (this.agent.getState() == Agent.CALLING_SERVER) {
+                    //         oooopsss, we have to be carreful here, the agent is actually calling the server
+                    //         so its migration is not over yet
+                    this.setRemainingTime(this.agent.getRemainingTime());
+                } else {
                     this.reachElement();
-                    break;
-                case WAITING_AGENT:
-                    if (this.agent.getState() == Agent.CALLING_SERVER) {
-                        //         oooopsss, we have to be carreful here, the agent is actually calling the server
-                        //         so its migration is not over yet
-                        this.setRemainingTime(this.agent.getRemainingTime());
-                    } else {
-                        this.reachElement();
-                    }
-                    break;
-                case TENSIONING:
-                    this.endOfCommunication();
-                    break;
+                }
+                break;
+            case TENSIONING:
+                this.endOfCommunication();
+                break;
             }
         }
     }
@@ -310,9 +297,8 @@ if (logger.isDebugEnabled()) {
 
     public void setRemainingTimoe(double time) {
         if (log) {
-            this.simulator.log(
-                    "setRemainingTime: old = " + this.remainingTime + 
-                    " new = " + time);
+            this.simulator.log("setRemainingTime: old = " + this.remainingTime +
+                " new = " + time);
         }
         this.remainingTime = time;
     }
@@ -329,41 +315,38 @@ if (logger.isDebugEnabled()) {
     }
 
     public void end() {
-if (logger.isDebugEnabled()) {
-        logger.debug("* gamma1 = " + 1000 / this.averagatorGamma1.average());
-        logger.debug(
-                "* ForwarderCount = " + 
-                this.averagatorForwarderCount.average() + " " + 
+        if (logger.isDebugEnabled()) {
+            logger.debug("* gamma1 = " +
+                (1000 / this.averagatorGamma1.average()));
+            logger.debug("* ForwarderCount = " +
+                this.averagatorForwarderCount.average() + " " +
                 this.averagatorForwarderCount.getCount());
-        logger.debug(
-                "* ExpectedForwarderCount = " + 
-                this.averagatorExpectedForwarderCount.average() + " " + 
+            logger.debug("* ExpectedForwarderCount = " +
+                this.averagatorExpectedForwarderCount.average() + " " +
                 this.averagatorExpectedForwarderCount.getCount());
-        logger.debug(
-                "* wait for agent = " + 
-                this.averagatorWaitTimeAgent.average() + " " + 
+            logger.debug("* wait for agent = " +
+                this.averagatorWaitTimeAgent.average() + " " +
                 this.averagatorWaitTimeAgent.getCount());
-        logger.debug(
-                "* Remaining life forwarder = " + 
-                this.averagatorRemainingLifeTime.average() + " " + 
+            logger.debug("* Remaining life forwarder = " +
+                this.averagatorRemainingLifeTime.average() + " " +
                 this.averagatorRemainingLifeTime.getCount());
-}
+        }
     }
 
     public String toString() {
-
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
-            case IDLE:
-                tmp.append("IDLE");
-                break;
-            case COMMUNICATING:
-                tmp.append("COMMUNICATING");
-                break;
-            case WAITING_AGENT:
-                tmp.append("WAITING_AGENT");
-                break;
+        case IDLE:
+            tmp.append("IDLE");
+            break;
+        case COMMUNICATING:
+            tmp.append("COMMUNICATING");
+            break;
+        case WAITING_AGENT:
+            tmp.append("WAITING_AGENT");
+            break;
         }
+
         //        tmp.append(" size = " + list.size());
         tmp.append(" size = " + this.listSize);
         tmp.append(" position = ").append(position);

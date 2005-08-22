@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import org.apache.log4j.Logger;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-
 import java.util.HashMap;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -285,30 +284,30 @@ public abstract class MOP {
      * @param constructorParameters Array of the constructor's parameters [wrapper]
      * @param proxyParameters The array holding the proxy parameter
      *
-       public static Object newInstance(String nameOfClass, Object[] constructorParameters, Object[] proxyParameters)
-         throws
-           ClassNotFoundException,
-           ClassNotReifiableException,
-           CannotGuessProxyNameException,
-           InvalidProxyClassException,
-           ConstructionOfProxyObjectFailedException,
-           ConstructionOfReifiedObjectFailedException {
-         String nameOfProxy = guessProxyName(forName(nameOfClass));
-         return newInstance(nameOfClass, constructorParameters, nameOfProxy, proxyParameters);
-       }*/
+         public static Object newInstance(String nameOfClass, Object[] constructorParameters, Object[] proxyParameters)
+           throws
+             ClassNotFoundException,
+             ClassNotReifiableException,
+             CannotGuessProxyNameException,
+             InvalidProxyClassException,
+             ConstructionOfProxyObjectFailedException,
+             ConstructionOfReifiedObjectFailedException {
+           String nameOfProxy = guessProxyName(forName(nameOfClass));
+           return newInstance(nameOfClass, constructorParameters, nameOfProxy, proxyParameters);
+         }*/
     /**
      * Reifies an object
      * @param proxyParameters Array holding the proxy parameters
      * @param target the object to reify
      *
-       public static Object turnReified(Object[] proxyParameters, Object target)
-         throws ClassNotReifiableException, CannotGuessProxyNameException, InvalidProxyClassException, ConstructionOfProxyObjectFailedException {
-         try {
-           return turnReified(guessProxyName(target.getClass()), proxyParameters, target);
-         } catch (ClassNotFoundException e) {
-           throw new CannotGuessProxyNameException();
-         }
-       }*/
+         public static Object turnReified(Object[] proxyParameters, Object target)
+           throws ClassNotReifiableException, CannotGuessProxyNameException, InvalidProxyClassException, ConstructionOfProxyObjectFailedException {
+           try {
+             return turnReified(guessProxyName(target.getClass()), proxyParameters, target);
+           } catch (ClassNotFoundException e) {
+             throw new CannotGuessProxyNameException();
+           }
+         }*/
     /**
      * Reifies an object
      * @param nameOfProxyClass the name of the object's proxy
@@ -335,17 +334,17 @@ public abstract class MOP {
      * @param nameOfStubClass The name of the object's stub class
      * @param target the object to reify
      *
-       public static Object turnReified(Object[] proxyParameters, String nameOfStubClass, Object target)
-         throws
-           ClassNotFoundException,
-           ReifiedCastException,
-           ClassNotReifiableException,
-           CannotGuessProxyNameException,
-           InvalidProxyClassException,
-           ConstructionOfProxyObjectFailedException {
-         String nameOfProxy = guessProxyName(target.getClass());
-         return turnReified(nameOfStubClass, nameOfProxy, proxyParameters, target);
-       }*/
+         public static Object turnReified(Object[] proxyParameters, String nameOfStubClass, Object target)
+           throws
+             ClassNotFoundException,
+             ReifiedCastException,
+             ClassNotReifiableException,
+             CannotGuessProxyNameException,
+             InvalidProxyClassException,
+             ConstructionOfProxyObjectFailedException {
+           String nameOfProxy = guessProxyName(target.getClass());
+           return turnReified(nameOfStubClass, nameOfProxy, proxyParameters, target);
+         }*/
     /**
      * Reifies an object
      * @param nameOfProxyClass the name of the object's proxy
@@ -732,7 +731,7 @@ public abstract class MOP {
             targetConstructor = findReifiedConstructor(targetClass,
                     targetConstructorArgs);
 
-            if (targetConstructor == null)// This may have failed because some wrappers should be interpreted
+            if (targetConstructor == null) // This may have failed because some wrappers should be interpreted
             // as primitive types. Let's investigate it
              {
                 targetConstructor = investigateAmbiguity(targetClass,
@@ -753,57 +752,57 @@ public abstract class MOP {
      * @return the name of the proxy class
      * @throws CannotGuessProxyNameException If the MOP cannot guess the name of the proxy
      *
-       private static String guessProxyName(Class targetClass) throws CannotGuessProxyNameException {
-         int i;
-         Class cl;
-         Class myInterface = null;
-         Class[] interfaces;
-         Field myField = null;
-         // Checks the cache
-         String nameOfProxy = (String) secondProxyTable.get(targetClass.getName());
-         if (nameOfProxy == null) {
-           Class currentClass;
-           // Checks if this class or any of its superclasses implements an
-           //  interface that is a subinterface of ROOT_INTERFACE
-           currentClass = targetClass;
-           //System.out.println("MOP: guessProxyName for targetClass " + targetClass);
-           while ((currentClass != null) && (myInterface == null)) {
-             boolean multipleMatches = false;
-             interfaces = currentClass.getInterfaces();
-             for (i = 0; i < interfaces.length; i++) {
-               if (ROOT_INTERFACE.isAssignableFrom(interfaces[i])) {
-                 if (multipleMatches == false) {
-                   myInterface = interfaces[i];
-                   multipleMatches = true;
-                 } else {
-                   // There are multiple interfaces in the current class
-                   // that inherit from ROOT_INTERFACE.
-                   System.err.println(
-                     "More than one interfaces declared in class " + currentClass.getName() + " inherit from " + ROOT_INTERFACE + ". Using " + myInterface);
+         private static String guessProxyName(Class targetClass) throws CannotGuessProxyNameException {
+           int i;
+           Class cl;
+           Class myInterface = null;
+           Class[] interfaces;
+           Field myField = null;
+           // Checks the cache
+           String nameOfProxy = (String) secondProxyTable.get(targetClass.getName());
+           if (nameOfProxy == null) {
+             Class currentClass;
+             // Checks if this class or any of its superclasses implements an
+             //  interface that is a subinterface of ROOT_INTERFACE
+             currentClass = targetClass;
+             //System.out.println("MOP: guessProxyName for targetClass " + targetClass);
+             while ((currentClass != null) && (myInterface == null)) {
+               boolean multipleMatches = false;
+               interfaces = currentClass.getInterfaces();
+               for (i = 0; i < interfaces.length; i++) {
+                 if (ROOT_INTERFACE.isAssignableFrom(interfaces[i])) {
+                   if (multipleMatches == false) {
+                     myInterface = interfaces[i];
+                     multipleMatches = true;
+                   } else {
+                     // There are multiple interfaces in the current class
+                     // that inherit from ROOT_INTERFACE.
+                     System.err.println(
+                       "More than one interfaces declared in class " + currentClass.getName() + " inherit from " + ROOT_INTERFACE + ". Using " + myInterface);
+                   }
                  }
                }
+               currentClass = currentClass.getSuperclass();
              }
-             currentClass = currentClass.getSuperclass();
+             if (myInterface == null) {
+               throw new CannotGuessProxyNameException(
+                 "Class " + targetClass.getName() + " does not implement any interface that inherits from org.objectweb.proactive.core.mop.Reflect");
+             }
+             // Now look for the PROXY_CLASS_NAME field in this interface
+             try {
+               myField = myInterface.getField("PROXY_CLASS_NAME");
+             } catch (NoSuchFieldException e) {
+               throw new CannotGuessProxyNameException("No field PROXY_CLASS_NAME in interface " + myInterface);
+             }
+             try {
+               nameOfProxy = (String) myField.get(null);
+             } catch (IllegalAccessException e) {
+               throw new CannotGuessProxyNameException("Cannot access field PROXY_CLASS_NAME in interface " + myInterface);
+             }
+             secondProxyTable.put(targetClass.getName(), nameOfProxy);
            }
-           if (myInterface == null) {
-             throw new CannotGuessProxyNameException(
-               "Class " + targetClass.getName() + " does not implement any interface that inherits from org.objectweb.proactive.core.mop.Reflect");
-           }
-           // Now look for the PROXY_CLASS_NAME field in this interface
-           try {
-             myField = myInterface.getField("PROXY_CLASS_NAME");
-           } catch (NoSuchFieldException e) {
-             throw new CannotGuessProxyNameException("No field PROXY_CLASS_NAME in interface " + myInterface);
-           }
-           try {
-             nameOfProxy = (String) myField.get(null);
-           } catch (IllegalAccessException e) {
-             throw new CannotGuessProxyNameException("Cannot access field PROXY_CLASS_NAME in interface " + myInterface);
-           }
-           secondProxyTable.put(targetClass.getName(), nameOfProxy);
-         }
-         return nameOfProxy;
-       }*/
+           return nameOfProxy;
+         }*/
     /**
      * Tries to solve ambiguity problems in constructors
      * @param targetClass the class

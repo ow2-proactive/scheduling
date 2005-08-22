@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * This class describes the state of a barrier.
- * 
+ *
  * @author Laurent Baduel
  */
 public class BarrierState implements Serializable {
@@ -45,7 +45,6 @@ public class BarrierState implements Serializable {
 
     /** The number of calls already received */
     private int receivedCalls = 0;
-
 
     /**
      * Returns the number of awaited calls to finish the barrier
@@ -77,5 +76,4 @@ public class BarrierState implements Serializable {
     public void incrementReceivedCalls() {
         this.receivedCalls++;
     }
-
 }

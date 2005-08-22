@@ -30,16 +30,16 @@
  */
 package org.objectweb.proactive.core.runtime.ibis;
 
-import ibis.rmi.Remote;
-
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+
+import ibis.rmi.Remote;
 
 
 /**
  * An IBIS adapter for a ProActiveRuntime to be able to receive remote calls with IBIS. This helps isolate
  * IBIS specific code into a small set of specific classes.
  * @author ProActiveTeam
- * @version 1.0, 9 août 2005
+ * @version 1.0, 9 ao?t 2005
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */

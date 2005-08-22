@@ -12,13 +12,13 @@ import org.apache.log4j.Logger;
 
 
 public class Forwarder extends Agent {
-
     static Logger logger = Logger.getLogger(Forwarder.class.getName());
     public static final int DEAD = 0;
     public static final int ACTIF = 1;
     public static final int UPDATING_SERVER = 2;
     public static int DefaultState;
     public static int Current_Number = 0;
+
     //    protected double remainingTime;
     //   protected int number;
     protected Server server;
@@ -86,8 +86,8 @@ public class Forwarder extends Agent {
     }
 
     public void notifyEvent(String description) {
-        this.timeNextEvent = this.remainingTime + 
-                             this.simulator.getCurrentTime();
+        this.timeNextEvent = this.remainingTime +
+            this.simulator.getCurrentTime();
         if (this.currentEvent != null) {
             this.simulator.removeEvent(this.currentEvent);
         }
@@ -124,21 +124,20 @@ public class Forwarder extends Agent {
         //this.notifyEvent();
         //we send the number of the next forwarder
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "Forwarder: calling server, next number is " + 
-                    (this.migrationCounter + 1));
+            logger.debug("Forwarder: calling server, next number is " +
+                (this.migrationCounter + 1));
         }
-        this.server.receiveRequestFromForwarder(this.migrationCounter + 1, 
-                                                this.id);
+        this.server.receiveRequestFromForwarder(this.migrationCounter + 1,
+            this.id);
     }
 
     /**
-    *  Remove any pending event in the calendar
-    */
+     *  Remove any pending event in the calendar
+     */
     public void clean() {
         if (this.currentEvent != null) {
-
             boolean b = this.simulator.removeEvent(this.currentEvent);
+
             //            if (!b) {
             //                System.out.println(" Forwarder clean() " + b);
             //                System.out.println(" Forwarder state " + this.state);
@@ -150,49 +149,50 @@ public class Forwarder extends Agent {
         //    if (this.remainingTime == 0) {
         this.currentEvent = null;
         switch (this.state) {
-            case ACTIF:
-                //                    this.state = DEAD;
-                //                    this.remainingTime = 50000000;
-                if (!"NO".equals(System.getProperties().getProperty(
-                                         "forwarder.callserver"))) {
-                    this.startCommunicationServer();
-                } else {
-                    this.state = DEAD;
-                    this.remainingTime = Double.MAX_VALUE;
-                    //  this.notifyEvent();
-                }
-                break;
-            case UPDATING_SERVER:
-                //                    this.state = DEAD;
-                this.endCommunicationServer();
-                break;
-            case DEAD:
-                this.setRemainingTime(Double.MAX_VALUE);
-                // this.notifyEvent();
-                break;
+        case ACTIF:
+            //                    this.state = DEAD;
+            //                    this.remainingTime = 50000000;
+            if (!"NO".equals(System.getProperties().getProperty("forwarder.callserver"))) {
+                this.startCommunicationServer();
+            } else {
+                this.state = DEAD;
+                this.remainingTime = Double.MAX_VALUE;
+                //  this.notifyEvent();
+            }
+            break;
+        case UPDATING_SERVER:
+            //                    this.state = DEAD;
+            this.endCommunicationServer();
+            break;
+        case DEAD:
+            this.setRemainingTime(Double.MAX_VALUE);
+            // this.notifyEvent();
+            break;
         }
+
         // }
     }
 
     public String getStateAsLetter() {
         switch (this.state) {
-            case DEAD:
-                return "d";
-            case ACTIF:
-                return "a";
-            case UPDATING_SERVER:
-                return "u";
+        case DEAD:
+            return "d";
+        case ACTIF:
+            return "a";
+        case UPDATING_SERVER:
+            return "u";
         }
         return "";
     }
 
     public double getRemainingTime() {
         if (this.currentEvent != null) {
-            return this.currentEvent.getTime() - 
-                   this.simulator.getCurrentTime();
+            return this.currentEvent.getTime() -
+            this.simulator.getCurrentTime();
         } else {
             return Double.MAX_VALUE;
         }
+
         //super.getRemainingTime();
     }
 
@@ -201,25 +201,24 @@ public class Forwarder extends Agent {
     }
 
     public String toString() {
-
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
-            case DEAD:
-                tmp.append("DEAD");
-                break;
-            case ACTIF:
-                tmp.append("ACTIF");
-                break;
-            case UPDATING_SERVER:
-                tmp.append("UPDATNG_SERVER");
-                break;
+        case DEAD:
+            tmp.append("DEAD");
+            break;
+        case ACTIF:
+            tmp.append("ACTIF");
+            break;
+        case UPDATING_SERVER:
+            tmp.append("UPDATNG_SERVER");
+            break;
         }
         tmp.append(" remainingTime = ").append(remainingTime);
         return tmp.toString();
     }
 
     public boolean equals(Forwarder f) {
-        return ((this.agentID == f.getAgentID()) && 
-               (this.migrationCounter == f.getMigrationCounter()));
+        return ((this.agentID == f.getAgentID()) &&
+        (this.migrationCounter == f.getMigrationCounter()));
     }
 }

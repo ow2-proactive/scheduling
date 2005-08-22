@@ -58,7 +58,6 @@ import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 public class RLoginProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_RLOGINPATH = "/usr/bin/rlogin ";
     private boolean exitAfterCommand;
-    
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -81,7 +80,6 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
      */
     public RLoginProcess(ExternalProcess targetProcess) {
         this(targetProcess, false);
-        
     }
 
     /**

@@ -1,37 +1,38 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.cs;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 
 /**
  * <p>
@@ -50,73 +51,64 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  *
  */
 public class Server {
-	
-	static Logger logger = Logger.getLogger(Server.class.getName());
+    static Logger logger = Logger.getLogger(Server.class.getName());
+    protected String messageOfTheDay;
+    protected java.util.ArrayList clients;
 
-  protected String messageOfTheDay;
-  protected java.util.ArrayList clients;
-
-
-  public Server() {
-  }
-
-
-  public Server(String messageOfTheDay) {
-    this.clients = new java.util.ArrayList();
-    this.messageOfTheDay = messageOfTheDay;
-  }
-
-
-  public String getMessageOfTheDay() {
-    return messageOfTheDay;
-  }
-
-
-  public void setMessageOfTheDay(String messageOfTheDay) {
-    logger.info("Server: new message: " + messageOfTheDay);
-    this.messageOfTheDay = messageOfTheDay;
-    this.notifyClients();
-  }
-
-
-  public void register(Client c) {
-    this.clients.add(c);
-  }
-
-
-  public void unregister(Client c) {
-    this.clients.remove(c);
-  }
-
-
-  protected void notifyClients() {
-    java.util.Iterator it = this.clients.iterator();
-    Client currentClient;
-
-    while (it.hasNext()) {
-      currentClient = (Client)it.next();
-      try {
-        currentClient.messageChanged(this.messageOfTheDay);
-      } catch (Exception t) {
-        it.remove();
-      }
+    public Server() {
     }
-  }
 
-
-  public static void main(String[] args) {
-	ProActiveConfiguration.load();
-    try {
-      // Creates an active object for the server
-      Server theServer = (Server)org.objectweb.proactive.ProActive.newActive(Server.class.getName(), new Object[]{"This is the first message"});
-      //Server theServer = (Server) org.objectweb.proactive.ProActive.newActive(Server.class.getName(), null, null);
-
-      // Binds the server to a specific URL
-      org.objectweb.proactive.ProActive.register(theServer, "///theServer");
-
-      System.out.println("Server is ready.");
-    } catch (Exception e) {
-      e.printStackTrace();
+    public Server(String messageOfTheDay) {
+        this.clients = new java.util.ArrayList();
+        this.messageOfTheDay = messageOfTheDay;
     }
-  }
+
+    public String getMessageOfTheDay() {
+        return messageOfTheDay;
+    }
+
+    public void setMessageOfTheDay(String messageOfTheDay) {
+        logger.info("Server: new message: " + messageOfTheDay);
+        this.messageOfTheDay = messageOfTheDay;
+        this.notifyClients();
+    }
+
+    public void register(Client c) {
+        this.clients.add(c);
+    }
+
+    public void unregister(Client c) {
+        this.clients.remove(c);
+    }
+
+    protected void notifyClients() {
+        java.util.Iterator it = this.clients.iterator();
+        Client currentClient;
+
+        while (it.hasNext()) {
+            currentClient = (Client) it.next();
+            try {
+                currentClient.messageChanged(this.messageOfTheDay);
+            } catch (Exception t) {
+                it.remove();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        ProActiveConfiguration.load();
+        try {
+            // Creates an active object for the server
+            Server theServer = (Server) org.objectweb.proactive.ProActive.newActive(Server.class.getName(),
+                    new Object[] { "This is the first message" });
+
+            //Server theServer = (Server) org.objectweb.proactive.ProActive.newActive(Server.class.getName(), null, null);
+            // Binds the server to a specific URL
+            org.objectweb.proactive.ProActive.register(theServer, "///theServer");
+
+            System.out.println("Server is ready.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

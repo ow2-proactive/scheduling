@@ -1,9 +1,10 @@
 package modelisation.time;
 
+
 /**
  * @author fhuet
  *
- * 
+ *
  *
  */
 public class TimeForwarder {
@@ -23,19 +24,18 @@ public class TimeForwarder {
     }
 
     public double evaluate() {
-        double N1 = (lambda + delta) * (lambda + nu) - gamma * nu;
-        double N2 = (lambda + delta) * (lambda + nu) - 
-                    gamma * (nu + lambda + delta);
+        double N1 = ((lambda + delta) * (lambda + nu)) - (gamma * nu);
+        double N2 = ((lambda + delta) * (lambda + nu)) -
+            (gamma * (nu + lambda + delta));
         double N3 = (lambda + delta) * (lambda + nu + delta);
         double N4 = delta * N2;
-        double N5 = (lambda + delta) * (lambda + nu) * (lambda * (lambda + nu) + 
-                    nu * (gamma + nu)) + delta * gamma * nu * lambda;
+        double N5 = ((lambda + delta) * (lambda + nu) * ((lambda * (lambda +
+            nu)) + (nu * (gamma + nu)))) + (delta * gamma * nu * lambda);
         double N6 = lambda * (lambda + nu) * (gamma + nu) * N2;
-        double ell = (-(nu + delta - gamma) + 
-                     Math.sqrt(Math.pow((nu + delta + gamma), 2) - 
-                                   4 * nu * delta)) / 2;
-        double TP0 = (ell + nu + delta) / (delta * ell) + 1 / gamma;
-        double T = N1 / N2 * TP0 - N3 / N4 - N5 / N6;
+        double ell = (-((nu + delta) - gamma) +
+            Math.sqrt(Math.pow((nu + delta + gamma), 2) - (4 * nu * delta))) / 2;
+        double TP0 = ((ell + nu + delta) / (delta * ell)) + (1 / gamma);
+        double T = (N1 / N2 * TP0) - (N3 / N4) - (N5 / N6);
         return T * 1000;
     }
 
@@ -104,10 +104,9 @@ public class TimeForwarder {
     }
 
     public static void main(String[] args) {
-        TimeForwarder tf = new TimeForwarder(Double.parseDouble(args[0]), 
-                                             Double.parseDouble(args[1]), 
-                                             Double.parseDouble(args[2]), 
-                                             Double.parseDouble(args[3]));
+        TimeForwarder tf = new TimeForwarder(Double.parseDouble(args[0]),
+                Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+                Double.parseDouble(args[3]));
         System.out.println(tf.evaluate());
     }
 }

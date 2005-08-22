@@ -126,9 +126,9 @@ public class TestNodes extends FunctionalTest {
     public void endTest() throws Exception {
         //killNodes();
     }
-    
+
     public void uponEndOfGroupOfTests() throws Exception {
-    	killNodes();
+        killNodes();
     }
 
     public static void killNodes() throws ProActiveException {

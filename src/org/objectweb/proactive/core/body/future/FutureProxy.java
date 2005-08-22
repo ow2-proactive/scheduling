@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.future;
 
 import java.lang.reflect.InvocationTargetException;
@@ -132,7 +132,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * registered
      */
     private ExceptionMaskLevel exceptionLevel;
-    
+
     /**
      * Get NFE logger
      */
@@ -143,7 +143,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Can be set with the property proactive.future.maxdelay
      */
     protected static long futureMaxDelay = -1;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -176,7 +176,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * <code>false</code> if <code>obj</code> is not a future object.
      */
     public static boolean isAwaited(Object obj) {
-    	return ProActive.isAwaited(obj);
+        return ProActive.isAwaited(obj);
     }
 
     public synchronized static FutureProxy getFutureProxy() {
@@ -258,13 +258,13 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * @return true iff the future has arrived.
      */
     public boolean isAvailable() {
-    	return target != null;
+        return target != null;
     }
-    
+
     public FutureResult getFutureResult() {
         return target;
     }
-    
+
     /**
      * Returns the result this future is for. The method blocks until the future is available
      * @return the result of this future object once available.
@@ -289,48 +289,49 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     /**
      * Blocks the calling thread until the future object is available.
      */
-/*    public synchronized void waitFor() {
-        if (isAvailable()) {
-            return;
-        }
 
-        UniqueID id = null;
+    /*    public synchronized void waitFor() {
+       if (isAvailable()) {
+           return;
+       }
+       UniqueID id = null;
+       // send WAIT_BY_NECESSITY event to listeners if there are any
+       if (futureEventProducer != null) {
+           id = ProActive.getBodyOnThis().getID();
+           if (LocalBodyStore.getInstance().getLocalBody(id) != null) {
+               // send event only if ActiveObject, not for HalfBodies
+               futureEventProducer.notifyListeners(id, getCreatorID(),
+                   FutureEvent.WAIT_BY_NECESSITY);
+           } else {
+               id = null;
+           }
+       }
+       while (!isAvailable()) {
+           try {
+               this.wait();
+           } catch (InterruptedException e) {
+           }
+       }
+       // send RECEIVED_FUTURE_RESULT event to listeners if there are any
+       if (id != null) {
+           futureEventProducer.notifyListeners(id, getCreatorID(),
+               FutureEvent.RECEIVED_FUTURE_RESULT);
+       }
+       }
+     */
 
-        // send WAIT_BY_NECESSITY event to listeners if there are any
-        if (futureEventProducer != null) {
-            id = ProActive.getBodyOnThis().getID();
-            if (LocalBodyStore.getInstance().getLocalBody(id) != null) {
-                // send event only if ActiveObject, not for HalfBodies
-                futureEventProducer.notifyListeners(id, getCreatorID(),
-                    FutureEvent.WAIT_BY_NECESSITY);
-            } else {
-                id = null;
-            }
-        }
-        while (!isAvailable()) {
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-            }
-        }
-
-        // send RECEIVED_FUTURE_RESULT event to listeners if there are any
-        if (id != null) {
-            futureEventProducer.notifyListeners(id, getCreatorID(),
-                FutureEvent.RECEIVED_FUTURE_RESULT);
-        }
-    }
-*/
-    
     /**
      * Blocks the calling thread until the future object is available.
-     */ 
+     */
     public synchronized void waitFor() {
         if (futureMaxDelay == -1) {
+
             /* First time, hopefully the configuration file has been read */
             try {
-                futureMaxDelay = Long.parseLong(System.getProperty("proactive.future.maxdelay"));
+                futureMaxDelay = Long.parseLong(System.getProperty(
+                            "proactive.future.maxdelay"));
             } catch (IllegalArgumentException iea) {
+
                 /* The property is not set, that's not a problem */
                 futureMaxDelay = 0;
             }
@@ -339,8 +340,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         try {
             waitFor(futureMaxDelay);
         } catch (ProActiveException e) {
-        	NonFunctionalException nfe = new FutureTimeoutException("Exception after waiting for " + futureMaxDelay + "ms", e);
-            
+            NonFunctionalException nfe = new FutureTimeoutException(
+                    "Exception after waiting for " + futureMaxDelay + "ms", e);
+
             /* TODO: mettre une NFE a la place */
             target = new FutureResult(null, e, null);
             notifyAll();
@@ -448,25 +450,26 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         // The object is available, but it may be a NFE that signal a service exception
         //System.out.println("GET FUTURE");
+
         /*if (this.isNFE) {
-            System.out.println("GET NFE");
-            Handler handler = ProActive.searchExceptionHandler((NonFunctionalException) this.target,
-                    this);
-            handler.handle((NonFunctionalException) this.target, c);
-            //throw ((InvocationTargetException) this.target);
-        }*/
+           System.out.println("GET NFE");
+           Handler handler = ProActive.searchExceptionHandler((NonFunctionalException) this.target,
+                   this);
+           handler.handle((NonFunctionalException) this.target, c);
+           //throw ((InvocationTargetException) this.target);
+           }*/
 
         // Now that the object is available, execute the call
         Object resultObject = target.getResult();
         try {
-        	result = c.execute(resultObject);
+            result = c.execute(resultObject);
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(
-                    "FutureProxy: Illegal arguments in call " + c.getName());
+                "FutureProxy: Illegal arguments in call " + c.getName());
         }
 
         // If target of this future is another future, make a shortcut !
-       if (resultObject instanceof StubObject) {
+        if (resultObject instanceof StubObject) {
             Proxy p = ((StubObject) resultObject).getProxy();
             if (p instanceof FutureProxy) {
                 target = ((FutureProxy) p).target;
@@ -476,61 +479,60 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         return result;
     }
 
-//    /**
-//     * Get information about the handlerizable object
-//     * @return information about the handlerizable object
-//     */
-//    public String getHandlerizableInfo() throws java.io.IOException {
-//        return "FUTURE (ID=" + this.ID + ") of CLASS [" + this.getClass() +
-//        "]";
-//    }
-//
-//    /** Give a reference to a local map of handlers
-//    * @return A reference to a map of handlers
-//    */
-//    public HashMap getHandlersLevel() throws java.io.IOException {
-//        return futureLevel;
-//    }
-//
-//    /**
-//         * Clear the local map of handlers
-//         */
-//    public void clearHandlersLevel() throws java.io.IOException {
-//        futureLevel.clear();
-//    }
-//
-//    /** Set a new handler within the table of the Handlerizable Object
-//         * @param handler A handler associated with a class of non functional exception.
-//         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//         */
-//    public void setExceptionHandler(Handler handler, Class exception)
-//        throws java.io.IOException {
-//        // add handler to future level
-//        if (futureLevel == null) {
-//            futureLevel = new HashMap();
-//        }
-//        futureLevel.put(exception, handler);
-//    }
-//
-//    /** Remove a handler from the table of the Handlerizable Object
-//         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//         * @return The removed handler or null
-//         */
-//    public Handler unsetExceptionHandler(Class exception)
-//        throws java.io.IOException {
-//        // remove handler from future level
-//        if (futureLevel != null) {
-//            Handler handler = (Handler) futureLevel.remove(exception);
-//            return handler;
-//        } else {
-//            if (logger.isDebugEnabled()) {
-//                logger.debug("[NFE_WARNING] No handler for [" +
-//                    exception.getName() + "] can be removed from FUTURE level");
-//            }
-//            return null;
-//        }
-//    }
-
+    //    /**
+    //     * Get information about the handlerizable object
+    //     * @return information about the handlerizable object
+    //     */
+    //    public String getHandlerizableInfo() throws java.io.IOException {
+    //        return "FUTURE (ID=" + this.ID + ") of CLASS [" + this.getClass() +
+    //        "]";
+    //    }
+    //
+    //    /** Give a reference to a local map of handlers
+    //    * @return A reference to a map of handlers
+    //    */
+    //    public HashMap getHandlersLevel() throws java.io.IOException {
+    //        return futureLevel;
+    //    }
+    //
+    //    /**
+    //         * Clear the local map of handlers
+    //         */
+    //    public void clearHandlersLevel() throws java.io.IOException {
+    //        futureLevel.clear();
+    //    }
+    //
+    //    /** Set a new handler within the table of the Handlerizable Object
+    //         * @param handler A handler associated with a class of non functional exception.
+    //         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+    //         */
+    //    public void setExceptionHandler(Handler handler, Class exception)
+    //        throws java.io.IOException {
+    //        // add handler to future level
+    //        if (futureLevel == null) {
+    //            futureLevel = new HashMap();
+    //        }
+    //        futureLevel.put(exception, handler);
+    //    }
+    //
+    //    /** Remove a handler from the table of the Handlerizable Object
+    //         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+    //         * @return The removed handler or null
+    //         */
+    //    public Handler unsetExceptionHandler(Class exception)
+    //        throws java.io.IOException {
+    //        // remove handler from future level
+    //        if (futureLevel != null) {
+    //            Handler handler = (Handler) futureLevel.remove(exception);
+    //            return handler;
+    //        } else {
+    //            if (logger.isDebugEnabled()) {
+    //                logger.debug("[NFE_WARNING] No handler for [" +
+    //                    exception.getName() + "] can be removed from FUTURE level");
+    //            }
+    //            return null;
+    //        }
+    //    }
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //

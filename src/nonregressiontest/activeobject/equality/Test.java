@@ -3,13 +3,12 @@
  */
 package nonregressiontest.activeobject.equality;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
-import nonregressiontest.group.A;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import nonregressiontest.group.A;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
@@ -20,7 +19,7 @@ import testsuite.test.FunctionalTest;
  * - active object creation
  * - lookupactive
  * - groups
- * 
+ *
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
@@ -31,10 +30,10 @@ public class Test extends FunctionalTest {
     private A a2 = null;
     private nonregressiontest.activeobject.lookupactive.A registeredA1 = null;
     private nonregressiontest.activeobject.lookupactive.A registeredA2 = null;
-    
 
     public Test() {
-        super("comparisons with active objects using equals", "compares active objects, groups and standard objects using with the equals method");
+        super("comparisons with active objects using equals",
+            "compares active objects, groups and standard objects using with the equals method");
     }
 
     public void action() throws Exception {
@@ -46,11 +45,13 @@ public class Test extends FunctionalTest {
         group1 = (A) ProActiveGroup.newGroup(A.class.getName());
         group2 = (A) ProActiveGroup.newGroup(A.class.getName());
         group3 = (A) ProActiveGroup.newGroup(A.class.getName());
-        
-        registeredA1 = (nonregressiontest.activeobject.lookupactive.A)ProActive.newActive(nonregressiontest.activeobject.lookupactive.A.class.getName(), new Object[] { "toto" });
+
+        registeredA1 = (nonregressiontest.activeobject.lookupactive.A) ProActive.newActive(nonregressiontest.activeobject.lookupactive.A.class.getName(),
+                new Object[] { "toto" });
         Thread.sleep(5000);
-        registeredA2 = (nonregressiontest.activeobject.lookupactive.A) ProActive.lookupActive(nonregressiontest.activeobject.lookupactive.A.class.getName(), UrlBuilder.buildUrlFromProperties("localhost","A"));
-        
+        registeredA2 = (nonregressiontest.activeobject.lookupactive.A) ProActive.lookupActive(nonregressiontest.activeobject.lookupactive.A.class.getName(),
+                UrlBuilder.buildUrlFromProperties("localhost", "A"));
+
         ProActiveGroup.getGroup(group1).add(a1);
         ProActiveGroup.getGroup(group1).add(a2);
 
@@ -58,7 +59,6 @@ public class Test extends FunctionalTest {
         ProActiveGroup.getGroup(group2).add(a2);
 
         ProActiveGroup.getGroup(group3).add(a1);
-        
     }
 
     public void initTest() throws Exception {
@@ -79,7 +79,7 @@ public class Test extends FunctionalTest {
         Assertions.assertNonEquals(a1, group3);
         Assertions.assertNonEquals(group3, a1);
         Assertions.assertEquals(registeredA1, registeredA2);
-        
+
         return true;
     }
 }

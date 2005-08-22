@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.model;
 
-import org.objectweb.fractal.gui.model.ConfigurationNotifier;
-
 import java.util.Iterator;
+
+import org.objectweb.fractal.gui.model.ConfigurationNotifier;
 
 
 /**

@@ -3,14 +3,13 @@
  */
 package nonregressiontest.group.exception;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
-import nonregressiontest.group.A;
-
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
+
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import nonregressiontest.group.A;
 
 import testsuite.test.FunctionalTest;
 
@@ -28,17 +27,17 @@ public class Test extends FunctionalTest {
     }
 
     public void action() throws Exception {
-		Object[][] params = {
-			{ "Agent0" },
-			{ "Agent1" },
-			{ "Agent2" }
-		};
-		Node[] nodes = {
-			TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-			TestNodes.getRemoteVMNode()
-		};
-		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
-				params, nodes);
+        Object[][] params = {
+                { "Agent0" },
+                { "Agent1" },
+                { "Agent2" }
+            };
+        Node[] nodes = {
+                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
+                TestNodes.getRemoteVMNode()
+            };
+        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+                params, nodes);
 
         this.resultTypedGroup = this.typedGroup.asynchronousCallException();
     }
@@ -83,7 +82,8 @@ public class Test extends FunctionalTest {
         // has the ExceptionListException the correct size ?
         ExceptionListException el = groupOfResult.getExceptionList();
         if (el.size() != groupOfResult.size()) {
-            System.err.println("the ExceptionListException hasn't the right size");
+            System.err.println(
+                "the ExceptionListException hasn't the right size");
             return false;
         }
 

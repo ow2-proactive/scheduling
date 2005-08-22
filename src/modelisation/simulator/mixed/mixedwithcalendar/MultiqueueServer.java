@@ -1,12 +1,11 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
-import modelisation.simulator.common.Averagator;
-
 import org.apache.log4j.Logger;
+
+import modelisation.simulator.common.Averagator;
 
 
 public class MultiqueueServer extends Server {
-
     static Logger logger = Logger.getLogger(MultiqueueServer.class.getName());
     protected RequestQueue[] requestQueueArray;
     protected int[] currentLocation;
@@ -37,8 +36,8 @@ public class MultiqueueServer extends Server {
     }
 
     public void notifyEvent(String description) {
-        this.timeNextEvent = this.remainingTime + 
-                             this.simulator.getCurrentTime();
+        this.timeNextEvent = this.remainingTime +
+            this.simulator.getCurrentTime();
         this.simulator.addEvent(new Event(this.timeNextEvent, this, description));
     }
 
@@ -51,8 +50,9 @@ public class MultiqueueServer extends Server {
             logger.debug("Server.receiveRequestFromAgent " + id);
         }
 
-        Request r = new Request(Request.AGENT, number, id, 
-                                this.simulator.getCurrentTime());
+        Request r = new Request(Request.AGENT, number, id,
+                this.simulator.getCurrentTime());
+
         //        if (id == 0 ) {
         r.setCreationTime(this.simulator.getCurrentTime());
         //             if (log) {
@@ -80,9 +80,8 @@ public class MultiqueueServer extends Server {
         if (logger.isDebugEnabled()) {
             logger.debug("Server.receiveRequestFromForwarder " + id);
         }
-        this.requestQueueArray[id].addRequest(new Request(Request.AGENT, number, 
-                                                          id, 
-                                                          this.simulator.getCurrentTime()));
+        this.requestQueueArray[id].addRequest(new Request(Request.AGENT,
+                number, id, this.simulator.getCurrentTime()));
         this.requestReceived(id);
     }
 
@@ -94,8 +93,8 @@ public class MultiqueueServer extends Server {
         if (logger.isDebugEnabled()) {
             logger.debug("Server.receiveRequestFromSource " + id);
         }
-        this.requestQueueArray[id].addRequest(new Request(Request.SOURCE, 0, id, 
-                                                          this.simulator.getCurrentTime()));
+        this.requestQueueArray[id].addRequest(new Request(Request.SOURCE, 0,
+                id, this.simulator.getCurrentTime()));
         this.requestReceived(id);
     }
 
@@ -126,12 +125,11 @@ public class MultiqueueServer extends Server {
             this.remainingTime = simulator.generateServiceTimeMu1();
             this.notifyEvent("Serving Agent");
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                        "Server.serveNextRequest will last " + 
-                        this.remainingTime);
-                logger.debug(
-                        "getNextRequestQueueFifo: the request waited " + 
-                        (this.simulator.getCurrentTime() - this.currentRequest.getCreationTime()));
+                logger.debug("Server.serveNextRequest will last " +
+                    this.remainingTime);
+                logger.debug("getNextRequestQueueFifo: the request waited " +
+                    (this.simulator.getCurrentTime() -
+                    this.currentRequest.getCreationTime()));
             }
             this.averagatorMu1.add(this.remainingTime);
         } else {
@@ -141,8 +139,8 @@ public class MultiqueueServer extends Server {
             this.notifyEvent("Serving Source");
             this.averagatorMu2.add(this.remainingTime);
             if (currentRequest.getSenderID() == 0) {
-                this.averagatorWaitTimeSource0.add(
-                        startTime - this.currentRequest.getCreationTime());
+                this.averagatorWaitTimeSource0.add(startTime -
+                    this.currentRequest.getCreationTime());
             }
         }
         this.averagatorUtilisation.add(this.remainingTime);
@@ -157,7 +155,6 @@ public class MultiqueueServer extends Server {
     }
 
     protected RequestQueue getNextRequestQueueCyclic() {
-
         int index = 0;
         for (int i = 0; i < this.requestQueueArray.length; i++) {
             index = (i + currentRequestQueueNumber) % this.requestQueueArray.length;
@@ -170,16 +167,16 @@ public class MultiqueueServer extends Server {
     }
 
     protected RequestQueue getNextRequestQueueOlderFirst() {
-
         double tmp = this.requestQueueArray[0].getYoungestCreationTime();
         int index = 0;
         for (int i = 1; i < this.requestQueueArray.length; i++) {
             if (!this.requestQueueArray[i].isEmpty()) {
-                if (tmp == 0 || 
-                    this.requestQueueArray[i].getYoungestCreationTime() < tmp) {
+                if ((tmp == 0) ||
+                        (this.requestQueueArray[i].getYoungestCreationTime() < tmp)) {
                     tmp = this.requestQueueArray[i].getYoungestCreationTime();
                     index = i;
                 }
+
                 //            this.requestQueueArray[i];
             }
         }
@@ -188,7 +185,6 @@ public class MultiqueueServer extends Server {
     }
 
     public int getNonEmptyQueueNumber() {
-
         int tmp = 0;
         for (int i = 0; i < this.requestQueueArray.length; i++) {
             if (!this.requestQueueArray[i].isEmpty()) {
@@ -207,27 +203,24 @@ public class MultiqueueServer extends Server {
                     logger.debug("MultiqueueServer: end of service for agent ");
                 }
                 if (this.currentRequest.getCreationTime() > 0) {
-                    this.averagatorMuForAgent[this.currentRequest.getSenderID()].add(
-                            endTime - this.currentRequest.getCreationTime() - 
-                            this.currentRequest.timeToSubstract);
+                    this.averagatorMuForAgent[this.currentRequest.getSenderID()].add(endTime -
+                        this.currentRequest.getCreationTime() -
+                        this.currentRequest.timeToSubstract);
                     if (logger.isDebugEnabled()) {
                         logger.debug(
-                                "MultiqueueServer: end of service for agent " + 
-                                this.currentRequest.getSenderID() + 
-                                " lasted " + 
-                                (endTime - this.currentRequest.getCreationTime() - 
-                                    this.currentRequest.timeToSubstract));
-                        logger.debug(
-                                "MultiqueueServer: known location " + 
-                                this.currentLocation[this.currentRequest.getSenderID()]);
+                            "MultiqueueServer: end of service for agent " +
+                            this.currentRequest.getSenderID() + " lasted " +
+                            (endTime - this.currentRequest.getCreationTime() -
+                            this.currentRequest.timeToSubstract));
+                        logger.debug("MultiqueueServer: known location " +
+                            this.currentLocation[this.currentRequest.getSenderID()]);
                     }
                 }
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Server: ignoring request from agent");
-                    logger.debug(
-                            "CurrentLocation " + currentLocation + " new " + 
-                            this.currentRequest.getNumber());
+                    logger.debug("CurrentLocation " + currentLocation +
+                        " new " + this.currentRequest.getNumber());
                 }
             }
             this.stateAfterService();
@@ -235,15 +228,15 @@ public class MultiqueueServer extends Server {
             if (this.requestQueueArray[this.currentRequest.getSenderID()].hasRequestFromAgent()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug(
-                            "Server.endOfService puting request in the queue");
+                        "Server.endOfService puting request in the queue");
                 }
-                this.requestQueueArray[this.currentRequest.getSenderID()].addRequest(
-                        this.currentRequest);
+                this.requestQueueArray[this.currentRequest.getSenderID()].addRequest(this.currentRequest);
                 this.stateAfterService();
             } else {
                 this.sendReply();
             }
         }
+
         //               this.averagatorActiveQueue.add(this.getNonEmptyQueueNumber());
     }
 
@@ -262,20 +255,18 @@ public class MultiqueueServer extends Server {
 
     public void endOfSendReply(double endTime) {
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "SelectiveServer: time microtimer = " + 
-                    (endTime - startTime) * 1000 + " for method " + 
-                    "searchObject");
-            logger.debug(
-                    "MultiqueueServer: last known position " + 
-                    this.currentLocation[this.currentRequest.getSenderID()]);
+            logger.debug("SelectiveServer: time microtimer = " +
+                ((endTime - startTime) * 1000) + " for method " +
+                "searchObject");
+            logger.debug("MultiqueueServer: last known position " +
+                this.currentLocation[this.currentRequest.getSenderID()]);
         }
+
         //        this.state = stateAfterService();
         //        if (this.state == IDL_REQUEST) {
         //            this.serveNextRequest(endTime);
         //        }
-        this.sourceArray[this.currentRequest.getSenderID()].receiveReplyFromServer(
-                this.currentLocation[this.currentRequest.getSenderID()]);
+        this.sourceArray[this.currentRequest.getSenderID()].receiveReplyFromServer(this.currentLocation[this.currentRequest.getSenderID()]);
         this.stateAfterService();
     }
 
@@ -287,6 +278,7 @@ public class MultiqueueServer extends Server {
             this.remainingTime = 0;
             this.notifyEvent("IDLE");
         }
+
         //        this.simulator.log("AQ " + this.getNonEmptyQueueNumber());
         //        this.averagatorActiveQueue.add(this.getNonEmptyQueueNumber());
     }
@@ -294,19 +286,16 @@ public class MultiqueueServer extends Server {
     public void end() {
         super.end();
         if (logger.isInfoEnabled()) {
-            logger.info(
-                    "* active queues " + 
-                    this.averagatorActiveQueue.average());
+            logger.info("* active queues " +
+                this.averagatorActiveQueue.average());
             for (int i = 0; i < this.averagatorMuForAgent.length; i++) {
-                logger.info(
-                        "* mu for agent " + i + "  = " + 
-                        1000 / this.averagatorMuForAgent[i].average() + " " + 
-                        this.averagatorMuForAgent[i].getCount());
+                logger.info("* mu for agent " + i + "  = " +
+                    (1000 / this.averagatorMuForAgent[i].average()) + " " +
+                    this.averagatorMuForAgent[i].getCount());
             }
             for (int i = 0; i < this.averagatorMuForAgent.length; i++) {
-                logger.info(
-                        "* arrival rate " + i + " " + 
-                        this.averagatorArrivalRate[i].getCount() / this.simulator.getCurrentTime() * 1000);
+                logger.info("* arrival rate " + i + " " +
+                    (this.averagatorArrivalRate[i].getCount() / this.simulator.getCurrentTime() * 1000));
             }
         }
     }
@@ -319,22 +308,23 @@ public class MultiqueueServer extends Server {
         //        }
         // if (this.remainingTime == 0) {
         switch (this.state) {
-            case IDLE:
-                if (getNonEmptyQueueNumber() == 0) {
-                    this.remainingTime = Double.MAX_VALUE;
-                    //   this.notifyEvent();
-                } else {
-                    this.serveNextRequest(time);
-                }
-                break;
-            case SERVING_SOURCE:
-            case SERVING_AGENT:
-                this.endOfService(time);
-                break;
-            case SENDING_REPLY:
-                this.endOfSendReply(time);
-                break;
+        case IDLE:
+            if (getNonEmptyQueueNumber() == 0) {
+                this.remainingTime = Double.MAX_VALUE;
+                //   this.notifyEvent();
+            } else {
+                this.serveNextRequest(time);
+            }
+            break;
+        case SERVING_SOURCE:
+        case SERVING_AGENT:
+            this.endOfService(time);
+            break;
+        case SENDING_REPLY:
+            this.endOfSendReply(time);
+            break;
         }
+
         // }
     }
 }

@@ -78,8 +78,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
 
     //indicates that this panel should be completely redrawn
     private boolean dirty;
-    
-  
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -105,8 +104,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         this.parentFrame = parentDataObjectPanel.parentFrame;
         this.defaultFont = parentDataObjectPanel.defaultFont;
         //controller.log("AbstractDataObjectPanel "+name+":"+type+" created");
-      
-			
     }
 
     private AbstractDataObjectPanel(String name, String type) {
@@ -149,13 +146,13 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
     public boolean isDestroyed() {
         return isDestroyed;
     }
-    
+
     public void setDirty(boolean t) {
-    	this.dirty=t;
+        this.dirty = t;
     }
-    
+
     public boolean isDirty() {
-    	return dirty;
+        return dirty;
     }
 
     //
@@ -297,17 +294,16 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         }
         return panel;
     }
-    
+
     public void revalidate() {
-       //just in case we want to introduce some finer behaviour here
-      super.revalidate();
-    }
- 
-    public void repaint() {
         //just in case we want to introduce some finer behaviour here
-    	super.repaint();
+        super.revalidate();
     }
 
+    public void repaint() {
+        //just in case we want to introduce some finer behaviour here
+        super.repaint();
+    }
 
     /**
      * get Child

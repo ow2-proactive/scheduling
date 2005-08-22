@@ -1,11 +1,10 @@
 package modelisation.simulator.mixed;
 
+import org.apache.log4j.Logger;
+
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
 import modelisation.statistics.RandomNumberGenerator;
-
-import org.apache.log4j.Logger;
 
 
 public class Source extends SimulatorElement {

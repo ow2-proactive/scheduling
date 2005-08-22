@@ -11,6 +11,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
+
 /**
  *
  *
@@ -39,9 +40,10 @@ public class MiniDescr {
             Object[] param = null;
 
             for (int i = 0; i < nodes.length; i++) {
-            	MiniDescrActive desc = (MiniDescrActive)ProActive.newActive(MiniDescrActive.class.getName(), param, nodes[i]); 
-            	Message msg = desc.getComputerInfo();
-            	logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
+                MiniDescrActive desc = (MiniDescrActive) ProActive.newActive(MiniDescrActive.class.getName(),
+                        param, nodes[i]);
+                Message msg = desc.getComputerInfo();
+                logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
             }
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -52,11 +54,10 @@ public class MiniDescr {
         virtualnode.killAll(false);
     }
 
-
     public static void main(String[] args) throws IOException {
-    	System.out.println("mini descriptor example");
-    	new MiniDescr("descriptors/examples/minidescriptor.xml");
-    
-    	System.exit(0);
+        System.out.println("mini descriptor example");
+        new MiniDescr("descriptors/examples/minidescriptor.xml");
+
+        System.exit(0);
     }
 }

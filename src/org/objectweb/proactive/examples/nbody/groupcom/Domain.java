@@ -1,35 +1,34 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.nbody.groupcom;
-
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -45,123 +44,128 @@ import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
+
 /**
  * Domains encapsulate one Planet, do their calculations, communicates with a Group, and synchronized by a master.
  */
-public class Domain implements Serializable{
-    
+public class Domain implements Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    
-    private int identification;					// unique domain identifier
-    private Domain neighbours;					// The Group containing all the other Domains
-    private String hostName = "unknown";		// to display on which host we're running
-    
-    private Maestro maestro;					// the master for synchronization
-    private Displayer display;					// If we want some graphical interface
-    
-    Planet info;								// the body information
-    private Planet [] values; 					// list of all the bodies sent by the other domains
-    private int nbvalues, nbReceived=0;			// iteration related variables, counting the "pings"
+    private int identification; // unique domain identifier
+    private Domain neighbours; // The Group containing all the other Domains
+    private String hostName = "unknown"; // to display on which host we're running
+    private Maestro maestro; // the master for synchronization
+    private Displayer display; // If we want some graphical interface
+    Planet info; // the body information
+    private Planet[] values; // list of all the bodies sent by the other domains
+    private int nbvalues; // iteration related variables, counting the "pings"
+    private int nbReceived = 0; // iteration related variables, counting the "pings"
     private org.objectweb.proactive.examples.nbody.common.Start killsupport;
-    
+
     /**
      * Required by ProActive Active Objects
      */
-    public Domain (){}
-    
+    public Domain() {
+    }
+
     /**
      * Constructor
      * @param i the unique identifier
      * @param planet the Planet which is inside this Domain
      */
-    public Domain (Integer i, Planet planet, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public Domain(Integer i, Planet planet,
+        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         identification = i.intValue();
         info = planet;
-        try { this.hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {  e.printStackTrace();  }
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
-    
+
     /**
-     * Sets some execution-time related variables. 
+     * Sets some execution-time related variables.
      * @param domainGroup all the other Domains.
      * @param dp The Displayer used to show on screen the movement of the objects.
-     * @param master Maestro used to synchronize the computations. 
+     * @param master Maestro used to synchronize the computations.
      */
     public void init(Domain domainGroup, Displayer dp, Maestro master) {
         this.neighbours = domainGroup;
         Group g = ProActiveGroup.getGroup(neighbours);
-        g.remove(ProActive.getStubOnThis()); 				// no need to send information to self
-        this.nbvalues = g.size();							// number of expected values to receive.
-        this.values = new Planet [nbvalues + 1] ; 			// leave empty slot for self
-        this.display=dp;
+        g.remove(ProActive.getStubOnThis()); // no need to send information to self
+        this.nbvalues = g.size(); // number of expected values to receive.
+        this.values = new Planet[nbvalues + 1]; // leave empty slot for self
+        this.display = dp;
         this.maestro = master;
     }
-    
+
     /**
      * Reset iteration-related variables
      *
      */
-    public void clearValues(){
-        this.nbReceived = 0 ;
-    } 
-    
+    public void clearValues() {
+        this.nbReceived = 0;
+    }
+
     /**
-     * Move the Planet contained, applying the force computed. 
+     * Move the Planet contained, applying the force computed.
      */
     public void moveBody() {
         // logger.info("Domain " + identification + " starting mvt computation");
-        Force force = new Force();  
-        for (int i = 0 ; i < values.length ; i++) {
+        Force force = new Force();
+        for (int i = 0; i < values.length; i++) {
             force.add(info, values[i]); // adds the interaction of the distant body 
         }
         this.info.moveWithForce(force);
         clearValues();
     }
-    
-    
+
     /**
      * Called by a distant Domain, this method adds the inf contribution to the force applied on the local Planet
      * @param inf the distant Planet which adds its contribution.
      * @param id the identifier of this distant body.
      */
     public void setValue(Planet inf, int id) {
-        this.values [id] = inf;
-        this.nbReceived ++ ;
-        if (this.nbReceived > this.nbvalues)  // This is a bad sign!
-            this.killsupport.abort( new RuntimeException("Domain " + identification + " received too many answers"));
+        this.values[id] = inf;
+        this.nbReceived++;
+        if (this.nbReceived > this.nbvalues) { // This is a bad sign!
+            this.killsupport.abort(new RuntimeException("Domain " +
+                    identification + " received too many answers"));
+        }
         if (this.nbReceived == this.nbvalues) {
             this.maestro.notifyFinished();
             moveBody();
         }
     }
-    
+
     /**
      * Triggers the emission of the local Planet to all the other Domains.
      */
     public void sendValueToNeighbours() {
-        this.neighbours.setValue(info,identification);
-        if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
-            if (this.identification==0) 
+        this.neighbours.setValue(info, identification);
+        if (this.display == null) { // if no display, only the first Domain outputs message to say recompute is going on
+            if (this.identification == 0) {
                 logger.info("Compute movement.");
+            }
+        } else {
+            this.display.drawBody((int) this.info.x, (int) this.info.y,
+                (int) this.info.vx, (int) this.info.vy, (int) this.info.mass,
+                (int) this.info.diameter, this.identification, this.hostName);
         }
-        else 
-            this.display.drawBody((int)this.info.x, (int)this.info.y, (int)this.info.vx, (int)this.info.vy, 
-                    (int)this.info.mass, (int)this.info.diameter, this.identification, this.hostName);
     }
-    
+
     /**
      * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
      */
-    private void readObject(java.io.ObjectInputStream in) 
-    throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in)
+        throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         try {
             this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            hostName="unknown";
+            hostName = "unknown";
             e.printStackTrace();
         }
-        
     }
 }

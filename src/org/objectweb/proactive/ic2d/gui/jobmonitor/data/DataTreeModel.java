@@ -1,8 +1,9 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import javax.swing.tree.DefaultTreeModel;
+
 import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
 
-import javax.swing.tree.DefaultTreeModel;
 
 /*
  * The TreeModel is built on top of the DataAssociation and feeded with a JTree

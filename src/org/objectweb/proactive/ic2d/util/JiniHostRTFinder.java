@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.util;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 
 
@@ -62,7 +61,7 @@ public class JiniHostRTFinder implements HostRTFinder {
         //we guess here that the port is fixed in Jini implementation
         JiniRTListener RTlist = new JiniRTListener(host, logger);
         try {
-//          stay around long enough to receice replies
+            //          stay around long enough to receice replies
             Thread.sleep(10000L);
         } catch (java.lang.InterruptedException e) {
             // do nothing

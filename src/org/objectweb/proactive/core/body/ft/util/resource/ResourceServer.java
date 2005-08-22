@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.core.body.ft.util.resource;
 
-import org.objectweb.proactive.core.node.Node;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+
+import org.objectweb.proactive.core.node.Node;
 
 
 /**

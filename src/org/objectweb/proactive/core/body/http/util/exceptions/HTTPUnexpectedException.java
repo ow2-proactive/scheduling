@@ -28,7 +28,8 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.exceptions  ;
+package org.objectweb.proactive.core.body.http.util.exceptions;
+
 
 /**
  * @author sbeucler
@@ -36,12 +37,11 @@ package org.objectweb.proactive.core.body.http.util.exceptions  ;
  * @see java.rmi.UnexpectedException
  */
 public class HTTPUnexpectedException extends HTTPRemoteException {
-	public HTTPUnexpectedException(String s) {
-		super(s);
-	}
+    public HTTPUnexpectedException(String s) {
+        super(s);
+    }
 
-	public HTTPUnexpectedException(String s, Throwable ex) {
-		super(s, ex);
-	}
-
+    public HTTPUnexpectedException(String s, Throwable ex) {
+        super(s, ex);
+    }
 }

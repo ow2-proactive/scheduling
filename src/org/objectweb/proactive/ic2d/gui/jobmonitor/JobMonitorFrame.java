@@ -1,12 +1,8 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-
 import java.rmi.registry.Registry;
 
 import javax.swing.JFrame;
@@ -14,6 +10,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+
+import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 
 
 public class JobMonitorFrame extends JFrame {
@@ -44,7 +43,8 @@ public class JobMonitorFrame extends JFrame {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     String initialHostValue = "localhost";
                     try {
-                        initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())+":"+System.getProperty("proactive.rmi.port");
+                        initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
+                            ":" + System.getProperty("proactive.rmi.port");
                     } catch (java.net.UnknownHostException exc) {
                     }
                     Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,
@@ -155,15 +155,14 @@ public class JobMonitorFrame extends JFrame {
 
         return menuBar;
     }
-    
+
     public void setVisible(boolean b) {
         super.setVisible(b);
         if (b) {
             panel.showOwnedFrames();
-    	}
-    	else {
+        } else {
             panel.hideOwnedFrames();
-    	}
+        }
     }
 
     public JobMonitorPanel getPanel() {

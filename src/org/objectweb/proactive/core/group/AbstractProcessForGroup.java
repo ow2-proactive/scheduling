@@ -1,11 +1,11 @@
 package org.objectweb.proactive.core.group;
 
+import java.util.Vector;
+
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
-
-import java.util.Vector;
 
 
 public abstract class AbstractProcessForGroup {

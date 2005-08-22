@@ -1,11 +1,11 @@
 package modelisation.statistics;
 
-import org.apache.log4j.Logger;
 import java.lang.reflect.Constructor;
+
+import org.apache.log4j.Logger;
 
 
 public class RandomNumberFactory {
-	
     static Logger logger = Logger.getLogger(RandomNumberFactory.class.getName());
 
     protected static String getFactoryName(String variableName) {
@@ -20,10 +20,10 @@ public class RandomNumberFactory {
         RandomNumberGenerator tmp = null;
         String className = getFactoryName(variableName);
 
-		if (logger.isInfoEnabled()) {
-				   logger.info("variable : " + variableName +
-						   " factory : " + className);
-			   }
+        if (logger.isInfoEnabled()) {
+            logger.info("variable : " + variableName + " factory : " +
+                className);
+        }
 
         try {
             Class[] argsClass = new Class[] { String.class };

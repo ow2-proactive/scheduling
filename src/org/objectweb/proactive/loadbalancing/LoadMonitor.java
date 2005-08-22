@@ -28,7 +28,6 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.loadbalancing;
 
 import java.util.Random;
@@ -36,47 +35,44 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
 
+
 /**
  * This is the main class for Load Monitors, particular implementations
  * of monitors should inherite from it.  Like all monitors, it will create a thread which
  * calculates the load, sending it to the load balancer, and sleeping for a a while.
- * 
+ *
  * To minimize reaction time against overloading, this implementation will reduce the
  * sleeping time while the load is increasing, supposing load index between 0 and 1.
- * 
+ *
  * This class provides the  monitor behaviour, the load calculus has to be provided.
- * 
+ *
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
+public class LoadMonitor implements Runnable {
+    private static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
+    protected double load = 0;
+    protected LoadBalancer lb;
 
-public  class LoadMonitor implements Runnable{
-	private static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
-
-	protected double load=0;
-	protected LoadBalancer lb;
-	
-	protected synchronized void calculateLoad() {};
-	
-    public void run()
-    {
-    	Random r=new Random();
-    	int i = 0;
-       do
-        {
-        	calculateLoad();
+    protected synchronized void calculateLoad() {
+    }
+    ;
+    public void run() {
+        Random r = new Random();
+        int i = 0;
+        do {
+            calculateLoad();
             lb.register(load);
-            try
-            {
-            	double sl;
-            	sl = LoadBalancingConstants.UPDATE_TIME*r.nextDouble();
-            	if (load > 0) {
-            		sl = sl * (1-load);
-            		sl = sl + LoadBalancingConstants.MIGRATION_TIME;
-            	}
+            try {
+                double sl;
+                sl = LoadBalancingConstants.UPDATE_TIME * r.nextDouble();
+                if (load > 0) {
+                    sl = sl * (1 - load);
+                    sl = sl + LoadBalancingConstants.MIGRATION_TIME;
+                }
                 Thread.sleep(Math.round(sl));
+            } catch (InterruptedException interruptedexception) {
             }
-            catch(InterruptedException interruptedexception) { }
-        } while(true);
+        } while (true);
     }
 }

@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.descriptor.services;
 
-import org.apache.log4j.Logger;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -40,8 +41,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.util.Vector;
 
 
 /**
@@ -200,7 +199,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     public void setXmlPath(String xml_path) {
         System.setProperty(PROPERPY_XML_PATH, xml_path);
     }
-	
+
     /**
      * @param peerList
      */
@@ -224,5 +223,4 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     public P2PService getP2PService() {
         return this.serviceP2P;
     }
-
 }

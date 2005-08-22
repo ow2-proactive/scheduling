@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.ssh;
 
+
 /**
  *
  * @author mlacage
@@ -11,55 +12,54 @@ package org.objectweb.proactive.core.ssh;
 public class TryCache {
     private java.util.Hashtable _hash;
 
-    public TryCache () {
-    	_hash = new java.util.Hashtable ();
+    public TryCache() {
+        _hash = new java.util.Hashtable();
     }
 
-    private String getKey (String host, int port) {
-    	return host;
+    private String getKey(String host, int port) {
+        return host;
     }
 
-    public boolean everTried (String host, int port) {
-    	String key = getKey (host, port);
-    	Boolean bool = (Boolean) _hash.get (key);
-    	if (bool != null) {
-    		// already tried this connection once.
-    		return true;
-    	} else {
-    		// never tried before.
-    		return false;
-    	}
+    public boolean everTried(String host, int port) {
+        String key = getKey(host, port);
+        Boolean bool = (Boolean) _hash.get(key);
+        if (bool != null) {
+            // already tried this connection once.
+            return true;
+        } else {
+            // never tried before.
+            return false;
+        }
     }
 
     /**
      * Return true only if we need to try this
      * host/port pair.
      */
-    public boolean needToTry (String host, int port) {
-    	String key = getKey (host, port);
-    	Boolean bool = (Boolean) _hash.get (key);
-    	if (bool != null) {
-    		if (bool.booleanValue ()) {
-    			// tried with success before.
-    			return true;
-    		} else {
-    			// previous try failed.
-    			return false;
-    		}
-    	} else {
-    		// never tried before.
-    		return true;
-    	}
+    public boolean needToTry(String host, int port) {
+        String key = getKey(host, port);
+        Boolean bool = (Boolean) _hash.get(key);
+        if (bool != null) {
+            if (bool.booleanValue()) {
+                // tried with success before.
+                return true;
+            } else {
+                // previous try failed.
+                return false;
+            }
+        } else {
+            // never tried before.
+            return true;
+        }
     }
 
-    public void recordTrySuccess (String host, int port) {
-    	String key = getKey (host, port);
-    	_hash.put (key, new Boolean (true));
+    public void recordTrySuccess(String host, int port) {
+        String key = getKey(host, port);
+        _hash.put(key, new Boolean(true));
     }
 
-
-    public void recordTryFailure (String host, int port) {
-    	String key = getKey (host, port);
-    	_hash.put (key, new Boolean (false));
+    public void recordTryFailure(String host, int port) {
+        String key = getKey(host, port);
+        _hash.put(key, new Boolean(false));
     }
 }

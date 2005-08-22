@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.component.controller;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 
+
 public interface ProActiveController {
 
     /*
@@ -24,5 +25,4 @@ public interface ProActiveController {
      * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
     public abstract Type getFcItfType();
-
 }

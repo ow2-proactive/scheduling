@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.gui.components.dialog.model;
 
 import org.objectweb.fractal.gui.dialog.model.TextFieldModel;
 import org.objectweb.fractal.gui.model.Component;
-
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 
 
@@ -107,5 +106,4 @@ public class ProActiveTextFieldModel extends TextFieldModel {
         }
         componentTextChanged(s);
     }
-    
 }

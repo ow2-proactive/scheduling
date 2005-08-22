@@ -30,20 +30,17 @@
  */
 package testsuite.manager;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.xml.sax.SAXException;
 
 import testsuite.group.Group;
-
 import testsuite.result.AbstractResult;
 import testsuite.result.ResultsCollections;
-
 import testsuite.test.FunctionalTest;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 
 /**
@@ -115,7 +112,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.initGroup();
             } catch (Exception e) {
-                logger.warn("Cannot initialize group of tests: " + group.getName(), e);
+                logger.warn("Cannot initialize group of tests: " +
+                    group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
                     "Cannot initialize group of tests: " + group.getName(), e);
                 continue;
@@ -128,7 +126,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 while (itTest.hasNext()) {
                     FunctionalTest test = (FunctionalTest) itTest.next();
                     if (logger.isInfoEnabled()) {
-                        logger.info(" -------  Launching test: " + test.getName());
+                        logger.info(" -------  Launching test: " +
+                            test.getName());
                     }
                     AbstractResult result = test.runTest();
                     if (result != null) {
@@ -178,7 +177,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
                     logger.warn("Cannot initialize group of tests: " +
                         group.getName(), e);
                     resultsGroup.add(AbstractResult.ERROR,
-                        "Cannot initialize group of tests: " + group.getName(), e);
+                        "Cannot initialize group of tests: " + group.getName(),
+                        e);
                     continue;
                 }
 

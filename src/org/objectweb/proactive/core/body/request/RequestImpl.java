@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import org.apache.log4j.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+import java.security.cert.X509Certificate;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -49,12 +53,6 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import sun.rmi.server.MarshalInputStream;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-
-import java.security.cert.X509Certificate;
 
 
 public class RequestImpl extends MessageImpl implements Request,

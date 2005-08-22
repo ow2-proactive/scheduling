@@ -16,10 +16,9 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @author mlacage
  */
 public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
-//    private static RegistryHelper registryHelper = new RegistryHelper();
-//    private static ClassServerHelper classServerHelper = new ClassServerHelper();
-//    private static ProActiveRuntime defaultRmiRuntime = null;
-
+    //    private static RegistryHelper registryHelper = new RegistryHelper();
+    //    private static ClassServerHelper classServerHelper = new ClassServerHelper();
+    //    private static ProActiveRuntime defaultRmiRuntime = null;
     public SshRmiRuntimeFactory() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
@@ -28,20 +27,19 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
     }
 
     // return a Runtime object "skeleton" (ie: a server)
-//    protected ProActiveRuntime getProtocolSpecificRuntimeImpl()
-//        throws ProActiveException {
-//        if (defaultRmiRuntime == null) {
-//            try {
-//                registryHelper.initializeRegistry();
-//            } catch (java.rmi.RemoteException e) {
-//                e.printStackTrace();
-//            }
-//
-//            defaultRmiRuntime = createRuntimeAdapter();
-//        }
-//        return defaultRmiRuntime;
-//    }
-
+    //    protected ProActiveRuntime getProtocolSpecificRuntimeImpl()
+    //        throws ProActiveException {
+    //        if (defaultRmiRuntime == null) {
+    //            try {
+    //                registryHelper.initializeRegistry();
+    //            } catch (java.rmi.RemoteException e) {
+    //                e.printStackTrace();
+    //            }
+    //
+    //            defaultRmiRuntime = createRuntimeAdapter();
+    //        }
+    //        return defaultRmiRuntime;
+    //    }
     // return a Runtime object "stub" (ie: a client)
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {

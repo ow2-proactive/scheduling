@@ -1,13 +1,13 @@
 package org.objectweb.proactive.core.exceptions.manager;
 
-import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 
 public class ExceptionMaskLevel {

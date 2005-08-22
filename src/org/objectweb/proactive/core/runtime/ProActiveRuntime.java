@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
@@ -47,8 +48,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.util.ArrayList;
 
 
 /**

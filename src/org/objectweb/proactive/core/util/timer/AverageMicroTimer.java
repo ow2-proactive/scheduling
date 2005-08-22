@@ -1,6 +1,5 @@
 package org.objectweb.proactive.core.util.timer;
 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,15 +19,15 @@ public class AverageMicroTimer implements Timer, Serializable {
     protected int nbrValues;
 
     //the total time measured by this timer
-    protected  long total;
+    protected long total;
 
     //temporary counter used to measure time when pausing/resuming
-    protected  long currentElapsed;
+    protected long currentElapsed;
     transient protected MicroTimer timer = new MicroTimer();
 
     //used to check that start has been pressed prior to a stop
-    protected boolean running; 
-	
+    protected boolean running;
+
     public AverageMicroTimer() {
         this(AverageMicroTimer.class.getName());
     }
@@ -57,16 +56,16 @@ public class AverageMicroTimer implements Timer, Serializable {
      */
     public void stop() {
         //System.out.println("AverageMicroTimer.stop()");
-    	if (running) {
-    		  timer.stop();
-    	        currentElapsed += timer.getCumulatedTime();
-    	        this.total += currentElapsed;
-//    	        if (tmp >= 0) {
-    	            this.nbrValues++;
-//    	        }
-    	        currentElapsed = 0;
-    	        running = false;
-    	}      
+        if (running) {
+            timer.stop();
+            currentElapsed += timer.getCumulatedTime();
+            this.total += currentElapsed;
+            //    	        if (tmp >= 0) {
+            this.nbrValues++;
+            //    	        }
+            currentElapsed = 0;
+            running = false;
+        }
     }
 
     /**
@@ -97,7 +96,7 @@ public class AverageMicroTimer implements Timer, Serializable {
         for (int i = 0; i <= (ln + 16); i++) {
             tmp.append("-");
         }
-       System.out.println(tmp.append("\n").toString());
+        System.out.println(tmp.append("\n").toString());
     }
 
     public String toString() {
@@ -127,9 +126,9 @@ public class AverageMicroTimer implements Timer, Serializable {
         this.timer = new MicroTimer();
     }
 
-	public void reset() {
-	    this.currentElapsed=0;
-	    this.nbrValues=0;
-	    this.total=0;
-	}
+    public void reset() {
+        this.currentElapsed = 0;
+        this.nbrValues = 0;
+        this.total = 0;
+    }
 }

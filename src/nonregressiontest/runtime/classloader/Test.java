@@ -49,9 +49,9 @@ import testsuite.test.FunctionalTest;
  *  => the class A is asked to the initial deployment runtime
  * 2. B is created from A, and creates a remote object C on a place where C is not available.
  * => class C is asked to the runtime of A and B, which asks to the initial deployment runtime
- * 
+ *
  * There is no need to configure paths, as a deployment file with the correct paths is created on the fly
- * 
+ *
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
@@ -76,8 +76,12 @@ public class Test extends FunctionalTest {
      */
     public void initTest() throws Exception {
         System.setProperty("proactive.classloader", "enable");
-        String oldFilePath = getClass().getResource("/nonregressiontest/runtime/classloader/deployment.xml").getPath();
-        String newFilePath=oldFilePath.replaceFirst("deployment.xml", "deployment-tmp.xml");
+        String oldFilePath = getClass()
+                                 .getResource("/nonregressiontest/runtime/classloader/deployment.xml")
+                                 .getPath();
+        String newFilePath = oldFilePath.replaceFirst("deployment.xml",
+                "deployment-tmp.xml");
+
         // if tests are run from the /compile directory : getParent for root directory 
         File userDir = new File(System.getProperty("user.dir"));
         String proactiveDir;
@@ -86,7 +90,8 @@ public class Test extends FunctionalTest {
         } else {
             proactiveDir = userDir.getPath();
         }
-        searchAndReplace(oldFilePath, newFilePath, "proactive.home", proactiveDir);
+        searchAndReplace(oldFilePath, newFilePath, "proactive.home",
+            proactiveDir);
         descriptor = ProActive.getProactiveDescriptor(getClass()
                                                           .getResource("/nonregressiontest/runtime/classloader/deployment-tmp.xml")
                                                           .getPath());
@@ -104,11 +109,14 @@ public class Test extends FunctionalTest {
     public boolean postConditions() throws Exception {
         return true;
     }
-    
-    private void searchAndReplace(String oldFilePath, String newFilePath , String oldString, String newString) {
+
+    private void searchAndReplace(String oldFilePath, String newFilePath,
+        String oldString, String newString) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(oldFilePath));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(newFilePath));
+            BufferedReader reader = new BufferedReader(new FileReader(
+                        oldFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(
+                        newFilePath));
             while (true) {
                 String oldLine = reader.readLine();
                 if (oldLine == null) {
@@ -123,7 +131,5 @@ public class Test extends FunctionalTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
     }
-
 }

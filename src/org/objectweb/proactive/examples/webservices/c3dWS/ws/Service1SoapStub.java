@@ -41,7 +41,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
     static {
         _operations = new org.apache.axis.description.OperationDesc[7];
         _initOperationDesc1();
-    } 
+    }
 
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -49,7 +49,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
     private java.util.Vector cachedDeserFactories = new java.util.Vector();
 
     public Service1SoapStub() throws org.apache.axis.AxisFault {
-        this(null); 
+        this(null);
     }
 
     public Service1SoapStub(java.net.URL endpointURL,

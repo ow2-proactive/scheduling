@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.proxy;
 
 import org.objectweb.proactive.Body;
@@ -84,31 +84,32 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     //
 
     /**
-    * Performs operations on the Call object created by the stub, thus changing
-    * the semantics of message-passing to asynchronous message-passing with
-    * future objects
-    *
-    *
-    * The semantics of message-passing implemented by this proxy class
-    * may be definied as follows :<UL>
-    * <LI>Asynchronous message-passing
-    * <LI>Creation of future objects where possible (which leads to
-    * wait-by-necessity).
-    * <LI>Synchronous, blocking calls where futures are not available.
-    * <LI>The Call <code>methodCall</code> is passed to the skeleton for execution.
-    * </UL>
-    */
+     * Performs operations on the Call object created by the stub, thus changing
+     * the semantics of message-passing to asynchronous message-passing with
+     * future objects
+     *
+     *
+     * The semantics of message-passing implemented by this proxy class
+     * may be definied as follows :<UL>
+     * <LI>Asynchronous message-passing
+     * <LI>Creation of future objects where possible (which leads to
+     * wait-by-necessity).
+     * <LI>Synchronous, blocking calls where futures are not available.
+     * <LI>The Call <code>methodCall</code> is passed to the skeleton for execution.
+     * </UL>
+     */
     public Object reify(MethodCall methodCall) throws Throwable {
-        if (methodCall.getName().equals("equals") && (methodCall.getNumberOfParameter() == 1)) {
+        if (methodCall.getName().equals("equals") &&
+                (methodCall.getNumberOfParameter() == 1)) {
             Object arg = methodCall.getParameter(0);
             if (MOP.isReifiedObject(arg)) {
-                    Proxy proxy = ((StubObject)arg).getProxy();
-                    if (proxy instanceof AbstractBodyProxy) {
-                        return new Boolean(bodyID.equals(((AbstractBodyProxy)proxy).bodyID));
-                    }
+                Proxy proxy = ((StubObject) arg).getProxy();
+                if (proxy instanceof AbstractBodyProxy) {
+                    return new Boolean(bodyID.equals(
+                            ((AbstractBodyProxy) proxy).bodyID));
+                }
             }
             return new Boolean(false);
-            
         }
 
         // Now gives the MethodCall object to the body
@@ -149,8 +150,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     }
 
     /**
-    *
-    */
+     *
+     */
     protected void reifyAsOneWay(MethodCall methodCall)
         throws Exception, RenegotiateSessionException {
         try {
@@ -167,12 +168,15 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         }
     }
 
-    /* 
+    /*
      * Dummy Future used to reply to a one-way method call with exceptions
-     * Declared as public to accomodate the MOP 
+     * Declared as public to accomodate the MOP
      */
-    public static class VoidFuture {public VoidFuture() {}}
-    
+    public static class VoidFuture {
+        public VoidFuture() {
+        }
+    }
+
     protected Object reifyAsAsynchronous(MethodCall methodCall)
         throws Exception, RenegotiateSessionException {
         StubObject futureobject = null;
@@ -180,15 +184,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         // Creates a stub + FutureProxy for representing the result
         try {
             Class returnType = methodCall.getReifiedMethod().getReturnType();
-        	
-        	if (returnType.equals(java.lang.Void.TYPE)) {
-        		/* A future for a void call is used to put the potential exception inside */
-        		futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
-        				null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
-        	} else {
-        		futureobject = (StubObject) MOP.newInstance(returnType,
-        				null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
-        	}
+
+            if (returnType.equals(java.lang.Void.TYPE)) {
+
+                /* A future for a void call is used to put the potential exception inside */
+                futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
+                        null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+            } else {
+                futureobject = (StubObject) MOP.newInstance(returnType, null,
+                        Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+            }
         } catch (MOPException e) {
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new FutureCreationException(
@@ -201,7 +206,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             NonFunctionalException nfe = new FutureCreationException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
                     methodCall.getName(), e);
-            
+
             NFEManager.fireAndThrowNFE(nfe, e, this);
         }
 
@@ -209,25 +214,24 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
         fp.setCreatorID(bodyID);
 
-//        // AHA : Associate handler to future automatically
-//        HashMap handlermap = null;
-//        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
-//                        this.getClass().toString())) != null) {
-//            Set keyset = handlermap.keySet();
-//            while (keyset.iterator().hasNext()) {
-//                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
-//                                                                            .next();
-//                try {
-//                    fp.setExceptionHandler((Handler) handlermap.get(
-//                            nfe.getClass()), nfe.getClass());
-//                } catch (IOException e) {
-//                    logger.debug(
-//                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
-//                        fp.getClass());
-//                }
-//            }
-//        }
-
+        //        // AHA : Associate handler to future automatically
+        //        HashMap handlermap = null;
+        //        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
+        //                        this.getClass().toString())) != null) {
+        //            Set keyset = handlermap.keySet();
+        //            while (keyset.iterator().hasNext()) {
+        //                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+        //                                                                            .next();
+        //                try {
+        //                    fp.setExceptionHandler((Handler) handlermap.get(
+        //                            nfe.getClass()), nfe.getClass());
+        //                } catch (IOException e) {
+        //                    logger.debug(
+        //                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+        //                        fp.getClass());
+        //                }
+        //            }
+        //        }
         // Send the request
         try {
             sendRequest(methodCall, (Future) futureobject.getProxy());
@@ -252,25 +256,24 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         Future f = FutureProxy.getFutureProxy();
         f.setCreatorID(bodyID);
 
-//        // AHA : Associate handler to future automatically
-//        HashMap handlermap = null;
-//        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
-//                        this.getClass().toString())) != null) {
-//            Set keyset = handlermap.keySet();
-//            while (keyset.iterator().hasNext()) {
-//                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
-//                                                                            .next();
-//                try {
-//                    FutureProxy.getFutureProxy().setExceptionHandler((Handler) handlermap.get(
-//                            nfe.getClass()), nfe.getClass());
-//                } catch (IOException e) {
-//                    logger.debug(
-//                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
-//                        FutureProxy.getFutureProxy().getClass());
-//                }
-//            }
-//        }
-
+        //        // AHA : Associate handler to future automatically
+        //        HashMap handlermap = null;
+        //        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
+        //                        this.getClass().toString())) != null) {
+        //            Set keyset = handlermap.keySet();
+        //            while (keyset.iterator().hasNext()) {
+        //                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+        //                                                                            .next();
+        //                try {
+        //                    FutureProxy.getFutureProxy().setExceptionHandler((Handler) handlermap.get(
+        //                            nfe.getClass()), nfe.getClass());
+        //                } catch (IOException e) {
+        //                    logger.debug(
+        //                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+        //                        FutureProxy.getFutureProxy().getClass());
+        //                }
+        //            }
+        //        }
         // Set it as the 'thing' to send results to methodCall.res = f;
         // Send the request
         try {

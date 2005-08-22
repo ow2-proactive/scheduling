@@ -1,7 +1,6 @@
 package modelisation.simulator.mixed.multiqueue;
 
 import modelisation.simulator.common.SimulatorElement;
-
 import modelisation.simulator.mixed.Agent;
 import modelisation.simulator.mixed.ForwarderChain;
 import modelisation.simulator.mixed.Server;
@@ -9,7 +8,6 @@ import modelisation.simulator.mixed.Source;
 
 
 public class ThreadWrapper {
-
     protected int elements;
     protected int remainingToProcess;
     protected SimulatorElement[] source;
@@ -19,8 +17,8 @@ public class ThreadWrapper {
     ThreadedUpdater[] threadedUpdaterArray;
     protected Server s;
 
-    public ThreadWrapper(SimulatorElement[] source, SimulatorElement[] agent, 
-                         SimulatorElement[] forwarderChain, Server s, int value) {
+    public ThreadWrapper(SimulatorElement[] source, SimulatorElement[] agent,
+        SimulatorElement[] forwarderChain, Server s, int value) {
         this.elements = source.length;
 
         // this.elements = source.length;
@@ -28,17 +26,16 @@ public class ThreadWrapper {
         this.elementsPerThread = value;
 
         int numberOfThreads;
-        if (elements % value == 0) {
+        if ((elements % value) == 0) {
             numberOfThreads = elements / value;
         } else {
-            numberOfThreads = elements / value + 1;
+            numberOfThreads = (elements / value) + 1;
         }
         this.threadedUpdaterArray = new ThreadedUpdater[numberOfThreads];
-//        System.out.println(" Elements " + elements);
-//        System.out.println(" Puting " + value + " elements per threads");
-//        System.out.println(" Creating " + numberOfThreads + 
-//                           "  ThreadUpdater");
-
+        //        System.out.println(" Elements " + elements);
+        //        System.out.println(" Puting " + value + " elements per threads");
+        //        System.out.println(" Creating " + numberOfThreads + 
+        //                           "  ThreadUpdater");
         Source[] tmpSource = null;
         Agent[] tmpAgent = null;
         ForwarderChain[] tmpFChain = null;
@@ -58,14 +55,13 @@ public class ThreadWrapper {
             System.arraycopy(agent, pos, tmpAgent, 0, length);
             System.arraycopy(forwarderChain, pos, tmpFChain, 0, length);
             System.out.println(pos / value);
-            threadedUpdaterArray[pos / value] = new ThreadedUpdater(this, 
-                                                                    tmpSource, 
-                                                                    tmpAgent, 
-                                                                    tmpFChain);
+            threadedUpdaterArray[pos / value] = new ThreadedUpdater(this,
+                    tmpSource, tmpAgent, tmpFChain);
             new Thread(threadedUpdaterArray[pos / value]).start();
             pos += length;
             remain -= length;
         }
+
         //
         //        for (int i = 0; i < elements; i++) {
         //
@@ -80,10 +76,11 @@ public class ThreadWrapper {
 
     public void decreaseTimeElements(double time) {
         this.remainingToProcess = threadedUpdaterArray.length;
-         int max = this.remainingToProcess;
-//        System.out.println(
-//                "ThreadWrapper decreaseTimeElements " + 
-//                this.remainingToProcess);
+        int max = this.remainingToProcess;
+
+        //        System.out.println(
+        //                "ThreadWrapper decreaseTimeElements " + 
+        //                this.remainingToProcess);
         for (int i = 0; i < max; i++) {
             this.threadedUpdaterArray[i].decreaseTime(time);
         }
@@ -93,8 +90,9 @@ public class ThreadWrapper {
     public void updateElements(double currentTime) {
         this.remainingToProcess = threadedUpdaterArray.length;
         int max = this.remainingToProcess;
-//        System.out.println(
-//                "ThreadWrapper updateElements " + this.remainingToProcess);
+
+        //        System.out.println(
+        //                "ThreadWrapper updateElements " + this.remainingToProcess);
         for (int i = 0; i < max; i++) {
             this.threadedUpdaterArray[i].updateElements(currentTime);
         }
@@ -103,7 +101,7 @@ public class ThreadWrapper {
 
     public synchronized void operationDone() {
         this.remainingToProcess--;
-//        System.out.println("done, remain " + this.remainingToProcess);
+        //        System.out.println("done, remain " + this.remainingToProcess);
         if (this.remainingToProcess == 0) {
             notifyAll();
         }
@@ -117,6 +115,7 @@ public class ThreadWrapper {
                 e.printStackTrace();
             }
         }
+
         //        this.remainingToProcess = elements;
     }
 }

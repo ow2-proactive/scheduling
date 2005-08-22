@@ -64,12 +64,12 @@ public class WorldObject extends AbstractDataObject {
     //
     // Host related methods
     //
-//    public HostObject addHostObject(BasicMonitoredObject monitoredHost, MonitoredObjectSet objectSet)
-//        throws java.rmi.RemoteException {
-//        return addHostObject(monitoredHost, objectSet, null);
-//    }
-
-    public HostObject addHostObject(BasicMonitoredObject monitoredHost, MonitoredObjectSet objectSet) throws java.rmi.RemoteException {
+    //    public HostObject addHostObject(BasicMonitoredObject monitoredHost, MonitoredObjectSet objectSet)
+    //        throws java.rmi.RemoteException {
+    //        return addHostObject(monitoredHost, objectSet, null);
+    //    }
+    public HostObject addHostObject(BasicMonitoredObject monitoredHost,
+        MonitoredObjectSet objectSet) throws java.rmi.RemoteException {
         String shortHostname = null;
         String hostname = monitoredHost.getFullName();
         try {
@@ -93,24 +93,22 @@ public class WorldObject extends AbstractDataObject {
             host.objectSet = objectSet;
         }
         host.createAllNodes();
-//        if (nodeName == null) {
-//            host.createAllNodes();
-//        } else {
-//            host.createOneNode(nodeName);
-//        }
+        //        if (nodeName == null) {
+        //            host.createAllNodes();
+        //        } else {
+        //            host.createOneNode(nodeName);
+        //        }
         return host;
     }
 
-//    public void addHosts() {
-//        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
-//            new CreateJiniNodeTask(this), controller);
-//    }
-
-//    public void addHosts(String host) {
-//        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
-//            new CreateJiniNodeTask(this, host), controller);
-//    }
-
+    //    public void addHosts() {
+    //        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
+    //            new CreateJiniNodeTask(this), controller);
+    //    }
+    //    public void addHosts(String host) {
+    //        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
+    //            new CreateJiniNodeTask(this, host), controller);
+    //    }
     public void addHostsObject(HostObject host) {
         if (listener != null) {
             listener.hostObjectAdded(host);

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -93,7 +92,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return int
      */
     public int getNodeCount();
-    
+
     /**
      * @deprecated use {@link #getNumberOfCurrentlyCreatedNodes()} or {@link #getNumberOfCreatedNodesAfterDeployment()} instead
      */

@@ -226,7 +226,7 @@ public class ContentDescription {
     void setFactory(MetaObjectFactory factory) {
         this.factory = factory;
     }
-    
+
     void setActivity(Active activity) {
         this.activity = activity;
     }

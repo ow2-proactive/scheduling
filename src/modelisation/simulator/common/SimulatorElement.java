@@ -1,10 +1,10 @@
 package modelisation.simulator.common;
 
 public abstract class SimulatorElement {
-
     protected int state;
     protected double remainingTime;
     protected int id;
+
     //indicates wether this object should report
     //messages to the simulator.
     protected boolean log = false;
@@ -12,7 +12,7 @@ public abstract class SimulatorElement {
 
     public SimulatorElement() {
     }
-    
+
     /**
      * Get the value of state.
      * @return Value of state.
@@ -56,10 +56,8 @@ public abstract class SimulatorElement {
     public double getTimeNextEvent() {
         return this.timeNextEvent;
     }
-    
+
     public String getName() {
-    return "SimulatorElement";	
-}
-   
-    
+        return "SimulatorElement";
+    }
 }

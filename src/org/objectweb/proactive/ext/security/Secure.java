@@ -6,17 +6,15 @@
  */
 package org.objectweb.proactive.ext.security;
 
+
 /**
  * @author acontes
- * Objects implementing this interface have access to ProActive security methods. 
+ * Objects implementing this interface have access to ProActive security methods.
  * Doing this, the object can monitor, check access and, by the way, block some
  * requests
  */
 public interface Secure {
-	
-	public SecurityContext receiveRequest (SecurityContext sc);
-	
-	public SecurityContext execute (SecurityContext sc);
-	
-	
+    public SecurityContext receiveRequest(SecurityContext sc);
+
+    public SecurityContext execute(SecurityContext sc);
 }

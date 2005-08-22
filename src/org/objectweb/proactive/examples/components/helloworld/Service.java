@@ -20,9 +20,8 @@
  *
  * Author: Eric Bruneton
  */
-
 package org.objectweb.proactive.examples.components.helloworld;
 
 public interface Service {
-  void print (String msg);
+    void print(String msg);
 }

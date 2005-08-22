@@ -30,23 +30,19 @@
  */
 package org.objectweb.proactive.ext.security;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.security.Provider;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-
-import java.security.Provider;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -37,12 +39,9 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.type.InterfaceType;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-
-import java.io.Serializable;
 
 
 /**
@@ -51,7 +50,8 @@ import java.io.Serializable;
  * @author Matthieu Morel
  *
  */
-public abstract class AbstractProActiveController extends AbstractRequestHandler implements Interface, Serializable, ProActiveController {
+public abstract class AbstractProActiveController extends AbstractRequestHandler
+    implements Interface, Serializable, ProActiveController {
     private Component owner;
     private boolean isInternal = true;
     private InterfaceType interfaceType;
@@ -147,6 +147,4 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     protected void setItfType(InterfaceType itfType) {
         this.interfaceType = itfType;
     }
-
- 
 }

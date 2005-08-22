@@ -12,20 +12,18 @@ public class WeibullLaw implements RandomNumberGenerator {
     public WeibullLaw(String variableName) {
         this.variableName = variableName;
         try {
-            scale = Double.parseDouble(System.getProperties().getProperty(
-                                               variableName + ".weibull.scale"));
+            scale = Double.parseDouble(System.getProperties().getProperty(variableName +
+                        ".weibull.scale"));
         } catch (Exception e) {
-            System.err.println(
-                    "WeibullLaw: property " + variableName + 
-                    ".weibull.scale not set");
+            System.err.println("WeibullLaw: property " + variableName +
+                ".weibull.scale not set");
         }
         try {
-            shape = Double.parseDouble(System.getProperties().getProperty(
-                                               variableName + ".weibull.shape"));
+            shape = Double.parseDouble(System.getProperties().getProperty(variableName +
+                        ".weibull.shape"));
         } catch (Exception e) {
-            System.err.println(
-                    "WeibullLaw: property " + variableName + 
-                    ".weibull.shape not set");
+            System.err.println("WeibullLaw: property " + variableName +
+                ".weibull.shape not set");
         }
     }
 

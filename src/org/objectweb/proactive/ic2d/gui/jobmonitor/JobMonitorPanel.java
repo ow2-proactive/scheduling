@@ -187,7 +187,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     public void addMonitoredHost(String host, int port) {
-        MonitoredHost hostObject = new MonitoredHost(host, port,"rmi:");
+        MonitoredHost hostObject = new MonitoredHost(host, port, "rmi:");
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);
             if (monitoredHosts.size() == 1) {
@@ -254,7 +254,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 public void run() {
                     asso.deleteItem(hostObject);
                     explorator.startExploration();
-                    handleHost(hostObject.getFullName(),((MonitoredHost)hostObject).getMonitorProtocol());
+                    handleHost(hostObject.getFullName(),
+                        ((MonitoredHost) hostObject).getMonitorProtocol());
                     explorator.endExploration();
                 }
             }).start();
@@ -345,23 +346,24 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             final MonitoredObjectSet objects = new MonitoredObjectSet();
             boolean hasHosts = false;
             int sameKey = NO_KEY;
-            
+
             if (selection != null) {
                 for (int i = 0; i < selection.length; i++) {
                     DataTreeNode node = (DataTreeNode) selection[i].getLastPathComponent();
                     if (!node.isRoot()) {
                         BasicMonitoredObject object = node.getObject();
                         objects.add(object);
-                    	int key = object.getKey();
+                        int key = object.getKey();
 
                         if (key == HOST) {
                             hasHosts = true;
                         }
 
-                        if (i == 0)
-                        	sameKey = key;
-                        else if (key != sameKey)
-                        	sameKey = NO_KEY;
+                        if (i == 0) {
+                            sameKey = key;
+                        } else if (key != sameKey) {
+                            sameKey = NO_KEY;
+                        }
                     }
                 }
             }
@@ -408,7 +410,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                     };
 
             menuItem = new JMenuItem(a);
-            menuItem.setEnabled(sameKey == JOB || sameKey == JVM);
+            menuItem.setEnabled((sameKey == JOB) || (sameKey == JVM));
             popupmenu.add(menuItem);
         }
 

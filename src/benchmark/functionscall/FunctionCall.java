@@ -30,10 +30,10 @@
  */
 package benchmark.functionscall;
 
-import benchmark.exception.NodeNotFoundException;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
+
+import benchmark.exception.NodeNotFoundException;
 
 import testsuite.test.ProActiveBenchmark;
 

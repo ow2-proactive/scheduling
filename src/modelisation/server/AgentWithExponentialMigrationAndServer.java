@@ -1,11 +1,11 @@
 package modelisation.server;
 
-import modelisation.statistics.RandomNumberFactory;
-import modelisation.statistics.RandomNumberGenerator;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
+
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
 
 
 public class AgentWithExponentialMigrationAndServer

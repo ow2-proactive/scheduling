@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
+import java.rmi.ConnectException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.rmi.ConnectException;
 
 
 /**

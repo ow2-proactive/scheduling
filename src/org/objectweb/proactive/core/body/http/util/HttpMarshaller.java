@@ -13,6 +13,7 @@ import java.io.IOException;
 import sun.rmi.server.MarshalInputStream;
 import sun.rmi.server.MarshalOutputStream;
 
+
 /**
  * @author vlegrand
  *
@@ -22,11 +23,11 @@ import sun.rmi.server.MarshalOutputStream;
 public class HttpMarshaller {
 
     /**
-     * 
+     *
      * @param o
      * @return
      */
-    public static byte [] marshallObject (Object o) {
+    public static byte[] marshallObject(Object o) {
         String result = null;
         byte[] buffer = null;
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -41,15 +42,15 @@ public class HttpMarshaller {
             try {
                 out.close();
                 oos.close();
-            } catch (IOException e) { 
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         result = new String(buffer);
         return buffer;
     }
-    
-    public static Object unmarshallObject (byte [] bytes) {
+
+    public static Object unmarshallObject(byte[] bytes) {
         Object o = null;
         MarshalInputStream in = null;
 
@@ -73,5 +74,4 @@ public class HttpMarshaller {
 
         return null;
     }
-    
 }

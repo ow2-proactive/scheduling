@@ -1,7 +1,6 @@
 package org.objectweb.proactive.core.classloader;
 
 import java.net.MalformedURLException;
-
 import java.rmi.server.RMIClassLoader;
 import java.rmi.server.RMIClassLoaderSpi;
 

@@ -9,12 +9,12 @@ import java.util.Locale;
 
 
 public class LinkedListCalendar implements Calendar {
+    static DecimalFormat df;
 
-  static DecimalFormat df ;
-  static { 
-  	df = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-  	df.applyPattern("###.00");	
-  }
+    static {
+        df = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+        df.applyPattern("###.00");
+    }
 
     protected LinkedList list;
 
@@ -30,9 +30,8 @@ public class LinkedListCalendar implements Calendar {
         double eTime = e.getTime();
         Event tmp = null;
         while (li.hasNext()) {
-            tmp = (Event)li.next();
+            tmp = (Event) li.next();
             if (tmp.getTime() > e.getTime()) {
-
                 int index = li.nextIndex() - 1;
                 list.add(index, e);
                 return;
@@ -42,7 +41,7 @@ public class LinkedListCalendar implements Calendar {
     }
 
     public boolean removeEvent(Event e) {
-//    	System.out.println("removing);
+        //    	System.out.println("removing);
         return this.list.remove(e);
     }
 
@@ -51,11 +50,10 @@ public class LinkedListCalendar implements Calendar {
     }
 
     public Event[] removeNextEvents() {
-
         //just because java is stupid
         Event[] events = new Event[1];
         ArrayList al = new ArrayList();
-        Event first = (Event)list.removeFirst();
+        Event first = (Event) list.removeFirst();
         if (first == null) {
             return null;
         }
@@ -64,34 +62,34 @@ public class LinkedListCalendar implements Calendar {
         ListIterator li = list.listIterator();
         Event tmp = null;
         while (li.hasNext()) {
-            tmp = (Event)li.next();
+            tmp = (Event) li.next();
             if (tmp.getTime() == first.getTime()) {
-            	li.remove();
+                li.remove();
                 al.add(tmp);
             } else {
-                return (Event[])al.toArray(events);
+                return (Event[]) al.toArray(events);
             }
         }
-        return (Event[])al.toArray(events);
+        return (Event[]) al.toArray(events);
         // return (Event)list.removeFirst();
         //   return null;
     }
 
     public String toString() {
-
         StringBuffer buff = new StringBuffer();
         ListIterator li = list.listIterator();
         Event tmp = null;
         while (li.hasNext()) {
-            tmp = (Event)li.next();
-            buff.append("(").append(tmp.getObject().getName()).append(",").append(df.format(tmp.getTime())).append(",").append(tmp.toString()).append(")");
+            tmp = (Event) li.next();
+            buff.append("(").append(tmp.getObject().getName()).append(",")
+                .append(df.format(tmp.getTime())).append(",")
+                .append(tmp.toString()).append(")");
             //
         }
         return buff.toString();
     }
 
     public static void main(String[] arguments) {
-
         LinkedListCalendar lc = new LinkedListCalendar();
         lc.addEvent(new Event(100, new Forwarder()));
         System.out.println(lc);

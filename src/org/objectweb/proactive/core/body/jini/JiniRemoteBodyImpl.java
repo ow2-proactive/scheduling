@@ -43,8 +43,8 @@ import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe jini objects library.
  */
-public class JiniRemoteBodyImpl extends RmiRemoteBodyImpl implements RmiRemoteBody,
-    java.rmi.server.Unreferenced {
+public class JiniRemoteBodyImpl extends RmiRemoteBodyImpl
+    implements RmiRemoteBody, java.rmi.server.Unreferenced {
 
     /**
      * A custom socket Factory

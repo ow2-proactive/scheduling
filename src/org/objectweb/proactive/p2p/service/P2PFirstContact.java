@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.node.Node;
@@ -39,10 +41,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.util.Vector;
 
 
 /**

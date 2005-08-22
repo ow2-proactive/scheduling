@@ -1,7 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -9,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+
 
 /*
  * The key used in the TreeMap association
@@ -44,9 +45,9 @@ class AssoKey implements Comparable {
  * This is the main data structure. Here we keep track of the relationship between
  * all the elements we have. We have lots of associations summed up in the following diagram.
  * The arrow means one to many. For example, a host can contain many jvms but a jvm is in
- * only one host. 
- * 
- * 
+ * only one host.
+ *
+ *
  *           Job Job-*->VN     Job
  *            |         |       |
  *            *         *       *
@@ -111,7 +112,7 @@ public class DataAssociation implements JobMonitorConstants {
         return sets[index];
     }
 
-    /* 
+    /*
      * We add the object to our collection, but if we already had it, we return
      * the previous version which should replace the just created new version.
      */
@@ -131,10 +132,10 @@ public class DataAssociation implements JobMonitorConstants {
      * Remove all children of a given key.
      */
     private void delAsso(BasicMonitoredObject from, int key) {
-    	AssoKey assoKey = new AssoKey(from, key);
-    	asso.remove(assoKey);
+        AssoKey assoKey = new AssoKey(from, key);
+        asso.remove(assoKey);
     }
-    
+
     /*
      * Add a child to an association. The from.getKey() -*-> to.getKey() or its
      * opposite should exist in the graph.
@@ -154,22 +155,24 @@ public class DataAssociation implements JobMonitorConstants {
         /*
          * Remove the element in its previous parent
          */
-        BasicMonitoredObject previousParent = getWritableAsso(to, from.getKey()).firstElement();
+        BasicMonitoredObject previousParent = getWritableAsso(to, from.getKey())
+                                                  .firstElement();
         if (previousParent != null) {
-        	getWritableAsso(previousParent, to.getKey()).remove(to);
+            getWritableAsso(previousParent, to.getKey()).remove(to);
         }
-        
+
         /*
          * First new child of 'from', remove the previous ones.
          */
-        if (from.isDeleted())
-        	delAsso(from, to.getKey());
-        
+        if (from.isDeleted()) {
+            delAsso(from, to.getKey());
+        }
+
         from.setDeleted(false);
         to.setDeleted(false);
 
         addAsso(from, to);
-        
+
         /*
          * We now know the only one true parent of 'to'.
          */
@@ -206,17 +209,19 @@ public class DataAssociation implements JobMonitorConstants {
     private boolean isValid(BasicMonitoredObject value, Set constraints) {
         Iterator iter = constraints.iterator();
         int key = value.getKey();
-        
+
         while (iter.hasNext()) {
             BasicMonitoredObject testValue = (BasicMonitoredObject) iter.next();
 
-            if (key == AO && testValue.getKey() == JOB)
-            	/* Migration */
-            	continue;
+            if ((key == AO) && (testValue.getKey() == JOB)) {
+
+                /* Migration */
+                continue;
+            }
 
             MonitoredObjectSet test = getValues(value, testValue.getKey(), null);
             if (!test.contains(testValue)) {
-            	return false;
+                return false;
             }
         }
 
@@ -304,23 +309,22 @@ public class DataAssociation implements JobMonitorConstants {
 
         return res;
     }
-    
+
     /*
      * Listing for the IC2D with big boxes
      */
     public MonitoredObjectSet getHosts() {
         return list(HOST, null);
     }
-    
+
     public MonitoredObjectSet getNodes() {
         return list(NODE, null);
     }
-    
+
     public MonitoredObjectSet getAOs() {
         return list(AO, null);
     }
-    
-    
+
     /*
      * Main entry point to extract data.
      */
@@ -469,6 +473,7 @@ nextCleared:
                     continue nextCleared;
                 }
             }
+
             /* If the parent has no more children, remove it */
             removeItem(parent);
         }

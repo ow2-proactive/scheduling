@@ -30,13 +30,13 @@
  */
 package nonregressiontest.activeobject.wrapper;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-
-import java.io.Serializable;
 
 
 public class A implements Serializable {

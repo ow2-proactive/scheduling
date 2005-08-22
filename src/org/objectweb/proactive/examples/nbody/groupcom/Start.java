@@ -56,9 +56,8 @@ import org.objectweb.proactive.examples.nbody.common.Rectangle;
  * @since   ProActive 2.2
  */
 public class Start {
-
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    
+
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
@@ -94,8 +93,7 @@ public class Start {
             killsupport.abort(e);
         }
 
-        logger.info("[NBODY] " + totalNbBodies +
-            " Domains are deployed");
+        logger.info("[NBODY] " + totalNbBodies + " Domains are deployed");
 
         Maestro maestro = null;
         try {

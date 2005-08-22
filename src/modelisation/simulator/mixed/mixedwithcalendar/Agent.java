@@ -1,9 +1,9 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
+import org.apache.log4j.Logger;
+
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
-import org.apache.log4j.Logger;
 
 
 public class Agent extends SimulatorElement {

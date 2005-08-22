@@ -14,9 +14,9 @@ import org.objectweb.proactive.core.util.HostsInfos;
  */
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
     java.io.Serializable {
-    
     String username;
     String hostname;
+
     public SshRMIClientSocketFactory() {
         this.username = System.getProperty("user.name");
         try {
@@ -45,6 +45,6 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        HostsInfos.setUserName(hostname,username);
+        HostsInfos.setUserName(hostname, username);
     }
 }

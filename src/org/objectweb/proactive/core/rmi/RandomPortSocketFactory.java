@@ -30,18 +30,15 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.apache.log4j.Logger;
-
 import java.io.IOException;
 import java.io.Serializable;
-
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
-
 import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 
 /**

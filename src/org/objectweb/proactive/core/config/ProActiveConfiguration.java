@@ -4,12 +4,12 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis 
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
  *
- * This library is free software; you can redistribute it and/or  
+ * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either 
+ * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
@@ -30,15 +30,14 @@
  */
 package org.objectweb.proactive.core.config;
 
+import java.util.HashMap;
+import java.util.Iterator;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-
 import org.objectweb.proactive.core.config.xml.MasterFileHandler;
-
-import java.util.HashMap;
-import java.util.Iterator;
 
 
 public class ProActiveConfiguration {
@@ -93,7 +92,7 @@ public class ProActiveConfiguration {
             ProActiveConfiguration.getConfiguration().addProperties();
             isLoaded = true;
         }
-    } 
+    }
 
     public synchronized static ProActiveConfiguration getConfiguration() {
         if (ProActiveConfiguration.singleton == null) {
@@ -168,30 +167,36 @@ public class ProActiveConfiguration {
     public static String getSchemaValidationState() {
         return System.getProperty("schema.validation");
     }
-    
+
     // FAULT TOLERANCE
     public static String getFTState() {
         return System.getProperty("proactive.ft");
     }
+
     public static String getCheckpointServer() {
         return System.getProperty("proactive.ft.server.checkpoint");
     }
+
     public static String getLocationServer() {
         return System.getProperty("proactive.ft.server.location");
     }
+
     public static String getRecoveryServer() {
         return System.getProperty("proactive.ft.server.recovery");
     }
+
     public static String getGlobalFTServer() {
         return System.getProperty("proactive.ft.server.global");
     }
+
     public static String getTTCValue() {
         return System.getProperty("proactive.ft.ttc");
     }
-    public static String getAttachedResourceServer(){
+
+    public static String getAttachedResourceServer() {
         return System.getProperty("proactive.ft.server.resource");
     }
-    
+
     //To be used for the launcher 
     //    /**
     //     * Sets the value of proactive.home if not already set
@@ -222,9 +227,9 @@ public class ProActiveConfiguration {
         if (System.getProperty("log4j.configuration") == null) {
             loadLogger();
         }
-        
+
         setProperty("proactive.rmi.port", "1099");
-        
+
         setProperty("proactive.ft", "disable");
         setProperty("proactive.ft.ttc", "30");
     }
@@ -245,7 +250,6 @@ public class ProActiveConfiguration {
         if (System.getProperty(name) == null) {
             System.setProperty(name, value);
             this.addedProperties.put(name, value);
-        } 
+        }
     }
 }
- 

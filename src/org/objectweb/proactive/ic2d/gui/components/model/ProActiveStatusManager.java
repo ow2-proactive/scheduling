@@ -56,6 +56,7 @@ public class ProActiveStatusManager extends StatusManager
     public void virtualNodeChanged(ProActiveComponent component, String oldValue) {
         long status = component.getStatus();
         String virtualNode = component.getVirtualNode();
+
         //System.out.println("CHANGED VN : " + oldValue + " TO : " +
         //    component.getVirtualNode());
         component.setStatus(status);

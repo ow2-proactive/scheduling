@@ -10,6 +10,7 @@ public class MonitoredNode extends BasicMonitoredObject {
     static protected int lastID = 0;
     static protected Map prettyNames = new HashMap();
     protected Node node;
+
     protected int incLastID() {
         return ++lastID;
     }
@@ -19,12 +20,12 @@ public class MonitoredNode extends BasicMonitoredObject {
     }
 
     public MonitoredNode(Node node, String jvm) {
-        super(NODE, node.getNodeInformation().getName(),node.getNodeInformation().getName() + " on " + jvm);
+        super(NODE, node.getNodeInformation().getName(),
+            node.getNodeInformation().getName() + " on " + jvm);
         this.node = node;
     }
-    
+
     public Node getNode() {
         return node;
     }
-    
 }

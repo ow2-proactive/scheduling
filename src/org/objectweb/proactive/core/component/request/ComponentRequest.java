@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.core.component.request;
 
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.request.Request;
 
 
 /**
@@ -41,11 +41,12 @@ import org.objectweb.proactive.core.body.UniversalBody;
  *
  */
 public interface ComponentRequest extends Request {
-
     //  strict FIFO (no priority)
     public static final short STRICT_FIFO_PRIORITY = 3;
+
     //  serve oldest NF before functional requests
     public static final short BEFORE_FUNCTIONAL_PRIORITY = 2;
+
     //  non functional FIFO : serve oldest NF if requested functional is older than oldest NF, 
     public static final short IMMEDIATE_PRIORITY = 1;
 
@@ -53,9 +54,9 @@ public interface ComponentRequest extends Request {
      * tells whether the request is a call to a control interface
      */
     public boolean isControllerRequest();
-    
+
     public boolean isStopFcRequest();
-    
+
     public boolean isStartFcRequest();
 
     /**
@@ -64,28 +65,29 @@ public interface ComponentRequest extends Request {
      * @param sender the sender of the functional component request
      * @param intermediate the component that the functional request has reached so far
      */
-    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate);
+    public void shortcutNotification(UniversalBody sender,
+        UniversalBody intermediate);
 
     /**
-     * 
-     * @return the shortcut object contained in this request, null if there is no shortcut 
+     *
+     * @return the shortcut object contained in this request, null if there is no shortcut
      */
     public Shortcut getShortcut();
 
     /**
-     * 
+     *
      * @return the number of membranes that could be shortcut, 0 if there is no shortcut
      */
     public int getShortcutLength();
-    
+
     /*
      * TODO : more comments on priorities of requests
      * @return the priority of the request
      */
     public short getPriority();
-    
+
     /**
-     * 
+     *
      * @return the class on which the method call contained in this request must be executed
      */
     public Class getTargetClass();

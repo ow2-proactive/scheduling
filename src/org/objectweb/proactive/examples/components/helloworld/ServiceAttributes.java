@@ -20,13 +20,17 @@
  *
  * Author: Eric Bruneton
  */
-
 package org.objectweb.proactive.examples.components.helloworld;
+
 import org.objectweb.fractal.api.control.AttributeController;
 
+
 public interface ServiceAttributes extends AttributeController {
-  String getHeader ();
-  void setHeader (String header);
-  int getCount ();
-  void setCount (int count);
+    String getHeader();
+
+    void setHeader(String header);
+
+    int getCount();
+
+    void setCount(int count);
 }

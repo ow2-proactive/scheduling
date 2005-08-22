@@ -30,18 +30,16 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
 
 public class RequestReceiverImpl implements RequestReceiver,
@@ -63,21 +61,23 @@ public class RequestReceiverImpl implements RequestReceiver,
     public int receiveRequest(Request request, Body bodyReceiver)
         throws java.io.IOException {
         try {
-        if (immediateExecution(request)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("immediately serving " + request.getMethodName());
-            }
-            bodyReceiver.serve(request);
-            if (logger.isDebugEnabled()) {
-                logger.debug("end of service for " + request.getMethodName());
-            }
+            if (immediateExecution(request)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("immediately serving " +
+                        request.getMethodName());
+                }
+                bodyReceiver.serve(request);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("end of service for " +
+                        request.getMethodName());
+                }
 
-            //Dummy value for immediate services...
-            return FTManager.IMMEDIATE_SERVICE;
-        } else {
-            request.notifyReception(bodyReceiver);
-            return bodyReceiver.getRequestQueue().add(request);
-        }
+                //Dummy value for immediate services...
+                return FTManager.IMMEDIATE_SERVICE;
+            } else {
+                request.notifyReception(bodyReceiver);
+                return bodyReceiver.getRequestQueue().add(request);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return 0;
@@ -85,7 +85,8 @@ public class RequestReceiverImpl implements RequestReceiver,
     }
 
     private boolean immediateExecution(Request request) {
-        if (request == null || request.getMethodCall() == null || request.getMethodCall().getReifiedMethod() == null) {
+        if ((request == null) || (request.getMethodCall() == null) ||
+                (request.getMethodCall().getReifiedMethod() == null)) {
             return false;
         } else {
             String methodName = request.getMethodName();
@@ -97,10 +98,13 @@ public class RequestReceiverImpl implements RequestReceiver,
                     Iterator it = ((List) immediateServices.get(methodName)).iterator();
                     while (it.hasNext()) {
                         Class[] next = (Class[]) it.next();
-                        if (Arrays.equals(next, request.getMethodCall().getReifiedMethod().getParameterTypes())) {
+                        if (Arrays.equals(next,
+                                    request.getMethodCall().getReifiedMethod()
+                                               .getParameterTypes())) {
                             return true;
                         }
                     }
+
                     // not found
                     return false;
                 }
@@ -109,6 +113,7 @@ public class RequestReceiverImpl implements RequestReceiver,
             }
         }
     }
+
     public void setImmediateService(String methodName) {
         this.immediateServices.put(methodName, ANY_PARAMETERS);
     }

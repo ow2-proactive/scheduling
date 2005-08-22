@@ -30,10 +30,6 @@
  */
 package nonregressiontest.component.controller;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.creation.ComponentA;
-import nonregressiontest.component.creation.ComponentInfo;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -42,6 +38,10 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.creation.ComponentA;
+import nonregressiontest.component.creation.ComponentInfo;
 
 
 /**
@@ -74,12 +74,16 @@ public class Test extends ComponentTest {
                             ComponentInfo.class.getName(), TypeFactory.SERVER,
                             TypeFactory.MANDATORY, TypeFactory.SINGLE),
                     }),
-                new ControllerDescription("componentA", Constants.PRIMITIVE, getClass().getResource("/nonregressiontest/component/controller/config.xml").getPath()),
+                new ControllerDescription("componentA", Constants.PRIMITIVE,
+                    getClass()
+                        .getResource("/nonregressiontest/component/controller/config.xml")
+                        .getPath()),
                 new ContentDescription(ComponentA.class.getName(),
                     new Object[] { "toto" }));
         //logger.debug("OK, instantiated the component");
-        ((DummyController)componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue("DUMMY");
-        result = ((DummyController)componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
+        ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(
+            "DUMMY");
+        result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
     }
 
     /**

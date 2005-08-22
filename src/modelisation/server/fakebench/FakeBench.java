@@ -28,8 +28,6 @@
  */
 package modelisation.server.fakebench;
 
-import modelisation.server.TimedLocationServerMetaObjectFactory;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -38,6 +36,8 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
+
+import modelisation.server.TimedLocationServerMetaObjectFactory;
 
 
 public class FakeBench implements org.objectweb.proactive.RunActive {

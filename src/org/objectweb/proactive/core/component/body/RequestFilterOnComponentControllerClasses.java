@@ -5,8 +5,8 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 
 
-public class RequestFilterOnComponentControllerClasses
-    implements RequestFilter, java.io.Serializable {
+public class RequestFilterOnComponentControllerClasses implements RequestFilter,
+    java.io.Serializable {
     public RequestFilterOnComponentControllerClasses() {
     }
 

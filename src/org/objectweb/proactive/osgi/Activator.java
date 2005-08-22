@@ -30,18 +30,16 @@
  */
 package org.objectweb.proactive.osgi;
 
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.rmi.ClassServerServlet;
-
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-
-import org.osgi.service.http.HttpService;
-
 import java.util.Properties;
 
 import javax.servlet.Servlet;
+
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.rmi.ClassServerServlet;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.http.HttpService;
 
 
 /**

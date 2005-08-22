@@ -3,13 +3,12 @@
  */
 package nonregressiontest.group.asynchronouscall;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
-import nonregressiontest.group.A;
-
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
+
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import nonregressiontest.group.A;
 
 import testsuite.test.FunctionalTest;
 
@@ -37,25 +36,23 @@ public class Test extends FunctionalTest {
         // nothing to do
     }
 
+    public boolean preConditions() throws Exception {
+        Object[][] params = {
+                { "Agent0" },
+                { "Agent1" },
+                { "Agent2" }
+            };
+        Node[] nodes = {
+                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
+                TestNodes.getRemoteVMNode()
+            };
+        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+                params, nodes);
 
-	public boolean preConditions() throws Exception {
-		Object[][] params = {
-			{ "Agent0" },
-			{ "Agent1" },
-			{ "Agent2" }
-		};
-		Node[] nodes = {
-			TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-			TestNodes.getRemoteVMNode()
-		};
-		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
-				params, nodes);
+        ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
-		ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
-		
-		return (this.typedGroup != null);
-	}
-
+        return (this.typedGroup != null);
+    }
 
     public boolean postConditions() throws Exception {
         // was the result group created ?
@@ -82,6 +79,6 @@ public class Test extends FunctionalTest {
     }
 
     public void initTest() throws Exception {
-		// nothing to do : ProActive methods can not be used here
+        // nothing to do : ProActive methods can not be used here
     }
 }

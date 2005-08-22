@@ -9,7 +9,7 @@ public class MonitoredHost extends BasicMonitoredObject {
     static protected Map prettyNames = new HashMap();
     private int port;
     private String monitorProtocol;
-    
+
     protected int incLastID() {
         return ++lastID;
     }
@@ -23,20 +23,21 @@ public class MonitoredHost extends BasicMonitoredObject {
         MonitoredHost hostObject = (MonitoredHost) o;
         hostObject.port = port;
     }
-    
+
     public MonitoredHost(String hostname, int port, String monitorProtocol) {
         super(HOST, hostname, hostname + ":" + port);
         this.port = port;
         this.monitorProtocol = monitorProtocol;
     }
-    
+
     public int getPort() {
-    	return port;
+        return port;
     }
+
     /**
      * @return Returns the monitorProtocol.
      */
     public String getMonitorProtocol() {
         return monitorProtocol;
     }
- }
+}

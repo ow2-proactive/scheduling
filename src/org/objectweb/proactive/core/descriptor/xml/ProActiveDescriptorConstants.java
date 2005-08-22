@@ -75,7 +75,7 @@ public interface ProActiveDescriptorConstants {
     public static final String OAR_PROCESS_TAG = "oarProcess";
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
-    public static final String GRID_ENGINE_OPTIONS_TAG="gridEngineOption";
+    public static final String GRID_ENGINE_OPTIONS_TAG = "gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
     public static final String SERVICES_TAG = "services";
     public static final String PROCESS_REFERENCE_TAG = "processReference";
@@ -94,13 +94,14 @@ public interface ProActiveDescriptorConstants {
     public static final String PROCESSOR_PER_NODE_TAG = "processorPerNode";
     public static final String BOOKING_DURATION_TAG = "bookingDuration";
     public static final String QUEUE_NAME_TAG = "queueName";
-    public static final String PARALLEL_ENVIRONMENT_TAG ="parallelEnvironment";
+    public static final String PARALLEL_ENVIRONMENT_TAG = "parallelEnvironment";
     public static final String PRUN_OUTPUT_FILE = "outputFile";
     public static final String PBS_OPTIONS_TAG = "pbsOption";
-    public static final String OAR_OPTIONS_TAG="oarOption";
-    public static final String OARGRID_OPTIONS_TAG="oarGridOption";
-    public static final String OAR_RESOURCE_TAG="resources";
-    public static final String OARGRID_WALLTIME_TAG="walltime";
+    public static final String OAR_OPTIONS_TAG = "oarOption";
+    public static final String OARGRID_OPTIONS_TAG = "oarGridOption";
+    public static final String OAR_RESOURCE_TAG = "resources";
+    public static final String OARGRID_WALLTIME_TAG = "walltime";
+
     //public static final String OAR_PROPERTY_TAG="properties";
     public static final String VARIABLE_TAG = "variable";
     public static final String CLASSPATH_TAG = "classpath";

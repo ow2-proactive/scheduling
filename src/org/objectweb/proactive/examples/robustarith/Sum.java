@@ -6,14 +6,13 @@
  */
 package org.objectweb.proactive.examples.robustarith;
 
+import java.io.Serializable;
+import java.math.BigInteger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-
-import java.io.Serializable;
-
-import java.math.BigInteger;
 
 
 /**

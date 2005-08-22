@@ -1,12 +1,12 @@
 package essai.proplayer;
 
+import java.util.Enumeration;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-
-import java.util.Enumeration;
 
 
 /**

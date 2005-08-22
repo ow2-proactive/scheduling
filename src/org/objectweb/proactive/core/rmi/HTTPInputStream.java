@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
@@ -22,7 +21,7 @@ import java.util.regex.Pattern;
 public class HTTPInputStream extends DataInputStream {
     private static Pattern pColon = Pattern.compile(": *");
     HashMap headers = new HashMap();
-	
+
     public HTTPInputStream(InputStream is) {
         super(is);
         in = in = new PushbackInputStream(in);
@@ -68,7 +67,7 @@ public class HTTPInputStream extends DataInputStream {
         String line;
         String prevFieldName = null;
         headers.clear();
-        
+
         do {
             if ((line = getLine()) == null) {
                 throw new IOException(
@@ -76,7 +75,6 @@ public class HTTPInputStream extends DataInputStream {
             }
 
             if ((line.length() > 0)) { // we don't care about headers in GET requests
-
                 if (line.startsWith(" ") || line.startsWith("\t")) {
                     headers.put(prevFieldName, headers.get(prevFieldName) +
                         line); // folding
@@ -98,7 +96,6 @@ public class HTTPInputStream extends DataInputStream {
             }
         } while (line.length() > 0); // empty line, end of headers
     }
-
 
     public String getHeader(String fieldName) {
         return (String) headers.get(fieldName.toLowerCase());

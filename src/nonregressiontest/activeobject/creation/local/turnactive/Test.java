@@ -30,14 +30,14 @@
  */
 package nonregressiontest.activeobject.creation.local.turnactive;
 
-import nonregressiontest.activeobject.creation.A;
+import java.net.InetAddress;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-import testsuite.test.FunctionalTest;
+import nonregressiontest.activeobject.creation.A;
 
-import java.net.InetAddress;
+import testsuite.test.FunctionalTest;
 
 
 /**

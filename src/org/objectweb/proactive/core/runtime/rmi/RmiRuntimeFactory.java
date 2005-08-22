@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime.rmi;
 
+import java.rmi.RemoteException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
@@ -38,8 +40,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.rmi.RemoteException;
 
 
 public class RmiRuntimeFactory extends RuntimeFactory {
@@ -118,8 +118,6 @@ public class RmiRuntimeFactory extends RuntimeFactory {
             throw new ProActiveException("Malformed URL:" + s, e);
         }
     }
-
-    
 
     protected ProActiveRuntimeAdapter createRuntimeAdapter()
         throws ProActiveException {

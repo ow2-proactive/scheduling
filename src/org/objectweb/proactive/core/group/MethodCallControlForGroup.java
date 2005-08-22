@@ -30,15 +30,13 @@
  */
 package org.objectweb.proactive.core.group;
 
-import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
-
 import java.io.IOException;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.util.LinkedList;
+
+import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 /**

@@ -102,7 +102,9 @@ public class ControllerDescription implements Serializable {
         if (controllersConfigFileLocation != null) {
             controllersConfigFile = new File(controllersConfigFileLocation);
         } else {
-            controllersConfigFile = new File(getClass().getResource(DEFAULT_COMPONENT_CONFIG_FILE_LOCATION).getFile());
+            controllersConfigFile = new File(getClass()
+                                                 .getResource(DEFAULT_COMPONENT_CONFIG_FILE_LOCATION)
+                                                 .getFile());
         }
     }
 

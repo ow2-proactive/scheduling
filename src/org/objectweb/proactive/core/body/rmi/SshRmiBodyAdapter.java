@@ -1,15 +1,14 @@
 package org.objectweb.proactive.core.body.rmi;
 
+import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIServerSocketFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.IOException;
-
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 
 /**

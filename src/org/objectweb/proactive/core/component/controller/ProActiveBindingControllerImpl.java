@@ -30,8 +30,13 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -44,7 +49,6 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Binding;
@@ -59,13 +63,6 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.io.Serializable;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -209,23 +206,24 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
         checkBindability(clientItfName, (Interface) serverItf);
-        
+
         // if output interceptors are defined
         // TODO_M check with groups : interception is here done at the beginning of the group invocation,
         // not for each element of the group
-        List outputInterceptors = ((ProActiveComponent)getFcItfOwner()).getOutputInterceptors(); 
+        List outputInterceptors = ((ProActiveComponent) getFcItfOwner()).getOutputInterceptors();
         if (!outputInterceptors.isEmpty()) {
             try {
-                serverItf = ProActiveOutputInterfaceInterceptor.newInstance((ProActiveInterface)serverItf,
+                serverItf = ProActiveOutputInterfaceInterceptor.newInstance((ProActiveInterface) serverItf,
                         outputInterceptors);
             } catch (ClassNotFoundException e) {
-                    logger.error("could not generate output interceptor for client interface " + clientItfName + " : " + e.getMessage());
-                    if (logger.isDebugEnabled()) {
-                        logger.error(e.getStackTrace().toString());
+                logger.error(
+                    "could not generate output interceptor for client interface " +
+                    clientItfName + " : " + e.getMessage());
+                if (logger.isDebugEnabled()) {
+                    logger.error(e.getStackTrace().toString());
                 }
             }
         }
-
 
         if (isPrimitive()) {
             // binding operation is delegated

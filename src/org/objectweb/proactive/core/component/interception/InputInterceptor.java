@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.interception;
 
 import java.lang.reflect.Method;
 
+
 /**
  * This interface must be implemented by controllers that need to intercept
  * incoming functional invocations. <br>
@@ -31,25 +32,22 @@ import java.lang.reflect.Method;
  * <code> --> callee.invocation  </code> <br>
  * <code> --> InputInterceptor2.afterInputMethodInvocation  </code> <br>
  * <code> --> InputInterceptor1.afterInputMethodInvocation  </code>
- * 
+ *
  * @author Matthieu Morel
  */
 public interface InputInterceptor {
-    
+
     /**
      * This method is when an input invocation is intercepted, before executing the input invocation.
      * @param method the method to be executed
      * @param args the parameters of the method
      */
     public void beforeInputMethodInvocation(Method method, Object[] args);
-    
+
     /**
      * This method is when an input invocation has been intercepted, after the execution of the input invocation.
      * @param method the method that has been executed
      * @param args the parameters of the method
      */
     public void afterInputMethodInvocation(Method method, Object[] args);
-    
-    
-
 }

@@ -31,9 +31,7 @@
 package org.objectweb.proactive.ic2d.gui;
 
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
-
 import org.objectweb.fractal.gui.FractalGUI;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;

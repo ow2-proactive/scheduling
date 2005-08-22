@@ -150,8 +150,8 @@ public class Service1Locator extends org.apache.axis.client.Service
     }
 
     /**
-    * Set the endpoint address for the specified port name.
-    */
+     * Set the endpoint address for the specified port name.
+     */
     public void setEndpointAddress(java.lang.String portName,
         java.lang.String address) throws javax.xml.rpc.ServiceException {
         if ("Service1Soap".equals(portName)) {
@@ -163,8 +163,8 @@ public class Service1Locator extends org.apache.axis.client.Service
     }
 
     /**
-    * Set the endpoint address for the specified port name.
-    */
+     * Set the endpoint address for the specified port name.
+     */
     public void setEndpointAddress(javax.xml.namespace.QName portName,
         java.lang.String address) throws javax.xml.rpc.ServiceException {
         setEndpointAddress(portName.getLocalPart(), address);

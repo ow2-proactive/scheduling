@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * This class acts as a proxy between a representative interface and the actual
  * destination of the invocation. It therefore allows the creation of shortcuts :
@@ -33,36 +34,36 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * component, without having to cross possible intermediate composite
  * components. Note that <b>the tensioning is performed during the rendez-vous
  * </b>, which guarantees causal dependency.
- * 
+ *
  * @author Matthieu Morel
  */
-public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, Serializable, Cloneable {
-
+public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
+    Serializable, Cloneable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
-
     private static Field universalBodyField;
     private static Field bodyIDField;
-
     Proxy bodyProxyDelegatee = null;
     Proxy nonShortcutProxy = null;
     String fcItfName; // name of the functional interface
 
     static {
         try {
-        universalBodyField = UniversalBodyProxy.class.getDeclaredField("universalBody");
-        universalBodyField.setAccessible(true);
-        bodyIDField = UniversalBodyProxy.class.getSuperclass().getDeclaredField("bodyID");
-        bodyIDField.setAccessible(true);
+            universalBodyField = UniversalBodyProxy.class.getDeclaredField(
+                    "universalBody");
+            universalBodyField.setAccessible(true);
+            bodyIDField = UniversalBodyProxy.class.getSuperclass()
+                                                  .getDeclaredField("bodyID");
+            bodyIDField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
-
-
     }
 
-    private FunctionalInterfaceProxyImpl() {}
+    private FunctionalInterfaceProxyImpl() {
+    }
 
-    public FunctionalInterfaceProxyImpl(Proxy bodyProxyDelegatee, String fcItfName) {
+    public FunctionalInterfaceProxyImpl(Proxy bodyProxyDelegatee,
+        String fcItfName) {
         nonShortcutProxy = this.bodyProxyDelegatee = bodyProxyDelegatee;
         this.fcItfName = fcItfName;
     }
@@ -72,10 +73,10 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, S
             if (logger.isDebugEnabled()) {
                 logger.debug("changing reference on body");
             }
-            UniversalBodyProxy proxy = (UniversalBodyProxy)UniversalBodyProxy.class.newInstance();
+            UniversalBodyProxy proxy = (UniversalBodyProxy) UniversalBodyProxy.class.newInstance();
             universalBodyField.set(proxy, body);
             bodyIDField.set(proxy, body.getID());
-            bodyProxyDelegatee=proxy;
+            bodyProxyDelegatee = proxy;
         } catch (InstantiationException e) {
             e.printStackTrace();
             throw new ProActiveRuntimeException(e);
@@ -88,7 +89,11 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, S
     public Object reify(MethodCall c) throws Throwable {
         // check shortcut by asking source body (LocalBodyStore.currentThreadBody)
         // if shortcut : change ref on Body
-        UniversalBody newDestinationBody = LocalBodyStore.getInstance().getCurrentThreadBody().getShortcutTargetBody(new FunctionalInterfaceID(c.getComponentInterfaceName(), ((UniversalBodyProxy)bodyProxyDelegatee).getBody().getID()));
+        UniversalBody newDestinationBody = LocalBodyStore.getInstance()
+                                                         .getCurrentThreadBody()
+                                                         .getShortcutTargetBody(new FunctionalInterfaceID(
+                    c.getComponentInterfaceName(),
+                    ((UniversalBodyProxy) bodyProxyDelegatee).getBody().getID()));
         if (newDestinationBody != null) {
             changeRefOnBody(newDestinationBody);
         }
@@ -103,21 +108,21 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, S
         return bodyProxyDelegatee;
     }
 
-//    public String getHandlerizableInfo() throws IOException {
-//        return null;
-//    }
-//
-//    public HashMap getHandlersLevel() throws IOException {
-//        return null;
-//    }
-//
-//    public void clearHandlersLevel() throws IOException {
-//    }
-//
-//    public void setExceptionHandler(Handler handler, Class exception) throws IOException {
-//    }
-//
-//    public Handler unsetExceptionHandler(Class exception) throws IOException {
-//        return null;
-//    }
+    //    public String getHandlerizableInfo() throws IOException {
+    //        return null;
+    //    }
+    //
+    //    public HashMap getHandlersLevel() throws IOException {
+    //        return null;
+    //    }
+    //
+    //    public void clearHandlersLevel() throws IOException {
+    //    }
+    //
+    //    public void setExceptionHandler(Handler handler, Class exception) throws IOException {
+    //    }
+    //
+    //    public Handler unsetExceptionHandler(Class exception) throws IOException {
+    //        return null;
+    //    }
 }

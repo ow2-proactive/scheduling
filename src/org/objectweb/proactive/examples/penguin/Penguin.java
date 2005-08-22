@@ -1,33 +1,33 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
@@ -38,220 +38,216 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.migration.Destination;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
 
-public class Penguin implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
-  private boolean onItinerary,initialized;
-  private transient PenguinFrame myFrame;
-  private PenguinMessageReceiver controler;
-  private Penguin otherPenguin;
-  private javax.swing.ImageIcon face;
-  private org.objectweb.proactive.ext.migration.MigrationStrategy myStrategy;
-  private org.objectweb.proactive.ext.migration.MigrationStrategyManager myStrategyManager;
-  private int index;
-  private String name;
-  private String[] itinerary;
+public class Penguin implements org.objectweb.proactive.RunActive,
+    java.io.Serializable {
+    private boolean onItinerary;
+    private boolean initialized;
+    private transient PenguinFrame myFrame;
+    private PenguinMessageReceiver controler;
+    private Penguin otherPenguin;
+    private javax.swing.ImageIcon face;
+    private org.objectweb.proactive.ext.migration.MigrationStrategy myStrategy;
+    private org.objectweb.proactive.ext.migration.MigrationStrategyManager myStrategyManager;
+    private int index;
+    private String name;
+    private String[] itinerary;
 
-
-  /**
-   * Empty constructor for ProActive
-   */
-  public Penguin() {
-  }
-
-
-  public Penguin(Integer ind) {
-    this.index = ind.intValue();
-    this.name = "Agent " + index;
-  }
-
-
-  public void loop() {
-    rebuild();
-  }
-
-
-  public void rebuild() {
-    Body body = ProActive.getBodyOnThis();
-    myFrame = new PenguinFrame(face, body.getNodeURL(), index);
-    //System.out.println("Penguin is here");
-    sendMessageToControler("I just got in node "+ProActive.getBodyOnThis().getNodeURL());
-    try {
-      Thread.sleep(2000);
-    } catch (InterruptedException e) {
+    /**
+     * Empty constructor for ProActive
+     */
+    public Penguin() {
     }
-  }
 
-
-  public void clean() {
-    if (myFrame != null) {
-      myFrame.dispose();
-      myFrame = null;
+    public Penguin(Integer ind) {
+        this.index = ind.intValue();
+        this.name = "Agent " + index;
     }
-  }
 
-
-  public String toString() {
-    return this.name;
-  }
-
-
-  public void initialize(String[] s) {
-    try {
-      //With this we can load the image from the same location than
-      //the classes
-      ClassLoader cl = this.getClass().getClassLoader();
-      java.net.URL u = cl.getResource("org/objectweb/proactive/examples/penguin/PenguinSmall.jpg");
-      face = new javax.swing.ImageIcon(u);
-    } catch (Exception e) {
-      e.printStackTrace();
+    public void loop() {
+        rebuild();
     }
-    myStrategyManager = new org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl(
-            (org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.ProActive.getBodyOnThis());
-    myStrategyManager.onDeparture("clean");
-    myStrategy = new MigrationStrategyImpl();
-    itinerary = s;
-    for (int i = 0; i < s.length; i++)
-      myStrategy.add(s[i], null);
-  }
 
-
-  public void setControler(PenguinMessageReceiver c) {
-    this.controler = c;
-    this.initialized = true;
-  }
-
-
-  public void setOther(Penguin penguin) {
-    this.otherPenguin = penguin;
-  }
-
-
-  public Destination nextHop() {
-    Destination r = myStrategy.next();
-    if (r == null) {
-      myStrategy.reset();
-      r = myStrategy.next();
-    }
-    return r;
-  }
-
-
-  public void runActivity(Body b) {
-    Service service = new Service(b);
-    if (!initialized) {
-      service.blockingServeOldest();
-    }
-    rebuild();
-    Destination r = null;
-    //first we empty the RequestQueue
-    while (b.isActive()) {
-      while (service.hasRequestToServe()) {
-        service.serveOldest();
-      }
-      if (onItinerary) {
-        r = nextHop();
+    public void rebuild() {
+        Body body = ProActive.getBodyOnThis();
+        myFrame = new PenguinFrame(face, body.getNodeURL(), index);
+        //System.out.println("Penguin is here");
+        sendMessageToControler("I just got in node " +
+            ProActive.getBodyOnThis().getNodeURL());
         try {
-	    //Non migration to the same node or a null node
-	    if (r != null && !NodeFactory.isNodeLocal(NodeFactory.getNode(r.getDestination())))
-		ProActive.migrateTo(r.getDestination());
-        } catch (Exception e) {
-          e.printStackTrace();
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
         }
-      } else {
-        service.blockingServeOldest();
-      }
     }
-  }
 
-
-  public String[] getItinerary() {
-    return itinerary;
-  }
-
-
-  public void setItinerary(String[] newItinerary) {
-    sendMessageToControler("I changed my itinerary", java.awt.Color.blue);
-    myStrategy = new MigrationStrategyImpl();
-    itinerary = newItinerary;
-    for (int i = 0; i < newItinerary.length; i++)
-      myStrategy.add(newItinerary[i], null);
-  }
-
-
-  public void start() {
-    sendMessageToControler("I am starting my itinerary", new java.awt.Color(0, 150, 0));
-    myStrategy.reset();
-    onItinerary = true;
-  }
-
-
-  public void suspend() {
-    if (! onItinerary) {
-      sendMessageToControler("I'm already suspended");
-    } else {
-      sendMessageToControler("I suspended my itinerary", java.awt.Color.red);
-      onItinerary = false;
+    public void clean() {
+        if (myFrame != null) {
+            myFrame.dispose();
+            myFrame = null;
+        }
     }
-  }
 
-
-  public void resume() {
-    if (onItinerary) {
-      sendMessageToControler("I'm already on my itinerary");
-    } else {
-      sendMessageToControler("I'm resuming my itinerary", new java.awt.Color(0, 150, 0));
-      onItinerary = true;
+    public String toString() {
+        return this.name;
     }
-  }
 
-
-  public String call() {
-    return "["+name+"] : I am working on node " + ProActive.getBodyOnThis().getNodeURL();
-  }
-
-
-  public void chainedCall() {
-    if (otherPenguin != null) {
-      sendMessageToControler("I'm calling my peer agent");
-      otherPenguin.chainedCall();
-    } else {
-      sendMessageToControler("I don't have a peer agent to call");
+    public void initialize(String[] s) {
+        try {
+            //With this we can load the image from the same location than
+            //the classes
+            ClassLoader cl = this.getClass().getClassLoader();
+            java.net.URL u = cl.getResource(
+                    "org/objectweb/proactive/examples/penguin/PenguinSmall.jpg");
+            face = new javax.swing.ImageIcon(u);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        myStrategyManager = new org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.ProActive.getBodyOnThis());
+        myStrategyManager.onDeparture("clean");
+        myStrategy = new MigrationStrategyImpl();
+        itinerary = s;
+        for (int i = 0; i < s.length; i++)
+            myStrategy.add(s[i], null);
     }
-  }
 
-
-  private void sendMessageToControler(String message) {
-    if (controler != null)
-      controler.receiveMessage("["+name+"] : "+message);
-  }
-
-
-  private void sendMessageToControler(String message, java.awt.Color color) {
-    if (controler != null)
-      controler.receiveMessage("[" + name + "] : " + message, color);
-  }
-
-
-  public static void main(String[] args) {
-  	ProActiveConfiguration.load();
-    if (!(args.length > 1)) {
-     System.out.println("Usage: java org.objectweb.proactive.examples.penguin.Penguin hostname1/NodeName1 hostname2/NodeName2 ");
-      System.exit(-1);
+    public void setControler(PenguinMessageReceiver c) {
+        this.controler = c;
+        this.initialized = true;
     }
-    try {
-      Penguin n = (Penguin) org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), null);
-      //	Penguin n2 = (Penguin)org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), null);
-      n.initialize(args);
-      //	n2.initialize(args);
-      //	n.startItinerary();
-      Object[] param = new Object[1];
-      param[0] = n;
-      org.objectweb.proactive.ProActive.newActive(PenguinMessageReceiver.class.getName(), param, (org.objectweb.proactive.core.node.Node) null);
-      //	n.setOther(n2);
-      //	n2.setOther(null);
-      //	n2.startItinerary();
-    } catch (Exception e) {
-      e.printStackTrace();
+
+    public void setOther(Penguin penguin) {
+        this.otherPenguin = penguin;
     }
-  }
+
+    public Destination nextHop() {
+        Destination r = myStrategy.next();
+        if (r == null) {
+            myStrategy.reset();
+            r = myStrategy.next();
+        }
+        return r;
+    }
+
+    public void runActivity(Body b) {
+        Service service = new Service(b);
+        if (!initialized) {
+            service.blockingServeOldest();
+        }
+        rebuild();
+        Destination r = null;
+
+        //first we empty the RequestQueue
+        while (b.isActive()) {
+            while (service.hasRequestToServe()) {
+                service.serveOldest();
+            }
+            if (onItinerary) {
+                r = nextHop();
+                try {
+                    //Non migration to the same node or a null node
+                    if ((r != null) &&
+                            !NodeFactory.isNodeLocal(NodeFactory.getNode(
+                                    r.getDestination()))) {
+                        ProActive.migrateTo(r.getDestination());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                service.blockingServeOldest();
+            }
+        }
+    }
+
+    public String[] getItinerary() {
+        return itinerary;
+    }
+
+    public void setItinerary(String[] newItinerary) {
+        sendMessageToControler("I changed my itinerary", java.awt.Color.blue);
+        myStrategy = new MigrationStrategyImpl();
+        itinerary = newItinerary;
+        for (int i = 0; i < newItinerary.length; i++)
+            myStrategy.add(newItinerary[i], null);
+    }
+
+    public void start() {
+        sendMessageToControler("I am starting my itinerary",
+            new java.awt.Color(0, 150, 0));
+        myStrategy.reset();
+        onItinerary = true;
+    }
+
+    public void suspend() {
+        if (!onItinerary) {
+            sendMessageToControler("I'm already suspended");
+        } else {
+            sendMessageToControler("I suspended my itinerary",
+                java.awt.Color.red);
+            onItinerary = false;
+        }
+    }
+
+    public void resume() {
+        if (onItinerary) {
+            sendMessageToControler("I'm already on my itinerary");
+        } else {
+            sendMessageToControler("I'm resuming my itinerary",
+                new java.awt.Color(0, 150, 0));
+            onItinerary = true;
+        }
+    }
+
+    public String call() {
+        return "[" + name + "] : I am working on node " +
+        ProActive.getBodyOnThis().getNodeURL();
+    }
+
+    public void chainedCall() {
+        if (otherPenguin != null) {
+            sendMessageToControler("I'm calling my peer agent");
+            otherPenguin.chainedCall();
+        } else {
+            sendMessageToControler("I don't have a peer agent to call");
+        }
+    }
+
+    private void sendMessageToControler(String message) {
+        if (controler != null) {
+            controler.receiveMessage("[" + name + "] : " + message);
+        }
+    }
+
+    private void sendMessageToControler(String message, java.awt.Color color) {
+        if (controler != null) {
+            controler.receiveMessage("[" + name + "] : " + message, color);
+        }
+    }
+
+    public static void main(String[] args) {
+        ProActiveConfiguration.load();
+        if (!(args.length > 1)) {
+            System.out.println(
+                "Usage: java org.objectweb.proactive.examples.penguin.Penguin hostname1/NodeName1 hostname2/NodeName2 ");
+            System.exit(-1);
+        }
+        try {
+            Penguin n = (Penguin) org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(),
+                    null);
+
+            //	Penguin n2 = (Penguin)org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), null);
+            n.initialize(args);
+            //	n2.initialize(args);
+            //	n.startItinerary();
+            Object[] param = new Object[1];
+            param[0] = n;
+            org.objectweb.proactive.ProActive.newActive(PenguinMessageReceiver.class.getName(),
+                param, (org.objectweb.proactive.core.node.Node) null);
+            //	n.setOther(n2);
+            //	n2.setOther(null);
+            //	n2.startItinerary();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

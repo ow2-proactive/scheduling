@@ -33,17 +33,18 @@ package org.objectweb.proactive.core.process.rlogin;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 
+
 /**
  * This class contains a list of RSHProcess processes
  * @author ProActiveTeam
  * @version 1.0, 2 mars 2005
  * @since ProActive 2.2
- * 
+ *
  */
 public class RLoginProcessList extends AbstractListProcessDecorator {
 
     /**
-     * 
+     *
      */
     public RLoginProcessList() {
         super();
@@ -55,5 +56,4 @@ public class RLoginProcessList extends AbstractListProcessDecorator {
     protected ExternalProcessDecorator createProcess() {
         return new RLoginProcess();
     }
-
 }

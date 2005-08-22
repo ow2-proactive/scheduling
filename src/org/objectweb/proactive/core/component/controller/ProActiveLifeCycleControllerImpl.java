@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
@@ -49,9 +51,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-import java.io.Serializable;
-
-
 /**
  * Implementation of the LifeCycleController ({@link org.objectweb.fractal.api.control.LifeCycleController}).<br>
  * It uses the request queue of the active objects.
@@ -59,10 +58,10 @@ import java.io.Serializable;
  * @author Matthieu Morel
  *
  */
-public class ProActiveLifeCycleControllerImpl extends AbstractProActiveController
-    implements ProActiveLifeCycleController, Serializable {
+public class ProActiveLifeCycleControllerImpl
+    extends AbstractProActiveController implements ProActiveLifeCycleController,
+        Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    
     private String fcState = LifeCycleController.STOPPED;
 
     public ProActiveLifeCycleControllerImpl(Component owner) {
@@ -83,8 +82,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
      */
     public String getFcState() {
         return fcState;
-//        return getRequestQueue().isStarted() ? LifeCycleController.STARTED
-//                                             : LifeCycleController.STOPPED;
+        //        return getRequestQueue().isStarted() ? LifeCycleController.STARTED
+        //                                             : LifeCycleController.STOPPED;
     }
 
     /*
@@ -103,9 +102,8 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                         throw new IllegalLifeCycleException(
                             "compulsory client interface " +
                             itf_type.getFcItfName() + " in component " +
-                            Fractal.getNameController(
-                                getFcItfOwner()).getFcName() +
-                            " is not bound. ");
+                            Fractal.getNameController(getFcItfOwner())
+                                   .getFcName() + " is not bound. ");
                     }
                 }
             }
@@ -161,6 +159,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                     }
                 }
             }
+
             //getRequestQueue().stop();
             fcState = LifeCycleController.STOPPED;
             if (logger.isDebugEnabled()) {
@@ -177,8 +176,6 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             ilce.printStackTrace();
         }
     }
-    
-    
 
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController#getFcState(short)
@@ -186,18 +183,18 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
     public String getFcState(short priority) {
         return getFcState();
     }
+
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController#startFc(short)
      */
     public void startFc(short priority) {
         startFc();
-
     }
+
     /*
      * @see org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController#stopFc(short)
      */
     public void stopFc(short priority) {
         stopFc();
-
     }
 }

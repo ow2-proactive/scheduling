@@ -8,15 +8,16 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
+
 /**
  * @author Matthieu Morel
  *
  */
-public class ProActiveNameController extends AbstractProActiveController implements NameController {
-    
+public class ProActiveNameController extends AbstractProActiveController
+    implements NameController {
     // FIXME coherency between this value and the one in component parameters controller
     String name;
-    
+
     /**
      * @param owner
      */
@@ -24,14 +25,14 @@ public class ProActiveNameController extends AbstractProActiveController impleme
         super(owner);
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.NAME_CONTROLLER,
-                    NameController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
+                    NameController.class.getName(), TypeFactory.SERVER,
+                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName(), e);
         }
     }
+
     /*
      * @see org.objectweb.fractal.api.control.NameController#getFcName()
      */
@@ -43,9 +44,6 @@ public class ProActiveNameController extends AbstractProActiveController impleme
      * @see org.objectweb.fractal.api.control.NameController#setFcName(java.lang.String)
      */
     public void setFcName(String name) {
-        this.name=name;
+        this.name = name;
     }
-    
-    
-
 }

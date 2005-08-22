@@ -46,6 +46,7 @@ import org.xml.sax.SAXException;
  * @author vlegrand
  */
 public class WSDLGenerator extends WSConstants {
+
     /**
      * Generates the WSDL document associate with an  active object exposed as a web service
      * @param c The class object that we want to obtain WSDL
@@ -55,8 +56,8 @@ public class WSDLGenerator extends WSConstants {
      * @param methods The public methods allowed for this service
      * @return a String containing the Wsdl document.
      */
-    public static String getWSDL(Class c, String serviceName,
-        String urlRouter, String documentation, String[] methods) {
+    public static String getWSDL(Class c, String serviceName, String urlRouter,
+        String documentation, String[] methods) {
         StringWriter sw = new StringWriter();
         String namespace = serviceName;
 
@@ -64,7 +65,7 @@ public class WSDLGenerator extends WSConstants {
             Emitter emitter = new Emitter();
 
             emitter.setDisallowedMethods(disallowedMethods);
-            
+
             if (methods != null) {
                 Vector allowedMethods = new Vector(methods.length);
                 for (int i = 0; i < methods.length; i++) {
@@ -72,17 +73,15 @@ public class WSDLGenerator extends WSConstants {
                 }
                 emitter.setAllowedMethods(allowedMethods);
             }
-            
-//            TypeMappingRegistryImpl tmr = new TypeMappin gRegistryImpl();
-//            emitter.setTypeMappingRegistry(tmr);
-             
+
+            //            TypeMappingRegistryImpl tmr = new TypeMappin gRegistryImpl();
+            //            emitter.setTypeMappingRegistry(tmr);
             emitter.setLocationUrl(urlRouter);
             emitter.setIntfNamespace(namespace);
             emitter.setImplNamespace(namespace);
             emitter.setCls(c);
             emitter.setServiceElementName(serviceName);
-           
-            
+
             String wsdl = emitter.emitToString(Emitter.MODE_ALL);
             System.out.println(wsdl);
             return wsdl;

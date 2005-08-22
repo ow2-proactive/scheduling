@@ -30,24 +30,23 @@
  */
 package org.objectweb.proactive.ext.webservices.soap;
 
-import org.apache.soap.SOAPException;
-import org.apache.soap.server.DefaultConfigManager;
-import org.apache.soap.server.DeploymentDescriptor;
-
 import java.io.IOException;
 import java.io.PrintWriter;
-
 import java.util.Hashtable;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.soap.SOAPException;
+import org.apache.soap.server.DefaultConfigManager;
+import org.apache.soap.server.DeploymentDescriptor;
+
 
 /**
  * This servlet return a WSDL document whn called with the urn of the service
  * @author vlegrand
-  */
+ */
 public class WsdlServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse res)
         throws IOException {

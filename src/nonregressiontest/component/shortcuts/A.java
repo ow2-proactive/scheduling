@@ -7,18 +7,17 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * @author Matthieu Morel
  */
 public class A implements InitActive, RunActive, EndActive {
-    
     protected static Logger logger = ProActiveLogger.getLogger(
-    "nonregressiontests.components");
+            "nonregressiontests.components");
 
+    public A() {
+    }
 
-    public A() {}
-
-    
     /*
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
@@ -26,8 +25,8 @@ public class A implements InitActive, RunActive, EndActive {
         if (logger.isDebugEnabled()) {
             logger.debug("A : starting activity");
         }
-
     }
+
     /*
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
@@ -37,7 +36,7 @@ public class A implements InitActive, RunActive, EndActive {
         }
         org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
         service.fifoServing();
-        }
+    }
 
     /*
      * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)

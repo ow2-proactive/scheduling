@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
-
 import java.io.DataInputStream;
 import java.io.IOException;
+
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.body.http.util.HttpMessage;
 
 
 /**

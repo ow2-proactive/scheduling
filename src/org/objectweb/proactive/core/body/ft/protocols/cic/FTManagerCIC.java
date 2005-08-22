@@ -220,7 +220,7 @@ public class FTManagerCIC
             // udpate checkpoint index
             if (mi[CKPT_INDEX] > currentCheckpointIndex) {
                 this.nextMax = Math.max(this.nextMax, mi[CKPT_INDEX]);
-			}
+            }
         }
         return currentCheckpointIndex;
     }
@@ -337,9 +337,11 @@ public class FTManagerCIC
                 } catch (SecurityNotAvailableException e1) {
                     toLog = new ReplyImpl(reply.getSourceBodyID(),
                             reply.getSequenceNumber(), reply.getMethodName(),
-                            (FutureResult) Utils.makeDeepCopy(reply.getResult()), null);
+                            (FutureResult) Utils.makeDeepCopy(reply.getResult()),
+                            null);
                 }
-                MessageLog log = new ReplyLog(toLog, destination.getRemoteAdapter());
+                MessageLog log = new ReplyLog(toLog,
+                        destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
                     ((Vector) (this.replyToResend.get(new Integer(i)))).add(log);
                 }
@@ -391,7 +393,8 @@ public class FTManagerCIC
                 request.getMethodCall().makeDeepCopyOfArguments();
                 //must reset the send counter (this request has not been forwarded)
                 request.resetSendCounter();
-                MessageLog log = new RequestLog(request, destination.getRemoteAdapter());
+                MessageLog log = new RequestLog(request,
+                        destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
                     ((Vector) (this.requestToResend.get(new Integer(i)))).add(log);
                 }
@@ -403,7 +406,7 @@ public class FTManagerCIC
     }
 
     public int onServeRequestBefore(Request request) {
-        while (this.haveToCheckpoint()) {            
+        while (this.haveToCheckpoint()) {
             this.checkpoint(request);
         }
         return 0;
@@ -438,18 +441,19 @@ public class FTManagerCIC
 
         //	add pending request to reuqestQueue
         Request pendingRequest = cic.pendingRequest;
+
         // pending request could be null 
         if (pendingRequest != null) {
             char[] mic = pendingRequest.getMessageInfo();
             if ((mic != null) && (mic[IS_ORPHAN_FOR] <= this.checkpointIndex)) {
                 if (this.owner.getID().equals(pendingRequest.getSourceBodyID())) {
                     throw new ProtocolErrorException(
-                            "A self request is orphan for " + this.owner.getID());
+                        "A self request is orphan for " + this.owner.getID());
                 }
                 pendingRequest = new AwaitedRequest(cic.pendingRequest.getSourceBodyID());
                 this.awaitedRequests.add(pendingRequest);
             }
-            queue.addToFront(pendingRequest);   
+            queue.addToFront(pendingRequest);
         }
 
         // building history
@@ -553,21 +557,23 @@ public class FTManagerCIC
                 this.extendReplyLog(this.checkpointIndex + 1);
                 this.extendRequestLog(this.checkpointIndex + 1);
                 ci.replyToResend = (Vector) (this.replyToResend.get(new Integer(this.checkpointIndex +
-                        1)));
+                            1)));
                 ci.requestToResend = (Vector) (this.requestToResend.get(new Integer(this.checkpointIndex +
-                        1)));
+                            1)));
                 ci.pendingRequest = pendingRequest;
                 ci.checkpointIndex = this.checkpointIndex + 1;
 
                 // delete logs
                 this.replyToResend.remove(new Integer(this.checkpointIndex + 1));
-                this.requestToResend.remove(new Integer(this.checkpointIndex + 1));
+                this.requestToResend.remove(new Integer(this.checkpointIndex +
+                        1));
 
                 // inc checkpoint index
                 this.checkpointIndex++;
 
                 // store infos for further sending to the server
-                this.awaitedCheckpointInfo.put(new Integer(this.checkpointIndex), ci);
+                this.awaitedCheckpointInfo.put(new Integer(this.checkpointIndex),
+                    ci);
 
                 // current informations are not stored in the checkpoint 
                 Hashtable awaitedCheckpointTMP = this.awaitedCheckpointInfo;
@@ -577,27 +583,24 @@ public class FTManagerCIC
                 Hashtable replyToSendTMP = this.replyToResend;
                 this.replyToResend = null;
                 this.history = new Vector();
-                
-  
-                
+
                 // checkpoint the active object
                 this.setCheckpointTag(true);
                 c = new Checkpoint((Body) owner, this.checkpointIndex,
                         this.additionalCodebase);
-                
+
                 // send it to server
-                int resStorage = this.storage.storeCheckpoint(c, this.incarnation);
+                int resStorage = this.storage.storeCheckpoint(c,
+                        this.incarnation);
                 this.setCheckpointTag(false);
 
                 // restore current informations               
                 this.awaitedCheckpointInfo = awaitedCheckpointTMP;
                 this.replyToResend = replyToSendTMP;
                 this.requestToResend = requestToSendTMP;
-                
-                
+
                 // reninit checkpoint values
                 this.checkpointTimer = System.currentTimeMillis();
-                
             }
             ((AbstractBody) owner).acceptCommunication();
             end = System.currentTimeMillis();
@@ -625,7 +628,8 @@ public class FTManagerCIC
                     this.historyIndex + ")");
             }
             for (int i = this.historyIndex + 1; i <= to; i++) {
-                CheckpointInfoCIC currentCi = (CheckpointInfoCIC) (this.awaitedCheckpointInfo.get(new Integer(i)));
+                CheckpointInfoCIC currentCi = (CheckpointInfoCIC) (this.awaitedCheckpointInfo.get(new Integer(
+                            i)));
                 currentCi.history = this.history;
                 this.storage.addInfoToCheckpoint(currentCi, this.owner.getID(),
                     i, this.incarnation);
@@ -686,7 +690,7 @@ public class FTManagerCIC
         } catch (IOException e) {
             logger.info("[FAULT] " + this.owner.getID() + " : FAILURE OF " +
                 destination.getID() + " SUSPECTED ON REPLY SENDING : " +
-                e.getMessage());          
+                e.getMessage());
             UniversalBody newDestination = this.communicationFailed(destination.getID(),
                     destination, e);
             return this.sendReply(r, newDestination);
@@ -721,11 +725,11 @@ public class FTManagerCIC
         while (itQueue.hasNext()) {
             Request current = (Request) (itQueue.next());
             char[] mi = current.getMessageInfo();
-            
-            if (mi==null){
+
+            if (mi == null) {
                 // current is an awaited request that is not updated 
-                this.awaitedRequests.add(current); 
-            }else if (mi[IS_ORPHAN_FOR] <= cic.checkpointIndex) {
+                this.awaitedRequests.add(current);
+            } else if (mi[IS_ORPHAN_FOR] <= cic.checkpointIndex) {
                 // current is an orpahn request 
                 toChange.add(current);
             }
@@ -799,9 +803,9 @@ public class FTManagerCIC
     public UniversalBody communicationFailed(UniqueID suspect,
         UniversalBody suspectLocation, Exception e) {
         try {
-         	// send an adapter to suspectLocation: the suspected body could be local
+            // send an adapter to suspectLocation: the suspected body could be local
             UniversalBody newLocation = this.location.searchObject(suspect,
-                    suspectLocation.getRemoteAdapter(), this.owner.getID());        
+                    suspectLocation.getRemoteAdapter(), this.owner.getID());
             if (newLocation == null) {
                 while (newLocation == null) {
                     try {
@@ -810,14 +814,15 @@ public class FTManagerCIC
                             logger.debug("[CIC] Waiting for recovery of " +
                                 suspect);
                         }
-                        Thread.sleep(TIME_TO_RESEND);                  
+                        Thread.sleep(TIME_TO_RESEND);
                     } catch (InterruptedException e2) {
                         e2.printStackTrace();
                     }
                     newLocation = this.location.searchObject(suspect,
-                            suspectLocation.getRemoteAdapter(), this.owner.getID());
-                }              
-           
+                            suspectLocation.getRemoteAdapter(),
+                            this.owner.getID());
+                }
+
                 return newLocation;
             } else {
                 // newLocation is the new location of suspect
@@ -859,7 +864,7 @@ public class FTManagerCIC
      * @return FaultDetector.OK if active object is alive, FaultDetector.IS_DEAD otherwise.
      */
     public int HandleHBEvent(Heartbeat fte) {
-        if (this.owner.isAlive()){
+        if (this.owner.isAlive()) {
             return FaultDetector.OK;
         } else {
             return FaultDetector.IS_DEAD;

@@ -1,7 +1,6 @@
 package org.objectweb.proactive.core.exceptions.manager;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;

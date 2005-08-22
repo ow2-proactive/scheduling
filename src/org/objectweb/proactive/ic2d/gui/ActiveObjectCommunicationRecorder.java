@@ -30,20 +30,21 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
-import org.objectweb.proactive.ic2d.data.ActiveObject;
-import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
-
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import org.objectweb.proactive.ic2d.data.ActiveObject;
+import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
+
+
 /**
- * This class is responsible for drawing the communications in IC2D 
+ * This class is responsible for drawing the communications in IC2D
  * using arrows. As a matter of efficiency the drawing is done in an offscreen buffer and
  * we explicitely handle a dirty flag. If false, then no new image is computed, the previous one is simply
- * handled to the caller. 
+ * handled to the caller.
  */
 public class ActiveObjectCommunicationRecorder {
     public static final int PROPORTIONAL_DRAWING_STYLE = 1;
@@ -74,16 +75,16 @@ public class ActiveObjectCommunicationRecorder {
         drawingStyle = FILAIRE_DRAWING_STYLE;
     }
 
-  /**
-   * Record that a communication has occured between source and dest
-   * Set the dirty flag to true iff there was no such link before
-   */
+    /**
+     * Record that a communication has occured between source and dest
+     * Set the dirty flag to true iff there was no such link before
+     */
     public void recordCommunication(ActiveObjectPanel source,
         ActiveObjectPanel dest) {
-//        System.out.println(
-//            "ActiveObjectCommunicationRecorder.recordCommunication e=" +
-//            enabled + " s=" + source.isDestroyed() + " d=" +
-//            dest.isDestroyed() + " dirty = " + dirty);
+        //        System.out.println(
+        //            "ActiveObjectCommunicationRecorder.recordCommunication e=" +
+        //            enabled + " s=" + source.isDestroyed() + " d=" +
+        //            dest.isDestroyed() + " dirty = " + dirty);
         if (!enabled) {
             return;
         }
@@ -91,14 +92,14 @@ public class ActiveObjectCommunicationRecorder {
         if (source.isDestroyed() || dest.isDestroyed()) {
             return;
         }
-        
+
         //whatever the event, if we are in proportinal or ratio, the
         //screen will have to be redrawn because the size of the arrows
         //will change
         if (this.drawingStyle != FILAIRE_DRAWING_STYLE) {
-        	this.dirty=true;
+            this.dirty = true;
         }
-        
+
         // try to find a mapping source <-> dest
         java.util.HashMap destMap = (java.util.HashMap) panelToPanelsMap.get(source);
         if (destMap == null) {
@@ -161,10 +162,11 @@ public class ActiveObjectCommunicationRecorder {
             }
         }
     }
-/**
-* Change the drawing style
-* Set the current drawing to dirty
-*/
+
+    /**
+     * Change the drawing style
+     * Set the current drawing to dirty
+     */
     public void setDrawingStyle(int drawingStyle) {
         switch (drawingStyle) {
         case PROPORTIONAL_DRAWING_STYLE:
@@ -180,7 +182,7 @@ public class ActiveObjectCommunicationRecorder {
             throw new IllegalArgumentException(
                 "The number passed is not a known drawing style");
         }
-        this.dirty=true;
+        this.dirty = true;
     }
 
     public int getDrawingStyle() {
@@ -197,7 +199,7 @@ public class ActiveObjectCommunicationRecorder {
             maxCommunicationCounter = 1;
             panelToPanelsMap.clear();
             activeObjectToPanelMap.clear();
-            this.dirty=true;
+            this.dirty = true;
         }
     }
 
@@ -213,7 +215,7 @@ public class ActiveObjectCommunicationRecorder {
         if (!enabled) {
             clear();
         }
-        this.dirty=true;
+        this.dirty = true;
     }
 
     public boolean isEnabled() {
@@ -286,15 +288,15 @@ public class ActiveObjectCommunicationRecorder {
                     java.util.Iterator destEntryIterator = destMap.entrySet()
                                                                   .iterator();
                     synchronized (destMap) {
-                        drawOneSourceLinks(destEntryIterator, (Graphics2D) temp,
-                            topLeftCornerScreenCoordinate, oldStroke, ratio,
-                            sourcePanel);
+                        drawOneSourceLinks(destEntryIterator,
+                            (Graphics2D) temp, topLeftCornerScreenCoordinate,
+                            oldStroke, ratio, sourcePanel);
                     }
                 } // end while
             }
         } else {
-//        	System.out
-//					.println("ActiveObjectCommunicationRecorder.drawAllLinksOffScreen() I am not dirty");
+            //        	System.out
+            //					.println("ActiveObjectCommunicationRecorder.drawAllLinksOffScreen() I am not dirty");
         }
         return bi;
     }
@@ -524,7 +526,7 @@ public class ActiveObjectCommunicationRecorder {
      */
     public void setAntiAlias(boolean antiAlias) {
         this.antiAlias = antiAlias;
-        this.dirty=true;
+        this.dirty = true;
     }
 
     /**

@@ -1,8 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,6 +13,9 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 
 class StatusCell extends JPanel implements JobMonitorConstants {

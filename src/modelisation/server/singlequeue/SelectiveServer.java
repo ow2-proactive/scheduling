@@ -1,6 +1,5 @@
 package modelisation.server.singlequeue;
 
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -12,10 +11,11 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.timer.MicroTimer;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-public class SelectiveServer extends SimpleLocationServer implements org.objectweb.proactive.RunActive {
 
-
+public class SelectiveServer extends SimpleLocationServer
+    implements org.objectweb.proactive.RunActive {
     protected MicroTimer microtimer;
+
     //the request of the source to put back in the request line
     //we need to do this because of the request processor and
     //a concurrent access exception
@@ -44,15 +44,15 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
         while (body.isActive()) {
             try {
                 queue.waitForRequest();
-//                System.out.println("XXXX SelectiveServer.live requests available" );
-//                 System.out.println(queue);
+                //                System.out.println("XXXX SelectiveServer.live requests available" );
+                //                 System.out.println(queue);
                 //   queue.processRequests(selectiveProcessor);
                 microtimer.start();
                 this.serve(body, this.getNexRequestAndFlush(queue));
-//                if (this.sourceRequest != null) {
-//                    queue.add(sourceRequest);
-//                    this.sourceRequest = null;
-//                }
+                //                if (this.sourceRequest != null) {
+                //                    queue.add(sourceRequest);
+                //                    this.sourceRequest = null;
+                //                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -78,7 +78,8 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
                 //sender.receiveReply(reply);
             } else {
                 try {
-                    System.out.println("SelectiveServer: puting the request back in the line");
+                    System.out.println(
+                        "SelectiveServer: puting the request back in the line");
                     body.getRequestQueue().add(request);
                     //this.sourceRequest = request;
                     reply = null;
@@ -89,8 +90,8 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
         }
         microtimer.stop();
         System.out.println("SelectiveServer: time microtimer = " +
-                           microtimer.getCumulatedTime() + " for method "
-                           + request.getMethodName());
+            microtimer.getCumulatedTime() + " for method " +
+            request.getMethodName());
         if (reply != null) {
             startTime = System.currentTimeMillis();
             try {
@@ -99,16 +100,14 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
                 e.printStackTrace();
             }
             endTime = System.currentTimeMillis();
-            System.out.println("SelectiveServer:  .............. done  = "
-                               + (endTime - startTime) + " for method "
-                               + request.getMethodName());
-
+            System.out.println("SelectiveServer:  .............. done  = " +
+                (endTime - startTime) + " for method " +
+                request.getMethodName());
         }
 
         //   System.out.println("SelectiveServer: there were " + body.getRequestQueue().size() +
         //                      "  methods in " + ((CompositeRequestQueue) body.getRequestQueue()).getQueueCount() + " queue ");
     }
-
 
     protected boolean sendAnswer(Body body, String name, Request r) {
         return (body.getRequestQueue().getOldest(name) == null);
@@ -121,7 +120,8 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
             requestToServe = queue.removeOldest("updateLocation");
             if (requestToServe != null) {
                 //remove all other requests
-                while (queue.removeOldest("updateLocation") != null) ;
+                while (queue.removeOldest("updateLocation") != null)
+                    ;
             } else {
                 requestToServe = queue.removeOldest("searchObject");
             }
@@ -129,71 +129,70 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
         }
     }
 
-    public static void main(String args[]) {   	
+    public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("usage: modelisation.SelectiveServer <server url> [node]");
+            System.out.println(
+                "usage: modelisation.SelectiveServer <server url> [node]");
             System.exit(-1);
         }
-		ProActiveConfiguration.load();
-        
-        Object arg[] = new Object[1];
+        ProActiveConfiguration.load();
+
+        Object[] arg = new Object[1];
         arg[0] = args[0];
         SelectiveServer server = null;
-        
-        
-    
 
-        
         try {
-            if (args.length == 2){
-            System.out.println("Creating server on node " + args[1]);
-                server = (SelectiveServer) ProActive.newActive(SelectiveServer.class.getName(), arg, NodeFactory.getNode(args[1]));
+            if (args.length == 2) {
+                System.out.println("Creating server on node " + args[1]);
+                server = (SelectiveServer) ProActive.newActive(SelectiveServer.class.getName(),
+                        arg, NodeFactory.getNode(args[1]));
+            } else {
+                server = (SelectiveServer) ProActive.newActive(SelectiveServer.class.getName(),
+                        arg);
             }
-            else
-                server = (SelectiveServer) ProActive.newActive(SelectiveServer.class.getName(), arg);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-//    protected class SelectiveRequestProcessor implements RequestProcessor {
-//        int counter, numberOfRequests;
-//        RequestQueue requestQueue;
-//        Request requestSource, requestAgent;
-//        Body body;
-//
-//        public SelectiveRequestProcessor(RequestQueue requestQueue, Body body) {
-//            this.requestQueue = requestQueue;
-//            this.body = body;
-//        }
-//
-//        public boolean processRequest(Request request) {
-//            if (counter == 0) {
-//                // first call
-//                numberOfRequests = requestQueue.size();
-//                requestSource = null;
-//                requestAgent = null;
-//            }
-//            counter++;
-//            if (request.getMethodName().equals("updateLocation")) {
-//                requestAgent = request;
-//            }
-//            if (request.getMethodName().equals("searchObject")) {
-//                requestSource = request;
-//            }
-//            if (counter == numberOfRequests) {
-////                System.out.println("SelectiveRequestProcessor.processRequest " +
-////                                   " requestAgent = " + requestAgent + " requestSource = " +
-////                                   requestSource);
-//                if (requestAgent != null) {
-//                    serve(body, requestAgent);
-//                }
-//                if (requestSource != null) {
-//                    serve(body, requestSource);
-//                }
-//                this.counter = 0;
-//            }
-//            return true;
-//        }
-//    }
+    //    protected class SelectiveRequestProcessor implements RequestProcessor {
+    //        int counter, numberOfRequests;
+    //        RequestQueue requestQueue;
+    //        Request requestSource, requestAgent;
+    //        Body body;
+    //
+    //        public SelectiveRequestProcessor(RequestQueue requestQueue, Body body) {
+    //            this.requestQueue = requestQueue;
+    //            this.body = body;
+    //        }
+    //
+    //        public boolean processRequest(Request request) {
+    //            if (counter == 0) {
+    //                // first call
+    //                numberOfRequests = requestQueue.size();
+    //                requestSource = null;
+    //                requestAgent = null;
+    //            }
+    //            counter++;
+    //            if (request.getMethodName().equals("updateLocation")) {
+    //                requestAgent = request;
+    //            }
+    //            if (request.getMethodName().equals("searchObject")) {
+    //                requestSource = request;
+    //            }
+    //            if (counter == numberOfRequests) {
+    ////                System.out.println("SelectiveRequestProcessor.processRequest " +
+    ////                                   " requestAgent = " + requestAgent + " requestSource = " +
+    ////                                   requestSource);
+    //                if (requestAgent != null) {
+    //                    serve(body, requestAgent);
+    //                }
+    //                if (requestSource != null) {
+    //                    serve(body, requestSource);
+    //                }
+    //                this.counter = 0;
+    //            }
+    //            return true;
+    //        }
+    //    }
 }

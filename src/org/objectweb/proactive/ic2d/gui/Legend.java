@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
-import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -49,6 +47,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
+
+import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
 
 
 public class Legend extends JFrame {
@@ -253,7 +253,7 @@ public class Legend extends JFrame {
                 nodePanel.add(comp);
                 nodePanel.add(new JLabel("RMI Node"));
             }
-            
+
             {
                 JComponent comp = new JPanel() {
                         public void paintComponent(Graphics g) {

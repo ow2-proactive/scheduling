@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.gui.components.tree.model;
 
 import org.objectweb.fractal.gui.tree.model.BasicTreeModel;
-
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
 

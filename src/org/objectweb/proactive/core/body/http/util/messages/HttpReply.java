@@ -39,49 +39,44 @@ import org.objectweb.proactive.core.body.http.util.HttpMessage;
 import org.objectweb.proactive.core.body.http.util.HttpUtils;
 import org.objectweb.proactive.core.body.reply.Reply;
 
+
 /**
- * This kind of HTTP message isusefull to receive and send replies. 
+ * This kind of HTTP message isusefull to receive and send replies.
  * @author vlegrand
  * @see HttpMessage
  */
-public class HttpReply extends HttpMessage  implements Serializable {
-	
-	  private Reply reply;
-	    private UniqueID  idBody;
-	 
-/**
- *  Constructs an HTTP Message containing a ProActive Reply
- * @param reply The ProActive Reply to encapsulate
- * @param idBody The unique id of the targeted active object 
- */
-	    public HttpReply(Reply reply , UniqueID idBody, String url) {
-	        super(url);
-	        this.reply = reply;
-	        this.idBody= idBody;
-	    }
+public class HttpReply extends HttpMessage implements Serializable {
+    private Reply reply;
+    private UniqueID idBody;
 
+    /**
+     *  Constructs an HTTP Message containing a ProActive Reply
+     * @param reply The ProActive Reply to encapsulate
+     * @param idBody The unique id of the targeted active object
+     */
+    public HttpReply(Reply reply, UniqueID idBody, String url) {
+        super(url);
+        this.reply = reply;
+        this.idBody = idBody;
+    }
 
-	    public int getReturnedObject () {
-	  
-	        if (this.returnedObject != null)
-	            return ((Integer)this.returnedObject).intValue();
-	        return 0; // or throws an exception ...
-	    }
-	 
-	    public Object  processMessage() {
-	 
-	    	try {
-	        	Body body = HttpUtils.getBody(idBody);
-	            if (this.reply != null) 
-	                return new Integer(body.receiveReply(this.reply));
-	          
-	        } catch (IOException e) {
-	         
-	            e.printStackTrace();
-	        } 
-	    
-	    return null;
-	    }
+    public int getReturnedObject() {
+        if (this.returnedObject != null) {
+            return ((Integer) this.returnedObject).intValue();
+        }
+        return 0; // or throws an exception ...
+    }
+
+    public Object processMessage() {
+        try {
+            Body body = HttpUtils.getBody(idBody);
+            if (this.reply != null) {
+                return new Integer(body.receiveReply(this.reply));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
-
-

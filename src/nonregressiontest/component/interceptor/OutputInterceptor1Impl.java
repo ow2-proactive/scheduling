@@ -2,8 +2,6 @@ package nonregressiontest.component.interceptor;
 
 import java.lang.reflect.Method;
 
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -13,8 +11,11 @@ import org.objectweb.proactive.core.component.controller.AbstractProActiveContro
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
-public class OutputInterceptor1Impl extends AbstractProActiveController implements OutputInterceptor1, OutputInterceptor  {
-    
+import nonregressiontest.component.controller.DummyController;
+
+
+public class OutputInterceptor1Impl extends AbstractProActiveController
+    implements OutputInterceptor1, OutputInterceptor {
     public OutputInterceptor1Impl(Component owner) {
         super(owner);
         try {
@@ -26,7 +27,7 @@ public class OutputInterceptor1Impl extends AbstractProActiveController implemen
                 this.getClass().getName());
         }
     }
-    
+
     public void setDummyValue(String value) {
         try {
             ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
@@ -44,7 +45,6 @@ public class OutputInterceptor1Impl extends AbstractProActiveController implemen
         }
     }
 
-
     public void afterOutputMethodInvocation(Method method, Object[] args) {
         setDummyValue(getDummyValue() + OutputInterceptor1.AFTER_INTERCEPTION);
     }
@@ -52,6 +52,4 @@ public class OutputInterceptor1Impl extends AbstractProActiveController implemen
     public void beforeOutputMethodInvocation(Method method, Object[] args) {
         setDummyValue(getDummyValue() + OutputInterceptor1.BEFORE_INTERCEPTION);
     }
-
-
 }

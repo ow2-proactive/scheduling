@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.core.exceptions;
 
-import org.objectweb.proactive.ProActive;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.ProActive;
 
 
 /**

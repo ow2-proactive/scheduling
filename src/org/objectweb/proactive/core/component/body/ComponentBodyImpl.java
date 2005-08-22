@@ -30,10 +30,12 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
@@ -42,9 +44,6 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /** This class has been inserted into the bodies hierarchy in order to instantiate the

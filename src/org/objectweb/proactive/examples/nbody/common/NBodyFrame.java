@@ -44,10 +44,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-
 import java.io.IOException;
 import java.io.Serializable;
-
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -122,7 +120,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
                 "org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
         final Image fond = getToolkit().getImage(u);
 
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); 
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.addWindowListener(this);
 
         // panels

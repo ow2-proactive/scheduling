@@ -108,6 +108,7 @@ public class ProActiveSecurityManager implements Serializable {
     /* Active object certificate */
     protected X509Certificate certificate;
     protected byte[] encodedCertificate;
+
     /* Active Object private Key */
     protected PrivateKey privateKey;
 
@@ -389,9 +390,6 @@ public class ProActiveSecurityManager implements Serializable {
 
         distantBody = distantBody.getRemoteAdapter();
 
-        
-
-        
         /*
            // get runtime Policy Server if exists
            try {
@@ -542,11 +540,7 @@ public class ProActiveSecurityManager implements Serializable {
                 distantBodyPolicy);
 
         //scDistant.setProposedPolicy(resultPolicy);
-        
-       //distantBody.getPolicy(scDistant);
-        
-
-
+        //distantBody.getPolicy(scDistant);
         long sessionID = 0;
         try {
             sessionID = distantBody.startNewSession(resultPolicy);
@@ -637,7 +631,6 @@ public class ProActiveSecurityManager implements Serializable {
      */
     public byte[][] encrypt(long sessionID, Object object) {
         Session session = (Session) sessions.get(new Long(sessionID));
-
 
         if (session != null) {
             try {
@@ -1528,18 +1521,14 @@ public class ProActiveSecurityManager implements Serializable {
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
         //	privateKeyEncoded = privateKey.getEncoded();
-   
         try {
-        	if (certificate != null ) {
-           encodedCertificate = certificate.getEncoded();
-            
-        	}
+            if (certificate != null) {
+                encodedCertificate = certificate.getEncoded();
+            }
         } catch (CertificateEncodingException e) {
             e.printStackTrace();
-        } 
-    	out.defaultWriteObject();
-
-   
+        }
+        out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -1558,14 +1547,14 @@ public class ProActiveSecurityManager implements Serializable {
         //decodePrivateKey();
         randomLongGenerator = new RandomLongGenerator();
 
-        
         if (encodedCertificate != null) {
-        certificate = ProActiveSecurity.decodeCertificate(encodedCertificate);
+            certificate = ProActiveSecurity.decodeCertificate(encodedCertificate);
 
-        this.certificate = policyServer.getCertificate();
-        this.privateKey = policyServer.getPrivateKey();
-        this.publicKey = certificate.getPublicKey();
+            this.certificate = policyServer.getCertificate();
+            this.privateKey = policyServer.getPrivateKey();
+            this.publicKey = certificate.getPublicKey();
         }
+
         //    logger.info("creating randomgenerator " + randomLongGenerator);
         //    logger.info("Security Manager restarted");
     }

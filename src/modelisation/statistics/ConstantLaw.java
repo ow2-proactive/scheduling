@@ -9,25 +9,22 @@
 package modelisation.statistics;
 
 public class ConstantLaw implements RandomNumberGenerator {
-
     protected double parameter;
     protected String variableName;
 
     public ConstantLaw(String variableName) {
-        this.variableName=variableName;
+        this.variableName = variableName;
     }
 
     public double next() {
-        return 1/parameter;
+        return 1 / parameter;
     }
 
     public void initialize(double parameter) {
         this.parameter = parameter;
     }
 
-      public void initialize(double parameter, long seed) {
+    public void initialize(double parameter, long seed) {
         this.initialize(parameter);
     }
-
-
 }

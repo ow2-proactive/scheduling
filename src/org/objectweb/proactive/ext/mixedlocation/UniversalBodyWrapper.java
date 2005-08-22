@@ -135,11 +135,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody.setImmediateService(methodName);
     }
 
-    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException {
         this.wrappedBody.removeImmediateService(methodName, parametersTypes);
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException {
         this.wrappedBody.setImmediateService(methodName, parametersTypes);
     }
 
@@ -184,53 +186,54 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //        System.gc();
     }
 
-//    /**
-//     * Get information about the handlerizable object
-//     * @return information about the handlerizable object
-//     */
-//    public String getHandlerizableInfo() throws java.io.IOException {
-//        return this.wrappedBody.getHandlerizableInfo();
-//    }
-//
-//    /** Give a reference to a local map of handlers
-//     * @return A reference to a map of handlers
-//     */
-//    public HashMap getHandlersLevel() throws java.io.IOException {
-//        return this.wrappedBody.getHandlersLevel();
-//    }
-//
-//    /**
-//     * Clear the local map of handlers
-//     */
-//    public void clearHandlersLevel() throws java.io.IOException {
-//        this.wrappedBody.clearHandlersLevel();
-//    }
-//
-//    /** Set a new handler within the table of the Handlerizable Object
-//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//     * @param handler A class of handler associated with a class of non functional exception.
-//     */
-//    public void setExceptionHandler(Handler handler, Class exception)
-//        throws java.io.IOException {
-//        this.wrappedBody.setExceptionHandler(handler, exception);
-//    }
-//
-//    /** Remove a handler from the table of the Handlerizable Object
-//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//     * @return The removed handler or null
-//     */
-//    public Handler unsetExceptionHandler(Class exception)
-//        throws java.io.IOException {
-//        return this.wrappedBody.unsetExceptionHandler(exception);
-//    }
-    
-//  NFEProducer implementation
+    //    /**
+    //     * Get information about the handlerizable object
+    //     * @return information about the handlerizable object
+    //     */
+    //    public String getHandlerizableInfo() throws java.io.IOException {
+    //        return this.wrappedBody.getHandlerizableInfo();
+    //    }
+    //
+    //    /** Give a reference to a local map of handlers
+    //     * @return A reference to a map of handlers
+    //     */
+    //    public HashMap getHandlersLevel() throws java.io.IOException {
+    //        return this.wrappedBody.getHandlersLevel();
+    //    }
+    //
+    //    /**
+    //     * Clear the local map of handlers
+    //     */
+    //    public void clearHandlersLevel() throws java.io.IOException {
+    //        this.wrappedBody.clearHandlersLevel();
+    //    }
+    //
+    //    /** Set a new handler within the table of the Handlerizable Object
+    //     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+    //     * @param handler A class of handler associated with a class of non functional exception.
+    //     */
+    //    public void setExceptionHandler(Handler handler, Class exception)
+    //        throws java.io.IOException {
+    //        this.wrappedBody.setExceptionHandler(handler, exception);
+    //    }
+    //
+    //    /** Remove a handler from the table of the Handlerizable Object
+    //     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+    //     * @return The removed handler or null
+    //     */
+    //    public Handler unsetExceptionHandler(Class exception)
+    //        throws java.io.IOException {
+    //        return this.wrappedBody.unsetExceptionHandler(exception);
+    //    }
+    //  NFEProducer implementation
     public void addNFEListener(NFEListener listener) {
         wrappedBody.addNFEListener(listener);
     }
+
     public void removeNFEListener(NFEListener listener) {
-    	wrappedBody.removeNFEListener(listener);
+        wrappedBody.removeNFEListener(listener);
     }
+
     public int fireNFE(NonFunctionalException e) {
         return wrappedBody.fireNFE(e);
     }
@@ -343,7 +346,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO implement
-        throw new ProActiveRuntimeException("create shortcut method not implemented yet");
-        
+        throw new ProActiveRuntimeException(
+            "create shortcut method not implemented yet");
     }
 }

@@ -1,13 +1,14 @@
 package org.objectweb.proactive.core.component.request;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
 import org.objectweb.proactive.core.util.log.Loggers;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * This class represents a shortcut. A shortcut represents the link between a
@@ -28,27 +29,27 @@ import java.util.Vector;
  * because this may be useful for managing dynamic reconfiguration in the
  * future.
  * <p>
- * 
+ *
  * @author Matthieu Morel
  */
 public class Shortcut implements Serializable {
-    
-    public static Logger logger = Logger.getLogger(Loggers.COMPONENTS_REQUEST); 
-
+    public static Logger logger = Logger.getLogger(Loggers.COMPONENTS_REQUEST);
     private transient UniversalBody sender;
-    private  List steps; // the list of crossed membranes; TODO_M transient 
+    private List steps; // the list of crossed membranes; TODO_M transient 
+
     // FIXME replace with a custom list with custom serialization of contained bodies 
-
     private String fcFunctionalInterfaceName;
-    
-    public Shortcut() {}
 
-    public Shortcut(String functionalInterfaceName, UniversalBody sender, UniversalBody intermediate) {
+    public Shortcut() {
+    }
+
+    public Shortcut(String functionalInterfaceName, UniversalBody sender,
+        UniversalBody intermediate) {
         fcFunctionalInterfaceName = functionalInterfaceName;
         steps = new Vector();
         this.sender = sender;
         steps.add(intermediate);
-   }
+    }
 
     public UniversalBody getSender() {
         return sender;
@@ -61,7 +62,7 @@ public class Shortcut implements Serializable {
     /**
      * This method returns length of the shortcut, in other words the number
      * of bindings it represents.
-     * A shortcut of length 1 indicates a normal binding. 
+     * A shortcut of length 1 indicates a normal binding.
      * @return
      */
     public int length() {
@@ -86,26 +87,27 @@ public class Shortcut implements Serializable {
      */
     public FunctionalInterfaceID getLinkedInterfaceID() {
         // it is the first encountered interface while creating the shortcut
-        return new FunctionalInterfaceID(fcFunctionalInterfaceName, ((UniversalBody)steps.get(0)).getID());
+        return new FunctionalInterfaceID(fcFunctionalInterfaceName,
+            ((UniversalBody) steps.get(0)).getID());
     }
 
     /**
-     * 
+     *
      * @return the ID of the last encountered interface when creating the shortcut
      */
     public FunctionalInterfaceID getShortcutInterfaceID() {
         // it is the last encountered interface while creating the shortcut
-        return new FunctionalInterfaceID(fcFunctionalInterfaceName, ((UniversalBody)steps.get(steps.size()-1)).getID());
+        return new FunctionalInterfaceID(fcFunctionalInterfaceName,
+            ((UniversalBody) steps.get(steps.size() - 1)).getID());
     }
 
     /**
-     * 
+     *
      * @return a reference on the body which is targetted by this shortcut
      */
     public UniversalBody getShortcutTargetBody() {
-        return (UniversalBody)steps.get(steps.size()-1);
+        return (UniversalBody) steps.get(steps.size() - 1);
     }
-    
 
     //
     // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
@@ -121,9 +123,4 @@ public class Shortcut implements Serializable {
         in.defaultReadObject();
         sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }
-
-
-
-
-
 }

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body.ft.checkpointing;
 
+
 /**
  * Marker interface for informations on a checkpoint.
  * @author cdelbe

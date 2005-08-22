@@ -3,7 +3,7 @@ package modelisation.simulator.common;
 public class Averagator {
     protected double value;
     protected int number;
-    
+
     //    protected BigDecimal value2;
     public Averagator() {
         // this.value2 = new BigDecimal(0);

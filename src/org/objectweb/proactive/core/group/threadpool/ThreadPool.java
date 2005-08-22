@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.core.group.threadpool;
 
-import org.objectweb.proactive.core.group.AbstractProcessForGroup;
-
 import java.util.ArrayList;
+
+import org.objectweb.proactive.core.group.AbstractProcessForGroup;
 
 
 /**

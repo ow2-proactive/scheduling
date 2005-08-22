@@ -36,10 +36,10 @@ import org.objectweb.proactive.core.node.Node;
 
 public class NodeCreationEventProducerImpl extends AbstractEventProducer
     implements NodeCreationEventProducer {
-    
-    public NodeCreationEventProducerImpl(){
-        super(false,false);
+    public NodeCreationEventProducerImpl() {
+        super(false, false);
     }
+
     //
     //-------------------inherited methods from AbstractEventProducer------------------
     //
@@ -59,7 +59,8 @@ public class NodeCreationEventProducerImpl extends AbstractEventProducer
     //
     //-------------------PROTECTED METHODS------------------
     //
-    protected void notifyListeners(VirtualNode vn, int type, Node node, int nodeCreated) {
+    protected void notifyListeners(VirtualNode vn, int type, Node node,
+        int nodeCreated) {
         if (hasListeners()) {
             notifyAllListeners(new NodeCreationEvent(vn, type, node, nodeCreated));
         } else {

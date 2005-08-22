@@ -49,11 +49,12 @@ public class BernouilliLaw implements RandomNumberGenerator {
 
     public double next() {
         double value = random.nextDouble();
+
         //System.out.println("Value = " + value);
         if (value < p) {
-            return 1.0/value1;
+            return 1.0 / value1;
         } else {
-            return 1.0/value2;
+            return 1.0 / value2;
         }
 
         //return 0;

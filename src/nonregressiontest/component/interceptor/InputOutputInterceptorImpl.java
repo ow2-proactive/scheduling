@@ -2,8 +2,6 @@ package nonregressiontest.component.interceptor;
 
 import java.lang.reflect.Method;
 
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -12,13 +10,15 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
+import nonregressiontest.component.controller.DummyController;
+
 
 /**
  * @author Matthieu Morel
  *
  */
 public class InputOutputInterceptorImpl extends AbstractProActiveController
-    implements InputOutputInterceptor{
+    implements InputOutputInterceptor {
 
     /**
      * @param owner
@@ -54,20 +54,23 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
 
     public void afterInputMethodInvocation(Method method, Object[] args) {
         //System.out.println("after method invocation");
-        setDummyValue(getDummyValue() + InputOutputInterceptor.AFTER_INPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() +
+            InputOutputInterceptor.AFTER_INPUT_INTERCEPTION);
     }
 
     public void beforeInputMethodInvocation(Method method, Object[] args) {
         //        System.out.println("before method invocation");
-        setDummyValue(getDummyValue() + InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() +
+            InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION);
     }
-    
+
     public void afterOutputMethodInvocation(Method method, Object[] args) {
-        setDummyValue(getDummyValue() + InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() +
+            InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION);
     }
 
     public void beforeOutputMethodInvocation(Method method, Object[] args) {
-        setDummyValue(getDummyValue() + InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() +
+            InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION);
     }
-
 }

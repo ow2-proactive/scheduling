@@ -53,7 +53,7 @@ public interface UniversalService extends Serializable {
     /**
      * Returns the name of the service.
      * The name is static, it means that it is the same name for all instances of a
-     * sefvice's class 
+     * sefvice's class
      * @return the static name of the service
      */
     public String getServiceName();

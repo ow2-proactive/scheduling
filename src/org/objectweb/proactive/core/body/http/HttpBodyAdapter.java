@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.body.http;
 
+import java.io.IOException;
+import java.util.Hashtable;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.RemoteBody;
@@ -38,10 +41,6 @@ import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedExce
 import org.objectweb.proactive.core.body.http.util.messages.HttpLookupMessage;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.IOException;
-
-import java.util.Hashtable;
 
 
 /**

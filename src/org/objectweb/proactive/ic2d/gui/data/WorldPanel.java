@@ -50,12 +50,10 @@ public class WorldPanel extends AbstractDataObjectPanel
     private WorldObject worldObject;
     private ActiveObjectCommunicationRecorder communicationRecorder;
     private String alignLayout = "H"; //keep state of layout H or V
-
     private Timer timer;
-    
     private int w;
     private int h;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -79,21 +77,21 @@ public class WorldPanel extends AbstractDataObjectPanel
                         controller);
                 }
             });
-//        popup.add(new javax.swing.AbstractAction("Monitor a new RMI Node", null) {
-//                public void actionPerformed(java.awt.event.ActionEvent e) {
-//                    DialogUtils.openNewNodeDialog(parentFrame, worldObject,
-//                        controller);
-//                }
-//            });
+
+        //        popup.add(new javax.swing.AbstractAction("Monitor a new RMI Node", null) {
+        //                public void actionPerformed(java.awt.event.ActionEvent e) {
+        //                    DialogUtils.openNewNodeDialog(parentFrame, worldObject,
+        //                        controller);
+        //                }
+        //            });
         popup.add(new javax.swing.AbstractAction("Monitor all JINI Hosts", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    DialogUtils.openNewJINIHostsDialog(parentFrame, worldObject,
-                            controller);
+                    DialogUtils.openNewJINIHostsDialog(parentFrame,
+                        worldObject, controller);
                 }
             });
 
-        popup.add(new javax.swing.AbstractAction("Monitor a new JINI Host",
-                null) {
+        popup.add(new javax.swing.AbstractAction("Monitor a new JINI Host", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     DialogUtils.openNewJINIHostDialog(parentFrame, worldObject,
                         controller);
@@ -191,33 +189,33 @@ public class WorldPanel extends AbstractDataObjectPanel
         int w2 = dim.width;
         int h2 = dim.height;
 
-
         //first time we are on display
-        if (w==0 && h ==0) {
-        	w =w2;
-        	h = h2;
-        	this.setDirty(true);
+        if ((w == 0) && (h == 0)) {
+            w = w2;
+            h = h2;
+            this.setDirty(true);
         }
+
         //we have been moved since the last time, we need 
         //to force a redraw of the arrows
-        if (w2!=w || h2 != h) {
-        	w=w2;
-        	h=h2;
-        	this.setDirty(true);
+        if ((w2 != w) || (h2 != h)) {
+            w = w2;
+            h = h2;
+            this.setDirty(true);
         }
-       super.paint(g);
-       Graphics2D g2 = (Graphics2D)g;
+        super.paint(g);
+        Graphics2D g2 = (Graphics2D) g;
 
         if (communicationRecorder.isEnabled()) {
             //we create a fully transparent image
-        	//we indicate to the communication recorder if we are dirty
-        	//which means the image would have to be redrawn
-            BufferedImage bi =  communicationRecorder.drawAllLinksOffScreen(w2,h2,this.getLocationOnScreen(), this.isDirty());
+            //we indicate to the communication recorder if we are dirty
+            //which means the image would have to be redrawn
+            BufferedImage bi = communicationRecorder.drawAllLinksOffScreen(w2,
+                    h2, this.getLocationOnScreen(), this.isDirty());
             this.setDirty(false);
             Graphics tempGraphics = bi.createGraphics();
             g2.drawImage(bi, 0, 0, this);
         }
-     
     }
 
     /**

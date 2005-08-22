@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.core.util;
 
-import org.apache.log4j.Logger;
-
 import java.util.Iterator;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -324,10 +324,10 @@ public class CircularArrayList extends java.util.AbstractList
     }
 
     public boolean addAll(int index, java.util.Collection c) {
-    	boolean result = true;
+        boolean result = true;
         Iterator it = c.iterator();
         while (it.hasNext()) {
-        	result &= this.add(it.next());
+            result &= this.add(it.next());
         }
         return result;
     }
@@ -368,5 +368,4 @@ public class CircularArrayList extends java.util.AbstractList
         for (int i = 0; i < tail; i++)
             array[i] = s.readObject();
     }
-
 }

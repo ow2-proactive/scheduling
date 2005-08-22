@@ -14,7 +14,6 @@ package modelisation.simulator.common;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class MemoryArray {
-
     protected static int DEFAULT_MEMORY_SIZE = 3;
 
     // protected int memorySize;
@@ -52,7 +51,6 @@ public class MemoryArray {
     }
 
     public double[] getMemory() {
-
         double[] tmp;
         if (this.maxCapacityReached) {
             tmp = new double[memory.length];
@@ -85,7 +83,6 @@ public class MemoryArray {
     }
 
     public double[] getCounter() {
-
         double[] tmp;
         if (this.maxCapacityReached) {
             tmp = new double[position.length];
@@ -104,7 +101,6 @@ public class MemoryArray {
     }
 
     public double[][] getMemoryAndCounter() {
-
         double[][] tmp = null;
         tmp = new double[2][];
         tmp[0] = this.getMemory();
@@ -113,7 +109,6 @@ public class MemoryArray {
     }
 
     public double[] getFirstLast() {
-
         double[] tmp = new double[2];
         if (this.maxCapacityReached) {
             tmp[0] = memory[headPosition];
@@ -142,7 +137,6 @@ public class MemoryArray {
     }
 
     public double calculateRate() {
-
         double[] memory = this.getMemory();
         double b = 0;
         double sumX = (memory.length * (memory.length + 1)) / 2;
@@ -172,7 +166,6 @@ public class MemoryArray {
     }
 
     public String prettyPrint() {
-
         StringBuffer tmpMemory = new StringBuffer();
         StringBuffer tmpCounter = new StringBuffer();
         if (this.maxCapacityReached) {
@@ -192,7 +185,6 @@ public class MemoryArray {
     }
 
     public String toString() {
-
         double[] mem = this.getMemory();
         StringBuffer tmp = new StringBuffer();
 
@@ -212,7 +204,6 @@ public class MemoryArray {
     }
 
     public static void main(String[] args) {
-
         MemoryArray m = new MemoryArray(5);
         for (int i = 0; i < args.length; i++) {
             m.add(Double.parseDouble(args[i]));

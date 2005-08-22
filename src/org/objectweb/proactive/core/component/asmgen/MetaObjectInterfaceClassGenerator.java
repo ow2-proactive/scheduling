@@ -108,8 +108,9 @@ public class MetaObjectInterfaceClassGenerator
     }
 
     protected ProActiveInterface generateInterface(final String interfaceName,
-            Component owner, InterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
-            throws InterfaceGenerationFailedException {
+        Component owner, InterfaceType interfaceType, boolean isInternal,
+        boolean isFunctionalInterface)
+        throws InterfaceGenerationFailedException {
         try {
             if (ProActiveLogger.getLogger("components.bytecodegeneration")
                                    .isDebugEnabled()) {
@@ -124,8 +125,8 @@ public class MetaObjectInterfaceClassGenerator
             // add functional interface
             Class functional_itf = Class.forName(interfaceType.getFcItfSignature());
             interfacesToImplement.add(functional_itf);
-            
-//            // add super-interfaces of the functional interface
+
+            //            // add super-interfaces of the functional interface
             interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
             Utils.addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
 
@@ -225,7 +226,8 @@ public class MetaObjectInterfaceClassGenerator
         return;
     }
 
-    protected CodeVisitor createMethod(int methodIndex, Method m, boolean isFunctional) {
+    protected CodeVisitor createMethod(int methodIndex, Method m,
+        boolean isFunctional) {
         String itf = Type.getInternalName(m.getDeclaringClass());
         String method_name = m.getName();
         String method_descriptor = Type.getMethodDescriptor(m);
@@ -267,12 +269,11 @@ public class MetaObjectInterfaceClassGenerator
             OBJECT_TYPE, null, null);
     }
 
-    protected void createStaticVariables(boolean isFunctionalInterface, String interfaceName) {
+    protected void createStaticVariables(boolean isFunctionalInterface,
+        String interfaceName) {
         // creates and set the field that points to the interface name
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC,
-            INTERFACE_NAME_FIELD_NAME,
-            INTERFACE_NAME_TYPE, interfaceName, null);
-
+            INTERFACE_NAME_FIELD_NAME, INTERFACE_NAME_TYPE, interfaceName, null);
     }
 
     protected void createStaticInitializer() throws ClassNotFoundException {

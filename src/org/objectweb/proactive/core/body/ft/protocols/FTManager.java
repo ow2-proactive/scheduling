@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -42,12 +47,6 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-
-import java.net.MalformedURLException;
-
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 
 
 /**

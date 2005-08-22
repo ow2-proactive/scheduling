@@ -31,23 +31,20 @@
 package org.objectweb.proactive.core.component.adl.vnexportation;
 
 import org.objectweb.fractal.adl.ADLException;
-
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 
 
 /**
  * An implementation of the {@link org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder} interface.
- * 
+ *
  * This class performs a logical composition of the exported virtual nodes of the components ADL.
- * 
- * 
+ *
+ *
  * @author Matthieu Morel
  *
  */
 public class ExportedVirtualNodesBuilderImpl
     implements ExportedVirtualNodesBuilder {
-    
-    
     // implementation of ExportedVirtualNodesBuilder
     public void compose(String componentName,
         ExportedVirtualNode[] exportedVirtualNodes,

@@ -1,14 +1,13 @@
 package org.objectweb.proactive.core.body.ft.util;
 
-import org.objectweb.proactive.core.rmi.RegistryHelper;
-
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
-
 import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
+
+import org.objectweb.proactive.core.rmi.RegistryHelper;
 
 
 /**

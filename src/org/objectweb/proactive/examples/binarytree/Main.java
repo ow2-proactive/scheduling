@@ -1,53 +1,55 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.binarytree;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
+
 public class Main {
-	
-	static Logger logger = Logger.getLogger(Main.class.getName());
-	
+    static Logger logger = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
         Main theMainActiveObject = null;
+
         // Creates an active instance of this class
-		ProActiveConfiguration.load();
+        ProActiveConfiguration.load();
         try {
-            theMainActiveObject = (Main)org.objectweb.proactive.ProActive.newActive(Main.class.getName(), 
-                                                                                    null);
+            theMainActiveObject = (Main) org.objectweb.proactive.ProActive.newActive(Main.class.getName(),
+                    null);
         } catch (Exception e) {
             logger.error(e);
             System.exit(1);
         }
+
         // Asks it to perform the test
         theMainActiveObject.doStuff();
         return;
@@ -55,6 +57,7 @@ public class Main {
 
     public void doStuff() {
         BinaryTree myTree = null;
+
         // This is the code for instanciating a passive version of the binary tree
         //        myTree = new BinaryTree ();
         // This is the code for instanciating an active version of the binary tree
@@ -67,12 +70,13 @@ public class Main {
         // * The last parameter 'null' means we want to instanciate this object in the current virtual machine
         try {
             //          Object o = new org.objectweb.proactive.examples.binarytree.ActiveBinaryTree ();
-            myTree = (BinaryTree)org.objectweb.proactive.ProActive.newActive(ActiveBinaryTree.class.getName(), 
-                                                                             null);
+            myTree = (BinaryTree) org.objectweb.proactive.ProActive.newActive(ActiveBinaryTree.class.getName(),
+                    null);
         } catch (Exception e) {
             logger.error(e);
             e.printStackTrace();
         }
+
         // Now we insert 4 elements in the tree
         // Note that this code is the same for the passive or active version of the tree
         myTree.put(1, "one");

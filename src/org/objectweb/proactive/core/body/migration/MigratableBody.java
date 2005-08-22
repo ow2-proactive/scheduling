@@ -1,37 +1,39 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.migration;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -46,10 +48,6 @@ import org.objectweb.proactive.ext.security.DefaultEntity;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityMigrationException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.util.ArrayList;
 
 
 public class MigratableBody extends BodyImpl implements Migratable,
@@ -156,13 +154,14 @@ public class MigratableBody extends BodyImpl implements Migratable,
             try {
                 ProActiveRuntime pr = null;
                 pr = node.getProActiveRuntime();
-                ProActive.loggerSecurity.debug("internal runtime" + pr.getURL());
+                ProActive.loggerSecurity.debug("internal runtime" +
+                    pr.getURL());
                 ArrayList entitiesFrom = null;
                 ArrayList entitiesTo = null;
                 try {
                     entitiesFrom = this.getEntities();
                 } catch (SecurityNotAvailableException e1) {
-                	logger.debug ("entitites from not found");
+                    logger.debug("entitites from not found");
                     entitiesFrom = new ArrayList();
                     entitiesFrom.add(new DefaultEntity());
                 }
@@ -174,7 +173,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
                         node.getNodeInformation().getName() + " taille " +
                         entitiesTo.size());
                 } catch (ProActiveException e1) {
-                	logger.debug ("entitites to not found");
+                    logger.debug("entitites to not found");
                     entitiesTo = new ArrayList();
                     entitiesTo.add(new DefaultEntity());
                 }
@@ -199,8 +198,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
                     }
                 }
             } catch (SecurityNotAvailableException e1) {
-            	logger.debug("Security not availaible");
-               // e1.printStackTrace();
+                logger.debug("Security not availaible");
+                // e1.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }

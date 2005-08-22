@@ -30,26 +30,24 @@
  */
 package nonregressiontest.component.interceptor;
 
-import nonregressiontest.component.ComponentTest;
-
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.controller.DummyController;
 
 
 /**
  *
  * Checks that interception of functional invocations works, and that the
  * order of the inputInterceptors is the same than this of the controllers config file.
- * 
+ *
  * Interceptors are only placed around the "A" component
  *
  *

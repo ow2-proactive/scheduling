@@ -21,16 +21,16 @@ import org.objectweb.proactive.core.component.adl.Launcher;
 /**
  * This example is a mix from the helloworld examples in the Fractal distribution : the example from Julia, and the one from the FractalADL.<b>
  * The differences are the following : <b>
- *     - from FractalADL : <b> 
+ *     - from FractalADL : <b>
  *             * this one uses a custom parser, based on the standard FractalADL, but it is able to add cardinality to virtual nodes and
  * allows the composition of virtual nodes.<b>
  *             * there are 4 .fractal files corresponding to definitions of the system in the current vm, in distributed vms (this uses
  * the ProActive deployment capabilities), a version with wrapping composite components and a version without wrapping components.
- *  
+ *
  * Use the "parser" parameter to make it work.<b>
- *     - from Julia : 
- * 
- * 
+ *     - from Julia :
+ *
+ *
  * Sections involving templates have been removed, because this implementation does not provide templates. <br>
  * A functionality offered by ProActive is the automatic deployment of components onto remote locations.<br>
  * TODO change comment
@@ -124,12 +124,12 @@ public class HelloWorld {
                 Component cComp = cf.newFcInstance(cType,
                         new ControllerDescription("client", Constants.PRIMITIVE),
                         new ContentDescription(ClientImpl.class.getName())); // other properties could be added (activity for example)
-                
+
                 // create server component
                 Component sComp = cf.newFcInstance(sType,
                         new ControllerDescription("server", Constants.PRIMITIVE),
                         new ContentDescription(ServerImpl.class.getName()));
-                
+
                 ((ServiceAttributes) Fractal.getAttributeController(sComp)).setHeader(
                     "--------> ");
                 ((ServiceAttributes) Fractal.getAttributeController(sComp)).setCount(1);

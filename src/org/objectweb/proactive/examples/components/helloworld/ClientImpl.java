@@ -20,44 +20,44 @@
  *
  * Author: Eric Bruneton
  */
-
 package org.objectweb.proactive.examples.components.helloworld;
+
 import org.objectweb.fractal.api.control.BindingController;
 
+
 public class ClientImpl implements Runnable, BindingController {
+    private Service service;
 
-  private Service service;
-
-  public ClientImpl () {
-      // the following instruction was removed, because ProActive requires empty no-args constructors
-      // otherwise this instruction is executed also at the construction of the stub
-      //System.err.println("CLIENT created");
-  }
-  
-  public void run() {
-    service.print("hello world");
-  }
-
-  public String[] listFc () {
-    return new String[] { "s" };
-  }
-
-  public Object lookupFc (final String cItf) {
-    if (cItf.equals("s")) {
-      return service;
+    public ClientImpl() {
+        // the following instruction was removed, because ProActive requires empty no-args constructors
+        // otherwise this instruction is executed also at the construction of the stub
+        //System.err.println("CLIENT created");
     }
-    return null;
-  }
 
-  public void bindFc (final String cItf, final Object sItf) {
-    if (cItf.equals("s")) {
-      service = (Service)sItf;
+    public void run() {
+        service.print("hello world");
     }
-  }
 
-  public void unbindFc (final String cItf) {
-    if (cItf.equals("s")) {
-      service = null;
+    public String[] listFc() {
+        return new String[] { "s" };
     }
-  }
+
+    public Object lookupFc(final String cItf) {
+        if (cItf.equals("s")) {
+            return service;
+        }
+        return null;
+    }
+
+    public void bindFc(final String cItf, final Object sItf) {
+        if (cItf.equals("s")) {
+            service = (Service) sItf;
+        }
+    }
+
+    public void unbindFc(final String cItf) {
+        if (cItf.equals("s")) {
+            service = null;
+        }
+    }
 }

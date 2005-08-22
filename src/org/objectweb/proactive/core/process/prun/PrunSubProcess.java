@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.process.prun;
 
+import java.util.StringTokenizer;
+
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -37,8 +39,6 @@ import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.SimpleExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
-
-import java.util.StringTokenizer;
 
 
 /**

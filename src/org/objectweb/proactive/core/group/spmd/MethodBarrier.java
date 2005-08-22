@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 /**
  * This class describes the state of a method-based barrier.
- *  
+ *
  * @author Laurent Baduel
  */
 public class MethodBarrier implements Serializable {

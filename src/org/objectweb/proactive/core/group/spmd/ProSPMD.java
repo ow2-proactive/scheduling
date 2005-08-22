@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -42,8 +44,6 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-
-import java.lang.reflect.InvocationTargetException;
 
 
 /**

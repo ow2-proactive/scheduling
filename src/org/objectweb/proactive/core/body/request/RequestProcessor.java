@@ -1,34 +1,35 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.request;
+
 
 /**
  * <p>
@@ -39,10 +40,10 @@ package org.objectweb.proactive.core.body.request;
  * the request shall be removed and served, removed without serving or kept.
  * </p><p>
  * It is used as a call back interface allowing a custom processing on request
- * stored in the request queue. 
+ * stored in the request queue.
  * </p><p>
- * Typically it can be used to serve requests stored in a request queue in a 
- * custom manner. When doing custom processing, a request should 
+ * Typically it can be used to serve requests stored in a request queue in a
+ * custom manner. When doing custom processing, a request should
  * be REMOVED from the queue BEFORE serving.
  * </p>
  *
@@ -53,18 +54,19 @@ package org.objectweb.proactive.core.body.request;
  */
 public interface RequestProcessor {
 
-  /** Constant indicating that the request shall be removed and served. */
-  public final static int REMOVE_AND_SERVE = 1;
-  /** Constant indicating that the request shall removed without being served. */
-  public final static int REMOVE = 2;
-  /** Constant indicating that the request shall be kept. */
-  public final static int KEEP = 3;
+    /** Constant indicating that the request shall be removed and served. */
+    public final static int REMOVE_AND_SERVE = 1;
 
-  /**
-   * Returns one of the constants indicating the desired treatment for the request.
-   * @param request the request to process
-   * @return one of the three constants above
-   */
-  public int processRequest(Request request);
-  
+    /** Constant indicating that the request shall removed without being served. */
+    public final static int REMOVE = 2;
+
+    /** Constant indicating that the request shall be kept. */
+    public final static int KEEP = 3;
+
+    /**
+     * Returns one of the constants indicating the desired treatment for the request.
+     * @param request the request to process
+     * @return one of the three constants above
+     */
+    public int processRequest(Request request);
 }

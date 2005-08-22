@@ -1,12 +1,13 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+
 
 /*
  * A DataTreeNode is an element in a displayed tree.
@@ -50,7 +51,8 @@ public class DataTreeNode extends DefaultMutableTreeNode
 
         DataTreeNode firstChild = (DataTreeNode) getChildAt(0);
         if (firstChild.getKey() != value.getKey()) {
-        	/* On a level, every child is of the same key */
+
+            /* On a level, every child is of the same key */
             return null;
         }
 

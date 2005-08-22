@@ -40,16 +40,17 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * @author       Lionel Mestre
  * @version      1.0
  */
-public class PathHandler extends BasicUnmarshaller implements ProActiveDescriptorConstants {
+public class PathHandler extends BasicUnmarshaller
+    implements ProActiveDescriptorConstants {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
-    
     private static final String ORIGIN_ATTRIBUTE = "origin";
     private static final String USER_HOME_ORIGIN = "user.home";
     private static final String WORKING_DIRECTORY_ORIGIN = "user.dir";
     private static final String FROM_CLASSPATH_ORIGIN = "user.classpath";
-   // private static final String PROACTIVE_ORIGIN = "proactive.home";
+
+    // private static final String PROACTIVE_ORIGIN = "proactive.home";
     private static final String DEFAULT_ORIGIN = USER_HOME_ORIGIN;
     private static final String VALUE_ATTRIBUTE = "value";
     private static final String proActiveDir = System.getProperty(
@@ -61,9 +62,8 @@ public class PathHandler extends BasicUnmarshaller implements ProActiveDescripto
             "path.separator");
     private static final String fileSeparator = System.getProperty(
             "file.separator");
-            
-	//static Logger logger = Logger.getLogger(PathHandler.class.getName());
 
+    //static Logger logger = Logger.getLogger(PathHandler.class.getName());
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
@@ -87,10 +87,11 @@ public class PathHandler extends BasicUnmarshaller implements ProActiveDescripto
             origin = DEFAULT_ORIGIN;
         }
         String value = attributes.getValue(VALUE_ATTRIBUTE);
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Found Path Element origin=" + origin + " value=" +
-//                value);
-//        }
+
+        //        if (logger.isDebugEnabled()) {
+        //            logger.debug("Found Path Element origin=" + origin + " value=" +
+        //                value);
+        //        }
         if (!checkNonEmpty(value)) {
             throw new org.xml.sax.SAXException(
                 "Path element defined without a value");
@@ -104,8 +105,8 @@ public class PathHandler extends BasicUnmarshaller implements ProActiveDescripto
                 setResultObject(resolvePath(userHome, value));
             } else if (origin.equals(WORKING_DIRECTORY_ORIGIN)) {
                 setResultObject(resolvePath(userDir, value));
-//            } else if (origin.equals(PROACTIVE_ORIGIN)) {
-//                setResultObject(resolvePath(proActiveDir, value));
+                //            } else if (origin.equals(PROACTIVE_ORIGIN)) {
+                //                setResultObject(resolvePath(proActiveDir, value));
             } else if (origin.equals(FROM_CLASSPATH_ORIGIN)) {
                 setResultObject(resolvePathFromClasspath(value));
             } else {
@@ -121,9 +122,10 @@ public class PathHandler extends BasicUnmarshaller implements ProActiveDescripto
     //
     private String resolvePath(String origin, String value) {
         java.io.File originDirectory = new java.io.File(origin);
+
         // in case of relative path, if the user put a / then remove it transparently
-        if(value.startsWith("/")){
-        	value = value.substring(1);
+        if (value.startsWith("/")) {
+            value = value.substring(1);
         }
         java.io.File file = new java.io.File(originDirectory, value);
         return file.getAbsolutePath();

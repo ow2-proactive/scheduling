@@ -4,12 +4,12 @@ import modelisation.simulator.common.SimulatorElement;
 
 
 public class Request extends SimulatorElement {
-
     public static final int SOURCE = 0;
     public static final int AGENT = 1;
     protected int number;
     protected int senderID;
     protected double creationTime;
+
     //this is just to test  a new way to get mu using agent requests
     public double timeToSubstract;
 
@@ -55,9 +55,8 @@ public class Request extends SimulatorElement {
     }
 
     public String toString() {
-
-        String s = new String("request " + 
-                              ((state == SOURCE) ? " from source" : " from agent"));
+        String s = new String("request " +
+                ((state == SOURCE) ? " from source" : " from agent"));
         s = s + " number " + number;
         return s;
     }

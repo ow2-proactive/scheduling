@@ -139,11 +139,12 @@ public class buildManual {
                 //the path might have changed since the global file is created in the parent dir
                 if (path.length() <= parent.length()) {
                     //we guess that just one level below can occur
-                    image_path = "../"+image_path;
+                    image_path = "../" + image_path;
                 } else {
                     String subpath = path.substring(parent.length() + 1);
-//                    String subdir = subpath.substring(0,
-//                            subpath.lastIndexOf("/"));
+
+                    //                    String subdir = subpath.substring(0,
+                    //                            subpath.lastIndexOf("/"));
                     image_path = subpath + "/" + image_path;
                     //System.out.println(image_path);
                 }

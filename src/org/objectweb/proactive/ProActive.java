@@ -30,14 +30,16 @@
  */
 package org.objectweb.proactive;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -82,12 +84,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
-
-import java.io.IOException;
-
-import java.net.UnknownHostException;
-
-import java.util.HashMap;
 
 
 public class ProActive {

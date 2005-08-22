@@ -30,11 +30,11 @@
  */
 package nonregressiontest.activeobject.request;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
-
-import java.io.Serializable;
 
 
 /**

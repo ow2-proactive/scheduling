@@ -49,7 +49,7 @@ public class ProcessReferenceHandler extends BasicUnmarshaller {
         throws org.xml.sax.SAXException {
         String refid = attributes.getValue("refid");
         if (logger.isDebugEnabled()) {
-            logger.debug("refid "+refid);
+            logger.debug("refid " + refid);
         }
         if (checkNonEmpty(refid)) {
             setResultObject(refid);

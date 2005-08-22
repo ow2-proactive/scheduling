@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.p2p.api.core;
 
-import org.objectweb.proactive.p2p.api.exception.NoResultsException;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.p2p.api.exception.NoResultsException;
 
 
 /**
@@ -91,15 +91,15 @@ public class Result implements Serializable {
      * @return the best result.
      */
     public Result returnTheBest(Result other) {
-    	try {
-			if (((Comparable) this.theResult).compareTo(other.getResult()) <= 0) {
-			    return this;
-			} else {
-			    return other;
-			}
-		} catch (NoResultsException e) {
-			return this;
-		}
+        try {
+            if (((Comparable) this.theResult).compareTo(other.getResult()) <= 0) {
+                return this;
+            } else {
+                return other;
+            }
+        } catch (NoResultsException e) {
+            return this;
+        }
     }
 
     /**

@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class RSHProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_RSHPATH = "/usr/bin/rsh ";
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //

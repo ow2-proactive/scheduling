@@ -75,7 +75,6 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     protected transient UniversalBody remoteBody;
     protected RemoteBodyFactory remoteBodyFactory;
     protected String jobID;
-
     protected Map shortcuts = null; // key = functionalItfID, value=shortcut
 
     //
@@ -160,7 +159,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
@@ -169,22 +168,25 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         }
         shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
     }
-    
+
     // NFEProducer implementation
     private NFEListenerList nfeListeners = null;
+
     public void addNFEListener(NFEListener listener) {
         if (nfeListeners == null) {
             nfeListeners = new NFEListenerList();
         }
         nfeListeners.addNFEListener(listener);
     }
+
     public void removeNFEListener(NFEListener listener) {
         if (nfeListeners != null) {
             nfeListeners.removeNFEListener(listener);
         }
     }
+
     public int fireNFE(NonFunctionalException e) {
-    	if (nfeListeners != null) {
+        if (nfeListeners != null) {
             return nfeListeners.fireNFE(e);
         }
         return 0;

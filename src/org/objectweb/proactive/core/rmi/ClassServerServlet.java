@@ -1,18 +1,17 @@
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.osgi.OsgiParameters;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
 import java.net.UnknownHostException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 public class ClassServerServlet extends HttpServlet {

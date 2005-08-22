@@ -1,7 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 
@@ -18,6 +16,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 
 
 public class MonitoredObjectsList extends JDialog {

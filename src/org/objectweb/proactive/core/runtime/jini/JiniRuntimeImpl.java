@@ -35,6 +35,14 @@ import java.security.SecureRandom;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
+import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ext.security.PolicyServer;
+
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
 import net.jini.core.lookup.ServiceID;
@@ -44,14 +52,6 @@ import net.jini.core.lookup.ServiceRegistration;
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.lease.LeaseRenewalEvent;
 import net.jini.lookup.entry.Name;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
-import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -90,7 +90,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //
     public JiniRuntimeImpl() throws java.rmi.RemoteException {
         super(true);
-        this.proActiveRuntime =  ProActiveRuntimeImpl.getProActiveRuntime();
+        this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
         this.proActiveRuntimeURL = buildRuntimeURL();
         this.jiniRuntimeMap = new java.util.Hashtable();
         jiniRuntimeMap.put(proActiveRuntimeURL, new java.util.Vector());
@@ -156,7 +156,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         proActiveRuntime.killAllNodes();
     }
 
-    public void killNode(String nodeName) throws RemoteException, ProActiveException {
+    public void killNode(String nodeName)
+        throws RemoteException, ProActiveException {
         String nodeUrl = null;
         String name = null;
         try {
@@ -208,7 +209,6 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
 
     public void unregisterVirtualNode(String virtualNodeName)
         throws RemoteException, ProActiveException {
-        
         String virtualNodeURL = null;
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualNodeName));
@@ -222,7 +222,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         }
     }
 
-    public void unregisterAllVirtualNodes() throws RemoteException, ProActiveException {
+    public void unregisterAllVirtualNodes()
+        throws RemoteException, ProActiveException {
         for (java.util.Enumeration e = jiniVirtualNodeMap.keys();
                 e.hasMoreElements();) {
             String vnNodeURL = (String) e.nextElement();

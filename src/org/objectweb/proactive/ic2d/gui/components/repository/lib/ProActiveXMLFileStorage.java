@@ -30,13 +30,13 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.repository.lib;
 
+import java.io.File;
+import java.io.FileWriter;
+
 import org.objectweb.fractal.adl.Node;
 import org.objectweb.fractal.adl.xml.XMLWriter;
 import org.objectweb.fractal.gui.repository.api.Storage;
 import org.objectweb.fractal.gui.repository.lib.XMLFileStorage;
-
-import java.io.File;
-import java.io.FileWriter;
 
 
 /**

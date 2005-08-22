@@ -1,13 +1,13 @@
 package modelisation.simulator.mixed;
 
+import org.apache.log4j.Logger;
+
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
 import modelisation.statistics.RandomNumberGenerator;
-import org.apache.log4j.Logger;
 
 
 public class Agent extends SimulatorElement {
-
     protected static Logger logger = Logger.getLogger(Agent.class.getName());
     public final static int WAITING = 0;
     public final static int MIGRATING = 1;
@@ -20,12 +20,10 @@ public class Agent extends SimulatorElement {
     protected static boolean callServer;
 
     static {
-        Agent.callServer = !"NO".equals(System.getProperties().getProperty(
-                                                "agent.performcallserver"));
+        Agent.callServer = !"NO".equals(System.getProperties().getProperty("agent.performcallserver"));
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "--- Agent will perform call to server " + 
-                    Agent.callServer);
+            logger.debug("--- Agent will perform call to server " +
+                Agent.callServer);
         }
     }
 
@@ -65,8 +63,8 @@ public class Agent extends SimulatorElement {
         this.nu = nu;
         if (log) {
             this.simulator.log(
-                    " AgentWithExponentialMigrationAndServer: waited " + 
-                    this.remainingTime + " before migration");
+                " AgentWithExponentialMigrationAndServer: waited " +
+                this.remainingTime + " before migration");
         }
         this.averagatorNu.add(this.remainingTime);
         this.remainingTime = this.waitTime();
@@ -86,22 +84,23 @@ public class Agent extends SimulatorElement {
         }
         if (this.state == WAITING) {
             return Agent.WAITING;
-        } else
+        } else {
             return Agent.BLOCKED;
+        }
     }
 
     public void update(double time) {
         if (this.remainingTime == 0) {
             switch (this.state) {
-                case WAITING:
-                    this.startMigration(time);
-                    break;
-                case MIGRATING:
-                    this.endMigration(time);
-                    break;
-                case CALLING_SERVER:
-                    this.endOfCallServer(time);
-                    break;
+            case WAITING:
+                this.startMigration(time);
+                break;
+            case MIGRATING:
+                this.endMigration(time);
+                break;
+            case CALLING_SERVER:
+                this.endOfCallServer(time);
+                break;
             }
         }
     }
@@ -111,6 +110,7 @@ public class Agent extends SimulatorElement {
         if (logger.isDebugEnabled()) {
             //            logger.debug(
         }
+
         //                    "Agent " + this.id + " getting random generator");
         //            this.expoDelta = RandomNumberFactory.getGenerator("delta");
         //            this.expoDelta.initialize(delta,
@@ -119,6 +119,7 @@ public class Agent extends SimulatorElement {
         if (logger.isDebugEnabled()) {
             //            logger.debug("Agent " + this.id +
         }
+
         //                               " got  random generator");
         //            //            this.expoDelta.initialize(delta, 58373435);
         //        }
@@ -126,6 +127,7 @@ public class Agent extends SimulatorElement {
         if (logger.isDebugEnabled()) {
             //        //        logger.debug("Agent: migration started, will last " + tmp);
         }
+
         //        //        return tmp;
         //        return this.expoDelta.next() * 1000;
         return this.simulator.generateMigrationTime();
@@ -136,6 +138,7 @@ public class Agent extends SimulatorElement {
         if (logger.isDebugEnabled()) {
             //                      logger.debug(
         }
+
         //                    "Agent " + this.id + " getting random generator for waitTime with parameter " + nu);
         //            this.expoNu = RandomNumberFactory.getGenerator("nu");
         //            //            this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
@@ -144,6 +147,7 @@ public class Agent extends SimulatorElement {
         if (logger.isDebugEnabled()) {
             //    //  logger.debug(expoNu.next() * 1000);
         }
+
         //        return expoNu.next() * 1000;
         return this.simulator.generateAgentWaitingTime();
     }
@@ -172,12 +176,10 @@ public class Agent extends SimulatorElement {
     public void endMigration(double endTime) {
         if (log) {
             this.simulator.log("Agent: Migration ended");
-            this.simulator.log(
-                    "Agent: length of the migration " + 
-                    (endTime - startTime));
-            this.simulator.log(
-                    "Agent: will call server " + 
-                    (((this.migrationCounter + 1) % maxMigrations) == 0));
+            this.simulator.log("Agent: length of the migration " +
+                (endTime - startTime));
+            this.simulator.log("Agent: will call server " +
+                (((this.migrationCounter + 1) % maxMigrations) == 0));
         }
         this.averagatorDelta.add(endTime - startTime);
         if (((this.migrationCounter + 1) % maxMigrations) == 0) {
@@ -185,26 +187,24 @@ public class Agent extends SimulatorElement {
         } else {
             this._endOfMigration(endTime);
         }
+
         // this.endOfCallServer(endTime);
     }
 
     protected void _endOfMigration(double endTime) {
         this.migrationCounter++;
         this.state = WAITING;
-        this.forwarderChain.add(new Forwarder(this.migrationCounter - 1, 
-                                              this.server, this.simulator, 
-                                              this.id));
+        this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
+                this.server, this.simulator, this.id));
         this.remainingTime = this.waitTime();
         if (log) {
+            this.simulator.log("Agent.endOfCallServer migrationCounter " +
+                this.migrationCounter);
+            this.simulator.log("Agent.endOfCallServer total time " +
+                (endTime - startTime));
             this.simulator.log(
-                    "Agent.endOfCallServer migrationCounter " + 
-                    this.migrationCounter);
-            this.simulator.log(
-                    "Agent.endOfCallServer total time " + 
-                    (endTime - startTime));
-            this.simulator.log(
-                    " AgentWithExponentialMigrationAndServer: waited " + 
-                    this.remainingTime + " before migration");
+                " AgentWithExponentialMigrationAndServer: waited " +
+                this.remainingTime + " before migration");
         }
         this.averagatorNu.add(this.remainingTime);
     }
@@ -236,10 +236,10 @@ public class Agent extends SimulatorElement {
         //the agent can only be waiting when a tensioning is initiated
         if (this.remainingTime < time) {
             if (log) {
-                this.simulator.log(
-                        "Simulator: agent wait end of tensioning " + 
-                        (time - this.remainingTime));
+                this.simulator.log("Simulator: agent wait end of tensioning " +
+                    (time - this.remainingTime));
             }
+
             //this is because of a nasty assumption in the model
             //it should be      this.remainingTime = time;
             this.remainingTime = time + this.waitTime();
@@ -256,48 +256,46 @@ public class Agent extends SimulatorElement {
 
     public void end() {
         if (logger.isDebugEnabled()) {
-            logger.debug("* nu = " + 1000 / this.averagatorNu.average());
-            logger.debug("* delta  = " + 
-                         1000 / this.averagatorDelta.average());
+            logger.debug("* nu = " + (1000 / this.averagatorNu.average()));
+            logger.debug("* delta  = " +
+                (1000 / this.averagatorDelta.average()));
             logger.debug("delta count " + this.averagatorDelta.getCount());
-            logger.debug(
-                    "gamma2 server = " + 
-                    1000 / this.averagatorGamma2.average());
+            logger.debug("gamma2 server = " +
+                (1000 / this.averagatorGamma2.average()));
             logger.debug(" gamma2 count " + this.averagatorGamma2.getCount());
-            logger.debug(
-                    "* Real delta = " + 
-                    1000 / ((this.averagatorDelta.getTotal() + this.averagatorGamma2.getTotal()) / this.averagatorDelta.getCount()));
+            logger.debug("* Real delta = " +
+                (1000 / ((this.averagatorDelta.getTotal() +
+                this.averagatorGamma2.getTotal()) / this.averagatorDelta.getCount())));
         }
     }
 
     public String getStateAsLetter() {
         switch (this.state) {
-            case WAITING:
-                return "w";
-            case MIGRATING:
-                return "m";
-            case CALLING_SERVER:
-                return "u";
+        case WAITING:
+            return "w";
+        case MIGRATING:
+            return "m";
+        case CALLING_SERVER:
+            return "u";
         }
         return "";
     }
 
     public String toString() {
-
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
-            case WAITING:
-                tmp.append("WAITING");
-                break;
-            case MIGRATING:
-                tmp.append("MIGRATING");
-                break;
-            case MIGRATED:
-                tmp.append("MIGRATED");
-                break;
-            case CALLING_SERVER:
-                tmp.append("CALLING_SERVER");
-                break;
+        case WAITING:
+            tmp.append("WAITING");
+            break;
+        case MIGRATING:
+            tmp.append("MIGRATING");
+            break;
+        case MIGRATED:
+            tmp.append("MIGRATED");
+            break;
+        case CALLING_SERVER:
+            tmp.append("CALLING_SERVER");
+            break;
         }
         tmp.append(" remainingTime = ").append(remainingTime);
         return tmp.toString();

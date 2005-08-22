@@ -427,29 +427,29 @@ public class ProActiveServicesImpl implements ProActiveService {
         return ProActive.getJobId();
     }
 
-//    /**
-//     * @see org.objectweb.proactive.osgi.ProActiveService#searchExceptionHandler(org.objectweb.proactive.core.exceptions.NonFunctionalException, java.lang.Object)
-//     */
-//    public Handler searchExceptionHandler(NonFunctionalException ex,
-//        Object target) {
-//        return ProActive.searchExceptionHandler(ex, target);
-//    }
-//
-//    /**
-//     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class, int, java.lang.Object)
-//     */
-//    public void setExceptionHandler(Handler h, Class exception, int levelID,
-//        Object target) {
-//        ProActive.setExceptionHandler(h, exception, levelID, target);
-//    }
-//
-//    /**
-//     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(java.lang.Class, java.lang.Class, int, java.lang.Object)
-//     */
-//    public void setExceptionHandler(Class handler, Class exception,
-//        int levelID, Object target) {
-//        ProActive.setExceptionHandler(handler, exception, levelID, target);
-//    }
+    //    /**
+    //     * @see org.objectweb.proactive.osgi.ProActiveService#searchExceptionHandler(org.objectweb.proactive.core.exceptions.NonFunctionalException, java.lang.Object)
+    //     */
+    //    public Handler searchExceptionHandler(NonFunctionalException ex,
+    //        Object target) {
+    //        return ProActive.searchExceptionHandler(ex, target);
+    //    }
+    //
+    //    /**
+    //     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class, int, java.lang.Object)
+    //     */
+    //    public void setExceptionHandler(Handler h, Class exception, int levelID,
+    //        Object target) {
+    //        ProActive.setExceptionHandler(h, exception, levelID, target);
+    //    }
+    //
+    //    /**
+    //     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(java.lang.Class, java.lang.Class, int, java.lang.Object)
+    //     */
+    //    public void setExceptionHandler(Class handler, Class exception,
+    //        int levelID, Object target) {
+    //        ProActive.setExceptionHandler(handler, exception, levelID, target);
+    //    }
 
     /**
      * @see org.objectweb.proactive.osgi.ProActiveService#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.String, java.lang.String[])

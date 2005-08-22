@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 
+
 /**
  * @author Matthieu Morel
  *
@@ -52,11 +53,11 @@ public interface ProActiveImplementationBuilder extends ImplementationBuilder {
      * @param contentDesc the description of the content
      * @param adlVN the virtual node where the component should be deployed
      * @param context context
-     * @return an instance of the specified component (or a group of instances if the virtual node is 
+     * @return an instance of the specified component (or a group of instances if the virtual node is
      * a multiple one)
      * @throws Exception if the creation of the component failed
      */
     public Object createComponent(Object type, String name, String definition,
-            ControllerDescription controllerDesc, ContentDescription contentDesc,
-            VirtualNode adlVN, Map context) throws Exception;
+        ControllerDescription controllerDesc, ContentDescription contentDesc,
+        VirtualNode adlVN, Map context) throws Exception;
 }

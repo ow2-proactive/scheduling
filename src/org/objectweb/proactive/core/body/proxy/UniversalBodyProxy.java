@@ -1,37 +1,39 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.proxy;
 
-import org.apache.log4j.Logger;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
@@ -52,9 +54,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 
 public class UniversalBodyProxy extends AbstractBodyProxy
@@ -110,7 +109,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
             //added lines----------------------------
             Active activity = (Active) parameters[1];
             MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
-            String jobID = (String)parameters[3];
+            String jobID = (String) parameters[3];
             Class[] argsClass = new Class[] {
                     ConstructorCall.class, String.class, Active.class,
                     MetaObjectFactory.class, String.class
@@ -119,7 +118,6 @@ public class UniversalBodyProxy extends AbstractBodyProxy
                     constructorCall, node.getNodeInformation().getURL(),
                     activity, factory, jobID
                 };
-            
 
             //added lines--------------------------
             //Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
@@ -231,7 +229,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     protected void sendRequest(MethodCall methodCall, Future future)
-        throws java.io.IOException , RenegotiateSessionException{
+        throws java.io.IOException, RenegotiateSessionException {
         // Determines the body that is at the root of the subsystem from which the
         // call was sent.
         // It is always true that the body that issued the request (and not the body
@@ -245,10 +243,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     protected void sendRequest(MethodCall methodCall, Future future,
-        Body sourceBody) throws java.io.IOException, RenegotiateSessionException {
+        Body sourceBody)
+        throws java.io.IOException, RenegotiateSessionException {
         // TODO if component request and shortcut : update body ref
-        
-
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
         UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
@@ -268,7 +265,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     protected void sendRequestInternal(MethodCall methodCall, Future future,
-        Body sourceBody) throws java.io.IOException, RenegotiateSessionException {
+        Body sourceBody)
+        throws java.io.IOException, RenegotiateSessionException {
         sourceBody.sendRequest(methodCall, future, universalBody);
     }
 
@@ -293,19 +291,18 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         }
     }
 
-	public boolean isLocal() {
-		return this.isLocal;
-	}
-
+    public boolean isLocal() {
+        return this.isLocal;
+    }
 
     //
     // -- SERIALIZATION -----------------------------------------------
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        if (this.universalBody == null){
+        if (this.universalBody == null) {
             out.writeObject(null);
-        }else{
+        } else {
             out.writeObject(universalBody.getRemoteAdapter());
         }
     }

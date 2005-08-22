@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/ 
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive;
 
 import org.apache.log4j.Logger;
@@ -71,14 +71,13 @@ import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
  */
 public class StartNode {
     public static final int DEFAULT_CLASSFILE_SERVER_PORT = 2001;
-    static Logger logger ;
+    static Logger logger;
     protected static final int DEFAULT_PORT = 1099;
     protected static final int MAX_RETRY = 3;
     protected static final String NO_REBIND_OPTION_NAME = "-noRebind";
     protected static final String NO_CLASS_SERVER_OPTION_NAME = "-noClassServer";
     protected static final String NO_REGISTRY_OPTION_NAME = "-noRegistry";
     protected static final String MULTICAST_LOCATOR_NAME = "-multicastLocator";
-
     protected boolean noClassServer = false;
     protected boolean noRebind = false;
     protected boolean noRegistry = false;
@@ -88,8 +87,8 @@ public class StartNode {
     protected String nodeURL;
 
     static {
-    	ProActiveConfiguration.load();
-		logger = Logger.getLogger(StartNode.class.getName());
+        ProActiveConfiguration.load();
+        logger = Logger.getLogger(StartNode.class.getName());
         if (logger.isDebugEnabled()) {
             logger.debug("Loading ProActive class");
         }
@@ -100,7 +99,7 @@ public class StartNode {
                 logger.fatal("Loading of ProActive class FAILED");
             }
             e.printStackTrace();
-			System.exit(1);
+            System.exit(1);
         }
     }
 
@@ -122,14 +121,14 @@ public class StartNode {
         }
 
         /*
-        // debug
-        System.out.println("Node name = "+nodeURL);
-        if (noRebind)
-          System.out.println(" - NoRebind");
-        if (noClassServer)
-          System.out.println(" - No ClassServer");
-        else System.out.println("ClassServer classpath = "+classpath);
-        */
+           // debug
+           System.out.println("Node name = "+nodeURL);
+           if (noRebind)
+             System.out.println(" - NoRebind");
+           if (noClassServer)
+             System.out.println(" - No ClassServer");
+           else System.out.println("ClassServer classpath = "+classpath);
+         */
     }
 
     //
@@ -152,12 +151,12 @@ public class StartNode {
      *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
      */
     public static void main(String[] args) {
-            try {
-                new StartNode(args).run();
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.fatal(e.toString());
-            }
+        try {
+            new StartNode(args).run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.fatal(e.toString());
+        }
     }
 
     //
@@ -181,6 +180,7 @@ public class StartNode {
         if (noClassServer) {
             return;
         }
+
         // look for classpath
         for (int i = start; i < args.length; i++) {
             String s = args[i];
@@ -191,16 +191,16 @@ public class StartNode {
         }
     }
 
-//    /**
-//     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-//     * sets the properties needed for the node creation
-//     */
-//    protected void setProperties() {
-//        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
-//        //  System.setProperty("java.rmi.dgc.leaseValue","800");
-//        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
-//        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
-//    }
+    //    /**
+    //     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
+    //     * sets the properties needed for the node creation
+    //     */
+    //    protected void setProperties() {
+    //        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
+    //        //  System.setProperty("java.rmi.dgc.leaseValue","800");
+    //        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
+    //        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
+    //    }
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -215,8 +215,8 @@ public class StartNode {
                 if (nodeURL == null) {
                     node = NodeFactory.getDefaultNode();
                 } else {
-                	//TODO allow start alone node with security parameters 
-                    node = NodeFactory.createNode(nodeURL, !noRebind,null,null);
+                    //TODO allow start alone node with security parameters 
+                    node = NodeFactory.createNode(nodeURL, !noRebind, null, null);
                 }
                 logger.info("OK. Node " + node.getNodeInformation().getName() +
                     " is created in VM id=" + UniqueID.getCurrentVMID());
@@ -232,11 +232,14 @@ public class StartNode {
                     } catch (InterruptedException e2) {
                     }
                 }
-                 // end if
+
+                // end if
             }
-             // try
+
+            // try
         }
-         // end while
+
+        // end while
     }
 
     /**
@@ -253,18 +256,19 @@ public class StartNode {
         if (RuntimeFactory.JINI_ENABLED) {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
         }
-  
+
         AverageMicroTimer mt = null;
         if (Profiling.STARTNODE) {
-        	mt = new AverageMicroTimer("StartNode");
-        	PAProfilerEngine.registerTimer(mt);
-        	mt.start();
+            mt = new AverageMicroTimer("StartNode");
+            PAProfilerEngine.registerTimer(mt);
+            mt.start();
         }
+
         // create node
         createNode(nodeURL, noRebind);
         if (Profiling.STARTNODE) {
-        	mt.stop();
-        //	mt.dump();
+            mt.stop();
+            //	mt.dump();
         }
     }
 
@@ -344,4 +348,5 @@ public class StartNode {
             MULTICAST_LOCATOR_NAME);
     }
 }
- // end class
+
+// end class

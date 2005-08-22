@@ -30,14 +30,14 @@
  */
 package org.objectweb.proactive.core.process.pbs;
 
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
-
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 
 /**

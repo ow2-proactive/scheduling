@@ -30,15 +30,13 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import org.apache.log4j.Logger;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.net.URL;
 import java.net.URLClassLoader;
-
 import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
 
 
 public class MOPClassLoader extends URLClassLoader {
@@ -65,10 +63,10 @@ public class MOPClassLoader extends URLClassLoader {
         return MOPClassLoader.mopCl;
     }
 
-  public MOPClassLoader(){
-	super(new URL[] {});
-  }
-    
+    public MOPClassLoader() {
+        super(new URL[] {  });
+    }
+
     /**
      * Get the bytecode of a stub given its name. If the stub can not be found
      * the cache, the MOPClassLoader tries to generate it.
@@ -142,7 +140,7 @@ public class MOPClassLoader extends URLClassLoader {
             urls = ((URLClassLoader) currentClassLoader).getURLs();
         } else {
             urls = new URL[0];
-         }
+        }
 
         // Creates a new MOPClassLoader
         return new MOPClassLoader(currentClassLoader, urls);
@@ -174,9 +172,9 @@ public class MOPClassLoader extends URLClassLoader {
             //defined the stub class using the context class loader
             //we check here
             try {
-            	return Thread.currentThread().getContextClassLoader().loadClass(name);
+                return Thread.currentThread().getContextClassLoader().loadClass(name);
             } catch (ClassNotFoundException e) {
-            	//no luck, proceed
+                //no luck, proceed
             }
         }
         try {
@@ -190,7 +188,7 @@ public class MOPClassLoader extends URLClassLoader {
             // a stub class to be created
             if (Utils.isStubClassName(name)) {
                 logger.info("Generating class : " + name);
-            //    e.printStackTrace();
+                //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(name);
 
                 //ASM is now the default bytecode manipulator

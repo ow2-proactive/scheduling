@@ -30,26 +30,24 @@
  */
 package org.objectweb.proactive.core.body.http.util.messages;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
-
-
 import java.lang.reflect.Method;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.body.http.util.HttpMessage;
 
 
 /**
  * @author jbroccol
  */
-public abstract class ReflectRequest extends HttpMessage{
+public abstract class ReflectRequest extends HttpMessage {
     private static Logger logger = Logger.getLogger("XML_HTTP");
 
-    public ReflectRequest (String url) {
-        super (url);
+    public ReflectRequest(String url) {
+        super(url);
     }
-    
+
     /**
      * init the hashmap, that contains all the methods of  ProActiveRuntimeImpl
      * @param theclass we want to get all the methods

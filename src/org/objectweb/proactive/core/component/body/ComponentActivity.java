@@ -1,11 +1,11 @@
 package org.objectweb.proactive.core.component.body;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
@@ -15,8 +15,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.io.Serializable;
 
 
 /**

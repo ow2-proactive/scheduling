@@ -30,21 +30,19 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
-import org.objectweb.proactive.osgi.OsgiParameters;
-
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.Socket;
 
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 /**

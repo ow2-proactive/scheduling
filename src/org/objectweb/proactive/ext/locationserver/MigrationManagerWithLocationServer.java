@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.ext.locationserver;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -39,9 +41,6 @@ import org.objectweb.proactive.core.body.migration.MigrationManagerImpl;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.node.Node;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
 
 
 public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
@@ -96,13 +95,12 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
         return remoteBody;
     }
 
-//    public void startingAfterMigration(Body body) {
-//        //we update our location
-//        //   System.out.println("YYYYYYYY");
-//        super.startingAfterMigration(body);
-//        updateLocation(body);
-//    }
-
+    //    public void startingAfterMigration(Body body) {
+    //        //we update our location
+    //        //   System.out.println("YYYYYYYY");
+    //        super.startingAfterMigration(body);
+    //        updateLocation(body);
+    //    }
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
         RequestReceiver currentRequestReceiver) {
         return new BouncingRequestReceiver();

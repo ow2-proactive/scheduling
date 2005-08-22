@@ -6,12 +6,12 @@
  */
 package org.objectweb.proactive.examples.robustarith;
 
+import java.math.BigInteger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-
-import java.math.BigInteger;
 
 
 /**
@@ -57,8 +57,9 @@ public class Main {
         //ProActive.tryWithCatch(java.io.IOException.class);
         ProActive.tryWithCatch(Exception.class);
         try {
-        	String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
-            ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:" + path);
+            String path = (args.length == 0) ? "descriptors/Matrix.xml" : args[0];
+            ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:" +
+                    path);
             VirtualNode dispatcher = pad.getVirtualNode("matrixNode");
             dispatcher.activate();
             Node[] nodes = dispatcher.getNodes();

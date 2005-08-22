@@ -40,7 +40,7 @@ public class Test extends Object {
         if (args.length == 1) {
             m = Integer.decode(args[0]).intValue();
         }
-        
+
         ProActiveConfiguration.load();
 
         Matrix m0;

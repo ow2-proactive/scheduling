@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -42,8 +43,6 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-
-import java.io.IOException;
 
 
 /**
@@ -129,14 +128,11 @@ public class AwaitedRequest implements Request, java.io.Serializable {
 
     //// WRAPPED METHODS
     public MethodCall getMethodCall() {
-        if (this.isArrived){
+        if (this.isArrived) {
             return this.wrappedRequest.getMethodCall();
         } else {
             return null;
         }
-        
-        
-        
     }
 
     public Object getParameter(int index) {
@@ -188,8 +184,8 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     }
 
     public long getSequenceNumber() {
-    	if (!this.isArrived) {
-           return 0;
+        if (!this.isArrived) {
+            return 0;
         } else {
             return wrappedRequest.getSequenceNumber();
         }
@@ -200,7 +196,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     }
 
     public char[] getMessageInfo() {
-        if (!this.isArrived){
+        if (!this.isArrived) {
             return null;
         } else {
             return wrappedRequest.getMessageInfo();

@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.examples.nbody.common;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
@@ -41,9 +43,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.io.IOException;
-import java.io.Serializable;
 
 
 /**
@@ -126,9 +125,9 @@ public class Start implements Serializable {
         logger.info("        Running with options set to " + totalNbBodies +
             " bodies, " + maxIter + " iterations, display " + display);
         xmlFileName = args[0];
-        
+
         logger.info(
-        " 1 : Simplest version, one-to-one communication and master");
+            " 1 : Simplest version, one-to-one communication and master");
         logger.info(" 2 : group communication and master");
         logger.info(" 3 : group communication, odd-even-synchronization");
         logger.info(" 4 : group communication, oospmd synchronization");
@@ -145,7 +144,7 @@ public class Start implements Serializable {
         } catch (IOException ioe) {
             abort(ioe);
         }
-    
+
         logger.info("Thank you!");
 
         // Construct deployment-related variables: pad & nodes

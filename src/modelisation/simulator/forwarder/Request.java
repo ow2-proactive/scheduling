@@ -2,21 +2,18 @@ package modelisation.simulator.forwarder;
 
 import modelisation.statistics.ExponentialLaw;
 
+
 public class Request {
-
-
     public static int BLOCKED = 0;
     public static int RUNNING = 1;
     private int state;
     private int forwarded;
-
     private double startTime;
     private double remainingTime;
     private int hops;
     private ExponentialLaw expoGamma;
 
     public Request() {
-
     }
 
     public Request(double startTime, int hops, double gamma) {
@@ -25,7 +22,8 @@ public class Request {
         this.startTime = startTime;
         this.remainingTime = this.expoGamma.next() * 1000;
         this.state = RUNNING;
-        System.out.println("Request: the communication will last " + this.remainingTime);
+        System.out.println("Request: the communication will last " +
+            this.remainingTime);
     }
 
     public double getRemainingTime() {
@@ -44,7 +42,6 @@ public class Request {
         this.remainingTime -= l;
     }
 
-
     public int getHops() {
         return this.hops;
     }
@@ -52,7 +49,6 @@ public class Request {
     public void setHops(int i) {
         this.hops = i;
     }
-
 
     public void doNextHop() {
         this.remainingTime = this.expoGamma.next() * 1000;
@@ -79,10 +75,7 @@ public class Request {
         this.forwarded++;
     }
 
-
     public int getForwarded() {
         return this.forwarded;
     }
-
-
 }

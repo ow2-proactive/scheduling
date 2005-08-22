@@ -1,57 +1,51 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.group;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 
 import testsuite.exception.BrowsePackageException;
-
 import testsuite.manager.AbstractManager;
-
 import testsuite.result.ResultsCollections;
-
 import testsuite.test.AbstractTest;
 import testsuite.test.Benchmark;
-
 import testsuite.timer.Timeable;
-
-import java.io.File;
-import java.io.FileFilter;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 
 
 /** It is a collection of tests.
@@ -166,8 +160,8 @@ public class Group {
         String parentPackage, Object[] params, boolean useInitFile,
         AbstractManager manager) throws BrowsePackageException {
         if (!directory.isDirectory()) {
-            throw new BrowsePackageException(
-                "Directory " + directory.getPath() + " is not a valid directory");
+            throw new BrowsePackageException("Directory " +
+                directory.getPath() + " is not a valid directory");
         }
 
         if ((packageName != null) && (packageName.length() != 0)) {

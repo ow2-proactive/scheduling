@@ -30,19 +30,18 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.model;
 
-import org.objectweb.fractal.gui.model.BasicComponent;
-import org.objectweb.fractal.gui.model.BasicConfiguration;
-import org.objectweb.fractal.gui.model.Interface;
-
-import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
-import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
-import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import org.objectweb.fractal.gui.model.BasicComponent;
+import org.objectweb.fractal.gui.model.BasicConfiguration;
+import org.objectweb.fractal.gui.model.Interface;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
+import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
+import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 
 
 /**

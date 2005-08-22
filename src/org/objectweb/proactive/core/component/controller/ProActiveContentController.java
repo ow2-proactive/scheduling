@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -48,11 +53,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 
 /**
  * Implementation of ContentController (@see org.objectweb.fractal.api.control.ContentController).
@@ -64,7 +64,6 @@ public class ProActiveContentController extends AbstractProActiveController
     implements ContentController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     List fcSubComponents;
- 
 
     /**
      * Constructor for ProActiveContentController.
@@ -73,9 +72,8 @@ public class ProActiveContentController extends AbstractProActiveController
         super(owner);
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
-                    ContentController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
+                    ContentController.class.getName(), TypeFactory.SERVER,
+                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
@@ -101,7 +99,8 @@ public class ProActiveContentController extends AbstractProActiveController
      *         */
     public Object getFcInternalInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        return ((ProActiveComponent)getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
+        return ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis()
+                .getFcInterface(interfaceName);
     }
 
     /*

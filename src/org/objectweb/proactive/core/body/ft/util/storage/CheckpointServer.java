@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.core.body.ft.util.storage;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
-
-import java.rmi.Remote;
-import java.rmi.RemoteException;
 
 
 /**
@@ -56,7 +56,8 @@ public interface CheckpointServer extends Remote {
      * image of the system.
      * @throws RemoteException
      */
-    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException;
+    public int storeCheckpoint(Checkpoint c, int incarnation)
+        throws RemoteException;
 
     /**
      * Return a checkpoint of the object identified by id.

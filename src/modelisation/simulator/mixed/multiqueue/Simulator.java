@@ -1,17 +1,15 @@
 package modelisation.simulator.mixed.multiqueue;
 
-import modelisation.simulator.common.SimulatorElement;
+import org.apache.log4j.Logger;
 
+import modelisation.simulator.common.SimulatorElement;
 import modelisation.simulator.mixed.Agent;
 import modelisation.simulator.mixed.ForwarderChain;
 import modelisation.simulator.mixed.Source;
-import org.apache.log4j.Logger;
 
 
 public class Simulator extends modelisation.simulator.mixed.Simulator {
-
- static Logger logger = Logger.getLogger(Simulator.class.getName());
-
+    static Logger logger = Logger.getLogger(Simulator.class.getName());
     protected Source[] sourceArray;
     protected Agent[] agentArray;
     protected ForwarderChain[] forwarderChainArray;
@@ -27,11 +25,11 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
     /**
      * Constructor for Simulator.
      */
-    public Simulator(double lambda, double nu, double delta, double gamma1, 
-                     double gamma2, double mu1, double mu2, double ttl, 
-                     int maxMigration, int maxCouples, double length) {
-        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, ttl, maxMigration, 
-              length);
+    public Simulator(double lambda, double nu, double delta, double gamma1,
+        double gamma2, double mu1, double mu2, double ttl, int maxMigration,
+        int maxCouples, double length) {
+        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, ttl, maxMigration,
+            length);
         this.maxCouples = maxCouples;
     }
 
@@ -56,12 +54,12 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
      * @see modelisation.simulator.mixed.Simulator#updateTime()
      */
     public double updateTime() {
-
         double minTime = getMinTime(agentArray);
         double tmp = getMinTime(sourceArray);
         if (minTime == 0) {
             return minTime;
         }
+
         // minTime = Math.min(minTime, tmp);
         minTime = (tmp <= minTime) ? tmp : minTime;
         if (minTime == 0) {
@@ -100,7 +98,6 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
     }
 
     protected double getMinTime(SimulatorElement[] tablo) {
-
         double minTime = tablo[0].getRemainingTime();
         double tmp;
         for (int i = 1; i < tablo.length; i++) {
@@ -110,6 +107,7 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
             } else {
                 minTime = (tmp <= minTime) ? tmp : minTime;
             }
+
             // minTime = Math.min(minTime, tablo[i].getRemainingTime());
         }
         return minTime;
@@ -157,7 +155,7 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
         this.sourceArray[0].setLog(false);
         this.agentArray[0].setLog(false);
         this.forwarderChainArray[0].setLog(false);
-        ((MultiqueueServer)this.server).setSourceArray(sourceArray);
+        ((MultiqueueServer) this.server).setSourceArray(sourceArray);
     }
 
     public void end() {
@@ -169,10 +167,9 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
 
     public static void main(String[] args) {
         if (args.length < 11) {
-            System.err.println(
-                    "Usage: java " + Simulator.class.getName() + 
-                    " <lambda> <nu> <delta> <gamma1> <gamma2> " + 
-                    " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
+            System.err.println("Usage: java " + Simulator.class.getName() +
+                " <lambda> <nu> <delta> <gamma1> <gamma2> " +
+                " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
             System.exit(-1);
         }
         logger.info("Starting Simulator");
@@ -188,17 +185,12 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
         logger.info("     couples = " + args[9]);
         logger.info("     length = " + args[10]);
 
-        Simulator simulator = new Simulator(Double.parseDouble(args[0]), 
-                                            Double.parseDouble(args[1]), 
-                                            Double.parseDouble(args[2]), 
-                                            Double.parseDouble(args[3]), 
-                                            Double.parseDouble(args[4]), 
-                                            Double.parseDouble(args[5]), 
-                                            Double.parseDouble(args[6]), 
-                                            Double.parseDouble(args[7]), 
-                                            Integer.parseInt(args[8]), 
-                                            Integer.parseInt(args[9]), 
-                                            Double.parseDouble(args[10]));
+        Simulator simulator = new Simulator(Double.parseDouble(args[0]),
+                Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+                Double.parseDouble(args[3]), Double.parseDouble(args[4]),
+                Double.parseDouble(args[5]), Double.parseDouble(args[6]),
+                Double.parseDouble(args[7]), Integer.parseInt(args[8]),
+                Integer.parseInt(args[9]), Double.parseDouble(args[10]));
         simulator.initialise();
         simulator.simulate();
     }

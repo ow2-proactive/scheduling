@@ -94,7 +94,6 @@ public class SpyListenerImpl implements SpyListener {
         }
     }
 
-  
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

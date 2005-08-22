@@ -6,14 +6,12 @@
  */
 package org.objectweb.proactive.core.util;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
 /**

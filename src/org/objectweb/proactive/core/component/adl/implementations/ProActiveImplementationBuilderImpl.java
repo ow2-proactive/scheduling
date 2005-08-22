@@ -115,8 +115,7 @@ public class ProActiveImplementationBuilderImpl
                 // 	TODO add self exported virtual node ?
                 // for the moment, just add a leaf to the linked vns
                 ExportedVirtualNodesList.instance().addLeafVirtualNode(name,
-                    adlVN.getName(),
-                    adlVN.getCardinality());  // TODO_M check this
+                    adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
                 org.objectweb.proactive.core.descriptor.data.VirtualNode proactive_vn =

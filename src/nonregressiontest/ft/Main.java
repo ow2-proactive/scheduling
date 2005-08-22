@@ -2,9 +2,9 @@ package nonregressiontest.ft;
 
 import java.io.Serializable;
 
-public class Main implements Serializable{
 
-    public static void main(String[] args){
+public class Main implements Serializable {
+    public static void main(String[] args) {
         try {
             Test ftt = new Test();
             ftt.action();
@@ -15,5 +15,4 @@ public class Main implements Serializable{
             e.printStackTrace();
         }
     }
-
 }

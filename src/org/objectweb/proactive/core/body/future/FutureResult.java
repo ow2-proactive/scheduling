@@ -1,9 +1,9 @@
 package org.objectweb.proactive.core.body.future;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
-
-import java.io.Serializable;
 
 
 /**

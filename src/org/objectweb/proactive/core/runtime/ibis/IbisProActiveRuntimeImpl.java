@@ -1,11 +1,5 @@
 package org.objectweb.proactive.core.runtime.ibis;
 
-import ibis.rmi.AlreadyBoundException;
-import ibis.rmi.Naming;
-import ibis.rmi.NotBoundException;
-import ibis.rmi.RemoteException;
-import ibis.rmi.server.UnicastRemoteObject;
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
@@ -27,6 +21,12 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import ibis.rmi.AlreadyBoundException;
+import ibis.rmi.Naming;
+import ibis.rmi.NotBoundException;
+import ibis.rmi.RemoteException;
+import ibis.rmi.server.UnicastRemoteObject;
 
 
 /**
@@ -93,7 +93,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.killAllNodes();
     }
 
-    public void killNode(String nodeName) throws RemoteException, ProActiveException {
+    public void killNode(String nodeName)
+        throws RemoteException, ProActiveException {
         String nodeUrl = null;
         String name = null;
         try {
@@ -111,7 +112,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.createVM(remoteProcess);
     }
 
-    public String[] getLocalNodeNames() throws RemoteException, ProActiveException {
+    public String[] getLocalNodeNames()
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getLocalNodeNames();
     }
 
@@ -139,7 +141,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
             proActiveRuntimeURL, creatorID, creationProtocol, vmName);
     }
 
-    public ProActiveRuntime[] getProActiveRuntimes() throws RemoteException, ProActiveException {
+    public ProActiveRuntime[] getProActiveRuntimes()
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getProActiveRuntimes();
     }
 
@@ -153,7 +156,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.addAcquaintance(proActiveRuntimeName);
     }
 
-    public String[] getAcquaintances() throws RemoteException, ProActiveException {
+    public String[] getAcquaintances()
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getAcquaintances();
     }
 
@@ -218,7 +222,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         vnNodesArray.remove(virtualNodeURL);
     }
 
-    public void unregisterAllVirtualNodes() throws RemoteException, ProActiveException {
+    public void unregisterAllVirtualNodes()
+        throws RemoteException, ProActiveException {
         for (int i = 0; i < vnNodesArray.size(); i++) {
             String url = (String) vnNodesArray.get(i);
             unregisterVirtualNode(url);
@@ -227,7 +232,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws RemoteException, ConstructorCallExecutionFailedException, ProActiveException, InvocationTargetException {
+        throws RemoteException, ConstructorCallExecutionFailedException, 
+            ProActiveException, InvocationTargetException {
         return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
             isNodeLocal);
     }
@@ -248,11 +254,13 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
      * @return policy server
      * @throws ProActiveException
      */
-    public PolicyServer getPolicyServer() throws RemoteException, ProActiveException {
+    public PolicyServer getPolicyServer()
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getPolicyServer();
     }
 
-    public String getVNName(String nodename) throws RemoteException, ProActiveException {
+    public String getVNName(String nodename)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getVNName(nodename);
     }
 
@@ -261,7 +269,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
      * @return returns all entities associated to the node
      * @throws ProActiveException
      */
-    public ArrayList getEntities(String nodeName) throws RemoteException, ProActiveException {
+    public ArrayList getEntities(String nodeName)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getEntities(nodeName);
     }
 
@@ -271,7 +280,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
      * @throws ProActiveException
      */
     public SecurityContext getPolicy(SecurityContext sc)
-        throws RemoteException, ProActiveException, SecurityNotAvailableException {
+        throws RemoteException, ProActiveException, 
+            SecurityNotAvailableException {
         return proActiveRuntime.getPolicy(sc);
     }
 
@@ -351,7 +361,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getJobID(java.lang.String)
      */
-    public String getJobID(String nodeUrl) throws RemoteException, ProActiveException {
+    public String getJobID(String nodeUrl)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getJobID(nodeUrl);
     }
 
@@ -415,8 +426,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     private String buildRuntimeURL() {
-        int port = IbisRuntimeFactory.getRegistryHelper()
-                                       .getRegistryPortNumber();
+        int port = IbisRuntimeFactory.getRegistryHelper().getRegistryPortNumber();
         String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                      .getInetAddress());
         String name = getVMInformation().getName();
@@ -433,7 +443,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
             String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                          .getInetAddress());
             int port = IbisRuntimeFactory.getRegistryHelper()
-                                           .getRegistryPortNumber();
+                                         .getRegistryPortNumber();
             return UrlBuilder.buildUrl(host, url, "ibis:", port);
         } else {
             return UrlBuilder.checkUrl(url);

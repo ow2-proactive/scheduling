@@ -1,37 +1,41 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.jini;
 
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
@@ -41,23 +45,19 @@ import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
-import org.objectweb.proactive.core.util.UrlBuilder;
-
 
 /**
-  * <p>
-  * The <code>ServiceLocatorHelper</code> is a utility class, that takes 
-        *        care of creating or discovering the
-  * Lookup Service when using JINI.
-  * </p>
-  *
-  * @author  ProActive Team
-  * @version 1.0,  2002/09/20
-  * @since   ProActive 0.9.3
-  *
-  */
+ * <p>
+ * The <code>ServiceLocatorHelper</code> is a utility class, that takes
+ *        care of creating or discovering the
+ * Lookup Service when using JINI.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
+ *
+ */
 public class ServiceLocatorHelper implements DiscoveryListener {
     protected static Logger logger = Logger.getLogger(ServiceLocatorHelper.class.getName());
     protected static int MAX_RETRY = 8;
@@ -69,13 +69,13 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     private static String policy;
     private static String DEFAULT_RMID_LOCATION = System.getProperty(
             "java.home") + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "rmid";
-    private static String DEFAULT_RMID_PARAMS = "-J-Djava.security.policy="; 
+    private static String DEFAULT_RMID_PARAMS = "-J-Djava.security.policy=";
     protected static LookupLocator lookup = null;
     protected static ServiceRegistrar registrar = null;
 
     /**
- * settings of the service locator
- */
+     * settings of the service locator
+     */
     protected boolean shouldCreateServiceLocator = true;
     protected boolean locatorChecked;
     protected static boolean multicastLocator = false;
@@ -85,8 +85,11 @@ public class ServiceLocatorHelper implements DiscoveryListener {
         try {
             host = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
             String policyLocation = System.getProperty("java.security.policy");
-            if(policyLocation != null) policy = getAbsolutePath(policyLocation);
-            else policy = DEFAULT_POLICY;
+            if (policyLocation != null) {
+                policy = getAbsolutePath(policyLocation);
+            } else {
+                policy = DEFAULT_POLICY;
+            }
             DEFAULT_RMID_PARAMS = DEFAULT_RMID_PARAMS.concat(policy);
         } catch (java.net.UnknownHostException e) {
             logger.fatal("Lookup failed: " + e.getMessage());
@@ -123,16 +126,16 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     }
 
     /**
- * true if you want a multicast service Locator
- * false if you want a unicast service Locator
- */
+     * true if you want a multicast service Locator
+     * false if you want a unicast service Locator
+     */
     public void setMulticastLocator(boolean v) {
         ServiceLocatorHelper.multicastLocator = v;
     }
 
     /**
- * Initialise the service locator for this host
- */
+     * Initialise the service locator for this host
+     */
     public synchronized void initializeServiceLocator() {
         if (!shouldCreateServiceLocator) {
             return; // don't bother
@@ -165,8 +168,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     // 
 
     /**
- * for multicast discover
- */
+     * for multicast discover
+     */
     public void discovered(DiscoveryEvent evt) {
         //if (logger.isDebugEnabled()) {
         //    //logger.debug(">> Start discover ...");
@@ -187,8 +190,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     }
 
     /**
- * for multicast discover
- */
+     * for multicast discover
+     */
     public void discarded(DiscoveryEvent evt) {
         //if (logger.isDebugEnabled()) {
         //    //logger.debug(">> discarded ...");
@@ -200,9 +203,9 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     // 
 
     /**
- * Delete recursively all files and directory
- *@param dir The directory to clean
- */
+     * Delete recursively all files and directory
+     *@param dir The directory to clean
+     */
     protected static void delDirectory(java.io.File dir) {
         java.io.File[] files = dir.listFiles();
         if (files != null) {
@@ -224,9 +227,9 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     // 
 
     /**
- * Display all services on this registrar
- *@param registrar The registrar to contact
- */
+     * Display all services on this registrar
+     *@param registrar The registrar to contact
+     */
     private void displayServices() {
         try {
             // the code takes separate routes from here for client or service
@@ -294,9 +297,9 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     }
 
     /**
- * Try to get the Service Locator on the local host (unicast search)
- * Create it if it doesn't exist 
- */
+     * Try to get the Service Locator on the local host (unicast search)
+     * Create it if it doesn't exist
+     */
     private void getOrCreateServiceLocator() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
@@ -361,8 +364,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     }
 
     /**
- * Create a new Service Locator on the local host
- */
+     * Create a new Service Locator on the local host
+     */
     private static void createServiceLocator() {
         //this block is usefull to avoid many ServiceLocator to be created by different
         //threads at the same time.If the file cannot be created, it is because another thread
@@ -408,10 +411,10 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     }
 
     /**
- * Method createLockFile.
- * @param host
- * @return String
- */
+     * Method createLockFile.
+     * @param host
+     * @return String
+     */
     private static boolean createLockFile() {
         jiniLockFile = new java.io.File(jiniLockFileLocation);
         //jiniLockFile.deleteOnExit();
@@ -422,17 +425,17 @@ public class ServiceLocatorHelper implements DiscoveryListener {
             return true;
         }
     }
-    
-	private static String getAbsolutePath(String path) {
-			if (path.startsWith("file:")) {
-				//remove file part to build absolute path
-				path = path.substring(5);
-			}
-			try {
-				return new File(path).getCanonicalPath();
-			} catch (IOException e) {
-				logger.error(e.getMessage());
-				return path;
-			}
-		}
+
+    private static String getAbsolutePath(String path) {
+        if (path.startsWith("file:")) {
+            //remove file part to build absolute path
+            path = path.substring(5);
+        }
+        try {
+            return new File(path).getCanonicalPath();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return path;
+        }
+    }
 }

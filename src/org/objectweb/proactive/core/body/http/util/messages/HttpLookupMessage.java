@@ -43,11 +43,10 @@ import org.objectweb.proactive.core.body.http.util.HttpMessage;
  * @see HttpMessage
  */
 public class HttpLookupMessage extends HttpMessage implements Serializable {
- 
     private String urn;
 
-    
     //Caller Side
+
     /**
      * Constructs an HTTP Message
      * @param urn The urn of the Object (it can be an active object or a runtime).
@@ -57,18 +56,16 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
         this.urn = urn;
     }
 
-    /** 
+    /**
      * Get the returned object.
      * @return
      */
-    public UniversalBody getReturnedObject () {
-       
-        return (UniversalBody)this.returnedObject;
+    public UniversalBody getReturnedObject() {
+        return (UniversalBody) this.returnedObject;
     }
-    
-    
-    
+
     //Callee side
+
     /**
      * Performs the lookup
      * @return The Object associated with the urn
@@ -82,8 +79,4 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
         }
         return this.returnedObject;
     }
-    
-    
 }
-
-  

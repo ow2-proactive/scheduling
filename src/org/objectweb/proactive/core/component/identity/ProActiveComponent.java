@@ -30,12 +30,11 @@
  */
 package org.objectweb.proactive.core.component.identity;
 
-import org.objectweb.fractal.api.Component;
-
-import org.objectweb.proactive.core.UniqueID;
-
 import java.io.Serializable;
 import java.util.List;
+
+import org.objectweb.fractal.api.Component;
+import org.objectweb.proactive.core.UniqueID;
 
 
 /**
@@ -75,16 +74,16 @@ public interface ProActiveComponent extends Component, Serializable {
      * @return a unique identifier of the component (of the active object) accross virtual machines
      */
     public UniqueID getID();
-    
+
     /**
      * getter
-     * @return the list of interceptors on input invocations for this component 
-     */    
+     * @return the list of interceptors on input invocations for this component
+     */
     public List getInputInterceptors();
-    
+
     /**
      * getter
-     * @return the list of interceptors on output invocations for this component 
-     */    
+     * @return the list of interceptors on output invocations for this component
+     */
     public List getOutputInterceptors();
 }

@@ -30,15 +30,13 @@
  */
 package testsuite.test;
 
-import testsuite.exception.AssertionFailedException;
-import testsuite.exception.NotStandAloneException;
-
-import testsuite.result.TestResult;
-
 import java.io.Serializable;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import testsuite.exception.AssertionFailedException;
+import testsuite.exception.NotStandAloneException;
+import testsuite.result.TestResult;
 
 
 /**
@@ -121,15 +119,16 @@ public abstract class FunctionalTest extends AbstractTest
      * @see testsuite.test.AbstractTest#runTest()
      */
     public TestResult runTest() {
-    	try {
-    		initTest();
-    	} catch(Exception e) {
-    		logger.error("Cannot initialize test", e);
-    	}
+        try {
+            initTest();
+        } catch (Exception e) {
+            logger.error("Cannot initialize test", e);
+        }
+
         // preconditions
-		if (logger.isDebugEnabled()){
-			logger.debug("Test Preconditions of "+this.getName());
-		}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Test Preconditions of " + this.getName());
+        }
         try {
             if (!preConditions()) {
                 if (logger.isDebugEnabled()) {
@@ -139,14 +138,15 @@ public abstract class FunctionalTest extends AbstractTest
                 return new TestResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
             }
-            if (logger.isDebugEnabled()){
-            	logger.debug("Preconditions success in "+this.getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Preconditions success in " + this.getName());
             }
         } catch (AssertionFailedException e) {
-        	logger.error("Failed assertion" + e);
-        	failed=true;
-            logger.warn("[FAILED] " + this.getName() );
-        	return new TestResult(this, TestResult.ERROR, "An assertion failed", e);
+            logger.error("Failed assertion" + e);
+            failed = true;
+            logger.warn("[FAILED] " + this.getName());
+            return new TestResult(this, TestResult.ERROR,
+                "An assertion failed", e);
         } catch (Exception e1) {
             logger.error("Exception in preconditions", e1);
             failed = true;
@@ -166,19 +166,20 @@ public abstract class FunctionalTest extends AbstractTest
             }
             return null;
         } catch (AssertionFailedException e) {
-        	logger.error("Failed assertion" + e);
-        	failed=true;
-            logger.warn("[FAILED] " + this.getName() );
-        	return new TestResult(this, TestResult.ERROR, "An assertion failed", e);
+            logger.error("Failed assertion" + e);
+            failed = true;
+            logger.warn("[FAILED] " + this.getName());
+            return new TestResult(this, TestResult.ERROR,
+                "An assertion failed", e);
         } catch (RuntimeException e) {
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             logger.fatal("Exception during the test", e);
             failed = true;
             return new TestResult(this, TestResult.ERROR,
                 "During the test execution", e);
         } catch (Exception e) {
-        	logger.warn(this.getName() + ": [FAILED]");
-        	e.printStackTrace();
+            logger.warn(this.getName() + ": [FAILED]");
+            e.printStackTrace();
             logger.fatal("Exception during the test", e);
             failed = true;
             return new TestResult(this, TestResult.ERROR,
@@ -186,37 +187,38 @@ public abstract class FunctionalTest extends AbstractTest
         }
         failed = false;
         // postconditions
-        if (logger.isDebugEnabled()){
-        	logger.debug("Test Postconditions of "+this.getName());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Test Postconditions of " + this.getName());
         }
         try {
             if (!postConditions()) {
-                logger.warn("[FAILED] " + this.getName() );
+                logger.warn("[FAILED] " + this.getName());
                 logger.warn("Postconditions are not verified");
                 failed = true;
             }
-			if (logger.isDebugEnabled()){
-				 logger.debug("Postconditions success in "+this.getName());
-			 }
-	    	try {
-	    		endTest();
-	    	} catch(Exception e) {
-	    		logger.error("Cannot correctly end test", e);
-	    	}
+            if (logger.isDebugEnabled()) {
+                logger.debug("Postconditions success in " + this.getName());
+            }
+            try {
+                endTest();
+            } catch (Exception e) {
+                logger.error("Cannot correctly end test", e);
+            }
         } catch (AssertionFailedException e) {
-        	logger.error("Failed assertion" + e);
-        	failed=true;
-            logger.warn("[FAILED] " + this.getName() );
-            return new TestResult(this, TestResult.ERROR, "An assertion failed in postconditions", e);
+            logger.error("Failed assertion" + e);
+            failed = true;
+            logger.warn("[FAILED] " + this.getName());
+            return new TestResult(this, TestResult.ERROR,
+                "An assertion failed in postconditions", e);
         } catch (Exception e1) {
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             logger.error("Exception in postcondition", e1);
             failed = true;
             return new TestResult(this, TestResult.ERROR, "In Postconditions",
                 e1);
         }
         if (failed) {
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
@@ -235,12 +237,12 @@ public abstract class FunctionalTest extends AbstractTest
                     logger.debug("Preconditions are not verified");
                 }
                 failed = true;
-                logger.warn("[FAILED] " + this.getName() );
+                logger.warn("[FAILED] " + this.getName());
                 return new TestResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
             }
         } catch (Exception e1) {
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             logger.error("Exception in preconditions", e1);
             failed = true;
             return new TestResult(this, TestResult.ERROR, "In Preconditions", e1);
@@ -280,14 +282,14 @@ public abstract class FunctionalTest extends AbstractTest
             logger.fatal("Test failed", e);
             failed = true;
             out = null;
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             return new TestResult(this, TestResult.ERROR,
                 "During the test execution", e);
         } catch (Exception e) {
             logger.fatal("Test failed", e);
             failed = true;
             out = null;
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             if (!(e instanceof InvocationTargetException)) {
                 return new TestResult(this, TestResult.ERROR,
                     "During the test execution", e);
@@ -312,7 +314,7 @@ public abstract class FunctionalTest extends AbstractTest
                 e1);
         }
         if (failed) {
-            logger.warn("[FAILED] " + this.getName() );
+            logger.warn("[FAILED] " + this.getName());
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {

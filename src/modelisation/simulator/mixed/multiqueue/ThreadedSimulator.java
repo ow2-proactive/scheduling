@@ -6,17 +6,15 @@ import modelisation.simulator.mixed.Source;
 
 
 public class ThreadedSimulator extends Simulator {
-
     protected ThreadWrapper wrapper;
 
- public ThreadedSimulator(double lambda, double nu, double delta, double gamma1, 
-                     double gamma2, double mu1, double mu2, double ttl, 
-                     int maxMigration, int maxCouples, double length) {
-        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, ttl, maxMigration, 
-              maxCouples, length);
-      //  this.maxCouples = maxCouples;
+    public ThreadedSimulator(double lambda, double nu, double delta,
+        double gamma1, double gamma2, double mu1, double mu2, double ttl,
+        int maxMigration, int maxCouples, double length) {
+        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, ttl, maxMigration,
+            maxCouples, length);
+        //  this.maxCouples = maxCouples;
     }
-
 
     public void updateElements(double currentTime) {
         wrapper.updateElements(currentTime);
@@ -51,23 +49,23 @@ public class ThreadedSimulator extends Simulator {
                 this.agentArray[i].setLog(false);
                 this.forwarderChainArray[i].setLog(false);
             }
+
             //            this.server.setSource(this.sourceArray[i]);
         }
-        ((MultiqueueServer)this.server).setSourceArray(sourceArray);
-//        System.out.println("XXXXXXXXXXXXXXXXXXXXXX");
-        this.wrapper = new ThreadWrapper(sourceArray, agentArray, 
-                                         forwarderChainArray, server,10);
-                                         
-//                                             System.out.println("XXXXXXXXXXXXXXXXXXXXXX");
+        ((MultiqueueServer) this.server).setSourceArray(sourceArray);
+        //        System.out.println("XXXXXXXXXXXXXXXXXXXXXX");
+        this.wrapper = new ThreadWrapper(sourceArray, agentArray,
+                forwarderChainArray, server, 10);
+
+        //                                             System.out.println("XXXXXXXXXXXXXXXXXXXXXX");
     }
 
     public static void main(String[] args) {
         //Simulator.main(args);
-         if (args.length < 11) {
-            System.err.println(
-                    "Usage: java " + Simulator.class.getName() + 
-                    " <lambda> <nu> <delta> <gamma1> <gamma2> " + 
-                    " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
+        if (args.length < 11) {
+            System.err.println("Usage: java " + Simulator.class.getName() +
+                " <lambda> <nu> <delta> <gamma1> <gamma2> " +
+                " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
             System.exit(-1);
         }
         System.out.println("Starting Simulator");
@@ -82,17 +80,12 @@ public class ThreadedSimulator extends Simulator {
         System.out.println("   max migrations = " + args[8]);
         System.out.println("     couples = " + args[9]);
         System.out.println("     length = " + args[10]);
-        Simulator simulator = new ThreadedSimulator(Double.parseDouble(args[0]), 
-                                            Double.parseDouble(args[1]), 
-                                            Double.parseDouble(args[2]), 
-                                            Double.parseDouble(args[3]), 
-                                            Double.parseDouble(args[4]), 
-                                            Double.parseDouble(args[5]), 
-                                            Double.parseDouble(args[6]), 
-                                            Double.parseDouble(args[7]), 
-                                            Integer.parseInt(args[8]), 
-                                            Integer.parseInt(args[9]), 
-                                            Double.parseDouble(args[10]));
+        Simulator simulator = new ThreadedSimulator(Double.parseDouble(args[0]),
+                Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+                Double.parseDouble(args[3]), Double.parseDouble(args[4]),
+                Double.parseDouble(args[5]), Double.parseDouble(args[6]),
+                Double.parseDouble(args[7]), Integer.parseInt(args[8]),
+                Integer.parseInt(args[9]), Double.parseDouble(args[10]));
         simulator.initialise();
         simulator.simulate();
         System.exit(0);

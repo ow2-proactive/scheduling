@@ -6,18 +6,18 @@ import modelisation.simulator.mixed.Source;
 
 
 public class ThreadedUpdater implements Runnable {
-
     protected ThreadWrapper parent;
     protected Agent[] agent;
     protected Source[] source;
+
     //  protected Server server;
     protected ForwarderChain[] chain;
     protected boolean performUpdate = false;
     protected boolean decreaseTime = false;
     protected double time;
 
-    public ThreadedUpdater(ThreadWrapper threadWrapper, Source[] source, 
-                           Agent[] agent, ForwarderChain[] fChain) {
+    public ThreadedUpdater(ThreadWrapper threadWrapper, Source[] source,
+        Agent[] agent, ForwarderChain[] fChain) {
         this.parent = threadWrapper;
         this.agent = agent;
         this.source = source;
@@ -46,13 +46,14 @@ public class ThreadedUpdater implements Runnable {
                 e.printStackTrace();
             }
         }
+
         //this.decreaseTime = false;
         if (this.decreaseTime) {
-//            System.out.println(" decreaseTime");
+            //            System.out.println(" decreaseTime");
             this._decreaseTime();
             this.decreaseTime = false;
         } else if (this.performUpdate) {
-//            System.out.println(" performUpdate");
+            //            System.out.println(" performUpdate");
             this._updateElements();
             this.performUpdate = false;
         }
@@ -68,6 +69,7 @@ public class ThreadedUpdater implements Runnable {
             this.chain[i].decreaseRemainingTime(time);
             this.source[i].decreaseRemainingTime(time);
         }
+
         //      this.server.decreaseRemainingTime(time);
         this.parent.operationDone();
     }

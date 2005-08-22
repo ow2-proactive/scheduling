@@ -30,19 +30,18 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
-
-import java.io.IOException;
 
 
 /**
  * @author vlegrand
  *
  */
-public class FileProcess  {
+public class FileProcess {
     protected static Logger logger = Logger.getLogger(FileProcess.class.getName());
     private java.io.File[] codebases;
     protected RequestInfo info;
@@ -68,18 +67,21 @@ public class FileProcess  {
         byte[] b = null;
         if (codebases == null) {
             try {
-				// reading from resources in the classpath
-				b = getBytesFromResource(info.getClassFileName());
-			} catch (IOException e) {
-		        throw new ClassNotFoundException("Cannot find class " + info.getClassFileName(), e);
-			}
+                // reading from resources in the classpath
+                b = getBytesFromResource(info.getClassFileName());
+            } catch (IOException e) {
+                throw new ClassNotFoundException("Cannot find class " +
+                    info.getClassFileName(), e);
+            }
         } else {
             for (int i = 0; i < codebases.length; i++) {
                 try {
                     if (codebases[i].isDirectory()) {
-                        b = getBytesFromDirectory(info.getClassFileName(), codebases[i]);
+                        b = getBytesFromDirectory(info.getClassFileName(),
+                                codebases[i]);
                     } else {
-                        b = getBytesFromArchive(info.getClassFileName(), codebases[i]);
+                        b = getBytesFromArchive(info.getClassFileName(),
+                                codebases[i]);
                     }
                 } catch (java.io.IOException e) {
                 }
@@ -116,7 +118,8 @@ public class FileProcess  {
         //    System.out.println("ClassServer sent class " + info.path +
         //        " successfully");
         //}
-        throw new ClassNotFoundException("Cannot find class " + info.getClassFileName());
+        throw new ClassNotFoundException("Cannot find class " +
+            info.getClassFileName());
     }
 
     //
@@ -132,10 +135,11 @@ public class FileProcess  {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    public static byte[] getBytesFromResource(String path) throws java.io.IOException {
+    public static byte[] getBytesFromResource(String path)
+        throws java.io.IOException {
         String filename = path.replace('.', '/') + ".class";
         java.io.InputStream in = FileProcess.class.getClassLoader()
-                                     .getResourceAsStream(filename);
+                                                  .getResourceAsStream(filename);
         if (in == null) {
             return null;
         }
@@ -221,8 +225,8 @@ public class FileProcess  {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in, int length)
-        throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in,
+        int length) throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[length];
         try {

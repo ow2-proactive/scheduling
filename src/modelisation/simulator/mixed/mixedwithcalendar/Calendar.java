@@ -8,6 +8,6 @@ public interface Calendar {
     public Event getNextEvent();
 
     public Event[] removeNextEvents();
-	public boolean removeEvent(Event event);
 
+    public boolean removeEvent(Event event);
 }

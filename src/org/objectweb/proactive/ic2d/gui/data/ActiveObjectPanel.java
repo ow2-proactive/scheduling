@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.awt.RenderingHints;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.ActiveObjectListener;
-
-import java.awt.RenderingHints;
 
 
 public class ActiveObjectPanel extends AbstractDataObjectPanel

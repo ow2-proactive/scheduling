@@ -31,7 +31,6 @@
 package org.objectweb.proactive.p2p.api;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -57,9 +56,9 @@ public class ProActiveSkeletons {
     }
 
     /**
-     * 
+     *
      * TODO javadoc
-     * 
+     *
      * @param root
      * @param managerNode
      * @param nodes

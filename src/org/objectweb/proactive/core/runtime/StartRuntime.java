@@ -30,19 +30,17 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.net.URL;
-import java.net.UnknownHostException;
 
 
 /**

@@ -29,19 +29,18 @@
  */
 package org.objectweb.proactive.core.component.adl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.adl.FactoryFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -97,7 +96,8 @@ public class Launcher {
             return ((Map) f.newComponent(pargs[1], new HashMap())).get(pargs[2]);
         } else {
             Factory f;
-            if ("org.objectweb.proactive.core.component.Fractive".equals(System.getProperty("fractal.provider"))) {
+            if ("org.objectweb.proactive.core.component.Fractive".equals(
+                        System.getProperty("fractal.provider"))) {
                 // return the ProActive factory as defined in
                 // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
@@ -115,13 +115,13 @@ public class Launcher {
                 try {
                     return f.newComponent(pargs[1], new HashMap());
                 } catch (ClassCastException e) {
-                    if (e.getMessage().indexOf("attribute_controller_representative")!=(-1)) {
+                    if (e.getMessage().indexOf("attribute_controller_representative") != (-1)) {
                         System.out.println(
                             "Error while parsing the ADL. This could be due to the setting of attributes without implementing AttributeController. ");
                         throw e;
                     } else {
-                    	e.printStackTrace();
-                    	return null;
+                        e.printStackTrace();
+                        return null;
                     }
                 }
             }

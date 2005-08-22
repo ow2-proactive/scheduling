@@ -32,18 +32,15 @@ package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.control.LifeCycleController;
 
+
 /**
  * @author Matthieu Morel
  *
  */
 public interface ProActiveLifeCycleController extends LifeCycleController {
-    
-    
     public String getFcState(short priority);
-    
-    public void startFc(short priority);
-    
-    public void stopFc(short priority);
-    
 
+    public void startFc(short priority);
+
+    public void stopFc(short priority);
 }

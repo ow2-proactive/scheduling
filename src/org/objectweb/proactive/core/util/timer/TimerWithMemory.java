@@ -1,8 +1,8 @@
 package org.objectweb.proactive.core.util.timer;
 
-import org.objectweb.proactive.core.util.profiling.Timer;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.core.util.profiling.Timer;
 
 
 /**
@@ -42,9 +42,9 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
     protected void addToMemoryTest(long time) {
         this.total += time;
         this.nbrValues++;
-    	this.addToMemory(time);
+        this.addToMemory(time);
     }
-    
+
     protected void addToMemory(long time) {
         if (this.position == this.memory.length) {
             //not enough space, need to increase the array
@@ -72,21 +72,21 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
 
     public double getVariance() {
         double average = this.getAverage();
-       double total2 =0;
+        double total2 = 0;
         for (int i = 0; i < this.position; i++) {
             total2 += Math.pow(memory[i], 2);
         }
-        return ((total2 / this.position)-Math.pow(average,2));
+        return ((total2 / this.position) - Math.pow(average, 2));
     }
 
     public double getStandardDeviation() {
         return Math.sqrt(this.getVariance());
     }
-    
+
     public void reset() {
-    	super.reset();
-    	   this.memory = new long[10];
-           this.position = 0;
+        super.reset();
+        this.memory = new long[10];
+        this.position = 0;
     }
 
     public void dump() {
@@ -111,7 +111,8 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
         System.out.println();
         System.out.println("Average is " + mt.getAverage());
         System.out.println("Variance is " + mt.getVariance());
-        
-        System.out.println("Standard deviation is " + mt.getStandardDeviation());
+
+        System.out.println("Standard deviation is " +
+            mt.getStandardDeviation());
     }
 }

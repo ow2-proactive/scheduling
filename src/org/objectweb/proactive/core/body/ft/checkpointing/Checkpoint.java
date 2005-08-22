@@ -30,11 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ft.checkpointing;
 
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.UniqueID;
-
-import sun.rmi.server.MarshalInputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,6 +37,11 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.rmi.server.RemoteObject;
 import java.rmi.server.RemoteStub;
+
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.UniqueID;
+
+import sun.rmi.server.MarshalInputStream;
 
 
 /**
@@ -180,18 +180,18 @@ public class Checkpoint implements java.io.Serializable {
         protected void annotateClass(Class cl) throws IOException {
             writeObject(this.codebase);
         }
-        
+
         /*
          * Checks for objects that are instances of java.rmi.Remote
          * that need to be serialized as RMI stubs !
          */
-        protected final Object replaceObject(Object obj) throws IOException {
+        protected final Object replaceObject(Object obj)
+            throws IOException {
             if ((obj instanceof RemoteObject) && !(obj instanceof RemoteStub)) {
-                return RemoteObject.toStub((RemoteObject)obj);
+                return RemoteObject.toStub((RemoteObject) obj);
             } else {
                 return obj;
             }
         }
     }
-
 }

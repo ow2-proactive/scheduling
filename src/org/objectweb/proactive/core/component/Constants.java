@@ -51,6 +51,5 @@ public interface Constants {
     public final static String COMPOSITE = "composite";
     public final static String PRIMITIVE = "primitive";
     public final static String PARALLEL = "parallel";
-
     public final static boolean SYNCHRONOUS = true;
 }

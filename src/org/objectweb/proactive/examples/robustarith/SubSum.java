@@ -7,7 +7,6 @@
 package org.objectweb.proactive.examples.robustarith;
 
 import java.io.Serializable;
-
 import java.math.BigInteger;
 
 

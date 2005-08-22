@@ -30,9 +30,11 @@
  */
 package org.objectweb.proactive.core.component.adl.implementations;
 
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.deployment.scheduling.component.api.FactoryProviderTask;
 import org.objectweb.deployment.scheduling.component.lib.AbstractInstanceProviderTask;
-
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Node;
@@ -44,7 +46,6 @@ import org.objectweb.fractal.adl.implementations.Implementation;
 import org.objectweb.fractal.adl.implementations.ImplementationCompiler;
 import org.objectweb.fractal.adl.implementations.ImplementationContainer;
 import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
@@ -52,9 +53,6 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
-
-import java.util.List;
-import java.util.Map;
 
 
 /**

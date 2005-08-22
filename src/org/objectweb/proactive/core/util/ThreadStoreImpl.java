@@ -1,34 +1,35 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.util;
+
 
 /**
  * <p>
@@ -40,92 +41,87 @@ package org.objectweb.proactive.core.util;
  * @since   ProActive 0.9.2
  */
 public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
+    private int counter;
+    private boolean defaultOpenState;
+    private transient boolean open;
 
-  private int counter;
-  private boolean defaultOpenState;
-  private transient boolean open;
-
-  /**
-   * Creates a new ThreadStore that is opened after creation.
-   */
-  public ThreadStoreImpl() {
-    this(true);
-  }
-
-
-  /**
-   * Constructor for ThreadStoreImpl.
-   * @param isOpened true is the store is opened after creation
-   */
-  public ThreadStoreImpl(boolean isOpened) {
-    defaultOpenState = isOpened;
-    open = defaultOpenState;
-  }
-
-
-  /**
-   * @see ThreadStore#threadCount()
-   */
-  public int threadCount() {
-    return counter;
-  }
-
-
-  /**
-   * @see ThreadStore#enter()
-   */
-  public synchronized void enter() {
-    while (!open) {
-      try {
-        wait();
-      } catch (InterruptedException e) {}
+    /**
+     * Creates a new ThreadStore that is opened after creation.
+     */
+    public ThreadStoreImpl() {
+        this(true);
     }
-    counter++;
-  }
 
-
-  /**
-   * @see ThreadStore#exit()
-   */
-  public synchronized void exit() {
-    counter--;
-    notifyAll();
-  }
-
-
-  /**
-   * @see ThreadStore#close()
-   */
-  public synchronized void close() {
-    open = false;
-    while (counter != 0 && !open) {
-      try {
-        wait();
-      } catch (InterruptedException e) {}
+    /**
+     * Constructor for ThreadStoreImpl.
+     * @param isOpened true is the store is opened after creation
+     */
+    public ThreadStoreImpl(boolean isOpened) {
+        defaultOpenState = isOpened;
+        open = defaultOpenState;
     }
-  }
 
+    /**
+     * @see ThreadStore#threadCount()
+     */
+    public int threadCount() {
+        return counter;
+    }
 
-  /**
-   * @see ThreadStore#open()
-   */
-  public synchronized void open() {
-    open = true;
-    notifyAll();
-  }
+    /**
+     * @see ThreadStore#enter()
+     */
+    public synchronized void enter() {
+        while (!open) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
+        counter++;
+    }
 
+    /**
+     * @see ThreadStore#exit()
+     */
+    public synchronized void exit() {
+        counter--;
+        notifyAll();
+    }
 
-  //
-  // -- PRIVATE METHODS -----------------------------------------------
-  //
+    /**
+     * @see ThreadStore#close()
+     */
+    public synchronized void close() {
+        open = false;
+        while ((counter != 0) && !open) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 
-  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-    out.defaultWriteObject();
-  }
+    /**
+     * @see ThreadStore#open()
+     */
+    public synchronized void open() {
+        open = true;
+        notifyAll();
+    }
 
-  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    // set open to the default value
-    open = defaultOpenState;
-  }
+    //
+    // -- PRIVATE METHODS -----------------------------------------------
+    //
+    private void writeObject(java.io.ObjectOutputStream out)
+        throws java.io.IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(java.io.ObjectInputStream in)
+        throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // set open to the default value
+        open = defaultOpenState;
+    }
 }

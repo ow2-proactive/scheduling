@@ -30,8 +30,13 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -56,13 +61,6 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
-
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.util.Iterator;
-import java.util.Random;
-import java.util.Vector;
 
 
 /**

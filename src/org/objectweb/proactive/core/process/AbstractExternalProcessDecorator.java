@@ -121,6 +121,7 @@ public abstract class AbstractExternalProcessDecorator
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
             }
+
             // the masterProcess is started, now we feed the output with the slave command
             outputMessageSink.setMessage(targetProcess.getCommand());
         }

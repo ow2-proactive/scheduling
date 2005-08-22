@@ -30,20 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.dialog.view;
 
-import org.objectweb.fractal.gui.dialog.model.DialogModel;
-import org.objectweb.fractal.gui.dialog.view.BasicDialogView;
-
-import org.objectweb.proactive.ic2d.gui.components.dialog.model.ProActiveDialogModel;
-import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
-import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +48,12 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
+
+import org.objectweb.fractal.gui.dialog.model.DialogModel;
+import org.objectweb.fractal.gui.dialog.view.BasicDialogView;
+import org.objectweb.proactive.ic2d.gui.components.dialog.model.ProActiveDialogModel;
+import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
+import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
 
 
 /**

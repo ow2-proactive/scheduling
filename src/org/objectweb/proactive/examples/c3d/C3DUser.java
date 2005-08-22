@@ -30,21 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-import org.objectweb.proactive.examples.c3d.prim.Light;
-import org.objectweb.proactive.examples.c3d.prim.Primitive;
-import org.objectweb.proactive.examples.c3d.prim.Sphere;
-import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
-
 import java.awt.Button;
 import java.awt.Canvas;
 import java.awt.Color;
@@ -75,13 +60,24 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.MemoryImageSource;
-
 import java.io.IOException;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.c3d.prim.Light;
+import org.objectweb.proactive.examples.c3d.prim.Primitive;
+import org.objectweb.proactive.examples.c3d.prim.Sphere;
+import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 
 public class C3DUser implements org.objectweb.proactive.RunActive,

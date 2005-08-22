@@ -7,31 +7,27 @@
 package modelisation.statistics;
 
 import java.io.Serializable;
-
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-
 import java.util.Random;
 
 import modelisation.edu.cornell.lassp.houle.RngPack.RandomElement;
 import modelisation.edu.cornell.lassp.houle.RngPack.Ranlux;
 
 
-public class ExponentialLaw implements RandomNumberGenerator,
-                                       Serializable {
-
+public class ExponentialLaw implements RandomNumberGenerator, Serializable {
     //extends GenericDistribution {
     private double parameter;
     private Random random;
+
     //    private SecureRandom random;
     protected RandomElement re;
 
     public ExponentialLaw() {
     }
 
-    public ExponentialLaw(double parameter)
-                   throws IllegalArgumentException {
+    public ExponentialLaw(double parameter) throws IllegalArgumentException {
         //        random = this.createRandomGenerator();
         //        if (parameter > 0) {
         //            this.parameter = parameter;
@@ -41,24 +37,24 @@ public class ExponentialLaw implements RandomNumberGenerator,
     }
 
     public ExponentialLaw(double parameter, long seed)
-                   throws IllegalArgumentException {
+        throws IllegalArgumentException {
         //   random = this.createRandomGenerator(seed);
         // random = new Random(seed);
     }
 
     public Random createRandomGenerator() {
-    	return this.createRandomGenerator(System.currentTimeMillis());
+        return this.createRandomGenerator(System.currentTimeMillis());
         //  return _createRandomGenerator();
         // return this._createRandomGenerator();
         //return this._createRanluxGenerator();
     }
 
     public Random createRandomGenerator(long seed) {
-
         // Random tmpRandom = new Random(seed);
-          Random tmpRandom = this._createRandomGenerator(seed);
-       // Random tmpRandom = this._createRanluxGenerator(seed);
-      //  this.random.setSeed(seed);
+        Random tmpRandom = this._createRandomGenerator(seed);
+
+        // Random tmpRandom = this._createRanluxGenerator(seed);
+        //  this.random.setSeed(seed);
         return tmpRandom;
     }
 
@@ -69,7 +65,7 @@ public class ExponentialLaw implements RandomNumberGenerator,
     public void initialize(double parameter, long seed) {
         this.parameter = parameter;
         this.random = this.createRandomGenerator(seed);
-    //  this.random = this.createRandomGenerator();
+        //  this.random = this.createRandomGenerator();
     }
 
     public double next() {
@@ -77,7 +73,6 @@ public class ExponentialLaw implements RandomNumberGenerator,
     }
 
     public static double moyenne(double[] values) {
-
         double total = 0;
         for (int i = 0; i < values.length; i++) {
             total += values[i];
@@ -86,7 +81,6 @@ public class ExponentialLaw implements RandomNumberGenerator,
     }
 
     protected Random _createSecureRandomGenerator() {
-
         SecureRandom tmpRandom = null;
         try {
             tmpRandom = SecureRandom.getInstance("SHA1PRNG", "SUN");
@@ -94,8 +88,7 @@ public class ExponentialLaw implements RandomNumberGenerator,
             byte[] tmp = tmpRandom.generateSeed(10);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-        }
-         catch (NoSuchProviderException e) {
+        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
         return tmpRandom;
@@ -105,13 +98,13 @@ public class ExponentialLaw implements RandomNumberGenerator,
         return new Random();
     }
 
- protected Random _createRandomGenerator(long l) {
+    protected Random _createRandomGenerator(long l) {
         return new Random(l);
     }
 
     protected Random _createRanluxGenerator() {
-      return this._createRanluxGenerator(System.currentTimeMillis());
-     //  return new Ranlux();
+        return this._createRanluxGenerator(System.currentTimeMillis());
+        //  return new Ranlux();
     }
 
     private Random _createRanluxGenerator(long l) {
@@ -121,7 +114,7 @@ public class ExponentialLaw implements RandomNumberGenerator,
     public static void main(String[] args) {
         if (args.length < 2) {
             System.err.println(
-                    "Usage: java statistics.ExponentialLaw <parameter> <number>");
+                "Usage: java statistics.ExponentialLaw <parameter> <number>");
             System.exit(-1);
         }
 

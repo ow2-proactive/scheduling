@@ -1,14 +1,15 @@
 package org.objectweb.proactive.ext.util;
 
+import java.io.File;
+import java.io.FileOutputStream;
+
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
 
 public class StubGenerator {
+
     /**
      * Turn a file name into a class name if necessary. Remove the ending .class and change all the '/' into '.'
      * @param name
@@ -49,7 +50,7 @@ public class StubGenerator {
         if (args.length <= 0) {
             printUsageAndExit();
         }
-        
+
         String directoryName = "./";
 
         if (args[0].equals("-d")) {

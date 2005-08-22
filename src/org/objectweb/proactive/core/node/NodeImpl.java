@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.core.node;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -39,12 +44,6 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-
-import java.util.ArrayList;
 
 
 /**
@@ -130,11 +129,12 @@ public class NodeImpl implements Node, Serializable {
         }
     }
 
-	/**
-	 * @see org.objectweb.proactive.core.node.Node#getNumberOfActiveObjects()
-	 */
-	public int getNumberOfActiveObjects() throws NodeException {
-		ArrayList bodyArray;  try {
+    /**
+     * @see org.objectweb.proactive.core.node.Node#getNumberOfActiveObjects()
+     */
+    public int getNumberOfActiveObjects() throws NodeException {
+        ArrayList bodyArray;
+        try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
             throw new NodeException(
@@ -142,8 +142,8 @@ public class NodeImpl implements Node, Serializable {
                 this.nodeInformation.getURL(), e);
         }
         return bodyArray.size();
-	}
-	
+    }
+
     /**
      * @see org.objectweb.proactive.core.node.Node#getActiveObjects(String)
      */

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.gui.components;
 
 import org.objectweb.fractal.gui.TitlePane;
-
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
 

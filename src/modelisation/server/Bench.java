@@ -1,16 +1,16 @@
 package modelisation.server;
 
-import modelisation.ModelisationBench;
-import modelisation.statistics.ExponentialLaw;
-import modelisation.statistics.RandomNumberFactory;
-import modelisation.statistics.RandomNumberGenerator;
-import modelisation.util.NodeControler;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
+
+import modelisation.ModelisationBench;
+import modelisation.statistics.ExponentialLaw;
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
+import modelisation.util.NodeControler;
 
 
 public class Bench extends ModelisationBench
@@ -57,11 +57,10 @@ public class Bench extends ModelisationBench
         Bench.auto = a;
     }
 
-//    public static void stop() {
-//        System.out.println("Bench: stoping......");
-//        Bench.auto.killAllProcess();
-//    }
-
+    //    public static void stop() {
+    //        System.out.println("Bench: stoping......");
+    //        Bench.auto.killAllProcess();
+    //    }
     //    public static Node[] readDestinationFile(String fileName) {
     //        FileReader f_in = null;
     //        Vector v = new Vector();
@@ -152,7 +151,6 @@ public class Bench extends ModelisationBench
             System.exit(-1);
         }
 
-        
         ProActiveConfiguration.load();
 
         RandomNumberGenerator expo = RandomNumberFactory.getGenerator("lambda");
@@ -161,29 +159,25 @@ public class Bench extends ModelisationBench
         LocationServer s = null;
         System.out.println("Test: looking up for the server");
         System.out.println("Test: using lambda = " + args[0] + " nu = " +
-        		args[1]);
+            args[1]);
 
         //        Node[] nodes = Bench.readDestinationFile(args[4],"" + args[0] + "_" + args[1]);
         Node[] nodes = Bench.readMapingFile(args[2]);
 
         System.out.println("NODES IN MAIN = " + nodes.length);
-        
-        
-        
-        
-//        ExponentialLaw expo = new ExponentialLaw(Double.parseDouble(args[0]));
-//        LocationServer s = null;
-//        NodeControler auto = new NodeControler();
-//        System.out.println("Test: looking up for the server");
-//        System.out.println("Test: using lambda = " + args[0] + " nu = " +
-//            args[1]);
-//        if (!auto.startAllNodes(auto.readDestinationFile(args[2]), "")) {
-//            auto.killAllProcess();
-//            System.err.println("Error creating nodes, aborting");
-//            System.exit(-1);
-//        }
-//        Bench.initialise(auto);
 
+        //        ExponentialLaw expo = new ExponentialLaw(Double.parseDouble(args[0]));
+        //        LocationServer s = null;
+        //        NodeControler auto = new NodeControler();
+        //        System.out.println("Test: looking up for the server");
+        //        System.out.println("Test: using lambda = " + args[0] + " nu = " +
+        //            args[1]);
+        //        if (!auto.startAllNodes(auto.readDestinationFile(args[2]), "")) {
+        //            auto.killAllProcess();
+        //            System.err.println("Error creating nodes, aborting");
+        //            System.exit(-1);
+        //        }
+        //        Bench.initialise(auto);
         //   System.exit(-1);
         //   System.out.println("Looking up location server");
         //     try {
@@ -195,10 +189,9 @@ public class Bench extends ModelisationBench
         //   System.out.println("Test: calling initialize on ObjectWithoutForwarder with parameter class " + s.getClass().getName());
         //Reading the destination file
         // Node[] nodes = Bench.readDestinationFile(args[2]);
-//        Node[] nodes = Bench.readMapingFile(args[2]);
-//
-//        System.out.println("NODES IN MAIN = " + nodes.length);
-
+        //        Node[] nodes = Bench.readMapingFile(args[2]);
+        //
+        //        System.out.println("NODES IN MAIN = " + nodes.length);
         //   System.exit(-1);
         //   obj1.initialize(nodes);
         //Bench.mesureRequestCost(obj1, 1000);

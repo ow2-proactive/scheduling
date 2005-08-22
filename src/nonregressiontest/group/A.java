@@ -95,5 +95,4 @@ public class A implements InitActive, RunActive, EndActive,
     public A asynchronousCallException() throws Exception {
         throw new Exception();
     }
-
 }

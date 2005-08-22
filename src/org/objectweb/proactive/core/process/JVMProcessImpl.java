@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.process;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.util.MessageLogger;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.MessageLogger;
 
 
 /**
@@ -234,14 +233,13 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public int getNodeNumber() {
         return 1;
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
      */
     public UniversalProcess getFinalProcess() {
         return this;
     }
-    
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -375,8 +373,4 @@ public class JVMProcessImpl extends AbstractExternalProcess
         }
         return path;
     }
-
-    
-
-   
 }

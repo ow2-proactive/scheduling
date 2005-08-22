@@ -1,9 +1,9 @@
 package org.objectweb.proactive.core.util.profiling;
 
-import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
 
 
 /**

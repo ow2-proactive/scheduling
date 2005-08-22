@@ -43,15 +43,15 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     }
 
     public void stop() {
-    	if (this.activeTimer!=null) {
-        this.activeTimer.stop();
-    	}
+        if (this.activeTimer != null) {
+            this.activeTimer.stop();
+        }
     }
 
     public void reset() {
-    	this.activeTimer.reset();
+        this.activeTimer.reset();
     }
-    
+
     public long getCumulatedTime() {
         long time = 0;
         Iterator it = timerMap.values().iterator();
@@ -88,7 +88,6 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     }
 
     public String toString() {
-
         StringBuffer tmp = new StringBuffer();
 
         tmp.append("Number of measures: ").append(this.getNumberOfValues());
@@ -97,18 +96,18 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         //  Now we deal with the internal timers
         Iterator it = timerMap.values().iterator();
         while (it.hasNext()) {
-        	Timer t = (Timer) it.next();
-        	tmp.append("    ").append(t.getName()).append("\n");
-        	tmp.append("        ").append("Number of measures: ").append(t.getNumberOfValues());
-        	tmp.append("\n        ").append("Total time measured: ").append(t.getCumulatedTime());
-        	tmp.append("\n        ").append("Average time: ").append(t.getAverage()).append("\n");
+            Timer t = (Timer) it.next();
+            tmp.append("    ").append(t.getName()).append("\n");
+            tmp.append("        ").append("Number of measures: ").append(t.getNumberOfValues());
+            tmp.append("\n        ").append("Total time measured: ").append(t.getCumulatedTime());
+            tmp.append("\n        ").append("Average time: ")
+               .append(t.getAverage()).append("\n");
         }
-  
+
         return tmp.toString();
     }
-    
-    
-    public void dump() {   
+
+    public void dump() {
         int ln = name.length();
         StringBuffer tmp = new StringBuffer();
         tmp.append("------- ").append(name).append(" -------\n");
@@ -116,9 +115,8 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         for (int i = 0; i <= (ln + 16); i++) {
             tmp.append("-");
         }
-       System.out.println(tmp.append("\n").toString());
+        System.out.println(tmp.append("\n").toString());
     }
-    
 
     public void setTimer(String name) {
         String realName = this.name + "." + name;

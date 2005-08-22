@@ -1,21 +1,20 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
-import modelisation.simulator.common.Averagator;
-
-import modelisation.statistics.RandomNumberFactory;
-import modelisation.statistics.RandomNumberGenerator;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
 
 //import modelisation.simulator.mixed.Agent;
 //import modelisation.simulator.mixed.ForwarderChain;
 //import modelisation.simulator.mixed.Source;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-
 import java.util.Locale;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
+
+import modelisation.simulator.common.Averagator;
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
 
 
 public class Simulator {
@@ -63,8 +62,7 @@ public class Simulator {
     protected Path visitedStates;
     protected Averagator averagatorPreferedPath;
     protected int totalFirst;
-
-protected int tmpCounter;
+    protected int tmpCounter;
 
     public Simulator() {
     }
@@ -154,16 +152,14 @@ protected int tmpCounter;
     }
 
     public double generateCommunicationTimeForwarder() {
-//    if (tmpCounter++ > 1000 ) {
-//    	System.err.println("Changing Gamma1");
-//    	gamma1=gamma1*5;
-//		this.expoGamma1.initialize(gamma1,
-//					   System.currentTimeMillis());
-//					   this.tmpCounter=0;
-//    	
-//    } else {
-    
-    	
+        //    if (tmpCounter++ > 1000 ) {
+        //    	System.err.println("Changing Gamma1");
+        //    	gamma1=gamma1*5;
+        //		this.expoGamma1.initialize(gamma1,
+        //					   System.currentTimeMillis());
+        //					   this.tmpCounter=0;
+        //    	
+        //    } else {
         if (this.expoGamma1 == null) {
             this.expoGamma1 = RandomNumberFactory.getGenerator("gamma1");
             this.expoGamma1.initialize(gamma1,
@@ -171,22 +167,21 @@ protected int tmpCounter;
 
             //                        this.expoGamma1.initialize(gamma1, 372917);
         }
-//    }
+
+        //    }
         return this.expoGamma1.next() * 1000;
-    
     }
 
     public double generateMigrationTime() {
-//		if (tmpCounter++ > 1000 ) {
-//			   System.err.println("Changing delta");
-//			   delta=delta/1.5;
-//			this.expoDelta.initialize(delta,
-//							System.currentTimeMillis() + 395672917);
-//    	tmpCounter=0;
-//		   } else {
-//    
-//    	
-    	
+        //		if (tmpCounter++ > 1000 ) {
+        //			   System.err.println("Changing delta");
+        //			   delta=delta/1.5;
+        //			this.expoDelta.initialize(delta,
+        //							System.currentTimeMillis() + 395672917);
+        //    	tmpCounter=0;
+        //		   } else {
+        //    
+        //    	
         if (this.expoDelta == null) {
             this.expoDelta = RandomNumberFactory.getGenerator("delta");
             this.expoDelta.initialize(delta,
@@ -194,8 +189,8 @@ protected int tmpCounter;
 
             //                        this.expoDelta.initialize(delta, 58373435);
         }
-//		}
 
+        //		}
         return this.expoDelta.next() * 1000;
     }
 
@@ -293,9 +288,9 @@ protected int tmpCounter;
 
         //        System.out.println(newState);
         if (this.preferedPaths.length == 0) {
-        	return;
+            return;
         }
-        
+
         if (this.preferedPaths[0].get(0).equals(newState)) {
             totalFirst++;
             this.visitedStates.clear();
@@ -333,24 +328,23 @@ protected int tmpCounter;
     }
 
     /**
-    *  we check wether the path followed is the one we wanted
-    */
+     *  we check wether the path followed is the one we wanted
+     */
     public boolean processVisitedStates() {
         boolean result = false;
 
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("processVisitedStates");
-//            logger.debug("comparing ");
-//            logger.debug(this.visitedStates + " Reference");
-//        }
-
+        //        if (logger.isDebugEnabled()) {
+        //            logger.debug("processVisitedStates");
+        //            logger.debug("comparing ");
+        //            logger.debug(this.visitedStates + " Reference");
+        //        }
         //
         for (int i = 0; i < preferedPaths.length; i++) {
             if (logger.isDebugEnabled()) {
                 logger.debug(this.preferedPaths[i] + " i =  " + i);
             }
-            if (isPreferedPath(this.visitedStates,this.preferedPaths[i])) {
-//				if (isPartialPreferedPath(this.visitedStates,this.preferedPaths[i])) {
+            if (isPreferedPath(this.visitedStates, this.preferedPaths[i])) {
+                //				if (isPartialPreferedPath(this.visitedStates,this.preferedPaths[i])) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("it's a match " +
                         (this.currentTime -
@@ -390,8 +384,8 @@ protected int tmpCounter;
         tmpPath.add(path.get(0));
         tmpPath.add(path.get(path.size() - 2));
         tmpPath.add(path.get(path.size() - 1));
-//System.out.println(tmpPath);
-//System.out.println(reference);
+        //System.out.println(tmpPath);
+        //System.out.println(reference);
         return reference.equals(tmpPath);
     }
 
@@ -619,11 +613,12 @@ protected int tmpCounter;
 
     public Path[] generatePreferedPaths() {
         //        Path[] tmp =//  new Path[3];
-//      Path[] tmp = this.generatePreferedPathsFinal();
-Path[] tmp = new Path[0];
-//                Path[] tmp = this.generatePreferedPathsi01n();
-//         Path[] tmp = this.generatePreferedPathsi01d();
-//		Path[] tmp = this.generatePartialPreferedPathsi01d();
+        //      Path[] tmp = this.generatePreferedPathsFinal();
+        Path[] tmp = new Path[0];
+
+        //                Path[] tmp = this.generatePreferedPathsi01n();
+        //         Path[] tmp = this.generatePreferedPathsi01d();
+        //		Path[] tmp = this.generatePartialPreferedPathsi01d();
         //		Path[] tmp = this.generatePreferedPathsi11n();
         //        Path[] tmp = this.generatePreferedPathsi11d();
         logger.info("Prefered paths:");
@@ -663,8 +658,8 @@ Path[] tmp = new Path[0];
     }
 
     /**
-    *  works only when using forwarding scheme
-    */
+     *  works only when using forwarding scheme
+     */
     public String getStateAsString() {
         StringBuffer tmp = new StringBuffer();
         tmp.append(forwarderChainArray[0].getNumberOfHops()).append(",");

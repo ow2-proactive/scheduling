@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.security.cert.X509Certificate;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ft.protocols.cic.HalfFTManagerCIC;
@@ -57,8 +59,6 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.security.cert.X509Certificate;
 
 
 public class HalfBody extends AbstractBody {

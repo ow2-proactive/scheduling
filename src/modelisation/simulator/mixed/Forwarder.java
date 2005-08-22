@@ -10,15 +10,15 @@ package modelisation.simulator.mixed;
 
 import org.apache.log4j.Logger;
 
+
 public class Forwarder extends Agent {
-
-protected static Logger logger = Logger.getLogger(Forwarder.class.getName());
-
+    protected static Logger logger = Logger.getLogger(Forwarder.class.getName());
     public static final int DEAD = 0;
     public static final int ACTIF = 1;
     public static final int UPDATING_SERVER = 2;
     public static int defaultState;
     public static int Current_Number = 0;
+
     //    protected double remainingTime;
     //   protected int number;
     protected Server server;
@@ -30,9 +30,9 @@ protected static Logger logger = Logger.getLogger(Forwarder.class.getName());
         } else {
             Forwarder.defaultState = ACTIF;
         }
-if (logger.isDebugEnabled()) {
-        logger.debug("--- Forwarders are " + Forwarder.defaultState);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("--- Forwarders are " + Forwarder.defaultState);
+        }
     }
 
     public Forwarder() {
@@ -54,12 +54,12 @@ if (logger.isDebugEnabled()) {
     }
 
     public void endLife() {
-	if ("INFINITE".equals(System.getProperty("forwarder.lifetime"))) {
-	    this.state= ACTIF;
-	    this.remainingTime= new Double(Double.MAX_VALUE).doubleValue();
-	}else {
-        this.state = DEAD;
-	}
+        if ("INFINITE".equals(System.getProperty("forwarder.lifetime"))) {
+            this.state = ACTIF;
+            this.remainingTime = new Double(Double.MAX_VALUE).doubleValue();
+        } else {
+            this.state = DEAD;
+        }
     }
 
     public void setLifeTime(double l) {
@@ -75,34 +75,35 @@ if (logger.isDebugEnabled()) {
     //        this.lifeTime -= l;
     //    }
     public int receiveMessage() {
-if (logger.isDebugEnabled()) {
-        //        logger.debug("Forwarder.receiveMessage state = " + this.state);
-        //        logger.debug("Forwarder.receiveMessage " + this);
-}
+        if (logger.isDebugEnabled()) {
+            //        logger.debug("Forwarder.receiveMessage state = " + this.state);
+            //        logger.debug("Forwarder.receiveMessage " + this);
+        }
         return this.state;
     }
 
     public void startCommunicationServer() {
-if (logger.isDebugEnabled()) {
-//              logger.debug("Forwarder.startCommunicationServer");
-}
+        if (logger.isDebugEnabled()) {
+            //              logger.debug("Forwarder.startCommunicationServer");
+        }
         this.state = UPDATING_SERVER;
         this.remainingTime = simulator.generateCommunicationTimeServer();
     }
 
     public void endCommunicationServer() {
-if (logger.isDebugEnabled()) {
-        //        logger.debug("Forwarder.endCommunication");
-}
+        if (logger.isDebugEnabled()) {
+            //        logger.debug("Forwarder.endCommunication");
+        }
         this.state = DEAD;
         this.remainingTime = 50000000;
         //we send the number of the next forwarder
-if (logger.isDebugEnabled()) {
-        //      logger.debug(
-}
+        if (logger.isDebugEnabled()) {
+            //      logger.debug(
+        }
+
         //         "Forwarder: calling server, next number is " + (this.number + 1));
-        this.server.receiveRequestFromForwarder(this.migrationCounter + 1, 
-                                                this.id);
+        this.server.receiveRequestFromForwarder(this.migrationCounter + 1,
+            this.id);
     }
 
     //
@@ -116,36 +117,35 @@ if (logger.isDebugEnabled()) {
     public void update(double time) {
         if (this.remainingTime == 0) {
             switch (this.state) {
-                case ACTIF:
-                    //                    this.state = DEAD;
-                    //                    this.remainingTime = 50000000;
-                    if (!"NO".equals(System.getProperties().getProperty("forwarder.callserver"))) {
-                         this.startCommunicationServer();
-                    } else {
-                    	     this.state = DEAD;
-        this.remainingTime = 50000000;
-                    }
-                    
-                    break;
-                case UPDATING_SERVER:
-                    //                    this.state = DEAD;
-                    this.endCommunicationServer();
-                    break;
-                case DEAD:
-                    this.setRemainingTime(50000000);
-                    break;
+            case ACTIF:
+                //                    this.state = DEAD;
+                //                    this.remainingTime = 50000000;
+                if (!"NO".equals(System.getProperties().getProperty("forwarder.callserver"))) {
+                    this.startCommunicationServer();
+                } else {
+                    this.state = DEAD;
+                    this.remainingTime = 50000000;
+                }
+                break;
+            case UPDATING_SERVER:
+                //                    this.state = DEAD;
+                this.endCommunicationServer();
+                break;
+            case DEAD:
+                this.setRemainingTime(50000000);
+                break;
             }
         }
     }
 
     public String getStateAsLetter() {
         switch (this.state) {
-            case DEAD:
-                return "d";
-            case ACTIF:
-                return "a";
-            case UPDATING_SERVER:
-                return "u";
+        case DEAD:
+            return "d";
+        case ACTIF:
+            return "a";
+        case UPDATING_SERVER:
+            return "u";
         }
         return "";
     }
@@ -153,15 +153,15 @@ if (logger.isDebugEnabled()) {
     public String toString() {
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
-            case DEAD:
-                tmp.append("DEAD");
-                break;
-            case ACTIF:
-                tmp.append("ACTIF");
-                break;
-            case UPDATING_SERVER:
-                tmp.append("UPDATNG_SERVER");
-                break;
+        case DEAD:
+            tmp.append("DEAD");
+            break;
+        case ACTIF:
+            tmp.append("ACTIF");
+            break;
+        case UPDATING_SERVER:
+            tmp.append("UPDATNG_SERVER");
+            break;
         }
         tmp.append(" remainingTime = ").append(remainingTime);
         return tmp.toString();

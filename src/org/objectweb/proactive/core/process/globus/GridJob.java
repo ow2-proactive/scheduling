@@ -31,17 +31,12 @@
 package org.objectweb.proactive.core.process.globus;
 
 import org.apache.log4j.Logger;
-
 import org.globus.gram.*;
-
 import org.globus.io.gass.server.*;
-
 
 //import org.globus.security.*;
 import org.globus.util.deactivator.Deactivator;
-
 import org.gridforum.jgss.ExtendedGSSManager;
-
 import org.ietf.jgss.GSSCredential;
 
 
@@ -100,7 +95,6 @@ public class GridJob implements GramJobListener {
                         RSL.substring(RSL.indexOf('&') + 1, RSL.length()) +
                         "(stdout=$(GLOBUSRUN_GASS_URL)/dev/stdout-5)(stderr=$(GLOBUSRUN_GASS_URL)/dev/sterr-5)";
                     //newRSL = RSL;
-                    
                 } else {
                     //	   format batching RSL so output can be retrieved later on using any GTK commands
                     newRSL = RSL +

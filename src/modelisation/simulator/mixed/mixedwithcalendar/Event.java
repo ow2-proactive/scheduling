@@ -4,7 +4,6 @@ import modelisation.simulator.common.SimulatorElement;
 
 
 public class Event {
-
     protected double time;
     protected SimulatorElement object;
     protected String description;
@@ -28,8 +27,8 @@ public class Event {
     }
 
     public boolean equals(Event e) {
-        return (this.time == e.getTime() && 
-               (this.object.equals(e.getObject())));
+        return ((this.time == e.getTime()) &&
+        (this.object.equals(e.getObject())));
     }
 
     public String toString() {

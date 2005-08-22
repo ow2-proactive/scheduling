@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -38,7 +37,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.runtime.http.HttpProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
 
 
 public class HttpHostRTFinder implements HostRTFinder {
@@ -57,13 +55,13 @@ public class HttpHostRTFinder implements HostRTFinder {
         ArrayList runtimeArray = new ArrayList();
         ProActiveRuntimeAdapter adapter;
         try {
-            adapter = new ProActiveRuntimeAdapter(new HttpProActiveRuntime(UrlBuilder.buildUrl(
-                        host, "", "http:", port)));
+            adapter = new ProActiveRuntimeAdapter(new HttpProActiveRuntime(
+                        UrlBuilder.buildUrl(host, "", "http:", port)));
             runtimeArray.add(adapter);
         } catch (ProActiveException e) {
             logger.log(e.getMessage(), e);
         }
-        
+
         return runtimeArray;
     }
 }

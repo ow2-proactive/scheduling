@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.body;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEventListener;

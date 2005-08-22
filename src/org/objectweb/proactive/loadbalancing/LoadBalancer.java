@@ -28,7 +28,6 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.loadbalancing;
 
 import org.apache.log4j.Logger;
@@ -41,61 +40,61 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 
+
 /**
  * This is the main class for load balancing algorithms, all implementations should inherite
  * from this one.  It provides the methods for register the load (used by the load monitor)
  * and to send active objects to another node, choosing the one with the shortest queue.
- * 
+ *
  * The load balance for Active Objects is server initiated: overloaded machines has to begin
  * the balance process. Using this paradigm, particular implementations of Load Balancing algorithms
  * have to implement only the method startBalancing.
- * 
- * Also, this class  provides a method to know if this CPU is in underloaded state 
+ *
+ * Also, this class  provides a method to know if this CPU is in underloaded state
  * (usefull in server oriented load balancing algorithms).
- * 
- * 
+ *
+ *
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
-
 public class LoadBalancer {
-	
-	protected static Logger logger = Logger.getLogger(P2PLoadBalancer.class.getName());
-
-	protected boolean underloaded=false;
-	protected LoadMonitor lm;
-	protected double normalization=1;
+    protected static Logger logger = Logger.getLogger(P2PLoadBalancer.class.getName());
+    protected boolean underloaded = false;
+    protected LoadMonitor lm;
+    protected double normalization = 1;
     protected double myLoad = 0;
-	protected double ranking=LoadBalancingConstants.RANKING_NORMALIZATION;
+    protected double ranking = LoadBalancingConstants.RANKING_NORMALIZATION;
 
     /**
      * This method is called by the LoadMonitor, it updates the load state
-     * @param <code>load</code> is the load value, using the load index from the load monitor. 
+     * @param <code>load</code> is the load value, using the load index from the load monitor.
      * @return none
      */
-	public void register(double load) {
-		myLoad = load;
-		if (load > LoadBalancingConstants.OVERLOADED_THREASHOLD) {
-			if (underloaded) {
-				underloaded = false;
-			}
-			startBalancing();
-		} else if (load >= LoadBalancingConstants.UNDERLOADED_THREASHOLD * normalization) {
-			if (underloaded) {
-				underloaded = false;
-			}
-		} else if (!underloaded) {
-			underloaded = true;
-		}
-	}
-	
+    public void register(double load) {
+        myLoad = load;
+        if (load > LoadBalancingConstants.OVERLOADED_THREASHOLD) {
+            if (underloaded) {
+                underloaded = false;
+            }
+            startBalancing();
+        } else if (load >= (LoadBalancingConstants.UNDERLOADED_THREASHOLD * normalization)) {
+            if (underloaded) {
+                underloaded = false;
+            }
+        } else if (!underloaded) {
+            underloaded = true;
+        }
+    }
+
     /**
      * This method has to be implemented for load balancing algorithms,
      * it starts the load balance process
-     * @param none 
+     * @param none
      * @return none
      */
-	public void startBalancing() {};
+    public void startBalancing() {
+    }
+    ;
 
     /**
      * This method sends an active object to a destiny, choosing the active objects
@@ -104,71 +103,68 @@ public class LoadBalancer {
      * If this node is local, this method does nothing.
      * @return none
      */
-	public void sendActiveObjectsTo(Node destNode) {
+    public void sendActiveObjectsTo(Node destNode) {
+        if (NodeFactory.isNodeLocal(destNode)) {
+            return;
+        }
 
-		if (NodeFactory.isNodeLocal(destNode))
-			return;
+        try {
+            BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
 
-		try {
+            if (knownBodies.size() < 1) {
+                return;
+            }
 
-			BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
+            int candidate = (int) (Math.random() * knownBodies.size());
 
-			if (knownBodies.size() < 1)
-				return;
+            java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();
 
-			int candidate = (int) (Math.random() * knownBodies.size());
+            /** ******** Choosing the shortest service queue ******** */
+            int minLength = Integer.MAX_VALUE;
+            Body minBody = null;
 
-			java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();
+            while (bodiesIterator.hasNext()) {
+                Body activeObjectBody = (Body) bodiesIterator.next();
+                Object testObject = activeObjectBody.getReifiedObject();
 
-			/** ******** Choosing the shortest service queue ******** */
-			int minLength = Integer.MAX_VALUE;
-			Body minBody = null;
+                /********** Only some Active Objects can migrate *************/
+                boolean testSerialization = testObject instanceof Balanceable;
 
-			while (bodiesIterator.hasNext()) {
-				Body activeObjectBody = (Body) bodiesIterator.next();
-				Object testObject = activeObjectBody.getReifiedObject();
+                if (activeObjectBody.isAlive()) {
+                    if (activeObjectBody.isActive() && testSerialization) {
+                        int aoQueueLenght = activeObjectBody.getRequestQueue()
+                                                            .size();
+                        if (aoQueueLenght < minLength) {
+                            minLength = aoQueueLenght;
+                            minBody = activeObjectBody;
+                        }
+                    }
+                }
+            }
 
-			/********** Only some Active Objects can migrate *************/
-				
-				boolean testSerialization = testObject instanceof Balanceable;
+            /***********  we have the Active Object with shortest queue, so we send the migration call ********/
+            if ((minBody != null) && minBody.isActive()) {
+                logger.info("[Loadbalancer] Migrating from " +
+                    minBody.getNodeURL() + " to " +
+                    destNode.getNodeInformation().getURL());
+                ProActive.migrateTo(minBody, destNode, true);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (MigrationException e) {
 
-				if (activeObjectBody.isAlive()) {
-					
-					if (activeObjectBody.isActive() && testSerialization) {
-						int aoQueueLenght = activeObjectBody.getRequestQueue()
-								.size();
-						if (aoQueueLenght < minLength) {
-							minLength = aoQueueLenght;
-							minBody = activeObjectBody;
-						}
-					}
-				}
-			}
-
-			/***********  we have the Active Object with shortest queue, so we send the migration call ********/
-			
-			if (minBody != null && minBody.isActive()) {
-				logger.info("[Loadbalancer] Migrating from "
-						+ minBody.getNodeURL() + " to "
-						+ destNode.getNodeInformation().getURL());
-				ProActive.migrateTo(minBody, destNode, true);
-			}
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (MigrationException e) {
-			/** ****** if you cannot migrate, is not my business ********** */
-		}
-	}
+            /** ****** if you cannot migrate, is not my business ********** */
+        }
+    }
 
     /**
      * This method returns if this machine is in an underloaded state
-     * @param none 
+     * @param none
      * @return none
      */
-	public boolean AreYouUnderloaded() {
-		return underloaded;
-	}
-
+    public boolean AreYouUnderloaded() {
+        return underloaded;
+    }
 }

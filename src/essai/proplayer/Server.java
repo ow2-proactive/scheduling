@@ -1,15 +1,14 @@
 package essai.proplayer;
 
+import java.io.FileInputStream;
+import java.net.URL;
+import java.net.UnknownHostException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.NodeFactory;
-
-import java.io.FileInputStream;
-
-import java.net.URL;
-import java.net.UnknownHostException;
 
 
 /**

@@ -8,14 +8,13 @@ import org.objectweb.proactive.ProActive;
  *
  */
 public class A {
-    
     private String name;
-    
+
     public A() {
-        
     }
-    
+
     public void createActiveObjectB() throws Exception {
-        Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.B", new Object[]{"dummy"});
+        Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.B",
+                new Object[] { "dummy" });
     }
 }

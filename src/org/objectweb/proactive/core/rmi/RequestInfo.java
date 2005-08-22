@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
-
 import java.io.IOException;
-
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
 
 
 public class RequestInfo {
@@ -68,10 +67,9 @@ public class RequestInfo {
     }
 
     /**
-     * Extract the http request fields and fill the RequestInfo fields. 
-     * @param request The HttpServletRequest to read 
+     * Extract the http request fields and fill the RequestInfo fields.
+     * @param request The HttpServletRequest to read
      */
-
     public void read(HttpServletRequest request) {
         this.contentType = request.getContentType();
         this.contentLength = request.getContentLength();

@@ -102,7 +102,8 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             }
             String protocol = attributes.getValue("protocol");
             if (!checkNonEmpty(protocol)) {
-                protocol = System.getProperty("proactive.communication.protocol");
+                protocol = System.getProperty(
+                        "proactive.communication.protocol");
             }
             protocol = UrlBuilder.checkProtocol(protocol);
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(vn,
@@ -226,7 +227,8 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
                     if (!checkNonEmpty(protocol)) {
-                        protocol = System.getProperty("proactive.communication.protocol");
+                        protocol = System.getProperty(
+                                "proactive.communication.protocol");
                     }
                     vn.createNodeOnCurrentJvm(protocol);
                 } else {

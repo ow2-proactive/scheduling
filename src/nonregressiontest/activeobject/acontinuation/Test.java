@@ -30,11 +30,11 @@
  */
 package nonregressiontest.activeobject.acontinuation;
 
+import java.util.Vector;
+
 import org.objectweb.proactive.ProActive;
 
 import testsuite.test.FunctionalTest;
-
-import java.util.Vector;
 
 
 /**

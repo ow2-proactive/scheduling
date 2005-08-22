@@ -30,14 +30,14 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.awt.Color;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.spy.Spy;
-
-import java.awt.Color;
 
 
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {
@@ -85,10 +85,10 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
                 }
             });
         popup.add(new javax.swing.AbstractAction("Kill this VM", null) {
-            public void actionPerformed(java.awt.event.ActionEvent e) {
-                vmObject.killVM();
-            }
-        });
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    vmObject.killVM();
+                }
+            });
 
         addMouseListener(popup.getMenuMouseListener());
     }

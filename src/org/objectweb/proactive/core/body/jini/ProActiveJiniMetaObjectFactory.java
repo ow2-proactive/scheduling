@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.jini;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -43,23 +43,23 @@ import org.objectweb.proactive.core.body.UniversalBody;
  * creating MetaObjects used in the Body.
  * </p>
  * <p>
- * One can inherit from this class in order to provide custom implementation 
- * of one or several factories. This class provide a default implementation that 
- * makes the factories a singleton. One instance of each mata object factory is 
- * created when this object is built and the same instance is returned each time 
+ * One can inherit from this class in order to provide custom implementation
+ * of one or several factories. This class provide a default implementation that
+ * makes the factories a singleton. One instance of each mata object factory is
+ * created when this object is built and the same instance is returned each time
  * somebody ask for an instance.
  * </p>
  * <p>
- * In order to change one meta object factory following that singleton pattern, 
+ * In order to change one meta object factory following that singleton pattern,
  * only the protected method <code>newXXXSingleton</code> has to be overwritten.
- * The method <code>newXXXSingleton</code> is guarantee to be called only once at 
+ * The method <code>newXXXSingleton</code> is guarantee to be called only once at
  * construction time of this object.
  * </p>
  * <p>
- * In order to change one meta object factory that does not follow the singleton 
+ * In order to change one meta object factory that does not follow the singleton
  * pattern, the public method <code>newXXX</code> has to be overwritten in order
- * to return a new instance of the factory each time. The default implementation 
- * of each <code>newXXX</code> method if to return the singleton instance of the 
+ * to return a new instance of the factory each time. The default implementation
+ * of each <code>newXXX</code> method if to return the singleton instance of the
  * factory created from <code>newXXXSingleton</code> method call.
  * </p>
  * <p>
@@ -71,62 +71,40 @@ import org.objectweb.proactive.core.body.UniversalBody;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class ProActiveJiniMetaObjectFactory extends ProActiveMetaObjectFactory implements java.io.Serializable {
-
-  //
-  // -- PRIVATE MEMBERS -----------------------------------------------
-  //
-
-  
-
-  //
-  // -- PROTECTED MEMBERS -----------------------------------------------
-  //
-
-
-  
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
-  
-
-
-  //
-  // -- PUBLICS METHODS -----------------------------------------------
-  //
-
-
-
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
-
-
-
-  protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-    return new RemoteJiniBodyFactoryImpl();
-  }
-
-
-
-  //
-  // -- INNER CLASSES -----------------------------------------------
-  //
-
-
-
-  protected static class RemoteJiniBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
-    public UniversalBody newRemoteBody(UniversalBody body) {
-      try {
-     // 	System.out.println("Creating ibis remote body adapter");
-          return new JiniBodyAdapter(body);
-      } catch (ProActiveException e) {
-          throw new ProActiveRuntimeException("Cannot create Jini Remote body adapter ", e);
-      }
+public class ProActiveJiniMetaObjectFactory extends ProActiveMetaObjectFactory
+    implements java.io.Serializable {
+    //
+    // -- PRIVATE MEMBERS -----------------------------------------------
+    //
+    //
+    // -- PROTECTED MEMBERS -----------------------------------------------
+    //
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
+    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+        return new RemoteJiniBodyFactoryImpl();
     }
-  } // end inner class RemoteBodyFactoryImpl
 
-
-
-
+    //
+    // -- INNER CLASSES -----------------------------------------------
+    //
+    protected static class RemoteJiniBodyFactoryImpl
+        implements RemoteBodyFactory, java.io.Serializable {
+        public UniversalBody newRemoteBody(UniversalBody body) {
+            try {
+                // 	System.out.println("Creating ibis remote body adapter");
+                return new JiniBodyAdapter(body);
+            } catch (ProActiveException e) {
+                throw new ProActiveRuntimeException("Cannot create Jini Remote body adapter ",
+                    e);
+            }
+        }
+    } // end inner class RemoteBodyFactoryImpl
 }

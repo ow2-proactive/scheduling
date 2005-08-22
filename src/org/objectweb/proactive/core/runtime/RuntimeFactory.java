@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.runtime;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;

@@ -484,8 +484,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     private String buildRuntimeURL() {
-        int port = RmiRuntimeFactory.getRegistryHelper()
-                                       .getRegistryPortNumber();
+        int port = RmiRuntimeFactory.getRegistryHelper().getRegistryPortNumber();
         String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                      .getInetAddress());
         String name = getVMInformation().getName();
@@ -501,7 +500,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
                                                          .getInetAddress());
 
             int port = RmiRuntimeFactory.getRegistryHelper()
-                                           .getRegistryPortNumber();
+                                        .getRegistryPortNumber();
             return UrlBuilder.buildUrl(host, url, getProtocol(), port);
         } else {
             return UrlBuilder.checkUrl(url);

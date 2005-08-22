@@ -8,13 +8,13 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.timer.MicroTimer;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-public class TimedLocationServer extends SimpleLocationServer implements org.objectweb.proactive.RunActive {
 
+public class TimedLocationServer extends SimpleLocationServer
+    implements org.objectweb.proactive.RunActive {
     protected MicroTimer microtimer;
 
     public TimedLocationServer() {
     }
-
 
     public TimedLocationServer(String url) {
         super(url);
@@ -46,28 +46,28 @@ public class TimedLocationServer extends SimpleLocationServer implements org.obj
             }
         }
         microtimer.stop();
-        System.out.println("SelectiveServer: time microtimer = "
-                           + microtimer.getCumulatedTime() + " for method "
-                           + request.getMethodName());
+        System.out.println("SelectiveServer: time microtimer = " +
+            microtimer.getCumulatedTime() + " for method " +
+            request.getMethodName());
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("usage: modelisation.SelectiveServer <server url> [node]");
+            System.out.println(
+                "usage: modelisation.SelectiveServer <server url> [node]");
             System.exit(-1);
         }
-        Object arg[] = new Object[1];
+        Object[] arg = new Object[1];
         arg[0] = args[0];
         TimedLocationServer server = null;
         try {
-            if (args.length == 2)
-                server = (TimedLocationServer)
-                        ProActive.newActive(TimedLocationServer.class.getName(),
-                                            arg, NodeFactory.getNode(args[1]));
-            else
-                server = (TimedLocationServer)
-                        ProActive.newActive(TimedLocationServer.class.getName(),
-                                            arg);
+            if (args.length == 2) {
+                server = (TimedLocationServer) ProActive.newActive(TimedLocationServer.class.getName(),
+                        arg, NodeFactory.getNode(args[1]));
+            } else {
+                server = (TimedLocationServer) ProActive.newActive(TimedLocationServer.class.getName(),
+                        arg);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

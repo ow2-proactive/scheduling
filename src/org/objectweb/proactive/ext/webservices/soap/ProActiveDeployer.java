@@ -58,6 +58,7 @@ import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
  * It serialize the stub/proxy into a string and send it to the rcprouter Servlet in order to register it on the tomcat server.
  * */
 public class ProActiveDeployer extends WSConstants {
+
     /**
      *  Deploy an active object as a web service
      * @param urn The name of the web service
@@ -157,10 +158,10 @@ public class ProActiveDeployer extends WSConstants {
      */
     private static void deploy(String urn, String url, Object o, Component c,
         String[] methods, boolean componentInterface) {
+
         /* first we need to generate a WSDL description of the object we want to deploy */
-        
-        String wsdl = WSDLGenerator.getWSDL(o.getClass().getSuperclass(), urn, url + ROUTER,
-                DOCUMENTATION, methods);
+        String wsdl = WSDLGenerator.getWSDL(o.getClass().getSuperclass(), urn,
+                url + ROUTER, DOCUMENTATION, methods);
 
         /*For deploying an active object we need a ServiceManagerClient that will contact the Serlvet */
         ServiceManagerClient serviceManagerClient = null;
@@ -188,18 +189,19 @@ public class ProActiveDeployer extends WSConstants {
         if (methods != null) {
             dd.setMethods(methods);
         } else {
-            Method[]  ms = o.getClass().getDeclaredMethods();
-            Vector mv = new Vector ();
-            for (int i=0; i< ms.length ; i++)
-                if(!disallowedMethods.contains(ms[i].getName()))
+            Method[] ms = o.getClass().getDeclaredMethods();
+            Vector mv = new Vector();
+            for (int i = 0; i < ms.length; i++)
+                if (!disallowedMethods.contains(ms[i].getName())) {
                     mv.addElement(ms[i].getName());
-                methods = new String[mv.size()];
-                Enumeration e = mv.elements();	
-                int j=0;
-                while (e.hasMoreElements())
-                    methods[j++] = (String)e.nextElement();
-                
-                dd.setMethods(methods);
+                }
+            methods = new String[mv.size()];
+            Enumeration e = mv.elements();
+            int j = 0;
+            while (e.hasMoreElements())
+                methods[j++] = (String) e.nextElement();
+
+            dd.setMethods(methods);
         }
 
         dd.setProviderClass(o.getClass().getName());
@@ -278,27 +280,24 @@ public class ProActiveDeployer extends WSConstants {
                 }
             }
         } else { // methods == null
-            
-            Method [] ms = c.getDeclaredMethods();
-            
-            for (int i=0 ; i< ms.length; i++) {
-                
-                if (!disallowedMethods.contains(ms[i].getName())){
-            
+            Method[] ms = c.getDeclaredMethods();
+
+            for (int i = 0; i < ms.length; i++) {
+                if (!disallowedMethods.contains(ms[i].getName())) {
                     Class[] parameters = ms[i].getParameterTypes();
-                for (int j = 0; j < parameters.length; j++) {
-                    if (!supportedTypes.contains(parameters[j])) {
-                        String pname = extractName(parameters[j]);
+                    for (int j = 0; j < parameters.length; j++) {
+                        if (!supportedTypes.contains(parameters[j])) {
+                            String pname = extractName(parameters[j]);
 
-                        TypeMapping tm = new TypeMapping("http://schemas.xmlsoap.org/soap/encoding/",
-                                new QName("http://" + pname,
-                                    getSimpleName(parameters[j])),
-                                parameters[j].getName(),
-                                "org.apache.soap.encoding.soapenc.BeanSerializer",
-                                "org.apache.soap.encoding.soapenc.BeanSerializer");
+                            TypeMapping tm = new TypeMapping("http://schemas.xmlsoap.org/soap/encoding/",
+                                    new QName("http://" + pname,
+                                        getSimpleName(parameters[j])),
+                                    parameters[j].getName(),
+                                    "org.apache.soap.encoding.soapenc.BeanSerializer",
+                                    "org.apache.soap.encoding.soapenc.BeanSerializer");
 
-                        tms.addElement(tm);
-                    }
+                            tms.addElement(tm);
+                        }
                     }
                 }
             }
@@ -312,8 +311,6 @@ public class ProActiveDeployer extends WSConstants {
         while (e.hasMoreElements()) {
             tmsArray[i++] = (TypeMapping) e.nextElement();
         }
-        
-        
 
         return tmsArray;
     }

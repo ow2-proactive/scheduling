@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime.ibis;
 
-import ibis.rmi.AlreadyBoundException;
-import ibis.rmi.RemoteException;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
@@ -43,9 +40,11 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.IbisProperties;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+import ibis.rmi.AlreadyBoundException;
+import ibis.rmi.RemoteException;
+
 
 public class IbisRuntimeFactory extends RuntimeFactory {
-    
 
     static {
         IbisProperties.load();

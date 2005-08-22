@@ -30,11 +30,10 @@
  */
 package org.objectweb.proactive.core.process;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.util.MessageLogger;
-
 import java.io.IOException;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.MessageLogger;
 
 
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess

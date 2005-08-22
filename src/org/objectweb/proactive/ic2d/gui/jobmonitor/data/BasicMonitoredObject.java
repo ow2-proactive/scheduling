@@ -1,7 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -11,36 +9,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+
+
 /*
  * BasicMonitoredObject is the base class for objects shown in the job monitor.
  * There is some boilerplate code that should be present in every derived classes.
  * The prettyNames and lastID stuff is because each element can have a prettyName which is
  * composed of a prefix and a number unique to the derived class.
- * 
+ *
  * A typical derived class looks like this:
- * 
+ *
  * package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
  *
  * import ...;
- * 
+ *
  * public class MonitoredFoo extends BasicMonitoredObject {
  *     static protected int lastID = 0;
  *     static protected Map prettyNames = new HashMap();
  *     private type someOtherAttributes;
- * 
+ *
  *     protected int incLastID() {
  *         return ++lastID;
  *     }
- * 
+ *
  *     protected Map getPrettyNames() {
  *         return prettyNames;
  *     }
- * 
+ *
  *     public MonitoredFoo(constructor parameters) {
  *         super(FOO, prefix, fullname); // FOO must be a registered key in JobMonitorConstants
  *         other initializations ...
  *     }
- * 
+ *
  *     // This method must be overriden is attributes are added to the class
  *     public void copyInto(BasicMonitoredObject o) {
  *         super.copyInto(o);
@@ -48,28 +49,28 @@ import java.util.Set;
  *         fooObject.attributes = attributes ...;
  *     }
  * }
- * 
+ *
  */
-
 public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
-	/* HOST or JVM or NODE or AO or JOB or VN */
-	protected int key;
-	
-	/* Displayed name */
+
+    /* HOST or JVM or NODE or AO or JOB or VN */
+    protected int key;
+
+    /* Displayed name */
     protected String prettyName;
-    
+
     /* Unique name, shown in the panel on the right */
     protected String fullname;
-    
+
     /* Timestamp to keep track of unjoinable elements */
     private GregorianCalendar deletedSince;
-    
+
     /*
      *  During a traversal, every element are deleted, this is boolean is
      * to keep track of really deleted elements
      */
     private boolean reallyDeleted;
-    
+
     /* Set of MonitoredObjectSet that contain this object */
     private Set references;
 
@@ -97,7 +98,8 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     private void computePrettyName(String prefix) {
         Map prettyNames = getPrettyNames();
         if (prettyNames == null) {
-        	/* Special case for the root element */
+
+            /* Special case for the root element */
             prettyName = null;
             return;
         }
@@ -109,11 +111,12 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
 
         prettyName = (String) prettyNames.get(fullname);
         if (prettyName == null) {
-        	int id = incLastID();
-        	if (getKey() == HOST)
-        		prettyName = prefix;
-        	else
-        		prettyName = prefix + "#" + id;
+            int id = incLastID();
+            if (getKey() == HOST) {
+                prettyName = prefix;
+            } else {
+                prettyName = prefix + "#" + id;
+            }
             prettyNames.put(fullname, prettyName);
         }
     }
@@ -127,12 +130,13 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
         references.remove(set);
     }
 
-    /* When an object is removed we also have to remove it in the sets that contain it */ 
+    /* When an object is removed we also have to remove it in the sets that contain it */
     public List removeInReferences() {
-    	/*
-    	 * The list is copied because, as we are removing the object in sets, the
-    	 * list is updated, which would cause ConcurrentModificationException.
-    	 */
+
+        /*
+         * The list is copied because, as we are removing the object in sets, the
+         * list is updated, which would cause ConcurrentModificationException.
+         */
         List copy = new ArrayList();
         copy.addAll(references);
         Iterator iter = copy.iterator();
@@ -146,7 +150,7 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
             }
         }
 
-        /* 
+        /*
          * We return the sets we have emptied to
          * delete the parents that have no more children.
          */

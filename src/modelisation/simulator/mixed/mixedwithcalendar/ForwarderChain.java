@@ -1,12 +1,11 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
-import modelisation.simulator.common.Averagator;
-
 import org.apache.log4j.Logger;
+
+import modelisation.simulator.common.Averagator;
 
 
 public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain {
-
     static Logger logger = Logger.getLogger(ForwarderChain.class.getName());
     public static final int IDLE = 0;
     public static final int COMMUNICATING = 1;
@@ -91,7 +90,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
         //        f.setLifeTime(10);
         //        this.list.add(f);
         if (this.listSize == this.list.length) {
-
             Forwarder[] tmp = new Forwarder[listSize];
             System.arraycopy(this.list, 0, tmp, 0, this.list.length);
             this.list = new Forwarder[2 * listSize];
@@ -102,7 +100,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     public int length() {
-
         int size = 0;
 
         for (int i = 0; i < list.length; i++) {
@@ -114,7 +111,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     protected int getPositionFromNumber(int forwarderNumber) {
-
         //       Forwarder f = null;
         for (int i = 0; i < this.listSize; i++) {
             if (this.list[i].getNumber() == forwarderNumber) {
@@ -138,7 +134,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
         }
 
         if (this.position < 0) {
-
             //the element we are looking for in not in the
             //forwarder chain, we check to see if it is the agent
             if (this.agent.getNumber() == objectNumber) {
@@ -150,7 +145,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
                 }
                 this.reachElementAgent(agent);
             } else {
-
                 //               this.simulator.log(
                 //                    "reachElement " + objectNumber + " at position " +
                 //                    this.position + " lookin for agent " +
@@ -164,7 +158,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     protected void reachElementAgent(Agent a) {
-
         int returnValue = a.receiveMessage();
 
         switch (returnValue) {
@@ -181,7 +174,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
         case Agent.BLOCKED:
             this.state = WAITING_AGENT;
             if (this.forwarderCount == 0) {
-
                 //System.out.println(""+(this.simulator.currentTime - source.startTime));
                 this.averagatorAgentMigration.add(this.simulator.currentTime -
                     source.startTime);
@@ -201,7 +193,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     protected void reachElementForwarder(Forwarder f) {
-
         double tmp;
         int returnValue = f.receiveMessage();
 
@@ -233,7 +224,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
      * Called by a source to init a communication
      */
     public void startCommunication(int forwarderNumber) {
-
         double tmp;
         this.objectNumber = forwarderNumber;
         this.hasBeenForwarded = false;
@@ -271,12 +261,10 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     protected int getChainLength(int forwarderNumber) {
-
         int l = 0;
         int tmpPosition = this.getPositionFromNumber(forwarderNumber);
 
         if (tmpPosition >= 0) {
-
             //         System.out.println("     adding " + (this.length()-tmpPosition));
             this.averagatorExpectedForwarderCount.add(this.length() -
                 tmpPosition);
@@ -363,7 +351,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     public void update(double time) {
-
         //           this.currentEvent = null;
         if (logger.isDebugEnabled()) {
             logger.debug(this.toString());
@@ -377,13 +364,11 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
             break;
         case WAITING_AGENT:
             if (this.agent.getState() == Agent.CALLING_SERVER) {
-
                 //         oooopsss, we have to be carreful here, the agent is actually calling the server
                 //         so its migration is not over yet
                 this.setRemainingTime(this.agent.getRemainingTime());
                 this.notifyEvent("Next hop");
             } else {
-
                 //FAb 10/02/03
                 this.state = COMMUNICATING;
                 this.reachElement();
@@ -453,7 +438,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     public int getNumberOfHops() {
-
         int tmpPosition = this.getPositionFromNumber(this.objectNumber);
 
         //		System.out.println(this + " tmpPosition " + tmpPosition);
@@ -485,7 +469,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
     }
 
     public String toString() {
-
         StringBuffer tmp = new StringBuffer("Fchain: ");
 
         switch (this.state) {
@@ -532,6 +515,6 @@ public class ForwarderChain extends modelisation.simulator.mixed.ForwarderChain 
      * @param d
      */
     public void notifyAgent(double d, int tries) {
-        this.agent.previousCommunicationTime(d,tries);
+        this.agent.previousCommunicationTime(d, tries);
     }
 }

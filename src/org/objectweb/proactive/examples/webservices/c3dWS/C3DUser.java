@@ -1,48 +1,34 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.webservices.c3dWS;
-
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
-import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 import java.awt.Button;
 import java.awt.Canvas;
@@ -74,13 +60,23 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.MemoryImageSource;
-
 import java.io.IOException;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
+import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 
 public class C3DUser implements org.objectweb.proactive.RunActive,
@@ -91,7 +87,6 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
      * The array of random colors
      */
     private static Vec[] color = {
-            
             //    new Vec(0,0,0), // Black 
             new Vec(1, 1, 1), // White
             new Vec(0, 0, 0.5), // Navy
@@ -398,42 +393,37 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         scene.addObject(p);
 
         /*
-            p = new Sphere(new Vec(0,0,0), 3);
-            p.setColor(1.0,1.0,1.0);
-            p.surf.shine = 15.0;
-            p.surf.ks = 0.5;
-            p.surf.kt=0.5;
-            scene.addObject(p);
-
-            p = new Sphere(new Vec(-10,5.77,0), 4);
-            p.setColor(0.0,1.0,1.0);
-            p.surf.shine = 14.0;
-            p.surf.kd = 0.7;
-            p.surf.ks = 0.3;
-            scene.addObject(p);
-
-            p = new Sphere(new Vec(10,5.77,0), 4);
-            p.setColor(1.0,1.0,0.0);
-            p.surf.shine = 14.0;
-            p.surf.kd = 0.7;
-            p.surf.ks = 0.3;
-            scene.addObject(p);
-
-            p = new Sphere(new Vec(0,-11.55,0), 4);
-            p.setColor(1.0,0.0,1.0);
-            p.surf.shine = 14.0;
-            p.surf.kd = 0.7;
-            p.surf.ks = 0.3;
-            scene.addObject(p);
-
-            p = new Sphere(new Vec(0,0,14), 8);
-            p.setColor(0.0,0.0,0.0);
-            p.surf.shine = 14.0;
-            p.surf.kd = 0.7;
-            p.surf.ks = 0.3;
-            scene.addObject(p);
-
-        */
+           p = new Sphere(new Vec(0,0,0), 3);
+           p.setColor(1.0,1.0,1.0);
+           p.surf.shine = 15.0;
+           p.surf.ks = 0.5;
+           p.surf.kt=0.5;
+           scene.addObject(p);
+           p = new Sphere(new Vec(-10,5.77,0), 4);
+           p.setColor(0.0,1.0,1.0);
+           p.surf.shine = 14.0;
+           p.surf.kd = 0.7;
+           p.surf.ks = 0.3;
+           scene.addObject(p);
+           p = new Sphere(new Vec(10,5.77,0), 4);
+           p.setColor(1.0,1.0,0.0);
+           p.surf.shine = 14.0;
+           p.surf.kd = 0.7;
+           p.surf.ks = 0.3;
+           scene.addObject(p);
+           p = new Sphere(new Vec(0,-11.55,0), 4);
+           p.setColor(1.0,0.0,1.0);
+           p.surf.shine = 14.0;
+           p.surf.kd = 0.7;
+           p.surf.ks = 0.3;
+           scene.addObject(p);
+           p = new Sphere(new Vec(0,0,14), 8);
+           p.setColor(0.0,0.0,0.0);
+           p.surf.shine = 14.0;
+           p.surf.kd = 0.7;
+           p.surf.ks = 0.3;
+           scene.addObject(p);
+         */
         /* Creates five lights for the scene */
         scene.addLight(new Light(100, 100, -50, 1.0));
         scene.addLight(new Light(-100, 100, -50, 1.0));
@@ -529,7 +519,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
     /**
      * Exit the application
-    * @throws IOException
+     * @throws IOException
      */
     void exit() {
         try {
@@ -562,6 +552,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
     public class UserFrame extends Frame implements ActionListener,
         ItemListener {
+
         /**
          * Button UP
          */
@@ -1087,12 +1078,14 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             Object source = e.getSource();
 
             if (source == b_left) {
+
                 /* Request 'rotate left' on button click */
                 if (c3ddispatcher != null) {
                     //b_left.setBackground(Color.yellow);
                     c3ddispatcher.rotateLeft(i_user);
                 }
             } else if (source == b_right) {
+
                 /* Request 'rotate right' on button click */
                 if (c3ddispatcher != null) {
                     //b_right.setBackground(Color.yellow);
@@ -1123,6 +1116,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                     c3ddispatcher.spinUnclock(i_user);
                 }
             } else if ((source == mi_exit) || (source == b_exit)) {
+
                 /* Exit the appplication */
                 setVisible(false);
                 exit();
@@ -1153,6 +1147,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                 }
             } else if ((source == b_connect) || (source == tf_name) ||
                     (source == tf_host)) {
+
                 /* The Welcome panel has been validated */
                 String s_name = tf_name.getText();
                 String s_host = tf_host.getText();
@@ -1181,6 +1176,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                     ex.printStackTrace();
                 }
             } else if (source == b_addSphere) {
+
                 /* The user wants to add a sphere */
 
                 // Computes randoms coords btw -10 and 10
@@ -1330,13 +1326,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             // TO BE REIMPLEMENTED AS SOON AS SOMEONE KNOWS HOW TO GET THE PATH WITHOUT SYSTEM.GETENV (DEPRECATED)
 
             /*
-                Runtime rt = Runtime.getRuntime();
-                System.out.println(rt);
-                try{
-                rt.exec("/usr/local/netscape/netscape/netscape -remote openURL'(http://www.inria.fr/proactive/)' &");
-                }
-                catch (Exception ex){}
-              */
+               Runtime rt = Runtime.getRuntime();
+               System.out.println(rt);
+               try{
+               rt.exec("/usr/local/netscape/netscape/netscape -remote openURL'(http://www.inria.fr/proactive/)' &");
+               }
+               catch (Exception ex){}
+             */
         }
 
         public void mouseReleased(MouseEvent e) {

@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.manager;
 
 import java.io.File;
@@ -108,19 +108,19 @@ public class ProActiveBenchManager extends BenchmarkManager
         if (logger.isDebugEnabled()) {
             logger.debug("Begin nodes initialization ...");
         }
-//        rshJVM = new RSHJVMProcess(new StandardOutputMessageLogger(),
-//                new StandardOutputMessageLogger());
-//        rshJVM.setHostname(remoteHostname);
-//        String remoteNodeName = "node" + System.currentTimeMillis();
-//        rshJVM.setParameters("///" + remoteNodeName);
-//        try {
-//            rshJVM.startProcess();
-//        } catch (IOException e3) {
-//            logger.fatal("Can't start a remote JVM with RSH on " +
-//                remoteHostname, e3);
-//            new RuntimeException(e3);
-//        }
 
+        //        rshJVM = new RSHJVMProcess(new StandardOutputMessageLogger(),
+        //                new StandardOutputMessageLogger());
+        //        rshJVM.setHostname(remoteHostname);
+        //        String remoteNodeName = "node" + System.currentTimeMillis();
+        //        rshJVM.setParameters("///" + remoteNodeName);
+        //        try {
+        //            rshJVM.startProcess();
+        //        } catch (IOException e3) {
+        //            logger.fatal("Can't start a remote JVM with RSH on " +
+        //                remoteHostname, e3);
+        //            new RuntimeException(e3);
+        //        }
         try {
             pad = ProActive.getProactiveDescriptor("file:" + xmlFileLocation);
         } catch (ProActiveException e) {
@@ -138,12 +138,14 @@ public class ProActiveBenchManager extends BenchmarkManager
                 } else if (virtualNode.getName().compareTo("Dispatcher1") == 0) {
                     localVMNode = virtualNode.getNode();
                 } else {
-                	remoteVMNode = virtualNode.getNode();
+                    remoteVMNode = virtualNode.getNode();
                 }
             }
-//            remoteVMNode = NodeFactory.getNode("//" + remoteHostname + "/" +
-//                    remoteNodeName);
-					setRemoteHostname(remoteVMNode.getNodeInformation().getInetAddress().getCanonicalHostName());
+
+            //            remoteVMNode = NodeFactory.getNode("//" + remoteHostname + "/" +
+            //                    remoteNodeName);
+            setRemoteHostname(remoteVMNode.getNodeInformation().getInetAddress()
+                                          .getCanonicalHostName());
         } catch (NodeException e1) {
             logger.fatal("Problem with a node", e1);
             throw new RuntimeException(e1);
@@ -161,7 +163,8 @@ public class ProActiveBenchManager extends BenchmarkManager
 
         try {
             results.add(AbstractResult.IMP_MSG,
-                "Local hostname : " + InetAddress.getLocalHost().getCanonicalHostName());
+                "Local hostname : " +
+                InetAddress.getLocalHost().getCanonicalHostName());
             if (logger.isInfoEnabled()) {
                 logger.info("Local hostname : " +
                     InetAddress.getLocalHost().getCanonicalHostName());
@@ -190,6 +193,7 @@ public class ProActiveBenchManager extends BenchmarkManager
         if (pad != null) {
             pad.killall(false);
         }
+
         //rshJVM.stopProcess();
     }
 
@@ -237,8 +241,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-             * @return
-             */
+     * @return
+     */
     public String getXmlFileLocation() {
         return xmlFileLocation;
     }

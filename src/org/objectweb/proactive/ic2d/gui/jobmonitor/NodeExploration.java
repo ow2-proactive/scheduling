@@ -1,5 +1,20 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.DefaultListModel;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.Node;
@@ -23,23 +38,6 @@ import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.IbisHostRTFinder;
 import org.objectweb.proactive.ic2d.util.JiniHostRTFinder;
 import org.objectweb.proactive.ic2d.util.RMIHostRTFinder;
-
-import java.io.IOException;
-
-import java.net.UnknownHostException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.swing.DefaultListModel;
 
 
 public class NodeExploration implements JobMonitorConstants {

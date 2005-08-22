@@ -1,44 +1,43 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package classloader;
+
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.apache.log4j.Logger;
 
 import sun.misc.Resource;
 import sun.misc.URLClassPath;
-
-import java.lang.reflect.Method;
-
-import java.net.URL;
-import java.net.URLClassLoader;
 
 
 /**
@@ -48,7 +47,6 @@ import java.net.URLClassLoader;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class CustomURLClassLoader extends URLClassLoader {
-
     protected static Logger logger = Logger.getLogger(CustomURLClassLoader.class.getName());
     protected URLClassPath ucp;
 
@@ -96,8 +94,8 @@ public class CustomURLClassLoader extends URLClassLoader {
                         effectiveArguments);
                 logger.debug("Calling defineClass");
 
-              //  Class tmpClass = 
-                 super.defineClass(name, b, 0, b.length);
+                //  Class tmpClass = 
+                super.defineClass(name, b, 0, b.length);
                 return tmpClass;
             } catch (Throwable ex) {
                 ex.printStackTrace();
@@ -108,16 +106,16 @@ public class CustomURLClassLoader extends URLClassLoader {
         }
     }
 
-//    public synchronized Class loadClass(String name)
-//        throws ClassNotFoundException {
-//        logger.debug(name);
-//        return super.loadClass(name);
-//    }
-//
-//    protected synchronized Class loadClass(String name, boolean resolve)
-//        throws ClassNotFoundException {
-//
-//        Class c = super.loadClass(name, resolve);
-//        return c;
-//    }
+    //    public synchronized Class loadClass(String name)
+    //        throws ClassNotFoundException {
+    //        logger.debug(name);
+    //        return super.loadClass(name);
+    //    }
+    //
+    //    protected synchronized Class loadClass(String name, boolean resolve)
+    //        throws ClassNotFoundException {
+    //
+    //        Class c = super.loadClass(name, resolve);
+    //        return c;
+    //    }
 }

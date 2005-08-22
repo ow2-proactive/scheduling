@@ -49,7 +49,7 @@ public interface ServiceUser {
      * @throws ProActiveException if the given service cannot be set on the user object
      */
     public void setService(UniversalService service) throws ProActiveException;
-    
+
     /**
      * Returns the real class of the service user
      * @return the real class of the service user

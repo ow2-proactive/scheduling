@@ -4,11 +4,11 @@
  */
 package nonregressiontest.component;
 
+import java.util.Set;
+
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-
-import java.util.Set;
 
 
 /**

@@ -30,10 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.repository.lib;
 
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.gui.model.Component;
-
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -41,9 +43,6 @@ import org.objectweb.proactive.core.component.adl.implementations.ProActiveImple
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
-
-import java.util.List;
-import java.util.Map;
 
 
 /**

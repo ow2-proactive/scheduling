@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.gui.components.undo.model;
 
 import org.objectweb.fractal.gui.undo.model.BasicUndoManager;
-
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
 

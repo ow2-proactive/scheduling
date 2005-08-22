@@ -1,30 +1,29 @@
 package modelisation.forwarder;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
-import java.io.Serializable;
 
-public class EvaluateGamma implements org.objectweb.proactive.RunActive, Serializable {
-
+public class EvaluateGamma implements org.objectweb.proactive.RunActive,
+    Serializable {
     private String[] destinations;
     int index;
     int max;
     int numberOfMigrations;
     boolean running;
 
-
     public EvaluateGamma() {
         System.out.println("EvaluateGamma constructor");
     }
 
-
     public EvaluateGamma(String[] nodes) {
-        System.out.println("EvaluateGamma constructor with " + nodes + " destinations");
+        System.out.println("EvaluateGamma constructor with " + nodes +
+            " destinations");
         index = 0;
         destinations = nodes;
     }
-
 
     public void echo() {
         System.out.println("Hello, I am here");
@@ -47,9 +46,9 @@ public class EvaluateGamma implements org.objectweb.proactive.RunActive, Seriali
                     body.serve(body.getRequestQueue().blockingRemoveOldest());
                 }
 
-                if (numberOfMigrations == max)
+                if (numberOfMigrations == max) {
                     this.running = false;
-                else {
+                } else {
                     if (index < destinations.length) {
                         index++;
                         numberOfMigrations++;
@@ -65,19 +64,19 @@ public class EvaluateGamma implements org.objectweb.proactive.RunActive, Seriali
         }
     }
 
-
     public static long communicate(EvaluateGamma e) {
         long startTime = System.currentTimeMillis();
+
         //	e.echo();
         e.getInt();
         long endTime = System.currentTimeMillis();
         return endTime - startTime;
     }
 
-
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.err.println("Usage: java modelisation.forwarder.EvaluateGamma <NumberOfMigrations> <tries> <nodeName> ... <nodeName>");
+            System.err.println(
+                "Usage: java modelisation.forwarder.EvaluateGamma <NumberOfMigrations> <tries> <nodeName> ... <nodeName>");
             System.exit(1);
         }
 
@@ -92,18 +91,23 @@ public class EvaluateGamma implements org.objectweb.proactive.RunActive, Seriali
         int maxRounds = Integer.parseInt(args[1]);
         try {
             System.out.println("Creating object");
-            eGamma = (EvaluateGamma) ProActive.newActive("modelisation.forwarder.EvaluateGamma", arg);
+            eGamma = (EvaluateGamma) ProActive.newActive("modelisation.forwarder.EvaluateGamma",
+                    arg);
 
             for (int i = 0; i < maxRounds; i++) {
                 eGamma.go(migrations);
                 Thread.sleep(20000);
                 t2 = EvaluateGamma.communicate(eGamma);
                 t += t2;
-                System.out.println("Time = " + t2 + " gamma= " + (1000 / (t2 / (migrations + 1))));
+                System.out.println("Time = " + t2 + " gamma= " +
+                    (1000 / (t2 / (migrations + 1))));
             }
-            System.out.println("Average time for " + migrations + " forwarding is " + (t / maxRounds));
-            System.out.println("Average time for one hop is   " + (t / maxRounds / (migrations + 1)));
-            System.out.println("Gamma =  " + (1000 / (t / maxRounds / (migrations + 1))));
+            System.out.println("Average time for " + migrations +
+                " forwarding is " + (t / maxRounds));
+            System.out.println("Average time for one hop is   " +
+                (t / maxRounds / (migrations + 1)));
+            System.out.println("Gamma =  " +
+                (1000 / (t / maxRounds / (migrations + 1))));
             //System.out.println("Calling the object");
             //test.echo();
         } catch (Exception e) {

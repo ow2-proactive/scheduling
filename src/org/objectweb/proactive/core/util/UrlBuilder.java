@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.core.util;
 
-import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.osgi.OsgiParameters;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 /**

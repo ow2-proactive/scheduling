@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
-import ibis.rmi.RemoteException;
-
 import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -57,10 +55,11 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import ibis.rmi.RemoteException;
+
 
 public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     implements IbisRemoteBody, java.rmi.server.Unreferenced {
-    
 
     /**
      * A custom socket Factory
@@ -152,11 +151,13 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
         body.setImmediateService(methodName);
     }
 
-    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException {
         body.removeImmediateService(methodName, parametersTypes);
     }
 
-    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException {
         body.setImmediateService(methodName, parametersTypes);
     }
 
@@ -262,15 +263,18 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     public void changeProxiedBody(Body newBody) {
         this.body = newBody;
     }
+
     //-------------------------------------
     //  NFEProducer implementation
     //-------------------------------------
     public void addNFEListener(NFEListener listener) {
         body.addNFEListener(listener);
     }
+
     public void removeNFEListener(NFEListener listener) {
-    	body.removeNFEListener(listener);
+        body.removeNFEListener(listener);
     }
+
     public int fireNFE(NonFunctionalException e) {
         return body.fireNFE(e);
     }
@@ -307,5 +311,4 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
        in.defaultReadObject();
        }
      */
-
 }

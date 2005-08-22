@@ -28,8 +28,8 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.loadbalancing;
+
 
 /**
  * @author Javier.Bustos@sophia.inria.fr
@@ -46,7 +46,7 @@ public interface LoadBalancingConstants {
      * <code>MIGRATION_TIME</code>: constant estimation of MIGRATION time.
      */
     public static final long MIGRATION_TIME = 5000;
-    
+
     /**
      * <code>OVERLOADED_THREASHOLD</code>: begin of overloaded state.
      */
@@ -71,5 +71,4 @@ public interface LoadBalancingConstants {
      * <code>SUBSET_SIZE</code>: Number of acquaintances requested for balancing.
      */
     public static final int SUBSET_SIZE = 3;
-
 }

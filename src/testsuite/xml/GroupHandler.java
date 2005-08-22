@@ -30,38 +30,30 @@
  */
 package testsuite.xml;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
 
 import testsuite.exception.BrowsePackageException;
-
 import testsuite.group.Group;
-
 import testsuite.manager.AbstractManager;
-
 import testsuite.test.AbstractTest;
 
-import java.io.File;
-
-import java.util.Vector;
 
 /**
  * @author Alexandre di Costanzo
- *  
+ *
  */
 public class GroupHandler {
-
     //-----------------------------------------------------------------------------------------------------------
-    public static class SimpleGroupHandler extends
-            AbstractUnmarshallerDecorator implements ManagerDescriptorConstants {
-
+    public static class SimpleGroupHandler extends AbstractUnmarshallerDecorator
+        implements ManagerDescriptorConstants {
         private Group group = null;
-
         private AbstractManager manager = null;
 
         SimpleGroupHandler(AbstractManager manager) {
@@ -75,7 +67,7 @@ public class GroupHandler {
         }
 
         public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
+            throws org.xml.sax.SAXException {
             group = new Group();
             String groupName = attributes.getValue("name");
             if (checkNonEmpty(groupName)) {
@@ -89,8 +81,7 @@ public class GroupHandler {
         }
 
         protected void notifyEndActiveHandler(String name,
-                UnmarshallerHandler activeHandler)
-                throws org.xml.sax.SAXException {
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
                 group.add((AbstractTest) activeHandler.getResultObject());
             }
@@ -98,13 +89,11 @@ public class GroupHandler {
     }
 
     //-----------------------------------------------------------------------------------------------------------
-    public static class PackageGroupHandler extends
-            AbstractUnmarshallerDecorator implements ManagerDescriptorConstants {
-
+    public static class PackageGroupHandler
+        extends AbstractUnmarshallerDecorator
+        implements ManagerDescriptorConstants {
         private Group group = null;
-
         private AbstractManager manager = null;
-
         private static Vector excludesTests = new Vector();
 
         PackageGroupHandler(AbstractManager manager) {
@@ -118,11 +107,13 @@ public class GroupHandler {
         }
 
         public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
+            throws org.xml.sax.SAXException {
             String dir = attributes.getValue("dir");
             String packageName = attributes.getValue("packageName");
-            if (!checkNonEmpty(dir) && !checkNonEmpty(packageName)) { throw new SAXException(
-                    "dir and packageName attributes must be fixed in packageGroup node"); }
+            if (!checkNonEmpty(dir) && !checkNonEmpty(packageName)) {
+                throw new SAXException(
+                    "dir and packageName attributes must be fixed in packageGroup node");
+            }
             File dirFile = new File(dir);
             try {
                 group = new Group(dirFile, packageName, null, false,
@@ -148,11 +139,9 @@ public class GroupHandler {
         private int indexGlobal = 0;
 
         protected void notifyEndActiveHandler(String name,
-                UnmarshallerHandler activeHandler)
-                throws org.xml.sax.SAXException {
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
-                AbstractTest test = (AbstractTest) activeHandler
-                        .getResultObject();
+                AbstractTest test = (AbstractTest) activeHandler.getResultObject();
                 if (excludesTests.contains(test)) {
                     // Rmove the test
                     group.remove(group.indexOf(test));
@@ -172,9 +161,7 @@ public class GroupHandler {
 
     //-----------------------------------------------------------------------------------------------------------
     private static class UnitTestHandler extends AbstractUnmarshallerDecorator {
-
         private AbstractTest test = null;
-
         private AbstractManager manager = null;
 
         UnitTestHandler(AbstractManager manager) {
@@ -187,22 +174,21 @@ public class GroupHandler {
         }
 
         public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
+            throws org.xml.sax.SAXException {
             Logger logger = manager.getLogger();
             String className = attributes.getValue("class");
             String excludeFlag = attributes.getValue("exclude");
 
             if (checkNonEmpty(className)) {
                 try {
-                    Class c = this.getClass().getClassLoader().loadClass(
-                            className);
+                    Class c = this.getClass().getClassLoader().loadClass(className);
                     test = (AbstractTest) c.newInstance();
                     test.setManager(this.manager);
                 } catch (ClassNotFoundException e) {
                     logger.fatal("Can't found " + className, e);
                 } catch (InstantiationException e) {
                     logger.fatal("Can't create a new instance of " + className,
-                            e);
+                        e);
                 } catch (IllegalAccessException e) {
                     logger.fatal("Can't access " + className, e);
                 }
@@ -218,8 +204,7 @@ public class GroupHandler {
         }
 
         protected void notifyEndActiveHandler(String name,
-                UnmarshallerHandler activeHandler)
-                throws org.xml.sax.SAXException {
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
         }
     }
 }

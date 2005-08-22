@@ -1,9 +1,7 @@
 package org.objectweb.proactive.core.ssh.rmissh;
 
 import java.io.IOException;
-
 import java.net.ServerSocket;
-
 import java.rmi.server.RMIServerSocketFactory;
 
 

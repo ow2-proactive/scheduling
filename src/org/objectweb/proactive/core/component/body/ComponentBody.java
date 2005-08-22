@@ -42,11 +42,10 @@ public interface ComponentBody {
      * @return a reference on the component meta-object ProActiveComponentImpl
      */
     public ProActiveComponent getProActiveComponent();
-    
+
     public boolean isComponent();
-    
+
     public void startingFunctionalActivity();
-    
+
     public void finishedFunctionalActivity();
-    
 }

@@ -31,12 +31,10 @@
 package org.objectweb.proactive.ext.webservices.utils;
 
 import java.io.File;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.activation.DataHandler;
-
 import javax.xml.messaging.URLEndpoint;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;

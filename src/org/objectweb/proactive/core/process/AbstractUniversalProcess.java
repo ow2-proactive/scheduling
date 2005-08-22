@@ -34,8 +34,6 @@ import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
-
-
 public abstract class AbstractUniversalProcess implements UniversalProcess {
     protected static final String LOCALHOST = getLocalHost();
     public final static String DEFAULT_USERNAME = System.getProperty(
@@ -109,8 +107,8 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     public void startProcess() throws java.io.IOException {
         checkStarted();
         isStarted = true;
-        if(username != null){
-            HostsInfos.setUserName(hostname,username);
+        if (username != null) {
+            HostsInfos.setUserName(hostname, username);
         }
         if (logger.isDebugEnabled()) {
             logger.debug(getCommand());
@@ -153,7 +151,6 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         toString(sb);
         return sb.toString();
     }
-
 
     //
     // -- PROTECTED METHODS -----------------------------------------------

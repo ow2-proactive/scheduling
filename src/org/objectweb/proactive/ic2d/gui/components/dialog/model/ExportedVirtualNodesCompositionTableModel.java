@@ -30,11 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.dialog.model;
 
-import org.objectweb.fractal.gui.model.Component;
-
-import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
-
 import javax.swing.table.AbstractTableModel;
+
+import org.objectweb.fractal.gui.model.Component;
+import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 
 
 /**

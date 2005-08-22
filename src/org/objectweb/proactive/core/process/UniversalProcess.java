@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * A class implementing this interface is able to start a process based on a command
  * to execute. The command is built from arbitrary parameters (up to the implementation) and
@@ -42,8 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * to methods to set the command throw an exception.
  */
 public interface UniversalProcess extends java.io.Serializable {
-    static Logger logger = 	ProActiveLogger.getLogger(
-    							Loggers.DEPLOYMENT_PROCESS);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
 
     /**
      * Returns the current environment for this process. Each
@@ -160,5 +160,4 @@ public interface UniversalProcess extends java.io.Serializable {
      * @return the path of the command to be executed by this process
      */
     public String getCommandPath();
-
 }

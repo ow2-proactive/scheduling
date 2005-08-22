@@ -4,10 +4,10 @@
  */
 package nonregressiontest.group.accessbyname;
 
-import nonregressiontest.group.A;
-
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+
+import nonregressiontest.group.A;
 
 import testsuite.test.FunctionalTest;
 

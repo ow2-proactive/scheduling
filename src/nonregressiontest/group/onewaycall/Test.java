@@ -3,17 +3,16 @@
  */
 package nonregressiontest.group.onewaycall;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
-import nonregressiontest.group.A;
+import java.util.Iterator;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.FunctionalTest;
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import nonregressiontest.group.A;
 
-import java.util.Iterator;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -51,14 +50,14 @@ public class Test extends FunctionalTest {
 
     public boolean preConditions() throws Exception {
         Object[][] params = {
-            { "Agent0" },
-            { "Agent1" },
-            { "Agent2" }
-        };
+                { "Agent0" },
+                { "Agent1" },
+                { "Agent2" }
+            };
         Node[] nodes = {
-            TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-            TestNodes.getRemoteVMNode()
-        };
+                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
+                TestNodes.getRemoteVMNode()
+            };
         this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
                 params, nodes);
         ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);

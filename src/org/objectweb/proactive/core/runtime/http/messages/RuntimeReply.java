@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.runtime.http.messages;
 
+
 /**
  * @author vlegrand
  *
@@ -37,19 +38,17 @@ package org.objectweb.proactive.core.runtime.http.messages;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class RuntimeReply implements java.io.Serializable {
-    
-	private Object returnedObject;
+    private Object returnedObject;
 
-	public RuntimeReply () { 
-		new RuntimeReply (null);
-	}
-	
-	public RuntimeReply (Object o) { 
-		this.returnedObject = o;
-	}
+    public RuntimeReply() {
+        new RuntimeReply(null);
+    }
 
-	public Object getReturnedObject () {
-		return this.returnedObject;
-	}
+    public RuntimeReply(Object o) {
+        this.returnedObject = o;
+    }
 
+    public Object getReturnedObject() {
+        return this.returnedObject;
+    }
 }

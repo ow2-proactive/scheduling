@@ -21,6 +21,7 @@
  * Author: Eric Bruneton
  */
 package org.objectweb.proactive.examples.components.helloworld;
+
 public interface Main {
-  void main (String[] args);
+    void main(String[] args);
 }

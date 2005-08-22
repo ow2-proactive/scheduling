@@ -41,11 +41,12 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.NodeExploration;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 
+
 /**
  * @author ProActiveTeam
  * @version 1.0, 26 janv. 2005
  * @since ProActive 2.2
- * 
+ *
  */
 public class MonitorThread extends Thread {
     private String protocol;
@@ -64,24 +65,23 @@ public class MonitorThread extends Thread {
         this.logger = logger;
         this.worldObject = worldObject;
     }
-    
-//    public MonitorThread(DataAssociation association, String protocol, String host, String depth,
-//            WorldObject worldObject, IC2DMessageLogger logger) {
-//            this.asso = association;
-//            this.protocol = protocol;
-//            this.host = host;
-//            this.depth = depth;
-//            this.logger = logger;
-//            this.worldObject = worldObject;
-//        }
 
+    //    public MonitorThread(DataAssociation association, String protocol, String host, String depth,
+    //            WorldObject worldObject, IC2DMessageLogger logger) {
+    //            this.asso = association;
+    //            this.protocol = protocol;
+    //            this.host = host;
+    //            this.depth = depth;
+    //            this.logger = logger;
+    //            this.worldObject = worldObject;
+    //        }
     public void run() {
         String hostname = null;
         int port = 0;
         DefaultListModel skippedObjects = new DefaultListModel();
 
-        NodeExploration explorator = new NodeExploration(asso,
-                skippedObjects, logger);
+        NodeExploration explorator = new NodeExploration(asso, skippedObjects,
+                logger);
         explorator.setMaxDepth(depth);
         explorator.startExploration();
         if (host != null) {
@@ -96,7 +96,8 @@ public class MonitorThread extends Thread {
 
             //                String tmphost = monitoredhost.getFullName();
             try {
-                worldObject.addHostObject(monitoredhost, asso.getValues(monitoredhost, 2, null));
+                worldObject.addHostObject(monitoredhost,
+                    asso.getValues(monitoredhost, 2, null));
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

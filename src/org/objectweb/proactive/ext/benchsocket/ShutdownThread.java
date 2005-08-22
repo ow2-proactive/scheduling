@@ -1,7 +1,5 @@
 package org.objectweb.proactive.ext.benchsocket;
 
-
-
 public class ShutdownThread extends Thread {
     //    //singleton pattern because of java bug #4533
     //    private static ShutdownThread sh;
@@ -58,7 +56,7 @@ public class ShutdownThread extends Thread {
 
     public void run() {
         ////        this.bos.displayTotal();
-    	//System.out.println("XXXfakerun " + fakeRun);
+        //System.out.println("XXXfakerun " + fakeRun);
         if (!this.fakeRun) {
             this.stream.displayTotal();
         }

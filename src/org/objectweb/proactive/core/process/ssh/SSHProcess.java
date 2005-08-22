@@ -104,7 +104,6 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
         checkStarted();
         return targetProcess.getFinalProcess();
     }
-    
 
     public static void main(String[] args) {
         try {

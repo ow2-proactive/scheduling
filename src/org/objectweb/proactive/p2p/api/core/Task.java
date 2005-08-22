@@ -31,7 +31,6 @@
 package org.objectweb.proactive.p2p.api.core;
 
 import java.io.Serializable;
-
 import java.util.Vector;
 
 

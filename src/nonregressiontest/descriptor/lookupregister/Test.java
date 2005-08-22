@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package nonregressiontest.descriptor.lookupregister;
 
 import org.objectweb.proactive.ProActive;
@@ -47,8 +47,7 @@ import testsuite.test.FunctionalTest;
  * Window>Preferences>Java>Code Generation.
  */
 public class Test extends FunctionalTest {
-	
-		ProActiveDescriptor proActiveDescriptorAgent;
+    ProActiveDescriptor proActiveDescriptorAgent;
     private static String FS = System.getProperty("file.separator");
     private static String AGENT_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/lookupregister/Agent.xml").getPath();
@@ -60,38 +59,38 @@ public class Test extends FunctionalTest {
     }
 
     /**
-    * @see testsuite.test.FunctionalTest#action()
-    */
+     * @see testsuite.test.FunctionalTest#action()
+     */
     public void action() throws Exception {
-        proActiveDescriptorAgent = ProActive.getProactiveDescriptor(
-                "file:" + AGENT_XML_LOCATION_UNIX);
+        proActiveDescriptorAgent = ProActive.getProactiveDescriptor("file:" +
+                AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
         A b = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "local" }, vnAgent.getNode());
-				Thread.sleep(3000);
-        VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties("localhost","Agent"));
+        Thread.sleep(3000);
+        VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties(
+                    "localhost", "Agent"));
         a = (A) vnLookup.getUniqueAO();
-        
     }
 
     /**
-    * @see testsuite.test.AbstractTest#initTest()
-    */
+     * @see testsuite.test.AbstractTest#initTest()
+     */
     public void initTest() throws Exception {
     }
 
     /**
-    * @see testsuite.test.AbstractTest#endTest()
-    */
+     * @see testsuite.test.AbstractTest#endTest()
+     */
     public void endTest() throws Exception {
-    	proActiveDescriptorAgent.killall(false);
+        proActiveDescriptorAgent.killall(false);
     }
 
     public boolean postConditions() throws Exception {
         return (a.getName().equals("local"));
     }
-    
+
     public static void main(String[] args) {
         Test test = new Test();
         try {
@@ -100,6 +99,5 @@ public class Test extends FunctionalTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
     }
 }

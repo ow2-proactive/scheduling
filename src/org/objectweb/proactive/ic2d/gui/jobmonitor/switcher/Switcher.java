@@ -1,10 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.switcher;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.Branch;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.Icons;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -22,6 +17,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.Branch;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.Icons;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 
 
 public class Switcher extends Box implements JobMonitorConstants {

@@ -1,33 +1,33 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.doctor;
 
 import java.awt.Dialog;
@@ -40,66 +40,59 @@ import java.awt.Point;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+
 public class Legend extends Dialog {
+    public class LegendPanel extends Panel {
+        DisplayPanel display;
 
-  public class LegendPanel extends Panel {
+        public LegendPanel(DisplayPanel _display) {
+            display = _display;
+        }
 
-    DisplayPanel display;
+        public void update(Graphics g) {
+            FontMetrics fm = g.getFontMetrics();
+            int h = fm.getAscent();
 
+            g.setColor(display.wellOn);
+            g.fillOval(30, 30 - h, h, h);
+            g.setColor(display.patColor);
+            g.drawString("Healthy patient", 40 + h, 30);
 
-    public LegendPanel(DisplayPanel _display) {
-      display = _display;
+            g.setColor(display.sickOn);
+            g.fillOval(30, (40 + h) - h, h, h);
+            g.setColor(display.patColor);
+            g.drawString("Sick patient", 40 + h, 40 + h);
+
+            g.setColor(display.cureOn);
+            g.fillOval(30, (50 + (2 * h)) - h, h, h);
+            g.setColor(display.patColor);
+            g.drawString("Patient with doctor", 40 + h, 50 + (2 * h));
+        }
+
+        public Dimension getPreferredSize() {
+            return new Dimension(200, 90);
+        }
+
+        public void paint(Graphics g) {
+            update(g);
+        }
     }
 
+    public Legend(Frame dw, DisplayPanel display) {
+        super(dw, "Legend", false);
 
-    public void update(Graphics g) {
-      FontMetrics fm = g.getFontMetrics();
-      int h = fm.getAscent();
+        Point parLoc = dw.getLocation();
+        setLocation(parLoc.x + (dw.getSize().width), parLoc.y);
 
-      g.setColor(display.wellOn);
-      g.fillOval(30, 30 - h, h, h);
-      g.setColor(display.patColor);
-      g.drawString("Healthy patient", 40 + h, 30);
+        LegendPanel pan = new LegendPanel(display);
+        add(pan);
 
-      g.setColor(display.sickOn);
-      g.fillOval(30, 40 + h - h, h, h);
-      g.setColor(display.patColor);
-      g.drawString("Sick patient", 40 + h, 40 + h);
+        pack();
 
-      g.setColor(display.cureOn);
-      g.fillOval(30, 50 + 2 * h - h, h, h);
-      g.setColor(display.patColor);
-      g.drawString("Patient with doctor", 40 + h, 50 + 2 * h);
+        this.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    setVisible(false);
+                }
+            });
     }
-
-
-    public Dimension getPreferredSize() {
-      return new Dimension(200, 90);
-    }
-
-
-    public void paint(Graphics g) {
-      update(g);
-    }
-  }
-
-
-  public Legend(Frame dw, DisplayPanel display) {
-    super(dw, "Legend", false);
-
-    Point parLoc = dw.getLocation();
-    setLocation(parLoc.x + (dw.getSize().width), parLoc.y);
-
-    LegendPanel pan = new LegendPanel(display);
-    add(pan);
-
-    pack();
-
-    this.addWindowListener(new WindowAdapter() {
-
-      public void windowClosing(WindowEvent e) {
-        setVisible(false);
-      }
-    });
-  }
 }

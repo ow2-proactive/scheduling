@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.gui.process;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.rsh.RSHProcess;
@@ -38,9 +41,6 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.MessageLogger;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 
 public class ProcessControlPanel extends javax.swing.JPanel {

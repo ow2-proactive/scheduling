@@ -63,7 +63,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * remotely. This interface is extended by protocol-specific(RMI, RMI/SSH, IBIS, HTTP, JINI)
  * remote interfaces to allow the body to be accessed remotely.
  * @author ProActiveTeam
- * @version 1.0, 5 août 2005
+ * @version 1.0, 5 ao?t 2005
  * @since ProActive 2.2
  * @see org.objectweb.proactive.core.body.UniversalBody
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>

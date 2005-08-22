@@ -1,7 +1,6 @@
 package essai.proplayer;
 
 import java.awt.*;
-
 import java.util.LinkedList;
 
 

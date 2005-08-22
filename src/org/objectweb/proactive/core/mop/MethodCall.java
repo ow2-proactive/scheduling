@@ -56,19 +56,19 @@ import sun.rmi.server.MarshalInputStream;
  * @author Julien Vayssi&egrave;re
  */
 public class MethodCall implements java.io.Serializable, Cloneable {
-   
-    
     // COMPONENTS added a field for the Fractal interface name 
     // (the name of the interface containing the method called)
-    private String componentInterfaceName=null;
+    private String componentInterfaceName = null;
     private boolean isFunctionalComponentMethodCall = false;
     private boolean isComponentMethodCall;
     protected static Logger componentLogger = null;
+
     // shortcuts have to be put in the method call, as only the method call is transferred 
     // when crossing membranesof composite components
     protected Shortcut shortcut = null;
     protected short priority; // non functional component requests priority
-  //
+
+    //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
     //
 
@@ -76,7 +76,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * The hashtable that caches Method/isAsynchronousCall
      * This dramatically improves performances, since we do not have to call
      * isAsynchronousCall for every call, but only once for a given method
-     */ 
+     */
     private static transient java.util.Hashtable REIF_AND_EXCEP = new java.util.Hashtable();
     private static Logger logger = Logger.getLogger(MethodCall.class.getName());
 
@@ -132,7 +132,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private String key;
 
     /**
-     * Actually only used for exceptions. 
+     * Actually only used for exceptions.
      */
     private MethodCallMetadata metadata;
 
@@ -216,7 +216,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      */
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
         Object[] effectiveArguments, MethodCallMetadata metadata) {
-
         metadata = MethodCallMetadata.optimize(metadata);
 
         if (MethodCall.getRecycleMethodCallObject()) {
@@ -237,11 +236,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         }
         return new MethodCall(reifiedMethod, effectiveArguments, metadata);
     }
-    
-    public synchronized static MethodCall getMethodCall(Method reifiedMethod, Object[] effectiveArguments) {
+
+    public synchronized static MethodCall getMethodCall(Method reifiedMethod,
+        Object[] effectiveArguments) {
         MethodCallMetadata metadata = ExceptionHandler.getMetadataForCall(reifiedMethod);
         return getMethodCall(reifiedMethod, effectiveArguments, metadata);
-        
     }
 
     /**
@@ -256,26 +255,27 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return MethodCall
      */
     public synchronized static MethodCall getComponentMethodCall(
-            Method reifiedMethod, Object[] effectiveArguments,
-            String interfaceName, boolean isFunctional, short priority) {
-            MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
-            if (MethodCall.componentLogger == null) {
-                MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
-            }
-            mc.isComponentMethodCall = true;
-            mc.isFunctionalComponentMethodCall = isFunctional;
-            mc.componentInterfaceName = interfaceName;
-            mc.priority = priority;
-            mc.shortcut = null;
-            return mc;
+        Method reifiedMethod, Object[] effectiveArguments,
+        String interfaceName, boolean isFunctional, short priority) {
+        MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
+        if (MethodCall.componentLogger == null) {
+            MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
         }
+        mc.isComponentMethodCall = true;
+        mc.isFunctionalComponentMethodCall = isFunctional;
+        mc.componentInterfaceName = interfaceName;
+        mc.priority = priority;
+        mc.shortcut = null;
+        return mc;
+    }
 
     public synchronized static MethodCall getComponentMethodCall(
-            Method reifiedMethod, Object[] effectiveArguments,
-            String interfaceName, boolean isFunctional) {
-            return MethodCall.getComponentMethodCall(reifiedMethod, effectiveArguments, interfaceName, isFunctional, ComponentRequest.STRICT_FIFO_PRIORITY);
-        }
-    
+        Method reifiedMethod, Object[] effectiveArguments,
+        String interfaceName, boolean isFunctional) {
+        return MethodCall.getComponentMethodCall(reifiedMethod,
+            effectiveArguments, interfaceName, isFunctional,
+            ComponentRequest.STRICT_FIFO_PRIORITY);
+    }
 
     /**
      *        Tells the recyclying process that the MethodCall object passed as parameter
@@ -317,17 +317,16 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // This constructor is private to this class
     // because we want to enforce the use of factory methods for getting fresh
     // instances of this class (see <I>Factory</I> pattern in GoF).
-    public MethodCall(Method reifiedMethod, Object[] effectiveArguments, MethodCallMetadata metadata) {
+    public MethodCall(Method reifiedMethod, Object[] effectiveArguments,
+        MethodCallMetadata metadata) {
         this.reifiedMethod = reifiedMethod;
         this.effectiveArguments = effectiveArguments;
         this.key = buildKey(reifiedMethod);
         this.metadata = MethodCallMetadata.optimize(metadata);
-        
     }
 
     public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
         this(reifiedMethod, effectiveArguments, null);
-        
     }
 
     /**
@@ -430,11 +429,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 "Arguments for the method " + this.getName() +
                 " are invalids: " + e);
         } /*catch (InvocationTargetException e) {
-            throw new MethodCallExecutionFailedException(
-                "Target for invocation of " + this.getName() +
-                " is invalid: " + e);
-        }*/
-    }
+           throw new MethodCallExecutionFailedException(
+               "Target for invocation of " + this.getName() +
+               " is invalid: " + e);
+           }*/}
 
     protected void finalize() {
         MethodCall.setMethodCall(this);
@@ -459,7 +457,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     public Object getParameter(int index) {
         return this.effectiveArguments[index];
     }
-    
+
     public Object[] getParameters() {
         return this.effectiveArguments;
     }
@@ -526,7 +524,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
     // --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
     //
-
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         this.writeTheObject(out);
@@ -595,9 +592,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return true if and only if the method call is one way
      */
     public boolean isOneWayCall() {
-        return 	this.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE) &&
-        		this.getReifiedMethod().getExceptionTypes().length == 0 &&
-        		!this.getMetadata().isRuntimeExceptionHandled();
+        return this.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE) &&
+        (this.getReifiedMethod().getExceptionTypes().length == 0) &&
+        !this.getMetadata().isRuntimeExceptionHandled();
     }
 
     /* Used in the REIF_AND_EXCEP cache */
@@ -605,7 +602,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         boolean reifiable; // Is the method return type reifiable ?
         boolean exceptions; // Does the method throws exceptions ? 
     }
-    
+
     /**
      * Checks if the <code>Call</code> object can be
      * processed with a future semantics, i-e if its returned object
@@ -621,6 +618,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         Method m = this.getReifiedMethod();
         ReifiableAndExceptions cached = (ReifiableAndExceptions) REIF_AND_EXCEP.get(m);
         if (cached == null) {
+
             /* void is reifiable even though the check by the MOP would tell otherwise */
             boolean reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
             if (!reifiable) {
@@ -628,10 +626,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                     MOP.checkClassIsReifiable(m.getReturnType());
                     reifiable = true;
                 } catch (ClassNotReifiableException e) {
+
                     /* Not reifiable, we already know :) */
                 }
             }
-            
+
             boolean exceptions = m.getExceptionTypes().length != 0;
             cached = new ReifiableAndExceptions();
             cached.reifiable = reifiable;
@@ -639,7 +638,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             REIF_AND_EXCEP.put(m, cached);
         }
 
-        return cached.reifiable && (!cached.exceptions || getMetadata().isExceptionAsynchronously());
+        return cached.reifiable &&
+        (!cached.exceptions || getMetadata().isExceptionAsynchronously());
     }
 
     /**
@@ -663,12 +663,13 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public MethodCallMetadata getMetadata() {
-        if (metadata == null)
+        if (metadata == null) {
             return MethodCallMetadata.DEFAULT;
+        }
 
         return metadata;
     }
-    
+
     //
     // --- INNER CLASSES -----------------------------------------------------------------------
     //
@@ -746,37 +747,40 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             return "FixWrapper: " + encapsulated.toString();
         }
     }
-        
-        
- 
+
     public Shortcut getShortcut() {
         return shortcut;
     }
 
-    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
+    public void shortcutNotification(UniversalBody sender,
+        UniversalBody intermediate) {
         if (shortcut == null) {
             // store only first sender?
-            shortcut = new Shortcut(getComponentInterfaceName(), sender, intermediate);
+            shortcut = new Shortcut(getComponentInterfaceName(), sender,
+                    intermediate);
         } else {
             shortcut.updateDestination(intermediate);
             if (componentLogger.isDebugEnabled()) {
-                componentLogger.debug("added shortcut : shortcutCounter is now " + shortcut.length());
+                componentLogger.debug(
+                    "added shortcut : shortcutCounter is now " +
+                    shortcut.length());
             }
         }
     }
-    
+
     public boolean isComponentMethodCall() {
         return isComponentMethodCall;
     }
-    
+
     public boolean isComponentControllerMethodCall() {
-        return (isComponentMethodCall() && (!isFunctionalComponentMethodCall) && (componentInterfaceName!=null));
+        return (isComponentMethodCall() && (!isFunctionalComponentMethodCall) &&
+        (componentInterfaceName != null));
     }
-    
+
     public boolean isComponentMethodCallOnComponent() {
-        return (isComponentMethodCall && (componentInterfaceName==null));
+        return (isComponentMethodCall && (componentInterfaceName == null));
     }
-    
+
     public short getPriority() {
         return priority;
     }

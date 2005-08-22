@@ -156,7 +156,6 @@ public class ExportedVirtualNodesList {
 
     public boolean addLeafVirtualNode(String componentName,
         String virtualNodeName, String cardinality) {
-        
         LinkedVirtualNode oldLeaf = getLeafVirtualNode(componentName);
         if (oldLeaf != null) {
             // ensure only 1 leaf per component
@@ -362,6 +361,7 @@ public class ExportedVirtualNodesList {
         if (linkedVirtualNodes.containsKey(componentName)) {
             List exportedVNs = (List) linkedVirtualNodes.get(componentName);
             Iterator it = exportedVNs.iterator();
+
             //List to_remove = new ArrayList();
             LinkedVirtualNode to_remove = null;
             while (it.hasNext()) {
@@ -374,21 +374,23 @@ public class ExportedVirtualNodesList {
                 }
             }
             if (to_remove == null) {
-                logger.error("trying to remove virtual node " + componentName + "." + virtualNodeName + ", but could not find it");
+                logger.error("trying to remove virtual node " + componentName +
+                    "." + virtualNodeName + ", but could not find it");
                 return;
             }
+
             // remove from composer
-            if (to_remove.getComposer()!=null) {
+            if (to_remove.getComposer() != null) {
                 to_remove.getComposer().getComposingVirtualNodes().remove(to_remove);
             }
             exportedVNs.remove(to_remove);
-//            it = to_remove.iterator();
-//            while (it.hasNext()) {
-//                LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
-//                exportedVNs.remove(lvn);
-//                lvn = null;
-//                System.out.println();
-//            }
+            //            it = to_remove.iterator();
+            //            while (it.hasNext()) {
+            //                LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
+            //                exportedVNs.remove(lvn);
+            //                lvn = null;
+            //                System.out.println();
+            //            }
         }
     }
 

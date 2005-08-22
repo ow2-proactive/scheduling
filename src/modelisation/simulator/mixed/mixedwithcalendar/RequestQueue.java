@@ -3,15 +3,13 @@ package modelisation.simulator.mixed.mixedwithcalendar;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import modelisation.simulator.common.SimulatorElement;
 import org.apache.log4j.Logger;
+
+import modelisation.simulator.common.SimulatorElement;
 
 
 public class RequestQueue extends SimulatorElement {
-	
-	protected static Logger logger = Logger.getLogger(Request.class.getName());
-  
-	
+    protected static Logger logger = Logger.getLogger(Request.class.getName());
     protected ArrayList list;
     protected double youngestRequestCreationTime;
 
@@ -29,22 +27,24 @@ public class RequestQueue extends SimulatorElement {
     }
 
     protected void addRequestFromAgent(Request request) {
-        int number        = request.getNumber();
-        ListIterator it   = this.list.listIterator();
-        Request r         = null;
+        int number = request.getNumber();
+        ListIterator it = this.list.listIterator();
+        Request r = null;
         boolean shouldAdd = true;
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             if (r.isFromAgent()) {
                 if (r.getNumber() < number) {
                     it.remove();
                     shouldAdd = true;
-                } else
+                } else {
                     shouldAdd = false;
+                }
             }
         }
-        if (shouldAdd)
+        if (shouldAdd) {
             this.list.add(request);
+        }
     }
 
     public void updateYoungestCreationTime(Request request) {
@@ -54,21 +54,21 @@ public class RequestQueue extends SimulatorElement {
         //        } else if (tmp < this.youngestRequestCreationTime) {
         //            this.youngestRequestCreationTime = tmp;
         //        }
-        Request r       = null;
-        double tmp      = -1;
+        Request r = null;
+        double tmp = -1;
         ListIterator it = this.list.listIterator();
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             if (tmp == -1) {
-            	tmp = r.getCreationTime();
+                tmp = r.getCreationTime();
             } else if (r.getCreationTime() < tmp) {
                 tmp = r.getCreationTime();
             }
         }
         if (tmp == -1) {
-        	this.youngestRequestCreationTime = 0;
+            this.youngestRequestCreationTime = 0;
         } else {
-        	this.youngestRequestCreationTime = tmp;
+            this.youngestRequestCreationTime = tmp;
         }
     }
 
@@ -77,9 +77,9 @@ public class RequestQueue extends SimulatorElement {
      */
     public Request removeRequestFromAgent() {
         ListIterator it = this.list.listIterator();
-        Request r       = null;
+        Request r = null;
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             if (r.isFromAgent()) {
                 it.remove();
                 this.updateYoungestCreationTime(r);
@@ -94,9 +94,9 @@ public class RequestQueue extends SimulatorElement {
      */
     public Request removeRequestFromSource() {
         ListIterator it = this.list.listIterator();
-        Request r       = null;
+        Request r = null;
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             if (!r.isFromAgent()) {
                 it.remove();
                 this.updateYoungestCreationTime(r);
@@ -116,31 +116,30 @@ public class RequestQueue extends SimulatorElement {
 
     public boolean hasRequestFromAgent() {
         ListIterator it = this.list.listIterator();
-        Request r       = null;
+        Request r = null;
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             if (r.isFromAgent()) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public Request getRequestFromAgent() {
-    	 ListIterator it = this.list.listIterator();
-        Request r       = null;
+        ListIterator it = this.list.listIterator();
+        Request r = null;
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             if (r.isFromAgent()) {
                 return r;
             }
         }
         return null;
-    	
     }
-    
+
     public double getYoungestCreationTime() {
-    	return this.youngestRequestCreationTime;
+        return this.youngestRequestCreationTime;
     }
 
     public void update(double time) {
@@ -148,10 +147,10 @@ public class RequestQueue extends SimulatorElement {
 
     public String toString() {
         StringBuffer tmp = new StringBuffer();
-        ListIterator it  = this.list.listIterator();
-        Request r        = null;
+        ListIterator it = this.list.listIterator();
+        Request r = null;
         while (it.hasNext()) {
-            r = (Request)it.next();
+            r = (Request) it.next();
             tmp.append(r);
             //            if (!r.isFromAgent()) {
             //                it.remove();

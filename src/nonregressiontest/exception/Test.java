@@ -47,50 +47,51 @@ public class Test extends FunctionalTest {
     public Test() {
         super("Exception", "Test exceptions");
     }
-    
+
     public boolean postConditions() throws Exception {
         if (counter == 11) {
-        	return true;
+            return true;
         } else {
-        	System.out.println("counter == " + counter);
-        	return false;
+            System.out.println("counter == " + counter);
+            return false;
         }
     }
-    
+
     private void good() {
-    	counter++;
+        counter++;
     }
-    
+
     private void bad() {
-    	counter = 1000;
-    	new Exception("Exception error").printStackTrace();
+        counter = 1000;
+        new Exception("Exception error").printStackTrace();
     }
-    
+
     public void testMechanism(Exc r) throws Exception {
-    	ProActive.tryWithCatch(Exception.class);
-    	try {
-    		/* voidRT() */
-    		r.voidRT();
-    		ProActive.endTryWithCatch();
-    		bad();
-    	} catch (Exception e) {
-    		good();
-    	} finally {
-    		ProActive.removeTryWithCatch();
-    	}
+        ProActive.tryWithCatch(Exception.class);
+        try {
+
+            /* voidRT() */
+            r.voidRT();
+            ProActive.endTryWithCatch();
+            bad();
+        } catch (Exception e) {
+            good();
+        } finally {
+            ProActive.removeTryWithCatch();
+        }
 
         /* futureRT() */
-    	ProActive.tryWithCatch(RuntimeException.class);
-    	try {
-    		Exc res = r.futureRT();
-    		good();
+        ProActive.tryWithCatch(RuntimeException.class);
+        try {
+            Exc res = r.futureRT();
+            good();
             res.nothing();
             bad();
             ProActive.endTryWithCatch();
         } catch (RuntimeException re) {
             good();
         } finally {
-        	ProActive.removeTryWithCatch();
+            ProActive.removeTryWithCatch();
         }
 
         /* voidExc() */
@@ -105,10 +106,10 @@ public class Test extends FunctionalTest {
             if (e.getMessage().startsWith("Test")) {
                 good();
             } else {
-            	bad();
+                bad();
             }
         } finally {
-        	ProActive.removeTryWithCatch();
+            ProActive.removeTryWithCatch();
         }
 
         /* futureExc() */
@@ -122,28 +123,28 @@ public class Test extends FunctionalTest {
             if (e.getMessage().startsWith("Test")) {
                 good();
             } else {
-            	bad();
+                bad();
             }
         } finally {
-        	ProActive.removeTryWithCatch();
+            ProActive.removeTryWithCatch();
         }
-        
+
         ProActive.tryWithCatch(Exception.class);
         Exc res = r.futureExc();
         try {
-        	ProActive.tryWithCatch(Exception.class);
+            ProActive.tryWithCatch(Exception.class);
         } catch (Exception e) {
-        	if (e.getMessage().startsWith("Test")) {
+            if (e.getMessage().startsWith("Test")) {
                 good();
             } else {
-            	bad();
+                bad();
             }
         } finally {
-        	ProActive.removeTryWithCatch();
-        	ProActive.removeTryWithCatch();
+            ProActive.removeTryWithCatch();
+            ProActive.removeTryWithCatch();
         }
     }
-    
+
     public void action() throws Exception {
 
         /* Server */
@@ -171,7 +172,7 @@ public class Test extends FunctionalTest {
             if (e.getMessage().startsWith("Test")) {
                 good();
             } else {
-            	bad();
+                bad();
             }
         }
 
@@ -183,10 +184,10 @@ public class Test extends FunctionalTest {
             if (e.getMessage().startsWith("Test")) {
                 good();
             } else {
-            	bad();
+                bad();
             }
         }
-        
+
         testMechanism(r);
     }
 
@@ -197,6 +198,7 @@ public class Test extends FunctionalTest {
     public void endTest() throws Exception {
         // TODO Auto-generated method stub
     }
+
     public static void main(String[] args) {
         Test test = new Test();
         try {
@@ -205,8 +207,6 @@ public class Test extends FunctionalTest {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            
         }
-        
     }
 }

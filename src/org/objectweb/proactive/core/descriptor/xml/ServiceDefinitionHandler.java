@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
 
 
@@ -144,7 +143,6 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             if (checkNonEmpty(xml_path)) {
                 p2pDescriptorService.setXmlPath(xml_path);
             }
-            
         }
 
         protected void notifyEndActiveHandler(String name,
@@ -156,7 +154,6 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         public Object getResultObject() throws org.xml.sax.SAXException {
             return p2pDescriptorService;
         }
-
     } // end of inner class P2PLookupHandler
 
     protected class FaultToleranceHandler extends PassiveCompositeUnmarshaller {

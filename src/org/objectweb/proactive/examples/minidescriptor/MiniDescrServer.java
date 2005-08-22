@@ -8,6 +8,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
+
 /**
  *
  *
@@ -32,9 +33,7 @@ public class MiniDescrServer {
         virtualnode.activate();
     }
 
-
     public static void main(String[] args) throws IOException {
-    
-    	new MiniDescrServer("descriptors/examples/minidescriptor_server.xml");
+        new MiniDescrServer("descriptors/examples/minidescriptor_server.xml");
     }
 }

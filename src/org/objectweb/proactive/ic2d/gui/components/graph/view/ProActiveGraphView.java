@@ -43,7 +43,8 @@ public class ProActiveGraphView extends BasicGraphView
     }
 
     // MATT
-    public void exportedVirtualNodeChanged(ProActiveComponent component, String virtualNodeName, String oldValue) {
+    public void exportedVirtualNodeChanged(ProActiveComponent component,
+        String virtualNodeName, String oldValue) {
         redraw();
     }
 }

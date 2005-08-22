@@ -30,15 +30,14 @@
  */
 package org.objectweb.proactive.core.config.xml;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
 
 
 public class MasterFileHandler extends AbstractUnmarshallerDecorator

@@ -6,7 +6,7 @@ import Jama.Matrix;
 /**
  * @author fhuet
  *
- * 
+ *
  *
  */
 public class TimeServer {
@@ -21,8 +21,8 @@ public class TimeServer {
     public TimeServer() {
     }
 
-    public TimeServer(double lambda, double nu, double delta, double gamma1, 
-                      double gamma2, double mu) {
+    public TimeServer(double lambda, double nu, double delta, double gamma1,
+        double gamma2, double mu) {
         this.lambda = lambda;
         this.nu = nu;
         this.delta = delta;
@@ -33,6 +33,7 @@ public class TimeServer {
 
     public Matrix generateAb() {
         Matrix Ab = new Matrix(MATRIX_SIZE, MATRIX_SIZE);
+
         //   for (int i = 0; i < MATRIX_SIZE; i++) {
         //      array_type array_element = array[i];
         //
@@ -284,73 +285,84 @@ public class TimeServer {
         Matrix A = generateA();
         Matrix Q = tmp.minus(A).transpose();
         Matrix BB = generateBB();
-//        BB.print(5, 5);
+
+        //        BB.print(5, 5);
         Matrix MQ = minor(Q, 18, 18);
-//        System.out.println("*** MQ ***");
-//        MQ.print(5, 5);
+
+        //        System.out.println("*** MQ ***");
+        //        MQ.print(5, 5);
         Matrix vectT = new Matrix(26, 1);
+
         //        vectT.print(5,5);
-//        System.out.println("*** inverse MQ ***");
-//        MQ.inverse().print(5, 5);
+        //        System.out.println("*** inverse MQ ***");
+        //        MQ.inverse().print(5, 5);
         for (int i = 0; i < 26; i++) {
             vectT.set(i, 0, -1);
         }
-//        System.out.println("*** vectT ***");
-//        vectT.print(5, 5);
+
+        //        System.out.println("*** vectT ***");
+        //        vectT.print(5, 5);
         Matrix resultT = MQ.inverse().times(vectT);
-//        System.out.println(" *** ResultT ***");
-//        resultT.print(10, 10);
+
+        //        System.out.println(" *** ResultT ***");
+        //        resultT.print(10, 10);
         //         resultT.print(5,5);
         Matrix tmp2 = new Matrix(6, 1);
         tmp2.set(0, 0, -Q.get(0, 3));
         Matrix RR3 = BB.inverse().times(tmp2);
-//        RR3.print(5, 5);
+
+        //        RR3.print(5, 5);
         tmp2.set(0, 0, 0);
         tmp2.set(1, 0, -Q.get(1, 5));
         Matrix RR5 = BB.inverse().times(tmp2);
-//        RR5.print(5, 5);
+
+        //        RR5.print(5, 5);
         tmp2.set(1, 0, 0);
         tmp2.set(2, 0, -Q.get(2, 6));
         Matrix RR6 = BB.inverse().times(tmp2);
-//        RR6.print(10, 10);
+
+        //        RR6.print(10, 10);
         tmp2.set(2, 0, 0);
         tmp2.set(3, 0, -Q.get(4, 8));
         Matrix RR8 = BB.inverse().times(tmp2);
-//        RR8.print(10, 10);
+
+        //        RR8.print(10, 10);
         double p3_18 = RR3.get(5, 0);
         double p5_18 = RR5.get(5, 0);
         double p6_18 = RR6.get(5, 0);
         double p8_18 = RR8.get(5, 0);
-        double p12_18 = nu / (nu + lambda) * lambda / (lambda + delta);
+        double p12_18 = (nu / (nu + lambda) * lambda) / (lambda + delta);
         double p17_18 = lambda / (lambda + nu);
-//        System.out.println(p3_18);
-//        System.out.println(p5_18);
-//        System.out.println(p6_18);
-//        System.out.println(p8_18);
-//        System.out.println(p12_18);
-//        System.out.println(p17_18);
+
+        //        System.out.println(p3_18);
+        //        System.out.println(p5_18);
+        //        System.out.println(p6_18);
+        //        System.out.println(p8_18);
+        //        System.out.println(p12_18);
+        //        System.out.println(p17_18);
         double TempsT3 = resultT.get(3, 0);
         double TempsT5 = resultT.get(5, 0);
         double TempsT6 = resultT.get(6, 0);
         double TempsT8 = resultT.get(8, 0);
         double TempsT12 = resultT.get(12, 0);
         double TempsT17 = resultT.get(17, 0);
-//        System.out.println(TempsT3);
-//        System.out.println(TempsT5);
-//        System.out.println(TempsT6);
-//        System.out.println(TempsT8);
-//        System.out.println(TempsT12);
-//        System.out.println(TempsT17);
+
+        //        System.out.println(TempsT3);
+        //        System.out.println(TempsT5);
+        //        System.out.println(TempsT6);
+        //        System.out.println(TempsT8);
+        //        System.out.println(TempsT12);
+        //        System.out.println(TempsT17);
         //RR5=evalm(inverse(BB) &* [0,-Q[2,6],0,0,0,0]);
         //RR6=evalm(inverse(BB) &* [0,0,-Q[3,7],0,0,0]);
         //RR8=evalm(inverse(BB) &* [0,0,0,-Q[5,9],0,0]);
-        
-        return (p3_18*TempsT3+p5_18*TempsT5+p6_18*TempsT6+p8_18*TempsT8+p12_18*TempsT12+p17_18*TempsT17)*1000;
+        return ((p3_18 * TempsT3) + (p5_18 * TempsT5) + (p6_18 * TempsT6) +
+        (p8_18 * TempsT8) + (p12_18 * TempsT12) + (p17_18 * TempsT17)) * 1000;
     }
 
     /**
- *  returns a minux a row and a column
- */
+     *  returns a minux a row and a column
+     */
     public Matrix minor(Matrix a, int row, int column) {
         //        Matrix tmp = new Matrix(a.getRowDimension() - 1,
         //                                a.getColumnDimension() - 1);
@@ -370,6 +382,7 @@ public class TimeServer {
                 j++;
             }
         }
+
         //        for (int k = 0; k < rows.length; k++) {
         //            System.out.println(rows[k] + " ");
         //        }
@@ -383,41 +396,41 @@ public class TimeServer {
     }
 
     /**
-         * Returns the delta.
-         * @return double
-         */
+     * Returns the delta.
+     * @return double
+     */
     public double getDelta() {
         return delta;
     }
 
     /**
- * Returns the gamma1.
- * @return double
- */
+     * Returns the gamma1.
+     * @return double
+     */
     public double getGamma1() {
         return gamma1;
     }
 
     /**
- * Returns the gamma2.
- * @return double
- */
+     * Returns the gamma2.
+     * @return double
+     */
     public double getGamma2() {
         return gamma2;
     }
 
     /**
- * Returns the lambda.
- * @return double
- */
+     * Returns the lambda.
+     * @return double
+     */
     public double getLambda() {
         return lambda;
     }
 
     /**
- * Returns the mu.
- * @return double
- */
+     * Returns the mu.
+     * @return double
+     */
     public double getMu() {
         return mu;
     }
@@ -431,41 +444,41 @@ public class TimeServer {
     }
 
     /**
-         * Sets the delta.
-         * @param delta The delta to set
-         */
+     * Sets the delta.
+     * @param delta The delta to set
+     */
     public void setDelta(double delta) {
         this.delta = delta;
     }
 
     /**
- * Sets the gamma1.
- * @param gamma1 The gamma1 to set
- */
+     * Sets the gamma1.
+     * @param gamma1 The gamma1 to set
+     */
     public void setGamma1(double gamma1) {
         this.gamma1 = gamma1;
     }
 
     /**
- * Sets the gamma2.
- * @param gamma2 The gamma2 to set
- */
+     * Sets the gamma2.
+     * @param gamma2 The gamma2 to set
+     */
     public void setGamma2(double gamma2) {
         this.gamma2 = gamma2;
     }
 
     /**
- * Sets the lambda.
- * @param lambda The lambda to set
- */
+     * Sets the lambda.
+     * @param lambda The lambda to set
+     */
     public void setLambda(double lambda) {
         this.lambda = lambda;
     }
 
     /**
- * Sets the mu.
- * @param mu The mu to set
- */
+     * Sets the mu.
+     * @param mu The mu to set
+     */
     public void setMu(double mu) {
         this.mu = mu;
     }
@@ -490,12 +503,10 @@ public class TimeServer {
         System.out.println("      gamma1 = " + args[3]);
         System.out.println("      gamma2 = " + args[4]);
         System.out.println("      mu= " + args[5]);
-        TimeServer t = new TimeServer(Double.parseDouble(args[0]), 
-                                      Double.parseDouble(args[1]), 
-                                      Double.parseDouble(args[2]), 
-                                      Double.parseDouble(args[3]), 
-                                      Double.parseDouble(args[4]), 
-                                      Double.parseDouble(args[5]));
+        TimeServer t = new TimeServer(Double.parseDouble(args[0]),
+                Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+                Double.parseDouble(args[3]), Double.parseDouble(args[4]),
+                Double.parseDouble(args[5]));
         System.out.println(t.evaluate());
     }
 }

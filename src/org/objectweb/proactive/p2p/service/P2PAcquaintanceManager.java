@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -50,10 +52,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.util.Iterator;
 
 
 /**

@@ -19,7 +19,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentD implements I1, BindingController {
-    protected final static Logger logger = ProActiveLogger.getLogger("nonregressiontests.components");
+    protected final static Logger logger = ProActiveLogger.getLogger(
+            "nonregressiontests.components");
     public final static String MESSAGE = "-->d";
 
     //public final static Message MESSAGE = new Message("-->PrimitiveComponentD");
@@ -81,11 +82,8 @@ public class PrimitiveComponentD implements I1, BindingController {
         if (clientItf.equals(I2_ITF_NAME)) {
             return i2;
         } else {
-            if (logger
-                                   .isDebugEnabled()) {
-                logger
-                               .debug("cannot find " + I2_ITF_NAME +
-                    " interface");
+            if (logger.isDebugEnabled()) {
+                logger.debug("cannot find " + I2_ITF_NAME + " interface");
             }
             return null;
         }
@@ -99,10 +97,8 @@ public class PrimitiveComponentD implements I1, BindingController {
             IllegalLifeCycleException {
         if (clientItf.equals(I2_ITF_NAME)) {
             i2Group.clear();
-            if (logger
-                                   .isDebugEnabled()) {
-                logger
-                               .debug(I2_ITF_NAME + " interface unbound");
+            if (logger.isDebugEnabled()) {
+                logger.debug(I2_ITF_NAME + " interface unbound");
             }
         } else {
             logger.error("client interface not found");

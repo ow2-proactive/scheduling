@@ -14,7 +14,6 @@ package modelisation.simulator.common;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class ExpoAverageWithMemory extends ExpoAverage {
-
     protected static int DEFAULT_MEMORY_SIZE;
     protected int memorySize;
     protected int headPosition;
@@ -71,7 +70,6 @@ public class ExpoAverageWithMemory extends ExpoAverage {
     }
 
     public static void main(String[] arguments) {
-
         int memorySize = 4;
         ExpoAverageWithMemory expo = new ExpoAverageWithMemory(0.99, memorySize);
         for (int i = 0; i < arguments.length; i++) {

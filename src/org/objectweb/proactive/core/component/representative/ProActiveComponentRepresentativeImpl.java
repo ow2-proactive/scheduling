@@ -125,7 +125,8 @@ public class ProActiveComponentRepresentativeImpl
 
         // add controllers
         //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
-        Iterator iteratorOnControllers = controllersConfiguration.keySet().iterator(); 
+        Iterator iteratorOnControllers = controllersConfiguration.keySet()
+                                                                 .iterator();
         Class controllerClass = null;
         AbstractProActiveController currentController;
         ProActiveInterface currentInterface = null;
@@ -134,7 +135,7 @@ public class ProActiveComponentRepresentativeImpl
             String controllerItfName = (String) iteratorOnControllers.next();
             try {
                 controllerItf = Class.forName(controllerItfName);
-                controllerClass = Class.forName((String)controllersConfiguration.get(
+                controllerClass = Class.forName((String) controllersConfiguration.get(
                             controllerItf.getName()));
                 Constructor controllerClassConstructor = controllerClass.getConstructor(new Class[] {
                             Component.class
@@ -147,15 +148,14 @@ public class ProActiveComponentRepresentativeImpl
                         this, (InterfaceType) currentController.getFcItfType());
             } catch (Exception e) {
                 logger.error("could not create controller " +
-                    controllersConfiguration.get(controllerItfName) +
-                    " : " + e.getMessage());
+                    controllersConfiguration.get(controllerItfName) + " : " +
+                    e.getMessage());
                 continue;
             }
 
             if (BindingController.class.isAssignableFrom(controllerClass)) {
                 if ((hierarchicalType.equals(Constants.PRIMITIVE) &&
-                        (Fractive.getClientInterfaceTypes(
-                            componentType).length == 0))) {
+                        (Fractive.getClientInterfaceTypes(componentType).length == 0))) {
                     //bindingController = null;
                     if (logger.isDebugEnabled()) {
                         logger.debug(

@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.interception;
 
 import java.lang.reflect.Method;
 
+
 /**
  * This interface must be implemented by controllers that need to intercept
  * outgoing functional invocations. <br>
@@ -31,15 +32,11 @@ import java.lang.reflect.Method;
  * <code> --> callee.invocation  </code> <br>
  * <code> --> OutputInterceptor2.afterOutputMethodInvocation  </code> <br>
  * <code> --> OutputInterceptor1.afterOutputMethodInvocation  </code>
- * 
+ *
  * @author Matthieu Morel
  */
-
 public interface OutputInterceptor {
-    
     public void beforeOutputMethodInvocation(Method method, Object[] args);
-    
+
     public void afterOutputMethodInvocation(Method method, Object[] args);
-
-
 }

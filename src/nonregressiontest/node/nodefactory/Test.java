@@ -36,23 +36,20 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 
 import testsuite.test.FunctionalTest;
 
+
 /**
  * @author rquilici
- * 
+ *
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates. To enable and disable the creation of type
  * comments go to Window>Preferences>Java>Code Generation.
  */
 public class Test extends FunctionalTest {
-
     Node rmiNode;
-
     Node jiniNode;
-
     private String rmiURL;
-
-    private String jiniURL = "jini://localhost/JININode"
-            + System.currentTimeMillis();
+    private String jiniURL = "jini://localhost/JININode" +
+        System.currentTimeMillis();
 
     //Node ibisNode;
 
@@ -61,7 +58,7 @@ public class Test extends FunctionalTest {
      */
     public Test() {
         super("NodeFactory",
-                "Test the creation of rmi, jini, ibis node whith the factory");
+            "Test the creation of rmi, jini, ibis node whith the factory");
     }
 
     /**
@@ -78,13 +75,14 @@ public class Test extends FunctionalTest {
      */
     public void initTest() throws Exception {
         String port = System.getProperty("proactive.rmi.port");
-        if (port != null)
-            rmiURL = UrlBuilder.buildUrl("localhost", "RMINode"
-                    + System.currentTimeMillis(), "rmi:", new Integer(port)
-                    .intValue());
-        else
-            rmiURL = UrlBuilder.buildUrl("localhost", "RMINode"
-                    + System.currentTimeMillis(), "rmi:");
+        if (port != null) {
+            rmiURL = UrlBuilder.buildUrl("localhost",
+                    "RMINode" + System.currentTimeMillis(), "rmi:",
+                    new Integer(port).intValue());
+        } else {
+            rmiURL = UrlBuilder.buildUrl("localhost",
+                    "RMINode" + System.currentTimeMillis(), "rmi:");
+        }
     }
 
     /**
@@ -99,8 +97,8 @@ public class Test extends FunctionalTest {
         rmiNode = NodeFactory.getNode(rmiURL);
         jiniNode = NodeFactory.getNode(jiniURL);
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
-        return ((rmiNode != null) && (jiniNode != null) && NodeFactory
-                .isNodeLocal(rmiNode));
+        return ((rmiNode != null) && (jiniNode != null) &&
+        NodeFactory.isNodeLocal(rmiNode));
         //        return ((rmiNode != null) &&
         //        		NodeFactory.isNodeLocal(rmiNode));
     }

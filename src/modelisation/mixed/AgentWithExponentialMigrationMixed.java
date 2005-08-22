@@ -1,12 +1,10 @@
 package modelisation.mixed;
 
-import modelisation.forwarder.DummyObject;
-
-import modelisation.server.AgentWithExponentialMigrationAndServer;
-
-import modelisation.statistics.RandomNumberFactory;
-
 import org.objectweb.proactive.core.node.Node;
+
+import modelisation.forwarder.DummyObject;
+import modelisation.server.AgentWithExponentialMigrationAndServer;
+import modelisation.statistics.RandomNumberFactory;
 
 
 public class AgentWithExponentialMigrationMixed

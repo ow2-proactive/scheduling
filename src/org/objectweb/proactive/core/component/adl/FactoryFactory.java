@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.core.component.adl;
 
+import java.util.HashMap;
+
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Factory;
-
-import java.util.HashMap;
 
 
 /**

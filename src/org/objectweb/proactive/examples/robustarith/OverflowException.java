@@ -8,6 +8,7 @@ package org.objectweb.proactive.examples.robustarith;
 
 import java.math.BigInteger;
 
+
 /**
  * @author gchazara
  *
@@ -18,13 +19,13 @@ public class OverflowException extends Exception {
     private String op;
     private BigInteger a;
     private BigInteger b;
-    
+
     public OverflowException(String op, BigInteger a, BigInteger b) {
         this.op = op;
         this.a = a;
         this.b = b;
     }
-    
+
     public String toString() {
         return "Overflow in " + a + " " + op + " " + b;
     }

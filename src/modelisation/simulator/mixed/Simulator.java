@@ -1,14 +1,13 @@
 package modelisation.simulator.mixed;
 
-import modelisation.statistics.RandomNumberFactory;
-import modelisation.statistics.RandomNumberGenerator;
 import org.apache.log4j.Logger;
 
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
+
+
 public class Simulator {
-
-protected static Logger logger = Logger.getLogger(Simulator.class.getName());
-
-
+    protected static Logger logger = Logger.getLogger(Simulator.class.getName());
     protected static final int MAX = 20;
     protected Source source;
     protected Agent agent;
@@ -43,9 +42,9 @@ protected static Logger logger = Logger.getLogger(Simulator.class.getName());
     public Simulator() {
     }
 
-    public Simulator(double lambda, double nu, double delta, double gamma1, 
-                     double gamma2, double mu1, double mu2, double alpha, 
-                     int maxMigration, double length) {
+    public Simulator(double lambda, double nu, double delta, double gamma1,
+        double gamma2, double mu1, double mu2, double alpha, int maxMigration,
+        double length) {
         this.length = length;
         this.gamma1 = gamma1;
         this.gamma2 = gamma2;
@@ -59,18 +58,19 @@ protected static Logger logger = Logger.getLogger(Simulator.class.getName());
     }
 
     public void initialise() {
-if (logger.isDebugEnabled()) {
-        logger.debug("Bench, length is " + length);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Bench, length is " + length);
+        }
+
         //        this.agent.waitBeforeMigration();
         //        this.source.waitBeforeCommunication();
-if (logger.isDebugEnabled()) {
-        logger.debug("Creating source");
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating source");
+        }
         this.source = new Source(this, lambda);
-if (logger.isDebugEnabled()) {
-        logger.debug("Creating Forwarder Chain");
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating Forwarder Chain");
+        }
         this.forwarderChain = new ForwarderChain(this);
         this.agent = new Agent(this, nu, delta, maxMigration);
         this.server = new Server(this);
@@ -90,9 +90,9 @@ if (logger.isDebugEnabled()) {
     public double generateCommunicationTimeServer() {
         if (this.expoGamma2 == null) {
             this.expoGamma2 = RandomNumberFactory.getGenerator("gamma2");
-            this.expoGamma2.initialize(gamma2, 
-                                       System.currentTimeMillis() + 276371);
-//                       this.expoGamma2.initialize(gamma2, 276371);
+            this.expoGamma2.initialize(gamma2,
+                System.currentTimeMillis() + 276371);
+            //                       this.expoGamma2.initialize(gamma2, 276371);
         }
         return this.expoGamma2.next() * 1000;
     }
@@ -101,7 +101,7 @@ if (logger.isDebugEnabled()) {
         if (this.expoMu1 == null) {
             this.expoMu1 = RandomNumberFactory.getGenerator("mu1");
             this.expoMu1.initialize(mu1, System.currentTimeMillis() + 120457);
-//                       this.expoMu1.initialize(mu1, 120457);
+            //                       this.expoMu1.initialize(mu1, 120457);
         }
         return this.expoMu1.next() * 1000;
     }
@@ -110,7 +110,7 @@ if (logger.isDebugEnabled()) {
         if (this.expoMu2 == null) {
             this.expoMu2 = RandomNumberFactory.getGenerator("mu2");
             this.expoMu2.initialize(mu2, System.currentTimeMillis() + 67457);
-//                        this.expoMu2.initialize(mu2, 67457);
+            //                        this.expoMu2.initialize(mu2, 67457);
         }
         return this.expoMu2.next() * 1000;
     }
@@ -118,9 +118,9 @@ if (logger.isDebugEnabled()) {
     public double generateCommunicationTimeForwarder() {
         if (this.expoGamma1 == null) {
             this.expoGamma1 = RandomNumberFactory.getGenerator("gamma1");
-            this.expoGamma1.initialize(gamma1, 
-                                       System.currentTimeMillis() + 372917);
-//                        this.expoGamma1.initialize(gamma1, 372917);
+            this.expoGamma1.initialize(gamma1,
+                System.currentTimeMillis() + 372917);
+            //                        this.expoGamma1.initialize(gamma1, 372917);
         }
         return this.expoGamma1.next() * 1000;
     }
@@ -128,9 +128,10 @@ if (logger.isDebugEnabled()) {
     public double generateMigrationTime() {
         if (this.expoDelta == null) {
             this.expoDelta = RandomNumberFactory.getGenerator("delta");
-//            this.expoDelta.initialize(delta, 
-//                                      System.currentTimeMillis() + 395672917);
-                        this.expoDelta.initialize(delta, System.currentTimeMillis() +  58373435);
+            //            this.expoDelta.initialize(delta, 
+            //                                      System.currentTimeMillis() + 395672917);
+            this.expoDelta.initialize(delta,
+                System.currentTimeMillis() + 58373435);
         }
         return this.expoDelta.next() * 1000;
     }
@@ -138,8 +139,8 @@ if (logger.isDebugEnabled()) {
     public double generateAgentWaitingTime() {
         if (this.expoNu == null) {
             this.expoNu = RandomNumberFactory.getGenerator("nu");
-                        this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
-//            this.expoNu.initialize(nu, 39566417);
+            this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
+            //            this.expoNu.initialize(nu, 39566417);
         }
         return expoNu.next() * 1000;
     }
@@ -147,9 +148,9 @@ if (logger.isDebugEnabled()) {
     public double generateSourceWaitingTime() {
         if (this.expoLambda == null) {
             this.expoLambda = RandomNumberFactory.getGenerator("lambda");
-            this.expoLambda.initialize(lambda, 
-                                       System.currentTimeMillis() + 8936917);
-//                        this.expoLambda.initialize(lambda, 8936917);
+            this.expoLambda.initialize(lambda,
+                System.currentTimeMillis() + 8936917);
+            //                        this.expoLambda.initialize(lambda, 8936917);
         }
         return expoLambda.next() * 1000;
     }
@@ -160,13 +161,13 @@ if (logger.isDebugEnabled()) {
         }
         if (this.randomTTL == null) {
             this.randomTTL = RandomNumberFactory.getGenerator("alpha");
-            this.randomTTL.initialize(1 / alpha, 
-                                      System.currentTimeMillis() + 5437);
-//                        this.randomTTL.initialize(alpha, 4251);
+            this.randomTTL.initialize(1 / alpha,
+                System.currentTimeMillis() + 5437);
+            //                        this.randomTTL.initialize(alpha, 4251);
         }
-if (logger.isDebugEnabled()) {
-        //   logger.debug(randomTTL.next());
-}
+        if (logger.isDebugEnabled()) {
+            //   logger.debug(randomTTL.next());
+        }
         return randomTTL.next();
     }
 
@@ -175,7 +176,7 @@ if (logger.isDebugEnabled()) {
     }
 
     public void simulate() {
-double startTime = System.currentTimeMillis();
+        double startTime = System.currentTimeMillis();
         double lengthOfState = 0;
         this.previousTime = 0;
 
@@ -189,46 +190,47 @@ double startTime = System.currentTimeMillis();
                 this.sameTimeAsPrevious = 0;
             }
             if (this.sameTimeAsPrevious > Simulator.MAX) {
-if (logger.isDebugEnabled()) {
-                logger.debug(" Simulation loop detected ");
-}
+                if (logger.isDebugEnabled()) {
+                    logger.debug(" Simulation loop detected ");
+                }
                 this.displayState();
                 System.exit(-1);
             }
-            if (this.currentTime > (length * nextEcho / 100)) {
-                System.err.println(
-                        nextEcho + "% at time " + 
-                        java.util.Calendar.getInstance().getTime());
+            if (this.currentTime > ((length * nextEcho) / 100)) {
+                System.err.println(nextEcho + "% at time " +
+                    java.util.Calendar.getInstance().getTime());
                 nextEcho += 5;
             }
-if (logger.isDebugEnabled()) {
-            //            logger.debug("length of state = " + lengthOfState);
-            //            logger.debug(
-}
+            if (logger.isDebugEnabled()) {
+                //            logger.debug("length of state = " + lengthOfState);
+                //            logger.debug(
+            }
+
             //                    "\n -------------- Time " + this.currentTime +
             //                    " ----------------------");
-if (logger.isDebugEnabled()) {
-            //            logger.debug("*** states before update ***");
-            //            logger.debug("STATE: " + this.server + "" + this.source
-}
+            if (logger.isDebugEnabled()) {
+                //            logger.debug("*** states before update ***");
+                //            logger.debug("STATE: " + this.server + "" + this.source
+            }
+
             //                               + "" + this.agent + " lasted " + lengthOfState);
             //            this.displayState();
-if (logger.isDebugEnabled()) {
-            //            logger.debug("***********************");
-}
+            if (logger.isDebugEnabled()) {
+                //            logger.debug("***********************");
+            }
             this.updateElements(currentTime);
             //                this.displayState();
-if (logger.isDebugEnabled()) {
-            //            logger.debug("--------------------------------------------------------------------");
-}
+            if (logger.isDebugEnabled()) {
+                //            logger.debug("--------------------------------------------------------------------");
+            }
         }
         this.end();
         double endTime = System.currentTimeMillis();
-if (logger.isDebugEnabled()) {
-        logger.debug("Total Execution Time " + (endTime - startTime));
-        //        logger.debug("Simulator.simulate currentTime " + currentTime);
-        // logger.debug("T1 is " + t1);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Total Execution Time " + (endTime - startTime));
+            //        logger.debug("Simulator.simulate currentTime " + currentTime);
+            // logger.debug("T1 is " + t1);
+        }
     }
 
     public void end() {
@@ -236,16 +238,15 @@ if (logger.isDebugEnabled()) {
     }
 
     public void displayState() {
-if (logger.isDebugEnabled()) {
-        logger.debug("Source: " + this.source);
-        logger.debug("ForwarderChain " + this.forwarderChain);
-        logger.debug("Agent: " + this.agent);
-        logger.debug("Server: " + this.server);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Source: " + this.source);
+            logger.debug("ForwarderChain " + this.forwarderChain);
+            logger.debug("Agent: " + this.agent);
+            logger.debug("Server: " + this.server);
+        }
     }
 
     public double updateTime() {
-
         double minTime = agent.getRemainingTime();
         minTime = Math.min(minTime, source.getRemainingTime());
         minTime = Math.min(minTime, forwarderChain.getRemainingTime());
@@ -270,44 +271,39 @@ if (logger.isDebugEnabled()) {
     }
 
     public void log(String s) {
-if (logger.isDebugEnabled()) {
-        logger.debug(s + "     time " + this.currentTime);
-        //        logger.debug(s);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug(s + "     time " + this.currentTime);
+            //        logger.debug(s);
+        }
     }
 
     public static void main(String[] args) {
         if (args.length < 10) {
-            System.err.println(
-                    "Usage: java " + Simulator.class.getName() + 
-                    " <lambda> <nu> <delta> <gamma1> <gamma2> " + 
-                    " <mu1> <mu2>  <alpha> <migration> <length>");
+            System.err.println("Usage: java " + Simulator.class.getName() +
+                " <lambda> <nu> <delta> <gamma1> <gamma2> " +
+                " <mu1> <mu2>  <alpha> <migration> <length>");
             System.exit(-1);
         }
-if (logger.isDebugEnabled()) {
-        logger.debug("Starting Simulator");
-        logger.debug("     lambda = " + args[0]);
-        logger.debug("         nu = " + args[1]);
-        logger.debug("      delta = " + args[2]);
-        logger.debug("      gamma1 = " + args[3]);
-        logger.debug("      gamma2 = " + args[4]);
-        logger.debug("      mu1 = " + args[5]);
-        logger.debug("      mu2 = " + args[6]);
-        logger.debug("      alpha = " + args[7]);
-        logger.debug("   max migrations = " + args[8]);
-        logger.debug("     length = " + args[9]);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("Starting Simulator");
+            logger.debug("     lambda = " + args[0]);
+            logger.debug("         nu = " + args[1]);
+            logger.debug("      delta = " + args[2]);
+            logger.debug("      gamma1 = " + args[3]);
+            logger.debug("      gamma2 = " + args[4]);
+            logger.debug("      mu1 = " + args[5]);
+            logger.debug("      mu2 = " + args[6]);
+            logger.debug("      alpha = " + args[7]);
+            logger.debug("   max migrations = " + args[8]);
+            logger.debug("     length = " + args[9]);
+        }
 
-        Simulator simulator = new Simulator(Double.parseDouble(args[0]), 
-                                            Double.parseDouble(args[1]), 
-                                            Double.parseDouble(args[2]), 
-                                            Double.parseDouble(args[3]), 
-                                            Double.parseDouble(args[4]), 
-                                            Double.parseDouble(args[5]), 
-                                            Double.parseDouble(args[6]), 
-                                            Double.parseDouble(args[7]), 
-                                            Integer.parseInt(args[8]), 
-                                            Double.parseDouble(args[9]));
+        Simulator simulator = new Simulator(Double.parseDouble(args[0]),
+                Double.parseDouble(args[1]), Double.parseDouble(args[2]),
+                Double.parseDouble(args[3]), Double.parseDouble(args[4]),
+                Double.parseDouble(args[5]), Double.parseDouble(args[6]),
+                Double.parseDouble(args[7]), Integer.parseInt(args[8]),
+                Double.parseDouble(args[9]));
         simulator.initialise();
         simulator.simulate();
     }

@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.ext.locationserver;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.event.MessageEventListener;
-
-import java.io.IOException;
 
 
 public class BouncingRequestReceiver implements RequestReceiver {

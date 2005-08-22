@@ -4,23 +4,23 @@
  */
 package nonregressiontest.component.descriptor.arguments;
 
-import nonregressiontest.component.ComponentTest;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 
-import testsuite.test.Assertions;
+import nonregressiontest.component.ComponentTest;
 
-import java.util.HashMap;
-import java.util.Map;
+import testsuite.test.Assertions;
 
 
 /**
  * This test instantiates a component from the "dummy.fractal" definition, which is parameterized
  * with the "message" argument.
  * The "message" argument is then used to set the "info" attribute in the dummy component.
- * 
+ *
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
@@ -60,7 +60,7 @@ public class Test extends ComponentTest {
     public boolean postConditions() throws Exception {
         return true;
     }
-    
+
     private Component getDummy() {
         return dummy;
     }

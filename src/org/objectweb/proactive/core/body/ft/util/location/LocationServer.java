@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.body.ft.util.location;
 
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.UniversalBody;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-
 import java.util.ArrayList;
+
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.UniversalBody;
 
 
 /**

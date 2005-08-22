@@ -12,7 +12,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * @author Matthieu Morel
  */
-public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA implements AttributeController {
+public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA
+    implements AttributeController {
     public String message;
     public final static String I2_ITF_NAME = "i2";
     private static Logger logger = ProActiveLogger.getLogger(
@@ -29,8 +30,7 @@ public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA implem
     public void setMessage(String message) {
         this.message = message;
     }
-    
-    
+
     public Message processInputMessage(Message message) {
         //      /logger.info("transferring message :" + message.toString());
         if (i2 != null) {

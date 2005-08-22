@@ -1,33 +1,33 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
+
 /**
  * <p>
  * A class implementing this interface is an object encapsulating a reified method call.
@@ -46,7 +47,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * The request must implements this Request interface.
  * </p><p>
  * In addition to the standard messaging facilities (sender, receiver) it adds the concepts
- * of method call and forwarding, which is, the ability for a request to pass on from 
+ * of method call and forwarding, which is, the ability for a request to pass on from
  * one body to another in case of migration.
  * </p>
  *
@@ -57,88 +58,80 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  */
 public interface Request extends Message {
 
-  /**
-   * Returns true if the request has been forwarded
-   * @return true if the request has been forwarded
-   */
-  public boolean hasBeenForwarded();
+    /**
+     * Returns true if the request has been forwarded
+     * @return true if the request has been forwarded
+     */
+    public boolean hasBeenForwarded();
 
-  
-  /**
-   * Set the send counter to 0.
-   */
-  public void resetSendCounter();
+    /**
+     * Set the send counter to 0.
+     */
+    public void resetSendCounter();
 
-  
-  /**
-   * Returns the parameter number <code>index</code> from the method call
-   * embedded in the request
-   * @param index the position of the parameter to return.
-   * @return the object passed in parameter of the method call that matches
-   * the given position or null if no match.
-   */
-  public Object getParameter(int index);
+    /**
+     * Returns the parameter number <code>index</code> from the method call
+     * embedded in the request
+     * @param index the position of the parameter to return.
+     * @return the object passed in parameter of the method call that matches
+     * the given position or null if no match.
+     */
+    public Object getParameter(int index);
 
+    /**
+     * Returns the MethodCall embedded in the request
+     * @return the MethodCall embedded in the request
+     */
+    public MethodCall getMethodCall();
 
-  /**
-   * Returns the MethodCall embedded in the request
-   * @return the MethodCall embedded in the request
-   */
-  public MethodCall getMethodCall();
+    /**
+     * Returns the sender of this request
+     * @return the sender of this request
+     */
+    public UniversalBody getSender();
 
-  
-  /**
-   * Returns the sender of this request
-   * @return the sender of this request
-   */
-  public UniversalBody getSender();
-  
-      
-  /**
-   * Sends this request to the body destination
-   * @param destinationBody the body destination of this request
-   * @exception java.io.IOException if the request fails to be sent
-   * @return value for fault-tolerance protocol
-   */
-  public int send(UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException;
+    /**
+     * Sends this request to the body destination
+     * @param destinationBody the body destination of this request
+     * @exception java.io.IOException if the request fails to be sent
+     * @return value for fault-tolerance protocol
+     */
+    public int send(UniversalBody destinationBody)
+        throws java.io.IOException, RenegotiateSessionException;
 
+    /**
+     * Serves this request by executing the embedded method call using the given
+     * <code>targetBody</code>. Once the eventual result obtained from the method call
+     * a the reply is returned (based on that result).
+     * @param targetBody the body destination of the call
+     * @return the reply built using the result or null if the request is one way
+     * @exception ServeException if the method call fails to be served
+     */
+    public Reply serve(Body targetBody) throws ServeException;
 
-  /**
-   * Serves this request by executing the embedded method call using the given 
-   * <code>targetBody</code>. Once the eventual result obtained from the method call
-   * a the reply is returned (based on that result).
-   * @param targetBody the body destination of the call
-   * @return the reply built using the result or null if the request is one way
-   * @exception ServeException if the method call fails to be served
-   */
-  public Reply serve(Body targetBody) throws ServeException;
+    /**
+     * Create a fake but valid reply by encapsulating a non functional exception instead of a result
+     * @param targetBody the body destination of the call
+     * @return the fake reply built using the non functional exception
+     */
+    public Reply serveAlternate(Body targetBody, NonFunctionalException nfe);
 
-  /**
-	* Create a fake but valid reply by encapsulating a non functional exception instead of a result
-	* @param targetBody the body destination of the call
-	* @return the fake reply built using the non functional exception
-	*/
-   public Reply serveAlternate(Body targetBody, NonFunctionalException nfe);
-   
-   
-  /**
-   * Notifies the request that it has been received by the destination.
-   * When this request gets fowarded, this method must not be called as a
-   * fowarder is not the genuine destination of the request.
-   * @param bodyReceiver the body destination that received the request
-   * @exception java.io.IOException if the request failed to perform a possible 
-   * operation upon that notification
-   */
-  public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException;
- 
-  // SECURITY
-  
-   public boolean isCiphered();
-  
-   public long getSessionId() ;
-  
-   public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException; 
+    /**
+     * Notifies the request that it has been received by the destination.
+     * When this request gets fowarded, this method must not be called as a
+     * fowarder is not the genuine destination of the request.
+     * @param bodyReceiver the body destination that received the request
+     * @exception java.io.IOException if the request failed to perform a possible
+     * operation upon that notification
+     */
+    public void notifyReception(UniversalBody bodyReceiver)
+        throws java.io.IOException;
 
+    // SECURITY
+    public boolean isCiphered();
 
-   
+    public long getSessionId();
+
+    public boolean decrypt(ProActiveSecurityManager psm)
+        throws RenegotiateSessionException;
 }

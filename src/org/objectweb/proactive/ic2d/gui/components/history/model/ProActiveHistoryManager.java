@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.gui.components.history.model;
 
 import org.objectweb.fractal.gui.history.model.BasicHistoryManager;
-
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
 

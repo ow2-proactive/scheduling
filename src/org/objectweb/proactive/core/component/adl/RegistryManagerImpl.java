@@ -39,7 +39,7 @@ import org.objectweb.fractal.api.Component;
  * It offers facilities for accessing a shared static registry for storing component instances according to
  * their name.
  *
- * 
+ *
  * @author Matthieu Morel
  */
 public class RegistryManagerImpl implements RegistryManager {
@@ -63,7 +63,7 @@ public class RegistryManagerImpl implements RegistryManager {
         return registry.getComponent(name);
     }
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.objectweb.fractal.adl.RegistryManager#clear()
      */
     public void clear() {

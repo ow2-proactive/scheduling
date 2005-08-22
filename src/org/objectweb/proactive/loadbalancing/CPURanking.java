@@ -28,19 +28,21 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.loadbalancing;
 
 import org.apache.log4j.Logger;
+
 
 /**
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
 public abstract interface CPURanking {
-	static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
+    static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
 
-	public double getRanking();
-	public void setRanking(double x);
-	public void addToRanking(double x);
+    public double getRanking();
+
+    public void setRanking(double x);
+
+    public void addToRanking(double x);
 }

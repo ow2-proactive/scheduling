@@ -39,7 +39,6 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.http.util.messages.ReflectRequest;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
- 
 
 
 /**
@@ -49,77 +48,74 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class RuntimeRequest extends ReflectRequest implements Serializable {
-	private static Logger logger = Logger.getLogger("XML_HTTP");
+    private static Logger logger = Logger.getLogger("XML_HTTP");
     private String methodName;
     private ArrayList parameters = new ArrayList();
     private ArrayList paramsTypes;
-
     private static HashMap hMapMethods;
     private static ProActiveRuntimeImpl runtime;
-     
+
     static {
-   
-    	// init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
+        // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
         // in 'Object' (value) and the name of funtions in key 
         // (Warning two functions can t have the same name (for now)) 
         runtime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-     	hMapMethods = getHashMapReflect(runtime.getClass());
-        
-    }
-    
-    public RuntimeRequest(String newmethodName, String url) {
-        super (url);
-            this.methodName = newmethodName;   	
-    }
-    
-    
-    public Object getReturnedObject ()  throws Exception{
-        if (this.returnedObject instanceof Exception)           
-            throw (Exception)this.returnedObject;
-        return this.returnedObject;
-    }
-   
-    public RuntimeRequest(String newmethodName, ArrayList newparameters, String url) {
-        
-        this(newmethodName , url);
-            this.parameters = newparameters;
-    }
- 
-    public RuntimeRequest(String newmethodName, ArrayList newparameters,
-        ArrayList newparamsTypes, String url) {
-        this(newmethodName,newparameters, url);
-            this.paramsTypes = newparamsTypes;
+        hMapMethods = getHashMapReflect(runtime.getClass());
     }
 
-    public Object  processMessage () throws Exception{
-            
-        		Object[] params = parameters.toArray();
-        		Object result = null;
-            
-        			Method m = getProActiveRuntimeMethod(methodName,parameters, hMapMethods.get(methodName));
-        			try {
-						result = m.invoke(runtime, parameters.toArray());
-                        					} catch (IllegalArgumentException e) {
-						//throw new HTTPRemoteException("Error during reflexion", e);
-					    //e.printStackTrace();
-					    //esult =e;
-					    throw e;
-					} catch (IllegalAccessException e) {
-						//throw new HTTPRemoteException("Error during reflexion", e);
-					    //.e.printStackTrace();
-					    //result = e;
-					    throw e;
-					} catch (InvocationTargetException e) {
-						//throw (Exception) e.getCause();	
-						//throw new HTTPRemoteException("Error during reflexion", e);
-//					    e.printStackTrace();
-//					    result = e;
-					    throw (Exception)e.getCause ();
-					} catch (Exception e) {
-//					    result = e;
-					    throw e;
-					}
-            return result ;
+    public RuntimeRequest(String newmethodName, String url) {
+        super(url);
+        this.methodName = newmethodName;
+    }
+
+    public Object getReturnedObject() throws Exception {
+        if (this.returnedObject instanceof Exception) {
+            throw (Exception) this.returnedObject;
+        }
+        return this.returnedObject;
+    }
+
+    public RuntimeRequest(String newmethodName, ArrayList newparameters,
+        String url) {
+        this(newmethodName, url);
+        this.parameters = newparameters;
+    }
+
+    public RuntimeRequest(String newmethodName, ArrayList newparameters,
+        ArrayList newparamsTypes, String url) {
+        this(newmethodName, newparameters, url);
+        this.paramsTypes = newparamsTypes;
+    }
+
+    public Object processMessage() throws Exception {
+        Object[] params = parameters.toArray();
+        Object result = null;
+
+        Method m = getProActiveRuntimeMethod(methodName, parameters,
+                hMapMethods.get(methodName));
+        try {
+            result = m.invoke(runtime, parameters.toArray());
+        } catch (IllegalArgumentException e) {
+            //throw new HTTPRemoteException("Error during reflexion", e);
+            //e.printStackTrace();
+            //esult =e;
+            throw e;
+        } catch (IllegalAccessException e) {
+            //throw new HTTPRemoteException("Error during reflexion", e);
+            //.e.printStackTrace();
+            //result = e;
+            throw e;
+        } catch (InvocationTargetException e) {
+            //throw (Exception) e.getCause();	
+            //throw new HTTPRemoteException("Error during reflexion", e);
+            //					    e.printStackTrace();
+            //					    result = e;
+            throw (Exception) e.getCause();
+        } catch (Exception e) {
+            //					    result = e;
+            throw e;
+        }
+        return result;
     }
 
     public String getMethodName() {
@@ -129,9 +125,8 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
     public ArrayList getParameters() {
         return this.parameters;
     }
-    
+
     public String toString() {
-        return "[ " +  methodName + " ( " + parameters + " )" + " ]";
+        return "[ " + methodName + " ( " + parameters + " )" + " ]";
     }
-       
 }

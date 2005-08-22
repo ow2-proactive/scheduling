@@ -8,19 +8,19 @@
  */
 package modelisation.simulator.mixed;
 
-import modelisation.simulator.common.SimulatorElement;
 import org.apache.log4j.Logger;
 
+import modelisation.simulator.common.SimulatorElement;
+
+
 public class Request extends SimulatorElement {
-
-protected static Logger logger = Logger.getLogger(Request.class.getName());
-
-
+    protected static Logger logger = Logger.getLogger(Request.class.getName());
     public static final int SOURCE = 0;
     public static final int AGENT = 1;
     protected int number;
     protected int senderID;
     protected double creationTime;
+
     //this is just to test  a new way to get mu using agent requests
     public double timeToSubstract;
 
@@ -66,9 +66,8 @@ protected static Logger logger = Logger.getLogger(Request.class.getName());
     }
 
     public String toString() {
-
-        String s = new String("request " + 
-                              ((state == SOURCE) ? " from source" : " from agent"));
+        String s = new String("request " +
+                ((state == SOURCE) ? " from source" : " from agent"));
         s = s + " number " + number;
         return s;
     }

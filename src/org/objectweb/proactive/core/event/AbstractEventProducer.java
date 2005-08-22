@@ -99,16 +99,17 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             eventListeners = new WeakReferenceListenerList();
         }
     }
-    
+
     /**
      * Creates an <code>AbstractEventProducer</code> and specifies whether its registered listener
      * should be serialized or not and whether the refence on listener should be weak or not.
      * If tshouldSerializeListeners is true, the secong is ignored, i.e Weak Ref won't be used
      * @param shouldSerializeListeners true if the registered listeners should be serialized, false else.
      */
-    public AbstractEventProducer(boolean shouldSerializeListeners, boolean useWeakRef) {
+    public AbstractEventProducer(boolean shouldSerializeListeners,
+        boolean useWeakRef) {
         this.shouldSerializeListeners = shouldSerializeListeners;
-        if ( ! shouldSerializeListeners && useWeakRef) {
+        if (!shouldSerializeListeners && useWeakRef) {
             eventListeners = new WeakReferenceListenerList();
         } else {
             eventListeners = new PlainListenerList();
@@ -400,5 +401,6 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
             return null;
         }
     }
-     // end inner class WeakReferenceIterator
+
+    // end inner class WeakReferenceIterator
 }

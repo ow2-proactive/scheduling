@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.group;
 
-import org.apache.log4j.Logger;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
@@ -46,8 +47,6 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-
-import java.util.Iterator;
 
 
 /**

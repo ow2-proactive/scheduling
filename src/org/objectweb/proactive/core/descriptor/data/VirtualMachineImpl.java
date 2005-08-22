@@ -65,10 +65,9 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
 
     /** indiquates if this machine results from a lookup or not  */
     private boolean hasProcess = true;
-    
 
     /** the process to start in order to create the JVM */
-    private  ExternalProcess process;
+    private ExternalProcess process;
 
     /** the service to start in order to acquire the JVM */
     private transient UniversalService service;

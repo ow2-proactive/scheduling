@@ -1,22 +1,19 @@
 package org.objectweb.proactive.core.component.interception;
 
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.Interface;
-import org.objectweb.fractal.api.type.InterfaceType;
-
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.mop.StubObject;
-
 import java.io.Serializable;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.mop.StubObject;
 
 
 /**

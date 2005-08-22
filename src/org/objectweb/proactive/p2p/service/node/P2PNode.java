@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
-import org.objectweb.proactive.core.node.Node;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -65,10 +65,10 @@ public class P2PNode implements Serializable {
         return this.node;
     }
 
-	/**
-	 * @return the associed node manager.
-	 */
-	public P2PNodeManager getNodeManager() {
-		return this.nodeManager;
-	}
+    /**
+     * @return the associed node manager.
+     */
+    public P2PNodeManager getNodeManager() {
+        return this.nodeManager;
+    }
 }

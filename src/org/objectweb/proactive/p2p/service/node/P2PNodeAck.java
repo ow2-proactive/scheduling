@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /**
- * 
+ *
  * @author Alexandre di Costanzo
  *
  * Created on May 19, 2005

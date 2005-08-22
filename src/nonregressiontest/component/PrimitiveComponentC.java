@@ -1,9 +1,8 @@
 /*
  * Created on Oct 20, 2003
  * author : Matthieu Morel
-  */
+ */
 package nonregressiontest.component;
-
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -17,7 +16,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentC implements I1, BindingController {
-    private final static Logger logger = ProActiveLogger.getLogger("nonregressiontests.components"); 
+    private final static Logger logger = ProActiveLogger.getLogger(
+            "nonregressiontests.components");
     public final static String MESSAGE = "-->c";
     public final static String I1_CLIENT_ITF_NAME = "i1-client";
     I1 i1Client;

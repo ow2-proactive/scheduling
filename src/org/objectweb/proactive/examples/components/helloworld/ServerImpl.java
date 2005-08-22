@@ -21,44 +21,43 @@
  * Author: Eric Bruneton
  */
 package org.objectweb.proactive.examples.components.helloworld;
+
 public class ServerImpl implements Service, ServiceAttributes {
+    private String header = "";
+    private int count = 0;
 
-  private String header = "";
-
-  private int count = 0;
-
-  public ServerImpl () {
-      // the following instruction was removed, because ProActive requires empty no-args constructors
-      // otherwise this instruction is executed also at the construction of the stubs
-    // System.err.println("SERVER created");
-  }
-  
-  public void print (final String msg) {
-    new Exception() {
-      public String toString () {
-        return "Server: print method called";
-      }
-    }.printStackTrace();
-    System.err.println("Server: begin printing...");
-    for (int i = 0; i < count; ++i) {
-      System.err.println(header + msg);
+    public ServerImpl() {
+        // the following instruction was removed, because ProActive requires empty no-args constructors
+        // otherwise this instruction is executed also at the construction of the stubs
+        // System.err.println("SERVER created");
     }
-    System.err.println("Server: print done.");
-  }
 
-  public String getHeader () {
-    return header;
-  }
+    public void print(final String msg) {
+        new Exception() {
+                public String toString() {
+                    return "Server: print method called";
+                }
+            }.printStackTrace();
+        System.err.println("Server: begin printing...");
+        for (int i = 0; i < count; ++i) {
+            System.err.println(header + msg);
+        }
+        System.err.println("Server: print done.");
+    }
 
-  public void setHeader (final String header) {
-    this.header = header;
-  }
+    public String getHeader() {
+        return header;
+    }
 
-  public int getCount () {
-    return count;
-  }
+    public void setHeader(final String header) {
+        this.header = header;
+    }
 
-  public void setCount (final int count) {
-    this.count = count;
-  }
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(final int count) {
+        this.count = count;
+    }
 }

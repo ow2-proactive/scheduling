@@ -55,9 +55,8 @@ import org.objectweb.proactive.examples.nbody.common.Rectangle;
  * @since   ProActive 2.2
  */
 public class Start {
-
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    
+
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
@@ -84,8 +83,7 @@ public class Start {
             }
         }
 
-        logger.info("[NBODY] " + totalNbBodies +
-            " Planets are deployed");
+        logger.info("[NBODY] " + totalNbBodies + " Planets are deployed");
 
         // Create a maestro, which will orchestrate the whole simulation, synchronizing the computations of the Domains
         Maestro maestro = null;

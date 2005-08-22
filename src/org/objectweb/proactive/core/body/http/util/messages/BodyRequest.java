@@ -68,21 +68,22 @@ public class BodyRequest extends ReflectRequest implements Serializable {
      * @param parameters The parameters associated with the method
      * @param oaid The unique ID of targeted active object
      */
-    public BodyRequest(String methodName, ArrayList parameters, UniqueID oaid, String url) {
-        super (url);
-        this.methodName = methodName;        
+    public BodyRequest(String methodName, ArrayList parameters, UniqueID oaid,
+        String url) {
+        super(url);
+        this.methodName = methodName;
         this.parameters = parameters;
         this.oaid = oaid;
     }
-     
-    public String getMethodName () {
+
+    public String getMethodName() {
         return this.methodName;
     }
 
-    public Object getReturnedObject() throws Exception    {
+    public Object getReturnedObject() throws Exception {
         if (this.returnedObject instanceof Exception) {
-//            System.out.println("J'ai choppe une exception ( " + ClassServer.getUrl() + ")");
-            throw (Exception)this.returnedObject;
+            //            System.out.println("J'ai choppe une exception ( " + ClassServer.getUrl() + ")");
+            throw (Exception) this.returnedObject;
         }
         return this.returnedObject;
     }
@@ -94,35 +95,34 @@ public class BodyRequest extends ReflectRequest implements Serializable {
      * @throws IllegalAccessException
      * @throws IllegalArgumentException
      */
-    public Object processMessage()  throws Exception  {
+    public Object processMessage() throws Exception {
         Object result = null;
 
-            if (body == null) {
-                this.body = HttpUtils.getBody(this.oaid);
-            }            
-            //System.out.println("invocation de la methode");
-            Method m = getProActiveRuntimeMethod(methodName, parameters,
-                    hMapMethods.get(methodName));
-            
-            try {
-                
-                result = m.invoke(body, parameters.toArray());
-            } catch (IllegalArgumentException e) {
-//               e.printStackTrace();
-                throw e;
-            } catch (IllegalAccessException e) {
-//                e.printStackTrace();
-                throw e;
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block 
-//                e.printStackTrace();
-                
-                throw new SecurityNotAvailableException(e.getCause());
-            } catch (Exception e) {
-                System.out.println("----------------------- Exception : "  + e.getClass());
-                throw e ;
-            }
+        if (body == null) {
+            this.body = HttpUtils.getBody(this.oaid);
+        }
 
+        //System.out.println("invocation de la methode");
+        Method m = getProActiveRuntimeMethod(methodName, parameters,
+                hMapMethods.get(methodName));
+
+        try {
+            result = m.invoke(body, parameters.toArray());
+        } catch (IllegalArgumentException e) {
+            //               e.printStackTrace();
+            throw e;
+        } catch (IllegalAccessException e) {
+            //                e.printStackTrace();
+            throw e;
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block 
+            //                e.printStackTrace();
+            throw new SecurityNotAvailableException(e.getCause());
+        } catch (Exception e) {
+            System.out.println("----------------------- Exception : " +
+                e.getClass());
+            throw e;
+        }
 
         return result;
     }

@@ -1,9 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
@@ -11,6 +7,10 @@ import java.awt.Font;
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 
 public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer

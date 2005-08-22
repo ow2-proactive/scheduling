@@ -15,11 +15,13 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
  */
 public abstract class AbstractNodeCreationEventListener
     implements NodeCreationEventListener {
-    public AbstractNodeCreationEventListener(VirtualNode vn) throws ProActiveException {
+    public AbstractNodeCreationEventListener(VirtualNode vn)
+        throws ProActiveException {
         if (!vn.isLookup()) {
             ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
-        }else{
-            throw new ProActiveException("Cannot instantiate a listener on a VirtualNodeLookup");
+        } else {
+            throw new ProActiveException(
+                "Cannot instantiate a listener on a VirtualNodeLookup");
         }
     }
 }

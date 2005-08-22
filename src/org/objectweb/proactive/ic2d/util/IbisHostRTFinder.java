@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
-import ibis.rmi.registry.LocateRegistry;
-import ibis.rmi.registry.Registry;
-
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -40,6 +37,9 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.IbisProperties;
+
+import ibis.rmi.registry.LocateRegistry;
+import ibis.rmi.registry.Registry;
 
 
 /**

@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
-
-import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -93,5 +93,4 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
         }
         return null;
     }
-
 }

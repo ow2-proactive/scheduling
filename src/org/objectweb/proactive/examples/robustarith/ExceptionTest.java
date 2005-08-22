@@ -1,8 +1,8 @@
 package org.objectweb.proactive.examples.robustarith;
 
-import org.objectweb.proactive.ProActive;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.ProActive;
 
 
 class DangerousException extends Exception {

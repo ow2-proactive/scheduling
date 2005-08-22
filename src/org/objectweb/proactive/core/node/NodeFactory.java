@@ -112,13 +112,14 @@ public class NodeFactory {
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
                         Integer.toString(
                             new java.util.Random(System.currentTimeMillis()).nextInt()),
-                        false,defaultRuntime.getPolicyServer(), 
-						 "DefaultVN",jobID );
+                        false, defaultRuntime.getPolicyServer(), "DefaultVN",
+                        jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             }
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    UrlBuilder.checkProtocol(System.getProperty("proactive.communication.protocol")), jobID);
+                    UrlBuilder.checkProtocol(System.getProperty(
+                            "proactive.communication.protocol")), jobID);
         }
         return defaultNode;
     }
@@ -146,7 +147,7 @@ public class NodeFactory {
      * @exception NodeException if the node cannot be created
      */
     public static Node createNode(String nodeURL) throws NodeException {
-        return createNode(nodeURL, false,null,null);
+        return createNode(nodeURL, false, null, null);
     }
 
     /**
@@ -164,8 +165,8 @@ public class NodeFactory {
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String url, boolean replacePreviousBinding, PolicyServer ps, String vnname)
-        throws NodeException {
+    public static Node createNode(String url, boolean replacePreviousBinding,
+        PolicyServer ps, String vnname) throws NodeException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
         String jobID = ProActive.getJobId();
@@ -182,7 +183,7 @@ public class NodeFactory {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
             nodeURL = proActiveRuntime.createLocalNode(url,
-                    replacePreviousBinding,ps,vnname, jobID);
+                    replacePreviousBinding, ps, vnname, jobID);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }

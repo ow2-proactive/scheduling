@@ -45,14 +45,13 @@ public class HttpRequest extends HttpMessage implements Serializable {
     private Request request;
     private UniqueID IdBody;
 
-    public HttpRequest(Request request, UniqueID idBody, String url) {        
-        super(url);        
+    public HttpRequest(Request request, UniqueID idBody, String url) {
+        super(url);
         this.request = request;
         this.IdBody = idBody;
     }
 
-    public int getReturnedObject()  {
-      
+    public int getReturnedObject() {
         if (this.returnedObject != null) {
             return ((Integer) this.returnedObject).intValue();
         }
@@ -69,14 +68,14 @@ public class HttpRequest extends HttpMessage implements Serializable {
                 Body body = HttpUtils.getBody(IdBody);
 
                 //TODO 
-                        	if (body == null) {
-                     		   try {
-                     			Thread.sleep(1000);
-                     			body = HttpUtils.getBody(IdBody);
-                     		} catch (InterruptedException e1) {
-                     			e1.printStackTrace();
-                     		}  
-                     	}
+                if (body == null) {
+                    try {
+                        Thread.sleep(1000);
+                        body = HttpUtils.getBody(IdBody);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                }
                 return new Integer(body.receiveRequest(this.request));
             } catch (IOException e) {
                 e.printStackTrace();

@@ -46,10 +46,10 @@ import testsuite.test.FunctionalTest;
 public class Test extends FunctionalTest {
     private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/rmilookup/OneVM.xml")
-                                                                       .getPath();
+                                                              .getPath();
     private static String LOOK_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/rmilookup/LookupRMI.xml")
-                                                                      .getPath();
+                                                             .getPath();
     Node node;
     ProActiveDescriptor pad;
     ProActiveDescriptor pad1;
@@ -88,7 +88,7 @@ public class Test extends FunctionalTest {
     public boolean postConditions() throws Exception {
         return node.getProActiveRuntime().getVMInformation().getName().equals("PA_JVM1");
     }
-    
+
     public static void main(String[] args) {
         Test test = new Test();
 

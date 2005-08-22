@@ -28,59 +28,55 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.loadbalancing;
 
 import java.io.*;
+
 
 /**
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
 public class LinuxCPURanking implements CPURanking {
-
-	private double ranking=1;
+    private double ranking = 1;
 
     /**
      * This method returns if the machine ranking
      */
-
-	public double getRanking() {
-		return ranking;
-	}
+    public double getRanking() {
+        return ranking;
+    }
 
     /**
      * This method returns sets the machine ranking, in our implementation is the CPU clock
      */
+    public LinuxCPURanking() {
+        BufferedReader br;
+        String line = null;
+        try {
+            br = new BufferedReader(new FileReader("/proc/cpuinfo"));
 
-	public LinuxCPURanking() {
-		BufferedReader br;
-		String line=null;
-		try {
-			br = new BufferedReader(new FileReader("/proc/cpuinfo"));
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("cpu MHz")) {
+                    String[] splited = line.split(":");
+                    double cpuClock = Double.parseDouble(splited[1]); // obtaining the cpu clock
+                    ranking = Math.log(cpuClock) / Math.log(10);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-			while ((line = br.readLine()) != null) {
-				if (line.startsWith("cpu MHz")) {
-						String splited[] = line.split(":");
-						double cpuClock = Double.parseDouble(splited[1]);   // obtaining the cpu clock
-						ranking = Math.log(cpuClock)/Math.log(10);
-						}
-				}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (NumberFormatException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    public void setRanking(double x) {
+        ranking = x;
+    }
 
-	public void setRanking(double x) {
-		ranking =x;
-	}
-	
-	public void addToRanking(double x) {
-		ranking += x;
-	}
-
+    public void addToRanking(double x) {
+        ranking += x;
+    }
 }

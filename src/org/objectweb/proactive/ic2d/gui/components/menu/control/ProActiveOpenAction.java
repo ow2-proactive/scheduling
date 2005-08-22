@@ -30,21 +30,19 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.menu.control;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 import org.objectweb.fractal.gui.UserData;
 import org.objectweb.fractal.gui.menu.control.OpenAction;
 import org.objectweb.fractal.gui.menu.control.SimpleFileFilter;
 import org.objectweb.fractal.gui.model.Component;
 import org.objectweb.fractal.swing.WaitGlassPane;
-
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.ic2d.gui.components.util.Verifier;
-
-import java.awt.event.ActionEvent;
-
-import java.io.File;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 
 
 /**

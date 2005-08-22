@@ -14,7 +14,7 @@ public class MonitoredJVM extends BasicMonitoredObject {
     static protected Map prettyNames = new HashMap();
     private int depth;
     private int port;
-    
+
     protected int incLastID() {
         return ++lastID;
     }
@@ -24,7 +24,7 @@ public class MonitoredJVM extends BasicMonitoredObject {
     }
 
     private void extractPort() {
-    	Pattern p = Pattern.compile("(.*//)?([^:]+):?([0-9]*)/(.+)");
+        Pattern p = Pattern.compile("(.*//)?([^:]+):?([0-9]*)/(.+)");
         Matcher m = p.matcher(fullname);
         if (!m.matches()) {
             port = Registry.REGISTRY_PORT;
@@ -32,14 +32,14 @@ public class MonitoredJVM extends BasicMonitoredObject {
 
         String portStr = m.group(3);
         try {
-        	port = Integer.parseInt(portStr);
+            port = Integer.parseInt(portStr);
         } catch (Exception e) {
-        	port = Registry.REGISTRY_PORT;
+            port = Registry.REGISTRY_PORT;
         }
     }
-    
+
     public MonitoredJVM(String url, int depth) {
-        super(JVM, "JVM",  url);
+        super(JVM, "JVM", url);
         this.depth = depth;
         //extractPort();
         this.port = UrlBuilder.getPortFromUrl(url);
@@ -55,8 +55,8 @@ public class MonitoredJVM extends BasicMonitoredObject {
     public int getDepth() {
         return depth;
     }
-    
+
     public int getPort() {
-    	return port;
+        return port;
     }
 }

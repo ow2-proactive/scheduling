@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.core.body.ft.util.faultdetection;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.util.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
-
-import java.rmi.Remote;
-import java.rmi.RemoteException;
 
 
 /**
@@ -47,20 +47,19 @@ import java.rmi.RemoteException;
  * @since ProActive 2.2
  */
 public interface FaultDetector extends Remote {
-    
-    
+
     /**
-     * This value is return by an alive and reachable active object that receive a 
+     * This value is return by an alive and reachable active object that receive a
      * heartbeat message.
      */
     public static int OK = 0;
 
     /**
-     * This value is return by a dead but reachable active object that receive a 
+     * This value is return by a dead but reachable active object that receive a
      * heartbeat message.
      */
     public static int IS_DEAD = 1;
-    
+
     /**
      * The fault detector test the reachability of the active object body by sending
      * a heartbeat message to body.

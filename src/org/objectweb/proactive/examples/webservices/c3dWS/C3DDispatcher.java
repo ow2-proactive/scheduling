@@ -30,20 +30,6 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
-
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
@@ -63,19 +49,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Stack;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
 
 
 /**
@@ -94,7 +90,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      * The array of random colors
      */
     private static Vec[] color = {
-            
             //    new Vec(0,0,0), // Black 
             new Vec(1, 1, 1), // White
             new Vec(0, 0, 0.5), // Navy
@@ -256,9 +251,9 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     }
 
     /**
-    *
-    * @param url
-    */
+     *
+     * @param url
+     */
     public void setUrl(String url) {
         this.url = url;
     }
@@ -397,6 +392,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
         if (keys != null) {
             for (int e = 0; e < keys.length; e++) {
+
                 /* Assigns one initial interval to each engine */
                 if (!int_stack.empty()) {
                     interval = (Interval) int_stack.pop();
@@ -482,6 +478,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         /* Delivers the new pixels to all user frames */
         for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
             User user = (User) e.nextElement();
+
             //System.out.println("classe user = " + user.getClass().getName());
             user.setPixels(newpix, interval);
         }
@@ -686,15 +683,14 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         rotateSceneZ(-Math.PI / 4);
     }
 
- 
     /*
-        public void changeColorAll() {
-            logger.info("changeColorAll()");
-            for (Enumeration e = h_users.elements(); e.hasMoreElements();)
-                ((User) e.nextElement()).getObject().getUserFrame().getB_left()
-                 .setBackground(Color.yellow);
-        }
-    */
+       public void changeColorAll() {
+           logger.info("changeColorAll()");
+           for (Enumeration e = h_users.elements(); e.hasMoreElements();)
+               ((User) e.nextElement()).getObject().getUserFrame().getB_left()
+                .setBackground(Color.yellow);
+       }
+     */
 
     /**
      * ProActive object life routine
@@ -711,6 +707,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
         /* Loops over lifetime */
         while (body.isActive()) {
+
             /* Waits on any method call */
             Request r = requestQueue.blockingRemoveOldest();
             String methodName = r.getMethodName();
@@ -994,7 +991,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      * @param name
      * @return
      */
-    public int  registerWSUser(String name, String url) {
+    public int registerWSUser(String name, String url) {
+
         /* Adds this User to the list */
         User newUser = new WSUser(name, url);
         h_users.put(new Integer(i_lastuser), newUser);
@@ -1027,13 +1025,14 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             /* Creates the intervals, starts the calculation with initial  intervals */
             render();
         } else {
+
             /* Initializes the image of the new-coming consumer */
             Interval inter = new Interval(0, width, height, 0, height, 1);
             render();
             newUser.setPixels(pixels, inter);
         }
 
-      return   i_lastuser++;
+        return i_lastuser++;
     }
 
     /**
@@ -1046,8 +1045,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         ProActiveConfiguration.load();
 
         String hostWS = "localhost:8080";
-        //System.out.println("host = " + hostWS);
 
+        //System.out.println("host = " + hostWS);
         if (argv.length == 2) {
             hostWS = argv[1];
         }
@@ -1085,8 +1084,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             String[] methods = {
                     "rotateRight", "getPicture", "rotateLeft", "rotateUp",
                     "rotateDown", "getPixels", "getPixelMax", "waitForImage",
-                    "spinClock", "spinUnclock", "addRandomSphere", "resetSceneWS",
-                    "registerWSUser", "unregisterWSUser"
+                    "spinClock", "spinUnclock", "addRandomSphere",
+                    "resetSceneWS", "registerWSUser", "unregisterWSUser"
                 };
 
             String urn = "C3DDispatcher";
@@ -1109,7 +1108,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         x = (Math.random() - 0.5) * 20.0;
         y = (Math.random() - 0.5) * 20.0;
         z = (Math.random() - 0.5) * 20.0;
-        r = (Math.random()) * 10.0; 
+        r = (Math.random()) * 10.0;
 
         Sphere sphere = new Sphere(new Vec(x, y, z), r);
 
@@ -1202,6 +1201,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
          * Does some initialization when the first consumer registers
          */
         if (h_users.size() == 1) {
+
             /* Sets the scene to the consumers wish */
             scene = newscene;
 
@@ -1238,6 +1238,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             /* Creates the intervals, starts the calculation with initial  intervals */
             render();
         } else {
+
             /* Initializes the image of the new-coming consumer */
             Interval inter = new Interval(0, width, height, 0, height, 1);
             c3duser.setPixels(pixels, inter);
@@ -1384,6 +1385,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     }
 
     public void unregisterWSUser(String name, String urlUser) {
+
         /* search the user */
         User removedUser;
         int number = 0;
@@ -1399,7 +1401,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     removedUser = user;
                 }
 
-               // System.out.println("Unregister WSUser : " + name + "--" +
+                // System.out.println("Unregister WSUser : " + name + "--" +
                 //    urlUser);
                 //System.out.println("User = " + number);
                 unregisterConsumer(number);
@@ -1680,7 +1682,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             try {
                 //				org.objectweb.proactive.ProActive.unregisterVirtualNode(
                 //					vn);
-               // System.out.println("undeploy : " + urn + " at : " + url);
+                // System.out.println("undeploy : " + urn + " at : " + url);
                 ProActive.unExposeAsWebService(urn, url);
                 proActiveDescriptor.killall(false);
             } catch (Exception e) {
@@ -1845,7 +1847,6 @@ class Election extends Thread {
             c3ddispatcher.rotateUp(0);
 
             break;
-
         case DOWN:
             c3ddispatcher.showMessageAll("   The scene will be rotated down.");
             Election.running = false;
@@ -1853,7 +1854,6 @@ class Election extends Thread {
             c3ddispatcher.rotateDown(0);
 
             break;
-
         case LEFT:
             c3ddispatcher.showMessageAll("   The scene will be rotated left.");
             Election.running = false;
@@ -1861,7 +1861,6 @@ class Election extends Thread {
             c3ddispatcher.rotateLeft(0);
 
             break;
-
         case RIGHT:
             c3ddispatcher.showMessageAll("   The scene will be rotated right.");
             Election.running = false;
@@ -1869,7 +1868,6 @@ class Election extends Thread {
             c3ddispatcher.rotateRight(0);
 
             break;
-
         case CLOCKWISE:
             c3ddispatcher.showMessageAll("  The scene will be spinned right");
             Election.running = false;
@@ -1877,7 +1875,6 @@ class Election extends Thread {
             c3ddispatcher.spinClock(0);
 
             break;
-
         case UNCLOCKWISE:
             c3ddispatcher.showMessageAll("  The scene will be spinned left");
             Election.running = false;
@@ -1885,7 +1882,6 @@ class Election extends Thread {
             c3ddispatcher.spinUnclock(0);
 
             break;
-
         default:
             c3ddispatcher.showMessageAll(
                 "   No consensus found, vote again please!");
@@ -1916,37 +1912,24 @@ class Election extends Thread {
         switch (wish.intValue()) {
         case UP:
             ret = "up";
-
             break;
-
         case DOWN:
             ret = "down";
-
             break;
-
         case LEFT:
             ret = "left";
-
             break;
-
         case RIGHT:
             ret = "right";
-
             break;
-
         case CLOCKWISE:
             ret = "clockwise";
-
             break;
-
         case UNCLOCKWISE:
             ret = "unclockwise";
-
             break;
-
         default:
             ret = "error";
-
             break;
         }
 

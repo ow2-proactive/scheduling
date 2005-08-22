@@ -190,12 +190,13 @@ public class ComponentRequestImpl extends RequestImpl
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
             List inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
-            .getInputInterceptors();
+                                      .getInputInterceptors();
             Iterator it = inputInterceptors.iterator();
             while (it.hasNext()) {
                 try {
-                    InputInterceptor interceptor = (InputInterceptor)it.next();
-                    interceptor.beforeInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
+                    InputInterceptor interceptor = (InputInterceptor) it.next();
+                    interceptor.beforeInputMethodInvocation(methodCall.getReifiedMethod(),
+                        methodCall.getParameters());
                     //((InputInterceptor) it.next()).beforeInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
                 } catch (NullPointerException e) {
                     e.printStackTrace();
@@ -207,21 +208,22 @@ public class ComponentRequestImpl extends RequestImpl
     // intercept and delegate for postprocessing from the inputInterceptors 
     private void interceptAfterInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-        if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
-            List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
-                                 .getInputInterceptors();
+            if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
+                List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
+                                     .getInputInterceptors();
 
-            // use inputInterceptors in reverse order after invocation
-            ListIterator it = interceptors.listIterator();
+                // use inputInterceptors in reverse order after invocation
+                ListIterator it = interceptors.listIterator();
 
-            // go to the end of the list first
-            while (it.hasNext()) {
-                it.next();
+                // go to the end of the list first
+                while (it.hasNext()) {
+                    it.next();
+                }
+                while (it.hasPrevious()) {
+                    ((InputInterceptor) it.previous()).afterInputMethodInvocation(methodCall.getReifiedMethod(),
+                        methodCall.getParameters());
+                }
             }
-            while (it.hasPrevious()) {
-                ((InputInterceptor) it.previous()).afterInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
-            }
-        }
         }
     }
 

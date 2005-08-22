@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
@@ -42,15 +46,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-
 import org.xml.sax.SAXException;
-
-import java.io.IOException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 
 /**

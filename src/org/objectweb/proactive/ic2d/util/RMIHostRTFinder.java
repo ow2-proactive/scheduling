@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
-
 public class RMIHostRTFinder implements HostRTFinder {
     static Logger log4jlogger = Logger.getLogger(RMIHostRTFinder.class.getName());
     private static final int DEFAULT_RMI_PORT = 1099;

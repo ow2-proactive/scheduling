@@ -2,8 +2,6 @@ package nonregressiontest.component.interceptor;
 
 import java.lang.reflect.Method;
 
-import nonregressiontest.component.controller.DummyController;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -12,6 +10,8 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+
+import nonregressiontest.component.controller.DummyController;
 
 
 /**
@@ -22,6 +22,7 @@ public class InputInterceptor1Impl extends AbstractProActiveController
     implements InputInterceptor {
     private int beforeInvocationCounter = 0;
     private int afterInvocationCounter = 0;
+
     /**
      * @param owner
      */

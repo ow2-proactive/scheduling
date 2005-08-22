@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.core.body.http.util;
 
-import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 
 
 /**
@@ -43,11 +43,11 @@ import java.io.Serializable;
 public abstract class HttpMessage implements Serializable {
     protected Object returnedObject;
     private String url;
-//    private int port;
 
+    //    private int port;
     public HttpMessage(String url) {
         this.url = url;
-//        this.port = port;
+        //        this.port = port;
     }
 
     /**
@@ -62,7 +62,7 @@ public abstract class HttpMessage implements Serializable {
      * @throws HTTPRemoteException
      */
     public final void send() throws HTTPRemoteException {
-        HttpMessageSender hms = new HttpMessageSender(this.url);     
+        HttpMessageSender hms = new HttpMessageSender(this.url);
         this.returnedObject = hms.sendMessage(this);
     }
 }

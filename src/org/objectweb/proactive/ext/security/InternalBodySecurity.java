@@ -30,18 +30,16 @@
  */
 package org.objectweb.proactive.ext.security;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.*;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 public class InternalBodySecurity {

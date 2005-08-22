@@ -5,15 +5,15 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Vector;
 
-import modelisation.mixed.Bench;
-import modelisation.util.NodeControler;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+
+import modelisation.mixed.Bench;
+import modelisation.util.NodeControler;
 
 
 public class ModelisationBench {
@@ -31,7 +31,7 @@ public class ModelisationBench {
     public static void stop() {
         System.out.println("Bench: stoping......");
         ModelisationBench.killAll();
-		System.out.println("Bench: stoping...... done");
+        System.out.println("Bench: stoping...... done");
     }
 
     public static Node[] readDestinationFile(String fileName, String extension) {

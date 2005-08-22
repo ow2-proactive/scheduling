@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.group;
 
+import java.util.Vector;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
@@ -8,8 +10,6 @@ import org.objectweb.proactive.core.component.representative.ProActiveComponentR
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
-
-import java.util.Vector;
 
 
 /**
@@ -49,14 +49,13 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                         // a call on the Component interface
                         target = object;
                     } else {
-                        target = ((ProActiveComponentRepresentative)object).getFcInterface(mc.getComponentInterfaceName());
+                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
                     }
                     this.proxyGroup.addToListOfResult(memberListOfResultGroup,
                         this.mc.execute(target), this.index);
                 } else if (object instanceof ProActiveInterface) {
                     this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                            this.mc.execute(object),
-                            this.index);
+                        this.mc.execute(object), this.index);
                 } else {
                     Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
                     if (lastProxy instanceof UniversalBodyProxy) {

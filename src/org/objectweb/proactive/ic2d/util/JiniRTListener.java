@@ -33,6 +33,12 @@ package org.objectweb.proactive.ic2d.util;
 import java.rmi.ConnectException;
 import java.rmi.RMISecurityManager;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
 import net.jini.core.lookup.ServiceRegistrar;
@@ -40,12 +46,6 @@ import net.jini.core.lookup.ServiceTemplate;
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
-import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
 public class JiniRTListener implements DiscoveryListener {
@@ -174,13 +174,11 @@ public class JiniRTListener implements DiscoveryListener {
                 } else {
                     log4jlogger.error("JiniRTListener: No Service");
                 }
-            }catch (ConnectException e) {
-              
+            } catch (ConnectException e) {
                 //System.err.println("JiniNodeListener RemoteException ");
                 continue;
                 //e.printStackTrace();
-            }
-             catch (java.rmi.RemoteException e) {
+            } catch (java.rmi.RemoteException e) {
                 //logger.log(e);
                 //System.err.println("JiniNodeListener RemoteException ");
                 //e.printStackTrace();
@@ -188,7 +186,7 @@ public class JiniRTListener implements DiscoveryListener {
                 //e.printStackTrace();
             } catch (ProActiveException e) {
                 //logger.log(e);
-               //e.printStackTrace();
+                //e.printStackTrace();
                 continue;
             }
         }

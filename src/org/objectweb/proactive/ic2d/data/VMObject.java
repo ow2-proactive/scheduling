@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.data;
 
-import org.apache.log4j.Logger;
+import java.rmi.dgc.VMID;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -47,8 +48,6 @@ import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.spy.Spy;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
-
-import java.rmi.dgc.VMID;
 
 
 /**
@@ -70,7 +69,8 @@ public class VMObject extends AbstractDataObject {
         //System.out.println("current host: "+currentHost);
         try {
             // TODO add security here
-            SPY_LISTENER_NODE = NodeFactory.createNode(UrlBuilder.buildUrlFromProperties(currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
+            SPY_LISTENER_NODE = NodeFactory.createNode(UrlBuilder.buildUrlFromProperties(
+                        currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
         } catch (NodeException e) {
             SPY_LISTENER_NODE = null;
         }
@@ -82,6 +82,7 @@ public class VMObject extends AbstractDataObject {
     protected java.util.HashMap objectNodeMap;
     protected SpyListenerImpl activeSpyListener;
     protected VMObjectListener listener;
+
     //this node will be used to kill the vm
     protected Node baseNode;
 
@@ -241,18 +242,18 @@ public class VMObject extends AbstractDataObject {
     public void destroyObject() {
         getTypedParent().removeVMObject(vmid);
     }
-    
-    public void killVM(){
+
+    public void killVM() {
         ProActiveRuntime part = null;
         try {
             part = baseNode.getProActiveRuntime();
             part.killRT(false);
         } catch (Exception e) {
             controller.log(" Virtual Machine " +
-                    part.getVMInformation().getVMID() + " on host " +
-                    UrlBuilder.getHostNameorIP(
-                        part.getVMInformation().getInetAddress()) +
-                    " terminated!!!");
+                part.getVMInformation().getVMID() + " on host " +
+                UrlBuilder.getHostNameorIP(part.getVMInformation()
+                                               .getInetAddress()) +
+                " terminated!!!");
         }
         getTypedParent().removeVMObject(vmid);
     }

@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.descriptor.services;
 
-import org.apache.log4j.Logger;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
@@ -47,8 +48,6 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.util.Vector;
 
 
 /**

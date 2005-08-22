@@ -90,7 +90,7 @@ public class A implements java.io.Serializable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         return a;
     }
 

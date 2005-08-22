@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive.core.component.asmgen;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Type;
@@ -41,11 +47,6 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.log.Loggers;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
 
 
 /**
@@ -64,14 +65,14 @@ import java.util.Map;
  * <p>
  * Here is an example of the generated method for reifying the bindFc method of
  * the BindingController interface
- * 
+ *
  * <pre>
  * public void bindFc(String s, Object obj) {
  *     myProxy.reify(MethodCall.getComponentMethodCall(methods[3], new Object[] {
  *             s, obj }, interfaceName, false));
  * }
  * </pre>
- * 
+ *
  * where <code> methods[3]  </code> corresponds to the <code> Method  </code>
  * object that matches <code> bindFc  </code>, s and <code> obj  </code> are the
  * parameters of the invocation, <code> interfaceName  </code> is added
@@ -82,23 +83,23 @@ import java.util.Map;
  * <p>
  * Here is an example of the generated method for reifying a foo metho of a
  * functional interface :
- * 
+ *
  * <pre>
  * public Object foo(Object parameter) {
  *     return myProxy.reify(MethodCall.getComponentMethodCall(methods[0],
  *             new Object[] { parameter }, interfaceName, true));
  * }
- * 
- * 
+ *
+ *
  * </pre>
- * 
+ *
  * where <code> methods[0]  </code> corresponds to the <code> Method  </code>
  * object that matches the <code> foo  </code> method, and
  * <code> parameter  </code> is the parameter of the invocation.
  * <code> interfaceName  </code> is added automatically, here it is for instance
  * "myFunctionalInterface". The last argument is <code> true  </code>, which
  * significates that the invocation is a functional one.
- * 
+ *
  * @author Matthieu Morel
  */
 public class RepresentativeInterfaceClassGenerator
@@ -115,9 +116,9 @@ public class RepresentativeInterfaceClassGenerator
 
     // this boolean for deciding of a possible indirection for the functionnal calls
     protected boolean isPrimitive = false;
-//    private String fcInterfaceName = null;
-//    private String controllerInterfaceName = null;
 
+    //    private String fcInterfaceName = null;
+    //    private String controllerInterfaceName = null;
     public RepresentativeInterfaceClassGenerator() {
         // Obtains the object that represents the type we want to create
         // a wrapper class for. This call may fail with a ClassNotFoundException
@@ -154,11 +155,11 @@ public class RepresentativeInterfaceClassGenerator
     }
 
     protected ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+        Component owner, InterfaceType interfaceType, boolean isInternal,
+        boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
             //this.fcInterfaceName = fcInterfaceName;
-
             //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
             //                                                    .equals(ComponentParameters.PRIMITIVE);
             interfacesToImplement = new ArrayList();
@@ -201,23 +202,22 @@ public class RepresentativeInterfaceClassGenerator
                 }
 
                 //                // Next few lines for debugging only
-//                try {
-//                    java.io.File file = new java.io.File("generated/" +
-//                            stubClassFullName + ".class");
-//
-//                    if (Logger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION).isDebugEnabled()) {
-//                        logger.debug("writing down the generated component representative class : " + file.getAbsolutePath());
-//                    }
-//
-//                    java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-//                    fos.write(bytes);
-//                    fos.close();
-//                } catch (Exception e) {
-//                    // e.printStackTrace();
-//                    logger.info(
-//                        "if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-//                }
-
+                //                try {
+                //                    java.io.File file = new java.io.File("generated/" +
+                //                            stubClassFullName + ".class");
+                //
+                //                    if (Logger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION).isDebugEnabled()) {
+                //                        logger.debug("writing down the generated component representative class : " + file.getAbsolutePath());
+                //                    }
+                //
+                //                    java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+                //                    fos.write(bytes);
+                //                    fos.close();
+                //                } catch (Exception e) {
+                //                    // e.printStackTrace();
+                //                    logger.info(
+                //                        "if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+                //                }
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);
             }
@@ -242,7 +242,8 @@ public class RepresentativeInterfaceClassGenerator
         }
     }
 
-    protected CodeVisitor createMethod(int methodIndex, Method m, boolean isFunctional) {
+    protected CodeVisitor createMethod(int methodIndex, Method m,
+        boolean isFunctional) {
         CodeVisitor cv = createMethodGenerator(m);
 
         // Pushes on the stack the reference to the proxy object
@@ -329,20 +330,18 @@ public class RepresentativeInterfaceClassGenerator
 
         // So now we have the Method object and the array of objects on the stack,
         // Pushes on the stack the reference to the interface name
-        
-            cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'),
-             INTERFACE_NAME_FIELD_NAME, INTERFACE_NAME_TYPE);
-            if (isFunctional) {
-                cv.visitInsn(ICONST_1);
-            } else {
-                cv.visitInsn(ICONST_0);
-            }
-            cv.visitMethodInsn(INVOKESTATIC,
-                    "org/objectweb/proactive/core/mop/MethodCall",
-                    "getComponentMethodCall",
-                    "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE +
-                    INTERFACE_NAME_TYPE + BOOLEAN_TYPE +")" + METHODCALL_TYPE);
-            
+        cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'),
+            INTERFACE_NAME_FIELD_NAME, INTERFACE_NAME_TYPE);
+        if (isFunctional) {
+            cv.visitInsn(ICONST_1);
+        } else {
+            cv.visitInsn(ICONST_0);
+        }
+        cv.visitMethodInsn(INVOKESTATIC,
+            "org/objectweb/proactive/core/mop/MethodCall",
+            "getComponentMethodCall",
+            "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE + INTERFACE_NAME_TYPE +
+            BOOLEAN_TYPE + ")" + METHODCALL_TYPE);
 
         //        }
         // Now, call 'reify' on the proxy object
@@ -371,7 +370,8 @@ public class RepresentativeInterfaceClassGenerator
             PROXY_TYPE, null, null);
     }
 
-    protected void createStaticVariables(boolean functionalInterface, String interfaceName) {
+    protected void createStaticVariables(boolean functionalInterface,
+        String interfaceName) {
         // Creates fields that contains the array of Method objects
         // that represent the reified methods of this class
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods",
@@ -379,9 +379,7 @@ public class RepresentativeInterfaceClassGenerator
 
         // creates and set the field that points to the interface name
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC,
-            INTERFACE_NAME_FIELD_NAME,
-            INTERFACE_NAME_TYPE, interfaceName, null);
-        
+            INTERFACE_NAME_FIELD_NAME, INTERFACE_NAME_TYPE, interfaceName, null);
     }
 
     protected void createStaticInitializer() throws ClassNotFoundException {

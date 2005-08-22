@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.cic;
 
-import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.request.Request;
-
 import java.util.Iterator;
 import java.util.Vector;
+
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.request.Request;
 
 
 /**

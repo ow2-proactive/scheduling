@@ -4,14 +4,7 @@
  */
 package nonregressiontest.component.descriptor.fractaladl;
 
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentA;
-import nonregressiontest.component.PrimitiveComponentB;
-
 import org.objectweb.fractal.api.Component;
-
 
 //import org.objectweb.fractal.adl.Registry;
 import org.objectweb.proactive.core.component.adl.Launcher;
@@ -19,6 +12,11 @@ import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentA;
+import nonregressiontest.component.PrimitiveComponentB;
 
 
 /**
@@ -82,17 +80,16 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-//        		System.out.println("\nMESSAGE IS : ");
-//        		System.out.println("-------------------------------------------------");
-//        		message.printToStream(System.out);
-//        		System.out.println("-------------------------------------------------");
+        //        		System.out.println("\nMESSAGE IS : ");
+        //        		System.out.println("-------------------------------------------------");
+        //        		message.printToStream(System.out);
+        //        		System.out.println("-------------------------------------------------");
         StringBuffer resulting_msg = new StringBuffer();
         int nb_messages = append(resulting_msg, message);
 
         //System.out.println("*** received " + nb_messages + "  : " +
         //    resulting_msg.toString());
         //System.out.println("***" + resulting_msg.toString());
-
         // this --> primitiveC --> primitiveA --> primitiveB--> primitiveA --> primitiveC --> this  (message goes through parallel and composite components)
         String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE +
             PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +

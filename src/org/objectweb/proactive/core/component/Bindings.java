@@ -30,17 +30,15 @@
  */
 package org.objectweb.proactive.core.component;
 
-import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.type.InterfaceType;
-
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 
 
 /**
@@ -54,7 +52,7 @@ import java.util.Map;
  * serverComponents.serverInterface (in the case of a parallel component,
  * requests on a server port are forwarded to the inner components)</li>
  * </ul>
- * 
+ *
  * @author Matthieu Morel
  */
 public class Bindings implements Serializable {
@@ -134,7 +132,8 @@ public class Bindings implements Serializable {
      * @return true if binding exists
      */
     public boolean containsBindingOn(String clientItfName) {
-        return (normalBindings.containsKey(clientItfName) || exportBindings.containsKey(clientItfName));
+        return (normalBindings.containsKey(clientItfName) ||
+        exportBindings.containsKey(clientItfName));
     }
 
     //	/**

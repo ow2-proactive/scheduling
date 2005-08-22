@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.data;
 
+import java.util.Iterator;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -40,8 +42,6 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.util.HostRTFinder;
-
-import java.util.Iterator;
 
 
 /**

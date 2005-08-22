@@ -15,7 +15,7 @@ public class Test {
             VirtualNode dispatcher = pad.getVirtualNode("Node1"); //------------- Returns the VirtualNode Dispatcher described in the xml file as a java object
             dispatcher.activate(); // ----------------- Activates the VirtualNode
             Node node = dispatcher.getNode(); //----------------Returns the first node available among nodes mapped to the VirtualNode
-        System.out.println(pad.getVirtualNodeMappingSize());
+            System.out.println(pad.getVirtualNodeMappingSize());
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

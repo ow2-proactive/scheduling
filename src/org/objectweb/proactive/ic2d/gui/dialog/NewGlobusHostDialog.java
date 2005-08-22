@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.gui.dialog;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -41,7 +39,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import java.net.InetAddress;
 
 import javax.swing.JButton;
@@ -49,6 +46,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 public class NewGlobusHostDialog extends JDialog implements ActionListener {

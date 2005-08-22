@@ -30,15 +30,15 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import java.io.Serializable;
 
 
 /**
@@ -48,8 +48,9 @@ import java.io.Serializable;
  * @author Matthieu Morel
  *
  */
-public class ProActiveComponentParametersController extends AbstractProActiveController
-    implements Serializable, ComponentParametersController {
+public class ProActiveComponentParametersController
+    extends AbstractProActiveController implements Serializable,
+        ComponentParametersController {
     private ComponentParameters componentParameters;
 
     /**

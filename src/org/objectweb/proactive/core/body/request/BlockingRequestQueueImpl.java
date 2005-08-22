@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import org.apache.log4j.Logger;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -40,10 +43,6 @@ import org.objectweb.proactive.core.group.spmd.MethodBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 
 
 public class BlockingRequestQueueImpl extends RequestQueueImpl
@@ -140,10 +139,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         RequestFilter requestFilter) {
         return blockingRemove(requestFilter, true, 0);
     }
-    
+
     public synchronized Request blockingRemoveOldest(
-            RequestFilter requestFilter, long timeout) {
-            return blockingRemove(requestFilter, true, timeout);
+        RequestFilter requestFilter, long timeout) {
+        return blockingRemove(requestFilter, true, timeout);
     }
 
     public synchronized Request blockingRemoveOldest(String methodName) {
@@ -158,13 +157,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
     public synchronized Request blockingRemoveOldest(long timeout) {
         return blockingRemove(null, true, timeout);
     }
-    
+
     public synchronized Request blockingRemoveYoungest(
         RequestFilter requestFilter) {
         return blockingRemove(requestFilter, false);
     }
-    
-    public synchronized Request blockingRemoveYoungest(RequestFilter requestFilter, long timeout) {
+
+    public synchronized Request blockingRemoveYoungest(
+        RequestFilter requestFilter, long timeout) {
         return blockingRemove(requestFilter, false, timeout);
     }
 
@@ -200,7 +200,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         return blockingRemove(requestFilter, oldest, 0);
     }
 
-    protected Request blockingRemove(RequestFilter requestFilter, boolean oldest, long timeout) {
+    protected Request blockingRemove(RequestFilter requestFilter,
+        boolean oldest, long timeout) {
         if (oldest && (requestFilter == null)) {
             if (this.spmdManager == null) {
                 this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
@@ -208,12 +209,15 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             return this.barrierBlockingRemoveOldest(timeout);
         }
 
-        long timeStartWaiting=0;
-        if (timeout>0) {
-             timeStartWaiting = System.currentTimeMillis();
+        long timeStartWaiting = 0;
+        if (timeout > 0) {
+            timeStartWaiting = System.currentTimeMillis();
         }
-        Request r = oldest ? ((requestFilter == null)?removeOldest() : removeOldest(requestFilter))
-                           : ((requestFilter==null)?removeYoungest():removeYoungest(requestFilter));
+        Request r = oldest
+            ? ((requestFilter == null) ? removeOldest()
+                                       : removeOldest(requestFilter))
+            : ((requestFilter == null) ? removeYoungest()
+                                       : removeYoungest(requestFilter));
         while ((r == null) && shouldWait) {
             if (hasListeners()) {
                 notifyAllListeners(new RequestQueueEvent(ownerID,
@@ -223,9 +227,13 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
                 this.wait(timeout);
             } catch (InterruptedException e) {
             }
-            if ((timeout ==0 ) || ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
-                r = oldest ? ((requestFilter==null)?removeOldest() :removeOldest(requestFilter))
-                        : ((requestFilter==null)?removeYoungest():removeYoungest(requestFilter));
+            if ((timeout == 0) ||
+                    ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
+                r = oldest
+                    ? ((requestFilter == null) ? removeOldest()
+                                               : removeOldest(requestFilter))
+                    : ((requestFilter == null) ? removeYoungest()
+                                               : removeYoungest(requestFilter));
             }
         }
         return r;
@@ -275,9 +283,9 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * @return the request found in the queue.
      */
     protected Request barrierBlockingRemoveOldest(long timeout) {
-        long timeStartWaiting=0;
-        if (timeout>0) {
-             timeStartWaiting = System.currentTimeMillis();
+        long timeStartWaiting = 0;
+        if (timeout > 0) {
+            timeStartWaiting = System.currentTimeMillis();
         }
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
@@ -293,7 +301,6 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             if ((System.currentTimeMillis() - timeStartWaiting) > timeout) {
                 return removeOldest();
             }
-
         }
         if (specialExecution) {
             specialExecution = false;
@@ -301,7 +308,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         }
         return barrierRemoveOldest();
     }
-    
+
     protected Request barrierRemoveOldest() {
         Request r = (Request) requestQueue.remove(indexOfRequestToServe());
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
@@ -343,8 +350,9 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             while (!isServable && it.hasNext()) {
                 index++;
                 MethodCall mc = ((Request) it.next()).getMethodCall();
+
                 // FT : mc could be an awaited request
-                if (mc==null){
+                if (mc == null) {
                     return -1;
                 }
                 isServable = this.spmdManager.checkExecution(mc.getBarrierTags());

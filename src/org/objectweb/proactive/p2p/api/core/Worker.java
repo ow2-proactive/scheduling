@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.p2p.api.core;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -44,8 +45,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.api.exception.IsAlreadyComputingException;
-
-import java.io.Serializable;
 
 
 /**

@@ -2,14 +2,14 @@
  * Launcher.java
  *
  * Copyright 1997 - 2001 INRIA Project Oasis. All Rights Reserved.
- * 
- * This software is the proprietary information of INRIA Sophia Antipolis.  
- * 2004 route des lucioles, BP 93 , FR-06902 Sophia Antipolis 
+ *
+ * This software is the proprietary information of INRIA Sophia Antipolis.
+ * 2004 route des lucioles, BP 93 , FR-06902 Sophia Antipolis
  * Use is subject to license terms.
- * 
+ *
  * @author  ProActive Team
  * @version ProActive 0.7 (October 2001)
- * 
+ *
  * ===================================================================
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -24,7 +24,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  * ===================================================================
- * 
+ *
  */
 package org.objectweb.proactive.examples.matrix;
 
@@ -35,87 +35,75 @@ import org.objectweb.proactive.core.node.NodeFactory;
 
 
 public class Launcher implements java.io.Serializable {
-	
-		static Logger logger = Logger.getLogger(Launcher.class.getName());
-
+    static Logger logger = Logger.getLogger(Launcher.class.getName());
     Node[] nodesList;
 
-    public Launcher () {}
-  
-    public Launcher (String[] nodesNameList) throws NodeException {
-	nodesList = new Node[nodesNameList.length];
-	for (int i=0; i<nodesNameList.length; i++) {
-	    nodesList[i] = NodeFactory.getNode(nodesNameList[i]);
-	}
+    public Launcher() {
     }
 
+    public Launcher(String[] nodesNameList) throws NodeException {
+        nodesList = new Node[nodesNameList.length];
+        for (int i = 0; i < nodesNameList.length; i++) {
+            nodesList[i] = NodeFactory.getNode(nodesNameList[i]);
+        }
+    }
 
     // MAIN !!!
-    public void start(Matrix m1, Matrix m2, int i) {	
-	// DISTRIBUTED MULTIPLICATION      
+    public void start(Matrix m1, Matrix m2, int i) {
+        // DISTRIBUTED MULTIPLICATION      
+        int matrixSize = m1.getWidth();
 
-	int matrixSize=m1.getWidth();
+        long startTime;
+        long endTime;
 
+        startTime = System.currentTimeMillis();
 
-	long startTime;
- 	long endTime;
-	
-	startTime = System.currentTimeMillis();
+        //System.out.println("Multiplication!!!!! ");
+        Matrix groupResult = multiply(m1, m2 /*group*/);
 
-	//System.out.println("Multiplication!!!!! ");
-	Matrix groupResult =multiply(m1,m2/*group*/);
+        //endTime = System.currentTimeMillis() - startTime;
+        //System.out.println("     Distributed Multiplication : " + endTime + " millisecondes\n");
+        //startTime = System.currentTimeMillis();
+        // RECONSTRUCTION
+        try {
+            Matrix result = reconstruction(groupResult, matrixSize);
+        } catch (Exception e) {
+        }
 
-	//endTime = System.currentTimeMillis() - startTime;
-	//System.out.println("     Distributed Multiplication : " + endTime + " millisecondes\n");
-	
+        endTime = System.currentTimeMillis() - startTime;
+        logger.info("\n       Result (" + i + ") : Total time spent = " +
+            endTime + " millisecondes");
 
-	//startTime = System.currentTimeMillis();
-	 
-	// RECONSTRUCTION
-	try {
-	    Matrix result = reconstruction(groupResult,matrixSize); }
-	catch (Exception e) {}
-	
-
-	endTime = System.currentTimeMillis() - startTime;
-	logger.info("\n       Result (" +i+ ") : Total time spent = " + endTime + " millisecondes");
-
-	//System.out.println(result);
+        //System.out.println(result);
     }
-
 
     public Matrix createMatrix(int size) {
-	Matrix m = new Matrix(size,size);
-	m.initializeWithRandomValues();
-	return m;
+        Matrix m = new Matrix(size, size);
+        m.initializeWithRandomValues();
+        return m;
     }
 
+    public Matrix distribute(Matrix m) {
+        Matrix verticalSubMatrixGroup = null;
+        verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodesList);
 
-    public Matrix distribute (Matrix m) {
-	Matrix verticalSubMatrixGroup = null;
-	verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodesList);
-
-	return verticalSubMatrixGroup;
+        return verticalSubMatrixGroup;
     }
 
-
-    public Matrix multiply (Matrix m, Matrix group) {
-	Matrix ma = group.localMultiplyForGroup(m);
-	return ma;
+    public Matrix multiply(Matrix m, Matrix group) {
+        Matrix ma = group.localMultiplyForGroup(m);
+        return ma;
     }
 
+    public Matrix reconstruction(Matrix group, int size) {
+        Matrix result = null;
 
-    public Matrix reconstruction (Matrix group, int size) {
-	Matrix result = null;
+        result = new Matrix(group, size);
 
-	result = new Matrix(group,size);
-
-	return result;
+        return result;
     }
-    
 
     public String getString(Matrix m) {
-	return m.toString();
+        return m.toString();
     }
-
 }

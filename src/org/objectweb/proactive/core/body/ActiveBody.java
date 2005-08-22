@@ -95,13 +95,13 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         super(c.execute(), nodeURL, activity, factory, jobID);
 
         Object reifiedObject = localBodyStrategy.getReifiedObject();
-        
+
         // when building a component, encapsulate the functional activity
         // TODO_M read some flag before doing this?
         if (getProActiveComponent() != null) {
             activity = new ComponentActivity(activity, reifiedObject);
         }
-        
+
         // InitActive
         if ((activity != null) && activity instanceof InitActive) {
             initActive = (InitActive) activity;
@@ -161,8 +161,8 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
             }
         } catch (Exception e) {
             logger.error("Exception occured in runActivity method of body " +
-                    toString() + ". Now terminating the body");
-           
+                toString() + ". Now terminating the body");
+
             e.printStackTrace();
             terminate();
         } finally {
@@ -170,7 +170,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
             if ((!hasJustMigrated) && (endActive != null)) {
                 endActive.endActivity(this);
             }
-            
+
             if (isActive()) {
                 activityStopped();
             }
@@ -188,8 +188,9 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         if (logger.isDebugEnabled()) {
             logger.debug("Starting Body");
         }
+
         // get the incarnation number if ft is enable
-        String inc = (this.ftmanager!=null)?(""+this.ftmanager):("");
+        String inc = (this.ftmanager != null) ? ("" + this.ftmanager) : ("");
         Thread t = new Thread(this,
                 shortClassName(getName()) + " on " + getNodeURL() + inc);
         t.start();
@@ -232,8 +233,8 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         in.defaultReadObject();
         // FAULT-TOLERANCE: if this is a recovering checkpoint, 
         // activity will be started in ProActiveRuntimeImpl.receiveCheckpoint()
-        if (this.ftmanager!=null){
-            if (!this.ftmanager.isACheckpoint()){
+        if (this.ftmanager != null) {
+            if (!this.ftmanager.isACheckpoint()) {
                 startBody();
             }
         } else {

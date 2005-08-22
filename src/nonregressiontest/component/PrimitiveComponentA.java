@@ -20,7 +20,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * @author Matthieu Morel
  */
-public class PrimitiveComponentA implements I1, BindingController, InitActive, RunActive, EndActive {
+public class PrimitiveComponentA implements I1, BindingController, InitActive,
+    RunActive, EndActive {
     public final static String MESSAGE = "-->a";
     public final static String I2_ITF_NAME = "i2";
     protected static Logger logger = ProActiveLogger.getLogger(
@@ -117,7 +118,7 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
             }
         }
     }
-    
+
     /*
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
@@ -125,8 +126,8 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive, R
         if (logger.isDebugEnabled()) {
             logger.debug("A : starting activity");
         }
-
     }
+
     /*
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */

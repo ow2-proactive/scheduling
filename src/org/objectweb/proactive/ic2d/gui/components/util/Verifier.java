@@ -30,13 +30,13 @@
  */
 package org.objectweb.proactive.ic2d.gui.components.util;
 
-import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
-import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
-
 import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+
+import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
+import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 
 
 /**
@@ -53,7 +53,8 @@ public class Verifier {
             StringBuffer buff = new StringBuffer();
             while (iter.hasNext()) {
                 LinkedVirtualNode lvn = (LinkedVirtualNode) iter.next();
-                buff.append(lvn.getCompleteNameBeforeComposition() + " composed into " +
+                buff.append(lvn.getCompleteNameBeforeComposition() +
+                    " composed into " +
                     lvn.getExportedVirtualNodeNameAfterComposition() + "\n");
             }
             JOptionPane.showMessageDialog(null,

@@ -11,7 +11,7 @@ public class WorldInfo {
     protected int totalHostsNumber;
     protected int currentHostNumber;
     protected String[] hostListAsArray;
-	protected String hostList;
+    protected String hostList;
 
     public WorldInfo() {
     }
@@ -23,8 +23,9 @@ public class WorldInfo {
         tmp = System.getProperty(HOST_NUMBER_PROPERTY);
         currentHostNumber = (tmp == null) ? 0 : Integer.parseInt(tmp);
         tmp = System.getProperty(HOST_LIST_PROPERTY);
-        hostList = (tmp == null) ? new String(): tmp;
-        hostListAsArray = (tmp == null) ? new String[] { "" } : this.stringToArray(tmp);
+        hostList = (tmp == null) ? new String() : tmp;
+        hostListAsArray = (tmp == null) ? new String[] { "" }
+                                        : this.stringToArray(tmp);
     }
 
     public int getTotalHostNumber() {
@@ -36,11 +37,13 @@ public class WorldInfo {
     }
 
     public String getHostList() {
-    	return this.hostList;
+        return this.hostList;
     }
+
     public String[] getHostListAsArray() {
-    	return this.hostListAsArray;
+        return this.hostListAsArray;
     }
+
     /**
      * Divide a string into elements separated by a blank space
      */

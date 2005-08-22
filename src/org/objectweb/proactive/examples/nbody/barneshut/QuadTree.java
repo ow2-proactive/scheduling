@@ -30,12 +30,11 @@
  */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
+import java.io.Serializable;
+import java.util.Vector;
+
 import org.objectweb.proactive.examples.nbody.common.Point2D;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
-
-import java.io.Serializable;
-
-import java.util.Vector;
 
 
 /**

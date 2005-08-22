@@ -33,17 +33,18 @@ package org.objectweb.proactive.core.process.rsh;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 
+
 /**
  * This class contains a list of RSHProcess processes
  * @author ProActiveTeam
  * @version 1.0, 2 mars 2005
  * @since ProActive 2.2
- * 
+ *
  */
 public class RSHProcessList extends AbstractListProcessDecorator {
 
     /**
-     * 
+     *
      */
     public RSHProcessList() {
         super();
@@ -55,5 +56,4 @@ public class RSHProcessList extends AbstractListProcessDecorator {
     protected ExternalProcessDecorator createProcess() {
         return new RSHProcess();
     }
-
 }

@@ -41,34 +41,33 @@ import org.objectweb.proactive.core.body.ft.util.resource.ResourceServer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
+
 /**
- * This class represents the fault-tolerance configuration for a 
+ * This class represents the fault-tolerance configuration for a
  * virtual node, i.e, url of ft servers and ft values such as ttc
  * @version 1.0,  2005/01/20
  * @since   ProActive 2.2
  * @author cdelbe
  */
 public class FaultToleranceService implements UniversalService {
-
-    public static final String FT_SERVICE_NAME = "Fault-Tolerance Service" ;
+    public static final String FT_SERVICE_NAME = "Fault-Tolerance Service";
     public static final String DEFAULT_PARAM_LINE = "-Dproactive.ft=disable";
-    
+
     // logger
     protected static Logger logger = Logger.getLogger(FaultToleranceService.class.getName());
-    
+
     // fault tolerance servers
     private String recoveryProcessURL;
     private String checkpointServerURL;
     private String locationServerURL;
     private String globalServerURL; // priority on the 3 upper values
-    
+
     // fault tolerance values
     private String ttcValue;
-    
+
     // attached ressource server
     private String attachedResourceServer; // null if not registred has a ressource node
-    
-    
+
     public FaultToleranceService() {
         super();
     }
@@ -92,103 +91,119 @@ public class FaultToleranceService implements UniversalService {
      * Build the java properties sequence corresponding to the set values.
      * @return the java properties sequence corresponding to the set values.
      */
-    public String buildParamsLine(){
+    public String buildParamsLine() {
         StringBuffer line = new StringBuffer("-Dproactive.ft=enable");
-        if (this.getGlobalServerURL()!=null){
-            if ( (this.getCheckpointServerURL()!=null) || (this.getLocationServerURL()!=null) || (this.getRecoveryProcessURL()!=null)){
-                logger.warn("A global server is set : other servers are ignored !!");
-            }           
-            line.append(" -Dproactive.ft.server.global=" + this.getGlobalServerURL());         
+        if (this.getGlobalServerURL() != null) {
+            if ((this.getCheckpointServerURL() != null) ||
+                    (this.getLocationServerURL() != null) ||
+                    (this.getRecoveryProcessURL() != null)) {
+                logger.warn(
+                    "A global server is set : other servers are ignored !!");
+            }
+            line.append(" -Dproactive.ft.server.global=" +
+                this.getGlobalServerURL());
         } else {
-            line.append(" -Dproactive.ft.server.checkpoint=" + this.getCheckpointServerURL());
-            line.append(" -Dproactive.ft.server.recovery=" + this.getRecoveryProcessURL());
-            line.append(" -Dproactive.ft.server.location=" + this.getLocationServerURL());
+            line.append(" -Dproactive.ft.server.checkpoint=" +
+                this.getCheckpointServerURL());
+            line.append(" -Dproactive.ft.server.recovery=" +
+                this.getRecoveryProcessURL());
+            line.append(" -Dproactive.ft.server.location=" +
+                this.getLocationServerURL());
         }
-        
-        if (this.getTtcValue()!=null){
+
+        if (this.getTtcValue() != null) {
             line.append(" -Dproactive.ft.ttc=" + this.getTtcValue());
-        } 
-        
-        if (this.getAttachedResourceServer()!=null){
-            line.append(" -Dproactive.ft.server.ressource=" + this.getAttachedResourceServer());
         }
-        
-        if (logger.isDebugEnabled()){
+
+        if (this.getAttachedResourceServer() != null) {
+            line.append(" -Dproactive.ft.server.ressource=" +
+                this.getAttachedResourceServer());
+        }
+
+        if (logger.isDebugEnabled()) {
             logger.debug("FT config is : " + line);
         }
         return line.toString();
     }
-    
-    
-    
+
     /**
      * Register all nodes in the RessourceServer. Do nothing if the ressource server is null.
      * @param nodes array of nodes that must be registered in the ressource server
      * @return true if nodes has been registered, false otherwise.
      */
-    public boolean registerRessources(Node[] nodes){
-        if (this.getAttachedResourceServer()!=null){
+    public boolean registerRessources(Node[] nodes) {
+        if (this.getAttachedResourceServer() != null) {
             try {
-                ResourceServer rs = (ResourceServer)(Naming.lookup(this.getAttachedResourceServer()));
-                for (int i=0;i<nodes.length;i++){
+                ResourceServer rs = (ResourceServer) (Naming.lookup(this.getAttachedResourceServer()));
+                for (int i = 0; i < nodes.length; i++) {
                     rs.addFreeNode(nodes[i]);
                 }
                 return true;
             } catch (MalformedURLException e) {
-                logger.error("**ERROR** RessourceServer unreachable : ressource is not registred." + e);
+                logger.error(
+                    "**ERROR** RessourceServer unreachable : ressource is not registred." +
+                    e);
             } catch (RemoteException e) {
-                logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
+                logger.error(
+                    "**ERROR** RessourceServer unreachable : ressource is not registred" +
+                    e);
             } catch (NotBoundException e) {
-                logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
+                logger.error(
+                    "**ERROR** RessourceServer unreachable : ressource is not registred" +
+                    e);
             }
             return false;
-        }else{
+        } else {
             return false;
         }
     }
-    
-    
-    
+
     // Getters and setters
-    
     public String getAttachedResourceServer() {
         return attachedResourceServer;
     }
+
     public void setAttachedResourceServer(String attachedRessourceServer) {
         this.attachedResourceServer = attachedRessourceServer;
     }
+
     public String getCheckpointServerURL() {
         return checkpointServerURL;
     }
+
     public void setCheckpointServerURL(String checkpointServerURL) {
         this.checkpointServerURL = checkpointServerURL;
     }
+
     public String getGlobalServerURL() {
         return globalServerURL;
     }
+
     public void setGlobalServerURL(String globalServerURL) {
         this.globalServerURL = globalServerURL;
     }
+
     public String getLocationServerURL() {
         return locationServerURL;
     }
+
     public void setLocationServerURL(String locationServerURL) {
         this.locationServerURL = locationServerURL;
     }
+
     public String getRecoveryProcessURL() {
         return recoveryProcessURL;
     }
+
     public void setRecoveryProcessURL(String recoveryProcessURL) {
         this.recoveryProcessURL = recoveryProcessURL;
     }
+
     public String getTtcValue() {
         return ttcValue;
     }
+
     public void setTtcValue(String ttcValue) {
         this.ttcValue = ttcValue;
     }
-    
-    
- 
-    
 }

@@ -2,15 +2,15 @@ package modelisation.forwarder;
 
 import java.util.Date;
 
-import modelisation.ModelisationBench;
-import modelisation.statistics.RandomNumberFactory;
-import modelisation.statistics.RandomNumberGenerator;
-import modelisation.util.NodeControler;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
+
+import modelisation.ModelisationBench;
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
+import modelisation.util.NodeControler;
 
 
 public class Bench extends ModelisationBench
@@ -19,31 +19,30 @@ public class Bench extends ModelisationBench
     protected static final int MAX = 50;
 
     // protected static final int MAX = 5;
-//    public static Agent startAgent(double d, Node[] nodes, String nodeName,
-//        long lifeTime) {
-//        Agent agent = null;
-//        Object[] args = new Object[3];
-//        args[0] = new Double(d);
-//        args[1] = nodes;
-//        args[2] = new Long(lifeTime);
-//        try {
-//            if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
-//                System.out.println(" USING IBIS");
-//                agent = (Agent) ProActive.newActive(Agent.class.getName(),
-//                        args, NodeFactory.getNode(nodeName), null,
-//                        new ForwarderIbisMetaObjectFactory());
-//            } else {
-//                System.out.println(" USING RMI");
-//                agent = (Agent) ProActive.newActive(Agent.class.getName(),
-//                        args, NodeFactory.getNode(nodeName), null,
-//                        new ForwarderMetaObjectFactory());
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return agent;
-//    }
-
+    //    public static Agent startAgent(double d, Node[] nodes, String nodeName,
+    //        long lifeTime) {
+    //        Agent agent = null;
+    //        Object[] args = new Object[3];
+    //        args[0] = new Double(d);
+    //        args[1] = nodes;
+    //        args[2] = new Long(lifeTime);
+    //        try {
+    //            if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+    //                System.out.println(" USING IBIS");
+    //                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+    //                        args, NodeFactory.getNode(nodeName), null,
+    //                        new ForwarderIbisMetaObjectFactory());
+    //            } else {
+    //                System.out.println(" USING RMI");
+    //                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+    //                        args, NodeFactory.getNode(nodeName), null,
+    //                        new ForwarderMetaObjectFactory());
+    //            }
+    //        } catch (Exception e) {
+    //            e.printStackTrace();
+    //        }
+    //        return agent;
+    //    }
     public static Agent startAgent(double d, Node[] nodes, long lifeTime) {
         Agent agent = null;
         Object[] args = new Object[3];
@@ -52,7 +51,8 @@ public class Bench extends ModelisationBench
         args[2] = new Long(lifeTime);
         System.out.println("NODES SIZE = " + nodes.length);
         try {
-            if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+            if ("ibis".equals(System.getProperty(
+                            "proactive.communication.protocol"))) {
                 System.out.println(" USING IBIS");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
                         args, Bench.StartNode, null,
@@ -153,15 +153,18 @@ public class Bench extends ModelisationBench
         Bench bench = null;
         Object[] param = new Object[] { agent, expo };
         try {
-            if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+            if ("ibis".equals(System.getProperty(
+                            "proactive.communication.protocol"))) {
                 System.out.println(" USING IBIS");
                 bench = (Bench) ProActive.newActive(Bench.class.getName(),
-                        param, (Node) null, null, new ForwarderIbisMetaObjectFactory());
+                        param, (Node) null, null,
+                        new ForwarderIbisMetaObjectFactory());
                 //   ProActiveMetaObjectFactory.instance = new ProActiveIbisMetaObjectFactory();
             } else {
                 System.out.println(" USING RMI");
                 bench = (Bench) ProActive.newActive(Bench.class.getName(),
-                        param, (Node) null, null, new ForwarderMetaObjectFactory());
+                        param, (Node) null, null,
+                        new ForwarderMetaObjectFactory());
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -185,15 +185,14 @@ public interface ProActiveService {
 
     public String getJobId();
 
-//    public Handler searchExceptionHandler(NonFunctionalException ex,
-//        Object target);
-//
-//    public void setExceptionHandler(Handler h, Class exception, int levelID,
-//        Object target);
-//
-//    public void setExceptionHandler(Class handler, Class exception,
-//        int levelID, Object target);
-
+    //    public Handler searchExceptionHandler(NonFunctionalException ex,
+    //        Object target);
+    //
+    //    public void setExceptionHandler(Handler h, Class exception, int levelID,
+    //        Object target);
+    //
+    //    public void setExceptionHandler(Class handler, Class exception,
+    //        int levelID, Object target);
     public void exposeAsWebService(Object o, String url, String urn,
         String[] methods);
 

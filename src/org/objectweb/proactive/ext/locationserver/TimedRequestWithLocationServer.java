@@ -12,16 +12,15 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.timer.MicroTimer;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
-
-import org.objectweb.proactive.core.util.timer.MicroTimer;
 
 
 public class TimedRequestWithLocationServer extends RequestImpl
     implements java.io.Serializable {
-
     private static final int MAX_TRIES = 30;
+
     /**
      * the number of time we try before reporting a failure
      */
@@ -32,33 +31,28 @@ public class TimedRequestWithLocationServer extends RequestImpl
     private int tries;
     private transient LocationServer server;
 
-    public TimedRequestWithLocationServer(MethodCall methodCall, 
-                                          UniversalBody sender, 
-                                          boolean isOneWay, long nextSequenceID, 
-                                          LocationServer server) {
+    public TimedRequestWithLocationServer(MethodCall methodCall,
+        UniversalBody sender, boolean isOneWay, long nextSequenceID,
+        LocationServer server) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         this.server = server;
     }
 
-    public Reply serve(Body targetBody)
-                throws ServeException {
-
+    public Reply serve(Body targetBody) throws ServeException {
         MicroTimer timer = new MicroTimer();
         timer.start();
 
         Reply r = super.serve(targetBody);
         timer.stop();
-        System.out.println(
-                "TimedRequestWithLocationServer: " + 
-                timer.getCumulatedTime() + " for method " + methodName);
+        System.out.println("TimedRequestWithLocationServer: " +
+            timer.getCumulatedTime() + " for method " + methodName);
         return r;
     }
 
     protected int sendRequest(UniversalBody destinationBody)
-                        throws java.io.IOException {
-        System.out.println(
-                "TimedRequestWithLocationServer: sending to remote " + 
-                methodName);
+        throws java.io.IOException {
+        System.out.println("TimedRequestWithLocationServer: sending to remote " +
+            methodName);
         int ftres = FTManager.NON_FT;
         try {
             startTime = System.currentTimeMillis();
@@ -66,18 +60,18 @@ public class TimedRequestWithLocationServer extends RequestImpl
 
             long endTime = System.currentTimeMillis();
             System.out.println(
-                    "TimedRequestWithLocationServer:  .............. 1/gamma = " + 
-                    (endTime - startTime) + " for method " + methodName);
+                "TimedRequestWithLocationServer:  .............. 1/gamma = " +
+                (endTime - startTime) + " for method " + methodName);
             System.out.println(
-                    "TimedRequestWithLocationServer:  .............. done  = " + 
-                    (endTime - startTime) + " for method " + methodName);
+                "TimedRequestWithLocationServer:  .............. done  = " +
+                (endTime - startTime) + " for method " + methodName);
         } catch (Exception e) {
             // endTime = System.currentTimeMillis();
             //There can only be a problem when trying to contact the Agent
             System.out.println(
-                    "TimedRequestWithLocationServer:  .............. FAILED = " + 
-                    (System.currentTimeMillis() - startTime) + 
-                    " for method " + methodName);
+                "TimedRequestWithLocationServer:  .............. FAILED = " +
+                (System.currentTimeMillis() - startTime) + " for method " +
+                methodName);
             //e.printStackTrace();
             System.out.println(">>>>>>>>>>>> Exception " + e);
             this.backupSolution(destinationBody);
@@ -89,8 +83,7 @@ public class TimedRequestWithLocationServer extends RequestImpl
      * Implements the backup solution
      */
     protected void backupSolution(UniversalBody destinationBody)
-                           throws java.io.IOException {
-
+        throws java.io.IOException {
         //   long startTimeGamma1=0;
         //   long endTimeGamma1=0;
         boolean ok = false;
@@ -100,18 +93,15 @@ public class TimedRequestWithLocationServer extends RequestImpl
         //get the new location from the server
         UniqueID bodyID = destinationBody.getID();
         while (!ok && (tries < MAX_TRIES)) {
-
             UniversalBody remoteBody = null;
-            System.out.println(
-                    " ==== Query server ==== time " + 
-                    System.currentTimeMillis());
+            System.out.println(" ==== Query server ==== time " +
+                System.currentTimeMillis());
 
             UniversalBody mobile = queryServer(bodyID);
-            System.out.println(
-                    "=========================== time " + 
-                    System.currentTimeMillis());
+            System.out.println("=========================== time " +
+                System.currentTimeMillis());
             //we want to bypass the stub/proxy
-            remoteBody = (UniversalBody)((FutureProxy)((StubObject)mobile).getProxy()).getResult();
+            remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
 
             long startTimeGamma = System.currentTimeMillis();
             try {
@@ -119,43 +109,41 @@ public class TimedRequestWithLocationServer extends RequestImpl
 
                 long endTime = System.currentTimeMillis();
                 System.out.println(
-                        "TimedRequestWithLocationServer:  .............. 1/gamma = " + 
-                        (endTime - startTimeGamma) + " for method " + 
-                        methodName);
+                    "TimedRequestWithLocationServer:  .............. 1/gamma = " +
+                    (endTime - startTimeGamma) + " for method " + methodName);
                 System.out.println(
-                        "TimedRequestWithLocationServer:  .............. done = " + 
-                        (endTime - startTime) + " for method " + methodName);
+                    "TimedRequestWithLocationServer:  .............. done = " +
+                    (endTime - startTime) + " for method " + methodName);
                 //everything went fine, we have to update the current location of the object
                 //so that next requests don't go through the server
-                if (sender != null)
+                if (sender != null) {
                     sender.updateLocation(bodyID, remoteBody);
-                else {
+                } else {
                     LocalBodyStore.getInstance().getLocalBody(getSourceBodyID())
                                   .updateLocation(bodyID, remoteBody);
                 }
                 ok = true;
             } catch (Exception e) {
                 System.out.println(
-                        "TimedRequestWithLocationServer:  .............. FAILED = " + 
-                        (System.currentTimeMillis() - startTimeGamma) + 
-                        " for method " + methodName);
+                    "TimedRequestWithLocationServer:  .............. FAILED = " +
+                    (System.currentTimeMillis() - startTimeGamma) +
+                    " for method " + methodName);
                 tries++;
             }
         }
     }
 
     protected UniversalBody queryServer(UniqueID bodyID) {
-
         long startTimeBackupSolution = System.currentTimeMillis();
         if (server == null) {
             server = LocationServerFactory.getLocationServer();
         }
 
-        UniversalBody mobile = (UniversalBody)server.searchObject(bodyID);
+        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
         long endTimeBackupSolution = System.currentTimeMillis();
         System.out.println(
-                "TimedRequestWithLocationServer: backupSolution() server has sent an answer after " + 
-                (endTimeBackupSolution - startTimeBackupSolution));
+            "TimedRequestWithLocationServer: backupSolution() server has sent an answer after " +
+            (endTimeBackupSolution - startTimeBackupSolution));
         ProActive.waitFor(mobile);
         return mobile;
     }
