@@ -89,6 +89,7 @@ custom activity of an active object ?</a></li>
  <li class="textNormal"><a href="#JiniUse">How can I use <b>Jini </b> in ProActive ?</a></li>
 <li class="textNormal"><a href="#JiniPb">Why do I get an exception when using <b>Jini </b>?</a></li>
 <li class="textNormal"><a href="#config">What is the difference between passing parameters in Deployment Descriptor and setting properties in ProActive Configuration  file?</a></li>
+<li class="textNormal"><a href="#valid_error">why do I get the following message when parsing my xml deployment file:<br>ERROR: file:~/ProActive/descriptor.xml Line:2 Message:cvc-elt.1: Cannot find the declaration of element 'ProActiveDescriptor' </a></li>
 
 </ol>
        
@@ -871,6 +872,21 @@ remains in the directory, in that case if you restart the application it will no
 <h3>What is the difference between passing parameters in Deployment Descriptor and setting properties in ProActive Configuration  file?</h3>
 </a>
 <p class="textNormal"></p>Parameters defined in Deployment Descriptor should be only jvm related, whereas properties set in the Configuration file are ProActive properties or user-defined properties. They are used with a different approach: parameters given in descriptors are part of the java command that will create other jvms, whereas properties will be loaded once jvms are created</p>
+ </li>
+<p></p>
+
+ <!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+
+<li class="textNormal"><a
+ name="valid_error">
+<h3>why do I get the following message when parsing my xml deployment file: <br>ERROR: file:~/ProActive/descriptor.xml Line:2 Message:cvc-elt.1: Cannot find the declaration of element 'ProActiveDescriptor' </h3>
+</a>
+<p class="textNormal"></p>This message turns up because the Schema cannot be found. Indeed at the beginning of our XML deployment files we put the line<br>
+<b>&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;</b><br>
+which means, the schema named DescriptorSchema.xsd is expected to be found in the current directory to validate the xml.
+Be sure you have this file in the same dir than your file, or just change the path to point to the correct schema. </p>
  </li>
 <p></p>
 
