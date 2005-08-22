@@ -91,11 +91,15 @@ public class Result implements Serializable {
      * @return the best result.
      */
     public Result returnTheBest(Result other) {
-        if (((Comparable) this.theResult).compareTo(other.theResult) == -1) {
-            return this;
-        } else {
-            return other;
-        }
+    	try {
+			if (((Comparable) this.theResult).compareTo(other.getResult()) <= 0) {
+			    return this;
+			} else {
+			    return other;
+			}
+		} catch (NoResultsException e) {
+			return this;
+		}
     }
 
     /**
