@@ -37,7 +37,6 @@ import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.Body;
@@ -136,9 +135,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     /** whether the body has been killed. A killed body has no more activity although
        stopping the activity thread is not immediate */
     private transient boolean isDead;
-
-    /** table of handlers associated to the body */
-    private HashMap bodyLevel;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.body.RemoteBody;
  * An object implementing this interface provides the minimum service a body offers
  * remotely through RMI.
  * @author ProActiveTeam
- * @version 1.0, 5 ao?t 2005
+ * @version 1.0
  * @since ProActive 2.2
  * @see org.objectweb.proactive.core.body.UniversalBody
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
