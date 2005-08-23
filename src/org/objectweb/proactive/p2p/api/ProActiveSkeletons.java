@@ -68,9 +68,10 @@ public class ProActiveSkeletons {
      */
     public static Manager newProblem(Task root, Node managerNode, Node[] nodes)
         throws ActiveObjectCreationException, NodeException {
-        Object[] args = new Object[2];
+        Object[] args = new Object[3];
         args[0] = root;
         args[1] = nodes;
+        args[2] = managerNode;
         Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
                 args, managerNode);
         if (logger.isInfoEnabled()) {

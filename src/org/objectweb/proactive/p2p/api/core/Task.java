@@ -79,29 +79,10 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * Called after the creation of the active object <code>Task</code>. This
-     * method is executed before the <code>execute</code> method. By default, it
-     * does nothing. You can override this method to do some jobs <b>before</b>
-     * executing the task.
-     */
-    public void initialization() {
-        // nothing to do
-    }
-
-    /**
      *
      * @return the computed result of this task.
      */
     public abstract Result execute();
-
-    /**
-     * Called after the <code>execute</code> method. By default, it does
-     * nothing. You can override this method to do some jobs <b>after</b>
-     * executing the task.
-     */
-    public void finalization() {
-        // nothing to do
-    }
 
     /**
      * Split this task in sub-tasks.

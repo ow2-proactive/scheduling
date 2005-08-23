@@ -34,17 +34,13 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.p2p.api.exception.IsAlreadyComputingException;
+import org.objectweb.proactive.p2p.api.exception.NoResultsException;
 
 
 /**
@@ -54,7 +50,6 @@ import org.objectweb.proactive.p2p.api.exception.IsAlreadyComputingException;
  */
 public class Worker implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_WORKER);
-    private boolean isComputing = false;
     private Manager manager = null;
     private Worker workerGroup = null;
     private Result bestCurrentResult = null;
@@ -80,17 +75,12 @@ public class Worker implements Serializable {
      * @return the result or a result with the exception.
      */
     public Result execute(Task task) {
-        if (this.isComputing == false) {
-            this.isComputing = true;
-        } else {
-            return new Result(new IsAlreadyComputingException());
-        }
-        Task activedTask = null;
         Exception exception = null;
-        Body body = ProActive.getBodyOnThis();
-        Service serviceQueue = new Service(body);
+        Task activedTask = null;
         try {
-            activedTask = (Task) ProActive.turnActive(task);
+            // Activing the task
+            String workerNodeUrl = ProActive.getBodyOnThis().getNodeURL();
+            activedTask = (Task) ProActive.turnActive(task, workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't actived the task", e);
@@ -100,26 +90,13 @@ public class Worker implements Serializable {
             exception = e;
         }
         if (activedTask != null) {
-            activedTask.initialization();
-            Result result = activedTask.execute();
-            while (ProActive.isAwaited(result)) {
-                Request r = serviceQueue.blockingRemoveOldest(100);
-                if (r != null) {
-                    try {
-                        r.serve(body);
-                    } catch (ServeException e) {
-                        logger.warn("Problem with serving a request", e);
-                    }
-                }
-            }
-            activedTask.finalization();
-            this.isComputing = false;
+            activedTask.initLowerBound();
+            activedTask.initUpperBound();
 
-            return result;
+            return activedTask.execute();
         } else {
             logger.fatal("The task was not actived");
-            this.isComputing = false;
-            return new Result(exception);
+            return new Result(new NoResultsException());
         }
     }
 
@@ -137,13 +114,13 @@ public class Worker implements Serializable {
     public void setBestCurrentResult(Result newBest) {
         if (this.bestCurrentResult == null) {
             this.bestCurrentResult = newBest;
-            this.workerGroup.informNewBestResult(this.bestCurrentResult);
             logger.info("A new best result was localy found: " +
                 this.bestCurrentResult);
         } else if (newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             this.workerGroup.informNewBestResult(this.bestCurrentResult);
-            logger.info("A new best result was localy found: " +
+            logger.info(
+                "A new best result was localy found and inform others: " +
                 this.bestCurrentResult);
         }
     }
@@ -152,7 +129,11 @@ public class Worker implements Serializable {
      * @return the local best result.
      */
     public Result getBestCurrentResult() {
-        return this.bestCurrentResult;
+        if (this.bestCurrentResult == null) {
+            return new Result(new NoResultsException());
+        } else {
+            return this.bestCurrentResult;
+        }
     }
 
     public void informNewBestResult(Result newBest) {

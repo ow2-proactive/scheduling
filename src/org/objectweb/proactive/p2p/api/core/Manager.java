@@ -69,6 +69,7 @@ public class Manager implements Serializable, InitActive {
     private Vector workingWorkerList = new Vector();
     private Vector allResults = new Vector();
     private Result finalResult = null;
+    private Node myNode = null;
 
     /**
      * The no args constructor for ProActive.
@@ -80,10 +81,12 @@ public class Manager implements Serializable, InitActive {
     /**
      * @param root the root task.
      * @param nodes the array of nodes for the computation.
+     * @param myNode the local node which is associated to this manager.
      */
-    public Manager(Task root, Node[] nodes) {
+    public Manager(Task root, Node[] nodes, Node myNode) {
+    	this.myNode = myNode;
         try {
-            this.rootTask = (Task) ProActive.turnActive(root);
+            this.rootTask = (Task) ProActive.turnActive(root, this.myNode);
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
