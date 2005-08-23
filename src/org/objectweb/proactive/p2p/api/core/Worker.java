@@ -156,7 +156,8 @@ public class Worker implements Serializable {
     }
 
     public void informNewBestResult(Result newBest) {
-        if (newBest.isBetterThan(this.bestCurrentResult)) {
+        if ((this.bestCurrentResult != null) &&
+                newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             logger.info("I was informed from a new remote best result: " +
                 this.bestCurrentResult);
