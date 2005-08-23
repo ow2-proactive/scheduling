@@ -49,11 +49,11 @@ import net.jini.lookup.entry.Name;
 
 public class JiniRuntimeFactory extends RuntimeFactory {
     protected static int MAX_RETRY = 3;
-    private final static long WAITFOR = 100000L;
+
+    //private final static long WAITFOR = 100000L;
     protected java.util.Random random;
     protected static ServiceLocatorHelper serviceLocatorHelper = new ServiceLocatorHelper();
     private static ProActiveRuntime defaultJiniRuntime = null;
-    private int count;
 
     static {
         if (JiniRuntimeFactory.class.getClassLoader() != null) {

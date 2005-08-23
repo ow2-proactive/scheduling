@@ -366,29 +366,4 @@ public abstract class RuntimeFactory {
         throw new ProActiveException(
             "No RuntimeFactory is registered for the protocol " + protocol);
     }
-
-    /**
-     * Return the protocol specified in the string
-     * The same convention as in URL is used
-     */
-    private static String getProtocol(String proActiveRuntimeURL) {
-        if (proActiveRuntimeURL == null) {
-            return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
-        }
-
-        int n = proActiveRuntimeURL.indexOf("://");
-        if (n <= 0) {
-            return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
-        }
-        return proActiveRuntimeURL.substring(0, n + 1);
-    }
-
-    /**
-     */
-    private static String removeProtocol(String url, String protocol) {
-        if (url.startsWith(protocol)) {
-            return url.substring(protocol.length());
-        }
-        return url;
-    }
 }

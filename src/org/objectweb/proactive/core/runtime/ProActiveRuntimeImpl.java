@@ -32,10 +32,8 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -108,14 +106,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private java.util.Hashtable virtualNodesMapNodes;
 
     // creator certificate
-    private X509Certificate creatorCertificate;
-    private X509Certificate certificate;
-    private PrivateKey privateKey;
-
+    //    private X509Certificate creatorCertificate;
+    //    private X509Certificate certificate;
+    //    private PrivateKey privateKey;
+    //    private String defaultNodeVirtualNode = null;
     // link to domain policy server 
     // private PolicyServer policyServer;
     private ProActiveSecurityManager psm;
-    private String defaultNodeVirtualNode = null;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------------------

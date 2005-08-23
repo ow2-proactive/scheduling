@@ -36,7 +36,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.http.util.messages.ReflectRequest;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
@@ -48,10 +47,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class RuntimeRequest extends ReflectRequest implements Serializable {
-    private static Logger logger = Logger.getLogger("XML_HTTP");
     private String methodName;
     private ArrayList parameters = new ArrayList();
-    private ArrayList paramsTypes;
     private static HashMap hMapMethods;
     private static ProActiveRuntimeImpl runtime;
 
@@ -84,7 +81,6 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
     public RuntimeRequest(String newmethodName, ArrayList newparameters,
         ArrayList newparamsTypes, String url) {
         this(newmethodName, newparameters, url);
-        this.paramsTypes = newparamsTypes;
     }
 
     public Object processMessage() throws Exception {

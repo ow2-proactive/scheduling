@@ -55,7 +55,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * to a RemoteProActiveRuntime using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
  * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
  * @author ProActiveTeam
- * @version 1.0, 5 ao?t 2005
+ * @version 1.0
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  *

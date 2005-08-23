@@ -57,7 +57,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * using another remote objects library.
  * Implemented protocols are RMI, RMISSH, IBIS, JINI, HTTP
  * @author ProActiveTeam
- * @version 1.0, 9 ao?t 2005
+ * @version 1.0
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
