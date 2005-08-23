@@ -80,7 +80,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public String getProperty() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getProperty();
     }
@@ -97,7 +97,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public long getTimeout() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getTimeout();
     }
@@ -106,7 +106,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#addVirtualMachine(VirtualMachine)
      */
     public void addVirtualMachine(VirtualMachine virtualMachine) {
-        vnlogger.warn(message);
+        vnLogger.warn(message);
     }
 
     /**
@@ -114,7 +114,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public VirtualMachine getVirtualMachine() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getVirtualMachine();
     }
@@ -137,7 +137,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 throw new ProActiveRuntimeException(e);
             }
         } else {
-            vnlogger.info("VirtualNode " + this.name +
+            vnLogger.info("VirtualNode " + this.name +
                 " already activated !!!");
         }
     }
@@ -147,7 +147,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public int getNodeCount() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getNodeCount();
     }
@@ -165,7 +165,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public int getNumberOfCurrentlyCreatedNodes() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getNumberOfCurrentlyCreatedNodes();
     }
@@ -191,7 +191,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public int getNumberOfCreatedNodesAfterDeployment() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getNumberOfCreatedNodesAfterDeployment();
     }
@@ -257,14 +257,14 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     public void killAll(boolean softly) {
-        vnlogger.warn(message);
+        vnLogger.warn(message);
     }
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createNodeOnCurrentJvm(String)
      */
     public void createNodeOnCurrentJvm(String protocol) {
-        vnlogger.warn(message);
+        vnLogger.warn(message);
     }
 
     public Object getUniqueAO() throws ProActiveException {
@@ -295,7 +295,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public String getJobID() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getJobID();
     }
@@ -338,7 +338,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public int getMinNumberOfNodes() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getMinNumberOfNodes();
     }
@@ -350,7 +350,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public PolicyServer getPolicyServer() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.getPolicyServer();
     }
@@ -360,7 +360,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      */
     public boolean isMultiple() {
         if (!isActivated) {
-            vnlogger.error(notActivatedMessage);
+            vnLogger.error(notActivatedMessage);
         }
         return virtualNode.isMultiple();
     }

@@ -35,6 +35,7 @@ import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
 
@@ -49,7 +50,7 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @see VirtualMachine
  */
 public interface VirtualNode extends java.io.Serializable, Job {
-    static Logger vnlogger = Logger.getLogger(VirtualNode.class.getName());
+    public final static Logger vnLogger = Logger.getLogger(Loggers.DEPLOYMENT);
 
     /**
      * Returns the value of property attribute.

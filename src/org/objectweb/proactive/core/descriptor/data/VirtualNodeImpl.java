@@ -173,8 +173,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         createdNodes = new java.util.ArrayList();
         awaitedVirtualNodes = new Hashtable();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        if (logger.isDebugEnabled()) {
-            logger.debug("vn " + this.name + " registered on " +
+        if (vnLogger.isDebugEnabled()) {
+            vnLogger.debug("vn " + this.name + " registered on " +
                 proActiveRuntimeImpl.getVMInformation().getVMID().toString());
         }
 
@@ -238,8 +238,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //we need to do it here otherwise event could occurs, whereas vm 's creator id is not in the hash map
             //just synchro pb, this workaround solves the pb
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("mapped VirtualNode=" + name +
+        if (vnLogger.isDebugEnabled()) {
+            vnLogger.debug("mapped VirtualNode=" + name +
                 " with VirtualMachine=" + virtualMachine.getName());
         }
     }
@@ -278,7 +278,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                             proActiveRuntimeImpl.createVM(process);
                         } catch (java.io.IOException e) {
                             e.printStackTrace();
-                            logger.error("cannot activate virtualNode " +
+                            vnLogger.error("cannot activate virtualNode " +
                                 this.name + " with the process " +
                                 process.getCommand());
                         }
@@ -311,10 +311,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     this.ftService.registerRessources(this.getNodes());
                 }
             } catch (NodeException e) {
-                logger.error(e.getMessage());
+                vnLogger.error(e.getMessage());
             }
         } else {
-            logger.info("VirtualNode " + this.name + " already activated !!!");
+            vnLogger.info("VirtualNode " + this.name +
+                " already activated !!!");
         }
     }
 
@@ -350,7 +351,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
-            logger.error("Problem occured while waiting for nodes creation");
+            vnLogger.error("Problem occured while waiting for nodes creation");
         }
         return nbCreatedNodes;
     }
@@ -387,7 +388,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
-            logger.error(e.getMessage());
+            vnLogger.error(e.getMessage());
         }
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
@@ -402,10 +403,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 throw new NodeException(
                     "Cannot return nodes, no nodes have been created");
             } else {
-                logger.warn("WARN: No nodes have yet been created.");
-                logger.warn(
+                vnLogger.warn("WARN: No nodes have yet been created.");
+                vnLogger.warn(
                     "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
-                logger.warn("WARN: Returning empty array");
+                vnLogger.warn("WARN: Returning empty array");
                 return new String[0];
             }
         }
@@ -417,7 +418,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
-            logger.error(e.getMessage());
+            vnLogger.error(e.getMessage());
         }
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
@@ -431,10 +432,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 throw new NodeException(
                     "Cannot return nodes, no nodes have been created");
             } else {
-                logger.warn("WARN: No nodes have yet been created.");
-                logger.warn(
+                vnLogger.warn("WARN: No nodes have yet been created.");
+                vnLogger.warn(
                     "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
-                logger.warn("WARN: Returning empty array");
+                vnLogger.warn("WARN: Returning empty array");
                 return new Node[0];
             }
         }
@@ -446,7 +447,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
-            logger.error(e.getMessage());
+            vnLogger.error(e.getMessage());
         }
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
@@ -496,7 +497,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     } catch (ProActiveException e1) {
                         e1.printStackTrace();
                     } catch (Exception e) {
-                        logger.info(" Virtual Machine " +
+                        vnLogger.info(" Virtual Machine " +
                             part.getVMInformation().getVMID() + " on host " +
                             UrlBuilder.getHostNameorIP(
                                 part.getVMInformation().getInetAddress()) +
@@ -540,7 +541,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public Object getUniqueAO() throws ProActiveException {
         if (!property.equals("unique_singleAO")) {
-            logger.warn(
+            vnLogger.warn(
                 "!!!!!!!!!!WARNING. This VirtualNode is not defined with unique_single_AO property in the XML descriptor. Calling getUniqueAO() on this VirtualNode can lead to unexpected behaviour");
         }
 
@@ -549,7 +550,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 Node node = getNode();
 
                 if (node.getActiveObjects().length > 1) {
-                    logger.warn(
+                    vnLogger.warn(
                         "!!!!!!!!!!WARNING. More than one active object is created on this VirtualNode.");
                 }
 
@@ -609,8 +610,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //Check if it this virtualNode that originates the process
         if ((event.getCreatorID().equals(this.name)) &&
                 (virtualMachine != null)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("runtime " + event.getCreatorID() +
+            if (vnLogger.isDebugEnabled()) {
+                vnLogger.debug("runtime " + event.getCreatorID() +
                     " registered on virtualnode " + this.name);
             }
             protocol = event.getProtocol();
@@ -948,8 +949,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
-        if (logger.isDebugEnabled()) {
-            logger.debug("askedNodes " + nodeNumber);
+        if (vnLogger.isDebugEnabled()) {
+            vnLogger.debug("askedNodes " + nodeNumber);
         }
         protocolId = process.getProcessId();
 
@@ -973,8 +974,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 e.printStackTrace();
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(localruntimeURL);
+            if (vnLogger.isDebugEnabled()) {
+                vnLogger.debug(localruntimeURL);
             }
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
@@ -985,16 +986,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 jvmProcess.setJvmOptions(this.ftService.buildParamsLine());
             }
         }
-    }
-
-    /**
-     * @param processClassname
-     * @return
-     */
-    private String findProtocolId(String processClassname) {
-        int index = processClassname.lastIndexOf(".") + 1;
-        int lastIndex = processClassname.lastIndexOf("Process");
-        return processClassname.substring(index, lastIndex) + "-";
     }
 
     /**
@@ -1039,8 +1030,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private void increaseNumberOfNodes(int n) {
         nbMappedNodes = nbMappedNodes + n;
-        if (logger.isDebugEnabled()) {
-            logger.debug("Number of nodes = " + nbMappedNodes);
+        if (vnLogger.isDebugEnabled()) {
+            vnLogger.debug("Number of nodes = " + nbMappedNodes);
         }
     }
 
@@ -1061,7 +1052,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String url, String protocol) {
         Node node = new NodeImpl(part, url, checkProtocol(protocol), this.jobID);
         createdNodes.add(node);
-        logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
+        vnLogger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
         nodeCreated = true;
         nbCreatedNodes++;
@@ -1079,7 +1070,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //  	part.registerVirtualnode(this.name,false);
             ProActive.registerVirtualNode(this, registrationProtocol, false);
         } catch (NodeException e) {
-            logger.error(e.getMessage());
+            vnLogger.error(e.getMessage());
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
