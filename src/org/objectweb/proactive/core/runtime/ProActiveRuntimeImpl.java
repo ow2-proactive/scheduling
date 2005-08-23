@@ -84,7 +84,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  *
  */
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
-    implements ProActiveRuntime {
+    implements ProActiveRuntime, LocalProActiveRuntime {
     //
     // -- STATIC MEMBERS -----------------------------------------------------------
     //
@@ -161,7 +161,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             if ((file != null) && new File(file).exists()) {
                 // loading security from a file
-                logger.info(
+                runtimeLogger.info(
                     "ProActive Security Policy (proactive.runtime.security) using " +
                     file);
 
@@ -180,7 +180,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //System.out.println(vmInformation.getVMID().toString());
         } catch (java.net.UnknownHostException e) {
             //System.out.println();
-            logger.fatal(" !!! Cannot do a reverse lookup on that host");
+            runtimeLogger.fatal(" !!! Cannot do a reverse lookup on that host");
             // System.out.println();
             e.printStackTrace();
             System.exit(1);
@@ -196,14 +196,28 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return proActiveRuntime;
     }
 
+    //
+    // -- Implements LocalProActiveRuntime  -----------------------------------------------
+    //
+
     /**
-     * Register the given VirtualNode on this ProActiveRuntime. This method cannot be called remotely.
-     * @param vn the virtualnode to register
-     * @param vnName the name of the VirtualNode to register
+     * @see org.objectweb.proactive.core.runtime.LocalProActiveRuntime#registerLocalVirtualNode(VirtualNode vn, String vnName)
      */
     public void registerLocalVirtualNode(VirtualNode vn, String vnName) {
         //System.out.println("vn "+vnName+" registered");
         virtualNodesMap.put(vnName, vn);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.LocalProActiveRuntime#setParent(String parentRuntimeName)
+     */
+    public void setParent(String parentRuntimeName) {
+        if (parentRuntimeURL == null) {
+            parentRuntimeURL = parentRuntimeName;
+            runtimeAcquaintancesURL.add(parentRuntimeURL);
+        } else {
+            runtimeLogger.error("Parent runtime already set!");
+        }
     }
 
     public void registerDescriptor(String url, ProActiveDescriptor pad) {
@@ -254,12 +268,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if ((vnName != null) && (vnName.equals("currentJVM"))) {
             // if Jvm has been started using the currentJVM tag
             // vnName = defaultNodeVirtualNode;
-            logger.debug("Local Node : " + nodeName + " VN name : " + vnName +
-                " policyserver " + ps);
+            runtimeLogger.debug("Local Node : " + nodeName + " VN name : " +
+                vnName + " policyserver " + ps);
         }
 
         if (ps != null) {
-            logger.debug("generating node certificate");
+            runtimeLogger.debug("generating node certificate");
             // ps.generateEntityCertificate(vnName + " " + nodeName, vmInformation);
             policyServerMap.put(nodeName, ps);
         }
@@ -404,20 +418,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public void rmAcquaintance(String proActiveRuntimeName) {
         runtimeAcquaintancesURL.remove(proActiveRuntimeName);
-    }
-
-    /**
-     * This method adds a reference to the runtime that created this runtime.
-     * It is called when a new runtime is created from another one.
-     * @param parentRuntimeName the name of the creator of this runtime
-     */
-    public void setParent(String parentRuntimeName) {
-        if (parentRuntimeURL == null) {
-            parentRuntimeURL = parentRuntimeName;
-            runtimeAcquaintancesURL.add(parentRuntimeURL);
-        } else {
-            logger.error("Parent runtime already set!");
-        }
     }
 
     /**
@@ -623,7 +623,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) {
-        logger.debug("Receive a checkpoint for recovery");
+        runtimeLogger.debug("Receive a checkpoint for recovery");
 
         // the recovered body
         Body ret = ckpt.recover();
@@ -643,8 +643,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         this.registerBody(nodeName, ret);
 
         // restart actvity
-        if (logger.isDebugEnabled()) {
-            logger.debug(ret.getID() + " is restarting activity...");
+        if (runtimeLogger.isDebugEnabled()) {
+            runtimeLogger.debug(ret.getID() + " is restarting activity...");
         }
         ((ActiveBody) ret).startBody();
 
@@ -713,7 +713,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             if (System.getProperty("proactive.runtime.name") != null) {
                 this.name = System.getProperty("proactive.runtime.name");
                 if (this.name.indexOf("PA_JVM") < 0) {
-                    logger.warn(
+                    runtimeLogger.warn(
                         "WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n" +
                         "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
                 }
@@ -943,8 +943,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             if (classData != null) {
                 // caching class
                 ClassDataCache.instance().addClassData(className, classData);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(getURL() + " -- > Returning class " +
+                if (runtimeLogger.isDebugEnabled()) {
+                    runtimeLogger.debug(getURL() + " -- > Returning class " +
                         className + " found in " + parentRuntimeURL);
                 }
                 return classData;
