@@ -31,6 +31,7 @@
 package org.objectweb.proactive.p2p.api.core;
 
 import java.io.Serializable;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -40,6 +41,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.p2p.api.exception.NoResultsException;
 
 
@@ -143,5 +145,13 @@ public class Worker implements Serializable {
             logger.info("I was informed from a new remote best result: " +
                 this.bestCurrentResult);
         }
+    }
+
+    public IntWrapper haveFreeWorkers() {
+        return this.manager.haveFreeWorkers();
+    }
+
+    public void sendSubTasksToTheManager(Vector subTaskList) {
+        this.manager.sendSubTasksToTheManager(subTaskList);
     }
 }

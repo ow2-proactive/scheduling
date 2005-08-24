@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 /**
@@ -67,6 +68,7 @@ public class Manager implements Serializable, InitActive {
     private Vector futureTaskList = new Vector();
     private Vector pendingTaskList = new Vector();
     private Vector workingWorkerList = new Vector();
+    private Vector freeWorkerList = new Vector();
     private Vector allResults = new Vector();
     private Result finalResult = null;
     private Node myNode = null;
@@ -84,7 +86,7 @@ public class Manager implements Serializable, InitActive {
      * @param myNode the local node which is associated to this manager.
      */
     public Manager(Task root, Node[] nodes, Node myNode) {
-    	this.myNode = myNode;
+        this.myNode = myNode;
         try {
             this.rootTask = (Task) ProActive.turnActive(root, this.myNode);
         } catch (ActiveObjectCreationException e) {
@@ -155,21 +157,30 @@ public class Manager implements Serializable, InitActive {
                 (Task) taskIt.next());
         }
 
+        Service service = new Service(body);
         while (taskIt.hasNext()) {
-            // wait for a free worker
-            int index = ProActive.waitForAny(this.futureTaskList);
-            this.allResults.add(this.futureTaskList.remove(index));
-            this.pendingTaskList.remove(index);
-            Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
-            this.assignTaskToWorker(freeWorker, (Task) taskIt.next());
+            try {
+                // wait for a free worker
+                int index = ProActive.waitForAny(this.futureTaskList, 500);
+                this.allResults.add(this.futureTaskList.remove(index));
+                this.pendingTaskList.remove(index);
+                Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
+                this.assignTaskToWorker(freeWorker, (Task) taskIt.next());
+            } catch (ProActiveException e) {
+                while (service.getRequestCount() > 0) {
+                    service.serveOldest();
+                }
+                continue;
+            }
         }
 
         // Serving requests and waiting for results
-        Service service = new Service(body);
-        while (this.allResults.size() != this.tasks.size()) {
+        while (taskIt.hasNext() ||
+                (this.allResults.size() != this.tasks.size())) {
             try {
-                int index = ProActive.waitForAny(this.futureTaskList, 1000);
+                int index = ProActive.waitForAny(this.futureTaskList, 500);
                 this.allResults.add(this.futureTaskList.remove(index));
+                this.freeWorkerList.add(this.workingWorkerList.remove(index));
             } catch (ProActiveException e) {
                 while (service.getRequestCount() > 0) {
                     service.serveOldest();
@@ -203,5 +214,13 @@ public class Manager implements Serializable, InitActive {
     public Result getFinalResult() {
         ProActive.waitFor(this.finalResult);
         return this.finalResult;
+    }
+
+    public IntWrapper haveFreeWorkers() {
+        return new IntWrapper(this.freeWorkerList.size());
+    }
+
+    public void sendSubTasksToTheManager(Vector subTaskList) {
+        this.tasks.add(subTaskList);
     }
 }
