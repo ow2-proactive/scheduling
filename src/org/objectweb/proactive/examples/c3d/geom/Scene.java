@@ -30,34 +30,57 @@
  */
 package org.objectweb.proactive.examples.c3d.geom;
 
+import org.objectweb.proactive.examples.c3d.prim.Light;
+import org.objectweb.proactive.examples.c3d.prim.Primitive;
+
+import java.util.Vector;
+import org.objectweb.proactive.examples.c3d.prim.View;
+
+
 /**
- * A class for making rays (lines in 3D), which have a start point, and a direction.
+ * Represents a 3D scene, with objects, lights and a view
  */
-final public class Ray implements java.io.Serializable {
-    public Vec P;
-    public Vec D;
+public class Scene implements java.io.Serializable {
+    private Vector lights = new Vector();
+    private Vector objects = new Vector();
+    private View view;
 
-    public Ray(Vec pnt, Vec dir) {
-        P = new Vec(pnt.x, pnt.y, pnt.z);
-        D = new Vec(dir.x, dir.y, dir.z);
-        D.normalize();
+    public void addLight(Light l) {
+        lights.addElement(l);
     }
 
-    /** This is very dangerous to use, as a 0,0 line is not a line ! */
-    public Ray() {
-        P = new Vec();
-        D = new Vec();
+    public Light getLight(int number) {
+        return (Light) lights.elementAt(number);
     }
 
-    /** 
-     * Works out the point which lies on this line, at distance t from origine.
-     * @returns V = P + D * t
-     */
-    public Vec point(double t) {
-        return new Vec(P.x + (D.x * t), P.y + (D.y * t), P.z + (D.z * t));
+    public int getNbLights() {
+        return lights.size();
     }
 
-    public String toString() {
-        return "{ Po = " + P.toString() + " dir= " + D.toString() + "}";
+    /** Add an object to the scene */
+    public void addPrimitive(Primitive object) {
+        objects.addElement(object);
     }
+
+    /** Swap an object of the scene for another one */
+    public void setPrimitive(Primitive object, int pos) {
+        objects.setElementAt(object, pos);
+    }
+
+    public Primitive getPrimitive(int number) {
+        return (Primitive) objects.elementAt(number);
+    }
+
+    public int getNbPrimitives() {
+        return objects.size();
+    }
+
+    public void setView(View view) {
+        this.view = view;
+    }
+
+    public View getView() {
+        return view;
+    }
+
 }

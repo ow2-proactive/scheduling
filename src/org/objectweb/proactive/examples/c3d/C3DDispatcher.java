@@ -30,97 +30,66 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Label;
-import java.awt.List;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.TextArea;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Stack;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.examples.c3d.geom.Scene;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.c3d.gui.DispatcherGUI;
+import org.objectweb.proactive.examples.c3d.gui.DispatcherGUIImpl;
+import org.objectweb.proactive.examples.c3d.prim.Light;
+import org.objectweb.proactive.examples.c3d.prim.Plane;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
+import org.objectweb.proactive.examples.c3d.prim.Surface;
+import org.objectweb.proactive.examples.c3d.prim.View;
 
 
 /**
- * This class decouples the set of user frames from the set of rendering
+ * This class is the bridge between renderers and users.
+ * It handles the logic of asking renderers to draw partial images. It then forwards them to the users.
+ * It also allows users to hold conversations, in a chat-like way.
  */
-public class C3DDispatcher implements org.objectweb.proactive.RunActive {
-    static Logger logger = Logger.getLogger(C3DDispatcher.class.getName());
-    protected VirtualNode vn;
-
-    /**
-     * Uses active objects if set to true
-     */
-    private static final boolean ACTIVE = true;
+public class C3DDispatcher implements RunActive {
+    private static Logger logger = Logger.getLogger(Loggers.EXAMPLES);
+    private static int IMAGE_HEIGHT = 250;
+    private static int IMAGE_WIDTH = 250;
 
     /*
-     * Stores the users in a hash table
+     * Stores the users in a bag containing ref to active object, name and identifier
      */
-    private Hashtable h_users = new Hashtable();
-
-    /*
-     * Timestamp used to estimate rendering time
-     */
-    private long startTime;
-
-    /**
-     * Avg time for a rendering
-     */
-    private long avgRender = 0;
-
-    /**
-     * Number of renderings
-     */
-    private long totalRender = 0;
+    private UserBag userBag = new UserBag();
+    private int i_lastuser = 0;
 
     /**
      * Interval stack; each interval holds information regarding its
      * height, width and relative position within the whole image
      */
-    private Stack int_stack = new Stack();
-
-    /**
-     * Array of rendering engines; each C3DRenderingEngine is a possibly remote,
-     * active object
-     */
-    private C3DRenderingEngine[] engine;
-
     /**
      * Hashtable of the rendering engines
      */
-    private Hashtable h_engines = new Hashtable();
+
+    /**  connects an Engine to its name, and other way round, without asking the remote object */  
+    private Vector engineAndStringTable = new Vector();
+    /** list of engines. */
+    public Vector engineVector = new Vector();
 
     /**
      * Scene to be rendered; set by the first user frame to register;
@@ -129,82 +98,23 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
     private Scene scene;
 
     /**
-     * Number of rendering engines
-     */
-    private int engines;
-
-    /**
-     * Number of intervals, the whole picture should be divided into; this
-     * value has got an impact on the performance; it should be in
-     * the size of 'three times the number of rendering engines'
-     */
-    private int intervals;
-
-    /**
-     * Width of the rendering image
-     */
-    private int width;
-
-    /**
-     * Height of the rendering image
-     */
-    private int height;
-
-    /**
-     * Height of one rendering interval; provided for convenience only;
-     * carries the value of height / intervals
-     */
-    private int intheight;
-
-    /**
      * Pixel array to store the rendered pixels; used to initialize the
      * image on new-coming user frames, actualized in setPixels
      */
-    private int[] pixels;
-
-    /**
-     * Number of intervals not yet rendered; used to determine the progress
-     * of the asynchronous rendering process; may or may not stay in
-     * future versions of live()
-     */
-    private int i_left = 0;
-    private int i_lastuser = 0;
-    private TextArea ta_log;
-    private List li_users;
-    private List li_enginesUsed;
-    private List li_enginesAvailable;
-    private String s_access_url;
-    private String s_hosts;
-    private Button b_addEng = new Button("Add engine");
-    private Button b_rmEng = new Button("Remove engine");
-    private Election election = null;
-
-    /**
-     * The average pining time for users
-     */
-    private long userPing = 0;
-
-    /**
-     * The number of User connected from the beginning
-     */
-    private long userTotal = 0;
-
-    /**
-     * The average pining time for rendering engines
-     */
-    private long enginePing = 0;
-
-    /**
-     * True if a rendering is going on [init = true because when 1st
-     * user registers, render starts]
-     */
-    private boolean b_render = false;
+    private int[] localCopyOfImage;
 
     /**
      * ProactiveDescriptor object for the dispatcher
      */
     private ProActiveDescriptor proActiveDescriptor;
     private String[] rendererNodes;
+
+    /**
+     * The unique GUI reference. All GUI actions use this pointer.
+     */
+    private transient DispatcherGUI gui;
+    private transient C3DDispatcher me;
+    private BlockingRequestQueue requestQueue;
 
     /**
      * The no-argument Constructor as commanded by ProActive;
@@ -214,112 +124,66 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
     }
 
     /**
-     * Real Constructor
-     */
-
-    //public C3DDispatcher(String s_hosts)
-    //{
-    //new C3DDispatcherFrame();
-    //this.s_hosts = s_hosts;
-    //}
-
-    /**
      * Constructor to call when using XML Descriptor
      */
-    public C3DDispatcher(String[] rendererNodes, VirtualNode vn,
-        ProActiveDescriptor pad) {
-        new C3DDispatcherFrame();
+    public C3DDispatcher(String[] rendererNodes, ProActiveDescriptor pad) {
         this.rendererNodes = rendererNodes;
-        this.vn = vn;
         this.proActiveDescriptor = pad;
     }
 
     /**
-     * Continues the initialization; called when the first user registers.
-     * It creates a set of rendering engines (one on each machine given by
-     * the Mapping in Utils) and passes a reference to its own stub to
-     * every engine.
+     * Second Constructor, does all the creation and linking.
+     * Creates the renderers, and the GUI
      */
-    public void init() {
+    public void go() {
+        this.me = (C3DDispatcher) ProActive.getStubOnThis();
         try {
-            C3DDispatcher d = (C3DDispatcher) org.objectweb.proactive.ProActive.getStubOnThis();
+            ProActive.register(me, "//localhost/" + "Dispatcher");
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        } 
 
-            /* Initializes the pixel array holding the whole image */
-
-            //Hosts hosts = new Hosts(s_hosts);
-            //engines = hosts.getMachines();
-            //engines = proActiveDescriptor.getVirtualNodeMappingSize()-1;
-            //System.out.println("taille du tableau d'engines "+engines);
-
-            /* Initializes the array to hold the rendering engines */
-
-            //engine = new C3DRenderingEngine[engines];
-            Object[] param = { d };
+        this.gui = new DispatcherGUIImpl("C3D Dispatcher", this.me);
+        try {
 
             /* Creates rendering engines */
+            for (int i = 0; i < this.rendererNodes.length; i++) {
+                String engineName = this.rendererNodes[i].toString();
 
-            //for (int n = 1; n <= engines; n++)
-            //{
-            //String node = hosts.getNextNode();
-            //VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer");
-            //System.out.println(renderer.getName());
-            //JVMNodeProcess jvmNodeProcess = (JVMNodeProcess)renderer.getVirtualMachine().getProcess();
-            //System.out.println(jvmNodeProcess.getClassname());
-            //renderer.activate();
-            //we have to wait for the creation of the nodes
-            //Node[] nodeTab = renderer.getNodes();
-            engines = rendererNodes.length;
-            engine = new C3DRenderingEngine[engines];
-            for (int i = 0; i < rendererNodes.length; i++) {
-                C3DRenderingEngine tmp = (C3DRenderingEngine) ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DRenderingEngine",
-                        param, rendererNodes[i]);
+                // toString() is to express the change, even though rendererNodes are Strings... 
+                Object[] param = { engineName }; // engine name = engineNode name
+                C3DRenderingEngine tmpEngine = (C3DRenderingEngine) ProActive.newActive(
+                        "org.objectweb.proactive.examples.c3d.C3DRenderingEngine", param,
+                        this.rendererNodes[i]);
 
-                //String nodeURL = nodeTab[i].getNodeInformation().getURL();
-                log("New rendering engine " + i + " created at " +
-                    rendererNodes[i]);
+                log("New rendering engine " + i + " created at " + this.rendererNodes[i]);
 
-                // always have a renderer used when launching the program
-                if (i == 1) {
-                    li_enginesUsed.add(rendererNodes[i].toString());
-                } else {
-                    li_enginesAvailable.add(rendererNodes[i].toString());
-                }
+                // always put all renderers as in use, when launching the program
+                // put this <renderer string> in the "used list" of the <GUI>
+                this.gui.addUsedEngine(engineName);
+                // put <renderer> in the "used list" of the <Dispatcher logic> for computation
+                this.engineVector.add(tmpEngine);
 
-                // adds the engine in the hashtable
-                h_engines.put(rendererNodes[i], tmp);
+                // adds all the engine in the hashtable
+                this.engineAndStringTable.add(new Object[] { tmpEngine, engineName });
             }
-
-            //String nodeURL = node.getNodeInformation().getURL();
-            //				C3DRenderingEngine tmp =
-            //					(
-            //						C3DRenderingEngine)ProActive
-            //							.newActive(
-            //						"org.objectweb.proactive.examples.c3d.C3DRenderingEngine",
-            //						param,
-            //						node);
-            //				log("New rendering engine " + n + " created at " + nodeURL);
-            //				
-            //				// always have a renderer used when launching the program
-            //				if (n == 1)
-            //					li_enginesUsed.add(nodeURL.toString());
-            //				else
-            //					li_enginesAvailable.add(nodeURL.toString());
-            //
-            //				// adds the engine in the hashtable
-            //				h_engines.put(nodeURL, tmp);
-            //}
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e.toString());
         }
+
+        //System.out.println("String 2 engine : " + stringToEngineHash);
     }
 
     /**
      * Appends message to the end of the list
      */
-    public void log(String s_message) {
-        ta_log.append(s_message + "\n");
+    private void log(String s_message) {
+        this.gui.log(s_message + "\n");
     }
+
+    // used to count arrived Intervals in the received vector
+    private int pointer;
 
     /**
      * Does the rendering; creates the interval stack, registers the current
@@ -327,159 +191,184 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
      * and triggers the calculation
      */
     private void render() {
-        // Checks there are some engines usde
-        if (li_enginesUsed.getItems().length == 0) {
-            showMessageAll("No engines ... contact the dispatcher");
+        // Checks there are some engines used
+        if (this.engineVector.size() == 0) {
+            allLog("No engines ... contact the dispatcher");
             return;
         }
 
-        // Toggles the rendering flag..
-        b_render = true;
-
         // Benchmarking stuff...
-        startTime = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-        Interval interval;
-        String[] keys = li_enginesUsed.getItems();
-        engines = keys.length;
+        C3DRenderingEngine[] engine = (C3DRenderingEngine[]) engineVector.toArray(
+                new C3DRenderingEngine[0]);
 
-        log("Creating " + intervals + " intervals");
-        intervals = 3 * keys.length;
-        intheight = height / intervals;
+        int nbTasks = 3 * engine.length; 
+        log("Creating " + nbTasks + " intervals");
+        int intheight = IMAGE_HEIGHT / nbTasks;
 
-        /* Sets the number of intervals not yet calculated to 'all' */
-        i_left = intervals;
+        // Create the interval stack 
+        Interval[] intervalsToDraw = new Interval[nbTasks];
+        boolean[] received = new boolean[nbTasks];
 
-        /* Creates the interval stack */
-        int_stack = new Stack();
-        for (int i = 0; i < intervals; i++) {
-            //      log("Creating inter : "+i);
-            Interval newint = new Interval(i, width, height, i * intheight,
-                    (i + 1) * intheight, intervals);
-            int_stack.push(newint);
+        // create all intervals except last one
+        for (int i = 0; i < (nbTasks - 1); i++) {
+            Interval newint = new Interval(
+                    i, IMAGE_WIDTH, IMAGE_HEIGHT, i * intheight, (i + 1) * intheight);
+            intervalsToDraw[i] = newint;
         }
 
-        engine = null;
-        engine = new C3DRenderingEngine[keys.length];
+        // last Interval goes to end of picture, ie IMAGE_HEIGHT
+        Interval newint = new Interval(
+                nbTasks - 1, IMAGE_WIDTH, IMAGE_HEIGHT, (nbTasks - 1) * intheight, IMAGE_HEIGHT);
+        intervalsToDraw[intervalsToDraw.length - 1] = newint;
 
-        C3DRenderingEngine tmp;
-        if (keys != null) {
-            for (int e = 0; e < keys.length; e++) {
+        // To store future ImagePart values
+        Vector images = new Vector();
+        int counter = 0; // says which interval is to assign next 
+        for (int i = 0; i < nbTasks; i++) // no value has come back yet    
 
-                /* Assigns one initial interval to each engine */
-                if (!int_stack.empty()) {
-                    interval = (Interval) int_stack.pop();
+            received[i] = false;
 
-                    tmp = (C3DRenderingEngine) h_engines.get(keys[e]);
-
-                    if (tmp != null) {
-                        tmp.setScene(scene);
-
-                        engine[e] = tmp;
-
-                        /* Triggers the calculation of this interval on engine e */
-                        tmp.render(e, interval);
-
-                        log("Interval " + interval.number +
-                            " assigned to engine " + keys[e] + "[" + e + "]");
-                    } else {
-                        log("Failed to assign an interval to engine " +
-                            keys[e]);
-                        h_engines.get(keys[e]);
-                    }
-                }
+        // assign one task to each renderer
+        for (int i = 0; i < engine.length; i++) {
+            try {
+                engine[i].setScene(this.scene);
+                Interval interval = intervalsToDraw[counter++];
+                images.add(engine[i].render(i, interval));
+                log(
+                    "Interval " + interval.number + " assigned to engine " +
+                    engineToName(engine[i]) + " [" + i + "]");
+            } catch (Exception e) {
+                log("OUPS , " + engineToName(engine[i]) + " is  dead");
             }
-        } else {
-            b_render = false;
-        }
-    }
-
-    long previousTime = -1;
-
-    /**
-     * Forwards the newly calculated pixels from the rendering engine to the
-     * redirectors (i.e. the consumers). This method is called directly by
-     * the rendering engines via their reference to this C3DDispatcher.
-     *
-     * @param newpix the newly calculated pixels as int[]
-     * @param interval the interval, the pixels belong to (width, height ...)
-     * @param engine_number number of the engine, that has calculated this
-     *        interval; this value is used to assign the next interval to
-     *        this same engine
-     */
-    public void setPixels(int[] newpix, Interval interval, int engine_number) {
-        //  public void setPixels(int[] newpix, Interval interval, C3DRenderingEngine currentEngine) {
-        long elapsed;
-
-        /* Delivers the new pixels to all user frames */
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-            User user = (User) e.nextElement();
-
-            user.getObject().setPixels(newpix, interval);
         }
 
-        /* Stores the newly rendered interval in <code>pixels</code>; this
-         * is later used to initialize the images of newcoming consumers */
-        System.arraycopy(newpix, 0, pixels, interval.width * interval.yfrom,
-            newpix.length);
-
-        /* Decreases the counter of not yet rendered intervals */
-        i_left--;
-
-        /* Has the next interval rendered by the same engine */
-        Interval nextinterval;
-        if (!int_stack.empty()) {
-            nextinterval = (Interval) int_stack.pop();
-            log("Next interval [" + nextinterval.number +
-                "] assigned to engine " + engine_number);
-            // new NextInterval(engine_number, engine[engine_number], nextinterval);
-            engine[engine_number].render(engine_number, nextinterval);
-            //      currentEngine.render(0, nextinterval);
-        } else if (i_left == 0) {
-            // Debugging: estimates the number of milliseconds elapsed
-            elapsed = System.currentTimeMillis() - startTime;
-
-            totalRender++;
-            avgRender += ((elapsed - avgRender) / totalRender);
-
-            showMessageAll("All intervals rendered in " + elapsed + " ms");
-            if (previousTime != -1) {
-                showMessageAll("Speed Up : " +
-                    (java.lang.Math.rint(
-                        ((double) previousTime / elapsed) * 1000) / 1000) +
-                    "\n");
-            } else {
-                showMessageAll("");
+        // assign another task to each renderer, so they are busy, even after returning the future
+        for (int i = 0; i < engine.length; i++) {
+            try {
+                Interval interval = intervalsToDraw[counter++];
+                images.add(engine[i].render(i, interval));
+                log(
+                    "Interval " + interval.number + " assigned to engine " +
+                    engineToName(engine[i]) + " [" + i + "]");
+            } catch (Exception e) {
+                log("OUPS , " + engineToName(engine[i]) + "  dead");
             }
-            previousTime = elapsed;
-
-            b_render = false;
         }
+
+        // when a renderer has finished its task, assign it a new one, until there are no more tasks
+        while (counter < intervalsToDraw.length) {
+            Image2D returnedImage = getReturned(images, received);
+            int engineFree = returnedImage.getEngineNb();
+
+            // log("RECEIVED interval " + returnedImage.getInterval().number + " from " + engineFree);
+            Interval newInterval = intervalsToDraw[counter++];
+            images.add(engine[engineFree].render(engineFree, newInterval));
+            log(
+                "Interval " + newInterval.number + " assigned to engine " +
+                engineToName(engine[engineFree]) + "[" + engineFree + "]");
+        }
+
+        this.pointer = 0;
+
+        Image2D returnedImage = getReturned(images, received);
+        int engineFree = returnedImage.getEngineNb();
+
+        //log("RECEIVED interval " + returnedImage.getInterval().number + " from " + engineFree);
+        // when all tasks have been assigned, finish treating arriving results
+        // and also redraw first intervals, hoping to get faster rendering...
+        int intervalToRecompute;
+        while (-1 != (intervalToRecompute = allArrived(received))) { // we're sure not all have yet arrived
+            // intervalToRecompute is the next not-yet-returned interval
+            //assert !received[stillComputing] : "Oups, recomputing one already received! " + stillComputing;
+            // assign to newly freed engine an interval not yet received
+            Interval redrawInterval = intervalsToDraw[intervalToRecompute];
+            images.add(engine[engineFree].render(engineFree, redrawInterval));
+            log(
+                "Interval " + redrawInterval.number + " re-assigned to engine " +
+                engineToName(engine[engineFree]) + "[" + engineFree + "]");
+
+            returnedImage = getReturned(images, received);
+            engineFree = returnedImage.getEngineNb();
+            //log("RECEIVED interval " + returnedImage.getInterval().number + " from " + engineFree);
+        }
+
+        long elapsed = System.currentTimeMillis() - startTime;
+
+        allLog("Image rendered in " + elapsed + " ms");
     }
 
     /**
-     * Rotates all the objects (spheres, for the moment) by <code>angle</code>
-     * around their y axis; re-renders the image afterwards
-     *
-     * @param angle the angle to rotate the objects in radians, a positive
-     *        value means a rotation to the 'right'
+     * Find the returned image in the images Vector, and sets received to true for this image.
+     * @param images the Vector which contains futures, on which to wait for arrival
+     * @param received the array of booleans which says if vector is arrived, aka !toBeComputedAgain
+     * @return an image which is no longer a future
      */
-    private void rotateSceneY(double angle) {
-        int objects = scene.getObjects();
-        Sphere o;
+    private Image2D getReturned(Vector images, boolean[] received) {
+        int index = ProActive.waitForAny(images);
+        Image2D returnedImage = (Image2D) images.remove(index);
+        setPixels(returnedImage);
+        received[returnedImage.getInterval().number] = true;
+        return returnedImage;
+    }
+
+    /**
+     * Checks whether ALL intervals have spawn an Image2D.
+     * This aims at having several renderers handling the same Interval ==> [fault tolerance] & speedup.
+     * // TODO : real fault tolerance requires surrounding distant calls with try catch & timeouts.
+     * Note we could be having an Interval still being computed, and also already
+     * received, but we only care about receiving all values. The future is discarded.
+     * @return -1 if all Intervals have returned an Image2D, index of interval missing elsewise.
+     */
+    private int allArrived(boolean[] received) {
+        // needed as stop value in the second for loop
+        int oldvalue = this.pointer;
+
+        // check all values from oldvalue to array.length
+        for (; this.pointer < received.length; this.pointer++)
+            if (!received[this.pointer]) {
+                return this.pointer++;
+            }
+
+        // check all values from 0 to oldvalue
+        for (this.pointer = 0; this.pointer < oldvalue; this.pointer++)
+            if (!received[this.pointer]) {
+                return this.pointer++;
+            }
+
+        // if all booleans in received[] are true, then it means all results have arrived.
+        return -1;
+    }
+
+    /** Delivers newly computed pixels to users, and stores for future use. */
+    private void setPixels(Image2D image) {
+        // TODO: this could be a group comm  : userGroup.setPixels(image);
+        // Delivers the new pixels to all users
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            this.userBag.currentUser().setPixels(image);
+        }
+
+        // Stores the newly rendered interval in this.localCopyOfImage. 
+        // this.localCopyOfImage is later used to initialize the images of newcoming consumers 
+        System.arraycopy(
+            image.getPixels(), 0, this.localCopyOfImage,
+            image.getInterval().totalImageWidth * image.getInterval().yfrom,
+            image.getPixels().length);
+    }
+
+    /**
+     * Rotate every object by the given angle
+     */
+    public void rotateScene(int i_user, Vec angles) {
+        int objects = this.scene.getNbPrimitives();
 
         /* on every object ... */
         for (int i = 0; i < objects; i++) {
-            o = (Sphere) scene.getObject(i);
-            Vec c = o.getCenter();
-            double phi = Math.atan2(c.z, c.x);
-            double l = Math.sqrt((c.x * c.x) + (c.z * c.z));
-
-            /* ... perform the standard rotation math */
-            c.x = l * Math.cos(phi + angle);
-            c.z = l * Math.sin(phi + angle);
-            o.setCenter(c);
-            scene.setObject(o, i);
+            Primitive p = this.scene.getPrimitive(i);
+            p.rotate(angles);
+            this.scene.setPrimitive(p, i);
         }
 
         /* re-renders the image to reflect the rotation */
@@ -487,1197 +376,391 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
     }
 
     /**
-     * Rotates all the objects (spheres, for the moment) by <code>angle</code>
-     * around their x axis; re-renders the image afterwards
-     *
-     * @param angle the angle to rotate the objects in radians, a positive
-     *        value means a rotation to the 'right'
+     * ProActive queue handling
      */
-    private void rotateSceneX(double angle) {
-        int objects = scene.getObjects();
-        Sphere o;
+    public void runActivity(Body body) {
+        // Creates the rendering engines 
+        go();
+        requestQueue = body.getRequestQueue();
 
-        /* on every object ... */
-        for (int i = 0; i < objects; i++) {
-            o = (Sphere) scene.getObject(i);
-            Vec c = o.getCenter();
-            double phi = Math.atan2(c.z, c.y);
-            double l = Math.sqrt((c.y * c.y) + (c.z * c.z));
-
-            /* ... perform the standard rotation math */
-            c.y = l * Math.cos(phi + angle);
-            c.z = l * Math.sin(phi + angle);
-            o.setCenter(c);
-            scene.setObject(o, i);
-        }
-
-        /* re-renders the image to reflect the rotation */
-        render();
-    }
-
-    /**
-     * Rotates all the objects (spheres, for the moment) by <code>angle</code>
-     * around their x axis; re-renders the image afterwards
-     *
-     * @param angle the angle to rotate the objects in radians, a positive
-     *        value means a rotation to the 'right'
-     */
-    private void rotateSceneZ(double angle) {
-        int objects = scene.getObjects();
-        Sphere o;
-
-        /* on every object ... */
-        for (int i = 0; i < objects; i++) {
-            o = (Sphere) scene.getObject(i);
-            Vec c = o.getCenter();
-            double phi = Math.atan2(c.x, c.y);
-            double l = Math.sqrt((c.y * c.y) + (c.x * c.x));
-
-            /* ... perform the standard rotation math */
-            c.y = l * Math.cos(phi + angle);
-            c.x = l * Math.sin(phi + angle);
-            o.setCenter(c);
-            scene.setObject(o, i);
-        }
-
-        /* re-renders the image to reflect the rotation */
-        render();
-    }
-
-    /**
-     * Rotates the objects in the rendering scene by pi/4 to the left
-     *
-     * @param i_user number of the user requesting this rotation; this
-     *        value used for the synchronization and notification of several
-     *        users
-     */
-    public void rotateLeft(int i_user) {
-        rotateSceneY(-Math.PI / 4);
-    }
-
-    /**
-     * Rotates the objects in the rendering scene by pi/4 to the right
-     *
-     * @param i_user number of the user requesting this rotation; this
-     *        value used for the synchronization and notification of several
-     *        users
-     */
-    public void rotateRight(int i_user) {
-        rotateSceneY(Math.PI / 4);
-    }
-
-    /**
-     * Rotates the objects in the rendering scene by pi/4 to the left
-     *
-     * @param i_user number of the user requesting this rotation; this
-     *        value used for the synchronization and notification of several
-     *        users
-     */
-    public void rotateUp(int i_user) {
-        rotateSceneX(Math.PI / 4);
-    }
-
-    /**
-     * Rotates the objects in the rendering scene by pi/4 down
-     *
-     * @param i_user number of the user requesting this rotation; this
-     *        value used for the synchronization and notification of several
-     *        users
-     */
-    public void rotateDown(int i_user) {
-        rotateSceneX(-Math.PI / 4);
-    }
-
-    /**
-     * Spins clockwise
-     *
-     * @param i_user number of the user requesting this rotation; this
-     *        value used for the synchronization and notification of several
-     *        users
-     */
-    public void spinClock(int i_user) {
-        rotateSceneZ(Math.PI / 4);
-    }
-
-    /**
-     * Spins the scene un-clockwise
-     *
-     * @param i_user number of the user requesting this rotation; this
-     *        value used for the synchronization and notification of several
-     *        users
-     */
-    public void spinUnclock(int i_user) {
-        rotateSceneZ(-Math.PI / 4);
-    }
-
-    public void changeColorAll() {
-        logger.info("changeColorAll()");
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();)
-            ((User) e.nextElement()).getObject().getUserFrame().getB_left()
-             .setBackground(Color.yellow);
-    }
-
-    /**
-     * ProActive object life routine
-     * To be remdelled..
-     */
-    public void runActivity(org.objectweb.proactive.Body body) {
-        //registerDispatcher(body.getNodeURL());
-
-        /* Creates the rendering engines */
-        init();
-        org.objectweb.proactive.core.body.request.BlockingRequestQueue requestQueue =
-            body.getRequestQueue();
-
-        /* Loops over lifetime */
+        // Loops over lifetime
         while (body.isActive()) {
 
             /* Waits on any method call */
             Request r = requestQueue.blockingRemoveOldest();
             String methodName = r.getMethodName();
-            if (methodName.startsWith("rotate") ||
-                    methodName.startsWith("spin")) {
-                processRotate(body, methodName, r);
+            if (methodName.equals("rotateScene")) {
+                processRotate(body, r);
+            } else if (!Election.isRunning()) {
+                // No election and the method isn't a rotation
+                body.serve(r);
+            } else if (methodName.equals("addSphere")) {
+                // There is an election and addsphere comes..
+                // nothing happens...
+                allLog("Cannot add spheres while an election is running");
             } else {
-                if (!Election.isRunning()) {
-                    // No election and the method != up,down,left,right
-                    body.serve(r);
-                } else if (methodName.equals("addSphere")) {
-                    // There is an election and addsphere comes..
-                    // nothing happens...
-                    showMessageAll(
-                        "Cannot add spheres while an election is running");
-                } else {
-                    // THERE IS a running election and the method name is not left or right..
-                    body.serve(r);
-                }
+                // There is a running election, the method is not rotate nor addshpere
+                body.serve(r);
             }
         }
-
-        //}
     }
 
-    //	private void registerDispatcher(String nodeURL)
-    //	{
-    //		/* Register this C3DDispatcher, this will serve as entry point to the
-    //		 * raytracing system for the user frames */
-    //		 
-    //		try
-    //		{
-    //			org.objectweb.proactive.core.node.Node node =
-    //				org.objectweb.proactive.core.node.NodeFactory.getNode(nodeURL);
-    //			s_access_url =
-    //				"//"
-    //					+ node.getNodeInformation().getInetAddress().getHostName()
-    //					+ "/"
-    //					+ C3D_DISPATCHER_BIND_NAME;
-    //			org.objectweb.proactive.ProActive.register(
-    //				org.objectweb.proactive.ProActive.getStubOnThis(),
-    //				s_access_url);
-    //			log("Successfully registered at " + s_access_url + " and ready.");
-    //			
-    //		}
-    //		catch (org.objectweb.proactive.core.node.NodeException e)
-    //		{
-    //			log("Error: The node of the body cannot be found!");
-    //			e.printStackTrace();
-    //		}
-    //		catch (UnknownHostException e)
-    //		{
-    //			log("Error: Name of the local host could not be determined!");
-    //			e.printStackTrace();
-    //		}
-    //		catch (java.io.IOException e)
-    //		{
-    //			log("Error: could not register, RMI registry not found!");
-    //			e.printStackTrace();
-    //		}
-    //	}
-
     /**
-     * Processes the requests which are relative to rotations
-     * @param body The body of the active object
-     * @param methodName The methodname <font size="-1">Not reconputed in order to gain time</font>
-     * @param r The request object
+     * check a demand for rotation is valid, and then possibly starts election
      */
-    public void processRotate(org.objectweb.proactive.Body body,
-        String methodName, Request r) {
+    public void processRotate(Body body, Request r) {
         int i_user = 0;
-        try {
-            i_user = ((Integer) r.getParameter(0)).intValue();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (methodName.equals("rotateLeft")) {
-            // A user wants to rotate left
-            if (Election.isRunning()) {
-                // There is an election
-                int i_votes = Election.vote(i_user, new Integer(Election.LEFT));
-                if (i_votes == h_users.size()) {
-                    election.finish();
-                }
-            } else {
-                // There is no election
-                if (i_left > 0) {
-                    showMessage(i_user, "Rendering in progress, request invalid");
-                } else if (h_users.size() == 1) {
-                    showMessage(i_user, "Scene is being rotated left");
-                    body.serve(r);
-                } else {
-                    election = new Election(i_user, new Integer(Election.LEFT),
-                            this);
-                }
+        Vec rotateVec = null;
+        i_user = ((Integer) r.getParameter(0)).intValue();
+        rotateVec = (Vec) r.getParameter(1);
+        if (Election.isRunning()) {
+            int nb_votes = Election.vote(i_user, rotateVec);
+            if (nb_votes == this.userBag.size()) {
+                Election.finish();
             }
-        } else if (methodName.equals("rotateRight")) {
-            // A user wants to go right
-            if (Election.isRunning()) {
-                // there is an election
-                int i_votes = Election.vote(i_user, new Integer(Election.RIGHT));
-                if (i_votes == h_users.size()) {
-                    election.finish();
-                }
-            } else {
-                // there is no election
-                if (i_left > 0) {
-                    showMessage(i_user, "Rendering in progress, request invalid");
-                } else if (h_users.size() == 1) {
-                    showMessage(i_user, "Scene is being rotated right");
-                    body.serve(r);
-                } else {
-                    election = new Election(i_user,
-                            new Integer(Election.RIGHT), this);
-                }
-            }
-        } else if (methodName.equals("rotateUp")) {
-            // A user wants to go up
-            if (Election.isRunning()) {
-                // There is an election
-                int i_votes = Election.vote(i_user, new Integer(Election.UP));
-                if (i_votes == h_users.size()) {
-                    election.finish();
-                }
-            } else {
-                // There is no election
-                if (i_left > 0) {
-                    showMessage(i_user, "Rendering in progress, request invalid");
-                } else if (h_users.size() == 1) {
-                    showMessage(i_user, "Scene is being rotated up");
-                    body.serve(r);
-                } else {
-                    election = new Election(i_user, new Integer(Election.UP),
-                            this);
-                }
-            }
-        } else if (methodName.equals("rotateDown")) {
-            // An user wants to go down
-            if (Election.isRunning()) {
-                // there is an election
-                int i_votes = Election.vote(i_user, new Integer(Election.DOWN));
-                if (i_votes == h_users.size()) {
-                    election.finish();
-                }
-            } else {
-                // there is no election
-                if (i_left > 0) {
-                    showMessage(i_user, "Rendering in progress, request invalid");
-                } else if (h_users.size() == 1) {
-                    showMessage(i_user, "Scene is being rotated down");
-                    body.serve(r);
-                } else {
-                    election = new Election(i_user, new Integer(Election.DOWN),
-                            this);
-                }
-            }
-        } else if (methodName.equals("spinClock")) {
-            // A user wants to spin clockwise
-            if (Election.isRunning()) {
-                // There is an election
-                int i_votes = Election.vote(i_user,
-                        new Integer(Election.CLOCKWISE));
-                if (i_votes == h_users.size()) {
-                    election.finish();
-                }
-            } else {
-                // There is no election
-                if (i_left > 0) {
-                    showMessage(i_user, "Rendering in progress, request invalid");
-                } else if (h_users.size() == 1) {
-                    showMessage(i_user, "Scene is being spinned right");
-                    body.serve(r);
-                } else {
-                    election = new Election(i_user,
-                            new Integer(Election.CLOCKWISE), this);
-                }
-            }
-        } else if (methodName.equals("spinUnclock")) {
-            // An user wants to spin unclock
-            if (Election.isRunning()) {
-                // there is an election
-                int i_votes = Election.vote(i_user,
-                        new Integer(Election.UNCLOCKWISE));
-                if (i_votes == h_users.size()) {
-                    election.finish();
-                }
-            } else {
-                // there is no election
-                if (i_left > 0) {
-                    showMessage(i_user, "Rendering in progress, request invalid");
-                } else if (h_users.size() == 1) {
-                    showMessage(i_user, "Scene is being spinned left");
-                    body.serve(r);
-                } else {
-                    election = new Election(i_user,
-                            new Integer(Election.UNCLOCKWISE), this);
-                }
-            }
+        } else if (this.userBag.size() == 1) {
+            userLog(i_user, "Scene is being spun along " + rotateVec.direction());
+            body.serve(r);
+        } else {
+            Election.newElection(i_user, rotateVec, this);
         }
     }
 
-    /**
-     * Displays a message at a consumer; convenience method
-     *
-     * @param i_user number of the user frame to show the message on
-     * @param message the message to display
-     */
-    public void showMessage(int i_user, String s_message) {
-        ((User) h_users.get(new Integer(i_user))).getObject().showMessage(s_message);
+    /** Sends a [log] message to given user */
+    public void userLog(int i_user, String s_message) {
+        this.userBag.getUser(i_user).log(s_message);
     }
 
-    /**
-     * Displays a dialog message at a consumer; convenience method
-     *
-     * @param i_user number of the user frame to show the message on
-     * @param message the message to display
-     */
-    public void showDialog(int i_user, String subject, String s_message) {
-        ((User) h_users.get(new Integer(i_user))).getObject().dialogMessage(subject,
-            s_message);
+    /** Shows a message to a user*/
+    public void userWriteMessage(int i_user, String s_message) {
+        this.userBag.getUser(i_user).message(s_message);
     }
 
-    /**
-     *   Displays a message sent by another user
-     */
-    public void showUserMessage(int i_user, String s_message) {
-        ((User) h_users.get(new Integer(i_user))).getObject().showUserMessage(s_message);
-    }
-
-    /**
-     * Sends  message to everybody
-     * @param s_message the message to display
-     */
-    public void showMessageAll(String s_message) {
+    /** Ask users & dispatcher log s_message, except one  */
+    public void allLogExcept(int i_user, String s_message) {
         log(s_message);
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-            ((User) e.nextElement()).getObject().showMessage(s_message);
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            if (this.userBag.currentKey() != i_user) {
+                this.userBag.currentUser().log(s_message);
+            }
         }
     }
 
-    /* public void setInitialColor() {
-       for (Enumeration e = h_users.elements() ; e.hasMoreElements() ;) {
-         ((User) e.nextElement()).getObject().getUserFrame().getB_clock().setBackground(Color.gray);
-       }
-       }*/
-
-    /**
-     * Sends a message to everybody except the user
-     * @param i_user The number of the user
-     * @param s_message The message
-     */
-    public void showMessageExcept(int i_user, String s_message) {
+    /** send message to all users except one */
+    public void userWriteMessageExcept(int i_user, String s_message) {
         log(s_message);
-        int i;
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            i = ((Integer) e.nextElement()).intValue();
-            if (i != i_user) {
-                showMessage(i, s_message);
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            if (this.userBag.currentKey() != i_user) {
+                this.userBag.currentUser().message(s_message);
             }
         }
     }
 
-    /**
-     * Sends a dialog message to everybody except the user
-     * @param i_user The number of the user
-     * @param s_message The message
-     */
-    public void showDialogExcept(int i_user, String subject, String s_message) {
-        int i;
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            i = ((Integer) e.nextElement()).intValue();
-            if (i != i_user) {
-                showDialog(i, subject, s_message);
-            }
-        }
-    }
-
-    /**
-     * Sends a message to everybody except the user
-     * @param i_user The number of the user
-     * @param s_message The message
-     */
-    public void showUserMessageExcept(int i_user, String s_message) {
+    /** Ask all users & dispatcher to log s_message */
+    public void allLog(String s_message) {
         log(s_message);
-        int i;
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            i = ((Integer) e.nextElement()).intValue();
-            if (i != i_user) {
-                showUserMessage(i, s_message);
-            }
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            this.userBag.currentUser().log(s_message);
         }
     }
-
     /**
      * Instanciates a new active C3DDispatcher on the local machine
-     *
-     * @param argv Name of the hosts file
+     * @param argv Name of the descriptor file
      */
-    public static void main(String[] argv) throws NodeException {
+    public static void main(String[] argv)
+        throws NodeException {
         ProActiveDescriptor proActiveDescriptor = null;
-        ProActiveConfiguration.load();
-        //if (argv.length < 1)
-        //{
-        //System.err.println(
-        //"Usage: java org.objectweb.proactive.examples.c3d.C3DDispatcher <engineFile> [<nodeURL>]");
-        //System.exit(0);
-        //}
-        Node node = null;
+        ProActiveConfiguration.load();     // this line also registers the dispatcher in the registry!!!
+        
 
-        //if (argv.length == 2) {
-        //node = NodeFactory.getNode("//localhost/dispatcher");
-        //} else {
-        //node = NodeFactory.createNode("//localhost/dispatcher");
-        //}
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
-                    argv[0]);
+            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" + argv[0]);
             proActiveDescriptor.activateMappings();
-            //Thread.sleep(20000);		
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Pb in main");
+            logger.error("Pb in main, trouble loading descriptor");
         }
 
-        //Object param[] = new Object[]{ proActiveDescriptor };
-        VirtualNode dispatcher = proActiveDescriptor.getVirtualNode(
-                "Dispatcher");
+        String[] rendererNodes = proActiveDescriptor.getVirtualNode("Renderer").getNodesURL();
+        Object[] param = new Object[] { rendererNodes, proActiveDescriptor };
 
-        VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer");
-        String[] rendererNodes = renderer.getNodesURL();
-        Object[] param = new Object[] {
-                rendererNodes, dispatcher, proActiveDescriptor
-            };
-
-        //System.out.println("in main"+dispatcher.getVirtualMachine().getProcess().getCommand());	
-        //VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer1");
-        //System.out.println(renderer.getName());
-        //JVMNodeProcess jvmNodeProcess = (JVMNodeProcess)renderer.getVirtualMachine().getProcess();
-        //System.out.println(jvmNodeProcess.getParameters());
-        //dispatcher.activate();
-        node = dispatcher.getNode();
-        //System.out.println(node.getNodeInformation().getURL());
-        //System.out.println(System.getProperty("java.class.path"));
-        //String nodeURL = node.getNodeInformation().getURL();
+        Node node = proActiveDescriptor.getVirtualNode("Dispatcher").getNode();
         try {
-            ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DDispatcher",
-                param, node);
+            ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DDispatcher", param, node);
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        // System.exit(0);
     }
 
-    /**
-     * The pinging function called by <code>C3DUser and C3DRenderingEngine</code>
-     * to get the avg. pinging time
-     */
-    public int ping() {
-        return 0;
-    }
+    /** Register a user, so he can join the fun */
 
-    /**
-     * Registers a consumer with this C3DDispatcher; called by the user frames
-     * after initialization.
-     *
-     * @param t the User as entry point for subsequent method
-     *          calls, e.g. setPixels
-     * @param scene the Scene the consumer wants to have rendered, only the
-     *        first Scene is accepted
-     * @return number (counter) of the consumer at this C3DDispatcher, used to
-     *         distinguish consumers in the display and for subsequent
-     *         method calls, e.g. rotateRight
-     */
-    public int registerConsumer(C3DUser c3duser, Scene newscene, String s_name) {
-        //System.out.println("User wan in: " + c3duser.getWidth());
+    //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
+    public int[] registerUser(C3DUser c3duser, String userName) {
         c3duser.log("-> Remote call-back: dispatcher found, user registered");
+        log("New user " + userName + "(" + this.i_lastuser + ") has joined");
 
-        log("New user " + s_name + "(" + i_lastuser + ") has joined");
-
-        User newUser = new User(s_name, c3duser);
-
-        /* Adds this User to the list */
-        h_users.put(new Integer(i_lastuser), newUser);
-        li_users.add(s_name + " (" + i_lastuser + ")");
-
-        /**
-         * Informs the other users of the new user
-         */
-
-        // Updates the remote h_users
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
-            User oldUser = ((User) h_users.get(new Integer(i)));
-            if (i != i_lastuser) {
-                // Inform the old users
-                oldUser.getObject().informNewUser(i_lastuser, s_name);
-                // Inform the new user
-                newUser.getObject().informNewUser(i, oldUser.getName());
-            }
+        // Informs the other users of the new user
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            this.userBag.currentUser().informNewUser(this.i_lastuser, userName);
+            c3duser.informNewUser(this.userBag.currentKey(), this.userBag.currentName());
         }
 
-        /**
-         * Pinging the new User
-         */
-        userTotal++;
-        long elapsed;
-        long start = System.currentTimeMillis();
+        // Adds this User to the list 
+        this.userBag.add(this.i_lastuser, c3duser, userName);
+        this.gui.addUser(userName + " (" + this.i_lastuser + ")");
 
-        // Forces the use of a synchroneous call by using future
-        if (c3duser.ping() == 0) {
-            // avg = avg + ((new-avg)/times)
-            elapsed = System.currentTimeMillis() - start;
-            userPing += ((elapsed - userPing) / userTotal);
-            log("Pinging user " + s_name + " in " + elapsed + " ms. Average: " +
-                userPing);
-        }
-
-        /**
-         * Does some initialization when the first consumer registers
-         */
-        if (h_users.size() == 1) {
-
-            /* Sets the scene to the consumers wish */
-            scene = newscene;
-
-            /* Initializes image properties */
-            width = c3duser.getWidth().intValue();
-            height = c3duser.getHeight().intValue();
-            pixels = new int[width * height];
-            intervals = 3 * engines;
-            intheight = height / intervals;
-            int max;
-
-            if (s_name.compareTo("Benchmarking bot") == 0) {
-                max = 50;
-            } else {
-                max = 1;
-            }
-
-            // Performs pings on the remote engines
-            int engPingTotal = 0;
-            for (int n = 0; n < engines; n++) {
-                for (int i = 1; i < max; i++) {
-                    engPingTotal++;
-                    start = System.currentTimeMillis();
-                    if (engine[n].ping() == 1) {
-                        elapsed = System.currentTimeMillis() - start;
-                        enginePing += ((elapsed - enginePing) / engPingTotal);
-                    }
-                }
-            }
-
-            /* Creates the intervals, starts the calculation with initial  intervals */
+        //  Do some initialization, if this was the first consumer to register
+        if (this.userBag.size() == 1) {
+            /* Sets the scene */
+            this.scene = createNewScene();
+            /* Initializes local image properties */
+            this.localCopyOfImage = new int[IMAGE_WIDTH * IMAGE_HEIGHT];
+            /* Creates the intervals, starts the calculation */
             render();
         } else {
-
             /* Initializes the image of the new-coming consumer */
-            Interval inter = new Interval(0, width, height, 0, height, 1);
-            c3duser.setPixels(pixels, inter);
+            Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, IMAGE_HEIGHT);
+            c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0)); 
         }
-        return i_lastuser++;
+
+        // return user_id, image_width & image_height;
+        int[] result = new int[] { this.i_lastuser++, IMAGE_WIDTH, IMAGE_HEIGHT };
+        return result;
     }
 
     public void registerMigratedUser(int userNumber) {
-        User user = (User) h_users.get(new Integer(userNumber));
-        log("User " + user.getName() + "(" + userNumber + ") has migrated ");
+        String name = this.userBag.getName(userNumber);
+        log("User " + name + "(" + userNumber + ") has migrated ");
+        C3DUser c3duser = this.userBag.getUser(userNumber);
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
-            User oldUser = ((User) h_users.get(new Integer(i)));
-            if (i != userNumber) {
-                // Inform users
-                user.getObject().informNewUser(i, oldUser.getName());
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            if (this.userBag.currentKey() != userNumber) {
+                c3duser.informNewUser(this.userBag.currentKey(), this.userBag.currentName());
             }
         }
 
         /* Initializes the image of the migrated consumer */
-        Interval inter = new Interval(0, width, height, 0, height, 1);
-        user.getObject().setPixels(pixels, inter);
+        Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, IMAGE_HEIGHT);
+        c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
     }
 
-    /**
-     * Reset the scene
-     */
-    public void resetScene(Scene s) {
-        if (!int_stack.isEmpty()) {
-            showMessageAll("Cannot reset scene while rendering");
-            return;
-        } else {
-            scene = s;
-            showMessageAll("The scene has been reseted. Rendering...");
-            render();
-        }
-    }
-
-    /**
-     * Removes a consumer from the list of registered consumers
-     *
-     * @param number number of the consumer to be removed
-     */
+    /** removes user from userList, so he cannot receive any more messages or images */
     public void unregisterConsumer(int number) {
-        showMessageExcept(number, "User " + nameOfUser(number) + " left");
+        allLogExcept(number, "User " + nameOfUser(number) + " left");
 
-        for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-            int i = ((Integer) e.nextElement()).intValue();
-
-            if (i != number) {
-                User user = ((User) h_users.get(new Integer(i)));
-
-                // Inform all user except the user that left
-                user.getObject().informUserLeft(nameOfUser(number));
+        // Inform all users one left
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            if (this.userBag.currentKey() != number) {
+                this.userBag.currentUser().informUserLeft(nameOfUser(number));
             }
         }
 
-        try {
-            li_users.remove(nameOfUser(number) + " (" + number + ")");
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        // remove that name from the Dispatcher frame
+        this.gui.removeUser(nameOfUser(number) + " (" + number + ")");
+
+        // remove from internal list of users.
+        this.userBag.remove(number); 
+
+        // if no more users, reset all numbers to zero
+        if (this.userBag.size() == 0) {
+            this.i_lastuser = 0;
         }
-        h_users.remove(new Integer(number));
-        if (h_users.isEmpty()) {
-            //h_engines.clear();
-            //li_enginesUsed.removeAll();
-            //li_enginesAvailable.removeAll();
-            int_stack.removeAllElements();
-            i_lastuser = 0;
-        }
+    }
+
+    public void resetScene() {
+        this.scene = createNewScene();
+        allLog("The scene has been reset. Rendering...");
+        render();
     }
 
     /**
-     * Return OS of the machine, this C3DDispatcher is running on
-     *
-     * @return name and version of the OS
+     * Create and initialize the scene for the rendering picture.
+     * @return The scene just created
      */
-    public String getOSString() {
-        return System.getProperty("os.name") + " " +
-        System.getProperty("os.version");
+    private Scene createNewScene() {
+        Scene scene = new Scene();
+
+        /* Creates three spheres */
+        Primitive p = new Sphere(new Vec(10, -5.77, 0), 7);
+        p.setSurface(new Surface(new Vec(1, 0, 0), 0.7, 0.3, 14, 0, 1));
+        scene.addPrimitive(p);
+
+        p = new Sphere(new Vec(0, 11.55, 0), 7);
+        p.setSurface(new Surface(new Vec(0, 1, 0), 0.7, 0.3, 14, 0, 1));
+        scene.addPrimitive(p);
+
+        p = new Sphere(new Vec(-10, -5.77, 0), 7);
+        p.setSurface(new Surface(new Vec(0, 0, 1), 0.7, 0.3, 14, 0, 1));
+        scene.addPrimitive(p);
+
+        /* How about a Plane ? */
+        p = new Plane(new Vec(0, 0, 1), 10);
+        
+        Vec cornSilk = new Vec(1,248./255.,220./255.);
+        //Vec nightBlue = new Vec(0.098, 0.098, 0.439);
+        p.setSurface(new Surface(cornSilk , 0.7, 0.3, 14, 0, 1));
+        scene.addPrimitive(p);
+
+        /* Creates lights for the scene */
+        scene.addLight(new Light(100, 100, -50, 1.0));
+        scene.addLight(new Light(-100, 100, -50, 1.0));
+        scene.addLight(new Light(100, -100, -50, 1.0));
+
+        /* Creates a View (viewing point) for the rendering scene */
+        View v = new View();
+        scene.setView(v);
+
+        return scene;
     }
 
-    public int getIntervals() {
-        return intervals;
-    }
-
-    public String getUserList() {
-        StringBuffer s_list = new StringBuffer();
-        for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-            s_list.append("  " + ((User) e.nextElement()).getName() + "\n");
+    /** Find the name of the machine this Dispatcher is running on */
+    public String getMachineName() {
+        String hostName = "unknown";
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-        return s_list.toString();
+        return hostName;
     }
 
+    /** Find the name of the OS the Dispatcher is running on */
+    public String getOSString() {
+        return System.getProperty("os.name") + " " + System.getProperty("os.version");
+    }
+
+    /** Get the list of users in an asynchronous call, entries being separated by \n */
+    public StringWrapper getUserList() {
+        StringBuffer s_list = new StringBuffer();
+        for (this.userBag.newIterator(); this.userBag.hasNext();) {
+            this.userBag.next();
+            s_list.append("  " + this.userBag.currentName() + "\n");
+        }
+        return new StringWrapper(s_list.toString());
+    }
+
+    /** transforms an id in a name */
     String nameOfUser(int i_user) {
-        return ((User) h_users.get(new Integer(i_user))).getName();
-    }
-
-    private void trace(String s_message) {
-        logger.info("C3DDispatcher: " + s_message);
+        return this.userBag.getName(i_user);
     }
 
     public void addSphere(Sphere s) {
         // Can only add sphere if there is no rendering going on
-        if (!int_stack.isEmpty()) {
-            showMessageAll("Cannot add spheres while rendering");
-            return;
-        } else {
-            scene.addObject((Primitive) s);
-            showMessageAll("A Sphere has been added\nX:" +
-                Math.floor(s.getCenter().x) + " Y:" +
-                Math.floor(s.getCenter().y) + " Z:" +
-                Math.floor(s.getCenter().y));
-            render();
-            log("Scene now contains " + scene.getObjects() + " spheres");
+        this.scene.addPrimitive(s);
+        allLog("A Sphere has been added\n" + s);
+        render();
+        log("Scene now contains " + this.scene.getNbPrimitives() + " spheres");
+    }
+
+    /** Shut down everything, send warning messages to users */
+    public void exit() {
+        allLog("Dispatcher closed, Exceptions may be generated...");
+        try {
+            proActiveDescriptor.killall(true);
+            gui.trash();
+            System.exit(0);
+        } catch (Exception e) {
+            logger.info("C3DDispatcher: WARNING occurs when killing the application!");
         }
     }
 
-    /**
-     * @@ experimental benchmark function...
-     * Should maybe dump the results into a file???
-     * Ascii / cvs format ???
-     */
+    /** See how well the simulation improves with more renderers */
     public void doBenchmarks() {
-        FileWriter bench;
-        long start;
-        long elapsed;
-
-        for (int n = 0; n < engines; n++) {
-            // Pings each engine
-            start = System.currentTimeMillis();
-            if (engine[n].ping() == 0) {
-                elapsed = System.currentTimeMillis() - start;
-                enginePing += ((elapsed - enginePing) / (n + 1));
-                log("Pinging engine " + n + "in " + elapsed + " ms. Average: " +
-                    enginePing);
-            }
-        }
+        String benchFileName = "c3d_benchmark.plot";
         try {
-            log("Creating file");
-
-            bench = new FileWriter("bench" + engines + ".txt");
-
-            bench.write("#Test file for bench generation\n");
-            bench.write(new Date().toString());
-            bench.write("#Total number of users:\n" + userTotal);
-            bench.write("\n#Avg. rd-trip time:\n" + userPing);
-            bench.write("\n#Number of engines:\n" + engine.length);
-            bench.write("\n#Avg rd-trip time:\n" + enginePing);
-            bench.write("\n#Number of renderings:\n" + totalRender);
-            bench.write("\n#Avg rendering time:\n" + avgRender);
-            bench.write('\n');
-            bench.close();
-            log("Closing");
-        } catch (IOException e) {
-            log(e.getMessage());
-        }
-
-        // Popular demand : plot file
-        try {
-            RandomAccessFile plot = new RandomAccessFile("papdc.plot", "rw");
-
-            // Goes to EOF
-            plot.seek(plot.length());
+            // open plot file
+            RandomAccessFile plot = new RandomAccessFile(benchFileName, "rw");
+            plot.seek(plot.length()); // Goes to EOF
             plot.writeChars("#" + new Date().toString() + "\n");
-            plot.writeChars("" + engines + "\t" + avgRender + "\n");
+            plot.writeChars("# fields : <nb machines> <average time>\n");
+
+            this.scene = createNewScene(); // make the scene
+            rotateScene(0, new Vec(0, Math.PI / 4, 0)); // just a little turn, so it's not flat.
+            Vec rotation = new Vec(0, 0, Math.PI / 4); // the rotation vector used
+            int max = this.engineAndStringTable.size(); // nb of engines available
+
+            for (int i = 1; i <= max; i++) {
+                log("##########   Testing with " + i + " engine(s)");
+                AverageMicroTimer timer = new AverageMicroTimer("Engines : " + i);
+
+                // A too long way to say "use only i engines"
+                String[] enginesNowUsed = this.gui.setEngines(i);
+                this.engineVector = new Vector(); // equal to "for all engines, turnOff(engine)"
+                for (int k = 0; k < enginesNowUsed.length; k++)
+                    turnOnEngine(enginesNowUsed[k]);
+
+                for (int j = 0; j < 16; j++) {
+                    if (requestQueue.hasRequest("doBenchmarks")) {
+                        break;
+                    }
+                    rotateScene(0, rotation);
+                    timer.start();
+                    render();
+                    timer.stop();
+                }
+                if (requestQueue.hasRequest("doBenchmarks")) {
+                    log("Test aborted!");
+                    plot.writeChars("Test aborted!\n");
+                    requestQueue.removeOldest("doBenchmarks");
+                    break;
+                }
+
+                log("End test " + i);
+                // write to file + to system.out
+                plot.writeChars(i + "\t" + timer.getAverage() + "\n");
+                logger.info("-------------------- nb of machines " + i + "------------");
+                logger.info(timer);
+            }
             plot.close();
-        } catch (Exception ex) {
-            return;
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
+        log("End benchmark : file written " + benchFileName);
     }
 
-    class C3DDispatcherFrame extends Frame implements ActionListener {
-        private MenuItem mi_exit;
-        private MenuItem mi_clear;
-        private MenuItem mi_benchmark;
-        private Font f_standard = new Font("SansSerif", Font.PLAIN, 12);
-        private int i_top;
-
-        public C3DDispatcherFrame() {
-            super("Collaborative 3D Environment - Dispatcher");
-
-            setBackground(Color.lightGray);
-            addWindowListener(new MyWindowListener());
-            setFont(f_standard);
-
-            MenuBar mb = new MenuBar();
-            Menu m_file = new Menu("File", false);
-            m_file.setFont(f_standard);
-            mi_exit = new MenuItem("Exit");
-            mi_clear = new MenuItem("Clear log");
-            mi_benchmark = new MenuItem("Benchmarks results");
-
-            // Font
-            mi_clear.setFont(f_standard);
-            mi_exit.setFont(f_standard);
-            mi_benchmark.setFont(f_standard);
-
-            // Actions
-            mi_exit.addActionListener(this);
-            mi_clear.addActionListener(this);
-            mi_benchmark.addActionListener(this);
-
-            m_file.add(mi_clear);
-            m_file.addSeparator();
-            m_file.add(mi_exit);
-            m_file.addSeparator();
-            m_file.add(mi_benchmark);
-            mb.add(m_file);
-            setMenuBar(mb);
-
-            GridBagLayout gridbag = new GridBagLayout();
-            GridBagConstraints c = new GridBagConstraints();
-            setLayout(gridbag);
-
-            Label l_header = new Label("C3D Dispatcher", Label.CENTER);
-            l_header.setFont(new Font("SansSerif", Font.ITALIC + Font.BOLD, 18));
-            c.insets = new Insets(12, 10, 0, 10);
-            c.weightx = 1.0;
-            c.gridx = 0;
-            c.gridy = 0;
-            c.weighty = 0.0;
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            gridbag.setConstraints(l_header, c);
-            add(l_header);
-
-            String s_localhost = "";
-            try {
-                s_localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost());
-            } catch (UnknownHostException e) {
-                s_localhost = "unknown!";
-            }
-            Label l_machine = new Label("on machine: " + s_localhost + " (" +
-                    System.getProperty("os.name") + " " +
-                    System.getProperty("os.version") + ")");
-            c.insets = new Insets(0, 10, 5, 10);
-            c.gridy = 1;
-            gridbag.setConstraints(l_machine, c);
-            add(l_machine);
-
-            ta_log = new TextArea(10, 35);
-            ta_log.setEditable(false);
-
-            c.anchor = GridBagConstraints.CENTER;
-            c.weighty = 1.0;
-            c.gridy++;
-            c.fill = GridBagConstraints.BOTH;
-            gridbag.setConstraints(ta_log, c);
-            add(ta_log);
-
-            Label l_users = new Label("List of current users:", Label.LEFT);
-            c.gridy++;
-            c.insets = new Insets(5, 10, 0, 10);
-            c.anchor = GridBagConstraints.WEST;
-            gridbag.setConstraints(l_users, c);
-            add(l_users);
-
-            li_users = new List(5);
-            c.gridy++;
-            gridbag.setConstraints(li_users, c);
-            add(li_users);
-
-            //-----------------------------
-            // Panel for engines
-            Panel p_eng = new Panel();
-            GridBagLayout p_gl = new GridBagLayout();
-            GridBagConstraints pc = new GridBagConstraints();
-
-            p_eng.setLayout(p_gl);
-            c.gridy++;
-            c.fill = GridBagConstraints.BOTH;
-            c.gridwidth = GridBagConstraints.REMAINDER;
-            //c.weightx=1.0;
-            //      p_eng.setBackground(Color.blue);
-            gridbag.setConstraints(p_eng, c);
-            add(p_eng);
-
-            Label l_engines = new Label("Available engines:", Label.CENTER);
-
-            //      pc.anchor=pc.CENTER;
-            //      pc.anchor=pc.center;
-            pc.weightx = 1.0;
-            pc.weighty = 1.0;
-            pc.gridx = 0;
-            pc.gridy = 0;
-            pc.insets = new Insets(5, 5, 5, 5);
-            pc.gridwidth = GridBagConstraints.RELATIVE;
-            p_gl.setConstraints(l_engines, pc);
-            p_eng.add(l_engines);
-
-            Label l_used = new Label("Engines used:", Label.CENTER);
-            pc.gridx = 1;
-            pc.gridwidth = GridBagConstraints.REMAINDER;
-            p_gl.setConstraints(l_used, pc);
-            p_eng.add(l_used);
-
-            li_enginesAvailable = new List(5);
-            li_enginesAvailable.setMultipleMode(true);
-            pc.fill = GridBagConstraints.BOTH;
-            pc.gridy = 1;
-            pc.gridx = 0;
-            pc.gridwidth = GridBagConstraints.RELATIVE;
-            p_gl.setConstraints(li_enginesAvailable, pc);
-            p_eng.add(li_enginesAvailable);
-
-            li_enginesUsed = new List(5);
-            li_enginesUsed.setMultipleMode(true);
-            pc.gridx = 1;
-            pc.gridwidth = GridBagConstraints.REMAINDER;
-            p_gl.setConstraints(li_enginesUsed, pc);
-            p_eng.add(li_enginesUsed);
-
-            b_addEng.addActionListener(this);
-            pc.fill = GridBagConstraints.NONE;
-            pc.gridx = 0;
-            pc.gridy = 2;
-            pc.gridwidth = GridBagConstraints.RELATIVE;
-            p_gl.setConstraints(b_addEng, pc);
-            p_eng.add(b_addEng);
-
-            b_rmEng.addActionListener(this);
-            pc.gridwidth = GridBagConstraints.REMAINDER;
-            pc.gridx = 1;
-            p_gl.setConstraints(b_rmEng, pc);
-            p_eng.add(b_rmEng);
-
-            pack();
-            setVisible(true);
-            toFront();
-        }
-
-        private void exit() {
-            try {
-                //				org.objectweb.proactive.ProActive.unregisterVirtualNode(
-                //					vn);
-                proActiveDescriptor.killall(false);
-            } catch (Exception e) {
-                trace("WARNING occurs when killing the application!");
-                //e.printStackTrace();
-            }
-            try {
-                setVisible(false);
-                dispose();
-                System.exit(0);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        public void paint(Graphics g) {
-            update(g);
-        }
-
-        public void update(Graphics g) {
-            i_top = this.getInsets().top;
-            g.setColor(Color.gray);
-            g.drawLine(0, i_top - 1, 2000, i_top - 1);
-            g.setColor(Color.white);
-            g.drawLine(0, i_top, 2000, i_top);
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            Object source = e.getSource();
-            if (source == mi_exit) {
-                exit();
-            } else if (source == mi_clear) {
-                ta_log.setText("");
-            } else if (source == mi_benchmark) {
-                doBenchmarks();
-            } else if (source == b_addEng) {
-                String[] sel = li_enginesAvailable.getSelectedItems();
-                if (sel != null) {
-                    for (int i = 0; i < sel.length; i++) {
-                        li_enginesUsed.add(sel[i]);
-                        try {
-                            li_enginesAvailable.remove(sel[i]);
-                        } catch (Exception l_ex) {
-                            l_ex.printStackTrace();
-                        }
-                    }
-                }
-            } else if (source == b_rmEng) {
-                String[] sel = li_enginesUsed.getSelectedItems();
-                if (sel != null) {
-                    for (int i = 0; i < sel.length; i++) {
-                        li_enginesAvailable.add(sel[i]);
-                        try {
-                            li_enginesUsed.remove(sel[i]);
-                        } catch (Exception l_ex) {
-                            l_ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-        }
-
-        /**
-         * AWT 1.1 event handling for window events
-         */
-        class MyWindowListener extends WindowAdapter {
-            public void windowClosing(WindowEvent e) {
-                exit();
-            }
-        }
+    /** Makes the engine participate in the computation of images */
+    public void turnOnEngine(String engineName) {
+        this.engineVector.add(nameToEngine(engineName));
     }
-}
 
-
-class Election extends Thread {
-    public static final int UP = 0;
-    public static final int DOWN = 1;
-    public static final int LEFT = 2;
-    public static final int RIGHT = 3;
-    public static final int CLOCKWISE = 4;
-    public static final int UNCLOCKWISE = 5;
+    /** Stops the engine from participating in the computation of images*/
+    public void turnOffEngine(String engineName) {
+        engineVector.remove(nameToEngine(engineName));
+    }
 
     /**
-     * Duration of one election round in seconds
+     * Transforms a String representing an Engine to the C3DRenderingEngine associated.
+     * @throws ArrayIndexOutOfBoundsException if no engine with such name
      */
-    private static final int WAITSECS = 4;
-    private static boolean running = false;
-    private static Hashtable wishes;
-    private static C3DDispatcher c3ddispatcher;
-
-    public Election(int i_user, Integer wish, C3DDispatcher c3ddispatcher) {
-        Election.c3ddispatcher = c3ddispatcher;
-        Election.running = true;
-        wishes = new Hashtable();
-        vote(i_user, wish);
-        c3ddispatcher.showMessage(i_user,
-            "Request 'rotate " + voteString(wish) + "' submitted, \nnew " +
-            WAITSECS + " second election started ...");
-        c3ddispatcher.showMessageExcept(i_user,
-            "New " + WAITSECS + " second election started:");
-        c3ddispatcher.showMessageExcept(i_user,
-            "   User " + c3ddispatcher.nameOfUser(i_user) +
-            " wants to rotate " + voteString(wish));
-
-        //c3ddispatcher.showDialogExcept(i_user,"Election","An election has been started !");
-        // Launches the Election thread
-        this.start();
-    }
-
-    public synchronized void run() {
-        try {
-            wait(WAITSECS * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        int[] score = { 0, 0, 0, 0, 0, 0 };
-
-        int i_user;
-
-        c3ddispatcher.showMessageAll("Election finished");
-        for (Enumeration e = wishes.keys(); e.hasMoreElements();) {
-            i_user = ((Integer) e.nextElement()).intValue();
-            Integer wish = (Integer) wishes.get(new Integer(i_user));
-            c3ddispatcher.showMessageAll("   User " +
-                c3ddispatcher.nameOfUser(i_user) + " voted '" +
-                voteString(wish) + "'");
-
-            // update the scores
-            score[wish.intValue()]++;
-        }
-        c3ddispatcher.showMessageAll("   Result:\n       " + score[RIGHT] +
-            " right, " + score[LEFT] + " left [rotate]\n      " + score[UP] +
-            " up ," + score[DOWN] + " down [vertical]\n      " +
-            score[CLOCKWISE] + " right," + score[UNCLOCKWISE] + " left [spin]");
-
-        // Computes the winner
-        int winner = -1;
-        for (int i = 0; i < score.length; i++) {
-            // If a candidate has got all the votes
-            if (score[i] == wishes.size()) {
-                winner = i;
+    private C3DRenderingEngine nameToEngine(String name) {
+        int length = engineAndStringTable.size();
+        for (int i = 0; i < length; i++) {
+            Object[] couple = (Object[]) engineAndStringTable.get(i);
+            if (couple[1].equals(name)) {
+                return (C3DRenderingEngine) couple[0];
             }
         }
+        throw new ArrayIndexOutOfBoundsException("Can't find engine named " + name);
+    }
 
-        switch (winner) {
-        case UP:
-            c3ddispatcher.showMessageAll("   The scene will be rotated up.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateUp(0);
-            break;
-        case DOWN:
-            c3ddispatcher.showMessageAll("   The scene will be rotated down.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateDown(0);
-            break;
-        case LEFT:
-            c3ddispatcher.showMessageAll("   The scene will be rotated left.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateLeft(0);
-            break;
-        case RIGHT:
-            c3ddispatcher.showMessageAll("   The scene will be rotated right.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateRight(0);
-            break;
-        case CLOCKWISE:
-            c3ddispatcher.showMessageAll("  The scene will be spinned right");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.spinClock(0);
-            break;
-        case UNCLOCKWISE:
-            c3ddispatcher.showMessageAll("  The scene will be spinned left");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.spinUnclock(0);
-            break;
-        default:
-            c3ddispatcher.showMessageAll(
-                "   No consensus found, vote again please!");
+    /**
+     * Transforms an Engine into its String, WITHOUT asking the Engine (which is remote)
+     * @throws ArrayIndexOutOfBoundsException if engine is not registered
+     */
+    private String engineToName(C3DRenderingEngine engine) {
+        int length = engineAndStringTable.size();
+        for (int i = 0; i < length; i++) {
+            Object[] couple = (Object[]) engineAndStringTable.get(i);
+            if (couple[0].equals(engine)) {
+                return (String) couple[1];
+            }
         }
-
-        Election.running = false;
-        Election.wishes.clear();
-    }
-
-    public synchronized static int vote(int i_user, Integer wish) {
-        if (wishes.containsKey(new Integer(i_user))) {
-            c3ddispatcher.showMessage(i_user,
-                "You have already voted in this round");
-        } else {
-            wishes.put(new Integer(i_user), wish);
-        }
-        return wishes.size();
-    }
-
-    public synchronized static boolean isRunning() {
-        return running;
-    }
-
-    public String voteString(Integer wish) {
-        String ret;
-        switch (wish.intValue()) {
-        case UP:
-            ret = "up";
-            break;
-        case DOWN:
-            ret = "down";
-            break;
-        case LEFT:
-            ret = "left";
-            break;
-        case RIGHT:
-            ret = "right";
-            break;
-        case CLOCKWISE:
-            ret = "clockwise";
-            break;
-        case UNCLOCKWISE:
-            ret = "unclockwise";
-            break;
-        default:
-            ret = "error";
-            break;
-        }
-        return ret;
-    }
-
-    public synchronized void finish() {
-        c3ddispatcher.showMessageAll("Everybody voted");
-        this.notify();
-    }
-}
-
-
-class User {
-    private String name;
-    private C3DUser c3duser;
-
-    User(String name, C3DUser c3duser) {
-        this.name = name;
-        this.c3duser = c3duser;
-    }
-
-    String getName() {
-        return name;
-    }
-
-    C3DUser getObject() {
-        return c3duser;
+        throw new ArrayIndexOutOfBoundsException("Can't find name of " + engine);
     }
 }

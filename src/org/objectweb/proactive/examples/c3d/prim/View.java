@@ -28,52 +28,29 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.c3d;
+package org.objectweb.proactive.examples.c3d.prim;
 
-import java.util.Vector;
+import org.objectweb.proactive.examples.c3d.geom.Vec;
 
-import org.objectweb.proactive.examples.c3d.prim.Light;
-import org.objectweb.proactive.examples.c3d.prim.Primitive;
-
-
-public class Scene implements java.io.Serializable {
-    private Vector lights = new Vector();
-    private Vector objects = new Vector();
-    private View view;
-
-    public void addLight(Light l) {
-        lights.addElement(l);
+/**
+ * Represents a punctual 3D viewpoint
+ */
+public class View implements java.io.Serializable {
+    public Vec from;
+    public Vec at;
+    public Vec up;
+    public double dist;
+    public double angle;
+    public double aspect;
+    
+    /** Default location */
+    public View () {
+        this.from = new Vec(0,0, -30);
+        this.at = new Vec(0,0, -15);
+        this.up = new Vec(0, 1, 0);
+        this.angle = (35.0 * 3.14159265) / 180.0;
+        this.aspect = 1.0; 
+        this.dist = 1.0;
     }
-
-    public void addObject(Primitive object) {
-        objects.addElement(object);
-    }
-
-    public void addView(View view) {
-        this.view = view;
-    }
-
-    public View getView() {
-        return view;
-    }
-
-    public Light getLight(int number) {
-        return (Light) lights.elementAt(number);
-    }
-
-    public Primitive getObject(int number) {
-        return (Primitive) objects.elementAt(number);
-    }
-
-    public int getLights() {
-        return lights.size();
-    }
-
-    public int getObjects() {
-        return objects.size();
-    }
-
-    public void setObject(Primitive object, int pos) {
-        objects.setElementAt(object, pos);
-    }
+    
 }

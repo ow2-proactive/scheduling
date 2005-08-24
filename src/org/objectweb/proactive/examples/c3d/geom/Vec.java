@@ -135,8 +135,8 @@ public class Vec implements java.io.Serializable {
     }
 
     public static Vec cross(Vec a, Vec b) {
-        return new Vec((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z),
-            (a.x * b.y) - (a.y * b.x));
+        return new Vec(
+            (a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
     }
 
     public static double dot(Vec a, Vec b) {
@@ -144,8 +144,7 @@ public class Vec implements java.io.Serializable {
     }
 
     public static Vec comb(double a, Vec A, double b, Vec B) {
-        return new Vec((a * A.x) + (b * B.x), (a * A.y) + (b * B.y),
-            (a * A.z) + (b * B.z));
+        return new Vec((a * A.x) + (b * B.x), (a * A.y) + (b * B.y), (a * A.z) + (b * B.z));
     }
 
     public final void comb2(double a, Vec A, double b, Vec B) {
@@ -179,5 +178,45 @@ public class Vec implements java.io.Serializable {
 
     public final String toString() {
         return "<" + x + "," + y + "," + z + ">";
+    }
+
+    /**
+     * Genreates a random Vec
+     * @param i size of the side of the bounding cube 
+     */
+    public static Vec random(float length) {
+        double x = (Math.random() - 0.5) * length;
+        double y = (Math.random() - 0.5) * length;
+        double z = (Math.random() - 0.5) * length;
+        return new Vec (x,y,z);
+    }
+
+    /**
+     * @return
+     */
+    public Vec direction() {
+        double xx = (this.x !=0 ? this.x / Math.abs(this.x) : 0);
+        double yy = (this.y !=0 ? this.y / Math.abs(this.y) : 0);
+        double zz = (this.z !=0 ? this.z / Math.abs(this.z) : 0);
+	    return new Vec(xx, yy, zz);
+    }
+    
+    public boolean equals (Object o) {
+        if (o instanceof Vec) {
+            Vec v = (Vec) o;
+            return 
+            (v.x - this.x == 0) &
+            (v.y - this.y == 0) &
+            (v.z - this.z == 0) ;
+            
+        }
+        return false;
+    }
+    
+    public boolean equals (Vec v) {
+        return 
+        (v.x - this.x == 0) &
+        (v.y - this.y == 0) &
+        (v.z - this.z == 0) ;
     }
 }
