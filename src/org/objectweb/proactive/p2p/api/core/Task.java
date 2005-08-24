@@ -59,14 +59,6 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * Create a new tasks with given params.
-     * @param params the params of tasks.
-     */
-    public Task(Object[] params) {
-        this.params = params;
-    }
-
-    /**
      * Construct a new task with given params and pre-computed bounds.
      * @param params the params of the tasks.
      * @param initLowerBound the lower bound.

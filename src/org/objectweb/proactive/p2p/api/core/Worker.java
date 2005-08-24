@@ -55,6 +55,7 @@ public class Worker implements Serializable {
     private Manager manager = null;
     private Worker workerGroup = null;
     private Result bestCurrentResult = null;
+    private TaskProvider taskProvider = null;
 
     /**
      * The active object empty constructor
@@ -67,8 +68,9 @@ public class Worker implements Serializable {
      * Construct a new Worker with its name.
      * @param name the Worker's name.
      */
-    public Worker(Manager manager) {
+    public Worker(Manager manager, TaskProvider taskProvider) {
         this.manager = manager;
+        this.taskProvider = taskProvider;
         logger.debug("Worker successfully created");
     }
 
@@ -82,7 +84,8 @@ public class Worker implements Serializable {
         try {
             // Activing the task
             String workerNodeUrl = ProActive.getBodyOnThis().getNodeURL();
-            activedTask = (Task) ProActive.turnActive(task, workerNodeUrl);
+            activedTask = (Task) ProActive.turnActive(ProActive.getFutureValue(
+                        task), workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't actived the task", e);
@@ -152,6 +155,7 @@ public class Worker implements Serializable {
     }
 
     public void sendSubTasksToTheManager(Vector subTaskList) {
-        this.manager.sendSubTasksToTheManager(subTaskList);
+        logger.info("The task sends " + subTaskList.size() + " sub tasks");
+        this.taskProvider.addAll(subTaskList);
     }
 }
