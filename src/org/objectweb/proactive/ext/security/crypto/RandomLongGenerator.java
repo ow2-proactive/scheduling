@@ -1,4 +1,4 @@
-package org.objectweb.proactive.ext.security.crypto; /*
+/*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
@@ -28,6 +28,7 @@ package org.objectweb.proactive.ext.security.crypto; /*
  *
  * ################################################################
  */
+package org.objectweb.proactive.ext.security.crypto;
 
 import java.security.*;
 

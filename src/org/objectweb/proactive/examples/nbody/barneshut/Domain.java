@@ -235,6 +235,7 @@ public class Domain implements Serializable {
             // add attractions of forces in the same Domain
             for (int i = 0; i < this.info.planets.length; i++) // compute iteraction with every close planet 
 
+
                 for (int j = 0; j < this.info.planets.length; j++)
                     if (i != j) {
                         this.totalForce[i].add(new Force(this.info.planets[i],

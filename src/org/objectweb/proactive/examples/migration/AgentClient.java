@@ -74,8 +74,7 @@ public class AgentClient {
                     nodeName);
             }
             myServer.endBodyActivity();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             logger.error("Could not reach/create server object");
             e.printStackTrace();
             System.exit(1);

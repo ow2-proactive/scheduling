@@ -183,7 +183,8 @@ public class Server extends SimulatorElement {
 
     public String toString() {
         switch (this.state) {
-        case IDL_EMPTY:return "IDL_EMPTY ";
+        case IDL_EMPTY:
+            return "IDL_EMPTY ";
         case IDL_REQUEST: {
             StringBuffer tmp = new StringBuffer("IDL_REQUEST ");
             if (this.messageFromSource) {

@@ -306,31 +306,31 @@ public class BenchCenter extends ProActiveBenchManager {
                            benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " standard handler on a Remote VM");
                            nfe.add(benchMigNFE);
            }
-        
+
            for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
                                    benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getLocalVMNode(), nb_handler, "handlerMedium");
                                    benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " medium-sized handler on a Local VM");
                                    nfe.add(benchMigNFE);
            }
-        
+
            for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
                                    benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getRemoteVMNode(), nb_handler, "handlerMedium");
                                    benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " medium-sized handler on a Remote VM");
                                    nfe.add(benchMigNFE);
            }
-        
+
            for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
                                    benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getLocalVMNode(), nb_handler, "handlerLarge");
                                    benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " large-sized handler on a Local VM");
                                    nfe.add(benchMigNFE);
            }
-        
+
            for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
                                    benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getRemoteVMNode(), nb_handler, "handlerLarge");
                                    benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " large-sized handler on a Remote VM");
                                    nfe.add(benchMigNFE);
            }
-        
+
            add(nfe);*/
     }
 

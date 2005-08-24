@@ -116,9 +116,12 @@ public class Agent {
 
     public String toString() {
         switch (state) {
-        case WAITING:return "waiting";
-        case MIGRATING:return "migrating";
-        case WAITING_FOR_TENSIONING:return "waiting end of tensioning";
+        case WAITING:
+            return "waiting";
+        case MIGRATING:
+            return "migrating";
+        case WAITING_FOR_TENSIONING:
+            return "waiting end of tensioning";
         }
         return null;
     }

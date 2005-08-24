@@ -30,10 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.util.log.Loggers;
-
 import java.awt.Dimension;
 import java.awt.Image;
 
@@ -41,6 +37,9 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 
 /**

@@ -30,15 +30,12 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
-
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -57,6 +54,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
+
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**

@@ -523,7 +523,7 @@ public class UnicoreProActiveClient {
 
         /*
            UnicoreParameters uParam = new UnicoreParameters();
-        
+
            uParam.setUnicoreDir("/home/mleyton/.unicore");
            uParam.setKeyFilePath("/home/mleyton/.unicore/keystore");
            uParam.setKeyPassword("testing");
@@ -533,11 +533,11 @@ public class UnicoreProActiveClient {
            uParam.setUsiteUrl("http://testgrid.unicorepro.com:4000");
            uParam.setUsiteType("CLASSIC");
            uParam.setVsiteName("SUPRENUM");
-        
+
            uParam.setVsiteNodes(1); uParam.setVsiteProcessors(1);
            uParam.setVsiteMemory(16); uParam.setVsiteRuntime(300);
            uParam.setVsitePriority("high");
-        
+
            uParam.setSubmitJob(false);
          */
         UnicoreProActiveClient upc = new UnicoreProActiveClient(parseArgs(args));

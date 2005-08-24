@@ -225,12 +225,12 @@ public class ProActiveSecurity {
            DateFormat convert = DateFormat.getDateInstance();
            certifGenerator.setPublicKey(publicKey);
            String subjectCN = dnName;
-        
+
            X509Name subject = new X509Name(subjectCN);
            X509Name issuer = new X509Name(issuerName);
            certifGenerator.setSubjectDN(subject);
            certifGenerator.setIssuerDN(issuer);
-        
+
            certifGenerator.setSignatureAlgorithm("MD5withRSA");
            Date start = new Date(System.currentTimeMillis() -
                    (1000L * 60 * 60 * 24 * 30));
@@ -250,7 +250,7 @@ public class ProActiveSecurity {
                false,
                new NetscapeCertType(NetscapeCertType.smime |
                    NetscapeCertType.sslServer));
-        
+
            try {
                certif = certifGenerator.generateX509Certificate(privateKey, "BC");
            } catch (InvalidKeyException e) {
@@ -577,16 +577,16 @@ public class ProActiveSecurity {
                                                                  PrivateKey sk,
                                                                  int hours)
             throws CertificateException {
-    
+
               boolean extensions = false;
               X509Certificate cert = new X509Certificate();
-    
+
               try {
                 cert.setSerialNumber(new BigInteger(20, new Random()));
                 cert.setSubjectDN(subject);
                 cert.setPublicKey(pk);
                 cert.setIssuerDN(issuer);
-    
+
                 GregorianCalendar date =
                   new GregorianCalendar(TimeZone.getTimeZone("GMT"));
                 date.add(Calendar.MINUTE, -5);
@@ -594,13 +594,13 @@ public class ProActiveSecurity {
                 date.add(Calendar.MINUTE, 5);
                 date.add(Calendar.HOUR, hours);
                 cert.setValidNotAfter(date.getTime());
-    
-    
+
+
                 cert.sign(AlgorithmID.md5WithRSAEncryption, sk);
               } catch (Exception ex) {
                 throw new GlobusProxyException("Create certificate failed.", ex);
               }
-    
+
               return cert;
        }
      */

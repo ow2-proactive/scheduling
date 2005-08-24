@@ -109,10 +109,14 @@ public class Source {
 
     public String toString() {
         switch (state) {
-        case WAITING:return "waiting";
-        case COMMUNICATION:return "calling agent";
-        case WAITING_FOR_AGENT:return "waiting for agent";
-        case TENSIONING:return "tensioning";
+        case WAITING:
+            return "waiting";
+        case COMMUNICATION:
+            return "calling agent";
+        case WAITING_FOR_AGENT:
+            return "waiting for agent";
+        case TENSIONING:
+            return "tensioning";
         }
         return null;
     }

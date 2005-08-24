@@ -109,7 +109,7 @@ public class ImplicitService extends BlockingRequestQueueImpl
            boolean test = true; // If something fails, do not serve the request !
            int index;
            System.out.println("ImplicitBody: run()");
-        
+
            //locateLiveRoutine("org.objectweb.proactive.Implicit");
            //launchLive();  // Executes the live(...) routine (reading associations)
            while (body.isActive()) {

@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.examples.c3d.prim;
 
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-
 import java.util.Random;
+
+import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
 /**

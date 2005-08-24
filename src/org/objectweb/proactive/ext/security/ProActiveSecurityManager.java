@@ -403,7 +403,7 @@ public class ProActiveSecurityManager implements Serializable {
            //System.out.println ("myBody is intanceof HalfBody " + (myBody instanceof HalfBody) + myBody + " " + myBody.getClass());
            logger.debug(" myBody.getNodeURL() : " + myBody.getNodeURL() +
                "VNNAME " + VNName);
-        
+
            if (VNName == null) {
                // && (! myBody.getNodeURL().equals("LOCAL"))) {
                // can be null if security was not enable at lauching time
@@ -446,9 +446,9 @@ public class ProActiveSecurityManager implements Serializable {
 
         /*
            if (VNName == null) {
-        
+
            } else {
-        
+
          */
 
         // retrienes entities from source 
@@ -487,7 +487,7 @@ public class ProActiveSecurityManager implements Serializable {
                        // distant Active Object is not security aware
                        distantOAVirtualNode = "*";
                    }
-        
+
          */
 
         // retrieve distant policy from local object

@@ -257,7 +257,6 @@ public class ProActiveComponentRenderer implements ComponentRenderer, Constants 
                  g.drawRect(w-bw1-6, 0, 8, 8);
                }
          */
-
         // -----
         g.setFont(NAME_FONT);
         String name = c.getName();

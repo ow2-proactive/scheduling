@@ -145,10 +145,10 @@ public class CertificateChainValidation {
            o = ProActiveSecurity
                            .generateCertificate("OU=nono", acCert.getSubjectDN()
                                            .toString(), acPrivateKey, acCert.getPublicKey());
-        
+
            certLevel1 = (X509Certificate) o[0];
            privateKeyLevel1 = (PrivateKey) o[1];
-        
+
          */
         X509Certificate certLevel1 = null;
         PrivateKey privateKeyLevel1 = null;
@@ -362,42 +362,42 @@ public class CertificateChainValidation {
         }
 
         /*
-        
+
                    try {
-        
+
                    ByteArrayOutputStream bout = new ByteArrayOutputStream();
                    ObjectOutputStream out = new ObjectOutputStream(bout);
-        
-        
+
+
                    byte[] certE = null;
-        
-        
-        
+
+
+
                    certE =certLevel1.getEncoded();
                    out.writeInt(certE.length);
                    out.write(certE);
-        
+
                    certE = certLevel2.getEncoded();
                    out.writeInt(certE.length);
                    out.write(certE);
-        
-        
+
+
                out.close();
                bout.close();
                    X509Certificate c1,c2;
                ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()));
-        
-        
+
+
                int i = in.readInt();
                byte[] certEncoded = new byte[i];
                in.read(certEncoded,0,i);
                c1 = ProActiveSecurity.decodeCertificate(certEncoded);
-        
+
                i = in.readInt();
                certEncoded = new byte[i];
                in.read(certEncoded,0,i);
                c2 = ProActiveSecurity.decodeCertificate(certEncoded);
-        
+
                      } catch (CertificateEncodingException e) {
                    e.printStackTrace();
                } catch (IOException e) {

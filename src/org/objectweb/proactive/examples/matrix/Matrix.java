@@ -300,7 +300,7 @@ public class Matrix implements java.io.Serializable {
                    s += "\n";
                }
                System.out.println(s);
-            
+
              */
         }
 

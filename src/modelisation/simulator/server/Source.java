@@ -121,12 +121,18 @@ public class Source extends SimulatorElement {
 
     public String toString() {
         switch (this.state) {
-        case WAITING:return "WAITING ";
-        case COMMUNICATION:return "COMMUNICATION " + (start ? "star " : "");
-        case WAITING_FOR_AGENT:return "WAITING_FOR_AGENT ";
-        case CALLING_SERVER:return "CALLING_SERVER ";
-        case WAITING_FOR_SERVER:return "WAITING_FOR_SERVER ";
-        case WAITING_ERROR_MESSAGE:return "WAITING_ERROR_MESSAGE ";
+        case WAITING:
+            return "WAITING ";
+        case COMMUNICATION:
+            return "COMMUNICATION " + (start ? "star " : "");
+        case WAITING_FOR_AGENT:
+            return "WAITING_FOR_AGENT ";
+        case CALLING_SERVER:
+            return "CALLING_SERVER ";
+        case WAITING_FOR_SERVER:
+            return "WAITING_FOR_SERVER ";
+        case WAITING_ERROR_MESSAGE:
+            return "WAITING_ERROR_MESSAGE ";
         }
         return null;
     }

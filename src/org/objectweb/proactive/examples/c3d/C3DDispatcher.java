@@ -30,8 +30,14 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
@@ -54,15 +60,6 @@ import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.examples.c3d.prim.View;
-
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import java.util.Date;
-import java.util.Vector;
 
 
 /**

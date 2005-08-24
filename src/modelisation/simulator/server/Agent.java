@@ -123,11 +123,14 @@ public class Agent extends SimulatorElement {
 
     public String toString() {
         switch (this.state) {
-        case WAITING:return "WAITING " + (migrated ? "migrated" : "reachable");
-        case MIGRATING:return "MIGRATING " +
-            (migrated ? "migrated" : "reachable");
-        case MIGRATED:return "MIGRATED ";
-        case CALLING_SERVER:return "CALLING_SERVER ";
+        case WAITING:
+            return "WAITING " + (migrated ? "migrated" : "reachable");
+        case MIGRATING:
+            return "MIGRATING " + (migrated ? "migrated" : "reachable");
+        case MIGRATED:
+            return "MIGRATED ";
+        case CALLING_SERVER:
+            return "CALLING_SERVER ";
         }
         return null;
     }

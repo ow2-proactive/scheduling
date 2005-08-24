@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
-import org.objectweb.proactive.examples.c3d.Image2D;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -54,6 +52,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+
+import org.objectweb.proactive.examples.c3d.Image2D;
 
 
 /**

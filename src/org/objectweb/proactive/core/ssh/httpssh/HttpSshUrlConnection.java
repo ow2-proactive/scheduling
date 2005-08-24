@@ -249,11 +249,12 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
             if (getTryCache().needToTry(host, port)) {
                 try {
                     java.net.URL httpURL = new java.net.URL("http://" + host +
-                            ":" + port// uncomment the following line and comment the one above to make sure
-                        // you test that connections fallback to tunneling if the main
+                            ":" +
+                            port // uncomment the following line and comment the one above to make sure
+                            // you test that connections fallback to tunneling if the main
                         // connection fails.
                         //+ 1 
-                             + path);
+                             +path);
                     logger.debug("try http not tunneled");
                     _httpConnection = (HttpURLConnection) httpURL.openConnection();
                     ensureSetup(_httpConnection);

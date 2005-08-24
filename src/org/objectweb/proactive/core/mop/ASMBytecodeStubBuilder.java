@@ -354,8 +354,8 @@ public class ASMBytecodeStubBuilder implements Constants {
             "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE + ")" + METHODCALL_TYPE);
 
         // Now, call 'reify' on the proxy object
-        cv.visitMethodInsn(//INVOKEVIRTUAL,
-        // BUGFIX: use INVOKEINTERFACE because Proxy is an interface
+        cv.visitMethodInsn( //INVOKEVIRTUAL,
+            // BUGFIX: use INVOKEINTERFACE because Proxy is an interface
         INVOKEINTERFACE, "org/objectweb/proactive/core/mop/Proxy", "reify",
             "(" + METHODCALL_TYPE + ")" + OBJECT_TYPE);
 

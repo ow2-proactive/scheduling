@@ -80,8 +80,7 @@ public class RuntimeRegistrationEventProducerImpl extends AbstractEventProducer
         if (hasListeners()) {
             notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime,
                     type, registeredRuntime, creatorID, protocol, vmName));
-        }
-        else {
+        } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("no listener");
             }

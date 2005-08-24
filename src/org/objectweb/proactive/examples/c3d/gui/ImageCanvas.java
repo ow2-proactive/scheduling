@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
-import org.objectweb.proactive.examples.c3d.Image2D;
-import org.objectweb.proactive.examples.c3d.Interval;
-
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -41,6 +38,9 @@ import java.awt.Image;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+
+import org.objectweb.proactive.examples.c3d.Image2D;
+import org.objectweb.proactive.examples.c3d.Interval;
 
 
 /**

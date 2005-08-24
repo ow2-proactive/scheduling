@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
-import org.objectweb.proactive.examples.c3d.C3DDispatcher;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 
 
 /**

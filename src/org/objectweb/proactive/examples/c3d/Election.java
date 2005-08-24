@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-
 import java.util.HashMap;
 import java.util.Iterator;
+
+import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
 /**
