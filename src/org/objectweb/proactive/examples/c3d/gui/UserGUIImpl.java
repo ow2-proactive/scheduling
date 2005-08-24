@@ -30,26 +30,25 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
+import org.objectweb.proactive.examples.c3d.C3DUser;
+import org.objectweb.proactive.examples.c3d.geom.Vec;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.objectweb.proactive.examples.c3d.C3DUser;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
 
-
-/** 
+/**
  * An implementation of User GUI, which handles all the generated events.
  */
 public class UserGUIImpl extends UserGUI {
-
     private C3DUser c3dUser;
-    
+
     /** Event handler, which transforms events into method calls */
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == rightButton) {  // Request 'rotate right' with button click
-            c3dUser.rotateScene(new Vec(0, Math.PI / 4, 0));  
+        if (source == rightButton) { // Request 'rotate right' with button click
+            c3dUser.rotateScene(new Vec(0, Math.PI / 4, 0));
         } else if (source == leftButton) {
             c3dUser.rotateScene(new Vec(0, -Math.PI / 4, 0));
         } else if (source == upButton) {
@@ -63,11 +62,12 @@ public class UserGUIImpl extends UserGUI {
         } else if ((source == exitMenuItem)) {
             this.c3dUser.terminate();
             trash();
-        } else if ((source == this.localMessageField) || (source == this.sendMessageButton)) {
+        } else if ((source == this.localMessageField) ||
+                (source == this.sendMessageButton)) {
             String message = this.localMessageField.getText();
             if (message.length() > 0) {
                 String recipient = (String) sendToComboBox.getSelectedItem();
-                c3dUser.sendMessage(message, recipient); 
+                c3dUser.sendMessage(message, recipient);
                 localMessageField.setText("");
             } else {
                 localMessageField.setText("Enter text to send");
@@ -84,25 +84,24 @@ public class UserGUIImpl extends UserGUI {
         } else if (source == clearMenuItem) {
             logArea.setText("");
         } else if (source == aboutMenuItem) {
-            new DialogBox(
-                    this.mainFrame, "About ProActive", "The ProActive Grid Middleware",
-            "http://ProActive.ObjectWeb.org/");
+            new DialogBox(this.mainFrame, "About ProActive",
+                "The ProActive Grid Middleware",
+                "http://ProActive.ObjectWeb.org/");
         } else {
             log("EVENT not handled : " + source);
         }
     }
-    
+
     /** Constructor, which mostly adds a window Listener */
-    public UserGUIImpl(String title, final C3DUser c3dUser, final int width, final int height) {
+    public UserGUIImpl(String title, final C3DUser c3dUser, final int width,
+        final int height) {
         super(title, width, height);
         this.c3dUser = c3dUser;
-        mainFrame.addWindowListener(
-                new WindowAdapter() {
-                    public void windowClosing(WindowEvent e) {
-                        c3dUser.terminate();
-                        trash();
-                    }
-                });
+        mainFrame.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    c3dUser.terminate();
+                    trash();
+                }
+            });
     }
-
 }

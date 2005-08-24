@@ -41,25 +41,28 @@ import org.objectweb.proactive.examples.c3d.prim.View;
 
 /**
  * Rendering Engine used by C3D.
- * When fed a scene and an Interval, returns a 2D picture of the 3D scene. 
+ * When fed a scene and an Interval, returns a 2D picture of the 3D scene.
  */
 public class C3DRenderingEngine implements java.io.Serializable {
-
     private static final double INFINITE = 1e6;
+
     // Alpha channel
     private static final int alpha = 255 << 24;
-    
+
     // the scene which should be drawn
     private Scene scene;
 
     // speed up contraptions
     // Current intersection instance (only one is needed!)
     private Isect inter = new Isect();
+
     // replace new Vec(0,0,0)
     private final Vec voidVec = new Vec();
+
     //Temporary ray and Vec
     private Ray tRay = new Ray();
     private Vec tmpVec = new Vec();
+
     // used by toString to show a better value than C3DRenderingEngine@11d2572 
     private String name;
 
@@ -74,7 +77,6 @@ public class C3DRenderingEngine implements java.io.Serializable {
         this.name = name;
     }
 
-
     /**
      * Creates the local objects used in the rendering
      */
@@ -88,56 +90,63 @@ public class C3DRenderingEngine implements java.io.Serializable {
      * @return the partial Image that was asked for
      */
     public Image2D render(int engineNb, Interval interval) {
-//      TODO : remove this testing code
-//        if (this.name.startsWith("//psychoquack.inria.fr/"))
-//      try {
-//      Thread.sleep(20000);
-//      } catch (InterruptedException e) {
-//      e.printStackTrace();
-//      }
+        //      TODO : remove this testing code
+        //        if (this.name.startsWith("//psychoquack.inria.fr/"))
+        //      try {
+        //      Thread.sleep(20000);
+        //      } catch (InterruptedException e) {
+        //      e.printStackTrace();
+        //      }
         // Screen variables
-        int[] row = new int[interval.totalImageWidth * (interval.yto - interval.yfrom)];
+        int[] row = new int[interval.totalImageWidth * (interval.yto -
+            interval.yfrom)];
         int pixCounter = 0; //iterator
-    
+
         // Rendering variables
-        int x, y;
-        int red, green, blue;
-        double xlen, ylen;
-    
+        int x;
+
+        // Rendering variables
+        int y;
+        int red;
+        int green;
+        int blue;
+        double xlen;
+        double ylen;
+
         View view = scene.getView();
         Vec viewVec = Vec.sub(view.at, view.from);
         viewVec.normalize();
-    
+
         Vec tmpVec = new Vec(viewVec);
         tmpVec.scale(Vec.dot(view.up, viewVec));
-    
+
         Vec upVec = Vec.sub(view.up, tmpVec);
         upVec.normalize();
-    
+
         Vec leftVec = Vec.cross(view.up, viewVec);
         leftVec.normalize();
-    
+
         double frustrumwidth = view.dist * Math.tan(view.angle);
-    
+
         upVec.scale(-frustrumwidth);
         leftVec.scale(view.aspect * frustrumwidth);
-    
+
         Ray r = new Ray(view.from, this.voidVec);
         Vec col = new Vec();
-    
+
         // All loops are reversed for 'speedup' (cf. thinking in java p331)
         // For each line
         for (y = interval.yfrom; y < interval.yto; y++) {
-            ylen = ( (2.0 * y) / interval.totalImageWidth) - 1.0;
-    
+            ylen = ((2.0 * y) / interval.totalImageWidth) - 1.0;
+
             // For each pixel of the line
             for (x = 0; x < interval.totalImageWidth; x++) {
-                xlen = ( (2.0 * x) / interval.totalImageWidth) - 1.0;
+                xlen = ((2.0 * x) / interval.totalImageWidth) - 1.0;
                 r.D = Vec.comb(xlen, leftVec, ylen, upVec);
                 r.D.add(viewVec);
                 r.D.normalize();
                 col = trace(0, 1.0, r);
-    
+
                 // computes the color of the ray
                 red = (int) (col.x * 255.0);
                 if (red > 255) {
@@ -151,9 +160,10 @@ public class C3DRenderingEngine implements java.io.Serializable {
                 if (blue > 255) {
                     blue = 255;
                 }
-    
+
                 // Sets the pixels
-                row[pixCounter++] = C3DRenderingEngine.alpha | (red << 16) | (green << 8) | (blue);
+                row[pixCounter++] = C3DRenderingEngine.alpha | (red << 16) |
+                    (green << 8) | (blue);
             } // end for (x)
         } // end for (y)
 
@@ -163,7 +173,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
 
     /**
      * Find closest Ray, return initialized Isect with intersection information.
-     * @returns true if intersection is found 
+     * @returns true if intersection is found
      */
     private boolean intersect(Ray r, double maxt) {
         int nhits = 0;
@@ -187,7 +197,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
      * Checks if there is a shadow
      */
     private boolean shadow(Ray r, double tmax) {
-        return !intersect(r, tmax) ;
+        return !intersect(r, tmax);
     }
 
     /**
@@ -209,8 +219,9 @@ public class C3DRenderingEngine implements java.io.Serializable {
         double eta = n1 / n2;
         double c1 = -Vec.dot(I, N);
         double cs2 = 1.0 - (eta * eta * (1.0 - (c1 * c1)));
-        if (cs2 < 0.0) 
+        if (cs2 < 0.0) {
             return null;
+        }
         Vec r = Vec.comb(eta, I, (eta * c1) - Math.sqrt(cs2), N);
         r.normalize();
         return r;
@@ -236,7 +247,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
         }
 
         // Computes the effectof each light
-        int nblights = this.scene.getNbLights() ; 
+        int nblights = this.scene.getNbLights();
         for (l = 0; l < nblights; l++) {
             Light light = this.scene.getLight(l);
             this.tmpVec.sub2(light.pos, P);
@@ -289,7 +300,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
 
     /**
      * Launches a ray.
-     * Please note, as return may be this.voidVec, the return 
+     * Please note, as return may be this.voidVec, the return
      * value should not be modified, once returned!
      */
     private Vec trace(int level, double weight, Ray ray) {
@@ -315,8 +326,8 @@ public class C3DRenderingEngine implements java.io.Serializable {
         // no intersection --> col = 0,0,0
         return this.voidVec;
     }
-    
+
     public String toString() {
         return this.name;
-        }
+    }
 }

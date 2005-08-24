@@ -33,8 +33,9 @@ package org.objectweb.proactive.examples.c3d.prim;
 import org.objectweb.proactive.examples.c3d.geom.Ray;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
+
 /**
- * 3D representation of a Sphere, in space. 
+ * 3D representation of a Sphere, in space.
  */
 public class Sphere extends Primitive implements java.io.Serializable {
     private Vec c;
@@ -42,14 +43,14 @@ public class Sphere extends Primitive implements java.io.Serializable {
     private double r2;
     private Vec tmp; // temporary vecs used to minimize the memory load
     private static double mindiff = 1e-6;
-    
+
     public Sphere(Vec center, double radius) {
         c = center;
         r = radius;
         r2 = r * r;
         tmp = new Vec();
     }
-    
+
     /**
      * Modified intersection method - creates _many_ less Vecs
      * @author Doyon Florian
@@ -74,7 +75,7 @@ public class Sphere extends Primitive implements java.io.Serializable {
         ip.prim = this;
         return ip;
     }
-    
+
     /**
      * Normal (outwards) vector at point P of the sphere.
      */
@@ -83,43 +84,45 @@ public class Sphere extends Primitive implements java.io.Serializable {
         normal.normalize();
         return normal;
     }
-    
+
     public String toString() {
         return "Sphere {" + c.toString() + ", radius " + r + "}";
     }
-    
+
     public Vec getCenter() {
         return c;
     }
-    
+
     public void setCenter(Vec c) {
         this.c = c;
     }
-    
+
     /**
      * Rotates the Sphere.
      * @see org.objectweb.proactive.examples.c3d.prim.Primitive#rotate(org.objectweb.proactive.examples.c3d.geom.Vec)
      */
     public void rotate(Vec vec) {
         double phi;
-        double l ;
-        
+        double l;
+
         // the X axis rotation
-        if (vec.x!=0) {
+        if (vec.x != 0) {
             phi = Math.atan2(c.z, c.y);
             l = Math.sqrt((c.y * c.y) + (c.z * c.z));
             c.y = l * Math.cos(phi + vec.x);
             c.z = l * Math.sin(phi + vec.x);
         }
+
         // the Y axis rotation
-        if (vec.y!=0) {
+        if (vec.y != 0) {
             phi = Math.atan2(c.z, c.x);
             l = Math.sqrt((c.x * c.x) + (c.z * c.z));
             c.x = l * Math.cos(phi + vec.y);
             c.z = l * Math.sin(phi + vec.y);
         }
+
         // the Z axis rotation
-        if (vec.z!=0) {
+        if (vec.z != 0) {
             phi = Math.atan2(c.x, c.y);
             l = Math.sqrt((c.y * c.y) + (c.x * c.x));
             c.y = l * Math.cos(phi + vec.z);

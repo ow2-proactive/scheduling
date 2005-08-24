@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
+import org.objectweb.proactive.examples.c3d.geom.Vec;
+
 import java.util.HashMap;
 import java.util.Iterator;
-
-import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
 /**
@@ -50,9 +50,9 @@ final class Election extends Thread {
     //private fields, accessible through Election.election
     private boolean running = false;
     private HashMap wishes; // hashes of (user_ident, rotation Vec voted)
+
     // implementation note : I would have prefered an array, but how can I know 
     // how many Users there are? Maybe in the constructor? 
-
     private C3DDispatcher c3ddispatcher; // to give back results
 
     /**
@@ -62,14 +62,13 @@ final class Election extends Thread {
         this.c3ddispatcher = c3ddispatcher;
         this.running = true;
         this.wishes = new HashMap();
-        this.c3ddispatcher.userLog(
-            i_user,
-            "Request 'rotate " + wish.direction() + "' submitted, \nnew " + WAITSECS +
-            " second election started ...");
-        this.c3ddispatcher.allLogExcept(
-            i_user,
+        this.c3ddispatcher.userLog(i_user,
+            "Request 'rotate " + wish.direction() + "' submitted, \nnew " +
+            WAITSECS + " second election started ...");
+        this.c3ddispatcher.allLogExcept(i_user,
             "New " + WAITSECS + " second election started:\n   User " +
-            this.c3ddispatcher.nameOfUser(i_user) + " wants to rotate " + wish.direction());
+            this.c3ddispatcher.nameOfUser(i_user) + " wants to rotate " +
+            wish.direction());
         // Launches the Election thread
         this.start();
     }
@@ -89,11 +88,13 @@ final class Election extends Thread {
         // count scores
         // TODO : this is horrible code ! counting votes should be more elegant!
         HashMap scores = new HashMap();
-        for (Iterator iterator = wishes.values().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = wishes.values().iterator();
+                iterator.hasNext();) {
             // for every vote expressed(let's call it 'vote')
             Vec vote = (Vec) iterator.next();
             boolean found = false;
-            for (Iterator keyiterator = scores.keySet().iterator(); keyiterator.hasNext();) {
+            for (Iterator keyiterator = scores.keySet().iterator();
+                    keyiterator.hasNext();) {
                 // for every vote already counted  (let's call it 'counted') 
                 Vec counted = (Vec) keyiterator.next();
 
@@ -114,10 +115,12 @@ final class Election extends Thread {
         // display results 
         Vec winner = null;
         this.c3ddispatcher.allLog("   Result:");
-        for (Iterator iterator = scores.keySet().iterator(); iterator.hasNext();) {
+        for (Iterator iterator = scores.keySet().iterator();
+                iterator.hasNext();) {
             Vec key = (Vec) iterator.next();
             int votes = ((Integer) scores.get(key)).intValue();
-            c3ddispatcher.allLog("       " + votes + " votes for " + key.direction());
+            c3ddispatcher.allLog("       " + votes + " votes for " +
+                key.direction());
             if (winner == null) {
                 winner = key;
             } else {
@@ -128,10 +131,11 @@ final class Election extends Thread {
         }
 
         if (winner == null) {
-            this.c3ddispatcher.allLog("   No consensus found, vote again please!");
-        } else {
             this.c3ddispatcher.allLog(
-                "   The scene will be rotated by " + winner.direction());
+                "   No consensus found, vote again please!");
+        } else {
+            this.c3ddispatcher.allLog("   The scene will be rotated by " +
+                winner.direction());
             this.c3ddispatcher.rotateScene(0, winner);
         }
         this.running = false;
@@ -147,8 +151,8 @@ final class Election extends Thread {
     public synchronized static int vote(int i_user, Vec wish) {
         assert Election.election != null : "Trying to vote in an Election not started!";
         if (Election.election.wishes.containsKey(new Integer(i_user))) {
-            Election.election.c3ddispatcher.userLog(
-                i_user, "You have already voted in this round");
+            Election.election.c3ddispatcher.userLog(i_user,
+                "You have already voted in this round");
         } else {
             Election.election.wishes.put(new Integer(i_user), wish);
         }
@@ -179,7 +183,8 @@ final class Election extends Thread {
         this.notify();
     }
 
-    public static void newElection(int i_user, Vec wish, C3DDispatcher c3ddispatcher) {
+    public static void newElection(int i_user, Vec wish,
+        C3DDispatcher c3ddispatcher) {
         Election.election = new Election(i_user, wish, c3ddispatcher);
         Election.vote(i_user, wish);
     }

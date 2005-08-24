@@ -38,54 +38,52 @@ import javax.swing.SwingConstants;
 import javax.swing.WindowConstants;
 
 
-/** 
+/**
  * A Message frame to ask the user for patience.
  * The message can be customized, as well as the frame title.
  */
-public class WaitFrame  {
-
+public class WaitFrame {
     private JFrame frame;
-    
+
     /**
      * Create a JFrame asking people to be patient
      * @param title Title of window
      * @param text the First line to show
      * @param text2 the Second line to show
      */
-    public WaitFrame(String title, String text, String text2)  {
+    public WaitFrame(String title, String text, String text2) {
         // Create the frame
         frame = new JFrame(title);
-        
+
         // Create the text component to add to the frame
-        JLabel comp = new JLabel(text,  SwingConstants.CENTER);
-        JLabel comp2 = new JLabel(text2,  SwingConstants.CENTER);
-        
+        JLabel comp = new JLabel(text, SwingConstants.CENTER);
+        JLabel comp2 = new JLabel(text2, SwingConstants.CENTER);
+
         // Add the component to the frame's content pane;
         // by default, the content pane has a border layout
         frame.getContentPane().add(comp, BorderLayout.CENTER);
         frame.getContentPane().add(comp2, BorderLayout.SOUTH);
-        
+
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
         // Show the frame
         frame.pack();
-        frame.setVisible(true);     
+        frame.setVisible(true);
     }
 
     /**
      * Create a JFrame asking people to be patient
      * Default values for text is "Please wait... A new window will soon appear!"
      */
-    public WaitFrame()  {
+    public WaitFrame() {
         // call the other constructor
-        this("Please wait...", "Please wait...", "A new window will soon appear!");
+        this("Please wait...", "Please wait...",
+            "A new window will soon appear!");
     }
-
 
     /** Clean up when no longer needed */
     public void destroy() {
         frame.setVisible(false);
         frame.dispose();
     }
-
 }

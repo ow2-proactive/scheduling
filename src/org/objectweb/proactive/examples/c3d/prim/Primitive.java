@@ -33,48 +33,47 @@ package org.objectweb.proactive.examples.c3d.prim;
 import org.objectweb.proactive.examples.c3d.geom.Ray;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
+
 /**
  * All palpable objects in space should implement this class.
  * As it is now, it only is a container for the surface.
  */
 public abstract class Primitive implements java.io.Serializable {
-    
     private Surface surf = new Surface();
-    
+
     /**
      * The normal Vector to the Primitve, considered at the given point.
      * The result must be normalized!
-     * @param pnt the coordinate on the primitive of which to give a normal. 
+     * @param pnt the coordinate on the primitive of which to give a normal.
      * @return the normal vector, ie the one orthogonal to the Primitive
      */
     public abstract Vec normal(Vec pnt);
-    
+
     /**
      * Given a Ray, find the intersection between the Primitive and the Ray.
      * @param ray the Ray which should intersect the Primitive
      * @return null if no intersection
      */
     public abstract Isect intersect(Ray ray);
-    
+
     /**
      * Rotate the object along the given three angles.
      * Watch out, performs rotateX, rotateY, then rotateZ [not commutative]
      * @param vec the three angles of rotation, in radians
      */
-    public abstract void rotate(Vec vec) ; 
-    
+    public abstract void rotate(Vec vec);
+
     /**
      * @param surf The surface to apply to this primitive.
      */
     public void setSurface(Surface surf) {
         this.surf = surf;
     }
-    
+
     /**
      * @return Returns the surface which is mapped onto this Primitive.
      */
     public Surface getSurface() {
         return surf;
     }
-    
 }

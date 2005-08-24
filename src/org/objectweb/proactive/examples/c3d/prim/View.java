@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.c3d.prim;
 
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
+
 /**
  * Represents a punctual 3D viewpoint
  */
@@ -42,15 +43,14 @@ public class View implements java.io.Serializable {
     public double dist;
     public double angle;
     public double aspect;
-    
+
     /** Default location */
-    public View () {
-        this.from = new Vec(0,0, -30);
-        this.at = new Vec(0,0, -15);
+    public View() {
+        this.from = new Vec(0, 0, -30);
+        this.at = new Vec(0, 0, -15);
         this.up = new Vec(0, 1, 0);
         this.angle = (35.0 * 3.14159265) / 180.0;
-        this.aspect = 1.0; 
+        this.aspect = 1.0;
         this.dist = 1.0;
     }
-    
 }

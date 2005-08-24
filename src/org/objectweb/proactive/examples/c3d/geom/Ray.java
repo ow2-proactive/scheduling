@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.examples.c3d.geom;
 
+
 /**
  * A class for making rays (lines in 3D), which have a start point, and a direction.
  */
@@ -49,7 +50,7 @@ final public class Ray implements java.io.Serializable {
         D = new Vec();
     }
 
-    /** 
+    /**
      * Works out the point which lies on this line, at distance t from origine.
      * @returns V = P + D * t
      */

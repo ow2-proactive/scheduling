@@ -30,12 +30,13 @@
  */
 package org.objectweb.proactive.examples.c3d.prim;
 
-import java.util.Random;
-
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
+import java.util.Random;
+
+
 /**
- * Represents the aspect of the surface of a primitive. 
+ * Represents the aspect of the surface of a primitive.
  * As it is currently, a Surface can only be homogeneous.
  */
 public class Surface implements java.io.Serializable {
@@ -45,11 +46,11 @@ public class Surface implements java.io.Serializable {
     public double shine;
     public double kt;
     public double ior;
-    
+
     /**
      * The array of possible initial colors
      */
-    private static Vec[] colors = { 
+    private static Vec[] colors = {
             new Vec(1, 1, 1), // White
             new Vec(0, 0, 0.5), // Navy
             new Vec(0, 0.5, 0), // darkgreen
@@ -58,7 +59,6 @@ public class Surface implements java.io.Serializable {
             new Vec(1, 0.7, 0.8), // Pink
             new Vec(0.8, 0.8, 1) // Lavender
         };
-
 
     /*
      * Create a surface with default values
@@ -71,12 +71,13 @@ public class Surface implements java.io.Serializable {
         this.kt = 0.0;
         this.ior = 1.0;
     }
-    
+
     /**
      * Create a surface with given parameters set to the internal values
      */
-    public Surface(Vec color, double kd, double ks, double shine, double kt, double ior) {
-        this.color = color ;
+    public Surface(Vec color, double kd, double ks, double shine, double kt,
+        double ior) {
+        this.color = color;
         this.kd = kd;
         this.ks = ks;
         this.shine = shine;
@@ -88,15 +89,10 @@ public class Surface implements java.io.Serializable {
      * Generate a random color.
      * @return a Surface with random parameters
      */
-    
     public static Surface random() {
         Random randomGen = new Random();
-        return new Surface (
-                colors[randomGen.nextInt(colors.length)],
-                Math.random(),
-                Math.random(),
-                Math.random() * 20.0,
-                0.,1.);
+        return new Surface(colors[randomGen.nextInt(colors.length)],
+            Math.random(), Math.random(), Math.random() * 20.0, 0., 1.);
     }
 
     public String toString() {
