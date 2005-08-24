@@ -162,7 +162,7 @@
         </chunks>
         <comments>
             <format>
-                <multiline>true</multiline>
+                <multiline>false</multiline>
             </format>
             <javadoc>
                 <check>
