@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
 
 
 public class A implements Serializable {
@@ -82,4 +83,13 @@ public class A implements Serializable {
         }
         return new StringWrapper("Alexandre dC is a famous coder :)");
     }
+
+    public FloatWrapper testFloatWrapper() {
+    try {
+        Thread.sleep(1000);
+    } catch (InterruptedException e) {
+    }
+    return new FloatWrapper(0);
+}
+
 }

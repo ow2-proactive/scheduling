@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import testsuite.test.FunctionalTest;
+import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
 
 
 /**
@@ -53,6 +54,7 @@ public class Test extends FunctionalTest {
     private IntWrapper integer;
     private LongWrapper longNumber;
     private StringWrapper string;
+    private FloatWrapper flt;
 
     public Test() {
         super("Non Reifiable Object Wrappers",
@@ -76,6 +78,7 @@ public class Test extends FunctionalTest {
         this.integer = this.ao.testIntWrapper();
         this.longNumber = this.ao.testLongWrapper();
         this.string = this.ao.testStringWrapper();
+        this.flt = this.ao.testFloatWrapper();
     }
 
     /**
@@ -85,7 +88,8 @@ public class Test extends FunctionalTest {
         return ProActive.isAwaited(this.bool) &&
         ProActive.isAwaited(this.dble) && ProActive.isAwaited(this.integer) &&
         ProActive.isAwaited(this.longNumber) &&
-        ProActive.isAwaited(this.string);
+        ProActive.isAwaited(this.string) &&
+        ProActive.isAwaited(this.flt);
     }
 
     public void endTest() throws Exception {
