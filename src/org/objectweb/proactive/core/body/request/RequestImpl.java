@@ -179,15 +179,14 @@ public class RequestImpl extends MessageImpl implements Request,
                 methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
-
-            // t.printStackTrace();
             if (isOneWay) {
+
+                /* ExceptionListException are handled by group users */
                 if (!(exception instanceof ExceptionListException)) {
-                    exception.printStackTrace();
+                    throw new ServeException("serve method " +
+                        methodCall.getReifiedMethod().toString() + " failed",
+                        exception);
                 }
-                throw new ServeException("serve method " +
-                    methodCall.getReifiedMethod().toString() + " failed",
-                    exception);
             }
         }
 
