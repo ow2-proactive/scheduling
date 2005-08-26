@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.event;
 
 import org.objectweb.proactive.ic2d.data.NodeObject;
+import org.objectweb.proactive.ic2d.data.VMObject;
 
 
 /**
@@ -40,4 +41,6 @@ public interface VMObjectListener extends MessageMonitoringListener {
     public void nodeObjectAdded(NodeObject nodeObject);
 
     public void nodeObjectRemoved(NodeObject nodeObject);
+	
+	public void vmNotResponding (VMObject vmObject) ;
 }
