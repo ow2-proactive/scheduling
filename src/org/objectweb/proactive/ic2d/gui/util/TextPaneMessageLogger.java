@@ -87,7 +87,7 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
     //
     public void warn(String message) {
         logInternal(message, errorStyle);
-        invokeDialog(message);
+        //invokeDialog(message); 
     }
 
     public void log(String message) {
