@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
@@ -52,6 +55,79 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @see VirtualMachine
  */
 public interface ProActiveDescriptor extends java.io.Serializable {
+
+    /**
+     * create a new MainDefinition object and add it to the map
+     *
+     */
+    public void createMainDefinition(String id);
+
+    /**
+     * set the mainClass attribute of the last defined mainDefinition
+     * @param mainClass fully qualified name of the mainclass
+     */
+    public void mainDefinitionSetMainClass(String mainClass);
+
+    /**
+     * add the parameter parameter to the parameters of the last
+     * defined mainDefinition
+     * @param parameter parameter to add
+     */
+    public void mainDefinitionAddParameter(String parameter);
+
+    /**
+     * add a VirtualNode virtualNode to the last defined mainDefinition
+     * @param virtualNode VirtualNode to add
+     */
+    public void mainDefinitionAddVirtualNode(VirtualNode virtualNode);
+
+    /**
+     * return true if at least one mainDefinition is defined
+     * @return true if at least one mainDefinition is defined
+     */
+    public boolean isMainDefined();
+
+    /**
+     * activates all mains of mainDefinitions defined
+     *
+     */
+    public void activateMains();
+
+    /**
+     * activates the main of the id-th mainDefinition
+     * @param mainDefinitionId key identifying a mainDefinition
+     */
+    public void activateMain(String mainDefinitionId);
+
+    /**
+     * return a table containing all the parameters of the last
+     * defined mainDefinition
+     * @param mainDefinitionId key identifying a mainDefinition
+     * @return a table of String containing all the parameters of the mainDefinition
+     */
+    public String[] mainDefinitionGetParameters(String mainDefinitionId);
+
+    /**
+     * return the main definitions mapping
+     * @return Map
+     */
+    public Map getMainDefinitionMapping();
+
+    /**
+     * return the virtual nodes mapping
+     * @return Map
+     */
+    public Map getVirtualNodeMapping();
+
+    public void setMainDefinitionMapping(HashMap newMapping);
+
+    public void setVirtualNodeMapping(HashMap newMapping);
+
+    /**
+     *
+     * @return a table containing all mainDefinitions conserving order
+     */
+    public MainDefinition[] getMainDefinitions();
 
     /**
      * Returns all VirtualNodes described in the XML Descriptor
@@ -97,6 +173,29 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * @return VirtualNode
      */
     public VirtualNode createVirtualNode(String vnName, boolean lookup);
+
+    /**
+     * Creates a VirtualNode with the given name
+     * If the VirtualNode with the given name has previously been created, this method returns it.
+     * @param vnName
+     * @param lookup if true, at creation time the VirtualNode will be a VirtualNodeLookup.
+     * @param padURL url of the proactive active descriptor that created the virtual node
+     * @return VirtualNode
+     */
+    public VirtualNode createVirtualNode(String vnName, boolean lookup,
+        String padURL);
+
+    /**
+     * Creates a VirtualNode with the given name
+     * If the VirtualNode with the given name has previously been created, this method returns it.
+     * @param vnName
+     * @param lookup if true, at creation time the VirtualNode will be a VirtualNodeLookup.
+     * @param padURL url of the proactive active descriptor that created the virtual node
+     * @param isMainVN true if the virtual node is linked to a main definition
+     * @return VirtualNode
+     */
+    public VirtualNode createVirtualNode(String vnName, boolean lookup,
+        String padURL, boolean isMainVN);
 
     /**
      * Creates a VirtualMachine of the given name
