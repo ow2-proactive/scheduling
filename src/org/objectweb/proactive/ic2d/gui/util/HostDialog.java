@@ -8,6 +8,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.util;
 
+import org.objectweb.proactive.ic2d.util.MonitorThread;
+
 
 /**
  *
@@ -38,11 +40,14 @@ public class HostDialog extends javax.swing.JDialog {
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
 
         jTextFieldHostIp = new javax.swing.JTextField(30);
         jLabelHostIp = new javax.swing.JLabel();
         jTextFielddepth = new javax.swing.JTextField(2);
+        jTextFieldttr = new javax.swing.JTextField(10);
         jLabel2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jButtonOK = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
@@ -70,6 +75,11 @@ public class HostDialog extends javax.swing.JDialog {
         jPanel3.add(jTextFielddepth);
         getContentPane().add(jPanel3);
 
+        jLabel4.setText("Time to refresh :");
+        jPanel6.add(jLabel4);
+        jTextFieldttr.setText(defaultTtr);
+        jPanel6.add(jTextFieldttr);
+        //getContentPane().add(jPanel6);
         jLabel3.setText(
             "You can change it there or from \"Menu Control, Set Depth Control\" ");
         jPanel4.add(jLabel3);
@@ -120,20 +130,28 @@ public class HostDialog extends javax.swing.JDialog {
     private static javax.swing.JPanel jPanel3;
     private static javax.swing.JPanel jPanel4;
     private static javax.swing.JPanel jPanel5;
+    private static javax.swing.JPanel jPanel6;
     private javax.swing.JButton jButtonOK;
     private javax.swing.JButton jButtonCancel;
     private static javax.swing.JLabel jLabelHostIp;
     private static javax.swing.JLabel jLabel2;
     private static javax.swing.JLabel jLabel3;
+    private static javax.swing.JLabel jLabel4;
     private static javax.swing.JTextField jTextFieldHostIp;
     private static javax.swing.JTextField jTextFielddepth;
+    private static javax.swing.JTextField jTextFieldttr;
     private boolean buttonOK = false;
     private static HostDialog _singleton = null;
     static private String defaultMaxDepth = "3";
+    static private String defaultTtr = "60";
 
     // End of variables declaration
     public String getJTextFielddepth() {
         return jTextFielddepth.getText();
+    }
+
+    public String getJTextFieldttr() {
+        return jTextFieldttr.getText();
     }
 
     public void setJTextFielddepth(String textFielddepth) {
@@ -187,5 +205,28 @@ public class HostDialog extends javax.swing.JDialog {
             return;
         }
         jTextFielddepth.setText((String) result);
+        MonitorThread.setDepth((String) result);
+    }
+
+    public static void openSetTtrControlDialog(
+        javax.swing.JFrame parentComponent) {
+        if (null == _singleton) {
+            _singleton = new HostDialog(parentComponent, true);
+        }
+
+        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
+                "Please enter the time to refresh control:", // Object message,
+                "Set Time to refresh Control", // String title,
+                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+                null, // Icon icon,
+                null, // Object[] selectionValues,
+                jTextFieldttr.getText() // Object initialSelectionValue)
+            );
+
+        if ((result == null) || (!(result instanceof String))) {
+            return;
+        }
+        jTextFieldttr.setText((String) result);
+        MonitorThread.setTtr(Long.parseLong((String) result));
     }
 }
