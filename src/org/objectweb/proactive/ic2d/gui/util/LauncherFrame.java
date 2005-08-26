@@ -27,6 +27,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorPanel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
 
+
 public class LauncherFrame extends JFrame {
     JPanel jPanel1 = new JPanel();
     JPanel jPanel2 = new JPanel();
@@ -46,7 +47,6 @@ public class LauncherFrame extends JFrame {
     JCheckBox gmCheckBox = new JCheckBox();
     private boolean doGraphicalMonitoring;
     private boolean doJobMonitoring;
-	
 
     public LauncherFrame() {
         super("Application launcher");
@@ -99,12 +99,13 @@ public class LauncherFrame extends JFrame {
 
     public void oKButton_actionPerformed(ActionEvent e) {
         try {
-			if (pathTextField.getText().equals(""))
-				return ;
+            if (pathTextField.getText().equals("")) {
+                return;
+            }
+
             // launch the application
             Launcher launcher = new Launcher(pathTextField.getText());
-			launcher.activate() ;
-			
+            launcher.activate();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -144,13 +145,13 @@ public class LauncherFrame extends JFrame {
     }
 
     public void jmCheckBox_actionPerformed(ActionEvent e) {
-		doJobMonitoring = jmCheckBox.isSelected();
+        doJobMonitoring = jmCheckBox.isSelected();
     }
 
     public void gmCheckBox_actionPerformed(ActionEvent e) {
-		doGraphicalMonitoring = gmCheckBox.isSelected();
+        doGraphicalMonitoring = gmCheckBox.isSelected();
     }
-	
+
     public boolean isGraphicalMonitoring() {
         return doGraphicalMonitoring;
     }
@@ -165,8 +166,7 @@ public class LauncherFrame extends JFrame {
 
     public void setIsGraphicalMonitoring(boolean isGraphicalMonitoring) {
         doGraphicalMonitoring = isGraphicalMonitoring;
-    }	
-	
+    }
 }
 
 

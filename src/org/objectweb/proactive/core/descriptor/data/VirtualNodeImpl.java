@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.security.cert.X509Certificate;
+import java.util.Hashtable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -58,13 +62,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.security.cert.X509Certificate;
-
-import java.util.Hashtable;
-import java.util.Vector;
 
 
 /**
@@ -987,7 +984,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     private void setParameters(ExternalProcess process, VirtualMachine vm) {
         JVMProcess jvmProcess;
-		jobID = ProActive.getJobId();
+        jobID = ProActive.getJobId();
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
@@ -1018,14 +1015,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
-			// if it is a main node we give to the process a new jobId
+
+            // if it is a main node we give to the process a new jobId
             if (mainVirtualNode) {
-				String newId = generateNewJobID() ;
-				this.jobID = newId ;
-				jvmProcess.setJvmOptions("-Dproactive.jobid=" + newId);
+                String newId = generateNewJobID();
+                this.jobID = newId;
+                jvmProcess.setJvmOptions("-Dproactive.jobid=" + newId);
+            } else {
+                jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             }
-            else 
-				jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
 
@@ -1036,16 +1034,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
-	/**
-	 * generate a new jobId based on the current time.
-	 * 
-	 * @return a new jobId
-	 */
-	private String generateNewJobID () {
-		return "JOB-" + System.currentTimeMillis() ;
-		
-	}
-	
+    /**
+     * generate a new jobId based on the current time.
+     *
+     * @return a new jobId
+     */
+    private String generateNewJobID() {
+        return "JOB-" + System.currentTimeMillis();
+    }
+
     /**
      * @param processClassname
      * @return
@@ -1176,18 +1173,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        
-            if (isActivated) {
-                try {
-                    waitForAllNodesCreation();
-                } catch (NodeException e) {
-                    out.defaultWriteObject();
-                    return;
-                }
+        if (isActivated) {
+            try {
+                waitForAllNodesCreation();
+            } catch (NodeException e) {
+                out.defaultWriteObject();
+                return;
             }
-            out.defaultWriteObject();
-
-        
+        }
+        out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -1224,4 +1218,3 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         P2P_LOGGER.debug("A P2P nodes lookup added to the vn: " + this.name);
     }
 }
-

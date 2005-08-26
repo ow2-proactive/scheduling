@@ -119,6 +119,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String arg = attributes.getValue("value");
+
             //System.out.println("enter in a arg node : " + arg);
             if (!checkNonEmpty(arg)) {
                 throw new org.xml.sax.SAXException(

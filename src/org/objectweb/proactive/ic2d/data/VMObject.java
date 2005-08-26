@@ -50,6 +50,7 @@ import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
 
+
 /**
  * Holder class for the host data representation
  */

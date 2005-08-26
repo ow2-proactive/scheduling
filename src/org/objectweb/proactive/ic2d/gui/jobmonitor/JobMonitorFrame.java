@@ -167,12 +167,12 @@ public class JobMonitorFrame extends JFrame {
                        panel.addMonitoredHost(host, port);
                        panel.updateHosts();
          *
-                       }
+                         }
         
-                   });
-                       launcherMenu.add(b);
+                     });
+                         launcherMenu.add(b);
         
-                       menuBar.add(launcherMenu);
+                         menuBar.add(launcherMenu);
          */
         return menuBar;
     }

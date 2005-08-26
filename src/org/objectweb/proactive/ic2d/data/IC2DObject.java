@@ -210,14 +210,14 @@ public class IC2DObject extends AbstractDataObject {
         public void log(String message, Throwable e, boolean dialog) {
             if (logger != null) {
                 //logger.log(message, e, dialog); // TODO changed
-				logger.log(message, e, false);
+                logger.log(message, e, false);
             }
         }
 
         public void log(Throwable e, boolean dialog) {
             if (logger != null) {
                 //logger.log(e, dialog); // TODO changed
-				logger.log(e, false);
+                logger.log(e, false);
             }
         }
     }

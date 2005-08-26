@@ -46,7 +46,7 @@ public class ActiveObject extends AbstractDataObject {
     public static final int STATUS_WAITING_BY_NECESSITY_WHILE_ACTIVE = 3;
     public static final int STATUS_WAITING_BY_NECESSITY_WHILE_SERVING = 4;
     public static final int STATUS_ACTIVE = 5;
-	public static final int STATUS_NOT_RESPONDING = 6;
+    public static final int STATUS_NOT_RESPONDING = 6;
 
     /**
      * Every so often we cleanup the cache

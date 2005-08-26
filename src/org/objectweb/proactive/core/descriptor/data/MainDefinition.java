@@ -1,11 +1,10 @@
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-
 import java.io.Serializable;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 
 public class MainDefinition implements Serializable {

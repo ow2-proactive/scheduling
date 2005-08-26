@@ -598,7 +598,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                } catch (SecurityNotAvailableException e) {
                        // do nothing
                        // security not available
-
              */
         } catch (CloneNotSupportedException e) {
             // should never happen

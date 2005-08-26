@@ -15,14 +15,13 @@ import org.objectweb.proactive.core.mop.Utils;
 
 public class RefactorPAD {
 
-
     /**
      * returns a deep copy of the pad
      * used by all other methods before doing changes
      * @param pad
      * @return ProActiveDescriptor
-	 * @throws IOException
-	 */
+     * @throws IOException
+     */
     private static ProActiveDescriptor makeDeepCopy(ProActiveDescriptor pad)
         throws IOException {
         ProActiveDescriptor padCopy = (ProActiveDescriptor) Utils.makeDeepCopy(pad);

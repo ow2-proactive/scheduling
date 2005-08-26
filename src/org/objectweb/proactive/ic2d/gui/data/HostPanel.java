@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.util.Iterator;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
@@ -37,8 +39,6 @@ import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
-
-import java.util.Iterator;
 
 
 public class HostPanel extends AbstractDataObjectPanel
