@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -63,7 +64,7 @@ import org.objectweb.proactive.osgi.OsgiParameters;
  * An HTTP adapter for a ProActiveRuntime to be able to receive remote calls with HTTP. This helps isolate
  * HTTP specific code into a small set of specific classes.
  * @author ProActiveTeam
- * @version 1.0, 9 ao?t 2005
+ * @version 1.0, 9 août 2005
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
@@ -775,6 +776,53 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
+    }
+
+    public ProActiveDescriptor getDescriptor(String url,
+        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+        if (isLocal) {
+            return localruntime.getDescriptor(url, isHierarchicalSearch);
+        }
+        ArrayList params = new ArrayList();
+        params.add(url);
+        params.add(new Boolean(isHierarchicalSearch));
+
+        RuntimeRequest req = new RuntimeRequest("getDescriptor", params,
+                this.url);
+        req.send();
+        try {
+            return (ProActiveDescriptor) req.getReturnedObject();
+        } catch (Exception e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public void launchMain(String className, String[] parameters)
+        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException {
+        if (isLocal) {
+            localruntime.launchMain(className, parameters);
+            return;
+        }
+        ArrayList params = new ArrayList();
+        params.add(className);
+        params.add(parameters);
+
+        RuntimeRequest req = new RuntimeRequest("launchMain", params, this.url);
+        req.send();
+    }
+
+    public void newRemote(String className)
+        throws IOException, ClassNotFoundException, ProActiveException {
+        if (isLocal) {
+            localruntime.newRemote(className);
+            return;
+        }
+        ArrayList params = new ArrayList();
+        params.add(className);
+
+        RuntimeRequest req = new RuntimeRequest("newRemote", params, this.url);
+        req.send();
     }
 
     protected String buildNodeURL(String url)
