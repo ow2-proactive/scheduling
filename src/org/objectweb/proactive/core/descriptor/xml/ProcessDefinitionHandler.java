@@ -286,8 +286,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             if (checkNonEmpty(spadding)) {
                 padding = Integer.parseInt(spadding);
             }
-            if (checkNonEmpty(fixedName) && checkNonEmpty(list) &&
-                    checkNonEmpty(domain)) {
+            if (checkNonEmpty(fixedName) && checkNonEmpty(list)) {
                 ((AbstractListProcessDecorator) targetProcess).setHostConfig(fixedName,
                     list, domain, padding);
             }

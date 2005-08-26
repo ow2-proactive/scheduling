@@ -398,8 +398,10 @@ public abstract class AbstractListProcessDecorator
                 word = "0" + word;
             }
         }
-        if (!domain.startsWith(".")) {
-            domain = "." + domain;
+        if (domain.length() > 0) {
+            if (!domain.startsWith(".")) {
+                domain = "." + domain;
+            }
         }
         return fixedName + word + domain;
     }
