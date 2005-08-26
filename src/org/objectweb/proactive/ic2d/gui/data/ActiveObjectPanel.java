@@ -49,6 +49,8 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         " -- WaitByNecessity";
     private static final String ACTIVE_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT +
         " -- Active, not serving request";
+    private static final String NOT_RESPONDING_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT +
+        " -- Not responding";
     public static final java.awt.Color COLOR_WHEN_ACTIVE = new java.awt.Color(180,
             255, 180);
     public static final java.awt.Color COLOR_WHEN_WAITING_BY_NECESSITY = new java.awt.Color(255,
@@ -56,7 +58,8 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
     public static final java.awt.Color COLOR_WHEN_SERVING_REQUEST = java.awt.Color.white;
     public static final java.awt.Color COLOR_WHEN_WAITING_REQUEST = new java.awt.Color(225,
             225, 225);
-    public static final java.awt.Color COLOR_WHEN_MIGRATING = java.awt.Color.red;
+    public static final java.awt.Color COLOR_WHEN_MIGRATING = java.awt.Color.blue;
+    public static final java.awt.Color COLOR_WHEN_NOT_RESPONDING = java.awt.Color.red;
     public static final java.awt.Color COLOR_REQUEST_SINGLE = java.awt.Color.green;
     public static final java.awt.Color COLOR_REQUEST_SEVERAL = java.awt.Color.red;
     public static final java.awt.Color COLOR_REQUEST_MANY = new java.awt.Color(150,
@@ -192,10 +195,14 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
             // waiting for request
             setBackground(COLOR_WHEN_WAITING_REQUEST);
             setToolTipText(WAITING_REQUEST_TOOL_TIP_TEXT);
-        } else {
+        } else if (v == ActiveObject.STATUS_ACTIVE) {
             // active
             setBackground(COLOR_WHEN_ACTIVE);
             setToolTipText(ACTIVE_TOOL_TIP_TEXT);
+        } else {
+            // not responding
+            setBackground(COLOR_WHEN_NOT_RESPONDING);
+            setToolTipText(NOT_RESPONDING_TOOL_TIP_TEXT);
         }
         repaint();
     }
