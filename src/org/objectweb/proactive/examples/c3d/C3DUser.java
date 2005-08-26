@@ -256,11 +256,17 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor(argv[0]);
-        } catch (ProActiveException e1) {
-            e1.printStackTrace();
+            if (argv.length == 0) {
+                proActiveDescriptor = ProActive.getProactiveDescriptor(); //"file:"+args[0]);
+            } else {
+                proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+                        argv[0]);
+            }			
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(-1);
         }
+
         proActiveDescriptor.activateMappings();
         VirtualNode user = proActiveDescriptor.getVirtualNode("User");
 

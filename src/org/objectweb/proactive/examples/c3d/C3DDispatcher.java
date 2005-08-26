@@ -472,8 +472,12 @@ public class C3DDispatcher implements RunActive {
         ProActiveConfiguration.load(); // this line also registers the dispatcher in the registry!!!
 
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
-                    argv[0]);
+            if (argv.length == 0) {
+                proActiveDescriptor = ProActive.getProactiveDescriptor(); //"file:"+args[0]);
+            } else {
+                proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+                        argv[0]);
+            }
             proActiveDescriptor.activateMappings();
         } catch (Exception e) {
             e.printStackTrace();
