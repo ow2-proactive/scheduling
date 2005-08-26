@@ -39,6 +39,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -210,4 +211,14 @@ public interface RemoteProActiveRuntime extends Serializable {
      */
     public byte[] getClassDataFromThisRuntime(String className)
         throws IOException, ProActiveException;
+
+    public void launchMain(String className, String[] parameters)
+        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException;
+
+    public void newRemote(String className)
+        throws IOException, ClassNotFoundException, ProActiveException;
+
+    public ProActiveDescriptor getDescriptor(String url,
+        boolean isHierarchicalSearch) throws IOException, ProActiveException;
 }

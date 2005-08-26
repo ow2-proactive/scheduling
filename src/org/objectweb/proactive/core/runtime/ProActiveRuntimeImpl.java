@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClas
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
@@ -224,8 +227,32 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         descriptorMap.put(url, pad);
     }
 
-    public ProActiveDescriptor getDescriptor(String url) {
-        return (ProActiveDescriptor) descriptorMap.get(url);
+    public ProActiveDescriptor getDescriptor(String url,
+        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+        ProActiveDescriptor pad = (ProActiveDescriptor) descriptorMap.get(url);
+
+        // hierarchical search or not, look if we know the pad
+        if (pad != null) {
+            // if pad found and hierarchy search return pad with no main
+            if (isHierarchicalSearch) {
+                return RefactorPAD.buildNoMainPAD(pad);
+            } else {
+                // if not hierarchy search, return the normal pad
+                return pad;
+            }
+        } else if (!isHierarchicalSearch) {
+            return null; // pad == null
+        } else { // else search pad in parent runtime
+            if (parentRuntimeURL == null) {
+                throw new IOException(
+                    "Descriptor cannot be found hierarchically since this runtime has no parent");
+            }
+
+            // get remote runtime
+            ProActiveRuntime parentRuntime = RuntimeFactory.getRuntime(parentRuntimeURL,
+                    UrlBuilder.getProtocol(parentRuntimeURL));
+            return parentRuntime.getDescriptor(url, true);
+        }
     }
 
     public void removeDescriptor(String url) {
@@ -986,6 +1013,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return null;
     }
 
+    public void launchMain(String className, String[] parameters)
+        throws ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException {
+        Class mainClass = Class.forName(className);
+        Method mainMethod = mainClass.getMethod("main",
+                new Class[] { String[].class });
+        new LauncherThread(mainMethod, parameters).start();
+    }
+
+    public void newRemote(String className)
+        throws ClassNotFoundException, ProActiveException {
+        Class remoteClass = Class.forName(className);
+        new LauncherThread(remoteClass).start();
+    }
+
     // tries to generate a stub without using MOP methods
     private byte[] generateStub(String className) {
         byte[] classData = null;
@@ -1032,5 +1074,50 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             return classData;
         }
         return null;
+    }
+
+    //
+    // ----------------- INNER CLASSES --------------------------------
+    //
+
+    /**
+     * inner class for method invocation
+     */
+    private class LauncherThread extends Thread {
+        private boolean launchMain;
+        private Method mainMethod;
+        private Class remoteClass;
+        private String[] parameters;
+
+        public LauncherThread(Class remoteClass) {
+            this.remoteClass = remoteClass;
+            launchMain = false;
+        }
+
+        public LauncherThread(Method mainMethod, String[] parameters) {
+            this.mainMethod = mainMethod;
+            this.parameters = parameters;
+            launchMain = true;
+        }
+
+        public void run() {
+            if (launchMain) {
+                try {
+                    mainMethod.invoke(null, new Object[] { parameters });
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    remoteClass.newInstance();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

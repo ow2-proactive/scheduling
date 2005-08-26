@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -453,6 +454,22 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     public byte[] getClassDataFromThisRuntime(String className)
         throws RemoteException, ProActiveException {
         return proActiveRuntime.getClassDataFromThisRuntime(className);
+    }
+
+    public void launchMain(String className, String[] parameters)
+        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException {
+        proActiveRuntime.launchMain(className, parameters);
+    }
+
+    public void newRemote(String className)
+        throws IOException, ClassNotFoundException, ProActiveException {
+        proActiveRuntime.newRemote(className);
+    }
+
+    public ProActiveDescriptor getDescriptor(String url,
+        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+        return proActiveRuntime.getDescriptor(url, isHierarchicalSearch);
     }
 
     //

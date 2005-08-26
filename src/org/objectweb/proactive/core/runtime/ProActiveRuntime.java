@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -38,6 +39,7 @@ import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -403,4 +405,36 @@ public interface ProActiveRuntime extends Job {
      */
     public byte[] getClassDataFromParentRuntime(String className)
         throws ProActiveException;
+
+    /**
+     * launch the main method of the main class with parameters
+     * @param className
+     * @param parameters
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws ProActiveException
+     */
+    public void launchMain(String className, String[] parameters)
+        throws ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException;
+
+    /**
+     * construct a new instance remotly
+     * @param className class to instance
+     * @throws ClassNotFoundException
+     * @throws ProActiveException
+     */
+    public void newRemote(String className)
+        throws ClassNotFoundException, ProActiveException;
+
+    /**
+     * return the pad matching with the given url or parse it from the file system
+     * @param xmlDescriptorUrl url of the pad
+     * @param hierarchicalSearch if yes search for the pad hierarchically
+     * @return the pad found or a new pad parsed from xmlDescriptorUrl
+     * @throws ProActiveException
+     * @throws IOException
+     */
+    public ProActiveDescriptor getDescriptor(String url,
+        boolean isHierarchicalSearch) throws IOException, ProActiveException;
 }

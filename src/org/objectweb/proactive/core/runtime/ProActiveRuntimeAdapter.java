@@ -40,6 +40,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -509,5 +510,29 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      */
     public String getJobID() {
         return vmInformation.getJobID();
+    }
+
+    public void launchMain(String className, String[] parameters)
+        throws ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException {
+        try {
+            proActiveRuntime.launchMain(className, parameters);
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public void newRemote(String className)
+        throws ClassNotFoundException, ProActiveException {
+        try {
+            proActiveRuntime.newRemote(className);
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public ProActiveDescriptor getDescriptor(String url,
+        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+        return proActiveRuntime.getDescriptor(url, isHierarchicalSearch);
     }
 }
