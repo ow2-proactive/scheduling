@@ -41,9 +41,12 @@ package org.objectweb.proactive.core.descriptor.xml;
  */
 public interface ProActiveDescriptorConstants {
     public static final String PROACTIVE_DESCRIPTOR_TAG = "ProActiveDescriptor";
+    public static final String MAIN_DEFINITION_TAG = "mainDefinition";
     public static final String DEPLOYMENT_TAG = "deployment";
     public static final String INFRASTRUCTURE_TAG = "infrastructure";
     public static final String COMPONENT_DEFINITION_TAG = "componentDefinition";
+	public static final String ARG_TAG = "arg";
+	public static final String MAP_TO_VIRTUAL_NODE_TAG = "mapToVirtualNode";
     public static final String VIRTUAL_NODES_DEFINITION_TAG = "virtualNodesDefinition";
     public static final String VIRTUAL_NODES_ACQUISITION_TAG = "virtualNodesAcquisition";
     public static final String VIRTUAL_NODE_TAG = "virtualNode";
