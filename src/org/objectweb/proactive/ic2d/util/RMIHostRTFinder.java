@@ -108,7 +108,7 @@ public class RMIHostRTFinder implements HostRTFinder {
 
     private void log(String s, Exception e) {
         if (logger != null) {
-            logger.log(s, e);
+            logger.log(s, e, false); // false to not have the dialog box
         } else {
             log4jlogger.info(s);
             e.printStackTrace();
