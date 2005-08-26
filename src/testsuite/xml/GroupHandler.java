@@ -106,6 +106,8 @@ public class GroupHandler {
             return group;
         }
 
+        private int indexGlobal = 0;
+        
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String dir = attributes.getValue("dir");
@@ -118,6 +120,7 @@ public class GroupHandler {
             try {
                 group = new Group(dirFile, packageName, null, false,
                         this.manager);
+                indexGlobal = 0;
             } catch (BrowsePackageException e) {
                 logger.warn("Can't create a package group");
                 throw new SAXException("Can't create a package group", e);
@@ -136,7 +139,7 @@ public class GroupHandler {
             manager.add(group);
         }
 
-        private int indexGlobal = 0;
+
 
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
