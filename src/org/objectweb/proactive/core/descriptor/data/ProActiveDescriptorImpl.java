@@ -33,7 +33,10 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -42,6 +45,7 @@ import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
@@ -67,6 +71,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
     protected static Logger logger = Logger.getLogger(ProActiveDescriptorImpl.class.getName());
+    private String lastMainDefinitionID;
+
+    /** map keys with mainDefinitions */
+    private Map mainDefinitionMapping;
 
     /** map virtualNode name and objects */
     private java.util.HashMap virtualNodeMapping;
@@ -102,6 +110,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * Contructs a new intance of ProActiveDescriptor
      */
     public ProActiveDescriptorImpl(String url) {
+        mainDefinitionMapping = new HashMap();
         virtualNodeMapping = new java.util.HashMap();
         virtualMachineMapping = new java.util.HashMap();
         processMapping = new java.util.HashMap();
@@ -114,6 +123,129 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
+
+    /**
+     * create a new mainDefintion with a unique id defined by the append of
+     * "mainDefinition:" + lastMainDefinitionID
+     */
+    public void createMainDefinition(String id) {
+        lastMainDefinitionID = id;
+        mainDefinitionMapping.put(id, new MainDefinition());
+    }
+
+    /**
+     * set the mainClass attribute of the last defined mainDefinition
+     * @param mainClass fully qualified name of the mainclass
+     */
+    public void mainDefinitionSetMainClass(String mainClass) {
+        getMainDefinition().setMainClass(mainClass);
+    }
+
+    /**
+     * add the parameter parameter to the parameters of the last
+     * defined mainDefinition
+     * @param parameter parameter to add
+     */
+    public void mainDefinitionAddParameter(String parameter) {
+        getMainDefinition().addParameter(parameter);
+    }
+
+    /**
+     * return an array that contains all the parameters of the last
+     * defined mainDefinition
+     * @param mainDefinitionId key identifying a mainDefinition
+     * @return a table of String containing all the parameters of the mainDefinition
+     */
+    public String[] mainDefinitionGetParameters(String mainDefinitionId) {
+        return getMainDefinition(mainDefinitionId).getParameters();
+    }
+
+    /**
+     * add a VirtualNode virtualNode to the last defined mainDefinition
+     * @param virtualNode VirtualNode to add
+     */
+    public void mainDefinitionAddVirtualNode(VirtualNode virtualNode) {
+        getMainDefinition().addVirtualNode(virtualNode);
+    }
+
+    /**
+     * return true if at least one mainDefinition is defined
+     * @return true if at least one mainDefinition is defined
+     */
+    public boolean isMainDefined() {
+        return !mainDefinitionMapping.isEmpty();
+    }
+
+    /**
+     * activates all mains of mainDefinitions defined
+     *
+     */
+    public void activateMains() {
+        if (!isMainDefined()) {
+            return;
+        }
+        Set mainsId = mainDefinitionMapping.keySet();
+        Iterator it = mainsId.iterator();
+        while (it.hasNext()) {
+            String id = (String) it.next();
+            activateMain(id);
+        }
+    }
+
+    /**
+     * activates the main of the id-th mainDefinition
+     * @param mainDefinitionId key identifying a mainDefinition
+     */
+    public void activateMain(String mainDefinitionId) {
+        MainDefinition mainDefinition = getMainDefinition(mainDefinitionId);
+        if (mainDefinition != null) {
+            mainDefinition.activateMain();
+        }
+    }
+
+    /**
+     * return the main definitions mapping
+     * @return Map
+     */
+    public Map getMainDefinitionMapping() {
+        return mainDefinitionMapping;
+    }
+
+    public void setMainDefinitionMapping(HashMap newMapping) {
+        mainDefinitionMapping = newMapping;
+    }
+
+    /**
+     * return the virtual nodes mapping
+     * @return Map
+     */
+    public Map getVirtualNodeMapping() {
+        return virtualNodeMapping;
+    }
+
+    public void setVirtualNodeMapping(HashMap newMapping) {
+        virtualNodeMapping = newMapping;
+    }
+
+    /**
+     *
+     * @return an array containing all mainDefinitions conserving order
+     */
+    public MainDefinition[] getMainDefinitions() {
+        MainDefinition[] mainDefinitions = new MainDefinition[mainDefinitionMapping.size()];
+        Set mainsId = mainDefinitionMapping.keySet();
+        Iterator it = mainsId.iterator();
+        int i = 0;
+
+        while (it.hasNext()) {
+            String id = (String) it.next();
+            mainDefinitions[i] = getMainDefinition(id);
+            i++;
+        }
+
+        return mainDefinitions;
+    }
+
     public VirtualNode[] getVirtualNodes() {
         int i = 0;
         VirtualNode[] virtualNodeArray = new VirtualNode[virtualNodeMapping.size()];
@@ -142,13 +274,23 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public VirtualNode createVirtualNode(String vnName, boolean lookup) {
+        return createVirtualNode(vnName, lookup, null);
+    }
+
+    public VirtualNode createVirtualNode(String vnName, boolean lookup,
+        String padURL) {
+        return createVirtualNode(vnName, lookup, padURL, false);
+    }
+
+    public VirtualNode createVirtualNode(String vnName, boolean lookup,
+        String padURL, boolean isMainNode) {
         VirtualNode vn = getVirtualNode(vnName);
         if (vn == null) {
             if (lookup) {
                 vn = new VirtualNodeLookup(vnName);
             } else {
                 vn = new VirtualNodeImpl(vnName, creatorCertificate,
-                        policyServer);
+                        policyServer, padURL, isMainNode);
             }
 
             virtualNodeMapping.put(vnName, vn);
@@ -186,7 +328,18 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         throws ProActiveException {
         try {
             Class processClass = Class.forName(processClassName);
-            return (ExternalProcess) processClass.newInstance();
+            ExternalProcess process = (ExternalProcess) processClass.newInstance();
+
+            // if the process is a jvm process we can pass it a property containing the pad url
+            if (process instanceof JVMProcess) {
+                String shortUrl = url;
+                if (url.startsWith("file:")) {
+                    shortUrl = url.substring(url.indexOf(":") + 1);
+                }
+                ((JVMProcess) process).setJvmOptions(" -Dproactive.pad=" +
+                    shortUrl);
+            }
+            return process;
         } catch (ClassNotFoundException e) {
             throw new ProActiveException(e);
         } catch (InstantiationException e) {
@@ -326,6 +479,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     //  ----- PRIVATE METHODS -----------------------------------------------------------------------------------
     //
+
+    /**
+     * return the main definition matching with the id mainDefinitionID
+     * @param mainDefinitionID Id of the mainDefinition
+     * @return MainDefinition
+     */
+    private MainDefinition getMainDefinition(String mainDefinitionID) {
+        return (MainDefinition) mainDefinitionMapping.get(mainDefinitionID);
+    }
+
+    /**
+     * return the last main definition added
+     * @return MainDefinition
+     */
+    private MainDefinition getMainDefinition() {
+        return getMainDefinition(lastMainDefinitionID);
+    }
+
     private void addExternalProcess(String processID, ExternalProcess process) {
         ProcessUpdater processUpdater = (ProcessUpdater) pendingProcessMapping.remove(processID);
         if (processUpdater != null) {
