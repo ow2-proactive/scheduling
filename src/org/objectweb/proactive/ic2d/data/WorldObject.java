@@ -72,6 +72,7 @@ public class WorldObject extends AbstractDataObject {
         MonitoredObjectSet objectSet) throws java.rmi.RemoteException {
         String shortHostname = null;
         String hostname = monitoredHost.getFullName();
+		//System.out.println("name of added host : " + hostname);
         try {
             shortHostname = UrlBuilder.getHostNameorIP(java.net.InetAddress.getByName(
                         UrlBuilder.removePortFromHost(hostname)));

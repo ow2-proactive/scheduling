@@ -48,7 +48,7 @@ import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.spy.Spy;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
-
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 /**
  * Holder class for the host data representation
@@ -57,6 +57,10 @@ public class VMObject extends AbstractDataObject {
     static Logger log4jlogger = Logger.getLogger(VMObject.class.getName());
     private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
     private static Node SPY_LISTENER_NODE;
+    private static int NOT_RESPONDING_MAX_TRIES = 3; // actually not used
+    private int notRespondingCounter = 0;
+    private long firstNotRespondingTime = 0;
+    private long lastNotRespondingTime = -1;
 
     static {
         String currentHost;
@@ -114,6 +118,8 @@ public class VMObject extends AbstractDataObject {
         addNodeObject(node);
         controller.log("VMObject id=" + vmid + " created based on node " +
             node.getNodeInformation().getURL());
+
+        notRespondingCounter = 0;
     }
 
     //
@@ -258,6 +264,14 @@ public class VMObject extends AbstractDataObject {
         getTypedParent().removeVMObject(vmid);
     }
 
+    public int getNotRespondingCounter() {
+        return notRespondingCounter;
+    }
+
+    public long getFirstNotRespondingTime() {
+        return firstNotRespondingTime;
+    }
+
     //
     // -- PROTECTED METHOD -----------------------------------------------
     //
@@ -308,9 +322,39 @@ public class VMObject extends AbstractDataObject {
     // -- PRIVATE METHOD -----------------------------------------------
     //
     private void recoverExceptionInSpy(Exception e) {
-        controller.log("Exception occured while contacting Spy for VM " + vmid +
-            ". Now removing the VM from IC2D.", e);
-        destroyObject();
+        // *******************************************
+        //controller.log("Exception occured while contacting Spy for VM " + vmid +
+        //    ". Now removing the VM from IC2D.", e);
+        controller.log("VM " + vmid + " is not responding ...");
+        if (listener != null) {
+            listener.vmNotResponding(this);
+        }
+
+        if (lastNotRespondingTime < 0) {
+            firstNotRespondingTime = System.currentTimeMillis();
+        }
+
+        if ((System.currentTimeMillis() - lastNotRespondingTime) > (MonitorThread.getTtr() * 1000)) {
+            notRespondingCounter++;
+            lastNotRespondingTime = System.currentTimeMillis();
+            //System.out.println("Spy lost #" + notRespondingCounter) ;
+        }
+
+        /*
+           if (notRespondingCounter == NOT_RESPONDING_MAX_TRIES ){
+                   controller.log("Now removing the VM from IC2D") ;
+                   System.out.println ("remove " + vmid + " VM") ;
+                   //getTypedParent().removeVMObject(vmid) ;
+        
+                   killVM() ;
+                   //destroyObject();
+                   destroy() ;
+                   lastNotRespondingTime = -1 ;
+        
+           }
+         */
+
+        //****************************************
     }
 
     private ActiveObject findActiveObject(UniqueID id) {

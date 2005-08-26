@@ -79,7 +79,7 @@ public class HostObject extends AbstractDataObject {
             //controller.log("HostObject "+this.hostname+ " created");
         } catch (java.net.UnknownHostException e) {
             this.hostname = monitoredHost.getFullName();
-            controller.warn("Hostname " + hostname + " failed reverse lookup.");
+            //controller.warn("Hostname " + hostname + " failed reverse lookup.");
         }
     }
 
@@ -188,7 +188,7 @@ public class HostObject extends AbstractDataObject {
             return vmObject;
         } catch (ActiveObjectCreationException e) {
             controller.log("Cannot create the spy on host " + hostname +
-                " on node " + node.getNodeInformation().getURL(), e);
+                " on node " + node.getNodeInformation().getURL());
 
             return null;
         } catch (NodeException e) {
