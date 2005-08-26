@@ -49,6 +49,7 @@ import org.objectweb.proactive.examples.c3d.Interval;
 public class ImageCanvas extends Canvas {
     private final int my_HEIGHT;
     private final int my_WIDTH;
+    private Dimension preferedSize; // the Canvas prefered size
     private BufferedImage display; // the image that is drawn 
     Image offScreenBuffer;
 
@@ -123,5 +124,13 @@ public class ImageCanvas extends Canvas {
     /** Used to make the windows show there proper size */
     public Dimension getPreferedSize() {
         return new Dimension(my_HEIGHT, my_WIDTH);
+    }
+
+    public void setPreferredSize(Dimension preferredSize) {
+        this.preferedSize = preferredSize;
+    }
+
+    public Dimension getPreferredSize() {
+        return this.preferedSize;
     }
 }
