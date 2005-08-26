@@ -153,6 +153,27 @@ public class JobMonitorFrame extends JFrame {
 
         menuBar.add(controlMenu);
 
+        /////////////////////
+        // added in 08/2005
+
+        /*javax.swing.JMenu launcherMenu = new javax.swing.JMenu("Launcher");
+           b = new javax.swing.JMenuItem(
+                   "Launch a new application");
+           b.addActionListener(new java.awt.event.ActionListener() {
+                   public void actionPerformed(java.awt.event.ActionEvent e) {
+                                           //DialogUtils.launchApplicationDialog() ;
+                                           /*String host = "localhost";
+                                           int port = Registry.REGISTRY_PORT;
+                       panel.addMonitoredHost(host, port);
+                       panel.updateHosts();
+         *
+                       }
+        
+                   });
+                       launcherMenu.add(b);
+        
+                       menuBar.add(launcherMenu);
+         */
         return menuBar;
     }
 

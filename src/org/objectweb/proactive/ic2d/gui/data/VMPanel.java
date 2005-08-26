@@ -38,6 +38,7 @@ import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.spy.Spy;
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {
@@ -109,6 +110,11 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         removeChild(nodeObject);
     }
 
+    public void vmNotResponding(VMObject vmObject) {
+        setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+        repaint();
+    }
+
     // ebe 06/2004
     // set VM horiz or vertic layout for that VM
     // needed if there's more than one node in one VM
@@ -136,10 +142,16 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     }
 
     protected Object[][] getDataObjectInfo() {
+        int timeNotResponding = 0;
+        if (vmObject.getFirstNotRespondingTime() > 0) {
+            timeNotResponding = (int) ((System.currentTimeMillis() -
+                vmObject.getFirstNotRespondingTime()) / 1000);
+        }
         return new Object[][] {
             { "ID", vmObject.getID() },
             { "Active objects", new Integer(vmObject.getActiveObjectsCount()) },
-            { "Protocol identifier", vmObject.getProtocolId() }
+            { "Protocol identifier", vmObject.getProtocolId() },
+            { "Not responding for ", timeNotResponding + "s" }
         };
     }
 

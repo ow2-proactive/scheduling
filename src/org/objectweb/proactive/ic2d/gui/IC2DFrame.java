@@ -46,9 +46,11 @@ import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorFrame;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.gui.util.HostDialog;
+import org.objectweb.proactive.ic2d.gui.util.LauncherFrame;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
@@ -76,7 +78,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     private ProActiveRuntimeImpl proActiveRuntimeImpl;
     private static final String HOME = System.getProperty("user.home");
     private int depthMonitor = 10;
-    private javax.swing.JFrame jobMonitorFrame;
+    private JobMonitorFrame jobMonitorFrame;
+    private LauncherFrame launcherFrame;
 
     //
     // -- CONTRUCTORS -----------------------------------------------
@@ -131,6 +134,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         eventListsFrame = createEventListFrame(eventListsPanel);
 
+        launcherFrame = new LauncherFrame();
+
         //fileChooserFrame = createFileChooserFrame();
         logger.log("IC2D ready !");
     }
@@ -173,14 +178,31 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         } else {
             url = UrlBuilder.buildUrl(host, nodeName, protocol);
         }
-        try {
-            proActiveRuntimeRegistered.createLocalNode(url, false, null,
-                this.getName(), ProActive.getJobId());
-        } catch (NodeException e1) {
-            logger.log(e1, false);
+
+        if (event.getCreatorID().equals("ic2d")) {
+            try {
+                proActiveRuntimeRegistered.createLocalNode(url, false, null,
+                    this.getName(), ProActive.getJobId());
+            } catch (NodeException e1) {
+                logger.log(e1, false);
+            }
         }
-        new MonitorThread(protocol, host, "1", ic2dObject.getWorldObject(),
-            logger).start();
+
+        String jobId = proActiveRuntimeRegistered.getJobID();
+        MonitoredJob monitoredJob = new MonitoredJob(jobId);
+
+        // monitor the host where is launched the runtime
+        if (launcherFrame.isGraphicalMonitoring()) {
+            ic2dPanel.getWorldPanel().monitoredHostAdded(host, protocol);
+        } else {
+            ic2dPanel.getWorldPanel().getMonitorThread().addObjectToSkip(monitoredJob);
+        }
+        if (launcherFrame.isJobMonitoring()) {
+            jobMonitorFrame.getPanel().addMonitoredHost(UrlBuilder.removePortFromHost(
+                    host), UrlBuilder.getPortFromUrl(host));
+        } else {
+            jobMonitorFrame.getPanel().addObjectToSkip(monitoredJob);
+        }
     }
 
     //
@@ -224,6 +246,14 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     public void allEventsProcessed() {
         ic2dPanel.allEventsProcessed();
         eventListsPanel.allEventsProcessed();
+    }
+
+    public JobMonitorFrame getJobMonitorFrame() {
+        return jobMonitorFrame;
+    }
+
+    public IC2DPanel getIc2dPanel() {
+        return ic2dPanel;
     }
 
     //
@@ -311,7 +341,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewRMIHostDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), logger);
+                            ic2dPanel.getWorldPanel(), logger);
                     }
                 });
             monitoringMenu.add(b);
@@ -334,7 +364,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewIbisHostDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), logger);
+                            ic2dPanel.getWorldPanel(), logger);
                     }
                 });
             monitoringMenu.add(b);
@@ -346,7 +376,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewJINIHostsDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), controller);
+                            ic2dPanel.getWorldPanel(), controller);
                     }
                 });
             monitoringMenu.add(b);
@@ -358,7 +388,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewJINIHostDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), logger);
+                            ic2dPanel.getWorldPanel(), logger);
                     }
                 });
             monitoringMenu.add(b);
@@ -369,7 +399,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewHTTPHostDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), logger);
+                            ic2dPanel.getWorldPanel(), logger);
                     }
                 });
             monitoringMenu.add(b);
@@ -428,68 +458,10 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         }
         menuBar.add(monitoringMenu);
 
-        //	//Deploy
-        //	   javax.swing.JMenu DeployMenu = new javax.swing.JMenu("Deploy");
-        //		   {
-        //		   javax.swing.JMenuItem b = new javax.swing.JMenuItem("Deploy with descriptors");
-        //		   b.addActionListener(new java.awt.event.ActionListener() {
-        //			   public void actionPerformed(java.awt.event.ActionEvent e) {
-        //			   	JFrame frame = createFileChooserFrame();
-        //			   	frame.setVisible(true);
-        //			 	}
-        //			   });
-        //			 
-        //		   DeployMenu.add(b);
-        //		   }   
-        //	menuBar.add(DeployMenu);
-        //ebe 20/08/2004  control menu
-        javax.swing.JMenu controlMenu = new javax.swing.JMenu("Control");
-        // Add depth control menu
-        {
-            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
-                    "Set depth Control...");
-            b.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        HostDialog.openSetDepthControlDialog(IC2DFrame.this);
-                    }
-                });
-            controlMenu.add(b);
-        }
-        menuBar.add(controlMenu);
-        //
-        // look and feel 
-        //
-        {
-            javax.swing.JMenu lookMenu = new javax.swing.JMenu("Look & feel");
-            javax.swing.UIManager.LookAndFeelInfo[] infos = javax.swing.UIManager.getInstalledLookAndFeels();
-            for (int i = 0; i < infos.length; i++) {
-                javax.swing.AbstractAction a = new javax.swing.AbstractAction(infos[i].getName(),
-                        null) {
-                        public void actionPerformed(
-                            java.awt.event.ActionEvent e) {
-                            try {
-                                String classname = (String) getValue("class");
-
-                                //javax.swing.JFrame frame = (javax.swing.JFrame)getValue("frame");
-                                javax.swing.UIManager.setLookAndFeel(classname);
-                                javax.swing.SwingUtilities.updateComponentTreeUI(IC2DFrame.this);
-                                javax.swing.SwingUtilities.updateComponentTreeUI(eventListsFrame);
-                                javax.swing.SwingUtilities.updateComponentTreeUI(processesFrame);
-                            } catch (Exception ex) {
-                            }
-                        }
-                    };
-                a.putValue("frame", this);
-                a.putValue("class", infos[i].getClassName());
-                lookMenu.add(a);
-            }
-            menuBar.add(lookMenu);
-        }
-
         //
         // Window
         //
-        javax.swing.JMenu windowMenu = new javax.swing.JMenu("Window");
+        javax.swing.JMenu windowMenu = new javax.swing.JMenu("Windows");
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
                     "Hide/Show EventsList windows");
@@ -536,6 +508,91 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         }
 
         menuBar.add(windowMenu);
+
+        /////////////////////
+        // added in 08/2005
+        javax.swing.JMenu launcherMenu = new javax.swing.JMenu("Launcher");
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Launch a new application");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        launcherFrame.setVisible(!launcherFrame.isVisible());
+                    }
+                });
+            launcherMenu.add(b);
+
+            menuBar.add(launcherMenu);
+        }
+
+        //*******************************************************
+        //	//Deploy
+        //	   javax.swing.JMenu DeployMenu = new javax.swing.JMenu("Deploy");
+        //		   {
+        //		   javax.swing.JMenuItem b = new javax.swing.JMenuItem("Deploy with descriptors");
+        //		   b.addActionListener(new java.awt.event.ActionListener() {
+        //			   public void actionPerformed(java.awt.event.ActionEvent e) {
+        //			   	JFrame frame = createFileChooserFrame();
+        //			   	frame.setVisible(true);
+        //			 	}
+        //			   });
+        //			 
+        //		   DeployMenu.add(b);
+        //		   }   
+        //	menuBar.add(DeployMenu);
+        //ebe 20/08/2004  control menu
+        javax.swing.JMenu controlMenu = new javax.swing.JMenu("Control");
+        // Add depth control menu
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Set depth Control...");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        HostDialog.openSetDepthControlDialog(IC2DFrame.this);
+                    }
+                });
+            controlMenu.add(b);
+        }
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Set time to refresh Control...");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        HostDialog.openSetTtrControlDialog(IC2DFrame.this);
+                    }
+                });
+            controlMenu.add(b);
+        }
+        menuBar.add(controlMenu);
+        //
+        // look and feel 
+        //
+        {
+            javax.swing.JMenu lookMenu = new javax.swing.JMenu("Look & feel");
+            javax.swing.UIManager.LookAndFeelInfo[] infos = javax.swing.UIManager.getInstalledLookAndFeels();
+            for (int i = 0; i < infos.length; i++) {
+                javax.swing.AbstractAction a = new javax.swing.AbstractAction(infos[i].getName(),
+                        null) {
+                        public void actionPerformed(
+                            java.awt.event.ActionEvent e) {
+                            try {
+                                String classname = (String) getValue("class");
+
+                                //javax.swing.JFrame frame = (javax.swing.JFrame)getValue("frame");
+                                javax.swing.UIManager.setLookAndFeel(classname);
+                                javax.swing.SwingUtilities.updateComponentTreeUI(IC2DFrame.this);
+                                javax.swing.SwingUtilities.updateComponentTreeUI(eventListsFrame);
+                                javax.swing.SwingUtilities.updateComponentTreeUI(processesFrame);
+                            } catch (Exception ex) {
+                            }
+                        }
+                    };
+                a.putValue("frame", this);
+                a.putValue("class", infos[i].getClassName());
+                lookMenu.add(a);
+            }
+            menuBar.add(lookMenu);
+        }
 
         //
         // Globus
@@ -646,11 +703,13 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         }
 
         public void log(String message, Throwable e, boolean dialog) {
-            logger.log(message, e, dialog);
+            //logger.log(message, e, dialog);
+            logger.log(message, e, false);
         }
 
         public void log(Throwable e, boolean dialog) {
-            logger.log(e, dialog);
+            //logger.log(e, dialog);
+            logger.log(e, false);
         }
     }
 }

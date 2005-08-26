@@ -186,6 +186,16 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         }
     }
 
+    public void addObjectToSkip(MonitoredJob job) {
+        if (!skippedObjects.contains(job)) {
+            skippedObjects.addElement(job);
+        }
+    }
+
+    public void removeObjectToSkip(MonitoredJob job) {
+        skippedObjects.removeElement(job);
+    }
+
     public void addMonitoredHost(String host, int port) {
         MonitoredHost hostObject = new MonitoredHost(host, port, "rmi:");
         if (!monitoredHosts.contains(hostObject)) {
@@ -453,6 +463,14 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
             tree.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
+                        TreePath[] selection = tree.getSelectionPaths();
+                        if (e.isPopupTrigger()) {
+                            constructPopupMenu(selection);
+                            popupmenu.show(tree, e.getX(), e.getY());
+                        }
+                    }
+
+                    public void mouseReleased(java.awt.event.MouseEvent e) {
                         TreePath[] selection = tree.getSelectionPaths();
                         if (e.isPopupTrigger()) {
                             constructPopupMenu(selection);

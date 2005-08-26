@@ -42,7 +42,9 @@ import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class WorldPanel extends AbstractDataObjectPanel
@@ -50,6 +52,7 @@ public class WorldPanel extends AbstractDataObjectPanel
     private WorldObject worldObject;
     private ActiveObjectCommunicationRecorder communicationRecorder;
     private String alignLayout = "H"; //keep state of layout H or V
+    private MonitorThread monitorThread;
     private Timer timer;
     private int w;
     private int h;
@@ -63,6 +66,7 @@ public class WorldPanel extends AbstractDataObjectPanel
         super(dataObjectPanel, "IC2D", "WorldObject");
         this.worldObject = targetWorldObject;
         this.communicationRecorder = communicationRecorder;
+
         setBackground(java.awt.Color.white);
 
         setLayout(new MyFlowLayout(java.awt.FlowLayout.CENTER, 25, 15));
@@ -70,10 +74,11 @@ public class WorldPanel extends AbstractDataObjectPanel
         //
         // Contextual Menu
         //
+        final WorldPanel thisPanel = this;
         PanelPopupMenu popup = new PanelPopupMenu("World Panel");
         popup.add(new javax.swing.AbstractAction("Monitor a new RMI Host", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    DialogUtils.openNewRMIHostDialog(parentFrame, worldObject,
+                    DialogUtils.openNewRMIHostDialog(parentFrame, thisPanel,
                         controller);
                 }
             });
@@ -86,14 +91,14 @@ public class WorldPanel extends AbstractDataObjectPanel
         //            });
         popup.add(new javax.swing.AbstractAction("Monitor all JINI Hosts", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    DialogUtils.openNewJINIHostsDialog(parentFrame,
-                        worldObject, controller);
+                    DialogUtils.openNewJINIHostsDialog(parentFrame, thisPanel,
+                        controller);
                 }
             });
 
         popup.add(new javax.swing.AbstractAction("Monitor a new JINI Host", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    DialogUtils.openNewJINIHostDialog(parentFrame, worldObject,
+                    DialogUtils.openNewJINIHostDialog(parentFrame, thisPanel,
                         controller);
                 }
             });
@@ -179,6 +184,9 @@ public class WorldPanel extends AbstractDataObjectPanel
 
         /***********************************************************/
         addMouseListener(popup.getMenuMouseListener());
+
+        // initialize the monitor thread
+        monitorThread = new MonitorThread("3", worldObject, controller);
     }
 
     //
@@ -245,8 +253,28 @@ public class WorldPanel extends AbstractDataObjectPanel
         hostObject.registerListener(panel);
     }
 
+    public void monitoredHostAdded(MonitoredHost host) {
+        monitorThread.addMonitoredHost(host);
+    }
+
+    public void monitoredHostAdded(String host, String protocol) {
+        monitorThread.addMonitoredHost(host, protocol);
+    }
+
     public void hostObjectRemoved(HostObject hostObject) {
         removeChild(hostObject);
+    }
+
+    public void monitoredHostRemoved(MonitoredHost host) {
+        monitorThread.addMonitoredHost(host);
+    }
+
+    public MonitorThread getMonitorThread() {
+        return monitorThread;
+    }
+
+    public WorldObject getWorldObject() {
+        return worldObject;
     }
 
     //

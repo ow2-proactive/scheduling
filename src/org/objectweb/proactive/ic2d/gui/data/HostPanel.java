@@ -35,7 +35,10 @@ import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
+import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
+
+import java.util.Iterator;
 
 
 public class HostPanel extends AbstractDataObjectPanel
@@ -43,6 +46,7 @@ public class HostPanel extends AbstractDataObjectPanel
     private HostObject hostObject;
     protected java.awt.Dimension minimumSize = new java.awt.Dimension(150, 80);
     protected PanelPopupMenu popup;
+    private WorldPanel parent;
     public String alignLayout; //keep state of layout H or V
     public javax.swing.ButtonGroup group;
 
@@ -60,7 +64,7 @@ public class HostPanel extends AbstractDataObjectPanel
         //else 
         setBackground(new java.awt.Color(0xd0, 0xd0, 0xd0));
         createBorder(hostObject.getOperatingSystem());
-        WorldPanel parent = (WorldPanel) getParentDataObjectPanel(); // get parent
+        parent = (WorldPanel) getParentDataObjectPanel(); // get parent
 
         alignLayout(parent.getAlignLayout()); //the host default alignement is the worldpanel alignement
         // Popup menu
@@ -69,9 +73,11 @@ public class HostPanel extends AbstractDataObjectPanel
         popup.addGenericMenu();
         popup.add(new javax.swing.AbstractAction("Look for new nodes", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    WorldObject worldObject = (WorldObject) hostObject.getParent();
-                    new MonitorThread(hostObject.getMonitoredProtocol(),
-                        hostObject.getHostName(), "1", worldObject, controller).start();
+                    //WorldObject worldObject = (WorldObject) hostObject.getParent();
+                    //new MonitorThread(hostObject.getMonitoredProtocol(),
+                    //    hostObject.getHostName(), "1", worldObject, controller);//.start();
+                    parent.monitoredHostAdded(hostObject.getHostName(),
+                        hostObject.getMonitoredProtocol());
                 }
             });
         popup.addSeparator();

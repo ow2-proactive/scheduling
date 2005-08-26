@@ -93,6 +93,10 @@ public class IC2DPanel extends AbstractDataObjectPanel
         worldPanel.filterChangeParentNotification(null);
     }
 
+    public WorldPanel getWorldPanel() {
+        return worldPanel;
+    }
+
     //
     // -- implements CommunicationEventListener -----------------------------------------------
     //

@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.gui.util;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
+import org.objectweb.proactive.ic2d.gui.data.WorldPanel;
 import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
@@ -44,8 +45,9 @@ public class DialogUtils {
     }
 
     public static void openNewRMIHostDialog(
-        java.awt.Component parentComponent, WorldObject worldObject,
+        java.awt.Component parentComponent, WorldPanel worldPanel,
         IC2DMessageLogger logger) {
+        WorldObject worldObject = worldPanel.getWorldObject();
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
@@ -64,13 +66,14 @@ public class DialogUtils {
         rmihostdialog.setButtonOK(false);
         String host = rmihostdialog.getJTextFieldHostIp();
 
-        new MonitorThread("rmi:", host, rmihostdialog.getJTextFielddepth(),
-            worldObject, logger).start();
+        worldPanel.monitoredHostAdded(host, "rmi:");
+        //new MonitorThread("rmi:", host, rmihostdialog.getJTextFielddepth(),worldObject, logger);//.start();
     }
 
     public static void openNewHTTPHostDialog(
-        java.awt.Component parentComponent, WorldObject worldObject,
+        java.awt.Component parentComponent, WorldPanel worldPanel,
         IC2DMessageLogger logger) {
+        WorldObject worldObject = worldPanel.getWorldObject();
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
@@ -89,8 +92,9 @@ public class DialogUtils {
         httphostdialog.setButtonOK(false);
         String host = httphostdialog.getJTextFieldHostIp();
 
-        new MonitorThread("http:", host, httphostdialog.getJTextFielddepth(),
-            worldObject, logger).start();
+        //new MonitorThread("http:", host, httphostdialog.getJTextFielddepth(),worldObject, logger);//.start();
+        worldPanel.monitoredHostAdded(host, "http:");
+
         //        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
         //                "Please enter the name or the IP of the host to monitor :", // Object message,
         //                "Adding a host to monitor", // String title,
@@ -112,8 +116,9 @@ public class DialogUtils {
     }
 
     public static void openNewIbisHostDialog(
-        java.awt.Component parentComponent, WorldObject worldObject,
+        java.awt.Component parentComponent, WorldPanel worldPanel,
         IC2DMessageLogger logger) {
+        WorldObject worldObject = worldPanel.getWorldObject();
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()) +
@@ -130,13 +135,14 @@ public class DialogUtils {
         ibishostdialog.setButtonOK(false);
         String host = ibishostdialog.getJTextFieldHostIp();
 
-        new MonitorThread("ibis:", host, ibishostdialog.getJTextFielddepth(),
-            worldObject, logger).start();
+        worldPanel.monitoredHostAdded(host, "ibis:");
+        //new MonitorThread("ibis:", host, ibishostdialog.getJTextFielddepth(), worldObject, logger);//.start();
     }
 
     public static void openNewJINIHostDialog(
-        java.awt.Component parentComponent, WorldObject worldObject,
+        java.awt.Component parentComponent, WorldPanel worldPanel,
         IC2DMessageLogger logger) {
+        WorldObject worldObject = worldPanel.getWorldObject();
         String initialHostValue = "localhost";
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
@@ -152,13 +158,15 @@ public class DialogUtils {
         jinihostdialog.setButtonOK(false);
         String host = jinihostdialog.getJTextFieldHostIp();
 
-        new MonitorThread("jini:", host, jinihostdialog.getJTextFielddepth(),
-            worldObject, logger).start();
+        worldPanel.monitoredHostAdded(host, "jini:");
+        //new MonitorThread("jini:", host, jinihostdialog.getJTextFielddepth(), worldObject, logger);//.start();
     }
 
     public static void openNewJINIHostsDialog(
-        java.awt.Component parentComponent, WorldObject worldObject,
+        java.awt.Component parentComponent, WorldPanel worldPanel,
         IC2DMessageLogger logger) {
+        WorldObject worldObject = worldPanel.getWorldObject();
+
         //            String initialHostValue = "localhost";
         //            try {
         //                initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
@@ -173,7 +181,8 @@ public class DialogUtils {
         //            }
         //            jinihostdialog.setButtonOK(false);
         //            String host = jinihostdialog.getJTextFieldHostIp();
-        new MonitorThread("jini:", null, "3", worldObject, logger).start();
+        worldPanel.monitoredHostAdded(null, "jini:");
+        //new MonitorThread("jini:", null, "3", worldObject, logger);//.start();
     }
 
     //    public static void openNewNodeDialog(java.awt.Component parentComponent,
