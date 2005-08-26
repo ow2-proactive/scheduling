@@ -61,7 +61,7 @@ public class Legend extends JFrame {
 
     private Legend() {
         super("World Panel Legend");
-        setSize(500, 400);
+        setSize(500, 500);
         {
             GridBagLayout gridBagLayout;
             getContentPane().setLayout(gridBagLayout = new GridBagLayout());
@@ -340,6 +340,21 @@ public class Legend extends JFrame {
                 jvmPanel.add(new JLabel("Jvm started with Globus"));
             }
 
+            /*
+               {
+                   JComponent comp = new JPanel() {
+                           public void paintComponent(Graphics g) {
+                               Dimension dim = getSize();
+                               int w = dim.width;
+                               int h = dim.height;
+                               g.setColor(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+                                                           g.fillRect(w / 4, 0, w / 2, h);
+                           }
+                       };
+                                   jvmPanel.add(comp);
+                                   jvmPanel.add(new JLabel("Jvm not responding"));
+               }
+             */
             JPanel hostPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
             getContentPane().add(hostPanel);
             hostPanel.setBorder(new TitledBorder("Hosts"));
@@ -363,6 +378,41 @@ public class Legend extends JFrame {
                     };
                 hostPanel.add(comp);
                 hostPanel.add(new JLabel("Standard Host"));
+            }
+
+            JPanel notRespondingPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
+            getContentPane().add(notRespondingPanel);
+            notRespondingPanel.setBorder(new TitledBorder("Not Responding"));
+            gridBagLayout.setConstraints(notRespondingPanel,
+                new GridBagConstraints(0, 5, 1, 1, 1.0, 1.0,
+                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                    new Insets(0, 0, 0, 0), 0, 0));
+
+            {
+                JComponent comp = new JPanel() {
+                        public void paintComponent(Graphics g) {
+                            Dimension dim = getSize();
+                            int w = dim.width;
+                            int h = dim.height;
+                            g.setColor(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+                            g.fillOval(w / 4, 0, w / 2, h);
+                        }
+                    };
+                notRespondingPanel.add(comp);
+                notRespondingPanel.add(new JLabel("Active Object"));
+            }
+            {
+                JComponent comp = new JPanel() {
+                        public void paintComponent(Graphics g) {
+                            Dimension dim = getSize();
+                            int w = dim.width;
+                            int h = dim.height;
+                            g.setColor(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+                            g.fillRect(w / 4, 0, w / 2, h);
+                        }
+                    };
+                notRespondingPanel.add(comp);
+                notRespondingPanel.add(new JLabel("JVM"));
             }
 
             getContentPane().validate();
