@@ -136,6 +136,39 @@ public class ProActive {
     //
 
     /**
+     *
+     * launch the main method of the main class through the node node
+     * @param classname classname of the main method to launch
+     * @param mainParameters parameters
+     * @param node node in which launch the main method
+     * @throws ClassNotFoundException
+     * @throws NoSuchMethodException
+     * @throws ProActiveException
+     */
+    public static void newMain(String classname, String[] mainParameters,
+        Node node)
+        throws ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException {
+        ProActiveRuntime part = node.getProActiveRuntime();
+        part.launchMain(classname, mainParameters);
+    }
+
+    /**
+     * return an instance of the remote class. This insctance is
+     * obtained by the default constructor
+     * @param classname
+     * @param node
+     * @return new instance
+     * @throws ClassNotFoundException
+     * @throws ProActiveException
+     */
+    public static void newRemote(String classname, Node node)
+        throws ClassNotFoundException, ProActiveException {
+        ProActiveRuntime part = node.getProActiveRuntime();
+        part.newRemote(classname);
+    }
+
+    /**
      * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
      * @param classname the name of the class to instanciate as active
      * @param constructorParameters the parameters of the constructor.
@@ -775,6 +808,23 @@ public class ProActive {
     }
 
     /**
+     *
+     * @return the pad associated to the current runtime
+     * @throws ProActiveException
+     * @throws RemoteException
+     */
+    public static ProActiveDescriptor getProactiveDescriptor()
+        throws ProActiveException, IOException {
+        String padURL = System.getProperty("proactive.pad");
+        if (padURL == null) {
+            System.out.println("pad null");
+            return null;
+        } else {
+            return getProactiveDescriptor(padURL, true);
+        }
+    }
+
+    /**
      * Returns a <code>ProActiveDescriptor</code> that gives an object representation
      * of the XML document located at the given url.
      * @param xmlDescriptorUrl The url of the XML document
@@ -786,22 +836,46 @@ public class ProActive {
      */
     public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
+        return getProactiveDescriptor(xmlDescriptorUrl, false);
+    }
+
+    /**
+     * return the pad matching with the given url or parse it from the file system
+     * @param xmlDescriptorUrl url of the pad
+     * @param hierarchicalSearch must search in hierarchy ?
+     * @return the pad found or a new pad parsed from xmlDescriptorUrl
+     * @throws ProActiveException
+     * @throws RemoteException
+     */
+    public static ProActiveDescriptor getProactiveDescriptor(
+        String xmlDescriptorUrl, boolean hierarchicalSearch)
+        throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
         if (!xmlDescriptorUrl.startsWith("file:")) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        if (part.getDescriptor(xmlDescriptorUrl) != null) {
-            return part.getDescriptor(xmlDescriptorUrl);
+        ProActiveDescriptor pad;
+
+        try {
+            pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
+        } catch (Exception e) {
+            throw new ProActiveException(e);
         }
 
+        // if pad found, returns it
+        if (pad != null) {
+            return pad;
+        }
+
+        // else parses it
         try {
             if (logger.isInfoEnabled()) {
                 logger.info("************* Reading deployment descriptor: " +
                     xmlDescriptorUrl + " ********************");
             }
             ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl);
-            ProActiveDescriptor pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
+            pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
             part.registerDescriptor(xmlDescriptorUrl, pad);
             return pad;
         } catch (org.xml.sax.SAXException e) {
