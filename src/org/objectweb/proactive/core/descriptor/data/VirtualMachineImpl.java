@@ -70,7 +70,7 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     private ExternalProcess process;
 
     /** the service to start in order to acquire the JVM */
-    private transient UniversalService service;
+    private UniversalService service;
 
     /** The name of the VirtualNode that created this VirtualMachine */
     private String creatorId = null;
