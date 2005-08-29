@@ -59,10 +59,10 @@ public class Test extends FunctionalTest {
      */
     public void action() throws Exception {
         String baseclassName = "nonregressiontest.stub.stubgeneration.A";
-        if ("ASM".equals(System.getProperty("bytecodeManipulator"))) {
+        if ("ASM".equals(System.getProperty("byteCodeManipulator"))) {
         ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(baseclassName);
         data = bsb.create();
-        } else if ("javassist".equals(System.getProperty("bytecodeManipulator"))) {
+        } else if ("javassist".equals(System.getProperty("byteCodeManipulator"))) {
             data = JavassistByteCodeStubBuilder.create(baseclassName);
         }
         stubClassName = Utils.convertClassNameToStubClassName(baseclassName);
