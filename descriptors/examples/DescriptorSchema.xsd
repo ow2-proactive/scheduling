@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Terence FERUT (Inria) -->
 <!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Quilici (Inria) -->
 <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!-- 
@@ -8,6 +9,10 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:annotation>
 			<xs:documentation>Deployment Descriptor Schema</xs:documentation>
 		</xs:annotation>
+		<xs:unique name="mainId">
+			<xs:selector xpath="mainDefinition"/>
+			<xs:field xpath="id"/>
+		</xs:unique>
 		<xs:unique name="processDefid">
 			<xs:selector xpath="infrastructure/processes/processDefinition"/>
 			<xs:field xpath="@id"/>
@@ -18,6 +23,14 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for infrastructure/services/serviceDefinition element-->
 		</xs:unique>
+		<xs:unique name="MapToVirtualNodeDefid">
+			<xs:selector xpath="mainDefinition/mapToVirtualNode"/>
+			<xs:field xpath="@value"/>
+		</xs:unique>
+		<xs:keyref name="MapToVirtualNodeValue" refer="MapToVNName">
+			<xs:selector xpath="mainDefinition/mapToVirtualNode"/>
+			<xs:field xpath="@value"/>
+		</xs:keyref>
 		<xs:keyref name="VirtNodeName" refer="vnName">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
@@ -111,6 +124,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@virtualNode"/>
 			<!-- Key definition for the attribute virtualNode located at deployment/mapping/map. This key will be used to ensure that the name attribute of virtualNodes/virtualNode element has a corresponding definition in deployment/mapping/map@virtualNode-->
 		</xs:key>
+		<xs:key name="MapToVNName">
+			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:field xpath="@name"/>
+			<!-- Key definition for the attribute virtualNode located at deployment/mapping/map. This key will be used to ensure that the name attribute of virtualNodes/virtualNode element has a corresponding definition in deployment/mapping/map@virtualNode-->
+		</xs:key>
 		<xs:key name="jvmNameinJvmsPart">
 			<xs:selector xpath="deployment/jvms/jvm"/>
 			<xs:field xpath="@name"/>
@@ -167,10 +185,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:enumeration value="no"/>
 		</xs:restriction>
 	</xs:simpleType>
-	<!--ProActiveDescriptor element has three childs: componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
+	<!--ProActiveDescriptor element has three or four childs: mainDefinition element, that may appears any number of times, componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
 			<xs:element name="security" type="SecurityType" minOccurs="0"/>
+			<xs:element name="mainDefinition" type="MainDefinitionType" minOccurs="0"/>
 			<xs:element name="componentDefinition" type="ComponentDefinitionType">
 				<xs:unique name="idName">
 					<xs:selector xpath=".//*"/>
@@ -187,6 +206,35 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="infrastructure" type="InfrastructureType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+	<!--main definition must have at least one child, a mapToVirtualNode and a not-empty attribute, the main class name. It may also have, in first, a group of elements of type ArgType, which define the arguments of the main class.-->
+	<xs:complexType name="MainDefinitionType">
+		<xs:sequence>
+			<xs:group ref="ArgGroup" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:group ref="MapToVirtualNodeGroup" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required"/>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!--Sequence of element of type ArgType-->
+	<xs:group name="ArgGroup">
+		<xs:sequence>
+			<xs:element name="arg" type="ArgType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+	<!--a arg is defined by a required value attribute, containing the argument.-->
+	<xs:complexType name="ArgType">
+		<xs:attribute name="value" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!--MapToVirtualNode is composed of only one required attribute : the value, what must match with a virtual node defined in the descriptor.-->
+	<xs:complexType name="MapToVirtualNodeType">
+		<xs:attribute name="value" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!--MapToVirtualNodeGroup is composed of any number but at least one of MapToVirtualNode-->
+	<xs:group name="MapToVirtualNodeGroup">
+		<xs:sequence>
+			<xs:element name="mapToVirtualNode" type="MapToVirtualNodeType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
 	<!--component definition element has one child, that is a group of element, one element(or many) of the group has to appear at least once or more -->
 	<xs:complexType name="ComponentDefinitionType">
 		<xs:group ref="VirtualNodesGroup"/>
@@ -534,14 +582,14 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="class" use="required">
-			<xs:simpleType>
+		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
+		<!--	<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHJVMProcess"/>
 					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHJVMProcess"/>
 				</xs:restriction>
 			</xs:simpleType>
-		</xs:attribute>
+		</xs:attribute>-->
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
@@ -617,14 +665,14 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="class" use="required">
-			<xs:simpleType>
+		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
+			<!--<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHJVMProcess"/>
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHJVMProcess"/>
 				</xs:restriction>
 			</xs:simpleType>
-		</xs:attribute>
+		</xs:attribute>-->
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>

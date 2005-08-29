@@ -48,22 +48,22 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 			<processDefinition id="rsh_predadab">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="predadab">
+                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
                      <processReference refid="localJVM"/>
                  </rshProcess>
              </processDefinition>
              <processDefinition id="rsh_noadcoco">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="noadcoco">
+                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="noadcoco">
                      <processReference refid="localJVM"/>
                  </rshProcess>
              </processDefinition>
              <processDefinition id="rsh_crusoe">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="crusoe">
+                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe">
                      <processReference refid="localJVM"/>
                  </rshProcess>
              </processDefinition>
              <processDefinition id="rsh_amstel">
-                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amstel">
+                <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amstel">
                      <processReference refid="localJVM"/>
                  </rshProcess>
              </processDefinition>

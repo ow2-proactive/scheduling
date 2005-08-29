@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Terence FERUT (Inria) -->
 <!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Quilici (Inria) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!-- 
 The following element ProActiveDescriptor defines the root of the schema
 -->
@@ -582,14 +582,14 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="class" use="required">
-			<xs:simpleType>
+		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
+		<!--	<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHJVMProcess"/>
 					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHJVMProcess"/>
 				</xs:restriction>
 			</xs:simpleType>
-		</xs:attribute>
+		</xs:attribute>-->
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
@@ -665,14 +665,14 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="class" use="required">
-			<xs:simpleType>
+		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
+			<!--<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHJVMProcess"/>
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHJVMProcess"/>
 				</xs:restriction>
 			</xs:simpleType>
-		</xs:attribute>
+		</xs:attribute>-->
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
