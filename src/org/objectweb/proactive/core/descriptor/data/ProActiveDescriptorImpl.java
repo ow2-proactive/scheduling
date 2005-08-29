@@ -330,15 +330,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             Class processClass = Class.forName(processClassName);
             ExternalProcess process = (ExternalProcess) processClass.newInstance();
 
-            // if the process is a jvm process we can pass it a property containing the pad url
-            if (process instanceof JVMProcess) {
-                String shortUrl = url;
-                if (url.startsWith("file:")) {
-                    shortUrl = url.substring(url.indexOf(":") + 1);
-                }
-                ((JVMProcess) process).setJvmOptions(" -Dproactive.pad=" +
-                    shortUrl);
-            }
             return process;
         } catch (ClassNotFoundException e) {
             throw new ProActiveException(e);

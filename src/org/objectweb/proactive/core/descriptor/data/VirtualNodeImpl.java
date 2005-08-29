@@ -142,7 +142,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private X509Certificate creatorCertificate;
     private PolicyServer policyServer;
     private String policyServerFile;
-    private String jobID = ProActive.getJobId();
+    protected String jobID = ProActive.getJobId();
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
@@ -1021,9 +1021,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 String newId = generateNewJobID();
                 this.jobID = newId;
                 jvmProcess.setJvmOptions("-Dproactive.jobid=" + newId);
+                jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL);
             } else {
                 jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             }
+
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
 

@@ -817,7 +817,7 @@ public class ProActive {
         throws ProActiveException, IOException {
         String padURL = System.getProperty("proactive.pad");
         if (padURL == null) {
-            System.out.println("pad null");
+            //System.out.println("pad null");
             return null;
         } else {
             return getProactiveDescriptor(padURL, true);
