@@ -33,8 +33,8 @@ package org.objectweb.proactive.core.rmi;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 
 
 /**

@@ -1,6 +1,6 @@
 package org.objectweb.proactive.core.component.interception;
 
-import java.lang.reflect.Method;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
@@ -39,15 +39,13 @@ public interface InputInterceptor {
 
     /**
      * This method is when an input invocation is intercepted, before executing the input invocation.
-     * @param method the method to be executed
-     * @param args the parameters of the method
+     * @param methodCall the method to be executed (MethodCall objects include method parameters and other ProActive-specific infos)
      */
-    public void beforeInputMethodInvocation(Method method, Object[] args);
+    public void beforeInputMethodInvocation(MethodCall methodCall);
 
     /**
      * This method is when an input invocation has been intercepted, after the execution of the input invocation.
-     * @param method the method that has been executed
-     * @param args the parameters of the method
+     * @param methodCall the method that has been executed (MethodCall objects include method parameters and other ProActive-specific infos)
      */
-    public void afterInputMethodInvocation(Method method, Object[] args);
+    public void afterInputMethodInvocation(MethodCall methodCall);
 }

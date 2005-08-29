@@ -3,8 +3,8 @@ package org.objectweb.proactive.core.classloader;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
@@ -77,13 +77,13 @@ public class ProActiveClassLoaderHelper {
             if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
                 ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
                 class_data = bsb.create();
-            } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("BCEL")) {
+            } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
                 BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
                 class_data = bsb.create();
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to BCEL.");
+                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist.");
                 System.err.println(
                     "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
             }

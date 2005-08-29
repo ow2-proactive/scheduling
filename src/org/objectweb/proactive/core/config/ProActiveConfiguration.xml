@@ -12,6 +12,7 @@
 		<prop key="name_server_pool" value="rutget"/>
 		<prop key="pool_host_number" value="1"/>
 		<prop key="proactive.communication.protocol" value="rmi"/> 
+		<prop key="byteCodeManipulator" value="ASM"/>
 		<!-- <prop key="proactive.rmi.port" value="2005"/>-->
 		<!--<prop key="proactive.http.port" value="2026"/> -->
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->

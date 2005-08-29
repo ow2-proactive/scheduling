@@ -31,6 +31,8 @@
 package nonregressiontest.stub.stubgeneration;
 
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
+import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
+import org.objectweb.proactive.core.mop.Utils;
 
 import testsuite.test.FunctionalTest;
 
@@ -56,10 +58,14 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(
-                "nonregressiontest.stub.stubgeneration.A");
+        String baseclassName = "nonregressiontest.stub.stubgeneration.A";
+        if ("ASM".equals(System.getProperty("bytecodeManipulator"))) {
+        ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(baseclassName);
         data = bsb.create();
-        stubClassName = bsb.getStubClassFullName();
+        } else if ("javassist".equals(System.getProperty("bytecodeManipulator"))) {
+            data = JavassistByteCodeStubBuilder.create(baseclassName);
+        }
+        stubClassName = Utils.convertClassNameToStubClassName(baseclassName);
     }
 
     /**

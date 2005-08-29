@@ -195,8 +195,7 @@ public class ComponentRequestImpl extends RequestImpl
             while (it.hasNext()) {
                 try {
                     InputInterceptor interceptor = (InputInterceptor) it.next();
-                    interceptor.beforeInputMethodInvocation(methodCall.getReifiedMethod(),
-                        methodCall.getParameters());
+                    interceptor.beforeInputMethodInvocation(methodCall);
                     //((InputInterceptor) it.next()).beforeInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
                 } catch (NullPointerException e) {
                     e.printStackTrace();
@@ -220,8 +219,7 @@ public class ComponentRequestImpl extends RequestImpl
                     it.next();
                 }
                 while (it.hasPrevious()) {
-                    ((InputInterceptor) it.previous()).afterInputMethodInvocation(methodCall.getReifiedMethod(),
-                        methodCall.getParameters());
+                    ((InputInterceptor) it.previous()).afterInputMethodInvocation(methodCall);
                 }
             }
         }

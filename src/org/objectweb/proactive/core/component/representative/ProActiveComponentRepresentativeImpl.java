@@ -52,9 +52,9 @@ import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.group.ProxyForGroup;
@@ -143,6 +143,9 @@ public class ProActiveComponentRepresentativeImpl
                 currentController = (AbstractProActiveController) controllerClassConstructor.newInstance(new Object[] {
                             this
                         });
+                //                currentInterface = RepresentativeInterfaceClassGenerator.instance()
+                //                                                                        .generateControllerInterface(currentController.getFcItfName(),
+                //                this, (InterfaceType) currentController.getFcItfType());
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
                                                                         .generateControllerInterface(currentController.getFcItfName(),
                         this, (InterfaceType) currentController.getFcItfType());

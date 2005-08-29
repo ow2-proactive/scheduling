@@ -29,8 +29,8 @@
 					<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
 				     <absolutePath value="proactive.home/dist/ProActive/ProActive.jar"/>
-				     <absolutePath value="proactive.home/lib/bcel.jar"/>
 				     <absolutePath value="proactive.home/lib/asm.jar"/>
+				     <absolutePath value="proactive.home/lib/javassist.jar"/>
 				     <absolutePath value="proactive.home/lib/log4j.jar"/>
 				     <absolutePath value="proactive.home/lib/xercesImpl.jar"/>
 				     <absolutePath value="proactive.home/lib/reggie.jar"/>

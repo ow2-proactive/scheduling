@@ -45,4 +45,12 @@ public class NoSuchComponentException extends Exception {
     public NoSuchComponentException(String message) {
         super(message);
     }
+
+    public NoSuchComponentException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NoSuchComponentException(Throwable cause) {
+        super(cause);
+    }
 }

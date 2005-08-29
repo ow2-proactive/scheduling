@@ -44,11 +44,9 @@ public class MOPClassLoader extends URLClassLoader {
 
     // retreives the optionnal byteCodeManipulator JVM arg
     // ASM is used by default
-    public static String BYTE_CODE_MANIPULATOR = ((System.getProperty(
+    public static String BYTE_CODE_MANIPULATOR = (System.getProperty(
             "byteCodeManipulator") != null)
-        ? ((System.getProperty("byteCodeManipulator").equals("BCEL")) ? "BCEL"
-                                                                      : "ASM")
-        : "ASM");
+        ? System.getProperty("byteCodeManipulator") : "javassist";
     protected static Hashtable classDataCache = new Hashtable();
     protected static MOPClassLoader mopCl = null;
 
@@ -195,18 +193,15 @@ public class MOPClassLoader extends URLClassLoader {
                 byte[] data = null;
                 if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
                     ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-                    long start_time = System.currentTimeMillis();
                     data = bsb.create();
                     MOPClassLoader.classDataCache.put(name, data);
-                } else if (BYTE_CODE_MANIPULATOR.equals("BCEL")) {
-                    BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
-                    long start_time = System.currentTimeMillis();
-                    data = bsb.create();
+                } else if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
+                    data = JavassistByteCodeStubBuilder.create(classname);
                     MOPClassLoader.classDataCache.put(name, data);
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                     logger.error(
-                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to BCEL.");
+                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist.");
                     logger.error(
                         "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
                 }

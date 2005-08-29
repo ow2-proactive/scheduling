@@ -1,7 +1,5 @@
 package nonregressiontest.component.interceptor;
 
-import java.lang.reflect.Method;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -9,6 +7,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 import nonregressiontest.component.controller.DummyController;
 
@@ -52,24 +51,24 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
         }
     }
 
-    public void afterInputMethodInvocation(Method method, Object[] args) {
+    public void afterInputMethodInvocation(MethodCall methodCall) {
         //System.out.println("after method invocation");
         setDummyValue(getDummyValue() +
             InputOutputInterceptor.AFTER_INPUT_INTERCEPTION);
     }
 
-    public void beforeInputMethodInvocation(Method method, Object[] args) {
+    public void beforeInputMethodInvocation(MethodCall methodCall) {
         //        System.out.println("before method invocation");
         setDummyValue(getDummyValue() +
             InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION);
     }
 
-    public void afterOutputMethodInvocation(Method method, Object[] args) {
+    public void afterOutputMethodInvocation(MethodCall methodCall) {
         setDummyValue(getDummyValue() +
             InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION);
     }
 
-    public void beforeOutputMethodInvocation(Method method, Object[] args) {
+    public void beforeOutputMethodInvocation(MethodCall methodCall) {
         setDummyValue(getDummyValue() +
             InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION);
     }

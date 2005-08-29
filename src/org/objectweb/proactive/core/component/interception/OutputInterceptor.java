@@ -1,6 +1,6 @@
 package org.objectweb.proactive.core.component.interception;
 
-import java.lang.reflect.Method;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
@@ -36,7 +36,7 @@ import java.lang.reflect.Method;
  * @author Matthieu Morel
  */
 public interface OutputInterceptor {
-    public void beforeOutputMethodInvocation(Method method, Object[] args);
+    public void beforeOutputMethodInvocation(MethodCall methodCall);
 
-    public void afterOutputMethodInvocation(Method method, Object[] args);
+    public void afterOutputMethodInvocation(MethodCall methodCall);
 }

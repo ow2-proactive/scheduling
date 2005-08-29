@@ -1522,7 +1522,7 @@ public class ProActive {
         }
     }
 
-    private static Object createStubObject(String className, UniversalBody body)
+    public static Object createStubObject(String className, UniversalBody body)
         throws MOPException {
         return createStubObject(className, null, new Object[] { body });
     }

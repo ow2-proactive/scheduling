@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.component.asmgen;
+package org.objectweb.proactive.core.component.gen;
 
 
 /**
@@ -41,6 +41,7 @@ public class Utils {
     public static final String GENERATED_DEFAULT_PREFIX = "Generated_";
     public static final String REPRESENTATIVE_DEFAULT_SUFFIX = "_representative";
     public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = "_composite";
+    public static final String OUTPUT_INTERCEPTOR_SUFFIX = "_outputInterceptor";
     public static final String STUB_DEFAULT_PACKAGE = null;
 
     public static String convertClassNameToRepresentativeClassName(
@@ -71,5 +72,12 @@ public class Utils {
         // just a way to have an identifier (possibly not unique ... but readable)
         return (getMetaObjectClassName(functionalInterfaceName,
             javaInterfaceName) + REPRESENTATIVE_DEFAULT_SUFFIX);
+    }
+
+    public static String getOutputInterceptorClassName(
+        String functionalInterfaceName, String javaInterfaceName) {
+        // just a way to have an identifier (possibly not unique ... but readable)
+        return (getMetaObjectClassName(functionalInterfaceName,
+            javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
     }
 }

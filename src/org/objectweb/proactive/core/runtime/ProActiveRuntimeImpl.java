@@ -49,8 +49,8 @@ import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -61,6 +61,7 @@ import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.NodeException;
@@ -1041,13 +1042,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
                     ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
                     classData = bsb.create();
-                } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("BCEL")) {
-                    BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
-                    classData = bsb.create();
+                } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+                    classData = JavassistByteCodeStubBuilder.create(classname);
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                     System.err.println(
-                        "byteCodeManipulator argument is optional. If specified, it can only be set to BCEL.");
+                        "byteCodeManipulator argument is optional. If specified, it can only be set to javassist.");
                     System.err.println(
                         "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
                 }

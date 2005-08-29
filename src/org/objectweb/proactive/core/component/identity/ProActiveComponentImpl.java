@@ -54,11 +54,11 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.controller.RequestHandler;
+import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
@@ -79,7 +79,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
-    //private ComponentParameters componentParameters;
+    // private ComponentParameters componentParameters;
     private Interface[] interfaceReferences;
     private Body body;
     private RequestHandler firstControllerRequestHandler;
@@ -96,9 +96,9 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      *
      * @param componentParameters
      * @param myBody
-     *                     a reference on the body (required notably to get a reference
-     *                     on the request queue, used to control the life cycle of the
-     *                     component)
+     *            a reference on the body (required notably to get a reference
+     *            on the request queue, used to control the life cycle of the
+     *            component)
      */
     public ProActiveComponentImpl(ComponentParameters componentParameters,
         Body myBody) {
@@ -112,7 +112,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         // 1. component identity
         interface_references_list.add(this);
 
-        //2. control interfaces
+        // 2. control interfaces
         Properties controllers = new Properties();
         boolean current_component_is_primitive = !(componentParameters.getHierarchicalType()
                                                                       .equals(Constants.COMPOSITE) ||
@@ -211,7 +211,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         List outputInterceptorsSignatures = componentConfiguration.getOutputInterceptors();
         outputInterceptors.setSize(outputInterceptorsSignatures.size());
 
-        //Properties controllers = loadControllersConfiguration(componentParameters.getControllerDescription().getControllersConfigFile());
+        // Properties controllers =
+        // loadControllersConfiguration(componentParameters.getControllerDescription().getControllersConfigFile());
         Iterator iteratorOnControllers = controllers.keySet().iterator();
         AbstractProActiveController lastController = null;
         while (iteratorOnControllers.hasNext()) {
@@ -263,7 +264,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
             if (BindingController.class.isAssignableFrom(controllerClass)) {
                 if ((componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                         (componentParameters.getClientInterfaceTypes().length == 0))) {
-                    //bindingController = null;
+                    // bindingController = null;
                     if (logger.isDebugEnabled()) {
                         logger.debug("user component class of '" +
                             componentParameters.getName() +
@@ -342,34 +343,34 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         if (interfaceReferences != null) {
             for (int i = 0; i < interfaceReferences.length; i++) {
                 // TODO check the following
-                //				if (ProActiveGroup.isGroup(interfaceReferences[i])) {
-                //					// need to find at least one occurence of the interface
-                //					// if exists but not for all elements of the group -> throw
+                // if (ProActiveGroup.isGroup(interfaceReferences[i])) {
+                // // need to find at least one occurence of the interface
+                // // if exists but not for all elements of the group -> throw
                 // error
-                //					// if does not exist -> do nothing
-                //					int count = 0;
-                //					Group itf_ref_group =
+                // // if does not exist -> do nothing
+                // int count = 0;
+                // Group itf_ref_group =
                 // ProActiveGroup.getGroup(interfaceReferences[i]);
-                //					Iterator iterator = itf_ref_group.iterator();
-                //					// ensure groups are coherent (ie : if 1 interface of the
+                // Iterator iterator = itf_ref_group.iterator();
+                // // ensure groups are coherent (ie : if 1 interface of the
                 // given name exists,
-                //					// all of the group elements should be of this kind
-                //					while (iterator.hasNext()) {
-                //						Interface group_element = (Interface) iterator.next();
-                //						if (group_element.getFcItfName().equals(interfaceName)) {
-                //							count++;
-                //						}
-                //					}
-                //					if (count > 0) {
-                //						if (count == itf_ref_group.size()) {
-                //							return interfaceReferences[i];
-                //						} else {
-                //							throw new NoSuchInterfaceException(
-                //								"some elements of the collection are not named " +
+                // // all of the group elements should be of this kind
+                // while (iterator.hasNext()) {
+                // Interface group_element = (Interface) iterator.next();
+                // if (group_element.getFcItfName().equals(interfaceName)) {
+                // count++;
+                // }
+                // }
+                // if (count > 0) {
+                // if (count == itf_ref_group.size()) {
+                // return interfaceReferences[i];
+                // } else {
+                // throw new NoSuchInterfaceException(
+                // "some elements of the collection are not named " +
                 // interfaceName);
-                //						}
-                //					}
-                //				} else { //looking into single interface
+                // }
+                // }
+                // } else { //looking into single interface
                 if (interfaceReferences[i].getFcItfName().equals(interfaceName)) {
                     return interfaceReferences[i];
                 }
@@ -446,11 +447,11 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
 
     /**
      * @return a ComponentParameters instance, corresponding to the
-     *                configuration of the current component
+     *         configuration of the current component
      */
     public ComponentParameters getComponentParameters()
         throws NoSuchInterfaceException {
-        //return componentParameters;
+        // return componentParameters;
         return ((ComponentParametersController) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters();
     }
 

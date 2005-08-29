@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component.representative;
 import java.io.File;
 
 import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.mop.Proxy;
 
 
@@ -67,12 +68,17 @@ public class ProActiveComponentRepresentativeFactory {
      * the implementations of the controllers of this component.
      * @param componentType the type of the component
      * @param proxy the proxy to the active object
-     * @param controllerConfigFile a file that contains the description of the controllers for this component
+     * @param controllerConfigFile a file that contains the description of the controllers for this component. null will load the default configuration
      * @return a corresponding component representative
      */
     public ProActiveComponentRepresentative createComponentRepresentative(
         ComponentType componentType, String hierarchicalType, Proxy proxy,
         File controllerConfigFile) {
+        if (controllerConfigFile == null) {
+            controllerConfigFile = new File(getClass()
+                                                .getResource(ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION)
+                                                .getFile());
+        }
         ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType,
                 hierarchicalType, controllerConfigFile);
         representative.setProxy(proxy);
