@@ -59,5 +59,4 @@ public class A implements ComponentInitActive, ComponentEndActive,
     public void endActivity(Body body) {
         MESSAGE += END_FUNCTIONAL_ACTIVITY;
     }
-    
 }

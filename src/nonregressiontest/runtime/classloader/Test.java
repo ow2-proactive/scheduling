@@ -53,7 +53,7 @@ import testsuite.test.FunctionalTest;
  * <p>
  * There is no need to configure paths, as a deployment file with the correct
  * paths is created on the fly <br>
- * 
+ *
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {

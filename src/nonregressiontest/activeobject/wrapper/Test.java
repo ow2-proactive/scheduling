@@ -33,12 +33,12 @@ package nonregressiontest.activeobject.wrapper;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import testsuite.test.FunctionalTest;
-import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
 
 
 /**
@@ -88,8 +88,7 @@ public class Test extends FunctionalTest {
         return ProActive.isAwaited(this.bool) &&
         ProActive.isAwaited(this.dble) && ProActive.isAwaited(this.integer) &&
         ProActive.isAwaited(this.longNumber) &&
-        ProActive.isAwaited(this.string) &&
-        ProActive.isAwaited(this.flt);
+        ProActive.isAwaited(this.string) && ProActive.isAwaited(this.flt);
     }
 
     public void endTest() throws Exception {

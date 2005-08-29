@@ -65,6 +65,13 @@
 			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
+		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.keygeneration.SecurityTestKeyGen"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
+		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>		
 	</packageGroup>
 	
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
@@ -129,7 +136,18 @@
 			</link> 
 		</interLinks>
 	</interLinkedGroup>
-		
+
+	<packageGroup name="Security tests group" description="Check security architecture" 
+		dir="../classes" packageName="nonregressiontest.security" >
+		    <unitTest exclude="no" class="nonregressiontest.security.SecurityTests"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.keygeneration.SecurityTestKeyGen"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
+		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>		
+	</packageGroup>
+
 	<!--<log4j>../compile/proactive-log4j</log4j>-->
 	
 	<result type="html" file="../test.html" />

@@ -34,10 +34,10 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
 
 
 public class A implements Serializable {
@@ -85,11 +85,10 @@ public class A implements Serializable {
     }
 
     public FloatWrapper testFloatWrapper() {
-    try {
-        Thread.sleep(1000);
-    } catch (InterruptedException e) {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+        }
+        return new FloatWrapper(0);
     }
-    return new FloatWrapper(0);
-}
-
 }
