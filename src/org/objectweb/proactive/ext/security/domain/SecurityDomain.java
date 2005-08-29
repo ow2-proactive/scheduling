@@ -28,51 +28,44 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security.crypto;
+package org.objectweb.proactive.ext.security.domain;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.util.ArrayList;
+
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityEntity;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**
- * This class provides a command-line tool to display the properties of a public or private certificate.
+ * @author Arnaud Contes
  *
- * @author     Vincent RIBAILLIER
- * <br>created    July 19, 2001
+ * A domain is used to enforce a security policy to a set of Runtimes
+ *
  */
-public class CertificateReader {
+public interface SecurityDomain extends SecurityEntity {
 
     /**
-     *  Constructor for the CertificateReader object
+     * @param securityContext
+     * @return returns the policy matching the corresponding securityContext
      *
-     * @since
      */
-    public CertificateReader() {
-    }
+    public SecurityContext getPolicy(SecurityContext securityContext);
 
     /**
-     *  The main program for the CertificateReader class
-     *
-     * @param  args
-     * @since
+     * @return returns the certificate of the entity corresponding to this domain
+     * @throws SecurityNotAvailableException
      */
-    public static void main(String[] args) {
-        //	Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-        //		Security.addProvider(myProvider);
-        String file_name = "";
-        try {
-            file_name = args[0];
-        } catch (Exception e) {
-            System.out.println("Usage : java CertificateReader mycertificate");
-        }
-        try {
-            FileInputStream fin = new FileInputStream(file_name);
-            ObjectInputStream in = new ObjectInputStream(fin);
-            Object object = in.readObject();
-            in.close();
-            System.out.println(object.toString());
-        } catch (Exception e) {
-            System.out.println("Exception : " + e);
-        }
-    }
+    public byte[] getCertificateEncoded() throws SecurityNotAvailableException;
+
+    /**
+     * @return returns the set of wrapping entities
+     * @throws SecurityNotAvailableException
+     */
+    public ArrayList getEntities() throws SecurityNotAvailableException;
+
+    /**
+     * @return Returns the name of the domain.
+     */
+    public String getName();
 }

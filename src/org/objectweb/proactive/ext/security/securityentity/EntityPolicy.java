@@ -28,10 +28,9 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.securityentity;
 
-import java.io.Serializable;
-import java.security.cert.X509Certificate;
+import org.objectweb.proactive.ext.security.PolicyRule;
 
 
 /**
@@ -40,26 +39,6 @@ import java.security.cert.X509Certificate;
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public class EntityCertificate extends Entity implements Serializable {
-
-    /**
-     *
-     */
-    public EntityCertificate(X509Certificate applicationCertificate,
-        X509Certificate certificate) {
-        super();
-        this.applicationCertificate = applicationCertificate;
-        this.certificate = certificate;
-    }
-
-    public String getName() {
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.ext.security.Entity#equals(org.objectweb.proactive.ext.security.Entity)
-     */
-    public boolean equals(Entity e) {
-        return e.getCertificate().equals(certificate);
-    }
+public interface EntityPolicy {
+    public PolicyRule getPolicyTo();
 }

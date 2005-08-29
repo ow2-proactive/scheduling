@@ -28,31 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
-
-import java.io.Serializable;
+package org.objectweb.proactive.ext.security.exceptions;
 
 
 /**
- * @author acontes
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * This exception is thrown when an entity try to communicate
+ * with another one without accreditation.
  */
-public class DefaultEntity extends Entity implements Serializable {
-
-    /**
-     *
-     */
-    public DefaultEntity() {
+public class CommunicationForbiddenException extends Exception {
+    public CommunicationForbiddenException() {
         super();
     }
 
-    public String getName() {
-        return "defaultEntity";
+    public CommunicationForbiddenException(String message) {
+        super(message);
     }
 
-    public boolean equals(Entity e) {
-        return true;
+    public CommunicationForbiddenException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CommunicationForbiddenException(Throwable cause) {
+        super(cause);
     }
 }

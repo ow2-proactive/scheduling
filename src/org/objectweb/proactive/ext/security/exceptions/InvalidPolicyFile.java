@@ -28,22 +28,41 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.exceptions;
 
-public class ComputePolicyException extends RuntimeException {
-    public ComputePolicyException() {
+
+/**
+ * @author acontes
+ *
+ */
+public class InvalidPolicyFile extends Exception {
+
+    /**
+     *
+     */
+    public InvalidPolicyFile() {
         super();
     }
 
-    public ComputePolicyException(String message) {
+    /**
+     * @param message
+     */
+    public InvalidPolicyFile(String message) {
         super(message);
     }
 
-    public ComputePolicyException(String message, Throwable cause) {
+    /**
+     * @param message
+     * @param cause
+     */
+    public InvalidPolicyFile(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public ComputePolicyException(Throwable cause) {
+    /**
+     * @param cause
+     */
+    public InvalidPolicyFile(Throwable cause) {
         super(cause);
     }
 }

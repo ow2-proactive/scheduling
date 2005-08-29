@@ -28,22 +28,22 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.exceptions;
 
-public class CommunicationForbiddenException extends Exception {
-    public CommunicationForbiddenException() {
+public class ComputePolicyException extends RuntimeException {
+    public ComputePolicyException() {
         super();
     }
 
-    public CommunicationForbiddenException(String message) {
+    public ComputePolicyException(String message) {
         super(message);
     }
 
-    public CommunicationForbiddenException(String message, Throwable cause) {
+    public ComputePolicyException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public CommunicationForbiddenException(Throwable cause) {
+    public ComputePolicyException(Throwable cause) {
         super(cause);
     }
 }

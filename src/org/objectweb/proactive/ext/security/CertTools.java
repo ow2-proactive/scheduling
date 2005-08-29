@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ext.security;
 
 import java.io.BufferedReader;
@@ -10,6 +40,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.URL;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -38,7 +69,6 @@ import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.ASN1TaggedObject;
-import org.bouncycastle.asn1.DERInputStream;
 import org.bouncycastle.asn1.DERObject;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DEROctetString;
@@ -54,16 +84,15 @@ import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.asn1.x509.X509NameTokenizer;
 import org.bouncycastle.jce.X509KeyUsage;
-import org.bouncycastle.jce.X509V3CertificateGenerator;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 
 /**
  * Tools to handle common certificate operations.
  *
- * @version $Id$
  */
 public class CertTools {
     private static Logger log = Logger.getLogger(CertTools.class);
@@ -368,7 +397,7 @@ public class CertTools {
         return stringToBCDNString(dn);
     } // getIssuerDN
 
-    private static CertificateFactory getCertificateFactory() {
+    public static CertificateFactory getCertificateFactory() {
         try {
             return CertificateFactory.getInstance("X.509", "BC");
         } catch (NoSuchProviderException nspe) {
@@ -616,11 +645,11 @@ public class CertTools {
         // Subject and Authority key identifier is always non-critical and MUST be present for certificates to verify in Mozilla.
         try {
             if (isCA == true) {
-                SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+                SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                             new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
-                SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+                SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                             new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
@@ -696,11 +725,11 @@ public class CertTools {
         try {
             if (false) {
                 //if (isCA == true) {
-                SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+                SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                             new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
-                SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+                SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                             new ByteArrayInputStream(acPubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
@@ -739,9 +768,9 @@ public class CertTools {
         if (extvalue == null) {
             return null;
         }
-        DEROctetString oct = (DEROctetString) (new DERInputStream(new ByteArrayInputStream(
+        DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(
                     extvalue)).readObject());
-        AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier((ASN1Sequence) new DERInputStream(
+        AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier((ASN1Sequence) new ASN1InputStream(
                     new ByteArrayInputStream(oct.getOctets())).readObject());
         return keyId.getKeyIdentifier();
     } // getAuthorityKeyId
@@ -759,9 +788,9 @@ public class CertTools {
         if (extvalue == null) {
             return null;
         }
-        ASN1OctetString str = ASN1OctetString.getInstance(new DERInputStream(
+        ASN1OctetString str = ASN1OctetString.getInstance(new ASN1InputStream(
                     new ByteArrayInputStream(extvalue)).readObject());
-        SubjectKeyIdentifier keyId = SubjectKeyIdentifier.getInstance(new DERInputStream(
+        SubjectKeyIdentifier keyId = SubjectKeyIdentifier.getInstance(new ASN1InputStream(
                     new ByteArrayInputStream(str.getOctets())).readObject());
         return keyId.getKeyIdentifier();
     } // getSubjectKeyId
@@ -780,9 +809,9 @@ public class CertTools {
         if (extvalue == null) {
             return null;
         }
-        DEROctetString oct = (DEROctetString) (new DERInputStream(new ByteArrayInputStream(
+        DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(
                     extvalue)).readObject());
-        ASN1Sequence seq = (ASN1Sequence) new DERInputStream(new ByteArrayInputStream(
+        ASN1Sequence seq = (ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(
                     oct.getOctets())).readObject();
 
         // Check the size so we don't ArrayIndexOutOfBounds
@@ -811,7 +840,7 @@ public class CertTools {
                 Integer no = (Integer) listitem.get(0);
                 if (no.intValue() == 0) {
                     byte[] altName = (byte[]) listitem.get(1);
-                    DERObject oct = (DERObject) (new DERInputStream(new ByteArrayInputStream(
+                    DERObject oct = (DERObject) (new ASN1InputStream(new ByteArrayInputStream(
                                 altName)).readObject());
                     ASN1Sequence seq = ASN1Sequence.getInstance(oct);
                     ASN1TaggedObject obj = (ASN1TaggedObject) seq.getObjectAt(1);
@@ -980,4 +1009,20 @@ public class CertTools {
 
         return null;
     } // generateMD5Fingerprint
+
+    public static KeyPair keyPair(int size) {
+        KeyPair kp = null;
+
+        // o = ProActiveSecurity.generateGenericCertificate();
+        try {
+            //acCert = (X509Certificate) o[0];
+            //acPrivateKey = (PrivateKey) o[1];
+            kp = KeyTools.genKeys(size);
+        } catch (NoSuchAlgorithmException e4) {
+            e4.printStackTrace();
+        } catch (NoSuchProviderException e4) {
+            e4.printStackTrace();
+        }
+        return kp;
+    }
 } // CertTools

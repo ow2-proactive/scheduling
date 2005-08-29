@@ -28,9 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security.exceptions;
+package org.objectweb.proactive.ext.security.domain;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.ext.security.ProActiveSecurity;
 
 
 /**
@@ -39,34 +46,40 @@ import java.io.Serializable;
  * To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class CertificateException extends Exception implements Serializable {
+public class StartDomain {
+    static Logger logger = Logger.getLogger("security.domain");
+    private String securityFileLocation = null;
+    private String domainName = null;
+    private SecurityDomain domain = null;
 
-    /**
-     *
-     */
-    public CertificateException() {
-        super();
+    protected StartDomain() {
+    }
+
+    private StartDomain(String[] args) {
+        domainName = args[0];
+        securityFileLocation = args[1];
+    }
+
+    public static void main(String[] args) {
+        ProActiveSecurity.loadProvider();
+
+        if (args.length != 2) {
+            System.out.println(
+                "Usage StartDomain <domain name> <path to security file>");
+            System.exit(-1);
+        }
+
+        ProActiveConfiguration.load();
+
+        new StartDomain(args).run();
     }
 
     /**
-     * @param arg0
+     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
+     * Runs the complete creation and registration of a ProActiveRuntime and creates a
+     * node once the creation is completed.
      */
-    public CertificateException(String arg0) {
-        super(arg0);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     */
-    public CertificateException(String arg0, Throwable arg1) {
-        super(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     */
-    public CertificateException(Throwable arg0) {
-        super(arg0);
+    private void run() {
+        //Domain domain = ProActive.newActive
     }
 }

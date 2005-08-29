@@ -33,12 +33,12 @@ package org.objectweb.proactive.ext.security;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.ext.security.securityentity.Entity;
+
 
 /**
- * @author acontes
+ * This classe represents a security context associated with a particular session
  *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class SecurityContext implements Serializable {
     public static int COMMUNICATION_SEND_REQUEST_TO = 0;

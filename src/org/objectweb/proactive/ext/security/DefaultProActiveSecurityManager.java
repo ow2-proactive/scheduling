@@ -45,8 +45,8 @@ import java.util.Random;
 import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.x509.X509Name;
-import org.bouncycastle.jce.X509V3CertificateGenerator;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
 
 
 public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
@@ -79,17 +79,15 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
 
         keyPair = keyPairGen.generateKeyPair();
 
-        privateKey = keyPair.getPrivate();
-        publicKey = keyPair.getPublic();
-
+        // privateKey = keyPair.getPrivate();
+        //publicKey = keyPair.getPublic();
         X509V3CertificateGenerator certifGenerator = new X509V3CertificateGenerator();
 
         X509Certificate certif = null;
 
         DateFormat convert = DateFormat.getDateInstance();
 
-        certifGenerator.setPublicKey(publicKey);
-
+        //certifGenerator.setPublicKey(publicKey);
         String subjectCN = "CN=Generic Certificate" + new Random().nextLong() +
             ", OU=Generic Certificate, EmailAddress=none";
 
@@ -109,92 +107,25 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
 
         certifGenerator.setNotAfter(stop);
         certifGenerator.setNotBefore(start);
-        certifGenerator.setPublicKey(publicKey);
+        //  certifGenerator.setPublicKey(publicKey);
         certifGenerator.setSerialNumber(new BigInteger("1"));
 
-        certificate = certifGenerator.generateX509Certificate(privateKey, "BC");
-
-        byte[] t = certificate.getEncoded();
-        certificate = ProActiveSecurity.decodeCertificate(t);
-
+        //certificate = certifGenerator.generateX509Certificate(privateKey, "BC");
+        // byte[] t = certificate.getEncoded();
+        // certificate = ProActiveSecurity.decodeCertificate(t);
         // System.out.println("Generic certificate created " + certificate.getSubjectDN());
         //  new RuntimeException().printStackTrace();
         //   System.out.println("******************** instantiated DefaultPSM ao Thread " + Thread.currentThread().getName() + "******************");
         // throw new SecurityException();
     }
 
-    /*
-       public synchronized void initiateSession(UniversalBody distantBody) throws CommunicationForbiddenException, AuthenticationException {
-           X509Certificate distantBodyCertificate = null;
-           Policy localPolicy = null;
-           Policy distantBodyPolicy = null;
-           long sessionID = 0;
-           try {
-               sessionID = distantBody.startNewSession();
-               //                System.out.println("new session ID is : " + sessionID);
-           } catch (IOException e) {
-               logger.warning("can't start a new session");
-               e.printStackTrace();
-               throw new org.objectweb.proactive.ext.security.crypto.AuthenticationException();
-           } catch (RenegotiateSessionException e) {
-                   terminateSession(sessionID);
-                           //e.printStackTrace();
-                   }
-           Session session = null;
-           try {
-               session = new Session(sessionID);
-           //    session.setPolicy(resultPolicy);
-           } catch (Exception e) {
-               e.printStackTrace();
-           }
-           session.distantBody = distantBody;
-           try {
-                           byte [] certE = distantBody.getRemoteAdapter().getCertificateEncoded();
-                                                      X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                           session.setDistantOACertificate(cert);
-                   } catch (IOException e2) {
-                           e2.printStackTrace();
-                   }
-           sessions.put(new Long(sessionID), session);
-           if (distantBodyCertificate != null) {
-               session.setDistantOAPublicKey(distantBodyCertificate.getPublicKey());
-           } else {
-               try {
-                                   session.setDistantOAPublicKey(distantBody.getPublicKey());
-                           } catch (IOException e1) {
-                                   e1.printStackTrace();
-                           }
-           }
-           try {
-             //  logger.info("Key exchange "  + sessionID);
-               keyNegociationSenderSide(distantBody, sessionID);
-             //  System.out.println("Session from " + certificate.getSubjectDN() + " to " + session.distantOACertificate.getSubjectDN());
-           } catch (KeyExchangeException e) {
-               logger.warning("Key exchange exception ");
-               e.printStackTrace();
-           }
-           //     if ( localPolicy.isAuthenticationEnabled() && distantBodyPolicy.isAuthenticationEnabled() ) {
-           //            mutualAuthenticationSenderSide(distantBody,distantBodyCertificate);
-           //       }
-       }
-     */
-    /*  public X509Certificate getCertificate() {
-       logger.info("asked for my certificate, replied null");
-       return null;
-       }*/
-    public ProActiveSecurityManager getProActiveSecurityManager()
-        throws java.io.IOException {
+    public ProActiveSecurityManager getProActiveSecurityManager() {
         return this;
     }
 
-    public Policy getPolicyFrom(X509Certificate certificate) {
-        //     logger.info("asked for my policy FROM, replied default policy");
-        return new Policy();
-    }
-
-    public Policy getPolicyTo(X509Certificate certificate) {
+    public PolicyRule getPolicyTo(X509Certificate certificate) {
         //   logger.info("asked for my policy TO, replied default policy");
-        return new Policy();
+        return new PolicyRule();
     }
 
     public Communication getPolicyTo(String type, String from, String to) {

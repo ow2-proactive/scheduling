@@ -28,51 +28,25 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security.crypto;
+package org.objectweb.proactive.ext.security.gui;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import org.objectweb.proactive.ext.security.CertTools;
 
 
 /**
- * This class provides a command-line tool to display the properties of a public or private certificate.
+ * @author acontes
  *
- * @author     Vincent RIBAILLIER
- * <br>created    July 19, 2001
  */
-public class CertificateReader {
-
-    /**
-     *  Constructor for the CertificateReader object
-     *
-     * @since
-     */
-    public CertificateReader() {
-    }
-
-    /**
-     *  The main program for the CertificateReader class
-     *
-     * @param  args
-     * @since
-     */
+public class ProActiveCertificateGenerator {
     public static void main(String[] args) {
-        //	Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-        //		Security.addProvider(myProvider);
-        String file_name = "";
-        try {
-            file_name = args[0];
-        } catch (Exception e) {
-            System.out.println("Usage : java CertificateReader mycertificate");
-        }
-        try {
-            FileInputStream fin = new FileInputStream(file_name);
-            ObjectInputStream in = new ObjectInputStream(fin);
-            Object object = in.readObject();
-            in.close();
-            System.out.println(object.toString());
-        } catch (Exception e) {
-            System.out.println("Exception : " + e);
-        }
+        CertTools.installBCProvider();
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ProActiveCertificateGeneratorGUI g = new ProActiveCertificateGeneratorGUI();
+
+                    //   s.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                    g.setVisible(true);
+                }
+            });
     }
 }

@@ -36,62 +36,37 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.exceptions.*;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
-public class InternalBodySecurity {
-    protected UniversalBody distantBody;
+/**
+ * This class is enabled when the body is a forwarder.  It
+ * acts like  a forwarder for all security related messages
+ *
+ */
+public class InternalBodySecurity implements SecurityEntity {
+    protected SecurityEntity distantBody;
 
     public InternalBodySecurity(UniversalBody distantBody) {
-        this.distantBody = distantBody;
-    }
-
-    public void initiateSession(int type, UniversalBody body)
-        throws IOException, CommunicationForbiddenException, 
-            AuthenticationException, RenegotiateSessionException, 
-            SecurityNotAvailableException {
-        distantBody.initiateSession(type, body);
+        this.distantBody = (SecurityEntity) distantBody;
     }
 
     public void terminateSession(long sessionID)
-        throws java.io.IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         distantBody.terminateSession(sessionID);
     }
 
     public X509Certificate getCertificate()
-        throws java.io.IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         return distantBody.getCertificate();
     }
 
-    public ProActiveSecurityManager getProActiveSecurityManager()
-        throws SecurityNotAvailableException, IOException {
-        return distantBody.getProActiveSecurityManager();
-    }
-
-    public Policy getPolicyFrom(X509Certificate certificate)
-        throws SecurityNotAvailableException, IOException {
-        return distantBody.getPolicyFrom(certificate);
-    }
-
-    public Communication getPolicyTo(String type, String from, String to)
-        throws SecurityNotAvailableException, IOException {
-        return distantBody.getPolicyTo(type, from, to);
-    }
-
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException, 
-            RenegotiateSessionException {
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
         return distantBody.startNewSession(policy);
-    }
-
-    public ConfidentialityTicket negociateKeyReceiverSide(
-        ConfidentialityTicket confidentialityTicket, long sessionID)
-        throws SecurityNotAvailableException, KeyExchangeException, IOException {
-        return distantBody.negociateKeyReceiverSide(confidentialityTicket,
-            sessionID);
     }
 
     public PublicKey getPublicKey()
@@ -99,22 +74,28 @@ public class InternalBodySecurity {
         return distantBody.getPublicKey();
     }
 
-    public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws Exception {
-        return distantBody.randomValue(sessionID, cl_rand);
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        return distantBody.randomValue(sessionID, clientRandomValue);
     }
 
-    public byte[][] publicKeyExchange(long sessionID, UniversalBody dBody,
-        byte[] my_pub, byte[] my_cert, byte[] sig_code)
-        throws Exception {
-        return distantBody.publicKeyExchange(sessionID, dBody, my_pub, my_cert,
-            sig_code);
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException, IOException {
+        return distantBody.publicKeyExchange(sessionID, myPublicKey,
+            myCertificate, signature);
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-        byte[] tmp2, byte[] tmp3, byte[] tmp4) throws Exception {
-        return distantBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
-            tmp4);
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        return distantBody.secretKeyExchange(sessionID, encodedAESKey,
+            encodedIVParameters, encodedClientMacKey, encodedLockData,
+            parametersSignature);
     }
 
     public void setDistantBody(UniversalBody distantBody) {
@@ -129,18 +110,14 @@ public class InternalBodySecurity {
      * @return distant Body Adapter
      */
     public UniversalBody getDistantBody() {
-        return distantBody.getRemoteAdapter();
-    }
-
-    public String getVNName() throws IOException, SecurityNotAvailableException {
-        return distantBody.getVNName();
+        return ((UniversalBody) distantBody).getRemoteAdapter();
     }
 
     /**
      * @return distant object's certificate as byte array
      */
     public byte[] getCertificatEncoded()
-        throws IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         return distantBody.getCertificateEncoded();
     }
 
@@ -149,12 +126,17 @@ public class InternalBodySecurity {
      * @return securityContext with distant object context
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
-        throws IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         return distantBody.getPolicy(securityContext);
     }
 
     public ArrayList getEntities()
-        throws IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         return distantBody.getEntities();
+    }
+
+    public byte[] getCertificateEncoded()
+        throws SecurityNotAvailableException, IOException {
+        return distantBody.getCertificateEncoded();
     }
 }

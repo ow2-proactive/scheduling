@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.securityentity;
 
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
@@ -39,12 +39,6 @@ import java.security.cert.X509Certificate;
  *
  * To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
- */
-/**
- * @author acontes
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class EntityVirtualNode extends Entity implements Serializable {
     protected String virtualNodeName;
@@ -65,11 +59,11 @@ public class EntityVirtualNode extends Entity implements Serializable {
         super();
         virtualNodeName = name;
         if (application == null) {
-            //   System.out.println("APPPLICATION CERTITIFACATE IS NULLL");
+            System.out.println("APPPLICATION CERTIFICATE IS NULLL");
             throw new RuntimeException();
         }
         if (name == null) {
-            //   System.out.println("APPPLICATION Name  IS NULLL");
+            System.out.println("APPPLICATION Virtual Node IS NULLL");
             throw new RuntimeException();
         }
 

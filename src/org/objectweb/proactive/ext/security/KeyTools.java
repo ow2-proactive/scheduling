@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ext.security;
 
 import java.io.*;
@@ -25,7 +55,6 @@ import org.bouncycastle.jce.interfaces.*;
 /**
  * Tools to handle common key and keystore operations.
  *
- * @version $Id$
  */
 public class KeyTools {
     private static Logger log = Logger.getLogger(KeyTools.class);
@@ -64,7 +93,7 @@ public class KeyTools {
 
     /**
      * Creates PKCS12-file that can be imported in IE or Netscape. The alias for the private key is
-     * set to 'privateKey' and the private key password is null.
+     * set to alias and the private key password is null.
      *
      * @param alias the alias used for the key entry
      * @param privKey RSA private key
@@ -91,7 +120,7 @@ public class KeyTools {
 
     /**
      * Creates PKCS12-file that can be imported in IE or Netscape.
-     * The alias for the private key is set to 'privateKey' and the private key password is null.
+     * The alias for the private key is set to alias and the private key password is null.
      * @param alias the alias used for the key entry
      * @param privKey RSA private key
      * @param cert user certificate
@@ -113,7 +142,7 @@ public class KeyTools {
 
     /**
      * Creates PKCS12-file that can be imported in IE or Netscape. The alias for the private key is
-     * set to 'privateKey' and the private key password is null.
+     * set to alias and the private key password is null.
      *
      * @param alias the alias used for the key entry
      * @param privKey RSA private key
@@ -289,31 +318,31 @@ public class KeyTools {
      */
     public static Certificate[] getCertChain(KeyStore keyStore,
         String privateKeyAlias) throws KeyStoreException {
-        log.debug(">getCertChain: alias='" + privateKeyAlias + "'");
+        System.out.println(">getCertChain: alias='" + privateKeyAlias + "'");
 
         Certificate[] certchain = keyStore.getCertificateChain(privateKeyAlias);
-        log.debug("Certchain retrieved from alias '" + privateKeyAlias +
-            "' has length " + certchain.length);
+        System.out.println("Certchain retrieved from alias '" +
+            privateKeyAlias + "' has length " + certchain.length);
 
         if (certchain.length < 1) {
             log.error("Cannot load certificate chain with alias '" +
                 privateKeyAlias + "' from keystore.");
-            log.debug("<getCertChain: alias='" + privateKeyAlias +
+            System.out.println("<getCertChain: alias='" + privateKeyAlias +
                 "', retlength=" + certchain.length);
 
             return certchain;
         } else if (certchain.length > 0) {
             if (CertTools.isSelfSigned(
                         (X509Certificate) certchain[certchain.length - 1])) {
-                log.debug("Issuer='" +
+                System.out.println("Issuer='" +
                     CertTools.getIssuerDN(
                         (X509Certificate) certchain[certchain.length - 1]) +
                     "'.");
-                log.debug("Subject='" +
+                System.out.println("Subject='" +
                     CertTools.getSubjectDN(
                         (X509Certificate) certchain[certchain.length - 1]) +
                     "'.");
-                log.debug("<getCertChain: alias='" + privateKeyAlias +
+                System.out.println("<getCertChain: alias='" + privateKeyAlias +
                     "', retlength=" + certchain.length);
 
                 return certchain;
@@ -339,7 +368,7 @@ public class KeyTools {
             if (chain1 == null) {
                 stop = true;
             } else {
-                log.debug("Loaded certificate chain with length " +
+                System.out.println("Loaded certificate chain with length " +
                     chain1.length + " with alias '" + ialias + "'.");
 
                 if (chain1.length == 0) {
@@ -362,14 +391,14 @@ public class KeyTools {
 
         for (int i = 0; i < ret.length; i++) {
             ret[i] = (X509Certificate) array.get(i);
-            log.debug("Issuer='" +
+            System.out.println("Issuer='" +
                 CertTools.getIssuerDN((X509Certificate) ret[i]) + "'.");
-            log.debug("Subject='" +
+            System.out.println("Subject='" +
                 CertTools.getSubjectDN((X509Certificate) ret[i]) + "'.");
         }
 
-        log.debug("<getCertChain: alias='" + privateKeyAlias + "', retlength=" +
-            ret.length);
+        System.out.println("<getCertChain: alias='" + privateKeyAlias +
+            "', retlength=" + ret.length);
 
         return ret;
     } // getCertChain
@@ -384,7 +413,7 @@ public class KeyTools {
     public static SubjectKeyIdentifier createSubjectKeyId(PublicKey pubKey) {
         try {
             ByteArrayInputStream bIn = new ByteArrayInputStream(pubKey.getEncoded());
-            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                         bIn).readObject());
 
             return new SubjectKeyIdentifier(info);

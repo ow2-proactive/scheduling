@@ -1,3 +1,6 @@
+package org.objectweb.proactive.ext.security.ssl;
+
+
 /*
  * ################################################################
  *
@@ -28,23 +31,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
+import java.io.*;
+import java.net.*;
+import java.rmi.server.*;
+
+import javax.net.ssl.*;
 
 
-/**
- * @author ProActive Team
- * Defines usefull constants for security
- *
- */
-public interface SecurityConstants {
-    public static final String XML_CERTIFICATE = "/Policy/Certificate";
-    public static final String XML_PRIVATE_KEY = "/Policy/PrivateKey";
-    public static final String XML_TRUSTED_CERTIFICATION_AUTHORITY = "/Policy/TrustedCertificationAuthority/CertificationAuthority";
-    public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
-    public static final String KEYSTORE_APPLICATION_PATH = "applicationCertificate";
-    public static final String KEYSTORE_ENTITY_PATH = "entityEntry";
-    public static final int MAX_SESSION_VALIDATION_WAIT = 30;
-    public static final int ENTITY_TYPE_OBJECT = 1;
-    public static final int ENTITY_TYPE_NODE = 2;
-    public static final int ENTITY_TYPE_RUNTIME = 3;
+public class RMISSLClientSocketFactory implements RMIClientSocketFactory,
+    Serializable {
+    public Socket createSocket(String host, int port) throws IOException {
+        SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+        SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
+        return socket;
+    }
 }

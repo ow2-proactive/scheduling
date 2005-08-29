@@ -28,15 +28,22 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.exceptions;
 
+public class IncompatiblePolicyException extends RuntimeException {
+    public IncompatiblePolicyException() {
+        super();
+    }
 
-/**
- * @author acontes
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
- */
-public interface EntityPolicy {
-    public Policy getPolicyTo();
+    public IncompatiblePolicyException(String message) {
+        super(message);
+    }
+
+    public IncompatiblePolicyException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public IncompatiblePolicyException(Throwable cause) {
+        super(cause);
+    }
 }

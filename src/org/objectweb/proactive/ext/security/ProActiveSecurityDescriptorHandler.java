@@ -30,18 +30,26 @@
  */
 package org.objectweb.proactive.ext.security;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
+import org.objectweb.proactive.ext.security.securityentity.DefaultEntity;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
+import org.objectweb.proactive.ext.security.securityentity.EntityVirtualNode;
 import org.xml.sax.SAXException;
 
 
@@ -55,6 +63,11 @@ public class ProActiveSecurityDescriptorHandler
     extends AbstractUnmarshallerDecorator {
     protected PolicyServer policyServer;
     protected X509Certificate applicationCertificate;
+    protected String pkcs12Keystore = null;
+    protected String applicationName = null;
+    protected String applicationPrivateKeyPath = null;
+    protected String applicationCertificatePath = null;
+    protected ArrayList policyRules = null;
     protected static Logger logger = Logger.getLogger(ProActiveSecurityDescriptorHandler.class.getName());
     protected static String PROACTIVE_SECURITY_TAG = "Policy";
     protected String RULE_TAG = "Rule";
@@ -75,6 +88,11 @@ public class ProActiveSecurityDescriptorHandler
     protected String RULE_MIGRATION_DENIED = "denied";
     protected String RULE_AOCREATION_AUTHORIZED = "authorized";
     protected String APPLICATION_NAME_TAG = "ApplicationName";
+    protected String PKCS12_CERTIFICATE = "PKCS12KeyStore";
+
+    static {
+        ProActiveSecurity.loadProvider();
+    }
 
     /**
      *
@@ -87,6 +105,8 @@ public class ProActiveSecurityDescriptorHandler
         addHandler(APPLICATION_NAME_TAG, new SingleValueUnmarshaller());
         addHandler(PRIVATE_KEY_TAG, new SingleValueUnmarshaller());
         addHandler(CERTIFICATE_TAG, new SingleValueUnmarshaller());
+        addHandler(PKCS12_CERTIFICATE, new SingleValueUnmarshaller());
+
         addHandler(RULES_TAG, new RulesHandler());
     }
 
@@ -95,14 +115,22 @@ public class ProActiveSecurityDescriptorHandler
      */
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
-        if (name.equals(PRIVATE_KEY_TAG)) {
-            policyServer.setApplicationPrivateKey((String) activeHandler.getResultObject());
-        } else if (name.equals(CERTIFICATE_TAG)) {
-            policyServer.setApplicationCertificate((String) activeHandler.getResultObject());
-        } else if (name.equals(RULES_TAG)) {
-            policyServer.setPolicies((ArrayList) activeHandler.getResultObject());
+        //        if (name.equals(PRIVATE_KEY_TAG)) {
+        //           applicationPrivateKeyPath = (String) activeHandler.getResultObject();
+        //           policyServer.setApplicationPrivateKey(applicationPrivateKeyPath);
+        //        } else if (name.equals(CERTIFICATE_TAG)) {
+        //            applicationCertificatePath = (String) activeHandler.getResultObject();
+        //            policyServer.setApplicationCertificate(applicationCertificatePath);
+        //        } else 
+        if (name.equals(RULES_TAG)) {
+            policyRules = (ArrayList) activeHandler.getResultObject();
+            policyServer.setPolicies(policyRules);
         } else if (name.equals(APPLICATION_NAME_TAG)) {
-            policyServer.setApplicationName((String) activeHandler.getResultObject());
+            applicationName = (String) activeHandler.getResultObject();
+            policyServer.setApplicationName(applicationName);
+        } else if (name.equals(PKCS12_CERTIFICATE)) {
+            pkcs12Keystore = (String) activeHandler.getResultObject();
+            policyServer.setPKCS12Keystore(pkcs12Keystore);
         }
     }
 
@@ -110,7 +138,24 @@ public class ProActiveSecurityDescriptorHandler
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
      */
     public Object getResultObject() throws SAXException {
+        //        if (pkcs12Keystore != null) {
+        //            KeyStore keyStore = null;
+        //        
+        //        try {
+        //             keyStore = KeyStore.getInstance("PKCS12", "BC");
+        //        keyStore.load(new FileInputStream(pkcs12Keystore), "ha".toCharArray());
+        //        } catch (Exception e ) {
+        //            e.printStackTrace();
+        //        }
+        //        return new PolicyServer(keyStore, policyRules);
+        //    } else {
+        //        policyServer = new PolicyServer();
+        //        policyServer.setApplicationPrivateKey(applicationPrivateKeyPath);
+        //        policyServer.setApplicationCertificate(applicationCertificatePath);
+        //        policyServer.setPolicies(policyRules);
+        //        policyServer.setApplicationName(applicationName);
         return policyServer;
+        //    }
     }
 
     /* (non-Javadoc)
@@ -199,11 +244,11 @@ public class ProActiveSecurityDescriptorHandler
      * This class receives Security events
      */
     private class RuleHandler extends AbstractUnmarshallerDecorator {
-        private Policy policy;
+        private PolicyRule policy;
 
         public RuleHandler() {
             super();
-            policy = new Policy();
+            policy = new PolicyRule();
             addHandler(ENTITY_FROM_TAG, new EntityCollector());
             addHandler(ENTITY_TO_TAG, new EntityCollector());
             addHandler(RULE_COMMUNICATION_TAG,
@@ -216,7 +261,7 @@ public class ProActiveSecurityDescriptorHandler
 
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
-            policy = new Policy();
+            policy = new PolicyRule();
         }
 
         /* (non-Javadoc)
@@ -428,7 +473,7 @@ public class ProActiveSecurityDescriptorHandler
      * @param xmlDescriptorUrl the URL of XML Descriptor
      */
     public static PolicyServer createPolicyServer(String xmlDescriptorUrl)
-        throws java.io.IOException, org.xml.sax.SAXException {
+        throws InvalidPolicyFile {
         //static method added to replace main method
         try {
             InitialHandler h = new InitialHandler();
@@ -438,14 +483,13 @@ public class ProActiveSecurityDescriptorHandler
             org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
                         uri), h);
             sr.read();
-            ((PolicyServer) h.getResultObject()).setFile(uri);
+            ((PolicyServer) h.getResultObject()).setPolicyRulesFileLocation(uri);
 
             return (PolicyServer) h.getResultObject();
-        } catch (org.xml.sax.SAXException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(
-                "a problem occurs when getting the secuirty part of the ProActiveDescriptorHandler");
-            throw e;
+            ProActiveLogger.getLogger("security").warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler");
+            throw new InvalidPolicyFile(e);
         }
     }
 

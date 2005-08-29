@@ -33,8 +33,11 @@ package org.objectweb.proactive.ext.security;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.ext.security.securityentity.DefaultEntity;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
-public class Policy implements Serializable {
+
+public class PolicyRule implements Serializable {
     protected ArrayList from;
     protected ArrayList to;
     protected Communication communicationReply;
@@ -46,7 +49,7 @@ public class Policy implements Serializable {
      * Default constructor, initialize a policy with communication attribute sets to allowed and
      * authentication,confidentiality and integrity set to optional
      */
-    public Policy() {
+    public PolicyRule() {
         from = new ArrayList();
         from.add(new DefaultEntity());
         to = new ArrayList();

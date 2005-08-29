@@ -32,12 +32,12 @@ package org.objectweb.proactive.ext.security;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.ext.security.exceptions.IncompatiblePolicyException;
+
 
 /**
- * @author acontes
+ *  This class represents security attributes granted to a targeted communication
  *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class Communication implements Serializable {
     public static int REQUIRED = 1;

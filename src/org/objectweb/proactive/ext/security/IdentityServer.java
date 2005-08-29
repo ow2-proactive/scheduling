@@ -30,8 +30,21 @@
  */
 package org.objectweb.proactive.ext.security;
 
-public class DomainPolicyServer {
-    public DomainPolicyServer(String file) {
-        //   Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+import java.io.Serializable;
+import java.security.KeyStore;
+
+
+/**
+ * @author acontes
+ *
+ */
+public class IdentityServer implements Serializable {
+    private KeyStore keyStore;
+
+    public IdentityServer() {
+    }
+
+    public IdentityServer(KeyStore keyStore) {
+        this.keyStore = keyStore;
     }
 }

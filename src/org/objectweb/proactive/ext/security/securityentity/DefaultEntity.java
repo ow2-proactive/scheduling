@@ -28,51 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ext.security.crypto;
+package org.objectweb.proactive.ext.security.securityentity;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
+import java.io.Serializable;
 
 
 /**
- * This class provides a command-line tool to display the properties of a public or private certificate.
+ * @author acontes
  *
- * @author     Vincent RIBAILLIER
- * <br>created    July 19, 2001
+ * To change the template for this generated type comment go to
+ * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public class CertificateReader {
+public class DefaultEntity extends Entity implements Serializable {
 
     /**
-     *  Constructor for the CertificateReader object
      *
-     * @since
      */
-    public CertificateReader() {
+    public DefaultEntity() {
+        super();
     }
 
-    /**
-     *  The main program for the CertificateReader class
-     *
-     * @param  args
-     * @since
-     */
-    public static void main(String[] args) {
-        //	Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-        //		Security.addProvider(myProvider);
-        String file_name = "";
-        try {
-            file_name = args[0];
-        } catch (Exception e) {
-            System.out.println("Usage : java CertificateReader mycertificate");
-        }
-        try {
-            FileInputStream fin = new FileInputStream(file_name);
-            ObjectInputStream in = new ObjectInputStream(fin);
-            Object object = in.readObject();
-            in.close();
-            System.out.println(object.toString());
-        } catch (Exception e) {
-            System.out.println("Exception : " + e);
-        }
+    public String getName() {
+        return "defaultEntity";
+    }
+
+    public boolean equals(Entity e) {
+        return true;
     }
 }

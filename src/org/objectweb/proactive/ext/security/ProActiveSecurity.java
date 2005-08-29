@@ -62,8 +62,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.bouncycastle.asn1.ASN1EncodableVector;
+import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
-import org.bouncycastle.asn1.DERInputStream;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.DERSequence;
 import org.bouncycastle.asn1.x509.AuthorityKeyIdentifier;
@@ -76,13 +76,12 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.x509.X509Extensions;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.X509KeyUsage;
-import org.bouncycastle.jce.X509V3CertificateGenerator;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
+import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.ext.security.exceptions.SecurityMigrationException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
@@ -159,11 +158,11 @@ public class ProActiveSecurity {
         try {
             if (false) {
                 //if (isCA == true) {
-                SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+                SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                             new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
-                SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+                SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                             new ByteArrayInputStream(acPubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
@@ -299,7 +298,7 @@ public class ProActiveSecurity {
     public static SubjectKeyIdentifier createSubjectKeyId(PublicKey pubKey) {
         try {
             ByteArrayInputStream bIn = new ByteArrayInputStream(pubKey.getEncoded());
-            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                         bIn).readObject());
 
             return new SubjectKeyIdentifier(info);
@@ -315,7 +314,7 @@ public class ProActiveSecurity {
         PublicKey pubKey, X509Name name, int sNumber) {
         try {
             ByteArrayInputStream bIn = new ByteArrayInputStream(pubKey.getEncoded());
-            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                         bIn).readObject());
 
             GeneralName genName = new GeneralName(name);
@@ -334,7 +333,7 @@ public class ProActiveSecurity {
     public static AuthorityKeyIdentifier createAuthorityKeyId(PublicKey pubKey) {
         try {
             ByteArrayInputStream bIn = new ByteArrayInputStream(pubKey.getEncoded());
-            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new DERInputStream(
+            SubjectPublicKeyInfo info = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
                         bIn).readObject());
 
             return new AuthorityKeyIdentifier(info);
@@ -365,90 +364,6 @@ public class ProActiveSecurity {
         //vn =  RuntimeFactory.getDefaultRuntime().getVNName(name);
     }
 
-    /**
-     *
-     */
-    public static void migrateTo(PolicyServer ps, String bodyURL, Node nodeTo)
-        throws SecurityMigrationException {
-        PolicyServer runtimePolicyServer = null;
-        PolicyServer applicationPolicyServer = null;
-        String vnFrom;
-        String vn;
-        String vnTo;
-        vn = vnFrom = vnTo = null;
-        vnFrom = bodyURL;
-
-        ProActiveRuntime pr = null;
-
-        try {
-            runtimePolicyServer = RuntimeFactory.getDefaultRuntime()
-                                                .getPolicyServer();
-
-            //applicationPolicyServer = RuntimeFactory.getDefaultRuntime().getPolicyServerFor()
-            //vnFrom = ProActive.getBodyOnThis().getNodeURL();
-            int n = vnFrom.lastIndexOf("/");
-            String name = vnFrom.substring(n + 1);
-
-            //System.out.println("name:" + name + " -- vnFrom :" + vnFrom);
-            vn = RuntimeFactory.getDefaultRuntime().getVNName(name);
-
-            vnTo = nodeTo.getVnName();
-            if (vnTo == null) {
-                vnTo = nodeTo.getNodeInformation().getURL();
-                n = vnTo.lastIndexOf("/");
-                name = vnTo.substring(n + 1);
-                //      System.out.println("name:" + name + " -- vnTo :" + vnTo);
-                pr = nodeTo.getProActiveRuntime();
-                vnTo = pr.getVNName(name);
-            }
-
-            //    System.out.println("JE SUIS SUR " + vn + "ET je vais sur " + vnTo);
-        } catch (ProActiveException e1) {
-            e1.printStackTrace();
-        }
-
-        if (runtimePolicyServer != null) {
-            if (runtimePolicyServer.canMigrateTo("VN", vn, vnTo)) {
-            } else {
-                throw new SecurityMigrationException("matching rule : VN[" +
-                    vn + "] --> VN[" + vnTo + "]");
-            }
-        }
-
-        if (ps != null) {
-            Communication runtimePolicy;
-            Communication VNPolicy;
-            Communication distantPolicy;
-
-            ArrayList arrayFrom = new ArrayList();
-            ArrayList arrayTo = new ArrayList();
-
-            if (vnFrom == null) {
-                arrayFrom.add(new DefaultEntity());
-            } else {
-                //    arrayFrom.add(new EntityVirtualNode(vnFrom));
-            }
-            if (vnTo == null) {
-                arrayTo.add(new DefaultEntity());
-            } else {
-                //    arrayTo.add(new EntityVirtualNode(vnTo));
-            }
-
-            SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
-                    arrayFrom, arrayTo);
-            try {
-                sc = ps.getPolicy(sc);
-            } catch (SecurityNotAvailableException e) {
-                // do nothing
-            }
-            if (sc.isMigration()) {
-            } else {
-                throw new SecurityMigrationException("matching rule : VN[" +
-                    vn + "] --> VN[" + vnTo + "]");
-            }
-        }
-    }
-
     public static X509Certificate decodeCertificate(byte[] encodedCert) {
         X509Certificate certificate = null;
 
@@ -456,10 +371,12 @@ public class ProActiveSecurity {
         // Recover Servers Certificate
         //
         try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
             certificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
                         encodedCert));
         } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
         return certificate;
@@ -604,4 +521,26 @@ public class ProActiveSecurity {
               return cert;
        }
      */
+    public static void loadProvider() {
+        CertTools.installBCProvider();
+        //Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+        //Security.addProvider(myProvider);
+    }
+
+    public static X509Certificate getMyCertificate() {
+        try {
+            return ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+                    .getCertificate();
+        } catch (SecurityNotAvailableException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public static X509Certificate[] getMyCertificateChain() {
+        //TODO finish him
+        //return ProActive.getBodyOnThis().getProActiveSecurityManager().getCertificate();
+        return null;
+    }
 }
