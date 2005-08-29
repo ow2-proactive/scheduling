@@ -40,10 +40,11 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
-import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.Session;
+import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
@@ -62,6 +63,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
      * the encrypted result
      */
     protected byte[][] encryptedResult;
+    protected boolean ciphered;
 
     /*
      * the session ID used to find the key and decrypt the reply
@@ -80,7 +82,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
         return result;
     }
 
-    public int send(UniversalBody destinationBody) throws java.io.IOException {
+    public int send(UniversalBody destinationBody) throws IOException {
         // if destination body is on the same VM that the sender, we must perform 
         // a deep copy of result in order to preserve ProActive model.
         UniqueID destinationID = destinationBody.getID();
@@ -91,9 +93,8 @@ public class ReplyImpl extends MessageImpl implements Reply,
             result = (FutureResult) Utils.makeDeepCopy(result);
         }
 
-        // security issue	
-        //	System.out.println("ReplyImpl send : Current Thread " + Thread.currentThread().getName() + " result : " + result + "!");
-        if (!ciphered) {
+        // security 
+        if (!ciphered && (psm != null)) {
             long sessionID = 0;
 
             try {
@@ -106,24 +107,25 @@ public class ReplyImpl extends MessageImpl implements Reply,
                 }
 
                 if (sessionID != 0) {
-                    encryptedResult = psm.encrypt(sessionID, result);
-
+                    encryptedResult = psm.encrypt(sessionID, result,
+                            Session.ACT_AS_SERVER);
                     ciphered = true;
                     this.sessionID = sessionID;
                 }
-
-                //   result = null;
             } catch (SecurityNotAvailableException e) {
-                // do nothing       
-            } catch (IOException e) {
-                // throws exception 
-                throw e;
+                // do nothing 
             } catch (CommunicationForbiddenException e) {
                 e.printStackTrace();
             } catch (AuthenticationException e) {
                 e.printStackTrace();
             } catch (RenegotiateSessionException e) {
-                e.printStackTrace();
+                psm.terminateSession(sessionID);
+                try {
+                    destinationBody.terminateSession(sessionID);
+                } catch (SecurityNotAvailableException e1) {
+                    e.printStackTrace();
+                }
+                this.send(destinationBody);
             }
         }
 
@@ -141,7 +143,8 @@ public class ReplyImpl extends MessageImpl implements Reply,
     public boolean decrypt(ProActiveSecurityManager psm)
         throws RenegotiateSessionException {
         if ((sessionID != 0) && ciphered) {
-            byte[] decryptedMethodCall = psm.decrypt(sessionID, encryptedResult);
+            byte[] decryptedMethodCall = psm.decrypt(sessionID,
+                    encryptedResult, Session.ACT_AS_CLIENT);
             try {
                 ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
                 ObjectInputStream in = new ObjectInputStream(bin);

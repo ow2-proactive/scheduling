@@ -62,5 +62,10 @@ public interface Loggers {
     public static final String P2P_SKELETONS_MANAGER = P2P_SKELETONS +
         ".manager";
 
+    // Security loggers
+    public static final String SECURITY = "security";
+    public static final String SECURITY_NODE = SECURITY + ".node";
+    public static final String SECURITY_SESSION = SECURITY + ".session";
+
     // -------------------------------------------------------------------------
 }

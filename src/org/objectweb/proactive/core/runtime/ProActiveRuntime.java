@@ -48,8 +48,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityEntity;
 
 
 /**
@@ -76,7 +76,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @since   ProActive 0.91
  *
  */
-public interface ProActiveRuntime extends Job {
+public interface ProActiveRuntime extends Job, SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     /**
@@ -87,8 +87,9 @@ public interface ProActiveRuntime extends Job {
      * @exception NodeException if the new node cannot be created
      */
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer policyServer,
-        String vnName, String jobId) throws NodeException;
+        boolean replacePreviousBinding,
+        ProActiveSecurityManager securityManager, String vnName, String jobId)
+        throws NodeException;
 
     /**
      * Kills all Nodes in this ProActiveRuntime
@@ -318,72 +319,7 @@ public interface ProActiveRuntime extends Job {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException;
 
-    // SECURITY
-
-    /**
-     * @return Policy server
-     */
-    public PolicyServer getPolicyServer() throws ProActiveException;
-
     public String getVNName(String Nodename) throws ProActiveException;
-
-    /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     */
-    public ArrayList getEntities(String nodeName) throws ProActiveException;
-
-    /**
-     * @param sc
-     */
-    public SecurityContext getPolicy(SecurityContext sc)
-        throws ProActiveException, SecurityNotAvailableException;
-
-    //-----------------------------------------
-    //	Security: methods not used 
-    //-----------------------------------------
-    //    /**
-    //     * @return creator's certificate if exists
-    //     */
-    //    public X509Certificate getCreatorCertificate() throws ProActiveException;
-    //
-    //    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-    //        throws ProActiveException;
-    //    
-    //
-    //    
-    //
-    //    public void setDefaultNodeVirtualNodeName(String s)
-    //        throws ProActiveException;
-    //
-    //    public PolicyServer getNodePolicyServer(String nodeName)
-    //        throws ProActiveException;
-    //
-    //    /**
-    //     *  sets all needed modifications to enable security components
-    //     * MUST be called when the descriptor is ready
-    //     */
-    //    public void enableSecurityIfNeeded() throws ProActiveException;
-    //
-    //    /**
-    //     * @param nodeName
-    //     * @return return certificate associated to the node designed by nodeName
-    //     */
-    //    public X509Certificate getNodeCertificate(String nodeName)
-    //        throws ProActiveException;
-    //
-    //    
-    //
-    //    /**
-    //     * @param uBody
-    //     * @return returns all entities associated to the node
-    //     */
-    //    public ArrayList getEntities(UniversalBody uBody) throws ProActiveException;
-    //
-    //    /**
-    //     * @return returns all entities associated to this runtime
-    //     */
-    //    public ArrayList getEntities() throws ProActiveException;
 
     /**
      * Looks for class bytecode in the current runtime.

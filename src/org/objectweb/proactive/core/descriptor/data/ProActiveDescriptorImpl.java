@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.IOException;
-import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -50,7 +48,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.xml.sax.SAXException;
+import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
 
 
 /**
@@ -98,8 +96,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     private String url;
 
     /** security rules */
+    protected ProActiveSecurityManager proactiveSecurityManager;
     public PolicyServer policyServer;
-    public X509Certificate creatorCertificate;
+
+    //  public X509Certificate creatorCertificate;
     public String securityFile;
 
     //
@@ -289,8 +289,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (lookup) {
                 vn = new VirtualNodeLookup(vnName);
             } else {
-                vn = new VirtualNodeImpl(vnName, creatorCertificate,
-                        policyServer, padURL, isMainNode);
+                vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
+                        padURL, isMainNode);
             }
 
             virtualNodeMapping.put(vnName, vn);
@@ -419,36 +419,23 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     // SECURITY
 
     /**
-     * Intialize application security policy
-     * @param file
+     * Initialize application security policy
+     * @param file link to the XML security policy file
      */
-    public void createPolicyServer(String file) {
+    public void createProActiveSecurityManager(String file) {
         securityFile = file;
         try {
             policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
-            //      policyServer = ps;
-            //         ProActiveRuntime prR = RuntimeFactory.getDefaultRuntime();
-            //        ProActiveSecurityManager psm = new ProActiveSecurityManager(file);
-            //       prR.setProActiveSecurityManager(psm);
-            //   } catch (ProActiveException e) {
-            //       e.printStackTrace();
+            proactiveSecurityManager = new ProActiveSecurityManager(policyServer);
+
             // set the security policyserver to the default proactive meta object
-            PolicyServer clonedPolicyServer = null;
-            try {
-                clonedPolicyServer = (PolicyServer) policyServer.clone();
-
-                clonedPolicyServer.generateEntityCertificate("HalfBody for " +
-                    policyServer.getApplicationName());
-
-                ProActiveSecurityManager psm = new ProActiveSecurityManager(clonedPolicyServer);
-                ProActiveMetaObjectFactory.newInstance()
-                                          .setProActiveSecurityManager(psm);
-            } catch (CloneNotSupportedException e1) {
-                e1.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
+            // by the way, the HalfBody will be associated to a security manager
+            // derivated from this one.
+            ProActiveSecurityManager psm = proactiveSecurityManager.generateSiblingCertificate(
+                    "HalfBody");
+            ProActiveMetaObjectFactory.newInstance()
+                                      .setProActiveSecurityManager(psm);
+        } catch (InvalidPolicyFile e) {
             e.printStackTrace();
         }
     }

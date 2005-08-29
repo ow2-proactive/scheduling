@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.node;
 
+import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
@@ -38,9 +39,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**
@@ -103,17 +107,18 @@ public class NodeFactory {
      * @exception NodeException if the default node cannot be instantiated
      */
     public static synchronized Node getDefaultNode() throws NodeException {
-        String nodeURL;
-        ProActiveRuntime defaultRuntime;
+        String nodeURL = null;
+        ProActiveRuntime defaultRuntime = null;
         String jobID = ProActive.getJobId();
+        ProActiveSecurityManager securityManager = null;
+
         if (defaultNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
                         Integer.toString(
                             new java.util.Random(System.currentTimeMillis()).nextInt()),
-                        false, defaultRuntime.getPolicyServer(), "DefaultVN",
-                        jobID);
+                        false, securityManager, "DefaultVN", jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             }
@@ -166,7 +171,7 @@ public class NodeFactory {
      * @exception NodeException if the node cannot be created
      */
     public static Node createNode(String url, boolean replacePreviousBinding,
-        PolicyServer ps, String vnname) throws NodeException {
+        ProActiveSecurityManager psm, String vnname) throws NodeException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
         String jobID = ProActive.getJobId();
@@ -183,7 +188,7 @@ public class NodeFactory {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
             nodeURL = proActiveRuntime.createLocalNode(url,
-                    replacePreviousBinding, ps, vnname, jobID);
+                    replacePreviousBinding, psm, vnname, jobID);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }

@@ -168,10 +168,10 @@ public class JobMonitorFrame extends JFrame {
                        panel.updateHosts();
          *
                          }
-        
+
                      });
                          launcherMenu.add(b);
-        
+
                          menuBar.add(launcherMenu);
          */
         return menuBar;

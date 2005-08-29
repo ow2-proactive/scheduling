@@ -31,9 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
-import java.security.Provider;
 import java.security.PublicKey;
-import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -55,19 +53,18 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
-import org.objectweb.proactive.ext.security.Policy;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.Secure;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
@@ -163,26 +160,28 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.spmdManager = factory.newProActiveSPMDGroupManagerFactory()
                                   .newProActiveSPMDGroupManager();
 
-        Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
-        Security.addProvider(myProvider);
-
+        ProActiveSecurity.loadProvider();
         // SECURITY
         if (reifiedObject instanceof Secure) {
             isInterfaceSecureImplemented = true;
         }
-        psm = new ProActiveSecurityManager();
-        internalBodySecurity = new InternalBodySecurity(null); // SECURITY
 
-        /*
-           this.psm = factory.getProActiveSecurityManager();
-             if (psm != null) {
-                     //  startDefaultProActiveSecurityManager();
-                     isSecurityOn = (psm != null);
-                     logger.debug("Security is " + isSecurityOn);
-                     psm.setBody(this);
-                     internalBodySecurity = new InternalBodySecurity(null);
-             }
-         */
+        if ((psm = factory.getProActiveSecurityManager()) == null) {
+            isSecurityOn = false;
+            ProActiveLogger.getLogger("security.body").debug("Active Object security Off");
+        } else {
+            isSecurityOn = true;
+            ProActiveLogger.getLogger("security.body").debug("Active Object security On application is " +
+                psm.getPolicyServer().getApplicationName());
+            ProActiveLogger.getLogger("security.body").debug("current thread is " +
+                Thread.currentThread().getName());
+        }
+
+        if (this.isSecurityOn) {
+            psm.setBody(this);
+            isSecurityOn = psm.getCertificate() != null;
+            internalBodySecurity = new InternalBodySecurity(null); // SECURITY
+        }
     }
 
     //
@@ -205,7 +204,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //
     public int receiveRequest(Request request)
         throws java.io.IOException, RenegotiateSessionException {
-        //System.out.println("" + this + "  --> receiveRequest m="+request.getMethodName());
+        //  System.out.println("" + this + "  --> receiveRequest m="+request.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
@@ -223,7 +222,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             if (this.isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
-
             if (this.isSecurityOn) {
 
                 /*
@@ -240,6 +238,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     }
                 } catch (SecurityNotAvailableException e) {
                     // do nothing
+                    e.printStackTrace();
                 }
             }
             this.registerIncomingFutures();
@@ -332,8 +331,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public void renegociateSessionIfNeeded(long sID)
-        throws IOException, RenegotiateSessionException, 
-            SecurityNotAvailableException {
+        throws RenegotiateSessionException, SecurityNotAvailableException, 
+            IOException {
         try {
             enterInThreadStore();
             if (!internalBodySecurity.isLocalBody() &&
@@ -357,44 +356,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public String getVNName()
-        throws java.io.IOException, SecurityNotAvailableException {
-        try {
-            enterInThreadStore();
-            if (isSecurityOn) {
-                if (internalBodySecurity.isLocalBody()) {
-                    return psm.getVNName();
-                } else {
-                    return internalBodySecurity.getVNName();
-                }
-            }
-        } finally {
-            exitFromThreadStore();
-        }
-        return null;
-    }
-
-    public void initiateSession(int type, UniversalBody body)
-        throws java.io.IOException, CommunicationForbiddenException, 
-            org.objectweb.proactive.ext.security.crypto.AuthenticationException, 
-            RenegotiateSessionException, SecurityNotAvailableException {
-        try {
-            enterInThreadStore();
-            if (isSecurityOn) {
-                if (internalBodySecurity.isLocalBody()) {
-                    psm.initiateSession(type, body);
-                } else {
-                    internalBodySecurity.initiateSession(type, body);
-                }
-            }
-        } finally {
-            exitFromThreadStore();
-        }
-        throw new SecurityNotAvailableException();
-    }
-
     public void terminateSession(long sessionID)
-        throws java.io.IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (isSecurityOn) {
@@ -404,14 +367,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     internalBodySecurity.terminateSession(sessionID);
                 }
             }
-            throw new SecurityNotAvailableException();
         } finally {
             exitFromThreadStore();
         }
     }
 
     public X509Certificate getCertificate()
-        throws java.io.IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (isSecurityOn) {
@@ -443,8 +405,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     // }
                     return psm;
                 } else {
-                    ProActiveSecurityManager plop = internalBodySecurity.getProActiveSecurityManager();
-                    return plop;
+                    //ProActiveSecurityManager plop = internalBodySecurity.getProActiveSecurityManager();
+                    //return plop;
+                    return null;
                 }
             } else {
                 throw new SecurityNotAvailableException();
@@ -458,35 +421,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.spmdManager;
     }
 
-    public Policy getPolicyFrom(X509Certificate certificate)
-        throws java.io.IOException, SecurityNotAvailableException {
-        try {
-            enterInThreadStore();
-            if (isSecurityOn) {
-                Policy pol;
-
-                if (internalBodySecurity.isLocalBody()) {
-                    // if (psm == null) {
-                    //  startDefaultProActiveSecurityManager();
-                    // }
-                    pol = psm.getPolicyTo(certificate);
-
-                    return pol;
-                } else {
-                    pol = internalBodySecurity.getPolicyFrom(certificate);
-
-                    return pol;
-                }
-            }
-            throw new SecurityNotAvailableException();
-        } finally {
-            exitFromThreadStore();
-        }
-    }
-
     public long startNewSession(Communication policy)
-        throws java.io.IOException, RenegotiateSessionException, 
-            SecurityNotAvailableException {
+        throws RenegotiateSessionException, SecurityNotAvailableException, 
+            IOException {
         try {
             enterInThreadStore();
             if (isSecurityOn) {
@@ -512,36 +449,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public ConfidentialityTicket negociateKeyReceiverSide(
-        ConfidentialityTicket confidentialityTicket, long sessionID)
-        throws java.io.IOException, KeyExchangeException, 
-            SecurityNotAvailableException {
-        try {
-            enterInThreadStore();
-            ConfidentialityTicket tick;
-
-            if (internalBodySecurity.isLocalBody()) {
-                //System.out.println("negociateKeyReceiverSide on demande un security manager a " + ProActive.getBodyOnThis());
-                //if (psm == null) {
-                //   startDefaultProActiveSecurityManager();       
-                // }
-                tick = psm.keyNegociationReceiverSide(confidentialityTicket,
-                        sessionID);
-
-                return tick;
-            } else {
-                tick = internalBodySecurity.negociateKeyReceiverSide(confidentialityTicket,
-                        sessionID);
-
-                return tick;
-            }
-        } finally {
-            exitFromThreadStore();
-        }
-    }
-
     public PublicKey getPublicKey()
-        throws java.io.IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (isSecurityOn) {
@@ -567,20 +476,21 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws java.io.IOException, SecurityNotAvailableException, Exception {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
         try {
             enterInThreadStore();
             if (isSecurityOn) {
                 byte[] plop;
 
                 if (internalBodySecurity.isLocalBody()) {
-                    //	System.out.println("randomValue on demande un security manager a " + ProActive.getBodyOnThis());
-                    plop = psm.randomValue(sessionID, cl_rand);
+                    plop = psm.randomValue(sessionID, clientRandomValue);
 
                     return plop;
                 } else {
-                    plop = internalBodySecurity.randomValue(sessionID, cl_rand);
+                    plop = internalBodySecurity.randomValue(sessionID,
+                            clientRandomValue);
 
                     return plop;
                 }
@@ -591,10 +501,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[][] publicKeyExchange(long sessionID,
-        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-        byte[] sig_code)
-        throws java.io.IOException, SecurityNotAvailableException, Exception {
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException, IOException {
         try {
             enterInThreadStore();
             if (isSecurityOn) {
@@ -603,13 +513,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 byte[][] pke;
 
                 if (internalBodySecurity.isLocalBody()) {
-                    pke = psm.publicKeyExchange(sessionID, distantBody, my_pub,
-                            my_cert, sig_code);
+                    pke = psm.publicKeyExchange(sessionID, myPublicKey,
+                            myCertificate, signature);
 
                     return pke;
                 } else {
                     pke = internalBodySecurity.publicKeyExchange(sessionID,
-                            distantBody, my_pub, my_cert, sig_code);
+                            myPublicKey, myCertificate, signature);
 
                     return pke;
                 }
@@ -620,29 +530,33 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-        byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws java.io.IOException, Exception, SecurityNotAvailableException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
         try {
             enterInThreadStore();
             if (!isSecurityOn) {
                 throw new SecurityNotAvailableException();
             }
 
-            renegociateSessionIfNeeded(sessionID);
-
             byte[][] ske;
 
             renegociateSessionIfNeeded(sessionID);
+
             if (internalBodySecurity.isLocalBody()) {
                 //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
-                ske = psm.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
-                        tmp4);
+                ske = psm.secretKeyExchange(sessionID, encodedAESKey,
+                        encodedIVParameters, encodedClientMacKey,
+                        encodedLockData, parametersSignature);
 
                 return ske;
             } else {
-                ske = internalBodySecurity.secretKeyExchange(sessionID, tmp,
-                        tmp1, tmp2, tmp3, tmp4);
+                ske = internalBodySecurity.secretKeyExchange(sessionID,
+                        encodedAESKey, encodedIVParameters,
+                        encodedClientMacKey, encodedLockData,
+                        parametersSignature);
 
                 return ske;
             }
@@ -651,26 +565,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public Communication getPolicyTo(String type, String from, String to)
-        throws SecurityNotAvailableException, java.io.IOException {
-        try {
-            enterInThreadStore();
-            if (!isSecurityOn) {
-                throw new SecurityNotAvailableException();
-            }
-
-            if (internalBodySecurity.isLocalBody()) {
-                return psm.getPolicyTo(type, from, to);
-            } else {
-                return internalBodySecurity.getPolicyTo(type, from, to);
-            }
-        } finally {
-            exitFromThreadStore();
-        }
-    }
-
     public SecurityContext getPolicy(SecurityContext securityContext)
-        throws java.io.IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (!isSecurityOn) {
@@ -688,7 +584,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public byte[] getCertificateEncoded()
-        throws IOException, SecurityNotAvailableException {
+        throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
 
@@ -733,7 +629,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             if (!isSecurityOn) {
                 throw new SecurityNotAvailableException();
             }
-
             if (internalBodySecurity.isLocalBody()) {
                 return psm.getEntities();
             } else {
@@ -865,24 +760,23 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             methodCall.setBarrierTags(this.spmdManager.getBarrierTags());
         }
 
-        // logger.debug("send Request Body" + destinationBody);
-        // logger.debug(" bla" + destinationBody.getRemoteAdapter());
         try {
             try {
                 if (!isSecurityOn) {
                     bodyLogger.debug("security is off");
                 } else {
                     if (internalBodySecurity.isLocalBody()) {
-                        byte[] certE = destinationBody.getRemoteAdapter()
-                                                      .getCertificateEncoded();
-                        X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+                        byte[] certE = destinationBody.getCertificateEncoded();
 
-                        //                        System.out.println("send Request AbstractBody, method " +
-                        //                            methodCall.getName() + " cert " +
-                        //                            cert.getSubjectDN().getName());
-                        if ((sessionID = this.psm.getSessionIDTo(cert)) == 0) {
-                            this.psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                                destinationBody.getRemoteAdapter());
+                        X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+                        ProActiveLogger.getLogger("security.body").debug("send Request AbstractBody " +
+                            this + ", method " + methodCall.getName() +
+                            " cert " + cert.getSubjectDN() + " " +
+                            cert.getPublicKey());
+                        sessionID = psm.getSessionIDTo(cert);
+                        if (sessionID == 0) {
+                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
+                                destinationBody);
                             sessionID = this.psm.getSessionIDTo(cert);
                         }
                     }
@@ -892,13 +786,19 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 bodyLogger.debug("communication without security");
                 //e.printStackTrace();
             }
+
             localBodyStrategy.sendRequest(methodCall, future, destinationBody);
         } catch (RenegotiateSessionException e) {
             if (e.getUniversalBody() != null) {
+                ProActiveLogger.getLogger("security.crypto").debug("renegotiate session " +
+                    sessionID);
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
+                psm.terminateSession(sessionID);
+                sendRequest(methodCall, future, e.getUniversalBody());
+            } else {
+                psm.terminateSession(sessionID);
+                sendRequest(methodCall, future, destinationBody);
             }
-            psm.terminateSession(sessionID);
-            sendRequest(methodCall, future, e.getUniversalBody());
         } catch (CommunicationForbiddenException e) {
             bodyLogger.warn(e);
             //e.printStackTrace();

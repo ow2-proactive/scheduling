@@ -52,13 +52,9 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
-import org.objectweb.proactive.ext.security.ProActiveSecurity;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 public class HalfBody extends AbstractBody {
@@ -79,27 +75,18 @@ public class HalfBody extends AbstractBody {
     // -- CONSTRUCTORS -----------------------------------------------
     //
     private HalfBody(MetaObjectFactory factory) {
-        //SECURITY 
         super(new Object(), "LOCAL", factory, getRuntimeJobID());
-        //super(new Object(),
-        //	 NodeFactory.getDefaultNode().getNodeInformation().getURL(), factory);
-        // creating a default psm for HalfBody
-        // TODO get application certificate instead of generated one
-        //Object[] o = ProActiveSecurity.generateGenericCertificate();
-        //psm = new ProActiveSecurityManager((X509Certificate) o[0], (PrivateKey) o[1], null);
-        //psm = new ProActiveSecurityManager();
-        //isSecurityOn = true;
-        //psm.setBody(this);
-        this.psm = factory.getProActiveSecurityManager();
+
+        //SECURITY 
         if (psm != null) {
-            //  startDefaultProActiveSecurityManager();
-            isSecurityOn = (psm != null);
-            bodyLogger.debug("HalfBody Security is " + isSecurityOn);
+            psm = psm.generateSiblingCertificate("HalfBody");
             psm.setBody(this);
-            internalBodySecurity = new InternalBodySecurity(null);
+            isSecurityOn = psm.getCertificate() != null;
+            internalBodySecurity = new InternalBodySecurity(null); // SECURITY
+            ProActiveLogger.getLogger("security.manager").debug("  ------> HalfBody Security is " +
+                isSecurityOn);
         }
 
-        // internalBodySecurity = new InternalBodySecurity(null);
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
@@ -162,7 +149,6 @@ public class HalfBody extends AbstractBody {
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-        //System.out.print("Half-Body receives Reply -> ");
         try {
             if (reply.isCiphered()) {
                 reply.decrypt(psm);
@@ -171,11 +157,6 @@ public class HalfBody extends AbstractBody {
             e.printStackTrace();
         }
 
-        /*if (reply.getResult() != null) {
-           System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
-           } else {
-                   System.out.println("Reply is : " + reply);
-           }*/
         return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
@@ -272,51 +253,12 @@ public class HalfBody extends AbstractBody {
                 futures.receiveFuture(future);
             }
 
-            // SECURITY 
-            long sessionID = 0;
-
-            //	logger.debug("send Request Body" + destinationBody);
-            //   logger.debug(" halfbla" + destinationBody.getRemoteAdapter());
-            try {
-                try {
-                    if (!isSecurityOn) {
-                        bodyLogger.debug("security is off");
-                        throw new SecurityNotAvailableException();
-                    }
-                    if (internalBodySecurity.isLocalBody()) {
-                        byte[] certE = destinationBody.getRemoteAdapter()
-                                                      .getCertificateEncoded();
-                        X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                        if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
-                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO,
-                                destinationBody.getRemoteAdapter());
-                            sessionID = psm.getSessionIDTo(cert);
-                        }
-                    }
-                } catch (SecurityNotAvailableException e) {
-                    // do nothing 
-                    bodyLogger.debug("communication without security");
-                    //e.printStackTrace();
-                }
-
-                // FAULT TOLERANCE
-                // System.out.println("a half body send a request: " + request.getMethodName());
-                if (HalfBody.this.ftmanager != null) {
-                    HalfBody.this.ftmanager.sendRequest(request, destinationBody);
-                } else {
-                    request.send(destinationBody);
-                }
-            } catch (RenegotiateSessionException e) {
-                //e.printStackTrace();
-                updateLocation(destinationBody.getID(), e.getUniversalBody());
-                psm.terminateSession(sessionID);
-                bodyLogger.debug("renegotiate session");
-                sendRequest(methodCall, future, e.getUniversalBody());
-            } catch (CommunicationForbiddenException e) {
-                bodyLogger.warn(e);
-                //e.printStackTrace();
-            } catch (AuthenticationException e) {
-                e.printStackTrace();
+            // FAULT TOLERANCE
+            // System.out.println("a half body send a request: " + request.getMethodName());
+            if (HalfBody.this.ftmanager != null) {
+                HalfBody.this.ftmanager.sendRequest(request, destinationBody);
+            } else {
+                request.send(destinationBody);
             }
         }
 

@@ -257,8 +257,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             if (!checkNonEmpty(file)) {
                 throw new org.xml.sax.SAXException("Empty security file");
             }
-            logger.debug("creating PolicyServer : " + file);
-            proActiveDescriptor.createPolicyServer(file);
+            logger.debug("creating ProActiveSecurityManager : " + file);
+            proActiveDescriptor.createProActiveSecurityManager(file);
         }
     }
 

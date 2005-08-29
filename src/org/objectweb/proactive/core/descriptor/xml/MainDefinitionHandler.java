@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 /**
  * This class receives main_definition events
  *
- * @author  Térence FERUT from ProActive Team
+ * @author  Tï¿½rence FERUT from ProActive Team
  * @version 1.0,  2005/07/07
  * @since   ProActive
  */

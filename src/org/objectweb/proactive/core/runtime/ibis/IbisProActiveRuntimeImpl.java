@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.runtime.ibis;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
@@ -49,8 +51,11 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import ibis.rmi.AlreadyBoundException;
@@ -64,7 +69,7 @@ import ibis.rmi.server.UnicastRemoteObject;
  *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate Ibis-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe remote objects library.
- *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
+ *   @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
 public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     implements IbisProActiveRuntime {
@@ -94,8 +99,9 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vnname,
-        String jobId) throws RemoteException, NodeException {
+        boolean replacePreviousBinding,
+        ProActiveSecurityManager securityManager, String vnname, String jobId)
+        throws RemoteException, NodeException {
         String nodeURL = null;
 
         //Node node;
@@ -107,8 +113,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
             //register the url in rmi registry
             register(nodeURL, replacePreviousBinding);
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding, ps,
-                vnname, jobId);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding,
+                securityManager, vnname, jobId);
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -279,114 +285,71 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
     }
 
-    // SECURITY
-
-    /**
-     * @return policy server
-     * @throws ProActiveException
-     */
-    public PolicyServer getPolicyServer()
-        throws RemoteException, ProActiveException {
-        return proActiveRuntime.getPolicyServer();
-    }
-
     public String getVNName(String nodename)
         throws RemoteException, ProActiveException {
         return proActiveRuntime.getVNName(nodename);
     }
 
-    /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     * @throws ProActiveException
-     */
-    public ArrayList getEntities(String nodeName)
-        throws RemoteException, ProActiveException {
-        return proActiveRuntime.getEntities(nodeName);
+    // SECURITY
+    public X509Certificate getCertificate()
+        throws SecurityNotAvailableException, RemoteException, IOException {
+        return proActiveRuntime.getCertificate();
     }
 
-    /**
-     * @return returns all entities associated to this runtime
-     * @throws SecurityNotAvailableException
-     * @throws ProActiveException
-     */
-    public SecurityContext getPolicy(SecurityContext sc)
-        throws RemoteException, ProActiveException, 
-            SecurityNotAvailableException {
-        return proActiveRuntime.getPolicy(sc);
+    public long startNewSession(Communication policy)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            RemoteException, IOException {
+        return proActiveRuntime.startNewSession(policy);
     }
 
-    //  -----------------------------------------
-    //	Security: methods not used 
-    //-----------------------------------------
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
-    //     */
-    //    public X509Certificate getCreatorCertificate() throws RemoteException {
-    //        return proActiveRuntime.getCreatorCertificate();
-    //    }
-    //
-    //    
-    //
-    //    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-    //        throws RemoteException {
-    //        proActiveRuntime.setProActiveSecurityManager(ps);
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
-    //     */
-    //    public void setDefaultNodeVirtualNodeName(String s)
-    //        throws RemoteException {
-    //        proActiveRuntime.setDefaultNodeVirtualNodeName(s);
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
-    //     */
-    //    public void updateLocalNodeVirtualName() throws RemoteException {
-    //        //   proActiveRuntime.updateLocalNodeVirtualName();
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
-    //     */
-    //    public PolicyServer getNodePolicyServer(String nodeName)
-    //        throws RemoteException {
-    //        return null;
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#enableSecurityIfNeeded()
-    //     */
-    //    public void enableSecurityIfNeeded() throws RemoteException {
-    //        // TODOremove this function
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
-    //     */
-    //    public X509Certificate getNodeCertificate(String nodeName)
-    //        throws RemoteException {
-    //        return proActiveRuntime.getNodeCertificate(nodeName);
-    //    }
-    //
-    //    
-    //
-    //    /**
-    //     * @param uBody
-    //     * @return returns all entities associated to the node
-    //     */
-    //    public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
-    //        return proActiveRuntime.getEntities(uBody);
-    //    }
-    //
-    //    /**
-    //     * @return returns all entities associated to this runtime
-    //     */
-    //    public ArrayList getEntities() throws RemoteException {
-    //        return proActiveRuntime.getEntities();
-    //    }
+    public PublicKey getPublicKey()
+        throws SecurityNotAvailableException, RemoteException, IOException {
+        return proActiveRuntime.getPublicKey();
+    }
+
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RemoteException, IOException, 
+            RenegotiateSessionException {
+        return proActiveRuntime.randomValue(sessionID, clientRandomValue);
+    }
+
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException, RemoteException, IOException {
+        return proActiveRuntime.publicKeyExchange(sessionID, myPublicKey,
+            myCertificate, signature);
+    }
+
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            RemoteException, IOException {
+        return proActiveRuntime.secretKeyExchange(sessionID, encodedAESKey,
+            encodedIVParameters, encodedClientMacKey, encodedLockData,
+            parametersSignature);
+    }
+
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException, RemoteException, IOException {
+        return proActiveRuntime.getPolicy(securityContext);
+    }
+
+    public byte[] getCertificateEncoded()
+        throws SecurityNotAvailableException, RemoteException, IOException {
+        return proActiveRuntime.getCertificateEncoded();
+    }
+
+    public ArrayList getEntities()
+        throws SecurityNotAvailableException, RemoteException, IOException {
+        return proActiveRuntime.getEntities();
+    }
+
+    public void terminateSession(long sessionID)
+        throws RemoteException, SecurityNotAvailableException, IOException {
+        proActiveRuntime.terminateSession(sessionID);
+    }
 
     /**
      * @throws ProActiveException

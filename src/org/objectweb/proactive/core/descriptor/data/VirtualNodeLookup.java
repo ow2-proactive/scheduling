@@ -343,18 +343,6 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         return virtualNode.getMinNumberOfNodes();
     }
 
-    //  SECURITY
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
-     */
-    public PolicyServer getPolicyServer() {
-        if (!isActivated) {
-            vnLogger.error(notActivatedMessage);
-        }
-        return virtualNode.getPolicyServer();
-    }
-
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
      */

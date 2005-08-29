@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -100,7 +105,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
  * @since   ProActive 0.9.2
  */
 public class ProActiveMetaObjectFactory implements MetaObjectFactory,
-    java.io.Serializable {
+    java.io.Serializable, Cloneable {
     public static final String COMPONENT_PARAMETERS_KEY = "component-parameters";
     public static final String SYNCHRONOUS_COMPOSITE_COMPONENT_KEY = "synchronous-composite";
     protected static Logger logger = Logger.getLogger(ProActiveMetaObjectFactory.class.getName());
@@ -406,5 +411,33 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
 
     public ProActiveSecurityManager getProActiveSecurityManager() {
         return proActiveSecurityManager;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        ProActiveMetaObjectFactory clone = null;
+
+        try {
+            ByteArrayOutputStream bout = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(bout);
+
+            out.writeObject(this);
+            out.flush();
+            bout.close();
+
+            byte[] byteArray = bout.toByteArray();
+
+            bout.close();
+
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
+                        bout.toByteArray()));
+
+            clone = (ProActiveMetaObjectFactory) ois.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return clone;
     }
 }

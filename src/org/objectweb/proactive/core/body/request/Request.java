@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.Securizable;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -56,7 +56,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * @since   ProActive 0.9
  *
  */
-public interface Request extends Message {
+public interface Request extends Message, Securizable {
 
     /**
      * Returns true if the request has been forwarded
@@ -126,12 +126,4 @@ public interface Request extends Message {
      */
     public void notifyReception(UniversalBody bodyReceiver)
         throws java.io.IOException;
-
-    // SECURITY
-    public boolean isCiphered();
-
-    public long getSessionId();
-
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
 }

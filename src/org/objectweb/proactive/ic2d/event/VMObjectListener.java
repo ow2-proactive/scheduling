@@ -41,6 +41,6 @@ public interface VMObjectListener extends MessageMonitoringListener {
     public void nodeObjectAdded(NodeObject nodeObject);
 
     public void nodeObjectRemoved(NodeObject nodeObject);
-	
-	public void vmNotResponding (VMObject vmObject) ;
+
+    public void vmNotResponding(VMObject vmObject);
 }

@@ -28,33 +28,21 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.reply;
+package org.objectweb.proactive.examples.mydiary;
 
-import java.io.IOException;
-
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.body.message.Message;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import java.io.Serializable;
 
 
-public interface Reply extends Message {
-    public FutureResult getResult();
+/**
+ * @author acontes
+ *
+ * This class presents the remotely accessible method of the diary
+ *
+ */
+public interface Diary extends Serializable {
+    public void addEntry(String entry);
 
-    /**
-     * Sends this reply to the body destination
-     * @param destinationBody the body destination of this reply
-     * @return value used by fault-tolerance mechanism.
-     * @exception java.io.IOException if the reply fails to be sent
-     */
-    public int send(UniversalBody destinationBody) throws IOException;
+    public int getNumberOfEntries();
 
-    // SECURITY
-    public boolean isCiphered();
-
-    public long getSessionId();
-
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
+    public String getEntry(int entryNumber);
 }

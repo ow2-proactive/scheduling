@@ -234,4 +234,9 @@ public class AwaitedRequest implements Request, java.io.Serializable {
         throws RenegotiateSessionException {
         return this.wrappedRequest.decrypt(psm);
     }
+
+    public boolean crypt(ProActiveSecurityManager psm,
+        UniversalBody destinationBody) throws RenegotiateSessionException {
+        return this.wrappedRequest.crypt(psm, destinationBody);
+    }
 }

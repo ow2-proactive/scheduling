@@ -124,7 +124,6 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             this.methodBarriers.add(new MethodBarrier(mcbwmn.getMethodNames()));
             this.suspend();
         }
-
         this.notifyAll();
         return ftres;
     }

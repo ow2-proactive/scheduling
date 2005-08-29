@@ -55,13 +55,10 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
-import org.objectweb.proactive.ext.security.Policy;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
@@ -264,23 +261,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(int, org.objectweb.proactive.core.body.UniversalBody)
-     */
-    public void initiateSession(int type, UniversalBody body)
-        throws IOException, CommunicationForbiddenException, 
-            AuthenticationException, RenegotiateSessionException, 
-            SecurityNotAvailableException {
-        if (isLocal) {
-            body.initiateSession(type, body);
-        } else {
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(new Integer(type));
-            paramsList.add(body);
-            new BodyRequest("initiateSession", paramsList, bodyID, this.url).send();
-        }
-    }
-
-    /**
      * @see org.objectweb.proactive.core.body.UniversalBody#terminateSession(long)
      */
     public void terminateSession(long sessionID)
@@ -316,29 +296,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyFrom(java.security.cert.X509Certificate)
-     */
-    public Policy getPolicyFrom(X509Certificate certificate)
-        throws SecurityNotAvailableException, IOException {
-        if (isLocal) {
-            return body.getPolicyFrom(certificate);
-        } else {
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(certificate);
-            BodyRequest req = new BodyRequest("getPolicyFrom", paramsList,
-                    bodyID, this.url);
-            req.send();
-            try {
-                return (Policy) req.getReturnedObject();
-            } catch (SecurityNotAvailableException ex) {
-                throw ex;
-            } catch (Exception e) {
-                throw new HTTPUnexpectedException("Unexpected exception", e);
-            }
-        }
-    }
-
-    /**
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
     public long startNewSession(Communication policy)
@@ -357,34 +314,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
             } catch (RenegotiateSessionException ex1) {
-                throw ex1;
-            } catch (Exception e) {
-                throw new HTTPUnexpectedException("Unexpected exception", e);
-            }
-        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#negociateKeyReceiverSide(org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket, long)
-     */
-    public ConfidentialityTicket negociateKeyReceiverSide(
-        ConfidentialityTicket confidentialityTicket, long sessionID)
-        throws SecurityNotAvailableException, KeyExchangeException, IOException {
-        if (isLocal) {
-            return body.negociateKeyReceiverSide(confidentialityTicket,
-                sessionID);
-        } else {
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(confidentialityTicket);
-            paramsList.add(new Long(sessionID));
-            BodyRequest req = new BodyRequest("negociateKeyReceiverSide",
-                    paramsList, bodyID, this.url);
-            req.send();
-            try {
-                return (ConfidentialityTicket) req.getReturnedObject();
-            } catch (SecurityNotAvailableException ex) {
-                throw ex;
-            } catch (KeyExchangeException ex1) {
                 throw ex1;
             } catch (Exception e) {
                 throw new HTTPUnexpectedException("Unexpected exception", e);
@@ -418,7 +347,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * @see org.objectweb.proactive.core.body.UniversalBody#randomValue(long, byte[])
      */
     public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws SecurityNotAvailableException, Exception {
+        throws SecurityNotAvailableException, IOException, 
+            RenegotiateSessionException {
         if (isLocal) {
             return body.randomValue(sessionID, cl_rand);
         } else {
@@ -429,23 +359,30 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             BodyRequest req = new BodyRequest("randomValue", paramsList,
                     bodyID, this.url);
             req.send();
-            return (byte[]) req.getReturnedObject();
+            try {
+                return (byte[]) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (RenegotiateSessionException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
         }
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
      */
-    public byte[][] publicKeyExchange(long sessionID,
-        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-        byte[] sig_code) throws SecurityNotAvailableException, Exception {
+    public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
+        byte[] my_cert, byte[] sig_code)
+        throws SecurityNotAvailableException, IOException, KeyExchangeException, 
+            RenegotiateSessionException {
         if (isLocal) {
-            return body.publicKeyExchange(sessionID, distantBody, my_pub,
-                my_cert, sig_code);
+            return body.publicKeyExchange(sessionID, my_pub, my_cert, sig_code);
         } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(new Long(sessionID));
-            paramsList.add(distantBody);
             paramsList.add(my_pub);
             paramsList.add(my_cert);
             paramsList.add(sig_code);
@@ -454,16 +391,28 @@ public class HttpRemoteBodyImpl implements RemoteBody {
                     bodyID, this.url);
             req.send();
 
-            return (byte[][]) req.getReturnedObject();
+            try {
+                return (byte[][]) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (RenegotiateSessionException e) {
+                throw e;
+            } catch (KeyExchangeException e) {
+                throw e;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
         }
     }
 
     /**
+     * @throws RenegotiateSessionException
      * @see org.objectweb.proactive.core.body.UniversalBody#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
      */
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws SecurityNotAvailableException, Exception {
+        throws SecurityNotAvailableException, IOException, 
+            RenegotiateSessionException {
         if (isLocal) {
             return body.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3, tmp4);
         } else {
@@ -478,31 +427,12 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             BodyRequest req = new BodyRequest("secretKeyExchange", paramsList,
                     bodyID, this.url);
             req.send();
-            return (byte[][]) req.getReturnedObject();
-        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyTo(java.lang.String, java.lang.String, java.lang.String)
-     */
-    public Communication getPolicyTo(String type, String from, String to)
-        throws SecurityNotAvailableException, IOException {
-        if (isLocal) {
-            return body.getPolicyTo(type, from, to);
-        } else {
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(type);
-            paramsList.add(from);
-            paramsList.add(to);
-
-            BodyRequest req = new BodyRequest("getPolicyTo", paramsList,
-                    bodyID, this.url);
-            req.send();
-
             try {
-                return (Communication) req.getReturnedObject();
+                return (byte[][]) req.getReturnedObject();
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
+            } catch (RenegotiateSessionException e) {
+                throw e;
             } catch (Exception e) {
                 throw new HTTPUnexpectedException("Unexpected exception", e);
             }
@@ -526,27 +456,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
 
             try {
                 return (SecurityContext) req.getReturnedObject();
-            } catch (SecurityNotAvailableException ex) {
-                throw ex;
-            } catch (Exception e) {
-                throw new HTTPUnexpectedException("Unexpected exception", e);
-            }
-        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
-     */
-    public String getVNName() throws SecurityNotAvailableException, IOException {
-        if (isLocal) {
-            return body.getVNName();
-        } else {
-            BodyRequest req = new BodyRequest("getVNName", new ArrayList(),
-                    bodyID, this.url);
-            req.send();
-
-            try {
-                return (String) req.getReturnedObject();
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
             } catch (Exception e) {
@@ -591,28 +500,6 @@ public class HttpRemoteBodyImpl implements RemoteBody {
 
             try {
                 return (ArrayList) req.getReturnedObject();
-            } catch (SecurityNotAvailableException ex) {
-                throw ex;
-            } catch (Exception e) {
-                throw new HTTPUnexpectedException("Unexpected exception", e);
-            }
-        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveSecurityManager()
-     */
-    public ProActiveSecurityManager getProActiveSecurityManager()
-        throws SecurityNotAvailableException, IOException {
-        if (isLocal) {
-            return body.getProActiveSecurityManager();
-        } else {
-            BodyRequest req = new BodyRequest("getProActiveSecurityManager",
-                    new ArrayList(), bodyID, this.url);
-            req.send();
-
-            try {
-                return (ProActiveSecurityManager) req.getReturnedObject();
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
             } catch (Exception e) {

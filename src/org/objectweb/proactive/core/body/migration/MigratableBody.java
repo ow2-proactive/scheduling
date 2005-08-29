@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyImpl;
@@ -44,7 +43,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.ext.security.DefaultEntity;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityMigrationException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
@@ -150,60 +150,45 @@ public class MigratableBody extends BodyImpl implements Migratable,
         nodeURL = node.getNodeInformation().getURL();
 
         try {
-            // security checks
-            try {
-                ProActiveRuntime pr = null;
-                pr = node.getProActiveRuntime();
-                ProActive.loggerSecurity.debug("internal runtime" +
-                    pr.getURL());
-                ArrayList entitiesFrom = null;
-                ArrayList entitiesTo = null;
+            if (this.isSecurityOn) {
+                // security checks
                 try {
+                    ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
+
+                    ArrayList entitiesFrom = null;
+                    ArrayList entitiesTo = null;
+
                     entitiesFrom = this.getEntities();
+                    entitiesTo = runtimeDestination.getEntities();
+
+                    SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
+                            entitiesFrom, entitiesTo);
+
+                    SecurityContext result = null;
+
+                    if (isSecurityOn) {
+                        result = psm.getPolicy(sc);
+
+                        if (!result.isMigration()) {
+                            ProActiveLogger.getLogger("security").info("NOTE : Security manager forbids the migration");
+                            return this;
+                        }
+                    } else {
+                        // no local security but need to check if distant runtime accepts migration
+                        result = runtimeDestination.getPolicy(sc);
+
+                        if (!result.isMigration()) {
+                            ProActiveLogger.getLogger("security").info("NOTE : Security manager forbids the migration");
+                            return this;
+                        }
+                    }
                 } catch (SecurityNotAvailableException e1) {
-                    logger.debug("entitites from not found");
-                    entitiesFrom = new ArrayList();
-                    entitiesFrom.add(new DefaultEntity());
+                    logger.debug("Security not availaible");
+                    e1.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-
-                try {
-                    entitiesTo = pr.getEntities(node.getNodeInformation()
-                                                    .getName());
-                    logger.debug("Node name " +
-                        node.getNodeInformation().getName() + " taille " +
-                        entitiesTo.size());
-                } catch (ProActiveException e1) {
-                    logger.debug("entitites to not found");
-                    entitiesTo = new ArrayList();
-                    entitiesTo.add(new DefaultEntity());
-                }
-
-                SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
-                        entitiesFrom, entitiesTo);
-
-                SecurityContext result = null;
-
-                if (isSecurityOn) {
-                    result = psm.getPolicy(sc);
-
-                    if (!result.isMigration()) {
-                        throw new SecurityMigrationException("migration denied");
-                    }
-                } else {
-                    // no local security but need to check if distant runtime accepts migration
-                    result = pr.getPolicy(sc);
-                    if (!result.isMigration()) {
-                        System.out.println("migration denied");
-                        throw new SecurityMigrationException("migration denied");
-                    }
-                }
-            } catch (SecurityNotAvailableException e1) {
-                logger.debug("Security not availaible");
-                // e1.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-
             nodeURL = node.getNodeInformation().getURL();
 
             // stop accepting communication
@@ -219,7 +204,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
 
             // security
             // save opened sessions
-            if (isSecurityOn) {
+            if (this.isSecurityOn) {
                 openedSessions = psm.getOpenedConnexion();
             }
 
@@ -233,7 +218,9 @@ public class MigratableBody extends BodyImpl implements Migratable,
             nodeURL = saveNodeURL;
             bodyID = savedID;
             localBodyStrategy.getFuturePool().unsetMigrationTag();
-            this.internalBodySecurity.setDistantBody(null);
+            if (this.isSecurityOn) {
+                this.internalBodySecurity.setDistantBody(null);
+            }
             acceptCommunication();
             throw e;
         } catch (ProActiveException e) {
@@ -283,5 +270,9 @@ public class MigratableBody extends BodyImpl implements Migratable,
         }
         in.defaultReadObject();
         hasJustMigrated = true;
+        if (this.isSecurityOn) {
+            internalBodySecurity = new InternalBodySecurity(null);
+            psm.setBody(this);
+        }
     }
 }

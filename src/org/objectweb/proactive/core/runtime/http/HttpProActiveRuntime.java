@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.runtime.http;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
@@ -54,8 +56,11 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.http.messages.RuntimeRequest;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
@@ -64,7 +69,7 @@ import org.objectweb.proactive.osgi.OsgiParameters;
  * An HTTP adapter for a ProActiveRuntime to be able to receive remote calls with HTTP. This helps isolate
  * HTTP specific code into a small set of specific classes.
  * @author ProActiveTeam
- * @version 1.0, 9 août 2005
+ * @version 1.0, 9 ao?t 2005
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
@@ -112,8 +117,9 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vname,
-        String jobId) throws NodeException, HTTPRemoteException {
+        boolean replacePreviousBinding,
+        ProActiveSecurityManager securityManager, String vname, String jobId)
+        throws NodeException, HTTPRemoteException {
         String nodeURL = null;
         try {
             nodeURL = buildNodeURL(nodeName);
@@ -125,13 +131,13 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         String name = UrlBuilder.getNameFromUrl(nodeURL);
 
         if (isLocal) {
-            localruntime.createLocalNode(name, replacePreviousBinding, ps,
-                vname, jobId);
+            localruntime.createLocalNode(name, replacePreviousBinding,
+                securityManager, vname, jobId);
         } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(name);
             paramsList.add(new Boolean(replacePreviousBinding));
-            paramsList.add(ps);
+            paramsList.add(securityManager);
             paramsList.add(vname);
             paramsList.add(jobId);
             RuntimeRequest req = new RuntimeRequest("createLocalNode",
@@ -448,212 +454,6 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         }
     }
 
-    // SECURITY 
-    public PolicyServer getPolicyServer()
-        throws ProActiveException, HTTPRemoteException {
-        if (isLocal) {
-            return localruntime.getPolicyServer();
-        }
-        RuntimeRequest req = new RuntimeRequest("getPolicyServer", this.url);
-        req.send();
-        try {
-            return (PolicyServer) req.getReturnedObject();
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
-    }
-
-    public String getVNName(String nodename)
-        throws ProActiveException, HTTPRemoteException {
-        if (isLocal) {
-            return localruntime.getVNName(nodename);
-        }
-        ArrayList params = new ArrayList();
-        params.add(nodename);
-
-        RuntimeRequest req = new RuntimeRequest("getVNName", params, this.url);
-        req.send();
-        try {
-            return (String) req.getReturnedObject();
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
-    }
-
-    /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     * @throws HTTPRemoteException
-     */
-    public ArrayList getEntities(String nodeName)
-        throws ProActiveException, HTTPRemoteException {
-        if (isLocal) {
-            return localruntime.getEntities(nodeName);
-        }
-        ArrayList params = new ArrayList();
-        params.add(nodeName);
-        RuntimeRequest req = new RuntimeRequest("getEntities", params, this.url);
-        req.send();
-        try {
-            return (ArrayList) req.getReturnedObject();
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
-    }
-
-    public SecurityContext getPolicy(SecurityContext sc)
-        throws ProActiveException, SecurityNotAvailableException, 
-            HTTPRemoteException {
-        if (isLocal) {
-            return localruntime.getPolicy(sc);
-        }
-        ArrayList params = new ArrayList();
-        params.add(sc);
-
-        RuntimeRequest req = new RuntimeRequest("getPolicy", params, this.url);
-        req.send();
-        try {
-            return (SecurityContext) req.getReturnedObject();
-        } catch (SecurityNotAvailableException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
-    }
-
-    //-----------------------------------------
-    //	Security: methods not used 
-    //-----------------------------------------
-    //    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-    //        throws ProActiveException {
-    //        
-    //        ArrayList params = new ArrayList();
-    //        params.add(ps);
-    //
-    //        try {
-    //            new RuntimeRequest("setProActiveSecurityManager", params, this.url).send();
-    //        } catch (HTTPRemoteException e) {
-    //            // TODO Auto-generated catch block
-    //            e.printStackTrace();
-    //        }
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
-    //     */
-    //    public X509Certificate getCreatorCertificate() throws ProActiveException {
-    //        RuntimeRequest req = new RuntimeRequest("getCreatorCertificate",
-    //                this.url);
-    //
-    //        try {
-    //            req.send();
-    //            return (X509Certificate) req.getReturnedObject();
-    //        } catch (Exception e) {
-    //            throw new ProActiveException(e);
-    //        }
-    //    }
-    //
-    //    
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
-    //     */
-    //    public void setDefaultNodeVirtualNodeName(String s)
-    //        throws ProActiveException {
-    //        ArrayList params = new ArrayList();
-    //        params.add(s);
-    //        try {
-    //            new RuntimeRequest("setDefaultNodeVirtualNodeName", params, this.url).send();
-    //        } catch (HTTPRemoteException e) {
-    //            // TODO Auto-generated catch block
-    //            e.printStackTrace();
-    //        }
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
-    //     */
-    //    public PolicyServer getNodePolicyServer(String nodeName)
-    //        throws ProActiveException {
-    //        ArrayList params = new ArrayList();
-    //        params.add(nodeName);
-    //
-    //        RuntimeRequest req = new RuntimeRequest("getNodePolicyServer", params,
-    //                this.url);
-    //
-    //        try {
-    //            req.send();
-    //            return (PolicyServer) req.getReturnedObject();
-    //        } catch (Exception e) {
-    //            throw new ProActiveException(e);
-    //        }
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
-    //     */
-    //    public void enableSecurityIfNeeded() throws ProActiveException {
-    //        try {
-    //            new RuntimeRequest("enableSecurityIfNeeded", this.url).send();
-    //        } catch (HTTPRemoteException e) {
-    //            // TODO Auto-generated catch block
-    //            e.printStackTrace();
-    //        }
-    //    }
-    //
-    //    /* (non-Javadoc)
-    //     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
-    //     */
-    //    public X509Certificate getNodeCertificate(String nodeName)
-    //        throws ProActiveException {
-    //        ArrayList params = new ArrayList();
-    //        params.add(nodeName);
-    //
-    //        RuntimeRequest req = new RuntimeRequest("getNodeCertificate", params,
-    //                this.url);
-    //
-    //        try {
-    //            req.send();
-    //            return (X509Certificate) req.getReturnedObject();
-    //        } catch (Exception e) {
-    //            throw new ProActiveException(e);
-    //        }
-    //    }
-    //
-    //    
-    //
-    //    /**
-    //     * @param uBody
-    //     * @return returns all entities associated to the node
-    //     */
-    //    public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
-    //        ArrayList params = new ArrayList();
-    //        params.add(uBody);
-    //
-    //        RuntimeRequest req = new RuntimeRequest("getEntities", params, this.url);
-    //
-    //        try {
-    //            req.send();
-    //            return (ArrayList) req.getReturnedObject();
-    //        } catch (Exception e) {
-    //            throw new ProActiveException(e);
-    //        }
-    //    }
-    //
-    //    /**
-    //     * @return returns all entities associated to this runtime
-    //     */
-    //    public ArrayList getEntities() throws ProActiveException {
-    //        RuntimeRequest req = new RuntimeRequest("getEntities", this.url);
-    //
-    //        try {
-    //            req.send();
-    //            return (ArrayList) req.getReturnedObject();
-    //        } catch (Exception e) {
-    //            throw new ProActiveException(e);
-    //        }
-    //    }
-
     /**
      * @throws HTTPRemoteException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getJobID(java.lang.String)
@@ -872,5 +672,283 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.isLocal = false;
+    }
+
+    public String getVNName(String nodename)
+        throws ProActiveException, HTTPRemoteException {
+        if (isLocal) {
+            return localruntime.getVNName(nodename);
+        }
+        ArrayList params = new ArrayList();
+        params.add(nodename);
+
+        RuntimeRequest req = new RuntimeRequest("getVNName", params, this.url);
+        req.send();
+        try {
+            return (String) req.getReturnedObject();
+        } catch (Exception e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public X509Certificate getCertificate()
+        throws SecurityNotAvailableException, IOException {
+        if (isLocal) {
+            return localruntime.getCertificate();
+        }
+
+        ArrayList params = new ArrayList();
+
+        RuntimeRequest req = new RuntimeRequest("getCertificate", params,
+                this.url);
+        req.send();
+        try {
+            return (X509Certificate) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public long startNewSession(Communication policy)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        if (isLocal) {
+            return localruntime.startNewSession(policy);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(policy);
+
+        RuntimeRequest req = new RuntimeRequest("startNewSession", params,
+                this.url);
+
+        req.send();
+        try {
+            return ((Long) req.getReturnedObject()).longValue();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
+    public PublicKey getPublicKey()
+        throws SecurityNotAvailableException, IOException {
+        if (isLocal) {
+            return localruntime.getPublicKey();
+        }
+
+        ArrayList params = new ArrayList();
+
+        RuntimeRequest req = new RuntimeRequest("getPublicKey", params, this.url);
+
+        req.send();
+        try {
+            return (PublicKey) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        if (isLocal) {
+            return localruntime.randomValue(sessionID, clientRandomValue);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(new Long(sessionID));
+        params.add(clientRandomValue);
+
+        RuntimeRequest req = new RuntimeRequest("randomValue", params, this.url);
+
+        req.send();
+        try {
+            return (byte[]) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException, IOException {
+        if (isLocal) {
+            return localruntime.publicKeyExchange(sessionID, myPublicKey,
+                myCertificate, signature);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(new Long(sessionID));
+        params.add(myPublicKey);
+        params.add(myCertificate);
+        params.add(signature);
+
+        RuntimeRequest req = new RuntimeRequest("publicKeyExchange", params,
+                this.url);
+
+        req.send();
+        try {
+            return (byte[][]) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        if (isLocal) {
+            return localruntime.secretKeyExchange(sessionID, encodedAESKey,
+                encodedIVParameters, encodedClientMacKey, encodedLockData,
+                parametersSignature);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(new Long(sessionID));
+        params.add(encodedAESKey);
+        params.add(encodedIVParameters);
+        params.add(encodedClientMacKey);
+        params.add(encodedLockData);
+        params.add(parametersSignature);
+
+        RuntimeRequest req = new RuntimeRequest("secretKeyExchange", params,
+                this.url);
+
+        req.send();
+        try {
+            return (byte[][]) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (RenegotiateSessionException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException, IOException {
+        if (isLocal) {
+            return localruntime.getPolicy(securityContext);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(securityContext);
+
+        RuntimeRequest req = new RuntimeRequest("getPolicy", params, this.url);
+
+        req.send();
+        try {
+            return (SecurityContext) req.getReturnedObject();
+        } catch (SecurityNotAvailableException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[] getCertificateEncoded()
+        throws SecurityNotAvailableException, IOException {
+        if (isLocal) {
+            return localruntime.getCertificateEncoded();
+        }
+
+        ArrayList params = new ArrayList();
+
+        RuntimeRequest req = new RuntimeRequest("getCertificateEncoded",
+                params, this.url);
+
+        req.send();
+        try {
+            return (byte[]) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ArrayList getEntities()
+        throws SecurityNotAvailableException, IOException {
+        if (isLocal) {
+            return localruntime.getEntities();
+        }
+
+        ArrayList params = new ArrayList();
+
+        RuntimeRequest req = new RuntimeRequest("getEntities", params, this.url);
+
+        req.send();
+        try {
+            return (ArrayList) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void terminateSession(long sessionID)
+        throws IOException, SecurityNotAvailableException {
+        if (isLocal) {
+            localruntime.terminateSession(sessionID);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(new Long(sessionID));
+
+        RuntimeRequest req = new RuntimeRequest("terminateSession", params,
+                this.url);
+
+        req.send();
+        try {
+            req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

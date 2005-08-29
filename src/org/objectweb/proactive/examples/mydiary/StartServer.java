@@ -28,33 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.reply;
+package org.objectweb.proactive.examples.mydiary;
 
-import java.io.IOException;
-
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.body.message.Message;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
-public interface Reply extends Message {
-    public FutureResult getResult();
+/**
+ * @author acontes
+ *
+ * TODO To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+public class StartServer {
+    public static void main(String[] args) {
+        Diary diary = null;
+        try {
+            ProActiveDescriptor pad = ProActive.getProactiveDescriptor(args[0]);
 
-    /**
-     * Sends this reply to the body destination
-     * @param destinationBody the body destination of this reply
-     * @return value used by fault-tolerance mechanism.
-     * @exception java.io.IOException if the reply fails to be sent
-     */
-    public int send(UniversalBody destinationBody) throws IOException;
+            pad.activateMappings();
 
-    // SECURITY
-    public boolean isCiphered();
-
-    public long getSessionId();
-
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
+            if (args.length == 2) {
+                diary = (Diary) ProActive.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
+                        new Object[] {  });
+            } else {
+                diary = (Diary) ProActive.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
+                        new Object[] { args[1] });
+            }
+            ProActive.register(diary, "//localhost/MyDiary");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

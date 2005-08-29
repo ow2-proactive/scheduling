@@ -224,8 +224,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         (bodiesToContinue.size() != 0)) {
                     ProActiveSecurityManager psm = null;
                     try {
-                        psm = ProActive.getBodyOnThis()
-                                       .getProActiveSecurityManager();
+                        psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
                     } catch (SecurityNotAvailableException e) {
                         psm = null;
                     }
@@ -455,9 +454,12 @@ public class FuturePool extends Object implements java.io.Serializable {
                 waitForAC();
                 while (owner == null) {
                     owner = LocalBodyStore.getInstance().getLocalBody(ownerBody);
+                    // Associating the thred with the body
+                    LocalBodyStore.getInstance().setCurrentThreadBody(owner);
                     // it's a halfbody...
                     if (owner == null) {
                         owner = LocalBodyStore.getInstance().getLocalHalfBody(ownerBody);
+                        LocalBodyStore.getInstance().setCurrentThreadBody(owner);
                     }
                 }
                 if (kill) {

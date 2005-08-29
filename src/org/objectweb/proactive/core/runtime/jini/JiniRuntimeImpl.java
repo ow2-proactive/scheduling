@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
@@ -116,8 +116,9 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     // -- Implements JiniRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vnname,
-        String jobId) throws RemoteException, NodeException {
+        boolean replacePreviousBinding,
+        ProActiveSecurityManager securityManager, String vnname, String jobId)
+        throws RemoteException, NodeException {
         //counter used to check that the node has been registered at 
         //least once as jini service
         //int counter = 0;
@@ -137,8 +138,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
             //System.out.println("name is : "+ name);
             //System.out.println("url is : "+ nodeURL);
             //create the node with the name 
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding, ps,
-                vnname, jobId);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding,
+                securityManager, vnname, jobId);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }

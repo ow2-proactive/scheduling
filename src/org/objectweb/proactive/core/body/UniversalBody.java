@@ -47,13 +47,13 @@ import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
-import org.objectweb.proactive.ext.security.Policy;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityEntity;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
@@ -70,7 +70,8 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RmiBodyAdapter
  */
-public interface UniversalBody extends NFEProducer, Job, Serializable {
+public interface UniversalBody extends NFEProducer, Job, Serializable,
+    SecurityEntity {
     public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
 
     /**
@@ -177,71 +178,6 @@ public interface UniversalBody extends NFEProducer, Job, Serializable {
      */
     public void removeImmediateService(String methodName,
         Class[] parametersTypes) throws IOException;
-
-    // SECURITY
-    public void initiateSession(int type, UniversalBody body)
-        throws java.io.IOException, CommunicationForbiddenException, 
-            AuthenticationException, RenegotiateSessionException, 
-            SecurityNotAvailableException;
-
-    public void terminateSession(long sessionID)
-        throws java.io.IOException, SecurityNotAvailableException;
-
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public ProActiveSecurityManager getProActiveSecurityManager()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public Policy getPolicyFrom(X509Certificate certificate)
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, java.io.IOException, 
-            RenegotiateSessionException;
-
-    public ConfidentialityTicket negociateKeyReceiverSide(
-        ConfidentialityTicket confidentialityTicket, long sessionID)
-        throws SecurityNotAvailableException, KeyExchangeException, 
-            java.io.IOException;
-
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws SecurityNotAvailableException, Exception;
-
-    public byte[][] publicKeyExchange(long sessionID,
-        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-        byte[] sig_code)
-        throws SecurityNotAvailableException, Exception, 
-            RenegotiateSessionException;
-
-    byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-        byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws SecurityNotAvailableException, Exception, 
-            RenegotiateSessionException;
-
-    public Communication getPolicyTo(String type, String from, String to)
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    public SecurityContext getPolicy(SecurityContext securityContext)
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    /**
-     * @return name of the virtual node where the object has been created
-     */
-    public String getVNName()
-        throws SecurityNotAvailableException, java.io.IOException;
-
-    /**
-     * @return object's X509Certificate as byte array
-     */
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException;
-
-    public ArrayList getEntities()
-        throws SecurityNotAvailableException, IOException;
 
     // FAULT TOLERANCE
 

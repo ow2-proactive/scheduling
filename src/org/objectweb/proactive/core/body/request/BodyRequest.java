@@ -79,6 +79,11 @@ public class BodyRequest extends MessageImpl implements Request,
         return 0;
     }
 
+    public boolean crypt(ProActiveSecurityManager psm,
+        UniversalBody destinationBody) {
+        return true;
+    }
+
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //

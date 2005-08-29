@@ -46,12 +46,7 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
-import org.objectweb.proactive.ext.security.Policy;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
@@ -264,26 +259,15 @@ public abstract class BodyAdapter implements UniversalBody {
         proxiedRemoteBody.removeImmediateService(methodName, parametersTypes);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(int, org.objectweb.proactive.core.body.UniversalBody)
-     */
-    public void initiateSession(int type, UniversalBody body)
-        throws IOException, CommunicationForbiddenException, 
-            AuthenticationException, RenegotiateSessionException, 
-            SecurityNotAvailableException {
-        proxiedRemoteBody.initiateSession(type, body);
-    }
+    //--------------------------------------------
+    // implements SecurityEntity
+    //--------------------------------------------
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#terminateSession(long)
-     */
-    public void terminateSession(long sessionID)
-        throws IOException, SecurityNotAvailableException {
-        proxiedRemoteBody.terminateSession(sessionID);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificate()
+     * entity certificate
+     * @return returns entity certificate
+     * @throws SecurityNotAvailableException if security is not available
+     * @throws java.io.IOException if communication fails
      */
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
@@ -291,42 +275,22 @@ public abstract class BodyAdapter implements UniversalBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveSecurityManager()
-     */
-    public ProActiveSecurityManager getProActiveSecurityManager()
-        throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getProActiveSecurityManager();
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyFrom(java.security.cert.X509Certificate)
-     */
-    public Policy getPolicyFrom(X509Certificate certificate)
-        throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getPolicyFrom(certificate);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
+     * start an unvalidated empty session
+     * @param policy policy associated to the session
+     * @return session ID
+     * @throws SecurityNotAvailableException if security is not available
+     * @throws RenegotiateSessionException if the session immediatly expires
      */
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException, 
-            RenegotiateSessionException {
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
         return proxiedRemoteBody.startNewSession(policy);
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#negociateKeyReceiverSide(org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket, long)
-     */
-    public ConfidentialityTicket negociateKeyReceiverSide(
-        ConfidentialityTicket confidentialityTicket, long sessionID)
-        throws SecurityNotAvailableException, KeyExchangeException, IOException {
-        return proxiedRemoteBody.negociateKeyReceiverSide(confidentialityTicket,
-            sessionID);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPublicKey()
+     * entity public key
+     * @return returns entity public key
+     * @throws SecurityNotAvailableException
      */
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
@@ -334,46 +298,75 @@ public abstract class BodyAdapter implements UniversalBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#randomValue(long, byte[])
+     * Exchange random value between client and server entity
+     * @param sessionID the session ID
+     * @param clientRandomValue client random value
+     * @return server random value
+     * @throws SecurityNotAvailableException if the security is not available
+     * @throws RenegotiateSessionException if the session has expired
      */
-    public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws SecurityNotAvailableException, Exception {
-        return proxiedRemoteBody.randomValue(sessionID, cl_rand);
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        return proxiedRemoteBody.randomValue(sessionID, clientRandomValue);
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
+     * exchange entity certificate and/or public key if certificate are not available
+     * @param sessionID the session ID
+     * @param myPublicKey encoded public key
+     * @param myCertificate encoded certificate
+     * @param signature encoded signature of previous paramaters
+     * @return an array containing :
+     *           - server certificate and/or server public key
+     *           - encoded signature of these parameters
+     * @throws SecurityNotAvailableException if the security is not available
+     * @throws RenegotiateSessionException if the session has expired
+     * @throws KeyExchangeException if a key data/length/algorithm is not supported
      */
-    public byte[][] publicKeyExchange(long sessionID,
-        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-        byte[] sig_code)
-        throws SecurityNotAvailableException, Exception, 
-            RenegotiateSessionException {
-        return proxiedRemoteBody.publicKeyExchange(sessionID, distantBody,
-            my_pub, my_cert, sig_code);
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException, IOException {
+        return proxiedRemoteBody.publicKeyExchange(sessionID, myPublicKey,
+            myCertificate, signature);
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
+     * this method sends encoded secret parameters to the target entity
+     * @param sessionID session ID
+     * @param encodedAESKey the AES key use to exchange secret message
+     * @param encodedIVParameters Initilization parameters for the AES key
+     * @param encodedClientMacKey MAC key for checking signature of future messages
+     * @param encodedLockData random value to prevent message replays by an external attacker
+     * @param parametersSignature encoded signature of the previous parameters
+     * @return an array containing  :
+     *             - encoded server AES key
+     *             - encoded IV parameters
+     *             - encoded server MAC key
+     *             - encoded lock data to prevent message replays
+     *             - encoded signature of previous parameters
+     * @throws SecurityNotAvailableException if this entity does not support security
+     * @throws RenegotiateSessionException if the session has expired or has been cancelled during this exchange
+     * @throws java.io.IOException if communication fails
      */
-    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-        byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws SecurityNotAvailableException, Exception, 
-            RenegotiateSessionException {
-        return proxiedRemoteBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
-            tmp3, tmp4);
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            IOException {
+        return proxiedRemoteBody.secretKeyExchange(sessionID, encodedAESKey,
+            encodedIVParameters, encodedClientMacKey, encodedLockData,
+            parametersSignature);
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyTo(java.lang.String, java.lang.String, java.lang.String)
-     */
-    public Communication getPolicyTo(String type, String from, String to)
-        throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getPolicyTo(type, from, to);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     * Ask the entity to fill the securityContext parameters with its own policy
+     * according to the communication details contained in the given securityContext
+     * @param securityContext communication details allowing the entity to
+     * look for a matching policy
+     * @return securityContext filled with this entity's policy
+     * @throws SecurityNotAvailableException thrown the entity doest not support the security
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
@@ -381,14 +374,8 @@ public abstract class BodyAdapter implements UniversalBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
-     */
-    public String getVNName() throws SecurityNotAvailableException, IOException {
-        return proxiedRemoteBody.getVNName();
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+     * Entity's X509Certificate as byte array
+     * @return entity's X509Certificate as byte array
      */
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
@@ -396,16 +383,28 @@ public abstract class BodyAdapter implements UniversalBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
+     * Retrieves all the entity's ID which contain this entity plus this entity ID.
+     * @return returns all the entity's ID which contain this entity plus this entity ID.
+     * @throws SecurityNotAvailableException if the target entity does not support security
      */
     public ArrayList getEntities()
         throws SecurityNotAvailableException, IOException {
         return proxiedRemoteBody.getEntities();
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
+    /**
+     * terminate a given session
+     * @param sessionID
+     * @throws SecurityNotAvailableException id security is not available
      */
+    public void terminateSession(long sessionID)
+        throws SecurityNotAvailableException, IOException {
+        proxiedRemoteBody.terminateSession(sessionID);
+    }
+
+    /* (non-Javadoc)
+      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
+      */
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(ev);
     }

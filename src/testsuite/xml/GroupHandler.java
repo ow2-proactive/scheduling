@@ -107,7 +107,7 @@ public class GroupHandler {
         }
 
         private int indexGlobal = 0;
-        
+
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String dir = attributes.getValue("dir");
@@ -138,8 +138,6 @@ public class GroupHandler {
             }
             manager.add(group);
         }
-
-
 
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {

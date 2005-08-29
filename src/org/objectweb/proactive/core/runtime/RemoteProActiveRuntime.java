@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -47,8 +49,12 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityEntity;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
@@ -62,12 +68,13 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public interface RemoteProActiveRuntime extends Serializable {
+public interface RemoteProActiveRuntime extends Serializable, SecurityEntity {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String VNname,
-        String jobId) throws IOException, NodeException;
+        boolean replacePreviousBinding,
+        ProActiveSecurityManager securityManager, String VNname, String jobId)
+        throws IOException, NodeException;
 
     public void killAllNodes() throws IOException, ProActiveException;
 
@@ -139,67 +146,6 @@ public interface RemoteProActiveRuntime extends Serializable {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws IOException, ProActiveException;
 
-    //Security
-    public PolicyServer getPolicyServer()
-        throws IOException, ProActiveException;
-
-    /**
-     * @param sc
-     */
-    public SecurityContext getPolicy(SecurityContext sc)
-        throws IOException, SecurityNotAvailableException, ProActiveException;
-
-    /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     */
-    public ArrayList getEntities(String nodeName)
-        throws IOException, ProActiveException;
-
-    public String getVNName(String Nodename)
-        throws IOException, ProActiveException;
-
-    //  -----------------------------------------
-    //	Security: methods not used 
-    //-----------------------------------------
-    //    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-    //    throws IOException, ProActiveException;
-    //        /**
-    //         * @return creator certificate
-    //         */
-    //        public X509Certificate getCreatorCertificate()
-    //            throws IOException;
-    //        /**
-    //         * @param s
-    //         */
-    //        public void setDefaultNodeVirtualNodeNAme(String s)
-    //            throws IOException;
-    //
-    //        public PolicyServer getNodePolicyServer(String nodeName)
-    //            throws IOException;
-    //
-    //        /**
-    //         *  sets all needed modifications to enable security components
-    //         * MUST be called when the descriptor is ready
-    //         */
-    //        public void enableSecurityIfNeeded() throws IOException;
-    //
-    //        public X509Certificate getNodeCertificate(String nodeName)
-    //            throws IOException;
-    //
-    //       
-    //
-    //        /**
-    //         * @param uBody
-    //         * @return returns all entities associated to the node
-    //         */
-    //        public ArrayList getEntities(UniversalBody uBody) throws IOException;
-    //
-    //        /**
-    //         * @return returns all entities associated to this runtime
-    //         */
-    //        public ArrayList getEntities() throws IOException;
-
     /**
      * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
      */
@@ -212,6 +158,9 @@ public interface RemoteProActiveRuntime extends Serializable {
     public byte[] getClassDataFromThisRuntime(String className)
         throws IOException, ProActiveException;
 
+    public String getVNName(String Nodename)
+        throws IOException, ProActiveException;
+
     public void launchMain(String className, String[] parameters)
         throws IOException, ClassNotFoundException, NoSuchMethodException, 
             ProActiveException;
@@ -221,4 +170,129 @@ public interface RemoteProActiveRuntime extends Serializable {
 
     public ProActiveDescriptor getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException;
+
+    //Security
+
+    /**
+     * entity certificate
+     * @return returns entity certificate
+     * @throws SecurityNotAvailableException if security is not available
+     * @throws java.io.IOException if communication fails
+     */
+    public X509Certificate getCertificate()
+        throws SecurityNotAvailableException, java.io.IOException;
+
+    /**
+     * start an unvalidated empty session
+     * @param policy policy associated to the session
+     * @return session ID
+     * @throws SecurityNotAvailableException if security is not available
+     * @throws RenegotiateSessionException if the session immediatly expires
+     * @throws java.io.IOException if communication fails
+     */
+    public long startNewSession(Communication policy)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            java.io.IOException;
+
+    /**
+     * entity public key
+     * @return returns entity public key
+     * @throws SecurityNotAvailableException
+     * @throws java.io.IOException
+     */
+    public PublicKey getPublicKey()
+        throws SecurityNotAvailableException, java.io.IOException;
+
+    /**
+     * Exchange random value between client and server entity
+     * @param sessionID the session ID
+     * @param clientRandomValue client random value
+     * @return server random value
+     * @throws SecurityNotAvailableException if the security is not available
+     * @throws RenegotiateSessionException if the session has expired
+     * @throws java.io.IOException if communication fails
+     */
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            java.io.IOException;
+
+    /**
+     * exchange entity certificate and/or public key if certificate are not available
+     * @param sessionID the session ID
+     * @param myPublicKey encoded public key
+     * @param myCertificate encoded certificate
+     * @param signature encoded signature of previous paramaters
+     * @return an array containing :
+     *           - server certificate and/or server public key
+     *           - encoded signature of these parameters
+     * @throws SecurityNotAvailableException if the security is not available
+     * @throws RenegotiateSessionException if the session has expired
+     * @throws KeyExchangeException if a key data/length/algorithm is not supported
+     * @throws java.io.IOException if communication fails
+     */
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException, java.io.IOException;
+
+    /**
+     * this method sends encoded secret parameters to the target entity
+     * @param sessionID session ID
+     * @param encodedAESKey the AES key use to exchange secret message
+     * @param encodedIVParameters Initilization parameters for the AES key
+     * @param encodedClientMacKey MAC key for checking signature of future messages
+     * @param encodedLockData random value to prevent message replays by an external attacker
+     * @param parametersSignature encoded signature of the previous parameters
+     * @return an array containing  :
+     *             - encoded server AES key
+     *             - encoded IV parameters
+     *             - encoded server MAC key
+     *             - encoded lock data to prevent message replays
+     *             - encoded signature of previous parameters
+     * @throws SecurityNotAvailableException if this entity does not support security
+     * @throws RenegotiateSessionException if the session has expired or has been cancelled during this exchange
+     * @throws java.io.IOException if communication fails
+     */
+    byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            java.io.IOException;
+
+    /**
+     * Ask the entity to fill the securityContext parameters with its own policy
+     * according to the communication details contained in the given securityContext
+     * @param securityContext communication details allowing the entity to
+     * look for a matching policy
+     * @return securityContext filled with this entity's policy
+     * @throws SecurityNotAvailableException thrown the entity doest not support the security
+     * @throws java.io.IOException throw when a communication with entity's parent fails.
+     */
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException, java.io.IOException;
+
+    /**
+     * Entity's X509Certificate as byte array
+     * @return entity's X509Certificate as byte array
+     */
+    public byte[] getCertificateEncoded()
+        throws SecurityNotAvailableException, java.io.IOException;
+
+    /**
+     * Retrieves all the entity's ID which contain this entity plus this entity ID.
+     * @return returns all the entity's ID which contain this entity plus this entity ID.
+     * @throws SecurityNotAvailableException if the target entity does not support security
+     * @throws java.io.IOException if the communication with one of the entity's parent entities fails
+     */
+    public ArrayList getEntities()
+        throws SecurityNotAvailableException, java.io.IOException;
+
+    /**
+     * terminate a given session
+     * @param sessionID
+     * @throws java.io.IOException if communication fails
+     * @throws SecurityNotAvailableException id security is not available
+     */
+    public void terminateSession(long sessionID)
+        throws java.io.IOException, SecurityNotAvailableException;
 }

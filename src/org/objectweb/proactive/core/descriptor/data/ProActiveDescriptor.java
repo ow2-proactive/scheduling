@@ -295,10 +295,11 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     // SECURITY
 
     /**
-     * Intialize application security policy
-     * @param file
+     * Creates the initial Security Manager associated to an application
+     * @param file contains all related security information for the application :
+     * certificate, policy rules, ...
      */
-    public void createPolicyServer(String file);
+    public void createProActiveSecurityManager(String file);
 
     public PolicyServer getPolicyServer();
 

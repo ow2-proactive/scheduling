@@ -59,8 +59,6 @@ public class MessageImpl implements Message, java.io.Serializable {
     /** the time the message has been issued or deserialized */
     protected transient long timeStamp;
     protected boolean isOneWay;
-    protected long sessionID;
-    protected boolean ciphered;
 
     // FAULT TOLERANCE
 

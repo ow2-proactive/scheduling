@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -40,6 +41,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -48,6 +50,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -300,9 +304,22 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      * @throws ProActiveException
      */
     private Node createNewNode() throws NodeException, ProActiveException {
+        // security 
+        ProActiveSecurityManager newNodeSecurityManager = null;
+
+        try {
+            newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+                                      .generateSiblingCertificate(P2PConstants.VN_NAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            // well nothing to do except maybe log it
+            ProActiveLogger.getLogger(Loggers.SECURITY_NODE).debug("Node created without security manager");
+        }
+
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
-                "_" + this.nodeCounter++, true,
-                this.proactiveRuntime.getPolicyServer(), P2PConstants.VN_NAME);
+                "_" + this.nodeCounter++, true, newNodeSecurityManager,
+                P2PConstants.VN_NAME);
         this.availbaleNodes.add(newNode);
         logger.info("New shared node created @" +
             newNode.getNodeInformation().getURL());

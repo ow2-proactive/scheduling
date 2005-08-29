@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.UnmarshalException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
@@ -46,8 +48,11 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
@@ -111,11 +116,12 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(java.lang.String, boolean, org.objectweb.proactive.ext.security.PolicyServer, java.lang.String, java.lang.String)
      */
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer policyServer,
-        String vnName, String jobId) throws NodeException {
+        boolean replacePreviousBinding,
+        ProActiveSecurityManager securityManager, String vnName, String jobId)
+        throws NodeException {
         try {
             return proActiveRuntime.createLocalNode(nodeName,
-                replacePreviousBinding, policyServer, vnName, jobId);
+                replacePreviousBinding, securityManager, vnName, jobId);
         } catch (IOException e) {
             throw new NodeException(e);
         }
@@ -422,44 +428,109 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
         }
     }
 
-    //-------------
-    // Security
-    //-------------
-
-    /**
-     * @throws ProActiveException
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicyServer()
-     */
-    public PolicyServer getPolicyServer() throws ProActiveException {
+    //
+    // Implements SecurityEntity Interface
+    //
+    public X509Certificate getCertificate()
+        throws SecurityNotAvailableException {
         try {
-            return proActiveRuntime.getPolicyServer();
+            return proActiveRuntime.getCertificate();
         } catch (IOException e) {
-            throw new ProActiveException(e);
+            e.printStackTrace();
+            return null;
         }
     }
 
-    /**
-     * @throws ProActiveException
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
-     */
-    public ArrayList getEntities(String nodeName) throws ProActiveException {
+    public long startNewSession(Communication policy)
+        throws SecurityNotAvailableException, RenegotiateSessionException {
         try {
-            return proActiveRuntime.getEntities(nodeName);
+            return proActiveRuntime.startNewSession(policy);
         } catch (IOException e) {
-            throw new ProActiveException(e);
+            e.printStackTrace();
+            return 0;
         }
     }
 
-    /**
-     * @throws ProActiveException
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-     */
-    public SecurityContext getPolicy(SecurityContext sc)
-        throws SecurityNotAvailableException, ProActiveException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException {
         try {
-            return proActiveRuntime.getPolicy(sc);
+            return proActiveRuntime.getPublicKey();
         } catch (IOException e) {
-            throw new ProActiveException(e);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
+        throws SecurityNotAvailableException, RenegotiateSessionException {
+        try {
+            return proActiveRuntime.randomValue(sessionID, clientRandomValue);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
+        byte[] myCertificate, byte[] signature)
+        throws SecurityNotAvailableException, RenegotiateSessionException, 
+            KeyExchangeException {
+        try {
+            return proActiveRuntime.publicKeyExchange(sessionID, myPublicKey,
+                myCertificate, signature);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
+        byte[] encodedIVParameters, byte[] encodedClientMacKey,
+        byte[] encodedLockData, byte[] parametersSignature)
+        throws SecurityNotAvailableException, RenegotiateSessionException {
+        try {
+            return proActiveRuntime.secretKeyExchange(sessionID, encodedAESKey,
+                encodedIVParameters, encodedClientMacKey, encodedLockData,
+                parametersSignature);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException {
+        try {
+            return proActiveRuntime.getPolicy(securityContext);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
+        try {
+            return proActiveRuntime.getCertificateEncoded();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public ArrayList getEntities() throws SecurityNotAvailableException {
+        try {
+            return proActiveRuntime.getEntities();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void terminateSession(long sessionID)
+        throws SecurityNotAvailableException {
+        try {
+            proActiveRuntime.terminateSession(sessionID);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

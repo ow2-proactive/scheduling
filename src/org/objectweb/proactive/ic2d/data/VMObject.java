@@ -73,7 +73,6 @@ public class VMObject extends AbstractDataObject {
 
         //System.out.println("current host: "+currentHost);
         try {
-            // TODO add security here
             SPY_LISTENER_NODE = NodeFactory.createNode(UrlBuilder.buildUrlFromProperties(
                         currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
         } catch (NodeException e) {
@@ -346,12 +345,12 @@ public class VMObject extends AbstractDataObject {
                    controller.log("Now removing the VM from IC2D") ;
                    System.out.println ("remove " + vmid + " VM") ;
                    //getTypedParent().removeVMObject(vmid) ;
-        
+
                    killVM() ;
                    //destroyObject();
                    destroy() ;
                    lastNotRespondingTime = -1 ;
-        
+
            }
          */
 

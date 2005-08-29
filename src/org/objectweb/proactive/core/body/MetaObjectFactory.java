@@ -138,4 +138,6 @@ public interface MetaObjectFactory {
     public ProActiveSecurityManager getProActiveSecurityManager();
 
     public void setProActiveSecurityManager(ProActiveSecurityManager psm);
+
+    public Object clone() throws CloneNotSupportedException;
 }

@@ -83,14 +83,24 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
+
+import ibis.rmi.RemoteException;
 
 
 public class ProActive {
     protected final static Logger logger = Logger.getLogger(ProActive.class.getName());
-    public final static Logger loggerSecurity = Logger.getLogger("SECURITY");
     public final static Logger loggerGroup = Logger.getLogger("GROUP");
     public final static Logger loggerNFE = Logger.getLogger("NFE");
+
+    /** Used for profiling */
+    private static CompositeAverageMicroTimer timer;
 
     //
     // -- STATIC MEMBERS -----------------------------------------------
@@ -260,10 +270,37 @@ public class ProActive {
             factory = ProActiveMetaObjectFactory.newInstance();
         }
 
+        if (Profiling.SECURITY) {
+            if (timer == null) {
+                timer = new CompositeAverageMicroTimer("newActiveSecurityTimer");
+                PAProfilerEngine.registerTimer(timer);
+            }
+            timer.setTimer("constructing certificate");
+            timer.start();
+        }
+
+        MetaObjectFactory clonedFactory = factory;
+
+        ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
+        if (factorySM != null) {
+            try {
+                clonedFactory = (MetaObjectFactory) factory.clone();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
+            ProActiveSecurityManager psm = clonedFactory.getProActiveSecurityManager();
+            psm = psm.generateSiblingCertificate(classname);
+            clonedFactory.setProActiveSecurityManager(psm);
+        }
+        if (Profiling.SECURITY) {
+            timer.stop();
+        }
+
         try {
-            // create stub object
+            //          create stub object
             Object stub = createStubObject(classname, constructorParameters,
-                    node, activity, factory);
+                    node, activity, clonedFactory);
 
             return stub;
         } catch (MOPException e) {
@@ -566,9 +603,26 @@ public class ProActive {
             factory = ProActiveMetaObjectFactory.newInstance();
         }
 
+        ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
+
+        MetaObjectFactory clonedFactory = factory;
+
+        if (factorySM != null) {
+            try {
+                clonedFactory = (MetaObjectFactory) factory.clone();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
+            clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
+                                                             .generateSiblingCertificate(nameOfTargetType));
+
+            ProActiveLogger.getLogger(Loggers.SECURITY).debug("new active object with security manager");
+        }
+
         try {
             return createStubObject(target, nameOfTargetType, node, activity,
-                factory);
+                clonedFactory);
         } catch (MOPException e) {
             Throwable t = e;
 

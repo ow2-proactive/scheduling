@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -139,8 +140,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /** represents the sum of the timeout + current time in ms*/
     protected long globalTimeOut;
     private Object uniqueActiveObject = null;
-    private X509Certificate creatorCertificate;
-    private PolicyServer policyServer;
+
+    // Security 
+    private ProActiveSecurityManager proactiveSecurityManager;
     private String policyServerFile;
     protected String jobID = ProActive.getJobId();
 
@@ -169,8 +171,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Contructs a new intance of VirtualNode
      */
-    VirtualNodeImpl(String name, X509Certificate creatorCertificate,
-        PolicyServer policyServer, String padURL, boolean isMainVN) {
+    VirtualNodeImpl(String name,
+        ProActiveSecurityManager proactiveSecurityManager, String padURL,
+        boolean isMainVN) {
         this.name = name;
         virtualMachines = new java.util.ArrayList(5);
         localVirtualMachines = new java.util.ArrayList();
@@ -183,8 +186,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         // SECURITY
-        this.creatorCertificate = creatorCertificate;
-        this.policyServer = policyServer;
+        this.proactiveSecurityManager = proactiveSecurityManager;
+
         // added for main infos
         this.mainVirtualNode = isMainVN;
         this.padURL = padURL;
@@ -674,19 +677,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
-                    PolicyServer nodePolicyServer = null;
-                    if (policyServer != null) {
-                        nodePolicyServer = (PolicyServer) policyServer.clone();
-                        nodePolicyServer.generateEntityCertificate(name);
+                    ProActiveSecurityManager siblingPSM = null;
+
+                    if (proactiveSecurityManager != null) {
+                        siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
                     }
 
                     proActiveRuntimeRegistered.createLocalNode(url, false,
-                        nodePolicyServer, this.getName(), this.jobID);
+                        siblingPSM, this.getName(), this.jobID);
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 }
             } catch (ProActiveException e) {
-                e.printStackTrace();
-            } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
         }
@@ -714,19 +715,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
-                    PolicyServer nodePolicyServer = null;
-                    if (policyServer != null) {
-                        nodePolicyServer = (PolicyServer) policyServer.clone();
+                    ProActiveSecurityManager siblingPSM = null;
 
-                        nodePolicyServer.generateEntityCertificate(name);
+                    if (proactiveSecurityManager != null) {
+                        siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
                     }
 
                     proActiveRuntimeRegistered.createLocalNode(url, false,
-                        nodePolicyServer, this.getName(), this.jobID);
+                        siblingPSM, this.getName(), this.jobID);
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 } catch (ProActiveException e) {
-                    e.printStackTrace();
-                } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
             }
@@ -798,30 +796,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         return minNumberOfNodes;
     }
 
-    //  SECURITY
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
-     */
-    public PolicyServer getPolicyServer() {
-        return policyServer;
-    }
-
-    /**
-     * @param server
-     */
-    public void setPolicyServer(PolicyServer server) {
-        // logger.debug("Setting PolicyServer " + server + " to VN " +name);
-        policyServer = server;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyFile(java.lang.String)
-     */
-    public void setPolicyFile(String file) {
-        policyServerFile = file;
-    }
-
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
      */
@@ -848,15 +822,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         protocol));
 
             //create the node
-            PolicyServer nodePolicyServer = null;
-            if (policyServer != null) {
-                nodePolicyServer = (PolicyServer) policyServer.clone();
+            ProActiveSecurityManager siblingPSM = null;
 
-                nodePolicyServer.generateEntityCertificate(name);
+            if (proactiveSecurityManager != null) {
+                siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
             }
 
-            url = defaultRuntime.createLocalNode(nodeName, false,
-                    nodePolicyServer, this.getName(), ProActive.getJobId());
+            url = defaultRuntime.createLocalNode(nodeName, false, siblingPSM,
+                    this.getName(), ProActive.getJobId());
             //add this node to this virtualNode
             performOperations(defaultRuntime, url, protocol);
         } catch (Exception e) {

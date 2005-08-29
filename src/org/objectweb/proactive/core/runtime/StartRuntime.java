@@ -81,7 +81,6 @@ public class StartRuntime {
             this.nodeURL = args[0];
             this.creatorID = args[0].trim();
             //System.out.println(creatorID);
-            //this.defaultRuntimeURL = args[1];
             this.defaultRuntimeURL = parse(args[1]);
             //this.acquisitionMethod = args[2];
             this.nodeNumber = args[2];

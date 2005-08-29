@@ -38,6 +38,7 @@ import java.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
@@ -47,8 +48,10 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.crypto.Session;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
@@ -60,6 +63,7 @@ public class RequestImpl extends MessageImpl implements Request,
     public static Logger logger = Logger.getLogger(RequestImpl.class.getName());
     public static Logger loggerNFE = Logger.getLogger("NFE");
     protected MethodCall methodCall;
+    protected boolean ciphered;
 
     /**
      * Indicates if the method has been sent through a forwarder
@@ -196,7 +200,7 @@ public class RequestImpl extends MessageImpl implements Request,
     protected Reply createReply(Body targetBody, FutureResult result) {
         ProActiveSecurityManager psm = null;
         try {
-            psm = ProActive.getBodyOnThis().getProActiveSecurityManager();
+            psm = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager();
         } catch (java.io.IOException e) {
             e.printStackTrace();
         } catch (SecurityNotAvailableException e) {
@@ -207,12 +211,13 @@ public class RequestImpl extends MessageImpl implements Request,
             result, psm);
     }
 
-    protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(" sending request " + methodCall.getName());
-        }
+    public boolean crypt(ProActiveSecurityManager psm,
+        UniversalBody destinationBody) throws RenegotiateSessionException {
         try {
+            if (logger.isDebugEnabled()) {
+                ProActiveLogger.getLogger("security.request").debug(" sending request " +
+                    methodCall.getName());
+            }
             if (!ciphered && !hasBeenForwarded()) {
                 sessionID = 0;
 
@@ -220,26 +225,39 @@ public class RequestImpl extends MessageImpl implements Request,
                     logger.warn("sender is null but why ?");
                 }
 
-                this.psm = sender.getProActiveSecurityManager();
-
                 byte[] certE = destinationBody.getCertificateEncoded();
                 X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
                 sessionID = psm.getSessionIDTo(cert);
-                System.out.println("session ID is : " + sessionID);
                 if (sessionID != 0) {
-                    methodCallCiphered = psm.encrypt(sessionID, methodCall);
+                    methodCallCiphered = psm.encrypt(sessionID, methodCall,
+                            Session.ACT_AS_CLIENT);
                     ciphered = true;
                     methodCall = null;
-
-                    System.out.println("methodcallciphered " +
-                        methodCallCiphered + ", ciphered " + ciphered +
-                        ", methodCall " + methodCall);
+                    if (logger.isDebugEnabled()) {
+                        ProActiveLogger.getLogger("security.request").debug("methodcallciphered " +
+                            methodCallCiphered + ", ciphered " + ciphered +
+                            ", methodCall " + methodCall);
+                    }
                 }
             }
         } catch (SecurityNotAvailableException e) {
             // do nothing
-            //e.printStackTrace();
+            //  e.printStackTrace();
             logger.debug("Request : security disabled");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    protected int sendRequest(UniversalBody destinationBody)
+        throws java.io.IOException, RenegotiateSessionException {
+        try {
+            this.crypt(((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager(),
+                destinationBody);
+        } catch (SecurityNotAvailableException e) {
+            //TODO remove SecurityNotAvalaible e.printStackTrace();
         }
 
         int ftres = destinationBody.receiveRequest(this);
@@ -260,13 +278,19 @@ public class RequestImpl extends MessageImpl implements Request,
         throws RenegotiateSessionException {
         //  String localCodeBase = null;
         //     if (ciphered) {
-        if (ciphered) {
-            try {
-                //System.out.println("PSM " + psm);
-                byte[] decryptedMethodCall = psm.decrypt(sessionID,
-                        methodCallCiphered);
+        ProActiveLogger.getLogger("security.request").debug(" RequestImpl " +
+            sessionID + " decrypt : methodcallciphered " + methodCallCiphered +
+            ", ciphered " + ciphered + ", methodCall " + methodCall);
 
-                // System.out.println("ReceiveRequest :method call apres decryption : " +  ProActiveSecurityManager.displayByte(decryptedMethodCall));
+        if ((ciphered) && (psm != null)) {
+            try {
+                ProActiveLogger.getLogger("security.request").debug("ReceiveRequest : this body is " +
+                    psm.getCertificate().getSubjectDN() + " " +
+                    psm.getCertificate().getPublicKey());
+                byte[] decryptedMethodCall = psm.decrypt(sessionID,
+                        methodCallCiphered, Session.ACT_AS_SERVER);
+
+                //ProActiveLogger.getLogger("security.request").debug("ReceiveRequest :method call apres decryption : " +  ProActiveSecurityManager.displayByte(decryptedMethodCall));
                 ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
                 MarshalInputStream in = new MarshalInputStream(bin);
 
@@ -294,7 +318,8 @@ public class RequestImpl extends MessageImpl implements Request,
             } catch (StreamCorruptedException e) {
                 e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+                // hum something wrong during decryption, trying with a new session
+                throw new RenegotiateSessionException("");
             }
 
             //    System.setProperty("java.rmi.server.codebase",localCodeBase);
