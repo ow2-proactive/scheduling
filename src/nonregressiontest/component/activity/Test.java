@@ -35,6 +35,7 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -87,6 +88,9 @@ public class Test extends ComponentTest {
             A.RUN_COMPONENT_ACTIVITY + A.INIT_FUNCTIONAL_ACTIVITY +
             A.RUN_FUNCTIONAL_ACTIVITY + A.END_FUNCTIONAL_ACTIVITY +
             A.END_COMPONENT_ACTIVITY;
+        while (!A.COMPONENT_ACTIVITY_IS_FINISHED) {
+            // wait; (hack for waiting active object termination)
+        }
         return expectedResult.equals(A.MESSAGE);
     }
 

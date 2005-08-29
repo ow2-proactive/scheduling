@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.component.body.ComponentRunActive;
 public class A implements ComponentInitActive, ComponentEndActive,
     ComponentRunActive, InitActive, RunActive, EndActive {
     public static String MESSAGE = "";
+    public static boolean COMPONENT_ACTIVITY_IS_FINISHED = false;
     public static String INIT_COMPONENT_ACTIVITY = "init-component-activity";
     public static String RUN_COMPONENT_ACTIVITY = "run-component-activity";
     public static String END_COMPONENT_ACTIVITY = "end-component-activity";
@@ -44,6 +45,7 @@ public class A implements ComponentInitActive, ComponentEndActive,
 
     public void endComponentActivity(Body body) {
         MESSAGE += END_COMPONENT_ACTIVITY;
+        COMPONENT_ACTIVITY_IS_FINISHED = true;
     }
 
     public void initActivity(Body body) {
@@ -57,4 +59,5 @@ public class A implements ComponentInitActive, ComponentEndActive,
     public void endActivity(Body body) {
         MESSAGE += END_FUNCTIONAL_ACTIVITY;
     }
+    
 }
