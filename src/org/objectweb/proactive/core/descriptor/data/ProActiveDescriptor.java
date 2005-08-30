@@ -247,12 +247,15 @@ public interface ProActiveDescriptor extends java.io.Serializable {
         String processID);
 
     /**
-     * Registers the specified extended JVMProcess with the specified processID.
-     * @param jvmProcess
-     * @param processID
+     * Maps the given jvmProcess with the extended JVMProcess defined with processID.
+     * @param jvmProcess the jvm defined in the descriptor that contains the extendedJvm clause
+     * @param processID id of the extended jvm
+     * @throws ProActiveException if the jvm with the given id does not exist.
+     * In fact, it means that if the extended jvm is defined later on in the descriptor the exception
+     * is thrown. The extended jvm must be defined before every other jvms that extend it.
      */
-    public void registerExtendedJVMProcess(JVMProcess jvmProcess,
-        String processID);
+    public void mapToExtendedJVM(JVMProcess jvmProcess, String processID)
+        throws ProActiveException;
 
     /**
      * Maps the service given by the specified serviceID with the specified virtualMachine.

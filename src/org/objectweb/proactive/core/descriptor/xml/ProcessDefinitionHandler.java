@@ -711,8 +711,12 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             } else if (name.equals(PARAMETERS_TAG)) {
                 jvmProcess.setParameters((String) activeHandler.getResultObject());
             } else if (name.equals(EXTENDED_JVM_TAG)) {
-                proActiveDescriptor.registerExtendedJVMProcess((JVMProcess) targetProcess,
-                    (String) activeHandler.getResultObject());
+                try {
+                    proActiveDescriptor.mapToExtendedJVM((JVMProcess) targetProcess,
+                        (String) activeHandler.getResultObject());
+                } catch (ProActiveException e) {
+                    throw new SAXException(e);
+                }
             } else {
                 super.notifyEndActiveHandler(name, activeHandler);
             }

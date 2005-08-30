@@ -360,12 +360,15 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-    public void registerExtendedJVMProcess(JVMProcess jvmProcess,
-        String processID) {
+    public void mapToExtendedJVM(JVMProcess jvmProcess, String processID)
+        throws ProActiveException {
         try {
             JVMProcessImpl process = (JVMProcessImpl) getProcess(processID);
             if (process == null) {
-                addPendingJVMProcess(processID, jvmProcess);
+                throw new ProActiveException("The jvmProcess with id " +
+                    processID +
+                    " is not yet defined in the descriptor. The extended jvmProcess must be defined before all jvmProcesses that extend it");
+                //addPendingJVMProcess(processID, jvmProcess);
             } else {
                 jvmProcess.setExtendedJVM(process);
             }
@@ -519,13 +522,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         addProcessUpdater(processID, updater);
     }
 
-    private void addPendingJVMProcess(String processID, JVMProcess jvmProcess) {
-        ProcessUpdater updater = new ExtendedJVMProcessUpdater(jvmProcess);
-
-        //pendingProcessMapping.put(processID, updater);
-        addProcessUpdater(processID, updater);
-    }
-
+    //Commented in the fist version of jvm extension
+    //    private void addPendingJVMProcess(String processID, JVMProcess jvmProcess) {
+    //        ProcessUpdater updater = new ExtendedJVMProcessUpdater(jvmProcess);
+    //
+    //        //pendingProcessMapping.put(processID, updater);
+    //        addProcessUpdater(processID, updater);
+    //    }
     private void addProcessUpdater(String processID,
         ProcessUpdater processUpdater) {
         CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping.get(processID);
@@ -627,18 +630,18 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-    private class ExtendedJVMProcessUpdater implements ProcessUpdater {
-        private JVMProcess jvmProcess;
-
-        public ExtendedJVMProcessUpdater(JVMProcess jvmProcess) {
-            this.jvmProcess = jvmProcess;
-        }
-
-        public void updateProcess(ExternalProcess p) {
-            jvmProcess.setExtendedJVM((JVMProcessImpl) p);
-        }
-    }
-
+    //  Commented in the fist version of jvm extension
+    //    private class ExtendedJVMProcessUpdater implements ProcessUpdater {
+    //        private JVMProcess jvmProcess;
+    //
+    //        public ExtendedJVMProcessUpdater(JVMProcess jvmProcess) {
+    //            this.jvmProcess = jvmProcess;
+    //        }
+    //
+    //        public void updateProcess(ExternalProcess p) {
+    //            jvmProcess.setExtendedJVM((JVMProcessImpl) p);
+    //        }
+    //    }
     private class VirtualMachineUpdater implements ProcessUpdater,
         ServiceUpdater {
         private VirtualMachine virtualMachine;
