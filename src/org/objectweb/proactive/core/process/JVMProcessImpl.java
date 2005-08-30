@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.process;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.MessageLogger;
@@ -92,7 +93,6 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
     public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.StartNode";
     public final static String DEFAULT_JVMPARAMETERS = "";
-    private final static String PROACTIVE_POLICYFILE_OPTION = " -Dproactive.runtime.security=";
     protected String classpath = DEFAULT_CLASSPATH;
     protected String bootClasspath;
     protected String javaPath = DEFAULT_JAVAPATH;
@@ -105,6 +105,17 @@ public class JVMProcessImpl extends AbstractExternalProcess
     protected StringBuffer parameters = new StringBuffer();
     protected StringBuffer jvmParameters = new StringBuffer();
 
+    //this array will be used to know which options have been modified in case
+    //this process extends anothe jvmprocess in the descriptor
+    protected ArrayList modifiedOptions;
+
+    /**
+     * This attributes is used when this jvm extends another one.
+     * If set to yes, the jvm options of the extended jvm will be ignored.
+     * If false, jvm options of this jvm will be appended to extended jvm ones. Default is false.
+     */
+    protected boolean overwrite = false;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -114,6 +125,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
      * Used with XML Descriptor
      */
     public JVMProcessImpl() {
+        this.modifiedOptions = new ArrayList();
     }
 
     /**
@@ -122,6 +134,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
      */
     public JVMProcessImpl(MessageLogger messageLogger) {
         super(messageLogger);
+        this.modifiedOptions = new ArrayList();
     }
 
     /**
@@ -132,6 +145,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public JVMProcessImpl(MessageLogger inputMessageLogger,
         MessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
+        this.modifiedOptions = new ArrayList();
     }
 
     //
@@ -157,11 +171,13 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
     public void setClasspath(String classpath) {
         checkStarted();
+        modifiedOptions.add("classpath");
         this.classpath = classpath;
     }
 
     public void setBootClasspath(String bootClasspath) {
         checkStarted();
+        modifiedOptions.add("bootClasspath");
         this.bootClasspath = bootClasspath;
     }
 
@@ -178,6 +194,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
         if (javaPath == null) {
             throw new NullPointerException();
         }
+        modifiedOptions.add("javaPath");
         this.javaPath = javaPath;
     }
 
@@ -187,6 +204,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
     public void setPolicyFile(String policyFile) {
         checkStarted();
+        modifiedOptions.add("policyFile");
         this.policyFile = policyFile;
     }
 
@@ -195,6 +213,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     }
 
     public void setLog4jFile(String log4jFile) {
+        modifiedOptions.add("log4jFile");
         this.log4jFile = log4jFile;
     }
 
@@ -217,7 +236,12 @@ public class JVMProcessImpl extends AbstractExternalProcess
     }
 
     public void setJvmOptions(String string) {
+        checkStarted();
         jvmParameters.append(string + " ");
+    }
+
+    public String getJvmOptions() {
+        return jvmParameters.toString();
     }
 
     /**
@@ -239,6 +263,14 @@ public class JVMProcessImpl extends AbstractExternalProcess
      */
     public UniversalProcess getFinalProcess() {
         return this;
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
+    }
+
+    public void setExtendedJVM(JVMProcessImpl jvmProcess) {
+        changeSettings(jvmProcess);
     }
 
     //
@@ -332,6 +364,27 @@ public class JVMProcessImpl extends AbstractExternalProcess
             logger.debug("JVMProcessImpl.buildJavaCommand() " + javaCommand);
         }
         return javaCommand.toString();
+    }
+
+    protected void changeSettings(JVMProcess jvmProcess) {
+        if (!modifiedOptions.contains("classpath")) {
+            this.classpath = jvmProcess.getClasspath();
+        }
+        if (!modifiedOptions.contains("bootClasspath")) {
+            this.bootClasspath = jvmProcess.getBootClasspath();
+        }
+        if (!modifiedOptions.contains("javaPath")) {
+            this.javaPath = jvmProcess.getJavaPath();
+        }
+        if (!modifiedOptions.contains("policyFile")) {
+            this.policyFile = jvmProcess.getPolicyFile();
+        }
+        if (!modifiedOptions.contains("log4jFile")) {
+            this.log4jFile = jvmProcess.getLog4jFile();
+        }
+        if (!overwrite) {
+            setJvmOptions(jvmProcess.getJvmOptions());
+        }
     }
 
     //

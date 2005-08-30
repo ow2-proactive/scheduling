@@ -81,6 +81,7 @@ public interface ProActiveDescriptorConstants {
     public static final String GRID_ENGINE_OPTIONS_TAG = "gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
     public static final String SERVICES_TAG = "services";
+    public static final String EXTENDED_JVM_TAG = "extendedJvm";
     public static final String PROCESS_REFERENCE_TAG = "processReference";
     public static final String SERVICE_REFERENCE_TAG = "serviceReference";
     public static final String COMMAND_PATH_TAG = "commandPath";

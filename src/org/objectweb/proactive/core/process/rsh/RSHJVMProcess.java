@@ -228,6 +228,18 @@ public class RSHJVMProcess extends RSHProcess implements JVMProcess {
         jvmProcess.setJvmOptions(parameters);
     }
 
+    public String getJvmOptions() {
+        return jvmProcess.getJvmOptions();
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        jvmProcess.setOverwrite(overwrite);
+    }
+
+    public void setExtendedJVM(JVMProcessImpl jvmProcess) {
+        jvmProcess.setExtendedJVM(jvmProcess);
+    }
+
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //

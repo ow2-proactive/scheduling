@@ -136,4 +136,31 @@ public interface JVMProcess extends ExternalProcess {
      * @param options Options to be given in order to start the jvm
      */
     public void setJvmOptions(String options);
+
+    /**
+     * Returns this jvm options
+     * @return this jvm options
+     */
+    public String getJvmOptions();
+
+    /**
+     * Sets the overwrite attribute with the given value
+     * @param overwrite
+     */
+    public void setOverwrite(boolean overwrite);
+
+    /**
+     * Allows this JVMProcess to extend another JVMProcessImpl.
+     * First implementation of this method. This method must be used carefully.
+     * Here is the basic behavior:
+     * If attributes are modified on this JVM using set methods, they keep the modified
+     * value, otherwise they take the value of the extended jvm. This doesn't apply for
+     * classname, and  parameters.
+     * Moreover, for the jvm options, the default behavior is to append the options of this
+     * jvm to the extended jvm ones, unless the setOverwrite is called previously with true as parameters
+     * In that case the jvm options of the extended jvm are ignored.
+     * At this point this method is only used in deployment descriptors.
+     * @param jvmProcess the extended jvm
+     */
+    public void setExtendedJVM(JVMProcessImpl jvmProcess);
 }

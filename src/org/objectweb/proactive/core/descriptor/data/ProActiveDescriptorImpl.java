@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
@@ -359,6 +360,22 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
+    public void registerExtendedJVMProcess(JVMProcess jvmProcess,
+        String processID) {
+        try {
+            JVMProcessImpl process = (JVMProcessImpl) getProcess(processID);
+            if (process == null) {
+                addPendingJVMProcess(processID, jvmProcess);
+            } else {
+                jvmProcess.setExtendedJVM(process);
+            }
+        } catch (ClassCastException e) {
+            logger.fatal(
+                "ERROR: a jvmProcess can only extend another jvmProcess. Correct the Descriptor");
+            e.printStackTrace();
+        }
+    }
+
     public void addService(String serviceID, UniversalService service) {
         ServiceUpdater serviceUpdater = (ServiceUpdater) pendingServiceMapping.remove(serviceID);
         if (serviceUpdater != null) {
@@ -502,6 +519,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         addProcessUpdater(processID, updater);
     }
 
+    private void addPendingJVMProcess(String processID, JVMProcess jvmProcess) {
+        ProcessUpdater updater = new ExtendedJVMProcessUpdater(jvmProcess);
+
+        //pendingProcessMapping.put(processID, updater);
+        addProcessUpdater(processID, updater);
+    }
+
     private void addProcessUpdater(String processID,
         ProcessUpdater processUpdater) {
         CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping.get(processID);
@@ -600,6 +624,18 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 logger.debug("Updating CompositeExternal Process");
             }
             compositeExternalProcess.setTargetProcess(p);
+        }
+    }
+
+    private class ExtendedJVMProcessUpdater implements ProcessUpdater {
+        private JVMProcess jvmProcess;
+
+        public ExtendedJVMProcessUpdater(JVMProcess jvmProcess) {
+            this.jvmProcess = jvmProcess;
+        }
+
+        public void updateProcess(ExternalProcess p) {
+            jvmProcess.setExtendedJVM((JVMProcessImpl) p);
         }
     }
 

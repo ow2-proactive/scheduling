@@ -638,6 +638,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             this.addHandler(PROACTIVE_PROPS_FILE_TAG, bch);
             this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
             this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
+            this.addHandler(EXTENDED_JVM_TAG, new ExtendedJVMHandler());
             // this.addHandler(JVMPARAMETERS_TAG, new
             // SingleValueUnmarshaller());
         }
@@ -709,10 +710,25 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 jvmProcess.setClassname((String) activeHandler.getResultObject());
             } else if (name.equals(PARAMETERS_TAG)) {
                 jvmProcess.setParameters((String) activeHandler.getResultObject());
-            } // else if (name.equals(JVMPARAMETERS_TAG)) {
-
-            else {
+            } else if (name.equals(EXTENDED_JVM_TAG)) {
+                proActiveDescriptor.registerExtendedJVMProcess((JVMProcess) targetProcess,
+                    (String) activeHandler.getResultObject());
+            } else {
                 super.notifyEndActiveHandler(name, activeHandler);
+            }
+        }
+
+        protected class ExtendedJVMHandler extends ProcessReferenceHandler {
+            public ExtendedJVMHandler() {
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                super.startContextElement(name, attributes);
+                String overwrite = attributes.getValue("overwriteParameters");
+                if ((overwrite != null) && overwrite.equals("yes")) {
+                    ((JVMProcess) targetProcess).setOverwrite(true);
+                }
             }
         }
     }

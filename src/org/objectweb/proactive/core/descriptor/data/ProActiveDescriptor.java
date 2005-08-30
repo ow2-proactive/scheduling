@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
 
@@ -243,6 +244,14 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * @param processID
      */
     public void registerProcess(ExternalProcessDecorator compositeProcess,
+        String processID);
+
+    /**
+     * Registers the specified extended JVMProcess with the specified processID.
+     * @param jvmProcess
+     * @param processID
+     */
+    public void registerExtendedJVMProcess(JVMProcess jvmProcess,
         String processID);
 
     /**
