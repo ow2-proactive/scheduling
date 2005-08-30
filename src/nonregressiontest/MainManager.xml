@@ -35,6 +35,7 @@
 			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.extendedjvm.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.rmilookup.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.p2p.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.launcher.Test" />
