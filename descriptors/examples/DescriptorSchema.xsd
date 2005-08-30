@@ -59,6 +59,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@virtualNode"/>
 			<!--This section references the virtualNodeAcquisitionName key defined above to ensure that the virtualNode attribute of element lookup  has a corresponding value defined in attribute name of  componentDefinition/virtualNodesAcquisition/virtualNode-->
 		</xs:keyref>
+		<xs:keyref name="jvmReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/jvmProcess/extendedJvm"/>
+			<xs:field xpath="@refid"/>
+			<!-- This section references the processid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
 		<xs:keyref name="processReferenceid" refer="processid">
 			<xs:selector xpath="deployment/jvms/jvm/creation/processReference"/>
 			<xs:field xpath="@refid"/>
@@ -523,6 +528,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--jvmProcess element has six childs: bootclasspath, classpath, javaPath, policyFile, log4jpropertiesFile, jvmParameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess.log4jpropertiesFilerepresents the location of the log4j properties file.  jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. This element has also one attribute: class which is required. This attribute can take only one value: org.objectweb.proactive.core.process.JVMNodeProcess. This element is used to create a local jvm-->
 	<xs:complexType name="JvmProcessType">
 		<xs:sequence>
+			<xs:element name="extendedJvm" type="ExtendedJVMType" minOccurs="0"/>
 			<xs:element name="bootclasspath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
@@ -534,6 +540,22 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 	</xs:complexType>
+	
+	<xs:complexType name="ExtendedJVMType">
+		<xs:complexContent>
+			<xs:extension base="ProcessReferenceType">
+				<xs:attribute name="overwriteParameters" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="yes"/>
+					<xs:enumeration value="no"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+			  </xs:extension>
+  </xs:complexContent>
+	</xs:complexType>
+	
 	<!--classpath element has two child: absolutePath and relativePath.  One of the child must appear once or more. Both element can be present in the classpath definition. For instance an absolutePath element followed by a relativePath element-->
 	<xs:complexType name="ClasspathType">
 		<xs:choice maxOccurs="unbounded">
@@ -583,6 +605,9 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+		<xs:attribute name="username" type="xs:string" use="optional"/>
+		<xs:attribute name="hostname" type="xs:string" use="required"/>
 		<!--	<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
@@ -590,9 +615,6 @@ The following element ProActiveDescriptor defines the root of the schema
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>-->
-		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
-		<xs:attribute name="username" type="xs:string" use="optional"/>
-		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!-- The ProcessListType represents a list of ssh, rsh or rlogin processes, they are defined by the class attributes that identifies wich process is included in the list
 by fixedName that is the fixed part of hostnames, list that represents the sequence of number, padding and domain-->
@@ -666,16 +688,16 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
-			<!--<xs:simpleType>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+		<xs:attribute name="username" type="xs:string" use="optional"/>
+		<xs:attribute name="hostname" type="xs:string" use="required"/>
+		<!--<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHJVMProcess"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>-->
-		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
-		<xs:attribute name="username" type="xs:string" use="optional"/>
-		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
 	<xs:complexType name="RloginProcessType">
