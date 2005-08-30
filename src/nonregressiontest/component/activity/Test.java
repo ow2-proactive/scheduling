@@ -88,9 +88,7 @@ public class Test extends ComponentTest {
             A.RUN_COMPONENT_ACTIVITY + A.INIT_FUNCTIONAL_ACTIVITY +
             A.RUN_FUNCTIONAL_ACTIVITY + A.END_FUNCTIONAL_ACTIVITY +
             A.END_COMPONENT_ACTIVITY;
-        while (!A.COMPONENT_ACTIVITY_IS_FINISHED) {
-            // wait; (hack for waiting active object termination)
-        }
+        A.getLock().waitForRelease(); // wait until component activity is finished
         return expectedResult.equals(A.MESSAGE);
     }
 
