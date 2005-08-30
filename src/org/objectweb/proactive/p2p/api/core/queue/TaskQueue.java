@@ -28,11 +28,30 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.exception;
+package org.objectweb.proactive.p2p.api.core.queue;
 
 import java.io.Serializable;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.p2p.api.core.Result;
+import org.objectweb.proactive.p2p.api.core.Task;
 
 
-public class IsAlreadyComputingException extends Exception
-    implements Serializable {
+public interface TaskQueue extends Serializable {
+    public final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
+
+    public abstract void addAll(Collection tasks);
+
+    public abstract IntWrapper size();
+
+    public abstract BooleanWrapper hasNext();
+
+    public abstract Task next();
+
+    public abstract void informNewBestResult(Result newBest, String taskTag);
 }

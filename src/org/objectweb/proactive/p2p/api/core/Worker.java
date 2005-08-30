@@ -41,8 +41,8 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.p2p.api.exception.NoResultsException;
+import org.objectweb.proactive.p2p.api.core.exception.NoResultsException;
+import org.objectweb.proactive.p2p.api.core.queue.TaskQueue;
 
 
 /**
@@ -55,7 +55,10 @@ public class Worker implements Serializable {
     private Manager manager = null;
     private Worker workerGroup = null;
     private Result bestCurrentResult = null;
-    private TaskProvider taskProvider = null;
+    private TaskQueue taskProvider = null;
+    private String workerNodeUrl = null;
+    private String currentTaskTag;
+    private int currentTaskPriority;
 
     /**
      * The active object empty constructor
@@ -68,7 +71,7 @@ public class Worker implements Serializable {
      * Construct a new Worker with its name.
      * @param name the Worker's name.
      */
-    public Worker(Manager manager, TaskProvider taskProvider) {
+    public Worker(Manager manager, TaskQueue taskProvider) {
         this.manager = manager;
         this.taskProvider = taskProvider;
         logger.debug("Worker successfully created");
@@ -83,7 +86,9 @@ public class Worker implements Serializable {
         Task activedTask = null;
         try {
             // Activing the task
-            String workerNodeUrl = ProActive.getBodyOnThis().getNodeURL();
+            if (this.workerNodeUrl == null) {
+                this.workerNodeUrl = ProActive.getBodyOnThis().getNodeURL();
+            }
             activedTask = (Task) ProActive.turnActive(ProActive.getFutureValue(
                         task), workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
@@ -95,13 +100,19 @@ public class Worker implements Serializable {
             exception = e;
         }
         if (activedTask != null) {
+            this.currentTaskTag = activedTask.getTag();
+            this.currentTaskPriority = activedTask.getPriority();
             activedTask.initLowerBound();
             activedTask.initUpperBound();
 
             return activedTask.execute();
         } else {
             logger.fatal("The task was not actived");
-            return new Result(new NoResultsException());
+            if (exception == null) {
+                return new Result(new NoResultsException());
+            } else {
+                return new Result(exception);
+            }
         }
     }
 
@@ -123,6 +134,8 @@ public class Worker implements Serializable {
                 this.bestCurrentResult);
         } else if (newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
+            this.taskProvider.informNewBestResult(this.bestCurrentResult,
+                this.currentTaskTag);
             this.workerGroup.informNewBestResult(this.bestCurrentResult);
             logger.info(
                 "A new best result was localy found and inform others: " +
@@ -150,12 +163,16 @@ public class Worker implements Serializable {
         }
     }
 
-    public IntWrapper haveFreeWorkers() {
-        return this.manager.haveFreeWorkers();
-    }
-
     public void sendSubTasksToTheManager(Vector subTaskList) {
-        logger.info("The task sends " + subTaskList.size() + " sub tasks");
+        for (int i = 0; i < subTaskList.size(); i++) {
+            Task current = (Task) subTaskList.get(i);
+            current.setPriority(this.currentTaskPriority);
+            current.incPriority();
+            current.setTag(this.currentTaskTag + "-" + i);
+        }
+        logger.info("The task sends " + subTaskList.size() +
+            " sub tasks with max priority of " +
+            ((Task) subTaskList.get(0)).getPriority());
         this.taskProvider.addAll(subTaskList);
     }
 }

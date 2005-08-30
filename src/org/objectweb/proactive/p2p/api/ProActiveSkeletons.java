@@ -40,6 +40,9 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.api.core.Manager;
 import org.objectweb.proactive.p2p.api.core.Task;
+import org.objectweb.proactive.p2p.api.core.queue.BasicQueueImpl;
+import org.objectweb.proactive.p2p.api.core.queue.LargerQueueImpl;
+import org.objectweb.proactive.p2p.api.core.queue.PriorityQueueImpl;
 
 
 /**
@@ -55,23 +58,32 @@ public class ProActiveSkeletons {
         ProActiveConfiguration.load();
     }
 
-    /**
-     *
-     * TODO javadoc
-     *
-     * @param root
-     * @param managerNode
-     * @param nodes
-     * @return
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static Manager newProblem(Task root, Node managerNode, Node[] nodes)
+    public static Manager newFarm(Task root, Node managerNode, Node[] nodes)
         throws ActiveObjectCreationException, NodeException {
-        Object[] args = new Object[3];
+        return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, managerNode,
+            nodes, BasicQueueImpl.class.getName());
+    }
+
+    public static Manager newFarmWithPriorityQueue(Task root, Node managerNode,
+        Node[] nodes) throws ActiveObjectCreationException, NodeException {
+        return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, managerNode,
+            nodes, PriorityQueueImpl.class.getName());
+    }
+
+    public static Manager newFarmWithLargerQueue(Task root, Node managerNode,
+        Node[] nodes) throws ActiveObjectCreationException, NodeException {
+        return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, managerNode,
+            nodes, LargerQueueImpl.class.getName());
+    }
+
+    public static Manager newFarmWithSpecifiedQueue(Task root,
+        Node managerNode, Node[] nodes, String queueType)
+        throws ActiveObjectCreationException, NodeException {
+        Object[] args = new Object[4];
         args[0] = root;
         args[1] = nodes;
         args[2] = managerNode;
+        args[4] = queueType;
         Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
                 args, managerNode);
         if (logger.isInfoEnabled()) {

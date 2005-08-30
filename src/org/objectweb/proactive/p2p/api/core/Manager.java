@@ -39,7 +39,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
@@ -49,8 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.p2p.api.core.queue.TaskQueue;
 
 
 /**
@@ -63,15 +61,13 @@ public class Manager implements Serializable, InitActive {
     private Task rootTask = null;
     private Node[] nodes = null;
     private Worker workerGroup;
-    private TaskProvider taskProvider;
-    private boolean isComputing = false;
+    private TaskQueue taskProvider;
     private Vector futureTaskList = new Vector();
     private Vector pendingTaskList = new Vector();
     private Vector workingWorkerList = new Vector();
     private Vector freeWorkerList = new Vector();
     private Vector allResults = new Vector();
-    private Result finalResult = null;
-    private Node myNode = null;
+    private String queueType = null;
 
     /**
      * The no args constructor for ProActive.
@@ -84,11 +80,12 @@ public class Manager implements Serializable, InitActive {
      * @param root the root task.
      * @param nodes the array of nodes for the computation.
      * @param myNode the local node which is associated to this manager.
+     * @param queueType
+     * @param setAutoPriorityQueue
      */
-    public Manager(Task root, Node[] nodes, Node myNode) {
-        this.myNode = myNode;
+    public Manager(Task root, Node[] nodes, Node myNode, String queueType) {
         try {
-            this.rootTask = (Task) ProActive.turnActive(root, this.myNode);
+            this.rootTask = (Task) ProActive.turnActive(root, myNode);
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
@@ -97,11 +94,12 @@ public class Manager implements Serializable, InitActive {
             throw new RuntimeException(e);
         }
         this.nodes = nodes;
+        this.queueType = queueType;
     }
 
     public void initActivity(Body body) {
         try {
-            this.taskProvider = (TaskProvider) ProActive.newActive(TaskProvider.class.getName(),
+            this.taskProvider = (TaskQueue) ProActive.newActive(this.queueType,
                     null, body.getNodeURL());
         } catch (ActiveObjectCreationException e1) {
             logger.fatal("Couldn't create the Task Provider", e1);
@@ -140,23 +138,29 @@ public class Manager implements Serializable, InitActive {
         logger.info("Compute the upper bound for the root task");
         this.rootTask.initUpperBound();
         logger.info("Calling for the first time split on the root task");
-        this.taskProvider.addAll(this.rootTask.split());
+        Vector subTaskList = this.rootTask.split();
+        String taskTag = this.rootTask.getTag();
+        if (taskTag == null) {
+            taskTag = 0 + "";
+        }
+        logger.info("The ROOT task sends " + subTaskList.size() +
+            " with group tag " + taskTag);
+        int rootPriority = this.rootTask.getPriority();
+        for (int i = 0; i < subTaskList.size(); i++) {
+            Task current = (Task) subTaskList.get(i);
+            current.setPriority(rootPriority);
+            current.incPriority();
+            current.setTag(taskTag + "-" + i);
+        }
+        this.taskProvider.addAll(subTaskList);
     }
 
-    public void start() {
-        Body body = ProActive.getBodyOnThis();
-        if (!body.isActive()) {
+    public Result start() {
+        // Nothing to do if the manager is not actived
+        if (!ProActive.getBodyOnThis().isActive()) {
             logger.fatal("The manager is not active");
             throw new RuntimeException("The manager is not active");
         }
-
-        if (this.isComputing) {
-            // nothing to do
-            logger.info("The manager is already started");
-            return;
-        }
-
-        this.isComputing = true;
 
         Group group = ProActiveGroup.getGroup(this.workerGroup);
         Iterator workerIt = group.iterator();
@@ -164,24 +168,37 @@ public class Manager implements Serializable, InitActive {
                 this.taskProvider.hasNext().booleanValue()) {
             this.assignTaskToWorker((Worker) workerIt.next(),
                 this.taskProvider.next());
+            logger.info("Init - Pending tasks: " + this.pendingTaskList.size() +
+                " - Achivied tasks: " + this.allResults.size() +
+                " - Not calculated tasks: " + this.taskProvider.size());
         }
 
-        Service service = new Service(body);
         while (this.taskProvider.hasNext().booleanValue()) {
+            if (workerIt.hasNext()) {
+                this.assignTaskToWorker((Worker) workerIt.next(),
+                    this.taskProvider.next());
+                logger.info("Init - Pending tasks: " +
+                    this.pendingTaskList.size() + " - Achivied tasks: " +
+                    this.allResults.size() + " - Not calculated tasks: " +
+                    this.taskProvider.size());
+                continue;
+            }
             try {
                 // wait for a free worker
-                int index = ProActive.waitForAny(this.futureTaskList, 500);
+                int index = ProActive.waitForAny(this.futureTaskList, 1000);
                 this.allResults.add(this.futureTaskList.remove(index));
                 this.pendingTaskList.remove(index);
                 Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
-                this.assignTaskToWorker(freeWorker, this.taskProvider.next());
-                logger.info("Pending tasks: " + this.pendingTaskList.size() +
-                    " - Achivied tasks: " + this.allResults.size() +
-                    " - Not calculated tasks: " + this.taskProvider.size());
-            } catch (ProActiveException e) {
-                while (service.getRequestCount() > 0) {
-                    service.serveOldest();
+                if (this.taskProvider.hasNext().booleanValue()) {
+                    this.assignTaskToWorker(freeWorker, this.taskProvider.next());
+                    logger.info("Pending tasks: " +
+                        this.pendingTaskList.size() + " - Achivied tasks: " +
+                        this.allResults.size() + " - Not calculated tasks: " +
+                        this.taskProvider.size());
+                } else {
+                    continue;
                 }
+            } catch (ProActiveException e) {
                 continue;
             }
         }
@@ -189,39 +206,51 @@ public class Manager implements Serializable, InitActive {
         // Serving requests and waiting for results
         while (this.taskProvider.hasNext().booleanValue() ||
                 (this.pendingTaskList.size() != 0)) {
+            if (workerIt.hasNext() &&
+                    this.taskProvider.hasNext().booleanValue()) {
+                this.assignTaskToWorker((Worker) workerIt.next(),
+                    this.taskProvider.next());
+                logger.info("Init - Pending tasks: " +
+                    this.pendingTaskList.size() + " - Achivied tasks: " +
+                    this.allResults.size() + " - Not calculated tasks: " +
+                    this.taskProvider.size());
+                continue;
+            }
             try {
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
                 if (this.taskProvider.hasNext().booleanValue()) {
                     this.allResults.add(this.futureTaskList.remove(index));
                     this.pendingTaskList.remove(index);
                     Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
-                    this.assignTaskToWorker(freeWorker, this.taskProvider.next());
-                    logger.info("Pending tasks: " +
-                        this.pendingTaskList.size() + " - Achivied tasks: " +
-                        this.allResults.size() + " - Not calculated tasks: " +
-                        this.taskProvider.size());
+                    if (this.taskProvider.hasNext().booleanValue()) {
+                        this.assignTaskToWorker(freeWorker,
+                            this.taskProvider.next());
+                        logger.info("Waiting for workers - Pending tasks: " +
+                            this.pendingTaskList.size() +
+                            " - Achivied tasks: " + this.allResults.size() +
+                            " - Not calculated tasks: " +
+                            this.taskProvider.size());
+                    } else {
+                        continue;
+                    }
                 } else {
                     this.allResults.add(this.futureTaskList.remove(index));
                     this.pendingTaskList.remove(index);
                     this.freeWorkerList.add(this.workingWorkerList.remove(index));
-                    logger.info("Pending tasks: " +
+                    logger.info("Waiting for final results - Pending tasks: " +
                         this.pendingTaskList.size() + " - Achivied tasks: " +
                         this.allResults.size() + " - Not calculated tasks: " +
                         this.taskProvider.size());
                 }
             } catch (ProActiveException e) {
-                while (service.getRequestCount() > 0) {
-                    service.serveOldest();
-                }
                 continue;
             }
         }
         logger.info("Total of results = " + this.allResults.size());
         logger.info("Total of tasks = " + this.taskProvider.size());
         // Set the final result
-        this.finalResult = this.rootTask.gather((Result[]) this.allResults.toArray(
-                    new Result[this.allResults.size()]));
-        this.isComputing = false;
+        return this.rootTask.gather((Result[]) this.allResults.toArray(
+                new Result[this.allResults.size()]));
     }
 
     /**
@@ -233,18 +262,5 @@ public class Manager implements Serializable, InitActive {
         this.futureTaskList.add(worker.execute(task));
         this.pendingTaskList.add(task);
         this.workingWorkerList.add(worker);
-    }
-
-    public BooleanWrapper isFinish() {
-        return new BooleanWrapper(!this.isComputing);
-    }
-
-    public Result getFinalResult() {
-        ProActive.waitFor(this.finalResult);
-        return this.finalResult;
-    }
-
-    public IntWrapper haveFreeWorkers() {
-        return new IntWrapper(this.freeWorkerList.size());
     }
 }

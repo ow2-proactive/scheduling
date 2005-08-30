@@ -41,7 +41,7 @@ import java.util.Vector;
  *
  * Created on May 2, 2005
  */
-public abstract class Task implements Serializable {
+public abstract class Task implements Serializable, Comparable {
 
     /**
      * The params of the task.
@@ -50,6 +50,8 @@ public abstract class Task implements Serializable {
     protected Result initLowerBound;
     protected Result initUpperBound;
     protected Worker worker = null;
+    private int priority = -1;
+    private String tag = null;
 
     /**
      * The no arg constructor for ProActive.
@@ -121,5 +123,39 @@ public abstract class Task implements Serializable {
      */
     public void setWorker(Worker worker) {
         this.worker = worker;
+    }
+
+    public void incPriority() {
+        this.priority++;
+    }
+
+    public int getPriority() {
+        return this.priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return this.tag;
+    }
+
+    /**
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(Object arg) {
+        Task t = (Task) arg;
+        if (this.equals(t)) {
+            return 0;
+        } else if (this.priority < t.priority) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 }

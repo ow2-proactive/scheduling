@@ -32,7 +32,7 @@ package org.objectweb.proactive.p2p.api.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.p2p.api.exception.NoResultsException;
+import org.objectweb.proactive.p2p.api.core.exception.NoResultsException;
 
 
 /**

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.exception;
+package org.objectweb.proactive.p2p.api.core.exception;
 
 import java.io.Serializable;
 

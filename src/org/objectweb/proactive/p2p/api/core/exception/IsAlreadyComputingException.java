@@ -28,35 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.core;
+package org.objectweb.proactive.p2p.api.core.exception;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Vector;
-
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
-public class TaskProvider implements Serializable {
-    private Vector tasks = new Vector();
-
-    public TaskProvider() {
-    }
-
-    public void addAll(Collection tasks) {
-        this.tasks.addAll(tasks);
-    }
-
-    public IntWrapper size() {
-        return new IntWrapper(this.tasks.size());
-    }
-
-    public BooleanWrapper hasNext() {
-        return new BooleanWrapper(tasks.size() > 0);
-    }
-
-    public Task next() {
-        return (Task) this.tasks.remove(0);
-    }
+public class IsAlreadyComputingException extends Exception
+    implements Serializable {
 }
