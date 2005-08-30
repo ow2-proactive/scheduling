@@ -89,7 +89,7 @@ public class Test extends ComponentTest {
             A.RUN_FUNCTIONAL_ACTIVITY + A.END_FUNCTIONAL_ACTIVITY +
             A.END_COMPONENT_ACTIVITY;
         A.getLock().waitForRelease(); // wait until component activity is finished
-        return expectedResult.equals(A.MESSAGE);
+        return expectedResult.equals(A.message);
     }
 
     public static void main(String[] args) {

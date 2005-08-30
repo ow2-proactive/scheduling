@@ -12,22 +12,22 @@ import org.objectweb.proactive.core.component.body.ComponentRunActive;
 
 public class A implements ComponentInitActive, ComponentEndActive,
     ComponentRunActive, InitActive, RunActive, EndActive {
-    public static String MESSAGE = "";
-    public static String INIT_COMPONENT_ACTIVITY = "init-component-activity";
-    public static String RUN_COMPONENT_ACTIVITY = "run-component-activity";
-    public static String END_COMPONENT_ACTIVITY = "end-component-activity";
-    public static String INIT_FUNCTIONAL_ACTIVITY = "init-functional-activity";
-    public static String RUN_FUNCTIONAL_ACTIVITY = "run-functional-activity";
-    public static String END_FUNCTIONAL_ACTIVITY = "end-functional-activity";
+    public static String message = "";
+    public static final String INIT_COMPONENT_ACTIVITY = "init-component-activity";
+    public static final String RUN_COMPONENT_ACTIVITY = "run-component-activity";
+    public static final String END_COMPONENT_ACTIVITY = "end-component-activity";
+    public static final String INIT_FUNCTIONAL_ACTIVITY = "init-functional-activity";
+    public static final String RUN_FUNCTIONAL_ACTIVITY = "run-functional-activity";
+    public static final String END_FUNCTIONAL_ACTIVITY = "end-functional-activity";
     private static Lock lock = new Lock();
 
     public void initComponentActivity(Body body) {
-        MESSAGE += INIT_COMPONENT_ACTIVITY;
+        message += INIT_COMPONENT_ACTIVITY;
         lock.acquireLock(); // get the lock for the duration of the component activity
     }
 
     public void runComponentActivity(Body body) {
-        MESSAGE += RUN_COMPONENT_ACTIVITY;
+        message += RUN_COMPONENT_ACTIVITY;
 
         Service service = new Service(body);
 
@@ -45,20 +45,20 @@ public class A implements ComponentInitActive, ComponentEndActive,
     }
 
     public void endComponentActivity(Body body) {
-        MESSAGE += END_COMPONENT_ACTIVITY;
+        message += END_COMPONENT_ACTIVITY;
         lock.releaseLock();
     }
 
     public void initActivity(Body body) {
-        MESSAGE += INIT_FUNCTIONAL_ACTIVITY;
+        message += INIT_FUNCTIONAL_ACTIVITY;
     }
 
     public void runActivity(Body body) {
-        MESSAGE += RUN_FUNCTIONAL_ACTIVITY;
+        message += RUN_FUNCTIONAL_ACTIVITY;
     }
 
     public void endActivity(Body body) {
-        MESSAGE += END_FUNCTIONAL_ACTIVITY;
+        message += END_FUNCTIONAL_ACTIVITY;
     }
 
     public static Lock getLock() {
