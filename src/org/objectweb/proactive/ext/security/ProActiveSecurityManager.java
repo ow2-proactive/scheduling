@@ -52,7 +52,7 @@ import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.SignedObject;
-import java.security.UnrecoverableEntryException;
+//import java.security.UnrecoverableEntryException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -1662,8 +1662,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             e.printStackTrace();
         } catch (KeyStoreException e) {
             e.printStackTrace();
-        } catch (UnrecoverableEntryException e) {
-            e.printStackTrace();
+//        } catch (UnrecoverableEntryException e) {
+//            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
