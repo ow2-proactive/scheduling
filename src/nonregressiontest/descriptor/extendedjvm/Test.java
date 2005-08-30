@@ -43,10 +43,11 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import testsuite.test.FunctionalTest;
 
 
-
 public class Test extends FunctionalTest {
     ProActiveDescriptor descriptor;
-    A a1,a2,a3;
+    A a1;
+    A a2;
+    A a3;
 
     public Test() {
         super("Jvm extension in deployment descriptor",
@@ -57,13 +58,15 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-    	VirtualNode vn1 = descriptor.getVirtualNode("vn1");
-    	VirtualNode vn2 = descriptor.getVirtualNode("vn2");
-    	VirtualNode vn3 = descriptor.getVirtualNode("vn3");
-    	a1 = (A)ProActive.newActive(A.class.getName(), new Object[]{}, vn1.getNode());
-    	a2 = (A)ProActive.newActive(A.class.getName(), new Object[]{}, vn2.getNode());
-    	a3 = (A)ProActive.newActive(A.class.getName(), new Object[]{}, vn3.getNode());
-    	  
+        VirtualNode vn1 = descriptor.getVirtualNode("vn1");
+        VirtualNode vn2 = descriptor.getVirtualNode("vn2");
+        VirtualNode vn3 = descriptor.getVirtualNode("vn3");
+        a1 = (A) ProActive.newActive(A.class.getName(), new Object[] {  },
+                vn1.getNode());
+        a2 = (A) ProActive.newActive(A.class.getName(), new Object[] {  },
+                vn2.getNode());
+        a3 = (A) ProActive.newActive(A.class.getName(), new Object[] {  },
+                vn3.getNode());
     }
 
     /**
@@ -100,11 +103,13 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        if(  a2.getTiti()!= null || a2.getTata()== null || a3.getTiti()== null || a3.getToto() == null){
-        	return false;
+        if ((a2.getTiti() != null) || (a2.getTata() == null) ||
+                (a3.getTiti() == null) || (a3.getToto() == null)) {
+            return false;
         }
-        if(a2.getClassPath().indexOf("ProActive.jar") < 0 || a2.getPolicy().indexOf("test")<0){
-        	return false;
+        if ((a2.getClassPath().indexOf("ProActive.jar") < 0) ||
+                (a2.getPolicy().indexOf("test") < 0)) {
+            return false;
         }
         return true;
     }
@@ -131,17 +136,16 @@ public class Test extends FunctionalTest {
             e.printStackTrace();
         }
     }
-    
+
     public static void main(String[] args) {
-		Test test = new Test();
-		try {
-			test.initTest();
-			test.action();
-			System.out.println(test.postConditions());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+        Test test = new Test();
+        try {
+            test.initTest();
+            test.action();
+            System.out.println(test.postConditions());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 }

@@ -30,33 +30,33 @@
  */
 package nonregressiontest.descriptor.extendedjvm;
 
+
 /**
  * @author  ProActive Team
- * @version 1.0 
+ * @version 1.0
  * @since   ProActive 2.2
  */
 public class A {
-	
-	public A(){}
-	
-	public String getTiti(){
-		return System.getProperty("titi");
-	}
-	
-	public String getToto(){
-		return System.getProperty("toto");
-	}
-	
-	public String getTata(){
-		return System.getProperty("tata");
-	}
-	
-	public String getClassPath(){
-		return System.getProperty("java.class.path");
-	}
-	
-	public String getPolicy(){
-		return System.getProperty("java.security.policy");
-	}
+    public A() {
+    }
 
+    public String getTiti() {
+        return System.getProperty("titi");
+    }
+
+    public String getToto() {
+        return System.getProperty("toto");
+    }
+
+    public String getTata() {
+        return System.getProperty("tata");
+    }
+
+    public String getClassPath() {
+        return System.getProperty("java.class.path");
+    }
+
+    public String getPolicy() {
+        return System.getProperty("java.security.policy");
+    }
 }
