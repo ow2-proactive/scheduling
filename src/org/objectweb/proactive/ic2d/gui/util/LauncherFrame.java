@@ -133,7 +133,7 @@ public class LauncherFrame extends JFrame {
         JFileChooser fileChooser = new JFileChooser(".");
 
         fileChooser.addChoosableFileFilter(new SimpleFileFilter("xml",
-                "XML Deployment files"));
+                "XML Descriptor files"));
         if (fileChooser.showOpenDialog(null) != JFileChooser.APPROVE_OPTION) {
             return;
         }

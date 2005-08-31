@@ -147,9 +147,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                         while (refresh) {
                             try {
                                 //						System.out.println ("Waiting for refresh - ttr = " + ttr + " seconds");
-                                Thread.sleep(ttr * 1000);
                                 //						System.out.println ("Automatic refresh starting");
                                 handleHosts();
+                                Thread.sleep(ttr * 1000);
                             } catch (InterruptedException e) {
                                 //						e.printStackTrace();
                             }
