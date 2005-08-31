@@ -349,7 +349,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (logger.isDebugEnabled()) {
             logger.debug("qsub command is " + qsubCommand.toString());
         }
-        System.out.println("PBSSubProcess.buildCommand() " + qsubCommand);
+        //System.out.println("PBSSubProcess.buildCommand() " + qsubCommand);
         return qsubCommand.toString();
     }
 
