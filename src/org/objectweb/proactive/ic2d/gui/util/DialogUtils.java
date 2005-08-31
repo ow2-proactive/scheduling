@@ -67,6 +67,7 @@ public class DialogUtils {
         String host = rmihostdialog.getJTextFieldHostIp();
 
         worldPanel.monitoredHostAdded(host, "rmi:");
+        worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("rmi:", host, rmihostdialog.getJTextFielddepth(),worldObject, logger);//.start();
     }
 
@@ -94,6 +95,7 @@ public class DialogUtils {
 
         //new MonitorThread("http:", host, httphostdialog.getJTextFielddepth(),worldObject, logger);//.start();
         worldPanel.monitoredHostAdded(host, "http:");
+        worldPanel.getMonitorThread().updateHosts();
 
         //        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
         //                "Please enter the name or the IP of the host to monitor :", // Object message,
@@ -136,6 +138,7 @@ public class DialogUtils {
         String host = ibishostdialog.getJTextFieldHostIp();
 
         worldPanel.monitoredHostAdded(host, "ibis:");
+        worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("ibis:", host, ibishostdialog.getJTextFielddepth(), worldObject, logger);//.start();
     }
 
@@ -159,6 +162,7 @@ public class DialogUtils {
         String host = jinihostdialog.getJTextFieldHostIp();
 
         worldPanel.monitoredHostAdded(host, "jini:");
+        worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("jini:", host, jinihostdialog.getJTextFielddepth(), worldObject, logger);//.start();
     }
 
@@ -182,6 +186,7 @@ public class DialogUtils {
         //            jinihostdialog.setButtonOK(false);
         //            String host = jinihostdialog.getJTextFieldHostIp();
         worldPanel.monitoredHostAdded(null, "jini:");
+        worldPanel.getMonitorThread().updateHosts();
         //new MonitorThread("jini:", null, "3", worldObject, logger);//.start();
     }
 

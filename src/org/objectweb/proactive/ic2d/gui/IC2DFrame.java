@@ -194,12 +194,14 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         // monitor the host where is launched the runtime
         if (launcherFrame.isGraphicalMonitoring()) {
             ic2dPanel.getWorldPanel().monitoredHostAdded(host, protocol);
+            ic2dPanel.getWorldPanel().getMonitorThread().updateHosts();
         } else {
             ic2dPanel.getWorldPanel().getMonitorThread().addObjectToSkip(monitoredJob);
         }
         if (launcherFrame.isJobMonitoring()) {
             jobMonitorFrame.getPanel().addMonitoredHost(UrlBuilder.removePortFromHost(
                     host), UrlBuilder.getPortFromUrl(host));
+            jobMonitorFrame.getPanel().updateHosts();
         } else {
             jobMonitorFrame.getPanel().addObjectToSkip(monitoredJob);
         }
