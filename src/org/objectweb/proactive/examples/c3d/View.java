@@ -28,32 +28,18 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.examples.c3d.prim;
+package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.examples.c3d.geom.Ray;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
-public abstract class Primitive implements java.io.Serializable {
+public class View implements java.io.Serializable {
 
-  public Surface surf = new Surface();
-
-
-  public void setColor(double r, double g, double b) {
-    surf.color = new Vec(r, g, b);
-  }
-
-
-  public abstract Vec normal(Vec pnt);
-
-
-  public abstract Isect intersect(Ray ry);
-
-
-  public abstract String toString();
-
-
-  public abstract Vec getCenter();
-
-
-  public abstract void setCenter(Vec c);
+  public Vec from;
+  public Vec at;
+  public Vec up;
+  public double dist;
+  public double angle;
+  public double aspect;
 }
+
+;

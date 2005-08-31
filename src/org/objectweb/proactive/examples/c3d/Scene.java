@@ -28,32 +28,61 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.examples.c3d.prim;
+package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.examples.c3d.geom.Ray;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.c3d.prim.Light;
+import org.objectweb.proactive.examples.c3d.prim.Primitive;
 
-public abstract class Primitive implements java.io.Serializable {
+import java.util.Vector;
 
-  public Surface surf = new Surface();
+public class Scene implements java.io.Serializable {
+
+  private Vector lights = new Vector();
+  private Vector objects = new Vector();
+  private View view;
 
 
-  public void setColor(double r, double g, double b) {
-    surf.color = new Vec(r, g, b);
+  public void addLight(Light l) {
+    lights.addElement(l);
   }
 
 
-  public abstract Vec normal(Vec pnt);
+  public void addObject(Primitive object) {
+    objects.addElement(object);
+  }
 
 
-  public abstract Isect intersect(Ray ry);
+  public void addView(View view) {
+    this.view = view;
+  }
 
 
-  public abstract String toString();
+  public View getView() {
+    return view;
+  }
 
 
-  public abstract Vec getCenter();
+  public Light getLight(int number) {
+    return (Light)lights.elementAt(number);
+  }
 
 
-  public abstract void setCenter(Vec c);
+  public Primitive getObject(int number) {
+    return (Primitive)objects.elementAt(number);
+  }
+
+
+  public int getLights() {
+    return lights.size();
+  }
+
+
+  public int getObjects() {
+    return objects.size();
+  }
+
+
+  public void setObject(Primitive object, int pos) {
+    objects.setElementAt(object, pos);
+  }
 }

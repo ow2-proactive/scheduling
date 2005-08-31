@@ -28,32 +28,36 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.examples.c3d.prim;
+package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.examples.c3d.geom.Ray;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
+import java.awt.Button;
+import java.awt.Dialog;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.Panel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public abstract class Primitive implements java.io.Serializable {
+public class MsgDialog extends Dialog implements ActionListener {
 
-  public Surface surf = new Surface();
+  Button bOk = new Button("OK");
 
 
-  public void setColor(double r, double g, double b) {
-    surf.color = new Vec(r, g, b);
+  public MsgDialog(Frame frame, String title, String content) {
+    super(frame, title, false);
+    add("North", new Label(content, Label.CENTER));
+    Panel panel = new Panel();
+
+    panel.add(bOk);
+    bOk.addActionListener(this);
+    bOk.setActionCommand("OK");
+    add("South", panel);
+    setSize(200, 50);
+    pack();
   }
 
 
-  public abstract Vec normal(Vec pnt);
-
-
-  public abstract Isect intersect(Ray ry);
-
-
-  public abstract String toString();
-
-
-  public abstract Vec getCenter();
-
-
-  public abstract void setCenter(Vec c);
+  public void actionPerformed(ActionEvent event) {
+    dispose();
+  }
 }
