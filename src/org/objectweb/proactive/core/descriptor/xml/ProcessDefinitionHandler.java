@@ -384,6 +384,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
+            String interactive = (attributes.getValue("interactive"));
+            if (checkNonEmpty(interactive)) {
+                ((PBSSubProcess) targetProcess).setInteractive(interactive);
+            }
             String queueName = (attributes.getValue("queue"));
             if (checkNonEmpty(queueName)) {
                 ((PBSSubProcess) targetProcess).setQueueName(queueName);
