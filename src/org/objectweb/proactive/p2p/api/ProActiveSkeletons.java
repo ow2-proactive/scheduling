@@ -83,7 +83,7 @@ public class ProActiveSkeletons {
         args[0] = root;
         args[1] = nodes;
         args[2] = managerNode;
-        args[4] = queueType;
+        args[3] = queueType;
         Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
                 args, managerNode);
         if (logger.isInfoEnabled()) {
