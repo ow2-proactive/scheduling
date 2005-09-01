@@ -1095,9 +1095,12 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		//}
 		try
 		{
-			proActiveDescriptor =
-				ProActive.getProactiveDescriptor(
-					"file:"+argv[0]);
+            if (argv.length == 0) {
+                proActiveDescriptor = ProActive.getProactiveDescriptor();
+            } else {
+                proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+                        argv[0]);
+            }
 			proActiveDescriptor.activateMappings();
 			//Thread.sleep(20000);		
 		}

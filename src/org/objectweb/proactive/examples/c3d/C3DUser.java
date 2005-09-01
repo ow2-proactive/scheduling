@@ -279,8 +279,12 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
-                    argv[0]);
+            if (argv.length == 0) {
+                proActiveDescriptor = ProActive.getProactiveDescriptor();
+            } else {
+                proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+                        argv[0]);
+            }
             proActiveDescriptor.activateMappings();
         } catch (Exception e) {
             e.printStackTrace();
