@@ -248,19 +248,23 @@ public class MonitorThread {
                 MonitoredHost hostObject = (MonitoredHost) monitoredHosts.get(i);
                 String host = hostObject.getFullName();
                 String protocol = hostObject.getMonitorProtocol();
-
-                //System.out.println ("\nMonitoring host " + (i + 1) + " / " + size + ": " + host);
                 handleHost(host, protocol);
-                try {
-                    worldObject.addHostObject(hostObject,
-                        asso.getValues(hostObject, 2, null));
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
             }
 
             explorator.exploreKnownJVM();
             explorator.endExploration();
+            Iterator it = asso.getHosts().iterator(); // iterator de MonitoredHost
+            while (it.hasNext()) {
+                MonitoredHost monitoredhost = (MonitoredHost) it.next();
+
+                //                String tmphost = monitoredhost.getFullName();
+                try {
+                    worldObject.addHostObject(monitoredhost,
+                        asso.getValues(monitoredhost, 2, null));
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
