@@ -58,6 +58,14 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 public interface ProActiveDescriptor extends java.io.Serializable {
 
     /**
+     * return the jobID of the pad
+     * @return String
+     */
+    public String getJobID();
+
+    public void setMainDefined(boolean mainDefined);
+
+    /**
      * create a new MainDefinition object and add it to the map
      *
      */

@@ -74,7 +74,7 @@ public class RefactorPAD {
                 //System.out.println("a VirtualNode lookup cannot be a main VN");
             }
         }
-
+        noMain.setMainDefined(false);
         //System.out.println("*** VN number after refactor : " +
         //    virtualNodesMapping.size());
         return noMain;

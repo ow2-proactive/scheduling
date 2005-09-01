@@ -157,6 +157,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /** Logger */
     private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
     private Vector p2pNodeslookupList = new Vector();
+    public static int counter = 0;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -174,7 +175,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     VirtualNodeImpl(String name,
         ProActiveSecurityManager proactiveSecurityManager, String padURL,
         boolean isMainVN) {
-        this.name = name;
+        // if we launch several times the same application 
+        // we have to change the name of the main VNs because of
+        // the register, otherwise we will monitor each time all the last
+        // main VNs with the same name.
+        if (isMainVN) {
+            this.name = name + (counter++);
+        } else {
+            this.name = name;
+        }
+
         virtualMachines = new java.util.ArrayList(5);
         localVirtualMachines = new java.util.ArrayList();
         createdNodes = new java.util.ArrayList();
@@ -957,7 +967,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     private void setParameters(ExternalProcess process, VirtualMachine vm) {
         JVMProcess jvmProcess;
-        jobID = ProActive.getJobId();
+
+        //jobID = ProActive.getJobId();
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
@@ -989,16 +1000,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.debug(localruntimeURL);
             }
 
-            // if it is a main node we give to the process a new jobId
+            // if it is a main node we set the property for retrieving the pad
             if (mainVirtualNode) {
-                String newId = generateNewJobID();
-                this.jobID = newId;
-                jvmProcess.setJvmOptions("-Dproactive.jobid=" + newId);
-                jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL);
-            } else {
-                jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
+                jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL + jobID);
             }
-
+            jvmProcess.setJvmOptions("-Dproactive.jobid=" + jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
 
@@ -1007,15 +1013,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 jvmProcess.setJvmOptions(this.ftService.buildParamsLine());
             }
         }
-    }
-
-    /**
-     * generate a new jobId based on the current time.
-     *
-     * @return a new jobId
-     */
-    private String generateNewJobID() {
-        return "JOB-" + System.currentTimeMillis();
     }
 
     /**

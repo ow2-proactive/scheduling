@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
@@ -95,6 +96,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     /** Location of the xml file */
     private String url;
+    private String jobID;
+    private boolean mainDefined;
 
     /** security rules */
     protected ProActiveSecurityManager proactiveSecurityManager;
@@ -119,11 +122,15 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         serviceMapping = new java.util.HashMap();
         pendingServiceMapping = new java.util.HashMap();
         this.url = url;
+        mainDefined = false;
     }
 
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
+    public String getJobID() {
+        return jobID;
+    }
 
     /**
      * create a new mainDefintion with a unique id defined by the append of
@@ -174,7 +181,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * @return true if at least one mainDefinition is defined
      */
     public boolean isMainDefined() {
-        return !mainDefinitionMapping.isEmpty();
+        return mainDefined;
+    }
+
+    public void setMainDefined(boolean mainDefined) {
+        this.mainDefined = mainDefined;
     }
 
     /**
@@ -286,12 +297,25 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public VirtualNode createVirtualNode(String vnName, boolean lookup,
         String padURL, boolean isMainNode) {
         VirtualNode vn = getVirtualNode(vnName);
+
+        if (jobID == null) {
+            if (isMainDefined()) {
+                this.jobID = generateNewJobID();
+                //System.out.println("new id generated : " + jobID);
+            } else {
+                this.jobID = ProActive.getJobId();
+            }
+        }
+
         if (vn == null) {
             if (lookup) {
                 vn = new VirtualNodeLookup(vnName);
             } else {
                 vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
                         padURL, isMainNode);
+                ((VirtualNodeImpl) vn).jobID = this.jobID;
+                //System.out.println("vn created with url: " + padURL +
+                //    " and jobid : " + jobID);
             }
 
             virtualNodeMapping.put(vnName, vn);
@@ -299,6 +323,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 logger.info("created VirtualNode name=" + vnName);
             }
         }
+
         return vn;
     }
 
@@ -419,7 +444,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public void killall(boolean softly) throws ProActiveException {
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        part.removeDescriptor(this.url);
+        part.removeDescriptor(this.url + jobID);
         VirtualNode[] vnArray = getVirtualNodes();
         for (int i = 0; i < vnArray.length; i++) {
             vnArray[i].killAll(softly);
@@ -559,6 +584,15 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             pendingServiceMapping.put(serviceID, compositeServiceUpdater);
         }
         compositeServiceUpdater.addServiceUpdater(serviceUpdater);
+    }
+
+    /**
+     * generate a new jobId based on the current time.
+     *
+     * @return a new jobId
+     */
+    private String generateNewJobID() {
+        return "JOB-" + System.currentTimeMillis();
     }
 
     //

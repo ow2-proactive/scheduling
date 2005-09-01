@@ -31,13 +31,8 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
-import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
@@ -46,7 +41,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 /**
  * This class receives main_definition events
  *
- * @author  T�rence FERUT from ProActive Team
+ * @author  Terence FERUT - ProActive Team
  * @version 1.0,  2005/07/07
  * @since   ProActive
  */
@@ -69,6 +64,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
         super();
         this.padURL = padURL;
         this.proActiveDescriptor = proActiveDescriptor;
+        proActiveDescriptor.setMainDefined(true);
         this.addHandler(ARG_TAG, new ArgHandler(proActiveDescriptor));
         this.addHandler(MAP_TO_VIRTUAL_NODE_TAG,
             new MapToVirtualNodeHandler(proActiveDescriptor, padURL));
