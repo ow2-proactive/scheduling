@@ -870,6 +870,8 @@ public class ProActive {
     public static ProActiveDescriptor getProactiveDescriptor()
         throws ProActiveException, IOException {
         String padURL = System.getProperty("proactive.pad");
+
+        //System.out.println("pad propertie : " + padURL) ;
         if (padURL == null) {
             //System.out.println("pad null");
             return null;
@@ -911,6 +913,7 @@ public class ProActive {
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptor pad;
 
+        //System.out.println("padurl with id : " + xmlDescriptorUrl) ;
         try {
             pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
         } catch (Exception e) {
@@ -922,6 +925,7 @@ public class ProActive {
             return pad;
         }
 
+        //System.out.println("not found parsing : " + xmlDescriptorUrl) ;
         // else parses it
         try {
             if (logger.isInfoEnabled()) {
@@ -930,7 +934,8 @@ public class ProActive {
             }
             ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl);
             pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
-            part.registerDescriptor(xmlDescriptorUrl, pad);
+            part.registerDescriptor(xmlDescriptorUrl + pad.getJobID(), pad);
+            //System.out.println("pad registered with id : " + xmlDescriptorUrl + pad.getJobID()) ;
             return pad;
         } catch (org.xml.sax.SAXException e) {
             e.printStackTrace();
