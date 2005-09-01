@@ -54,6 +54,7 @@ public class DialogUtils {
                 ":" + System.getProperty("proactive.rmi.port");
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
+            return;
         }
 
         //	calling dlg for host or ip and depth control
@@ -82,6 +83,7 @@ public class DialogUtils {
             ;
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
+            return;
         }
         HostDialog httphostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
                 initialHostValue);
@@ -127,6 +129,7 @@ public class DialogUtils {
                 ":" + System.getProperty("proactive.rmi.port");
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
+            return;
         }
         HostDialog ibishostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
                 initialHostValue);
@@ -151,6 +154,7 @@ public class DialogUtils {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
+            return;
         }
         HostDialog jinihostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
                 initialHostValue);
