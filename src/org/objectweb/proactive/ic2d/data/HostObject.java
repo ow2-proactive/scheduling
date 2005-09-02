@@ -188,7 +188,7 @@ public class HostObject extends AbstractDataObject {
             return vmObject;
         } catch (ActiveObjectCreationException e) {
             controller.log("Cannot create the spy on host " + hostname +
-                " on node " + node.getNodeInformation().getURL());
+                " on node " + node.getNodeInformation().getURL(), e);
 
             return null;
         } catch (NodeException e) {
