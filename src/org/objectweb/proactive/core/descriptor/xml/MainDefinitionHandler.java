@@ -64,7 +64,6 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
         super();
         this.padURL = padURL;
         this.proActiveDescriptor = proActiveDescriptor;
-        proActiveDescriptor.setMainDefined(true);
         this.addHandler(ARG_TAG, new ArgHandler(proActiveDescriptor));
         this.addHandler(MAP_TO_VIRTUAL_NODE_TAG,
             new MapToVirtualNodeHandler(proActiveDescriptor, padURL));
@@ -80,6 +79,8 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             throw new org.xml.sax.SAXException(
                 "class Tag without any mainDefinition defined");
         }
+
+        proActiveDescriptor.setMainDefined(true);
         proActiveDescriptor.mainDefinitionSetMainClass(className);
     }
 

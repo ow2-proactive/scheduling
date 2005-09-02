@@ -304,6 +304,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 //System.out.println("new id generated : " + jobID);
             } else {
                 this.jobID = ProActive.getJobId();
+                //System.out.println("using runtime id : " + jobID);
             }
         }
 
@@ -314,8 +315,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
                         padURL, isMainNode);
                 ((VirtualNodeImpl) vn).jobID = this.jobID;
-                //System.out.println("vn created with url: " + padURL +
-                //    " and jobid : " + jobID);
+                //System.out.println("vn created with url: " + padURL + " and jobid : " + ((VirtualNodeImpl) vn).jobID);
             }
 
             virtualNodeMapping.put(vnName, vn);
