@@ -186,14 +186,14 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         }
     }
 
-    public void addObjectToSkip(MonitoredJob job) {
-        if (!skippedObjects.contains(job)) {
-            skippedObjects.addElement(job);
+    public void addObjectToSkip(BasicMonitoredObject object) {
+        if (!skippedObjects.contains(object)) {
+            skippedObjects.addElement(object);
         }
     }
 
-    public void removeObjectToSkip(MonitoredJob job) {
-        skippedObjects.removeElement(job);
+    public void removeObjectToSkip(BasicMonitoredObject object) {
+        skippedObjects.removeElement(object);
     }
 
     public void addMonitoredHost(String host, int port) {

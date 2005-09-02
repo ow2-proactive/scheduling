@@ -37,6 +37,7 @@ import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
 
@@ -81,10 +82,12 @@ public class HostPanel extends AbstractDataObjectPanel
                 }
             });
         popup.addSeparator();
+
         popup.add(new javax.swing.AbstractAction("Stop Monitoring this host",
                 null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     hostObject.destroyObject();
+                    parent.stopMonitorHost(hostObject);
                 }
             });
 

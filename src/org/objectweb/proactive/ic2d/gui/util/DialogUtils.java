@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.util;
 
+import java.net.InetAddress;
+
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
@@ -66,6 +68,13 @@ public class DialogUtils {
         }
         rmihostdialog.setButtonOK(false);
         String host = rmihostdialog.getJTextFieldHostIp();
+        try {
+            String host1 = UrlBuilder.removePortFromHost(host);
+            host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+        } catch (java.net.UnknownHostException e) {
+            logger.log(e, false);
+            return;
+        }
 
         worldPanel.monitoredHostAdded(host, "rmi:");
         worldPanel.getMonitorThread().updateHosts();
@@ -94,6 +103,13 @@ public class DialogUtils {
 
         httphostdialog.setButtonOK(false);
         String host = httphostdialog.getJTextFieldHostIp();
+        try {
+            String host1 = UrlBuilder.removePortFromHost(host);
+            host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+        } catch (java.net.UnknownHostException e) {
+            logger.log(e, false);
+            return;
+        }
 
         //new MonitorThread("http:", host, httphostdialog.getJTextFielddepth(),worldObject, logger);//.start();
         worldPanel.monitoredHostAdded(host, "http:");
@@ -139,6 +155,13 @@ public class DialogUtils {
         }
         ibishostdialog.setButtonOK(false);
         String host = ibishostdialog.getJTextFieldHostIp();
+        try {
+            String host1 = UrlBuilder.removePortFromHost(host);
+            host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+        } catch (java.net.UnknownHostException e) {
+            logger.log(e, false);
+            return;
+        }
 
         worldPanel.monitoredHostAdded(host, "ibis:");
         worldPanel.getMonitorThread().updateHosts();
@@ -164,6 +187,13 @@ public class DialogUtils {
         }
         jinihostdialog.setButtonOK(false);
         String host = jinihostdialog.getJTextFieldHostIp();
+        try {
+            String host1 = UrlBuilder.removePortFromHost(host);
+            host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+        } catch (java.net.UnknownHostException e) {
+            logger.log(e, false);
+            return;
+        }
 
         worldPanel.monitoredHostAdded(host, "jini:");
         worldPanel.getMonitorThread().updateHosts();

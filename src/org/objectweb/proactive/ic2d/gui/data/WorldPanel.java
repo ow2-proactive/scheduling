@@ -37,11 +37,13 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.Timer;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
@@ -275,6 +277,19 @@ public class WorldPanel extends AbstractDataObjectPanel
 
     public WorldObject getWorldObject() {
         return worldObject;
+    }
+
+    /**
+     * stop to monitor an host
+     * @param hostObject host to do not monitor anymore.
+     */
+    public void stopMonitorHost(HostObject hostObject) {
+        String hostname = UrlBuilder.removePortFromHost(hostObject.getHostName());
+        int port = UrlBuilder.getPortFromUrl(hostObject.getHostName());
+        MonitoredHost object = new MonitoredHost(hostname, port,
+                hostObject.getMonitoredProtocol());
+        monitorThread.addObjectToSkip(object);
+        monitorThread.removeAsso(object);
     }
 
     //

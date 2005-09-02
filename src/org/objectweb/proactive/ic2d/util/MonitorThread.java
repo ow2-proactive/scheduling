@@ -78,7 +78,7 @@ public class MonitorThread {
         monitoredHosts = new DefaultListModel();
         skippedObjects = new DefaultListModel();
         //skippedObjects.addElement(new MonitoredJob(ProActive.getJobId()));
-        ttr = 60;
+        ttr = 30;
         explorator = new NodeExploration(asso, skippedObjects, logger);
 
         String hostname = null;
@@ -214,20 +214,24 @@ public class MonitorThread {
         }
     }
 
-    /**
-     * add an monitored job to the skip objects list
-     * @param job monitored job to skip
-     */
-    public void addObjectToSkip(MonitoredJob job) {
-        skippedObjects.addElement(job);
+    public void removeAsso(MonitoredHost hostObject) {
+        asso.removeItem(hostObject);
     }
 
     /**
-     * remove a skipped job from the skipped objects list
-     * @param job
+     * add an monitored object to the skip objects list
+     * @param object monitored object to skip
      */
-    public void removeObjectToSkip(MonitoredJob job) {
-        skippedObjects.removeElement(job);
+    public void addObjectToSkip(BasicMonitoredObject object) {
+        skippedObjects.addElement(object);
+    }
+
+    /**
+     * remove a skipped object from the skipped objects list
+     * @param object
+     */
+    public void removeObjectToSkip(BasicMonitoredObject object) {
+        skippedObjects.removeElement(object);
     }
 
     public void updateHosts() {
