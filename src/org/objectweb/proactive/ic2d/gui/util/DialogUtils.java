@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.gui.util;
 
-import java.net.InetAddress;
-
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
@@ -40,6 +38,8 @@ import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
+
+import java.net.InetAddress;
 
 
 public class DialogUtils {
@@ -103,9 +103,15 @@ public class DialogUtils {
 
         httphostdialog.setButtonOK(false);
         String host = httphostdialog.getJTextFieldHostIp();
+
         try {
+            // ********************* Fix bug : In Http we need the port number !****************************
+            int port = UrlBuilder.getPortFromUrl(host);
             String host1 = UrlBuilder.removePortFromHost(host);
+            //Get the host IP           
             host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+            //Put the port
+            host = host + ':' + port;
         } catch (java.net.UnknownHostException e) {
             logger.log(e, false);
             return;
