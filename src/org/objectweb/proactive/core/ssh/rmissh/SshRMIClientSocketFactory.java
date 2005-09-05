@@ -27,7 +27,8 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
     }
 
     public Socket createSocket(String host, int port) throws IOException {
-        Socket socket = new SshSocket(host, port);
+    	String realName = HostsInfos.getSecondaryName(host);
+        Socket socket = new SshSocket(realName, port);
         return socket;
     }
 

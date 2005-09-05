@@ -47,6 +47,16 @@ public class HostsInfos {
         return (String) host_infos.get("username");
     }
 
+    public static String getSecondaryName(String hostname) {
+        Hashtable host_infos = getHostInfos(hostname, true);
+        String secondary = (String) host_infos.get("secondary");
+        if (secondary != null) {
+            return secondary;
+        } else {
+            return hostname;
+        }
+    }
+
     public static void setUserName(String hostname, String username) {
         Hashtable host_infos = getHostInfos(hostname, false);
         if (host_infos.get("username") == null) {
@@ -57,6 +67,13 @@ public class HostsInfos {
             //        		// TODO Auto-generated catch block
             //        		e.printStackTrace();
             //        	}
+        }
+    }
+
+    public static void setSecondaryName(String hostname, String secondary_name) {
+        Hashtable host_infos = getHostInfos(hostname, false);
+        if (host_infos.get("secondary") == null) {
+            host_infos.put("secondary", secondary_name);
         }
     }
 
