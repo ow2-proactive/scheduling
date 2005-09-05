@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -118,11 +120,18 @@ public abstract class DispatcherGUI implements ActionListener {
      * Contains all the components, except the menuBar.
      */
     private JComponent createMainPanel() {
-        Box mainPanel = Box.createVerticalBox();
-        mainPanel.add(createInfoText());
-        mainPanel.add(createLogPanel("Application Log", new Dimension(200, 200)));
-        mainPanel.add(createUserListPanel());
-        mainPanel.add(createEnginePanel());
+        // The BorderLayout was used to have the log use as much space as possible.
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
+        mainPanel.add(createInfoText(), BorderLayout.NORTH);
+        mainPanel.add(createLogPanel("Application Log", new Dimension(200, 200)),
+            BorderLayout.CENTER);
+
+        JPanel extraPanel = new JPanel();
+        extraPanel.setLayout(new GridLayout(2, 1));
+        extraPanel.add(createUserListPanel());
+        extraPanel.add(createEnginePanel());
+        mainPanel.add(extraPanel, BorderLayout.SOUTH);
         return mainPanel;
     }
 
@@ -130,7 +139,7 @@ public abstract class DispatcherGUI implements ActionListener {
      * The top part, stating name of program & machine name
      */
     private JComponent createInfoText() {
-        JPanel infoPanel = new JPanel(); // TODO : the box should be enough, but this overwrites the menu!!!
+        JPanel infoPanel = new JPanel(); // TODO : the box should have been enough, but the label overwrites the menu!!!
         Box box = Box.createVerticalBox();
         String localhostName = "";
         try {
@@ -171,11 +180,9 @@ public abstract class DispatcherGUI implements ActionListener {
      * A GridBag containing selectable engines, and buttons to add/remove them.
      */
     private JComponent createEnginePanel() {
-        Box panel = Box.createHorizontalBox();
+        // two parallel boxes, which contain used & available engines
         Box left = Box.createVerticalBox();
         Box right = Box.createVerticalBox();
-        panel.add(left);
-        panel.add(right);
 
         left.add(new JLabel("Available engines"));
         right.add(new JLabel("Engines used"));
@@ -192,11 +199,17 @@ public abstract class DispatcherGUI implements ActionListener {
 
         this.addEngineButton = new JButton("Add engine");
         this.addEngineButton.addActionListener(this);
+        left.add(this.addEngineButton);
+
         this.removeEngineButton = new JButton("Remove engine");
         this.removeEngineButton.addActionListener(this);
-        left.add(this.addEngineButton);
         right.add(this.removeEngineButton);
-        return panel;
+
+        JPanel engineChoicePanel = new JPanel();
+        engineChoicePanel.setLayout(new GridLayout(1, 2));
+        engineChoicePanel.add(left);
+        engineChoicePanel.add(right);
+        return engineChoicePanel;
     }
 
     private JComponent createLogPanel(String title, Dimension prefSize) {
