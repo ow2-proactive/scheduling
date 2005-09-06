@@ -69,8 +69,10 @@ public class DialogUtils {
         rmihostdialog.setButtonOK(false);
         String host = rmihostdialog.getJTextFieldHostIp();
         try {
+        	int port = UrlBuilder.getPortFromUrl(host);
             String host1 = UrlBuilder.removePortFromHost(host);
             host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+            host = host+":"+port;
         } catch (java.net.UnknownHostException e) {
             logger.log(e, false);
             return;
@@ -162,8 +164,12 @@ public class DialogUtils {
         ibishostdialog.setButtonOK(false);
         String host = ibishostdialog.getJTextFieldHostIp();
         try {
+        	int port = UrlBuilder.getPortFromUrl(host);
             String host1 = UrlBuilder.removePortFromHost(host);
+            //Get the host IP           
             host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
+            //Put the port
+            host = host + ':' + port;
         } catch (java.net.UnknownHostException e) {
             logger.log(e, false);
             return;
