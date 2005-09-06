@@ -68,7 +68,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public interface RemoteProActiveRuntime extends Serializable, SecurityEntity {
+public interface RemoteProActiveRuntime extends Serializable {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     public String createLocalNode(String nodeName,
