@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
@@ -238,6 +239,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
 
     /**
      * @param n number of neighbors which receive the balance request
+     * @param sender who sends the request
+     * @param ranking the ranking of the caller
      */
     public void chooseNneighborsAndSendTheBalanceRequest(int n,
         P2PService sender, double ranking) {
@@ -250,12 +253,32 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         }
 
         int candidate = (int) (Math.random() * size);
-        int low = ((candidate - 1) < 0) ? 0 : (candidate - 1);
-        int high = ((candidate + 1) >= size) ? (size - 1) : (candidate + 1);
-        Group subGroupofAcquaintances = this.groupOfAcquaintances.range(low,
-                high);
 
-        ((P2PService) subGroupofAcquaintances.getGroupByType()).balanceWithMe(sender,
-            ranking);
+        for (int i = 0; i < n; i++) {
+        	((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).balanceWithMe(sender,
+                    ranking);
+        }
+
     }
+
+    /**
+     * @param n number of neighbors which receive the balance request
+     * @param ranking who sends the request
+     * @param myNodeAddress the ranking of the caller
+     */
+	public void chooseNneighborsAndStealTheirWork(int n, double ranking, String myNodeAddress) {
+        int size = this.groupOfAcquaintances.size();
+        if (size <= 0) {
+            return;
+        }
+        if (n > size) {
+            n = size;
+        }
+
+        int candidate = (int) (Math.random() * size);
+
+        for (int i = 0; i < n; i++) {
+        	((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).ImStealingYou(ranking,myNodeAddress);
+        }
+	}
 }
