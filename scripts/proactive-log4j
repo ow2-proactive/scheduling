@@ -2,9 +2,6 @@
 
 log4j.rootLogger=INFO, A1
 
-# NFE Logger
-log4j.logger.NFE = FATAL
-
 #A1 uses PatternLayout
 #and displays the associated message (%m)
 #using the platform dependant separator (%n)
