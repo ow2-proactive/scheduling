@@ -30,8 +30,10 @@ public class NFEListenerList implements NFEProducer {
         Iterator iter = listeners.iterator();
         while (iter.hasNext()) {
             NFEListener listener = (NFEListener) iter.next();
-            listener.handleNFE(e);
-            nbListeners++;
+            if (listener.canHandleNFE(e)) {
+                listener.handleNFE(e);
+                nbListeners++;
+            }
         }
 
         return nbListeners;

@@ -32,7 +32,6 @@ package org.objectweb.proactive;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -54,6 +53,7 @@ import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
 import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
@@ -97,7 +97,6 @@ import ibis.rmi.RemoteException;
 public class ProActive {
     protected final static Logger logger = Logger.getLogger(ProActive.class.getName());
     public final static Logger loggerGroup = Logger.getLogger("GROUP");
-    public final static Logger loggerNFE = Logger.getLogger("NFE");
 
     /** Used for profiling */
     private static CompositeAverageMicroTimer timer;
@@ -105,34 +104,9 @@ public class ProActive {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
-
-    /**
-     * Default level is used to store default handlers
-     */
-    static public HashMap defaultLevel = null;
-
-    /**
-     * VM level provides handling strategies according to the virtual machine
-     */
-    static public HashMap VMLevel = null;
-
-    /**
-     * Code level is used for temporary handlers
-     */
-    static public HashMap codeLevel = null;
-
-    /**
-     * Declaration of the handler manager with a default policy
-     */
-
-    // static public HandlerManager handlerManager;
     static {
         ProActiveConfiguration.load();
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
-
-        // Creation of the default level which contains standard exception handlers
-        //        ProActive.defaultLevel = new HashMap();
-        //        HandlerManager.initialize();
     }
 
     //
@@ -1673,12 +1647,42 @@ public class ProActive {
         ExceptionHandler.waitForPotentialException();
     }
 
-    //NFE
-    public static void addNFEListener(NFEListener listener) {
+    /* NFE handlers on the local JVM */
+    public static void addNFEListenerOnJVM(NFEListener listener) {
         NFEManager.addNFEListener(listener);
     }
 
-    public static void removeNFEListener(NFEListener listener) {
+    public static void removeNFEListenerOnJVM(NFEListener listener) {
         NFEManager.removeNFEListener(listener);
+    }
+
+    /* NFE handlers associated to an active object (body) */
+    public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
+        BodyAdapter body = getRemoteBody(ao);
+        body.addNFEListener(listener);
+    }
+
+    public static void removeNFEListenerOnAO(Object ao, NFEListener listener) {
+        BodyAdapter body = getRemoteBody(ao);
+        body.removeNFEListener(listener);
+    }
+
+    /* NFE handlers associated to a proxy */
+    public static void addNFEListenerOnProxy(Object ao, NFEListener listener) {
+        try {
+            ((AbstractProxy) ao).addNFEListener(listener);
+        } catch (ClassCastException cce) {
+            throw new IllegalArgumentException(
+                "The object must be a proxy to an active object");
+        }
+    }
+
+    public static void removeNFEListenerOnProxy(Object ao, NFEListener listener) {
+        try {
+            ((AbstractProxy) ao).removeNFEListener(listener);
+        } catch (ClassCastException cce) {
+            throw new IllegalArgumentException(
+                "The object must be a proxy to an active object");
+        }
     }
 }

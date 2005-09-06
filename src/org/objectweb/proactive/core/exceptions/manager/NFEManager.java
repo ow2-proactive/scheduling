@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.exceptions.manager;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.HalfBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
@@ -69,6 +70,13 @@ public class NFEManager {
     }
 
     public static void defaultNFEHandler(NonFunctionalException nfe) {
-        logger.warn(nfe);
+
+        /* Hack to avoid killing an active object */
+        if (ProActive.getBodyOnThis() instanceof HalfBody) {
+            logger.warn("NFE in a HalfBody", nfe);
+            //throw nfe;
+        } else {
+            logger.warn("NFE in a Body", nfe);
+        }
     }
 }
