@@ -40,105 +40,19 @@ package org.objectweb.proactive.core;
  *
  */
 public class ProActiveException extends Exception {
-    public Throwable detail;
-
-    /**
-     * Constructs a <code>ProActiveException</code> with no specified
-     * detail message.
-     */
     public ProActiveException() {
-    }
-
-    /**
-     * Constructs a <code>ProActiveException</code> with the specified detail message.
-     * @param s the detail message
-     */
-    public ProActiveException(String s) {
-        super(s);
-    }
-
-    /**
-     * Constructs a <code>ProActiveException</code> with the specified
-     * detail message and nested exception.
-     * @param s the detail message
-     * @param ex the nested exception
-     */
-    public ProActiveException(String s, Throwable ex) {
-        super(s);
-        detail = ex;
-    }
-
-    /**
-     * Constructs a <code>ProActiveException</code> with the specified
-     * detail message and nested exception.
-     * @param ex the nested exception
-     */
-    public ProActiveException(Throwable ex) {
         super();
-        detail = ex;
     }
 
-    /**
-     * Returns the embedded target exception or null.
-     * @return the embedded target exception or null.
-     */
-    public Throwable getTargetException() {
-        return detail;
+    public ProActiveException(String message) {
+        super(message);
     }
 
-    /**
-     * Returns the detail message, including the message from the nested
-     * exception if there is one.
-     */
-    public String getMessage() {
-        if (detail == null) {
-            return super.getMessage();
-        } else {
-            if (super.getMessage() == null) {
-                return detail.getMessage();
-            } else {
-                return super.getMessage() + "; nested exception is: \n" +
-                detail.toString();
-            }
-        }
+    public ProActiveException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    /**
-     * Prints the composite message and the embedded stack trace to
-     * the specified stream <code>ps</code>.
-     * @param ps the print stream
-     */
-    public void printStackTrace(java.io.PrintStream ps) {
-        if (detail == null) {
-            super.printStackTrace(ps);
-        } else {
-            synchronized (ps) {
-                ps.println(getMessage());
-                detail.printStackTrace(ps);
-            }
-        }
-    }
-
-    /**
-     * Prints the composite message to <code>System.err</code>.
-     */
-    public void printStackTrace() {
-        printStackTrace(System.err);
-    }
-
-    /**
-     * Prints the composite message and the embedded stack trace to
-     * the specified print writer <code>pw</code>.
-     * @param pw the print writer
-     */
-    public void printStackTrace(java.io.PrintWriter pw) {
-        if (detail == null) {
-            super.printStackTrace(pw);
-        } else {
-            synchronized (pw) {
-                pw.println(getMessage());
-                detail.printStackTrace(pw);
-            }
-        }
+    public ProActiveException(Throwable cause) {
+        super(cause);
     }
 }

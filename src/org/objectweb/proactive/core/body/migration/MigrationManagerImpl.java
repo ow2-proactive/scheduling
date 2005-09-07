@@ -123,7 +123,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
             return remoteBody;
         } catch (ProActiveException e) {
             MigrationException me = new MigrationException("Exception while sending the Object",
-                    e.getTargetException());
+                    e.getCause());
             if (hasListeners()) {
                 notifyAllListeners(new MigrationEvent(me));
             }
