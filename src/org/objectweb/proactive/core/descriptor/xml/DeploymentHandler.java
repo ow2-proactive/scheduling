@@ -53,8 +53,6 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 class DeploymentHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
     private ProActiveDescriptor proActiveDescriptor;
-    private String padURL;
-
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
