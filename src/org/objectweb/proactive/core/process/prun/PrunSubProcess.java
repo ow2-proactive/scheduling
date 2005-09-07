@@ -83,6 +83,8 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
+    private static final String FILE_TRANSFER_DEFAULT_PROTOCOL = null;
+    
     protected int jobID;
     protected String queueName;
     protected String hostList;
@@ -155,6 +157,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
             PrunSubProcess p = new PrunSubProcess(new SimpleExternalProcess(
                         "/bin/ls "));
             p.setHostsNumber("2");
+            p.setQueueName("plugtest");
             p.startProcess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -371,6 +374,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         //        System.out.println(
         //            "---------------Internal start process of PBSSubProcess " +
         //            command);
+    	System.out.println(command);
         super.internalStartProcess(command);
     }
 
@@ -385,16 +389,16 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         prunCommand.append(" -no-panda -v -" + processorPerNode + " -t " +
             bookingDuration + " ");
 
+        if (queueName != null) {
+            prunCommand.append("-native '-q " + queueName + "' ");
+        }
+        
         if (hostList != null) {
             prunCommand.append("-m " + hostList + " ");
         }
 
         if (outputFile != null) {
             prunCommand.append("-o " + outputFile + " ");
-        }
-
-        if (queueName != null) {
-            prunCommand.append("-q " + queueName + " ");
         }
 
         prunCommand.append(commandAndOptions[0] + " " + hosts + " " +
@@ -457,6 +461,10 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         public void log(String message, Throwable t) {
         }
     }
+
+	public String getFileTransferDefaultCopyProtocol() {
+		return FILE_TRANSFER_DEFAULT_PROTOCOL;
+	}
 
     // end inner class CompositeMessageLogger
 }
