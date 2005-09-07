@@ -254,9 +254,14 @@ public class C3DUser implements InitActive, java.io.Serializable {
 
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor(argv[0]);
-        } catch (ProActiveException e1) {
-            e1.printStackTrace();
+            if (argv.length == 0) {
+                proActiveDescriptor = ProActive.getProactiveDescriptor();
+            } else {
+                proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+                        argv[0]);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             System.exit(-1);
         }
         proActiveDescriptor.activateMappings();

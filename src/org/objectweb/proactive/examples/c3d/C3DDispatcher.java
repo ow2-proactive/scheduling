@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -494,8 +495,12 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
-                    argv[0]);
+            if (argv.length == 0) {
+                proActiveDescriptor = ProActive.getProactiveDescriptor();
+            } else {
+                proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
+                        argv[0]);
+            }
             proActiveDescriptor.activateMappings();
         } catch (Exception e) {
             e.printStackTrace();
@@ -506,10 +511,11 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
                                                     .getNodesURL();
         Object[] param = new Object[] { rendererNodes, proActiveDescriptor };
 
-        Node node = proActiveDescriptor.getVirtualNode("Dispatcher").getNode();
+        Node dispatcherNode = proActiveDescriptor.getVirtualNode("Dispatcher")
+                                                 .getNode();
         try {
             ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DDispatcher",
-                param, node);
+                param, dispatcherNode);
         } catch (Exception e) {
             e.printStackTrace();
         }
