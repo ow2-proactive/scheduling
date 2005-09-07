@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by Terence FERUT (Inria) -->
 <!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Quilici (Inria) -->
 <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!-- 
@@ -23,6 +22,12 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for infrastructure/services/serviceDefinition element-->
 		</xs:unique>
+		<xs:unique name="filetransferDefid">
+			<xs:selector xpath="FileTransferDefinitions/FileTransfer"/>
+			<xs:field xpath="@id"/>
+			<!--Uniqueness of the id attribute for FileTransferDefinitions/FileTransfer element-->
+		</xs:unique>
+
 		<xs:unique name="MapToVirtualNodeDefid">
 			<xs:selector xpath="mainDefinition/mapToVirtualNode"/>
 			<xs:field xpath="@value"/>
@@ -34,6 +39,11 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:keyref name="VirtNodeName" refer="vnName">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
+		</xs:keyref>
+		<xs:keyref name="VirtNodeFileTransfer" refer="filetransferid">
+			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:field xpath="@FileTransferDeploy"/>
+			<!--xs:field xpath="@FileTransferRetrieve"/-->
 		</xs:keyref>
 		<xs:keyref name="vnFtServiceId" refer="serviceid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
@@ -114,6 +124,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
+		<xs:keyref name="unicoreprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/unicoreProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/unicoreProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
 		<xs:key name="virtualNodeDefinitionName">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
@@ -153,6 +168,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="infrastructure/services/serviceDefinition"/>
 			<xs:field xpath="@id"/>
 			<!-- Key definition for the attribute id located at  infrastructure/services/serviceDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/services/serviceDefinition@id -->
+		</xs:key>
+		<xs:key name="filetransferid">
+			<xs:selector xpath="FileTransferDefinitions/FileTransfer"/>
+			<xs:field xpath="@id"/>
+			<!-- Key definition for the attribute id located at FileTransferDefinitions/FileTransfer. This key will be used to ensure that the FileTransferDeploy & FileTransferRetrieve attribute defined in the VirtualNodeExtType has a correponding value in FileTransferDefinitions/FileTransfer@id -->
 		</xs:key>
 	</xs:element>
 	<!--processReference element is defined as a global element, hence it can be referenced in many part of the document. It has one attribute: refid that must occur once and only once. This element must reference a process defined elsewhere in the infrastructure section. Hence in the infrastructure section there must be an element ProcessDefinition with the corresponding value for id attribute   -->
@@ -208,6 +228,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				<!-- </xs:keyref>-->
 			</xs:element>
 			<xs:element name="deployment" type="DeploymentType"/>
+			<xs:element name="FileTransferDefinitions" type="FileTransferDefinitionsType" minOccurs="0"/>
 			<xs:element name="infrastructure" type="InfrastructureType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -295,6 +316,8 @@ The following element ProActiveDescriptor defines the root of the schema
 				<xs:attribute name="ftServiceId" type="xs:string" use="optional"/>
 				<xs:attribute name="timeout" type="xs:positiveInteger" use="optional"/>
 				<xs:attribute name="waitForTimeout" type="xs:boolean" use="optional" default="false"/>
+				<xs:attribute name="FileTransferDeploy" type="xs:string" use="optional"/>
+				<xs:attribute name="FileTransferRetrieve" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -414,6 +437,31 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:element ref="processReference"/>
 		</xs:sequence>
+	</xs:complexType>
+	<!--FileTransferDefinitions element has one child: FileTransfer that can appear cero or more times -->
+	<xs:complexType name="FileTransferDefinitionsType">
+		<xs:sequence>
+			<xs:element name="FileTransfer" type="FileTransferType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FileTransferType">
+			<xs:sequence>
+				<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="src" type="xs:string" use="required"/>
+						<xs:attribute name="dest" type="xs:string" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dir" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="src" type="xs:string" use="required"/>
+						<xs:attribute name="dest" type="xs:string" use="optional"/>
+						<xs:attribute name="includes" type="xs:string" use="optional"/>
+						<xs:attribute name="excludes" type="xs:string" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--infrastructure element has two childs: processes and services element that can appear zero or  once -->
 	<xs:complexType name="InfrastructureType">
@@ -597,6 +645,21 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="parameter">
 		<xs:attribute name="value" type="xs:string"/>
 	</xs:complexType>
+	<!-- FileTransfer Process Specific Information -->
+	<xs:complexType name="FileTransferStructureType">
+		<xs:sequence>
+			<xs:element name="copyProtocol" minOccurs="0"/>
+			<xs:element name="sourceInfo" type="FileTransferStructureInfoType" minOccurs="0"/>
+			<xs:element name="destinationInfo" type="FileTransferStructureInfoType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="refid" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="FileTransferStructureInfoType">
+		<xs:attribute name="prefix"   type="xs:string" use="optional"/>
+		<xs:attribute name="hostname" type="xs:string" use="optional"/>
+		<xs:attribute name="username" type="xs:string" use="optional"/>
+		<xs:attribute name="password" type="xs:string" use="optional"/>
+	</xs:complexType>
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
 	<xs:complexType name="RshProcessType">
 		<xs:sequence>
@@ -686,6 +749,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -848,13 +913,22 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<xs:complexType name="sgeProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
-			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="gridEngineOption" type="OarOptionType" minOccurs="0"/>
+			<xs:element ref="commandPath"/>
+			<xs:element name="gridEngineOption" type="GridEngineOptionType"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="GridEngineOptionType">
+		<xs:sequence>
+			<xs:element name="hostsNumber" type="xs:string"/>
+			<xs:element name="bookingDuration" type="xs:string"/>
+			<xs:element name="scriptPath" type="FilePathType"/>
+			<xs:element name="hostlist" type="xs:string" minOccurs="0"/>
+			<xs:element name="parallelEnvironment" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
 	</xs:complexType>
 	<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
 	<xs:simpleType name="ListType">
@@ -892,8 +966,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="processReference"/>
 			<xs:element name="unicoreDirPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="keyFilePath" type="FilePathType" minOccurs="0"/>
-			<xs:element name="importFiles" type="unicoreImportFilesType" minOccurs="0"/>
 			<xs:element name="unicoreOption" type="unicoreOptionType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.unicore.UnicoreProcess"/>
 		<xs:attribute name="keypassword" type="xs:string" use="optional"/>
@@ -901,13 +975,6 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="submitjob" type="xs:boolean" use="optional" default="true"/>
 		<xs:attribute name="savejob" type="xs:boolean" use="optional" default="false"/>
 		<!--xs:attribute name="closeStream" type="CloseStreamType" use="optional"/-->
-	</xs:complexType>
-	<!--unicoreImportFilesType element has two child: absolutePath and relativePath.  One of the child must appear once or more. Both element can be present in the import file definition. For instance an absolutePath element followed by a relativePath element-->
-	<xs:complexType name="unicoreImportFilesType">
-		<xs:choice maxOccurs="unbounded">
-			<xs:element name="absolutePath" type="AbsolutePathType"/>
-			<xs:element name="relativePath" type="RelativePathType"/>
-		</xs:choice>
 	</xs:complexType>
 	<!--unicoreOption has 2 childs: unicoreUsiteType represents the Unicore site, unicoreVsiteType represents the virtual site
 	within the Unicore site. Notice that not all unicore features are supported. -->
