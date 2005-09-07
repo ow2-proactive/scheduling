@@ -1015,16 +1015,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * @param processClassname
-     * @return
-     */
-    private String findProtocolId(String processClassname) {
-        int index = processClassname.lastIndexOf(".") + 1;
-        int lastIndex = processClassname.lastIndexOf("Process");
-        return processClassname.substring(index, lastIndex) + "-";
-    }
-
-    /**
      * Returns a deepcopy of the process
      * @param process the process to copy
      * @return ExternalProcess, the copy version of the process
