@@ -61,16 +61,14 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
-    public DeploymentHandler(ProActiveDescriptor proActiveDescriptor,
-        String padURL) {
+    public DeploymentHandler(ProActiveDescriptor proActiveDescriptor) {
         super(false);
-        this.padURL = padURL;
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(REGISTER_TAG, new RegisterHandler());
         this.addHandler(LOOKUP_TAG, new LookupHandler());
         {
             PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
-            ch.addHandler(MAP_TAG, new MapHandler(padURL));
+            ch.addHandler(MAP_TAG, new MapHandler());
             this.addHandler(MAPPING_TAG, ch);
         }
         {
@@ -170,13 +168,11 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
      */
     private class MapHandler extends PassiveCompositeUnmarshaller {
         VirtualNode vn;
-        private String padURL;
 
-        private MapHandler(String padURL) {
+        private MapHandler() {
             //    	CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
             //   		cu.addHandler(VMNAME_TAG, new VmNameHandler());
             //    	this.addHandler(JVMSET_TAG, cu);
-            this.padURL = padURL;
             this.addHandler(JVMSET_TAG, new JvmSetHandler());
         }
 
@@ -188,7 +184,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 throw new org.xml.sax.SAXException(
                     "mapping defined without specifying virtual node");
             }
-            vn = proActiveDescriptor.createVirtualNode(vnName, false, padURL);
+            vn = proActiveDescriptor.createVirtualNode(vnName, false);
         }
 
         protected void notifyEndActiveHandler(String name,

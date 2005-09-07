@@ -877,7 +877,7 @@ public class ProActive {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    public static ProActiveDescriptor getProactiveDescriptor(
+    private static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl, boolean hierarchicalSearch)
         throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
@@ -886,10 +886,15 @@ public class ProActive {
         }
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptor pad;
-
-        //System.out.println("padurl with id : " + xmlDescriptorUrl) ;
         try {
-            pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
+            if (!hierarchicalSearch) {
+                //if not hierarchical search, we assume that the descriptor might has been
+                //register with the default jobID
+                pad = part.getDescriptor(xmlDescriptorUrl +
+                        ProActive.getJobId(), hierarchicalSearch);
+            } else {
+                pad = part.getDescriptor(xmlDescriptorUrl, hierarchicalSearch);
+            }
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
@@ -899,7 +904,6 @@ public class ProActive {
             return pad;
         }
 
-        //System.out.println("not found parsing : " + xmlDescriptorUrl) ;
         // else parses it
         try {
             if (logger.isInfoEnabled()) {
@@ -908,8 +912,7 @@ public class ProActive {
             }
             ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl);
             pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
-            part.registerDescriptor(xmlDescriptorUrl + pad.getJobID(), pad);
-            //System.out.println("pad registered with id : " + xmlDescriptorUrl + pad.getJobID()) ;
+            part.registerDescriptor(pad.getUrl(), pad);
             return pad;
         } catch (org.xml.sax.SAXException e) {
             e.printStackTrace();

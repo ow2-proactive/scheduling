@@ -58,10 +58,11 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 public interface ProActiveDescriptor extends java.io.Serializable {
 
     /**
-     * return the jobID of the pad
-     * @return String
+     * return the Url of the pad
+     * @return String in fact it is an identifire for the pad that is returned.
+     * This identifier is build from the pad url appended with the pad's jobId.
      */
-    public String getJobID();
+    public String getUrl();
 
     public void setMainDefined(boolean mainDefined);
 
@@ -188,23 +189,11 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * If the VirtualNode with the given name has previously been created, this method returns it.
      * @param vnName
      * @param lookup if true, at creation time the VirtualNode will be a VirtualNodeLookup.
-     * @param padURL url of the proactive active descriptor that created the virtual node
-     * @return VirtualNode
-     */
-    public VirtualNode createVirtualNode(String vnName, boolean lookup,
-        String padURL);
-
-    /**
-     * Creates a VirtualNode with the given name
-     * If the VirtualNode with the given name has previously been created, this method returns it.
-     * @param vnName
-     * @param lookup if true, at creation time the VirtualNode will be a VirtualNodeLookup.
-     * @param padURL url of the proactive active descriptor that created the virtual node
      * @param isMainVN true if the virtual node is linked to a main definition
      * @return VirtualNode
      */
     public VirtualNode createVirtualNode(String vnName, boolean lookup,
-        String padURL, boolean isMainVN);
+        boolean isMainVN);
 
     /**
      * Creates a VirtualMachine of the given name

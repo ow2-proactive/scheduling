@@ -645,7 +645,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //
     public synchronized void runtimeRegistered(RuntimeRegistrationEvent event) {
         String nodeName;
-        String[] nodeNames = null;
         ProActiveRuntime proActiveRuntimeRegistered;
         String nodeHost;
         String protocol;
@@ -1002,7 +1001,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             // if it is a main node we set the property for retrieving the pad
             if (mainVirtualNode) {
-                jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL + jobID);
+                jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL);
             }
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +

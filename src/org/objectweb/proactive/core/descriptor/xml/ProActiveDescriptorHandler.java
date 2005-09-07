@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -59,9 +58,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         super(false);
         proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
         addHandler(MAIN_DEFINITION_TAG,
-            new MainDefinitionHandler(proActiveDescriptor, xmlDescriptorUrl));
-        addHandler(DEPLOYMENT_TAG,
-            new DeploymentHandler(proActiveDescriptor, xmlDescriptorUrl));
+            new MainDefinitionHandler(proActiveDescriptor));
+        addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
         addHandler(INFRASTRUCTURE_TAG,
             new InfrastructureHandler(proActiveDescriptor));
         addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
@@ -232,7 +230,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 throw new org.xml.sax.SAXException(
                     "VirtualNode defined without name");
             }
-            VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName, true);
+            proActiveDescriptor.createVirtualNode(vnName, true);
         }
     } // end inner class VirtualNodeLookupHandler
 

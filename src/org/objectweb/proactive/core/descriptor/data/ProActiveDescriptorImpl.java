@@ -128,8 +128,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
-    public String getJobID() {
-        return jobID;
+    public String getUrl() {
+        return this.url;
     }
 
     /**
@@ -286,16 +286,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public VirtualNode createVirtualNode(String vnName, boolean lookup) {
-        return createVirtualNode(vnName, lookup, null);
+        return createVirtualNode(vnName, lookup, false);
     }
 
     public VirtualNode createVirtualNode(String vnName, boolean lookup,
-        String padURL) {
-        return createVirtualNode(vnName, lookup, padURL, false);
-    }
-
-    public VirtualNode createVirtualNode(String vnName, boolean lookup,
-        String padURL, boolean isMainNode) {
+        boolean isMainNode) {
         VirtualNode vn = getVirtualNode(vnName);
 
         if (jobID == null) {
@@ -306,6 +301,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 this.jobID = ProActive.getJobId();
                 //System.out.println("using runtime id : " + jobID);
             }
+            this.url = url + this.jobID;
         }
 
         if (vn == null) {
@@ -313,7 +309,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 vn = new VirtualNodeLookup(vnName);
             } else {
                 vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
-                        padURL, isMainNode);
+                        this.url, isMainNode);
                 ((VirtualNodeImpl) vn).jobID = this.jobID;
                 //System.out.println("vn created with url: " + padURL + " and jobid : " + ((VirtualNodeImpl) vn).jobID);
             }

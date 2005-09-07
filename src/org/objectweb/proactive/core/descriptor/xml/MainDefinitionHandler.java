@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
     private ProActiveDescriptor proActiveDescriptor;
-    private String padURL;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -59,14 +58,12 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     public MainDefinitionHandler() {
     }
 
-    public MainDefinitionHandler(ProActiveDescriptor proActiveDescriptor,
-        String padURL) {
+    public MainDefinitionHandler(ProActiveDescriptor proActiveDescriptor) {
         super();
-        this.padURL = padURL;
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(ARG_TAG, new ArgHandler(proActiveDescriptor));
         this.addHandler(MAP_TO_VIRTUAL_NODE_TAG,
-            new MapToVirtualNodeHandler(proActiveDescriptor, padURL));
+            new MapToVirtualNodeHandler(proActiveDescriptor));
     }
 
     public void startContextElement(String name, Attributes attributes)
@@ -128,12 +125,9 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
 
     private class MapToVirtualNodeHandler extends BasicUnmarshaller {
         ProActiveDescriptor proActiveDescriptor;
-        private String padURL;
 
-        private MapToVirtualNodeHandler(
-            ProActiveDescriptor proActiveDescriptor, String padURL) {
+        private MapToVirtualNodeHandler(ProActiveDescriptor proActiveDescriptor) {
             this.proActiveDescriptor = proActiveDescriptor;
-            this.padURL = padURL;
         }
 
         public void startContextElement(String name, Attributes attributes)
@@ -145,7 +139,7 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
             }
 
             VirtualNode vn = (VirtualNode) proActiveDescriptor.createVirtualNode(virtualNode,
-                    false, padURL, true);
+                    false, true);
 
             proActiveDescriptor.mainDefinitionAddVirtualNode(vn);
         }
