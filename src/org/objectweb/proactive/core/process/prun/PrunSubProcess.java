@@ -374,7 +374,9 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         //        System.out.println(
         //            "---------------Internal start process of PBSSubProcess " +
         //            command);
-    	System.out.println(command);
+    	if(logger.isDebugEnabled())
+    		logger.debug(command);
+    	
         super.internalStartProcess(command);
     }
 
