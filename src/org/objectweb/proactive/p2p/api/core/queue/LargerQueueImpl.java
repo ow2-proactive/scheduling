@@ -35,14 +35,12 @@ import java.util.Vector;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.p2p.api.core.Result;
 import org.objectweb.proactive.p2p.api.core.Task;
 
 
 public class LargerQueueImpl implements TaskQueue {
     private Vector queue = new Vector();
     private int size = 0;
-    private Result bestCurrentResult = null;
 
     public LargerQueueImpl() {
     }
@@ -53,8 +51,11 @@ public class LargerQueueImpl implements TaskQueue {
     public void addAll(Collection tasks) {
         this.queue.add(tasks);
         this.size += tasks.size();
-        logger.info("Task provider just received and added " + tasks.size() +
-            " of group " + ((Task) tasks.iterator().next()).getTag());
+        if (logger.isInfoEnabled()) {
+            Task t = ((Task) tasks.iterator().next());
+            logger.info("Task provider just received and added " +
+                tasks.size() + " of group " + t.getTag());
+        }
     }
 
     /**
@@ -77,6 +78,9 @@ public class LargerQueueImpl implements TaskQueue {
      * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#next()
      */
     public Task next() {
+        if (this.size == 0) {
+            throw new RuntimeException("No more elements");
+        }
         if (current >= this.queue.size()) {
             current = 0;
         }
@@ -89,24 +93,5 @@ public class LargerQueueImpl implements TaskQueue {
             this.size--;
             return (Task) subTasks.remove(0);
         }
-    }
-
-    /**
-     * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#informNewBestResult(org.objectweb.proactive.p2p.api.core.Result, java.lang.String)
-     */
-    public void informNewBestResult(Result newBest, String taskTag) {
-        if (this.bestCurrentResult == null) {
-            this.bestCurrentResult = newBest;
-        } else if (newBest.isBetterThan(this.bestCurrentResult)) {
-            this.bestCurrentResult = newBest;
-        } else {
-            // not a new best result
-            logger.debug("The task provider just had inform of a new result," +
-                " but it is not better than the precedent");
-            return;
-        }
-
-        logger.info("The task provider was inform of a new best result from " +
-            taskTag);
     }
 }

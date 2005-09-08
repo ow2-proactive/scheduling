@@ -75,23 +75,4 @@ public class BasicQueueImpl implements TaskQueue {
     public Task next() {
         return (Task) this.queue.remove(0);
     }
-
-    /**
-     * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#informNewBestResult(org.objectweb.proactive.p2p.api.core.Result, java.lang.String)
-     */
-    public void informNewBestResult(Result newBest, String taskTag) {
-        if (this.bestCurrentResult == null) {
-            this.bestCurrentResult = newBest;
-        } else if (newBest.isBetterThan(this.bestCurrentResult)) {
-            this.bestCurrentResult = newBest;
-        } else {
-            // not a new best result
-            logger.debug("The task provider just had inform of a new result," +
-                " but it is not better than the precedent");
-            return;
-        }
-
-        logger.info("The task provider was inform of a new best result from " +
-            taskTag);
-    }
 }

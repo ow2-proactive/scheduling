@@ -38,7 +38,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.p2p.api.core.Result;
 import org.objectweb.proactive.p2p.api.core.Task;
 
 
@@ -52,6 +51,4 @@ public interface TaskQueue extends Serializable {
     public abstract BooleanWrapper hasNext();
 
     public abstract Task next();
-
-    public abstract void informNewBestResult(Result newBest, String taskTag);
 }
