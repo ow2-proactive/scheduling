@@ -92,6 +92,7 @@ public interface ProActiveDescriptorConstants {
     public static final String SCRIPT_PATH_TAG = "scriptPath";
     public static final String GLOBUS_OPTIONS_TAG = "globusOption";
     public static final String GLOBUS_COUNT_TAG = "count";
+    public static final String GLOBUS_MAXTIME_TAG = "maxTime";
     public static final String PRUN_OPTIONS_TAG = "prunOption";
     public static final String PROCESSOR_TAG = "processor";
     public static final String HOSTS_NUMBER_TAG = "hostsNumber";

@@ -53,6 +53,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     protected String stderr = null;
     protected String stdout = null;
     protected String queue = null;
+    protected String maxTime = null;
 
     //===========================================================
     // Constructor
@@ -136,6 +137,9 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         if (environment != null) {
             RSLCommand = RSLCommand + "(environment=" +
                 buildEnvironmentCommand() + ")";
+        }
+        if (maxTime != null) {
+            RSLCommand = RSLCommand + "(maxTime=" + maxTime + ")";
         }
         return RSLCommand;
     }
@@ -249,4 +253,12 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     public void setQueue(String queue) {
         this.queue = queue;
     }
+
+	public String getMaxTime() {
+		return maxTime;
+	}
+
+	public void setMaxTime(String maxTime) {
+		this.maxTime = maxTime;
+	}
 }

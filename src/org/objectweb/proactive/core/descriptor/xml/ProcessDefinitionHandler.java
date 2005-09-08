@@ -873,6 +873,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         protected class GlobusOptionHandler extends PassiveCompositeUnmarshaller {
             public GlobusOptionHandler() {
                 this.addHandler(GLOBUS_COUNT_TAG, new SingleValueUnmarshaller());
+                this.addHandler(GLOBUS_MAXTIME_TAG,
+                    new SingleValueUnmarshaller());
             }
 
             public void startContextElement(String name, Attributes attributes)
@@ -887,6 +889,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 GlobusProcess globusProcess = (GlobusProcess) targetProcess;
                 if (name.equals(GLOBUS_COUNT_TAG)) {
                     globusProcess.setCount((String) activeHandler.getResultObject());
+                } else if (name.equals(GLOBUS_MAXTIME_TAG)) {
+                    globusProcess.setMaxTime((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
