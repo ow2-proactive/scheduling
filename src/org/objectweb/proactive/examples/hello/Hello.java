@@ -30,50 +30,63 @@
  */
 package org.objectweb.proactive.examples.hello;
 
-import org.objectweb.proactive.core.util.UrlBuilder;
+import java.net.UnknownHostException;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
-/**
- * Our hello server
- */
-public class Hello implements org.objectweb.proactive.RunActive,
-    java.io.Serializable {
-    private String name;
-    private String nodeURL;
-    private String hi = "Hello world";
+/** A stripped-down Active Object example.
+ * The object has only one public method, sayHello()
+ * The object does nothing but reflect the host its on. */
+public class Hello implements java.io.Serializable {
+    static Logger logger = Logger.getLogger(Loggers.EXAMPLES);
+    private final String message = "Hello World!";
     private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat(
             "dd/MM/yyyy HH:mm:ss");
 
+    /** ProActive compulsory no-args constructor */
     public Hello() {
     }
 
-    public Hello(String name) {
-        this.name = name;
+    /** The Active Object creates and returns information on its location
+     * @return a StringWrapper which is a Serialized version, for asynchrony */
+    public StringWrapper sayHello() {
+        return new StringWrapper(this.message + "\n from " + getHostName() +
+            "\n at " + dateFormat.format(new java.util.Date()));
     }
 
-    public String sayHello() {
-        return hi + " at " + dateFormat.format(new java.util.Date()) +
-        "\n from \n" + nodeURL;
-    }
-
-    public void runActivity(org.objectweb.proactive.Body body) {
-        org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
-        nodeURL = body.getNodeURL();
-        service.fifoServing();
-    }
-
-    public static void main(String[] args) {
-        // Registers it with an URL
+    /** finds the name of the local machine */
+    static String getHostName() {
         try {
-            // Creates an active instance of class HelloServer on the local node
-            Hello hello = (Hello) org.objectweb.proactive.ProActive.newActive(Hello.class.getName(),
-                    new Object[] { "remote" });
-            java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
-            org.objectweb.proactive.ProActive.register(hello,
-                "//" + UrlBuilder.getHostNameorIP(localhost) + "/Hello");
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
+            return java.net.InetAddress.getLocalHost().toString();
+        } catch (UnknownHostException e) {
+            return "unknown";
         }
+    }
+
+    /** The call that starts the Acive Objects, and displays results.
+     * @param args must contain the name of an xml descriptor */
+    public static void main(String[] args) throws Exception {
+        // Access the nodes of the descriptor file
+        ProActiveDescriptor descriptorPad = ProActive.getProactiveDescriptor(args[0]);
+        descriptorPad.activateMappings();
+        VirtualNode vnode = descriptorPad.getVirtualNode("Hello");
+        Node[] nodes = vnode.getNodes();
+
+        // Creates an active instance of class Hello2 on the local node
+        Hello hello = (Hello) ProActive.newActive(Hello.class.getName(), // the class to deploy
+                null, // the arguments to pass to the constructor, here none
+                nodes[0]); // which jvm should be used to hold the Active Object
+
+        // get and display a value 
+        StringWrapper received = hello.sayHello(); // possibly remote call
+        logger.info("On " + getHostName() + ", a message was received: " +
+            received); // potential wait-by-necessity 
     }
 }

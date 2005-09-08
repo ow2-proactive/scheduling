@@ -33,9 +33,14 @@ package org.objectweb.proactive.examples.hello;
 import org.apache.log4j.Logger;
 
 
+/**
+ * This shows an example of how to access another Active Object,
+ * which may have been created by another application.
+ */
 public class HelloClient {
     static Logger logger = Logger.getLogger(HelloClient.class.getName());
 
+    /** Looks for a Hello Active Object bepending on args, and calls a method on it */
     public static void main(String[] args) {
         Hello myServer;
         String message;
@@ -53,7 +58,7 @@ public class HelloClient {
             }
 
             // Invokes a remote method on this object to get the message
-            message = myServer.sayHello();
+            message = myServer.sayHello().toString();
             // Prints out the message
             logger.info("The message is : " + message);
         } catch (Exception e) {

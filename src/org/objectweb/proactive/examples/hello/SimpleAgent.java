@@ -36,22 +36,28 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
+/**
+ * An example of the use of migration.
+ * The SimpleAgent simply says where it is. The main() jsut creates it,
+ * and moves it to user-specified node (node must be created manually previously)
+ */
 public class SimpleAgent implements java.io.Serializable {
     static Logger logger = Logger.getLogger(SimpleAgent.class.getName());
 
+    /** ProActive compulsory empty no-args constructor */
     public SimpleAgent() {
     }
 
+    /** Migrate the Active Object to a new host */
     public void moveTo(String t) {
         try {
-            logger.info("Avant la migration ");
             ProActive.migrateTo(t);
-            logger.info("Apres la migration je suis sur " + whereAreYou());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    /** Returns the machine name on which the Active Objzect is currently */
     public String whereAreYou() {
         try {
             return UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
@@ -60,8 +66,9 @@ public class SimpleAgent implements java.io.Serializable {
         }
     }
 
+    /** Creates a migratable SimpleAgaent, and migrates it */
     public static void main(String[] args) {
-        if (!(args.length > 0)) {
+        if (args.length != 1) {
             logger.info(
                 "Usage: java org.objectweb.proactive.examples.hello.SimpleAgent hostname/NodeName ");
             System.exit(-1);
@@ -79,9 +86,8 @@ public class SimpleAgent implements java.io.Serializable {
 
         // migrate the SimpleAgent to the location identified by the given node URL
         // we assume here that the node does already exist
-        logger.info("Je migre depuis " + t.whereAreYou());
+        logger.info("Migrating from " + t.whereAreYou());
         t.moveTo(args[0]);
-        logger.info("The Active Object is now on host (j'suis ici) : " +
-            t.whereAreYou());
+        logger.info("The Active Object is now on host : " + t.whereAreYou());
     }
 }

@@ -33,6 +33,11 @@ package org.objectweb.proactive.examples.hello;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
+/**
+ * An Applet to display the results of calls on a (distant) Hello Active Object.
+ * Can connect to an already deployed Hello if specified.
+ * Makes a nice demo.
+ */
 public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame {
 
     /** The active Hello object */
@@ -108,7 +113,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
     private class HelloTimer implements Runnable {
         public void run() {
             while (shouldRun) {
-                lMessage.setText(activeHello.sayHello());
+                lMessage.setText(activeHello.sayHello().toString());
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
