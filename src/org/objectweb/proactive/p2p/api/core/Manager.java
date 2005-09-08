@@ -179,59 +179,6 @@ public class Manager implements Serializable, InitActive,
             throw new RuntimeException("The manager is not active");
         }
 
-        while (this.taskProvider.hasNext().booleanValue()) {
-            if (this.workerGroupListIt.hasNext()) {
-                this.assignTaskToWorker((Worker) this.workerGroupListIt.next(),
-                    this.taskProvider.next());
-                logger.info("Init - Pending tasks: " +
-                    this.pendingTaskList.size() + " - Achivied tasks: " +
-                    this.allResults.size() + " - Not calculated tasks: " +
-                    this.taskProvider.size());
-                continue;
-            }
-
-            if (this.freeWorkerList.size() > 0) {
-                this.assignTaskToWorker((Worker) this.freeWorkerList.remove(0),
-                    this.taskProvider.next());
-                logger.info("Init - Pending tasks: " +
-                    this.pendingTaskList.size() + " - Achivied tasks: " +
-                    this.allResults.size() + " - Not calculated tasks: " +
-                    this.taskProvider.size());
-                continue;
-            }
-
-            try {
-                // wait for a free worker
-                if (this.futureTaskList.size() == 0) {
-                    continue;
-                }
-                int index = ProActive.waitForAny(this.futureTaskList, 1000);
-                this.allResults.add(this.futureTaskList.remove(index));
-                logger.info("New result found, best current is: " +
-                    this.rootTask.gather(
-                        (Result[]) this.allResults.toArray(
-                            new Result[this.allResults.size()])));
-                this.pendingTaskList.remove(index);
-                Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
-                if (this.taskProvider.hasNext().booleanValue()) {
-                    this.assignTaskToWorker(freeWorker, this.taskProvider.next());
-                    logger.info("Pending tasks: " +
-                        this.pendingTaskList.size() + " - Achivied tasks: " +
-                        this.allResults.size() + " - Not calculated tasks: " +
-                        this.taskProvider.size());
-                } else {
-                    continue;
-                }
-            } catch (ProActiveException e) {
-                continue;
-            }
-
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-            }
-        }
-
         // Serving requests and waiting for results
         while (this.taskProvider.hasNext().booleanValue() ||
                 (this.pendingTaskList.size() != 0)) {
@@ -254,6 +201,17 @@ public class Manager implements Serializable, InitActive,
                     this.pendingTaskList.size() + " - Achivied tasks: " +
                     this.allResults.size() + " - Not calculated tasks: " +
                     this.taskProvider.size());
+                continue;
+            } else if (this.futureTaskList.size() == 0) {
+                continue;
+            }
+            
+            if (this.futureTaskList.size() == 0) {
+                // Waiting workers
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
                 continue;
             }
 
@@ -293,10 +251,6 @@ public class Manager implements Serializable, InitActive,
                 }
             } catch (ProActiveException e) {
                 continue;
-            }
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
             }
         }
         logger.info("Total of results = " + this.allResults.size());
