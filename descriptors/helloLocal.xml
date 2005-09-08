@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Hello" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+           <register virtualNode="Hello" protocol="rmi"/> 
+           <mapping>
+			<map virtualNode="Hello">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

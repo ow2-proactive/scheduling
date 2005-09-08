@@ -1,6 +1,6 @@
 @echo off
-echo. 
-echo --- Hello World ---------------------------------------------
+echo.
+echo --- Hello World example ---------------------------------------------
 
 goto doit
 
@@ -8,18 +8,28 @@ goto doit
 echo. 
 goto end
 
-
 :doit
 SETLOCAL
 call init.bat
 
-rem For creating the hello object on a remote node simply pass the url of 
-rem the node in parameter. If the node cannot be found it will be 
-rem created locally.
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\.
 
-%JAVA_CMD% org.objectweb.proactive.examples.hello.HelloApplet //remotehost/node1
+REM JUST the hello launcher. No parameter. batch file asks a question.
+
+CHOICE /C:LR "Do you want to use a Local or remote descriptor file ? Simplest is local  "
+if errorlevel 1 GOTO remote
+
+:local 
+set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloLocal.xml
+goto launch
+
+:remote
+set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloRemote.xml
+
+:launch
+
+%JAVA_CMD% org.objectweb.proactive.examples.hello.Hello %XMLDESCRIPTOR%
 ENDLOCAL
 
-:end
-echo. 
-echo ---------------------------------------------------------
+echo.
+echo ----------------------------------------------------------
