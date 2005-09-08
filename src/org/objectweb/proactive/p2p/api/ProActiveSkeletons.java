@@ -34,15 +34,17 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.api.core.Manager;
 import org.objectweb.proactive.p2p.api.core.Task;
 import org.objectweb.proactive.p2p.api.core.queue.BasicQueueImpl;
 import org.objectweb.proactive.p2p.api.core.queue.LargerQueueImpl;
-import org.objectweb.proactive.p2p.api.core.queue.PriorityQueueImpl;
+import org.objectweb.proactive.p2p.api.core.queue.TaskQueue;
 
 
 /**
@@ -64,16 +66,25 @@ public class ProActiveSkeletons {
             nodes, BasicQueueImpl.class.getName());
     }
 
-    public static Manager newFarmWithPriorityQueue(Task root, Node managerNode,
-        Node[] nodes) throws ActiveObjectCreationException, NodeException {
-        return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, managerNode,
-            nodes, PriorityQueueImpl.class.getName());
+    public static Manager newFarm(Task root, VirtualNode virtualNode)
+        throws ActiveObjectCreationException, NodeException {
+        assert virtualNode.isActivated() == false : "The virtual must be not actived";
+        return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, virtualNode,
+            BasicQueueImpl.class.getName());
     }
 
     public static Manager newFarmWithLargerQueue(Task root, Node managerNode,
         Node[] nodes) throws ActiveObjectCreationException, NodeException {
         return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, managerNode,
             nodes, LargerQueueImpl.class.getName());
+    }
+
+    public static Manager newFarmWithLargerQueue(Task root,
+        VirtualNode virtualNode)
+        throws ActiveObjectCreationException, NodeException {
+        assert virtualNode.isActivated() == false : "The virtual must be not actived";
+         return ProActiveSkeletons.newFarmWithSpecifiedQueue(root, virtualNode,
+            LargerQueueImpl.class.getName());
     }
 
     public static Manager newFarmWithSpecifiedQueue(Task root,
@@ -84,12 +95,33 @@ public class ProActiveSkeletons {
         args[1] = nodes;
         args[2] = managerNode;
         args[3] = queueType;
-        Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
-                args, managerNode);
-        if (logger.isInfoEnabled()) {
-            logger.info("Manager actived on: " +
-                nodes[0].getNodeInformation().getURL());
-        }
-        return manager;
+        return ProActiveSkeletons.activingTheManager(args);
+    }
+
+    public static Manager newFarmWithSpecifiedQueue(Task root,
+        VirtualNode virtualNode, String queueType)
+        throws ActiveObjectCreationException, NodeException {
+        assert virtualNode.isActivated() == false : "The virtual must be not actived";
+        Object[] args = new Object[4];
+        args[0] = root;
+        args[1] = virtualNode;
+        args[2] = null;
+        args[3] = queueType;
+        return ProActiveSkeletons.activingTheManager(args);
+    }
+
+    private static Manager activingTheManager(Object[] args)
+        throws ActiveObjectCreationException, NodeException {
+        assert args.length == 4 : args;
+        assert args[0] instanceof Task : args[0];
+        assert args[1] instanceof Node[] || args[1] instanceof VirtualNode : args[1];
+        assert args[2] instanceof Node : args[2];
+        assert args[3] instanceof TaskQueue : args[3];
+
+        Node managerNode = (args[2] == null) ? NodeFactory.getDefaultNode()
+                                             : (Node) args[2];
+        args[2] = managerNode;
+        return (Manager) ProActive.newActive(Manager.class.getName(), args,
+            managerNode);
     }
 }

@@ -52,13 +52,12 @@ import org.objectweb.proactive.p2p.api.core.queue.TaskQueue;
  */
 public class Worker implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_WORKER);
-    private Manager manager = null;
     private Worker workerGroup = null;
     private Result bestCurrentResult = null;
     private TaskQueue taskProvider = null;
     private String workerNodeUrl = null;
     private String currentTaskTag;
-    private int currentTaskPriority;
+    private Group workerGroupCollection = null;
 
     /**
      * The active object empty constructor
@@ -71,8 +70,7 @@ public class Worker implements Serializable {
      * Construct a new Worker with its name.
      * @param name the Worker's name.
      */
-    public Worker(Manager manager, TaskQueue taskProvider) {
-        this.manager = manager;
+    public Worker(TaskQueue taskProvider) {
         this.taskProvider = taskProvider;
         logger.debug("Worker successfully created");
     }
@@ -101,7 +99,6 @@ public class Worker implements Serializable {
         }
         if (activedTask != null) {
             this.currentTaskTag = activedTask.getTag();
-            this.currentTaskPriority = activedTask.getPriority();
             activedTask.initLowerBound();
             activedTask.initUpperBound();
 
@@ -117,8 +114,11 @@ public class Worker implements Serializable {
     }
 
     public void setWorkerGroup(Worker workerGroup) {
-        Group group = ProActiveGroup.getGroup(workerGroup);
-        group.remove(ProActive.getStubOnThis());
+        this.workerGroupCollection = ProActiveGroup.getGroup(workerGroup);
+        if (!this.workerGroupCollection.remove(ProActive.getStubOnThis()) &&
+                (this.workerGroupCollection.size() > 0)) {
+            this.bestCurrentResult = ((Worker) this.workerGroupCollection.get(0)).getBestCurrentResult();
+        }
         this.workerGroup = workerGroup;
     }
 
@@ -134,9 +134,9 @@ public class Worker implements Serializable {
                 this.bestCurrentResult);
         } else if (newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
-            this.taskProvider.informNewBestResult(this.bestCurrentResult,
-                this.currentTaskTag);
-            this.workerGroup.informNewBestResult(this.bestCurrentResult);
+            if (this.workerGroup != null) {
+                this.workerGroup.informNewBestResult(this.bestCurrentResult);
+            }
             logger.info(
                 "A new best result was localy found and inform others: " +
                 this.bestCurrentResult);
@@ -148,7 +148,7 @@ public class Worker implements Serializable {
      */
     public Result getBestCurrentResult() {
         if (this.bestCurrentResult == null) {
-            return new Result(new NoResultsException());
+            return new Result((Exception) new NoResultsException());
         } else {
             return this.bestCurrentResult;
         }
@@ -166,13 +166,13 @@ public class Worker implements Serializable {
     public void sendSubTasksToTheManager(Vector subTaskList) {
         for (int i = 0; i < subTaskList.size(); i++) {
             Task current = (Task) subTaskList.get(i);
-            current.setPriority(this.currentTaskPriority);
-            current.incPriority();
             current.setTag(this.currentTaskTag + "-" + i);
         }
-        logger.info("The task sends " + subTaskList.size() +
-            " sub tasks with max priority of " +
-            ((Task) subTaskList.get(0)).getPriority());
+        logger.info("The task sends " + subTaskList.size() + " sub tasks");
         this.taskProvider.addAll(subTaskList);
+    }
+
+    public void addMember(Worker newWorker) {
+        this.workerGroupCollection.add(newWorker);
     }
 }

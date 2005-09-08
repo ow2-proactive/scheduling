@@ -50,7 +50,6 @@ public abstract class Task implements Serializable, Comparable {
     protected Result initLowerBound;
     protected Result initUpperBound;
     protected Worker worker = null;
-    private int priority = -1;
     private String tag = null;
 
     /**
@@ -125,18 +124,6 @@ public abstract class Task implements Serializable, Comparable {
         this.worker = worker;
     }
 
-    public void incPriority() {
-        this.priority++;
-    }
-
-    public int getPriority() {
-        return this.priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
     public void setTag(String tag) {
         this.tag = tag;
     }
@@ -152,7 +139,7 @@ public abstract class Task implements Serializable, Comparable {
         Task t = (Task) arg;
         if (this.equals(t)) {
             return 0;
-        } else if (this.priority < t.priority) {
+        } else if (this.tag.lastIndexOf('-') > t.tag.lastIndexOf('-')) {
             return -1;
         } else {
             return 1;
