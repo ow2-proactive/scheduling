@@ -27,7 +27,6 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for FileTransferDefinitions/FileTransfer element-->
 		</xs:unique>
-
 		<xs:unique name="MapToVirtualNodeDefid">
 			<xs:selector xpath="mainDefinition/mapToVirtualNode"/>
 			<xs:field xpath="@value"/>
@@ -445,23 +444,23 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="FileTransferType">
-			<xs:sequence>
-				<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute name="src" type="xs:string" use="required"/>
-						<xs:attribute name="dest" type="xs:string" use="optional"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="dir" minOccurs="0" maxOccurs="unbounded">
-					<xs:complexType>
-						<xs:attribute name="src" type="xs:string" use="required"/>
-						<xs:attribute name="dest" type="xs:string" use="optional"/>
-						<xs:attribute name="includes" type="xs:string" use="optional"/>
-						<xs:attribute name="excludes" type="xs:string" use="optional"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:sequence>
-			<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:sequence>
+			<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="src" type="xs:string" use="required"/>
+					<xs:attribute name="dest" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="dir" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="src" type="xs:string" use="required"/>
+					<xs:attribute name="dest" type="xs:string" use="optional"/>
+					<xs:attribute name="includes" type="xs:string" use="optional"/>
+					<xs:attribute name="excludes" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--infrastructure element has two childs: processes and services element that can appear zero or  once -->
 	<xs:complexType name="InfrastructureType">
@@ -588,22 +587,20 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 	</xs:complexType>
-	
 	<xs:complexType name="ExtendedJVMType">
 		<xs:complexContent>
 			<xs:extension base="ProcessReferenceType">
 				<xs:attribute name="overwriteParameters" use="optional">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="yes"/>
-					<xs:enumeration value="no"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-			  </xs:extension>
-  </xs:complexContent>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="yes"/>
+							<xs:enumeration value="no"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
-	
 	<!--classpath element has two child: absolutePath and relativePath.  One of the child must appear once or more. Both element can be present in the classpath definition. For instance an absolutePath element followed by a relativePath element-->
 	<xs:complexType name="ClasspathType">
 		<xs:choice maxOccurs="unbounded">
@@ -655,7 +652,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="refid" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="FileTransferStructureInfoType">
-		<xs:attribute name="prefix"   type="xs:string" use="optional"/>
+		<xs:attribute name="prefix" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="password" type="xs:string" use="optional"/>
@@ -951,6 +948,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<xs:complexType name="GlobusOptionType">
 		<xs:sequence>
 			<xs:element name="count" type="xs:positiveInteger" minOccurs="0"/>
+			<xs:element name="maxTime" type="xs:positiveInteger" minOccurs="0"/>
 			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
 			<xs:element name="errorFile" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
