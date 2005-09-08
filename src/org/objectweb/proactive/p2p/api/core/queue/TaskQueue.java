@@ -51,4 +51,6 @@ public interface TaskQueue extends Serializable {
     public abstract BooleanWrapper hasNext();
 
     public abstract Task next();
+    
+    public abstract void flushAll();
 }

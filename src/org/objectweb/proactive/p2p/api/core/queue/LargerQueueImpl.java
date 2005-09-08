@@ -49,12 +49,14 @@ public class LargerQueueImpl implements TaskQueue {
      * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#addAll(java.util.Collection)
      */
     public void addAll(Collection tasks) {
-        this.queue.add(tasks);
-        this.size += tasks.size();
-        if (logger.isInfoEnabled()) {
-            Task t = ((Task) tasks.iterator().next());
-            logger.info("Task provider just received and added " +
-                tasks.size() + " of group " + t.getTag());
+        if (tasks.size() > 0) {
+            this.queue.add(tasks);
+            this.size += tasks.size();
+            if (logger.isInfoEnabled()) {
+                Task t = ((Task) tasks.iterator().next());
+                logger.info("Task provider just received and added " +
+                    tasks.size() + " of group " + t.getTag());
+            }
         }
     }
 
@@ -93,5 +95,11 @@ public class LargerQueueImpl implements TaskQueue {
             this.size--;
             return (Task) subTasks.remove(0);
         }
+    }
+
+    public void flushAll() {
+        this.queue.removeAllElements();
+        this.current = 0;
+        this.size = 0;
     }
 }

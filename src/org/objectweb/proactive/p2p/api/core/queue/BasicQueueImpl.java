@@ -35,13 +35,11 @@ import java.util.Vector;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.p2p.api.core.Result;
 import org.objectweb.proactive.p2p.api.core.Task;
 
 
 public class BasicQueueImpl implements TaskQueue {
     private Vector queue = new Vector();
-    private Result bestCurrentResult = null;
 
     public BasicQueueImpl() {
     }
@@ -50,9 +48,12 @@ public class BasicQueueImpl implements TaskQueue {
      * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#addAll(java.util.Collection)
      */
     public void addAll(Collection tasks) {
-        queue.addAll(tasks);
-        logger.info("Task provider just received and added " + tasks.size() +
-            " of group " + ((Task) tasks.iterator().next()).getTag());
+        if (tasks.size() > 0) {
+            queue.addAll(tasks);
+            logger.info("Task provider just received and added " +
+                tasks.size() + " of group " +
+                ((Task) tasks.iterator().next()).getTag());
+        }
     }
 
     /**
@@ -74,5 +75,9 @@ public class BasicQueueImpl implements TaskQueue {
      */
     public Task next() {
         return (Task) this.queue.remove(0);
+    }
+
+    public void flushAll() {
+        this.queue.removeAllElements();
     }
 }
