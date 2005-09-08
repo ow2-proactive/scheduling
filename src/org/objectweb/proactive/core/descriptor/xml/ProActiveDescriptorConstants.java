@@ -100,7 +100,8 @@ public interface ProActiveDescriptorConstants {
     public static final String BOOKING_DURATION_TAG = "bookingDuration";
     public static final String QUEUE_NAME_TAG = "queueName";
     public static final String PARALLEL_ENVIRONMENT_TAG = "parallelEnvironment";
-    public static final String PRUN_OUTPUT_FILE = "outputFile";
+    public static final String OUTPUT_FILE = "outputFile";
+    public static final String ERROR_FILE = "errorFile";
     public static final String PBS_OPTIONS_TAG = "pbsOption";
     public static final String OAR_OPTIONS_TAG = "oarOption";
     public static final String OARGRID_OPTIONS_TAG = "oarGridOption";

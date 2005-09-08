@@ -335,7 +335,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     new SingleValueUnmarshaller());
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
-                this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
+                this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -366,7 +366,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     //                }
                 } else if (name.equals(BOOKING_DURATION_TAG)) {
                     prunSubProcess.setBookingDuration((String) activeHandler.getResultObject());
-                } else if (name.equals(PRUN_OUTPUT_FILE)) {
+                } else if (name.equals(OUTPUT_FILE)) {
                     prunSubProcess.setOutputFile((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
@@ -403,7 +403,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     new SingleValueUnmarshaller());
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
-                this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
+                this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -428,7 +428,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     pbsSubProcess.setScriptLocation((String) activeHandler.getResultObject());
                 } else if (name.equals(BOOKING_DURATION_TAG)) {
                     pbsSubProcess.setBookingDuration((String) activeHandler.getResultObject());
-                } else if (name.equals(PRUN_OUTPUT_FILE)) {
+                } else if (name.equals(OUTPUT_FILE)) {
                     pbsSubProcess.setOutputFile((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
@@ -875,6 +875,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(GLOBUS_COUNT_TAG, new SingleValueUnmarshaller());
                 this.addHandler(GLOBUS_MAXTIME_TAG,
                     new SingleValueUnmarshaller());
+                this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
+                this.addHandler(ERROR_FILE, new SingleValueUnmarshaller());
             }
 
             public void startContextElement(String name, Attributes attributes)
@@ -891,6 +893,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     globusProcess.setCount((String) activeHandler.getResultObject());
                 } else if (name.equals(GLOBUS_MAXTIME_TAG)) {
                     globusProcess.setMaxTime((String) activeHandler.getResultObject());
+                } else if (name.equals(OUTPUT_FILE)) {
+                    globusProcess.setStdout((String) activeHandler.getResultObject());
+                } else if (name.equals(ERROR_FILE)) {
+                    globusProcess.setStderr((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
