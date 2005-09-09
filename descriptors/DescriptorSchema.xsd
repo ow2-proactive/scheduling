@@ -128,6 +128,16 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/unicoreProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
+		<xs:keyref name="hierarchicalprocessProcessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/hierarchicalProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/hierarchicalProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="hierarchicalprocessHierarchicalReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/hierarchicalProcess/hierarchicalReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/hierarchicalProcess/hierarchicalReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
 		<xs:key name="virtualNodeDefinitionName">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
@@ -569,6 +579,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="prunProcess" type="prunProcessType"/>
 			<xs:element name="gridEngineProcess" type="sgeProcessType"/>
 			<xs:element name="unicoreProcess" type="unicoreProcessType"/>
+			<xs:element name="hierarchicalProcess" type="hierarchicalProcessType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -1011,5 +1022,26 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="hierarchicalProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element name="hierarchicalReference" type="ProcessReferenceType"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" use="required">
+		<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.RSHHierarchicalProcess"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+		<xs:attribute name="username" type="xs:string" use="optional"/>
+		<xs:attribute name="hostname" type="xs:string" use="required"/>
+		<xs:attribute name="internal_ip" type="xs:string" use="optional"/>
 	</xs:complexType>
 </xs:schema>
