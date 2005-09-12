@@ -130,6 +130,9 @@ public class Worker implements Serializable {
     public void setBestCurrentResult(Result newBest) {
         if (this.bestCurrentResult == null) {
             this.bestCurrentResult = newBest;
+            if (this.workerGroup != null) {
+                this.workerGroup.informNewBestResult(this.bestCurrentResult);
+            }
             logger.info("A new best result was localy found: " +
                 this.bestCurrentResult);
         } else if (newBest.isBetterThan(this.bestCurrentResult)) {
