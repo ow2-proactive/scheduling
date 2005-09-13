@@ -205,11 +205,11 @@ public class Manager implements Serializable, InitActive,
             } else if (this.futureTaskList.size() == 0) {
                 continue;
             }
-            
+
             if (this.futureTaskList.size() == 0) {
                 // Waiting workers
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                 }
                 continue;
@@ -217,38 +217,17 @@ public class Manager implements Serializable, InitActive,
 
             try {
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
+                this.allResults.add(this.futureTaskList.remove(index));
+                this.pendingTaskList.remove(index);
+                Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
+                this.freeWorkerList.add(freeWorker);
                 if (this.taskProvider.hasNext().booleanValue()) {
-                    this.allResults.add(this.futureTaskList.remove(index));
-                    logger.info("New result found, best current is: " +
-                        this.rootTask.gather(
-                            (Result[]) this.allResults.toArray(
-                                new Result[this.allResults.size()])));
-                    this.pendingTaskList.remove(index);
-                    Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
-                    if (this.taskProvider.hasNext().booleanValue()) {
-                        this.assignTaskToWorker(freeWorker,
-                            this.taskProvider.next());
-                        logger.info("Waiting for workers - Pending tasks: " +
-                            this.pendingTaskList.size() +
-                            " - Achivied tasks: " + this.allResults.size() +
-                            " - Not calculated tasks: " +
-                            this.taskProvider.size());
-                    } else {
-                        continue;
-                    }
-                } else {
-                    this.allResults.add(this.futureTaskList.remove(index));
-                    logger.info("New result found, best current is: " +
-                        this.rootTask.gather(
-                            (Result[]) this.allResults.toArray(
-                                new Result[this.allResults.size()])));
-                    this.pendingTaskList.remove(index);
-                    this.freeWorkerList.add(this.workingWorkerList.remove(index));
-                    logger.info("Waiting for final results - Pending tasks: " +
-                        this.pendingTaskList.size() + " - Achivied tasks: " +
-                        this.allResults.size() + " - Not calculated tasks: " +
-                        this.taskProvider.size());
+                    this.assignTaskToWorker(freeWorker, this.taskProvider.next());
                 }
+                logger.info("Waiting for final results - Pending tasks: " +
+                    this.pendingTaskList.size() + " - Achivied tasks: " +
+                    this.allResults.size() + " - Not calculated tasks: " +
+                    this.taskProvider.size());
             } catch (ProActiveException e) {
                 continue;
             }
