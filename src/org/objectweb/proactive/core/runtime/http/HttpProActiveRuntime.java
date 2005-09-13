@@ -144,6 +144,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                     paramsList, this.url);
             req.send();
         }
+        runtimeLogger.info(nodeURL + " successfully registered ");
         return nodeURL;
     }
 
