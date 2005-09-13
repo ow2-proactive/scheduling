@@ -440,7 +440,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public void killall(boolean softly) throws ProActiveException {
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        part.removeDescriptor(this.url + jobID);
+        part.removeDescriptor(this.url);
         VirtualNode[] vnArray = getVirtualNodes();
         for (int i = 0; i < vnArray.length; i++) {
             vnArray[i].killAll(softly);
