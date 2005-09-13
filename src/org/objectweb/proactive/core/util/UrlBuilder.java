@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
@@ -45,6 +46,8 @@ public class UrlBuilder {
             "///", "//localhost.localdomain", "//localhost", "//127.0.0.1"
         };
     private final static int DEFAULT_REGISTRY_PORT = 1099;
+    
+    protected static Logger logger = Logger.getLogger(UrlBuilder.class.getName());
 
     //
     //------------Constructor--------------------------------
@@ -243,7 +246,7 @@ public class UrlBuilder {
                 return getPortNumber(validUrl.substring(n + 2, m));
             }
         } catch (java.net.UnknownHostException e) {
-            e.printStackTrace();
+            logger.info("Cannot resolve hostname "+e.getMessage());
             int n = url.indexOf("//");
             int m = url.lastIndexOf("/");
             if (m == (n + 1)) {
