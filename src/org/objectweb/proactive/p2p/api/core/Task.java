@@ -33,6 +33,10 @@ package org.objectweb.proactive.p2p.api.core;
 import java.io.Serializable;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 /**
  * This is the root class of all our API <code>Task</code> classes.
@@ -42,6 +46,7 @@ import java.util.Vector;
  * Created on May 2, 2005
  */
 public abstract class Task implements Serializable, Comparable {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
 
     /**
      * The params of the task.
