@@ -25,7 +25,7 @@ IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\li
 IF EXIST %PROACTIVE%\lib\components\fractal.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\fractal.jar
 IF EXIST %PROACTIVE%\lib\jsch.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jsch.jar
 IF EXIST %PROACTIVE%\ic2d.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ic2d.jar
-IF EXIST %PROACTIVE%\lib\bcel.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bcel.jar
+IF EXIST %PROACTIVE%\lib\javassist.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\javassist.jar
 
 rem -------------------------------------------------
 rem jars for Jini

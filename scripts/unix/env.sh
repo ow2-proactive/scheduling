@@ -65,9 +65,9 @@ if [ -f $PROACTIVE/ic2d.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
 fi
-if [ -f $PROACTIVE/lib/bcel.jar ]
+if [ -f $PROACTIVE/lib/javassist.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/javassist.jar
 fi
 
 #--------------------------------------------------
