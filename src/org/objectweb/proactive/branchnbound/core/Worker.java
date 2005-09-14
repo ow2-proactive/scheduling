@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.core;
+package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
 import java.util.Vector;
@@ -36,13 +36,13 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
+import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.p2p.api.core.exception.NoResultsException;
-import org.objectweb.proactive.p2p.api.core.queue.TaskQueue;
 
 
 /**

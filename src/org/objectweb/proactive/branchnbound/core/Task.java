@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.core;
+package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
 import java.util.Vector;

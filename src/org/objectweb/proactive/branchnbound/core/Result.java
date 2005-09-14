@@ -28,11 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.core;
+package org.objectweb.proactive.branchnbound.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.p2p.api.core.exception.NoResultsException;
+import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
 
 
 /**

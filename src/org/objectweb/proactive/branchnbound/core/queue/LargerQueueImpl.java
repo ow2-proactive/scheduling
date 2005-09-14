@@ -28,14 +28,14 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.api.core.queue;
+package org.objectweb.proactive.branchnbound.core.queue;
 
 import java.util.Collection;
 import java.util.Vector;
 
+import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.p2p.api.core.Task;
 
 
 public class LargerQueueImpl implements TaskQueue {
@@ -46,7 +46,7 @@ public class LargerQueueImpl implements TaskQueue {
     }
 
     /**
-     * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#addAll(java.util.Collection)
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
     public void addAll(Collection tasks) {
         if (tasks.size() > 0) {
@@ -61,14 +61,14 @@ public class LargerQueueImpl implements TaskQueue {
     }
 
     /**
-     * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#size()
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#size()
      */
     public IntWrapper size() {
         return new IntWrapper(this.size);
     }
 
     /**
-     * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#hasNext()
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#hasNext()
      */
     public BooleanWrapper hasNext() {
         return new BooleanWrapper(this.size > 0);
@@ -77,7 +77,7 @@ public class LargerQueueImpl implements TaskQueue {
     private int current = 0;
 
     /**
-     * @see org.objectweb.proactive.p2p.api.core.queue.TaskQueue#next()
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#next()
      */
     public Task next() {
         if (this.size == 0) {
