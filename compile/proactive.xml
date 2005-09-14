@@ -151,10 +151,16 @@
 		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
+		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeForwarderImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+			<classpath refid="project.classpath"/>
+		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.jini.JiniRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.body.ft.util.GlobalFTServer" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+			<classpath refid="project.classpath"/>
+		</rmic>
+		<rmic classname="org.objectweb.proactive.core.body.rmi.RmiRemoteBodyForwarderImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
 	</target>
