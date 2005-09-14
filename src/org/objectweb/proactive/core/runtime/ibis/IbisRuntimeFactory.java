@@ -34,7 +34,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.IbisProperties;
@@ -109,12 +110,15 @@ public class IbisRuntimeFactory extends RuntimeFactory {
         if (runtimeLogger.isDebugEnabled()) {
             runtimeLogger.debug("looking for " + s);
         }
+
         try {
             RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(
                         s, "ibis:"));
+
             if (runtimeLogger.isDebugEnabled()) {
                 runtimeLogger.debug(remoteProActiveRuntime.getClass().getName());
             }
+
             return createRuntimeAdapter(remoteProActiveRuntime);
         } catch (ibis.rmi.RemoteException e) {
             throw new ProActiveException("Remote", e);
@@ -125,9 +129,10 @@ public class IbisRuntimeFactory extends RuntimeFactory {
         }
     }
 
-    protected ProActiveRuntimeAdapter createRuntimeAdapter()
+    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         IbisProActiveRuntimeImpl impl;
+
         try {
             impl = new IbisProActiveRuntimeImpl();
         } catch (RemoteException e) {
@@ -136,7 +141,8 @@ public class IbisRuntimeFactory extends RuntimeFactory {
         } catch (AlreadyBoundException e) {
             throw new ProActiveException("Cannot bind remoteProactiveRuntime", e);
         }
-        return new ProActiveRuntimeAdapter(impl);
+
+        return new ProActiveRuntimeAdapterImpl(impl);
     }
 
     protected static RegistryHelper getRegistryHelper() {

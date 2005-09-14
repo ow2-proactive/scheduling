@@ -290,6 +290,19 @@ public class JVMProcessImpl extends AbstractExternalProcess
             javaCommand.append(checkWhiteSpaces(javaPath));
         }
 
+        // XXX cmathieu
+        //      append info for remote debugging
+        if (System.getProperty("remoteDebuggingPort") != null) {
+            int port = Integer.valueOf(System.getProperty("remoteDebuggingPort"))
+                              .intValue();
+            if (logger.isDebugEnabled()) {
+                logger.debug("opening debugging port on " + port);
+            }
+            javaCommand.append(
+                " -Xint -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=" +
+                port);
+        }
+
         if (bootClasspath != null) {
             javaCommand.append(" -Xbootclasspath:");
             javaCommand.append(checkWhiteSpaces(bootClasspath));

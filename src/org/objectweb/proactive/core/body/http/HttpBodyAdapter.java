@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
-public class HttpBodyAdapter extends BodyAdapter {
+public class HttpBodyAdapter extends BodyAdapterImpl {
 
     /**
      * an Hashtable containing all the http  adapters registered. They can be retrieved
@@ -118,6 +118,7 @@ public class HttpBodyAdapter extends BodyAdapter {
             String url;
             int port = ClassServer.getServerSocketPort();
             url = urn;
+
             if (urn.lastIndexOf(":") > 4) {
                 port = UrlBuilder.getPortFromUrl(urn);
 
@@ -129,6 +130,7 @@ public class HttpBodyAdapter extends BodyAdapter {
 
             HttpLookupMessage message = new HttpLookupMessage(urn, url, port);
             message.send();
+
             //            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
             //                    port, message, ProActiveXMLUtils.MESSAGE);
             //UniversalBody result = (UniversalBody) message.processMessage();

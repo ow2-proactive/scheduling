@@ -28,12 +28,46 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime;
+package org.objectweb.proactive.core.process.ssh;
 
-import java.io.Serializable;
+import java.io.IOException;
+
+import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.HierarchicalProcess;
+import org.objectweb.proactive.core.process.JVMProcess;
 
 
-public abstract class ProActiveRuntimeAdapter implements ProActiveRuntime,
-    Serializable {
-    protected VMInformation vmInformation;
+/**
+ * @author ProActive Team
+ */
+public class SSHHierarchicalProcess extends SSHProcess
+    implements HierarchicalProcess {
+
+    /** Embded process to be deployed from the forwarder */
+    private ExternalProcess hierarchicalProcess;
+
+    public void setHierarchicalProcess(ExternalProcess process) {
+        hierarchicalProcess = process;
+    }
+
+    public ExternalProcess getHierarchicalProcess() {
+        return hierarchicalProcess;
+    }
+
+    public boolean isHierarchical() {
+        return true;
+    }
+
+    public int getNodeNumber() {
+        return hierarchicalProcess.getNodeNumber();
+    }
+
+    public void startProcess() throws IOException {
+        JVMProcess jp = (JVMProcess) getFinalProcess();
+
+        // Hierarchical deployment : We need a RuntimeForwarder on the forwarder.
+        jp.setClassname(
+            "org.objectweb.proactive.core.runtime.StartHierarchical");
+        super.startProcess();
+    }
 }

@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
@@ -116,6 +117,19 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
+    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+        throws ProActiveException {
+        ArrayList params = new ArrayList();
+        params.add(padURL);
+        params.add(vmname);
+        try {
+            new RuntimeRequest("getProcessToDeploy", params, this.url).send();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String vname, String jobId)

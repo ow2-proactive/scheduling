@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.body.rmi;
 import java.rmi.ConnectException;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
-public class RmiBodyAdapter extends BodyAdapter {
+public class RmiBodyAdapter extends BodyAdapterImpl {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //

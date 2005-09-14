@@ -60,13 +60,13 @@ import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
-import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.rmi.FileProcess;
 import org.objectweb.proactive.core.util.ClassDataCache;
@@ -105,24 +105,28 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     // -- STATIC MEMBERS -----------------------------------------------------------
     //
     //the Unique instance of ProActiveRuntime
-    private static ProActiveRuntime proActiveRuntime = new ProActiveRuntimeImpl();
+    private static ProActiveRuntime proActiveRuntime;
+
+    static {
+        String val = System.getProperty("proactive.hierarchicalRuntime");
+
+        if ((val != null) && val.equals("true")) {
+            proActiveRuntime = new ProActiveRuntimeForwarderImpl();
+        } else {
+            proActiveRuntime = new ProActiveRuntimeImpl();
+        }
+    }
+
     private static Random prng = null; // new Random();
 
-    private static synchronized int getNextInt() {
-        if (prng == null) {
-            prng = new Random();
-        }
-        return prng.nextInt();
-    }
+    // runtime security manager 
+    private static ProActiveSecurityManager runtimeSecurityManager;
 
     //	map nodes and theirs security managers 
     private java.util.Hashtable nodeSecurityManagerMap;
 
     // map nodes and their virtual nodes
     private java.util.Hashtable virtualNodesMapNodes;
-
-    // runtime security manager 
-    private static ProActiveSecurityManager runtimeSecurityManager;
     private String defaultNodeVirtualNode = null;
 
     //
@@ -144,6 +148,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     // map proActiveRuntime registered on this VM and their names
     private java.util.Hashtable proActiveRuntimeMap;
+    private java.util.Hashtable proActiveRuntimeForwarderMap;
 
     // synchronized set of URL to runtimes in which we are registered
     private java.util.Set runtimeAcquaintancesURL;
@@ -153,12 +158,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     // -- CONSTRUCTORS -----------------------------------------------------------
     //
     // singleton
-    private ProActiveRuntimeImpl() {
+    protected ProActiveRuntimeImpl() {
         try {
             this.nodeMap = new java.util.Hashtable();
 
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable();
+            this.proActiveRuntimeForwarderMap = new java.util.Hashtable();
             this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet());
             this.virtualNodesMap = new java.util.Hashtable();
             this.virtualNodesMapNodes = new java.util.Hashtable();
@@ -179,6 +185,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                     // Is the runtime included within a Domain ?
                     String domainURL = System.getProperties().getProperty("proactive.runtime.domain.url");
+
                     if (domainURL != null) {
                         SecurityEntity domain = (SecurityDomain) ProActive.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
                                 domainURL);
@@ -198,12 +205,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } catch (java.net.UnknownHostException e) {
             //System.out.println();
             logger.fatal(" !!! Cannot do a reverse lookup on that host");
+
             // System.out.println();
             e.printStackTrace();
             System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    protected static synchronized int getNextInt() {
+        if (prng == null) {
+            prng = new Random();
+        }
+
+        return prng.nextInt();
     }
 
     //
@@ -265,6 +281,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // get remote runtime
             ProActiveRuntime parentRuntime = RuntimeFactory.getRuntime(parentRuntimeURL,
                     UrlBuilder.getProtocol(parentRuntimeURL));
+
             return parentRuntime.getDescriptor(url, true);
         }
     }
@@ -292,6 +309,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 nodeJobIdMap.remove(nodeName);
             }
         }
+
         if (!replacePreviousBinding && (nodeMap.get(nodeName) != null)) {
             throw new NodeException("Node " + nodeName +
                 " already created on this ProActiveRuntime. To overwrite this node, use true for replacePreviousBinding");
@@ -307,8 +325,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             // setting virtual node name
             nodeSecurityManager.setVNName(vnName);
+
             // setting parent entity 
             nodeSecurityManager.setParent(this);
+
             // registering the security manager
             nodeSecurityManagerMap.put(nodeName, nodeSecurityManager);
 
@@ -362,13 +382,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public String[] getLocalNodeNames() {
         int i = 0;
         String[] nodeNames;
+
         synchronized (nodeMap) {
             nodeNames = new String[nodeMap.size()];
+
             for (java.util.Enumeration e = nodeMap.keys(); e.hasMoreElements();) {
                 nodeNames[i] = (String) e.nextElement();
                 i++;
             }
         }
+
         return nodeNames;
     }
 
@@ -393,6 +416,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             proActiveRuntimeDist, creatorID, creationProtocol, vmName);
     }
 
+    public void register(RemoteProActiveRuntimeForwarder proActiveRuntimeDist,
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) {
+        System.err.println("Putting: " + proActiveRuntimeName + " " +
+            proActiveRuntimeDist);
+        proActiveRuntimeForwarderMap.put(proActiveRuntimeName,
+            proActiveRuntimeDist);
+    }
+
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
@@ -410,14 +442,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public ProActiveRuntime[] getProActiveRuntimes() {
         int i = 0;
         ProActiveRuntime[] runtimeArray;
+
         synchronized (proActiveRuntimeMap) {
             runtimeArray = new ProActiveRuntime[proActiveRuntimeMap.size()];
+
             for (java.util.Enumeration e = proActiveRuntimeMap.elements();
                     e.hasMoreElements();) {
                 runtimeArray[i] = (ProActiveRuntime) e.nextElement();
                 i++;
             }
         }
+
         return runtimeArray;
     }
 
@@ -443,7 +478,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         synchronized (runtimeAcquaintancesURL) {
             urls = new String[runtimeAcquaintancesURL.size()];
+
             java.util.Iterator iter = runtimeAcquaintancesURL.iterator();
+
             for (int i = 0; i < urls.length; i++)
                 urls[i] = (String) iter.next();
         }
@@ -480,16 +517,19 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+
         if (bodyList == null) {
             // Probably the node is killed
             return localBodies;
         }
+
         synchronized (bodyList) {
             for (int i = 0; i < bodyList.size(); i++) {
                 UniqueID bodyID = (UniqueID) bodyList.get(i);
 
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
+
                 if (body == null) {
                     //runtimeLogger.warn("body null");
                     // the body with the given ID is not any more on this ProActiveRuntime
@@ -502,12 +542,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                     //adapter
                     bodyAndObjectClass.add(0, body.getRemoteAdapter());
+
                     //className
                     bodyAndObjectClass.add(1,
                         body.getReifiedObject().getClass().getName());
                     localBodies.add(bodyAndObjectClass);
                 }
             }
+
             return localBodies;
         }
     }
@@ -538,6 +580,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public String getJobID(String nodeUrl) {
         String name = UrlBuilder.getNameFromUrl(nodeUrl);
+
         return (String) nodeJobIdMap.get(name);
     }
 
@@ -546,16 +589,19 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+
         if (bodyList == null) {
             // Probably the node is killed
             return localBodies;
         }
+
         synchronized (bodyList) {
             for (int i = 0; i < bodyList.size(); i++) {
                 UniqueID bodyID = (UniqueID) bodyList.get(i);
 
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
+
                 if (body == null) {
                     //runtimeLogger.warn("body null");
                     // the body with the given ID is not any more on this ProActiveRuntime
@@ -572,6 +618,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     }
                 }
             }
+
             return localBodies;
         }
     }
@@ -588,6 +635,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // SECURITY
         try {
             ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
+
             if (objectSecurityManager != null) {
                 ProActiveSecurityManager nodeSecurityManager = (ProActiveSecurityManager) this.nodeSecurityManagerMap.get(nodeName);
                 objectSecurityManager.setParent(nodeSecurityManager);
@@ -598,6 +646,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // should never happen normally
             e.printStackTrace();
         }
+
         ProActiveLogger.getLogger("runtime").debug("nodeName " + nodeName);
         registerBody(nodeName, localBody);
 
@@ -630,6 +679,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         registerBody(nodeName, body);
+
         return body.getRemoteAdapter();
     }
 
@@ -661,6 +711,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if (runtimeLogger.isDebugEnabled()) {
             runtimeLogger.debug(ret.getID() + " is restarting activity...");
         }
+
         ((ActiveBody) ret).startBody();
 
         // no more need to return the recovered body
@@ -677,6 +728,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
                 //System.out.println("in registerbody id = "+ bodyID.toString());
@@ -695,8 +747,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //System.out.println("in remove id= "+ bodyID.toString());
         //System.out.println("array size "+((ArrayList)nodeMap.get(nodeName)).size());
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+
         synchronized (bodyList) {
             bodyList.remove(bodyID);
+
             //System.out.println("array size "+((ArrayList)nodeMap.get(nodeName)).size());
         }
     }
@@ -784,9 +838,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    public String getVNName(String nodeName) {
-        return (String) virtualNodesMapNodes.get(nodeName);
-    }
+    //  SECURITY
 
     /**
      * set the runtime security manager
@@ -796,6 +848,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if (runtimeSecurityManager != null) {
             return;
         }
+
         runtimeSecurityManager = server;
     }
 
@@ -822,9 +875,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ProActiveSecurityManager nodeSecurityManager = null;
 
         nodeSecurityManager = (ProActiveSecurityManager) nodeSecurityManagerMap.get(nodeName);
+
         if (nodeSecurityManager != null) {
             return nodeSecurityManager.getCertificate();
         }
+
         return null;
     }
 
@@ -852,6 +907,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         entities.add(nodeEntity);
+
         return entities;
     }
 
@@ -866,6 +922,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         return null;
+
         //nodeMap.
         //    	try {
         //        System.out.println(" testing for securityentityID " + securityEntity);
@@ -932,7 +989,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if (runtimeSecurityManager == null) {
             return sc;
         }
+
         PolicyServer policyServer = runtimeSecurityManager.getPolicyServer();
+
         return policyServer.getPolicy(sc);
     }
 
@@ -957,13 +1016,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 // continue searching
                 classData = runtime.getClassDataFromParentRuntime(className);
             }
+
             if (classData != null) {
                 // caching class
                 ClassDataCache.instance().addClassData(className, classData);
+
                 if (runtimeLogger.isDebugEnabled()) {
                     runtimeLogger.debug(getURL() + " -- > Returning class " +
                         className + " found in " + parentRuntimeURL);
                 }
+
                 return classData;
             }
         }
@@ -978,28 +1040,34 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // 1. look in class cache
         // this can be redundant if not looking in a parent
         classData = ClassDataCache.instance().getClassData(className);
+
         // found something in classloader or cache...
         if (classData != null) {
             return classData;
         }
+
         try {
             // 2. look in classpath
             classData = FileProcess.getBytesFromResource(className);
         } catch (IOException e2) {
             e2.printStackTrace();
         }
+
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
+
             return classData;
         }
 
         if (parentRuntimeURL == null) {
             // top of hierarchy of runtimes
             classData = generateStub(className);
+
             if (classData != null) {
                 return classData;
             }
         }
+
         return null;
     }
 
@@ -1021,6 +1089,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     // tries to generate a stub without using MOP methods
     private byte[] generateStub(String className) {
         byte[] classData = null;
+
         if (Utils.isStubClassName(className)) {
             try {
                 // do not use directly MOP methods (avoid classloader cycles)
@@ -1045,70 +1114,32 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             } catch (ClassNotFoundException ignored) {
             }
         }
+
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
+
             return classData;
         }
 
         // try to get the class as a generated component interface reference
         classData = RepresentativeInterfaceClassGenerator.getClassData(className);
+
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
+
             return classData;
         }
 
         // try to get the class as a generated component interface reference
         classData = MetaObjectInterfaceClassGenerator.getClassData(className);
+
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
+
             return classData;
         }
+
         return null;
-    }
-
-    //
-    // ----------------- INNER CLASSES --------------------------------
-    //
-
-    /**
-     * inner class for method invocation
-     */
-    private class LauncherThread extends Thread {
-        private boolean launchMain;
-        private Method mainMethod;
-        private Class remoteClass;
-        private String[] parameters;
-
-        public LauncherThread(Class remoteClass) {
-            this.remoteClass = remoteClass;
-            launchMain = false;
-        }
-
-        public LauncherThread(Method mainMethod, String[] parameters) {
-            this.mainMethod = mainMethod;
-            this.parameters = parameters;
-            launchMain = true;
-        }
-
-        public void run() {
-            if (launchMain) {
-                try {
-                    mainMethod.invoke(null, new Object[] { parameters });
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    remoteClass.newInstance();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     /* (non-Javadoc)
@@ -1160,6 +1191,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -1200,5 +1232,67 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public byte[] getCertificateEncoded() throws SecurityNotAvailableException {
         return runtimeSecurityManager.getCertificateEncoded();
+    }
+
+    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+        throws ProActiveException {
+        ProActiveDescriptor pad = (ProActiveDescriptor) descriptorMap.get(padURL);
+
+        if (pad == null) {
+            logger.info("Cannot find descriptor, " + padURL);
+
+            return null;
+        }
+
+        return pad.getHierarchicalProcess(vmname);
+    }
+
+    public String getVNName(String nodename) throws ProActiveException {
+        return (String) virtualNodesMapNodes.get(nodename);
+    }
+
+    //
+    // ----------------- INNER CLASSES --------------------------------
+    //
+
+    /**
+     * inner class for method invocation
+     */
+    private class LauncherThread extends Thread {
+        private boolean launchMain;
+        private Method mainMethod;
+        private Class remoteClass;
+        private String[] parameters;
+
+        public LauncherThread(Class remoteClass) {
+            this.remoteClass = remoteClass;
+            launchMain = false;
+        }
+
+        public LauncherThread(Method mainMethod, String[] parameters) {
+            this.mainMethod = mainMethod;
+            this.parameters = parameters;
+            launchMain = true;
+        }
+
+        public void run() {
+            if (launchMain) {
+                try {
+                    mainMethod.invoke(null, new Object[] { parameters });
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    remoteClass.newInstance();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

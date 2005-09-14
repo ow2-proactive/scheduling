@@ -78,6 +78,11 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNode, Serializable, RuntimeRegistrationEventListener,
         NodeCreationEventListener, ServiceUser {
+
+    /** Logger */
+    private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
+    public static int counter = 0;
+
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
@@ -153,11 +158,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     // PAD infos
     private boolean mainVirtualNode;
     private String padURL;
-
-    /** Logger */
-    private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
     private Vector p2pNodeslookupList = new Vector();
-    public static int counter = 0;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -190,6 +191,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         createdNodes = new java.util.ArrayList();
         awaitedVirtualNodes = new Hashtable();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
                 proActiveRuntimeImpl.getVMInformation().getVMID().toString());
@@ -251,13 +253,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void addVirtualMachine(VirtualMachine virtualMachine) {
         virtualMachines.add(virtualMachine);
+
         if (!((virtualMachine.getCreatorId()).equals(this.name))) {
             // add in the hashtable the vm's creator id, and the number of nodes that should be created
             awaitedVirtualNodes.put(virtualMachine.getCreatorId(),
                 virtualMachine);
+
             //we need to do it here otherwise event could occurs, whereas vm 's creator id is not in the hash map
             //just synchro pb, this workaround solves the pb
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("mapped VirtualNode=" + name +
                 " with VirtualMachine=" + virtualMachine.getName());
@@ -268,7 +273,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (virtualMachines.isEmpty()) {
             return null;
         }
+
         VirtualMachine vm = (VirtualMachine) virtualMachines.get(lastVirtualMachineIndex);
+
         return vm;
     }
 
@@ -279,6 +286,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (!isActivated) {
             proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
             proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
+
             for (int i = 0; i < virtualMachines.size(); i++) {
                 VirtualMachine vm = getVirtualMachine();
 
@@ -293,6 +301,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // will register.
                     if (!vmAlreadyAssigned) {
                         setParameters(process, vm);
+
                         // It is this virtual Node that originates the creation of the vm
                         try {
                             proActiveRuntimeImpl.createVM(process);
@@ -320,6 +329,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //initialization of the global timeout
             globalTimeOut = System.currentTimeMillis() + timeout;
             isActivated = true;
+
             if (registration) {
                 register();
             }
@@ -404,6 +414,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } catch (NodeException e) {
             logger.error("Problem occured while waiting for nodes creation");
         }
+
         return nbCreatedNodes;
     }
 
@@ -416,9 +427,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //try first to get the Node from the createdNodes array to be continued
         Node node;
         waitForNodeCreation();
+
         if (!createdNodes.isEmpty()) {
             node = (Node) createdNodes.get(lastNodeIndex);
             increaseNodeIndex();
+
             return node;
         } else {
             throw new NodeException("Cannot get the node " + this.name);
@@ -427,23 +440,28 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public Node getNode(int index) throws NodeException {
         Node node = (Node) createdNodes.get(index);
+
         if (node == null) {
             throw new NodeException(
                 "Cannot return the first node, no nodes hava been created");
         }
+
         return node;
     }
 
     public String[] getNodesURL() throws NodeException {
         String[] nodeNames;
+
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
             logger.error(e.getMessage());
         }
+
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
                 nodeNames = new String[createdNodes.size()];
+
                 for (int i = 0; i < createdNodes.size(); i++) {
                     nodeNames[i] = ((Node) createdNodes.get(i)).getNodeInformation()
                                     .getURL();
@@ -458,22 +476,27 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.warn(
                     "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
                 logger.warn("WARN: Returning empty array");
+
                 return new String[0];
             }
         }
+
         return nodeNames;
     }
 
     public Node[] getNodes() throws NodeException {
         Node[] nodeTab;
+
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
             logger.error(e.getMessage());
         }
+
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
                 nodeTab = new Node[createdNodes.size()];
+
                 for (int i = 0; i < createdNodes.size(); i++) {
                     nodeTab[i] = ((Node) createdNodes.get(i));
                 }
@@ -487,28 +510,34 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.warn(
                     "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
                 logger.warn("WARN: Returning empty array");
+
                 return new Node[0];
             }
         }
+
         return nodeTab;
     }
 
     public Node getNode(String url) throws NodeException {
         Node node = null;
+
         try {
             waitForAllNodesCreation();
         } catch (NodeException e) {
             logger.error(e.getMessage());
         }
+
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
                 for (int i = 0; i < createdNodes.size(); i++) {
                     if (((Node) createdNodes.get(i)).getNodeInformation()
                              .getURL().equals(url)) {
                         node = (Node) createdNodes.get(i);
+
                         break;
                     }
                 }
+
                 return node;
             }
         } else {
@@ -520,6 +549,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public void killAll(boolean softly) {
         Node node;
         ProActiveRuntime part = null;
+
         if (isActivated) {
             // Killing p2p nodes
             if (this.p2pNodeslookupList.size() > 0) {
@@ -563,7 +593,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     }
                 }
             }
+
             isActivated = false;
+
             try {
                 //if registered in any regigistry, unregister everything
                 if (registration) {
@@ -587,6 +619,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (protocol == null) {
             protocol = System.getProperty("proactive.communication.protocol");
         }
+
         localVirtualMachines.add(protocol);
     }
 
@@ -610,6 +643,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 e.printStackTrace();
             }
         }
+
         if (uniqueActiveObject == null) {
             throw new ProActiveException(
                 "No active object are registered on this VirtualNode");
@@ -651,6 +685,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String url;
         int port = 0;
         VirtualMachine virtualMachine = null;
+
         for (int i = 0; i < virtualMachines.size(); i++) {
             if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
@@ -664,7 +699,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.debug("runtime " + event.getCreatorID() +
                     " registered on virtualnode " + this.name);
             }
+
             protocol = event.getProtocol();
+
             //gets the registered runtime
             proActiveRuntimeRegistered = event.getRegisteredRuntime();
 
@@ -678,6 +715,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 //get the node on the registered runtime
                 // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
                 int nodeNumber = (new Integer((String) virtualMachine.getNodeNumber())).intValue();
+
                 for (int i = 1; i <= nodeNumber; i++) {
                     nodeName = this.name +
                         Integer.toString(new java.util.Random(
@@ -705,6 +743,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
             //gets the registered runtime
             proActiveRuntimeRegistered = event.getRegisteredRuntime();
+
             // get the host for the node to be created
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                  .getHostName();
@@ -715,6 +754,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // it is the only way to get accurate value of askedNodes
             VirtualMachine vm = (VirtualMachine) awaitedVirtualNodes.get(event.getCreatorID());
             int nodeNumber = (new Integer((String) vm.getNodeNumber())).intValue();
+
             for (int i = 1; i <= nodeNumber; i++) {
                 try {
                     nodeName = this.name +
@@ -822,6 +862,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // we must increase the node count
             String url;
             increaseNumberOfNodes(1);
+
             String nodeName = this.name +
                 Integer.toString(new java.util.Random(
                         System.currentTimeMillis()).nextInt());
@@ -839,6 +880,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             url = defaultRuntime.createLocalNode(nodeName, false, siblingPSM,
                     this.getName(), ProActive.getJobId());
+
             //add this node to this virtualNode
             performOperations(defaultRuntime, url, protocol);
         } catch (Exception e) {
@@ -868,6 +910,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     "After many retries, not even one node can be found");
             }
         }
+
         return;
     }
 
@@ -877,11 +920,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private synchronized void waitForAllNodesCreation()
         throws NodeException {
         int tempNodeCount = nbMappedNodes;
+
         if (tempNodeCount != P2PConstants.MAX_NODE) {
             //nodeCount equal 0 means there is only a P2P service with MAX number of nodes requested
             // so if different of 0, we can set to false the boolean
             MAX_P2P = false;
         }
+
         if (waitForTimeout) {
             try {
                 Thread.sleep(timeout);
@@ -894,6 +939,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (minNumberOfNodes != 0) {
                 tempNodeCount = minNumberOfNodes;
             }
+
             while (nbCreatedNodes < tempNodeCount) {
                 if (!timeoutExpired()) {
                     try {
@@ -915,17 +961,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             }
         }
+
         return;
     }
 
     private boolean timeoutExpired() {
         long currentTime = System.currentTimeMillis();
+
         return (globalTimeOut < currentTime);
     }
 
     private long getTimeToSleep() {
         // if timeToSleep is < 0 we throw an exception
         long timeToSleep = globalTimeOut - System.currentTimeMillis();
+
         if (timeToSleep > 0) {
             return timeToSleep;
         } else {
@@ -951,11 +1000,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (!vmAlreadyAssigned) {
             copyProcess = (ExternalProcess) makeDeepCopy(process);
             vm.setProcess(copyProcess);
+
             return copyProcess;
         } else {
             //increment the node count by askedNodes
             increaseNumberOfNodes(process.getNodeNumber() * new Integer(
                     vm.getNodeNumber()).intValue());
+
             return process;
         }
     }
@@ -970,9 +1021,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //jobID = ProActive.getJobId();
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
+
         if (logger.isDebugEnabled()) {
             logger.debug("askedNodes " + nodeNumber);
         }
+
         protocolId = process.getProcessId();
 
         increaseNumberOfNodes(process.getNodeNumber() * nodeNumber);
@@ -980,13 +1033,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
         jvmProcess = (JVMProcess) process.getFinalProcess();
+
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             String vnName = this.name;
 
             String localruntimeURL = null;
+
             try {
                 localruntimeURL = RuntimeFactory.getDefaultRuntime().getURL();
+
                 if (process.getUsername() != null) {
                     localruntimeURL = System.getProperty("user.name") + "@" +
                         localruntimeURL;
@@ -1000,9 +1056,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             // if it is a main node we set the property for retrieving the pad
-            if (mainVirtualNode) {
+            if (mainVirtualNode || process.isHierarchical()) {
                 jvmProcess.setJvmOptions(" -Dproactive.pad=" + padURL);
             }
+
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
@@ -1022,12 +1079,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private Object makeDeepCopy(Object process) {
         //deepCopyTag = true;
         Object result = null;
+
         try {
             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
             java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
             oos.writeObject(process);
             oos.flush();
             oos.close();
+
             java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
             java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
             result = ois.readObject();
@@ -1056,6 +1115,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private void increaseNumberOfNodes(int n) {
         nbMappedNodes = nbMappedNodes + n;
+
         if (logger.isDebugEnabled()) {
             logger.debug("Number of nodes = " + nbMappedNodes);
         }
@@ -1071,6 +1131,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (protocol.indexOf(":") == -1) {
             return protocol.concat(":");
         }
+
         return protocol;
     }
 
@@ -1082,8 +1143,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             url + " done");
         nodeCreated = true;
         nbCreatedNodes++;
+
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
+
         //notify all listeners that a node has been created
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
             nbCreatedNodes);
@@ -1092,6 +1155,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private void register() {
         try {
             waitForAllNodesCreation();
+
             //  	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
             //  	part.registerVirtualnode(this.name,false);
             ProActive.registerVirtualNode(this, registrationProtocol, false);
@@ -1113,6 +1177,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // the same service this might lead to unexpected behaviour
         UniversalService copyService = (UniversalService) makeDeepCopy(service);
         vm.setService(copyService);
+
         if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
             int nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
 
@@ -1120,6 +1185,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // of nodes requested
             if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
                 increaseNumberOfNodes(nodeRequested);
+
                 //nodeRequested = MAX means that the service will try to get every nodes 
                 // it can. So we can't predict how many nodes will return.
             } else {
@@ -1129,6 +1195,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //increase with 1 node
             increaseNumberOfNodes(1);
         }
+
         new ServiceThread(this, vm).start();
     }
 
@@ -1139,9 +1206,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 waitForAllNodesCreation();
             } catch (NodeException e) {
                 out.defaultWriteObject();
+
                 return;
             }
         }
+
         out.defaultWriteObject();
     }
 
@@ -1165,6 +1234,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.p2pNodes.add(newNode);
         nbCreatedNodes++;
         nodeCreated = true;
+
         //notify all listeners that a node has been created
         notifyAll();
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, newNode,

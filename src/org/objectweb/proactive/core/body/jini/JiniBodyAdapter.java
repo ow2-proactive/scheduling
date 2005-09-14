@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.body.jini;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
  * @author ProActiveTeam
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
-public class JiniBodyAdapter extends BodyAdapter {
+public class JiniBodyAdapter extends BodyAdapterImpl {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -109,6 +109,7 @@ public class JiniBodyAdapter extends BodyAdapter {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
         }
+
         if (o instanceof RmiRemoteBody) {
             try {
                 construct((RmiRemoteBody) o);
@@ -116,6 +117,7 @@ public class JiniBodyAdapter extends BodyAdapter {
                 throw new java.io.IOException(
                     "The remote object with the given url is not accessible ");
             }
+
             return this;
         } else {
             throw new java.io.IOException(

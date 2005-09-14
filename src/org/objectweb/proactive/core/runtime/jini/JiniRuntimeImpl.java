@@ -37,6 +37,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
@@ -115,6 +116,11 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //
     // -- Implements JiniRuntime -----------------------------------------------
     //
+    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+        throws ProActiveException {
+        return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+    }
+
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String vnname, String jobId)

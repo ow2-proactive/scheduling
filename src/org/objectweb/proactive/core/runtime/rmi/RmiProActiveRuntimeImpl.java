@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -129,6 +130,11 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+        throws ProActiveException {
+        return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+    }
+
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String VNname, String jobId)

@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.body.ibis;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyAdapter;
+import org.objectweb.proactive.core.body.BodyAdapterImpl;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
-public class IbisBodyAdapter extends BodyAdapter {
+public class IbisBodyAdapter extends BodyAdapterImpl {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -113,6 +113,7 @@ public class IbisBodyAdapter extends BodyAdapter {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
         }
+
         if (o instanceof IbisRemoteBody) {
             try {
                 construct((IbisRemoteBody) o);
@@ -120,6 +121,7 @@ public class IbisBodyAdapter extends BodyAdapter {
                 throw new java.io.IOException(
                     "The remote object with the given url is not accessible ");
             }
+
             return this;
         } else {
             throw new java.io.IOException(

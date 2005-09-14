@@ -141,12 +141,14 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
+        System.err.println("AbstractUniversalBody.writeObject: " + this.jobID); // REMOVEME
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
+        System.err.println("AbstractUniversalBody.readObject: " + this.jobID); // REMOVEME
         //System.out.println("@@@@@@@@@@@@@@@@@@" + this.jobID);
         if (bodyID == null) {
             // it may happen that the bodyID is set to null before serialization if we want to

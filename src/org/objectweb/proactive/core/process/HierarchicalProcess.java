@@ -28,12 +28,43 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime;
-
-import java.io.Serializable;
+package org.objectweb.proactive.core.process;
 
 
-public abstract class ProActiveRuntimeAdapter implements ProActiveRuntime,
-    Serializable {
-    protected VMInformation vmInformation;
+/**
+ * A hierarchical process must implement this interface and override some
+ * methods from UniversalProcess
+ *
+ * <ul>
+ *         <li>
+ *                 <b>isHierarchical</b>: must return true
+ *         </li>
+ *         <li>
+ *                 <b>getNodeNumber</b>: must return the count of effective nodes
+ *                 (forwarders are not)
+ *         </li>
+ *         <li>
+ *                 <b>StartProcess</b>: must ensure that org.objectweb.proactive.core.runtime.StartHierarchical
+ *                 is launched on the forwarder
+ *         </li>
+ * </ul>
+ *
+ * Take a look at SSHHierarchicalProcess for an example of HierarchicalProcess implementation.
+ *
+ * @author ProActive Team
+ * @see org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess
+ */
+public interface HierarchicalProcess {
+
+    /**
+     * Set the Process to be deployed from the forwarder
+     * @param process
+     */
+    public void setHierarchicalProcess(ExternalProcess process);
+
+    /**
+     * Get the Processto be deployed from the forwarder
+     * @return
+     */
+    public ExternalProcess getHierarchicalProcess();
 }

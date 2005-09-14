@@ -138,6 +138,10 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         return isFinished;
     }
 
+    public boolean isHierarchical() {
+        return false;
+    }
+
     public void setCommandPath(String path) {
         this.command_path = path;
     }

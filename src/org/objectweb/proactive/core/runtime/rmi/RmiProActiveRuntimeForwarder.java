@@ -28,12 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime;
+package org.objectweb.proactive.core.runtime.rmi;
 
-import java.io.Serializable;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntimeForwarder;
 
 
-public abstract class ProActiveRuntimeAdapter implements ProActiveRuntime,
-    Serializable {
-    protected VMInformation vmInformation;
+public interface RmiProActiveRuntimeForwarder extends java.rmi.Remote,
+    RmiProActiveRuntime, RemoteProActiveRuntimeForwarder {
 }

@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
@@ -167,6 +168,13 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public ExternalProcess getProcess(String name);
 
     /**
+     * Returns the process to hierarchically deploy
+     * @param vmname
+     * @return
+     */
+    public ExternalProcess getHierarchicalProcess(String vmname);
+
+    /**
      * Returns the Service of the given name
      * @param serviceID
      * @return an UniversalService
@@ -241,6 +249,14 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * @param processID
      */
     public void registerProcess(ExternalProcessDecorator compositeProcess,
+        String processID);
+
+    /**
+     * Registers the specified hierarchical process with the specified processID.
+     * @param hp
+     * @param processID
+     */
+    public void registerHierarchicalProcess(HierarchicalProcess hp,
         String processID);
 
     /**

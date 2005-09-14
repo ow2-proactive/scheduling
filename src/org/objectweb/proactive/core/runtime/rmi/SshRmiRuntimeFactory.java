@@ -35,7 +35,8 @@ import java.rmi.registry.Registry;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterForwarderImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIServerSocketFactory;
@@ -96,7 +97,7 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
     /**
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#createRuntimeAdapter()
      */
-    protected ProActiveRuntimeAdapter createRuntimeAdapter()
+    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         RmiProActiveRuntimeImpl impl;
         try {
@@ -108,6 +109,21 @@ public class SshRmiRuntimeFactory extends RmiRuntimeFactory {
         } catch (java.rmi.AlreadyBoundException e) {
             throw new ProActiveException("Cannot bind remoteProactiveRuntime", e);
         }
-        return new ProActiveRuntimeAdapter(impl);
+        return new ProActiveRuntimeAdapterImpl(impl);
+    }
+
+    protected ProActiveRuntimeAdapterForwarderImpl createRuntimeAdapterForwarder()
+        throws ProActiveException {
+        RmiSshProActiveRuntimeForwarder impl;
+        try {
+            impl = new RmiSshProActiveRuntimeForwarder(new SshRMIClientSocketFactory(),
+                    new SshRMIServerSocketFactory());
+        } catch (java.rmi.RemoteException e) {
+            throw new ProActiveException("Cannot create the RemoteProActiveRuntimeImpl",
+                e);
+        } catch (java.rmi.AlreadyBoundException e) {
+            throw new ProActiveException("Cannot bind remoteProactiveRuntime", e);
+        }
+        return new ProActiveRuntimeAdapterForwarderImpl(impl);
     }
 }

@@ -33,62 +33,54 @@ package org.objectweb.proactive.core.runtime;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**
- * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * <i><font size="-1" color="#FF0000">**For internal use only**</font></i><br>
  * <p>
- * This class is a utility class allowing to start a ProActiveRuntime with a JVM.
- * </p><p>
- * This class is mainly used with ProActiveDescriptor to start a ProActiveRuntime
- * on a local or remote JVM.
+ * This class is a utility class allowing to start a ProActiveRuntimeForwarder
+ * with a JVM.
  * </p>
- *
+
  * @author  ProActive Team
- * @version 1.0,  2002/08/29
- * @since   ProActive 0.9
- *
  */
-public class StartRuntime {
-    //Name of the runtime that launched this class reading the ProActiveDescriptor
-    //private static final String DefaultRuntimeName = "PART_DEFAULT";
-    //Name of the runtime's host that launched this class reading the ProActiveDescriptor
-    static Logger logger = Logger.getLogger(StartRuntime.class.getName());
-    protected String defaultRuntimeURL;
+public class StartHierarchical {
+    static Logger logger = Logger.getLogger(StartHierarchical.class.getName());
     protected String nodeURL;
     protected String creatorID;
+    protected String defaultRuntimeURL;
+    protected String sNodeNumber;
+    protected int nodeNumber;
+    protected String protocolId;
+    protected String vmName;
+    protected String padURL;
     protected ProActiveRuntime proActiveRuntime;
 
-    //protected String acquisitionMethod;
-    protected String nodeNumber;
-    protected String vmName;
-    protected int nodenumber; //it is only the int value of nodeNumber
-    protected String protocolId;
-
-    protected StartRuntime() {
+    protected StartHierarchical() {
     }
 
-    private StartRuntime(String[] args) {
+    private StartHierarchical(String[] args) {
         if (args.length != 0) {
             this.nodeURL = args[0];
             this.creatorID = args[0].trim();
 
             //System.out.println(creatorID);
-            this.defaultRuntimeURL = parse(args[1]);
+            this.defaultRuntimeURL = args[1];
 
             //this.acquisitionMethod = args[2];
-            this.nodeNumber = args[2];
+            this.sNodeNumber = args[2];
 
             //   this.portNumber = Integer.parseInt(args[4]);
-            this.nodenumber = (new Integer(nodeNumber)).intValue();
+            this.nodeNumber = (new Integer(sNodeNumber)).intValue();
             this.protocolId = args[3];
             this.vmName = args[4];
         }
@@ -126,66 +118,71 @@ public class StartRuntime {
             e.printStackTrace();
         }
 
-        new StartRuntime(args).run();
+        new StartHierarchical(args).run();
     }
 
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Runs the complete creation and registration of a ProActiveRuntime and creates a
-     * node once the creation is completed.
-     */
     private void run() {
-        ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        impl.getVMInformation().setCreationProtocolID(protocolId);
-
-        if (defaultRuntimeURL != null) {
-            register(defaultRuntimeURL);
-            impl.setParent(defaultRuntimeURL);
-        }
-    }
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Performs the registration of a ProActiveRuntime on the runtime that initiated the creation
-     * of ProActiveDescriptor.
-     */
-    private void register(String hostName) {
         try {
+            System.setProperty("proactive.hierarchicalRuntime", "true");
+            padURL = System.getProperty("proactive.pad");
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
+            proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
-            ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
-                    UrlBuilder.getProtocol(defaultRuntimeURL));
-
-            PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                creatorID,
-                System.getProperty("proactive.communication.protocol") + ":",
-                vmName);
+            LocalProActiveRuntime localPart = (LocalProActiveRuntime) ProActiveRuntimeImpl.getProActiveRuntime();
+            localPart.setParent(defaultRuntimeURL);
         } catch (ProActiveException e) {
             e.printStackTrace();
 
-            // if we cannot register, this jvm is useless
+            //we can still try to register if for instance an Alreadybound exception occurs
+        }
+
+        try {
+            ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
+                    UrlBuilder.getProtocol(defaultRuntimeURL));
+
+            /*            PART.register(proActiveRuntime, proActiveRuntime.getURL(),
+                                creatorID,
+                                System.getProperty("proactive.communication.protocol") + ":",
+                                vmName); */
+            ExternalProcess process = PART.getProcessToDeploy(padURL, vmName);
+
+            if (process == null) {
+                logger.info("getProcessToDeploy failed. Aborting");
+                System.exit(0);
+            }
+
+            ((ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime()).setProcessesToDeploy(padURL,
+                vmName, process);
+
+            try {
+                setParameters(process);
+                process.startProcess();
+            } catch (IOException e) {
+                logger.info("process starting failed: " + e.getMessage());
+                System.exit(0);
+            }
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+
+            // if we cannot get runtimes to deploy this JVM is useless
             System.exit(0);
         }
     }
 
-    private String parse(String url) {
-        //this method is used to extract the username, that might be necessary for the callback
-        //it updates the hostable.
-        int index = url.indexOf("@");
+    private void setParameters(ExternalProcess process) {
+        String localruntimeURL = null;
 
-        if (index >= 0) {
-            String username = url.substring(0, index);
-            url = url.substring(index + 1, url.length());
-
-            try {
-                HostsInfos.setUserName(UrlBuilder.getHostNameFromUrl(url),
-                    username);
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
+        try {
+            localruntimeURL = RuntimeFactory.getDefaultRuntime().getURL();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
         }
 
-        return url;
+        JVMProcess jvmProcess = (JVMProcess) process.getFinalProcess();
+
+        jvmProcess.setJvmOptions("-Dproactive.jobid=" + ProActive.getJobId());
+        jvmProcess.setParameters(creatorID + " " + localruntimeURL + " " +
+            nodeNumber + " " + protocolId + " " + vmName);
     }
 }

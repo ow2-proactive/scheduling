@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -196,8 +197,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         if (!isMainDefined()) {
             return;
         }
+
         Set mainsId = mainDefinitionMapping.keySet();
         Iterator it = mainsId.iterator();
+
         while (it.hasNext()) {
             String id = (String) it.next();
             activateMain(id);
@@ -210,6 +213,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      */
     public void activateMain(String mainDefinitionId) {
         MainDefinition mainDefinition = getMainDefinition(mainDefinitionId);
+
         if (mainDefinition != null) {
             mainDefinition.activateMain();
         }
@@ -262,10 +266,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         int i = 0;
         VirtualNode[] virtualNodeArray = new VirtualNode[virtualNodeMapping.size()];
         Collection collection = virtualNodeMapping.values();
+
         for (Iterator iter = collection.iterator(); iter.hasNext();) {
             virtualNodeArray[i] = (VirtualNode) iter.next();
             i++;
         }
+
         return virtualNodeArray;
     }
 
@@ -279,6 +285,25 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public ExternalProcess getProcess(String name) {
         return (ExternalProcess) processMapping.get(name);
+    }
+
+    public ExternalProcess getHierarchicalProcess(String vmname) {
+        VirtualMachine vm = getVirtualMachine(vmname);
+
+        if (vm == null) {
+            logger.warn("" + vmname + "cannot be found");
+
+            return null;
+        }
+
+        if (vm.getProcess() instanceof HierarchicalProcess) {
+            return ((HierarchicalProcess) vm.getProcess()).getHierarchicalProcess();
+        } else {
+            logger.warn("" + vmname +
+                " does not contain a hierarchical process !");
+
+            return null;
+        }
     }
 
     public UniversalService getService(String serviceID) {
@@ -296,11 +321,14 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         if (jobID == null) {
             if (isMainDefined()) {
                 this.jobID = generateNewJobID();
+
                 //System.out.println("new id generated : " + jobID);
             } else {
                 this.jobID = ProActive.getJobId();
+
                 //System.out.println("using runtime id : " + jobID);
             }
+
             this.url = url + this.jobID;
         }
 
@@ -311,10 +339,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
                         this.url, isMainNode);
                 ((VirtualNodeImpl) vn).jobID = this.jobID;
+
                 //System.out.println("vn created with url: " + padURL + " and jobid : " + ((VirtualNodeImpl) vn).jobID);
             }
 
             virtualNodeMapping.put(vnName, vn);
+
             if (logger.isInfoEnabled()) {
                 logger.info("created VirtualNode name=" + vnName);
             }
@@ -325,24 +355,29 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public VirtualMachine createVirtualMachine(String vmName) {
         VirtualMachine vm = getVirtualMachine(vmName);
+
         if (vm == null) {
             vm = new VirtualMachineImpl();
             vm.setName(vmName);
             virtualMachineMapping.put(vmName, vm);
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("created virtualMachine name=" + vmName);
         }
+
         return vm;
     }
 
     public ExternalProcess createProcess(String processID,
         String processClassName) throws ProActiveException {
         ExternalProcess process = getProcess(processID);
+
         if (process == null) {
             process = createProcess(processClassName);
             addExternalProcess(processID, process);
         }
+
         return process;
     }
 
@@ -364,6 +399,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public void registerProcess(VirtualMachine virtualMachine, String processID) {
         ExternalProcess process = getProcess(processID);
+
         if (process == null) {
             addPendingProcess(processID, virtualMachine);
         } else {
@@ -374,6 +410,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public void registerProcess(ExternalProcessDecorator compositeProcess,
         String processID) {
         ExternalProcess process = getProcess(processID);
+
         if (process == null) {
             addPendingProcess(processID, compositeProcess);
         } else {
@@ -385,10 +422,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         throws ProActiveException {
         try {
             JVMProcessImpl process = (JVMProcessImpl) getProcess(processID);
+
             if (process == null) {
                 throw new ProActiveException("The jvmProcess with id " +
                     processID +
                     " is not yet defined in the descriptor. The extended jvmProcess must be defined before all jvmProcesses that extend it");
+
                 //addPendingJVMProcess(processID, jvmProcess);
             } else {
                 jvmProcess.setExtendedJVM(process);
@@ -400,19 +439,34 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
+    public void registerHierarchicalProcess(HierarchicalProcess hp,
+        String processID) {
+        ExternalProcess process = getProcess(processID);
+
+        if (process == null) {
+            addHierarchicalPendingProcess(processID, hp);
+        } else {
+            hp.setHierarchicalProcess(process);
+        }
+    }
+
     public void addService(String serviceID, UniversalService service) {
         ServiceUpdater serviceUpdater = (ServiceUpdater) pendingServiceMapping.remove(serviceID);
+
         if (serviceUpdater != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating Service name=" + serviceID);
             }
+
             serviceUpdater.updateService(service);
         }
+
         processMapping.put(serviceID, service);
     }
 
     public void registerService(ServiceUser serviceUser, String serviceID) {
         UniversalService service = getService(serviceID);
+
         if (service == null) {
             addPendingService(serviceID, serviceUser);
         } else {
@@ -428,6 +482,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public void activateMappings() {
         VirtualNode[] virtualNodeArray = getVirtualNodes();
+
         for (int i = 0; i < virtualNodeArray.length; i++) {
             virtualNodeArray[i].activate();
         }
@@ -440,11 +495,15 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public void killall(boolean softly) throws ProActiveException {
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+
         part.removeDescriptor(this.url);
+
         VirtualNode[] vnArray = getVirtualNodes();
+
         for (int i = 0; i < vnArray.length; i++) {
             vnArray[i].killAll(softly);
             virtualNodeMapping.remove(vnArray[i].getName());
+
             //vnArray[i] = null;		
         }
     }
@@ -465,6 +524,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      */
     public void createProActiveSecurityManager(String file) {
         securityFile = file;
+
         try {
             policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
             proactiveSecurityManager = new ProActiveSecurityManager(policyServer);
@@ -518,12 +578,15 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     private void addExternalProcess(String processID, ExternalProcess process) {
         ProcessUpdater processUpdater = (ProcessUpdater) pendingProcessMapping.remove(processID);
+
         if (processUpdater != null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating Process name=" + processID);
             }
+
             processUpdater.updateProcess(process);
         }
+
         processMapping.put(processID, process);
     }
 
@@ -543,6 +606,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         addProcessUpdater(processID, updater);
     }
 
+    private void addHierarchicalPendingProcess(String processID,
+        HierarchicalProcess hp) {
+        ProcessUpdater updater = new HierarchicalProcessUpdater(hp);
+        addProcessUpdater(processID, updater);
+    }
+
     //Commented in the fist version of jvm extension
     //    private void addPendingJVMProcess(String processID, JVMProcess jvmProcess) {
     //        ProcessUpdater updater = new ExtendedJVMProcessUpdater(jvmProcess);
@@ -553,32 +622,40 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     private void addProcessUpdater(String processID,
         ProcessUpdater processUpdater) {
         CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping.get(processID);
+
         if (compositeProcessUpdater == null) {
             compositeProcessUpdater = new CompositeProcessUpdater();
+
             //pendingProcessMapping.put(processID, processUpdater);
             pendingProcessMapping.put(processID, compositeProcessUpdater);
         }
+
         compositeProcessUpdater.addProcessUpdater(processUpdater);
     }
 
     private void addPendingService(String serviceID, ServiceUser serviceUser) {
         ServiceUpdater updater = null;
+
         if (serviceUser instanceof VirtualMachine) {
             updater = new VirtualMachineUpdater((VirtualMachine) serviceUser);
         } else {
             updater = new ServiceUpdaterImpl(serviceUser);
         }
+
         addServiceUpdater(serviceID, updater);
     }
 
     private void addServiceUpdater(String serviceID,
         ServiceUpdater serviceUpdater) {
         CompositeServiceUpdater compositeServiceUpdater = (CompositeServiceUpdater) pendingServiceMapping.get(serviceID);
+
         if (compositeServiceUpdater == null) {
             compositeServiceUpdater = new CompositeServiceUpdater();
+
             //pendingProcessMapping.put(processID, processUpdater);
             pendingServiceMapping.put(serviceID, compositeServiceUpdater);
         }
+
         compositeServiceUpdater.addServiceUpdater(serviceUpdater);
     }
 
@@ -598,6 +675,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         public void updateService(UniversalService service);
     }
 
+    private interface ProcessUpdater {
+        public void updateProcess(ExternalProcess p);
+    }
+
     private class CompositeServiceUpdater implements ServiceUpdater {
         private java.util.ArrayList updaterList;
 
@@ -611,16 +692,14 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
         public void updateService(UniversalService s) {
             java.util.Iterator it = updaterList.iterator();
+
             while (it.hasNext()) {
                 ServiceUpdater serviceUpdater = (ServiceUpdater) it.next();
                 serviceUpdater.updateService(s);
             }
+
             updaterList.clear();
         }
-    }
-
-    private interface ProcessUpdater {
-        public void updateProcess(ExternalProcess p);
     }
 
     private class CompositeProcessUpdater implements ProcessUpdater {
@@ -636,10 +715,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
         public void updateProcess(ExternalProcess p) {
             java.util.Iterator it = updaterList.iterator();
+
             while (it.hasNext()) {
                 ProcessUpdater processUpdater = (ProcessUpdater) it.next();
                 processUpdater.updateProcess(p);
             }
+
             updaterList.clear();
         }
     }
@@ -656,7 +737,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating CompositeExternal Process");
             }
+
             compositeExternalProcess.setTargetProcess(p);
+        }
+    }
+
+    private class HierarchicalProcessUpdater implements ProcessUpdater {
+        private HierarchicalProcess hp;
+
+        public HierarchicalProcessUpdater(HierarchicalProcess hp) {
+            this.hp = hp;
+        }
+
+        public void updateProcess(ExternalProcess p) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating Hierarchical Process");
+            }
+
+            hp.setHierarchicalProcess(p);
         }
     }
 
@@ -684,6 +782,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating VirtualMachine Process");
             }
+
             virtualMachine.setProcess(p);
         }
 
@@ -691,6 +790,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating VirtualMachine Service");
             }
+
             virtualMachine.setService(s);
         }
     }
@@ -706,6 +806,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (logger.isDebugEnabled()) {
                 logger.debug("Updating VirtualMachine Service");
             }
+
             try {
                 serviceUser.setService(s);
             } catch (ProActiveException e) {

@@ -35,7 +35,8 @@ import java.rmi.RemoteException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jini.ServiceLocatorHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -189,7 +190,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
         //    }
     }
 
-    protected ProActiveRuntimeAdapter createRuntimeAdapter()
+    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         JiniRuntimeImpl impl;
         try {
@@ -197,7 +198,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
         } catch (RemoteException e) {
             throw new ProActiveException("Cannot create the JiniRuntimeImpl", e);
         }
-        return new ProActiveRuntimeAdapter(impl);
+        return new ProActiveRuntimeAdapterImpl(impl);
     }
 
     public static void setMulticastLocator(boolean multicastLocator) {

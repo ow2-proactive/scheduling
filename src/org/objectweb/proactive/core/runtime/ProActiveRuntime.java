@@ -44,10 +44,10 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityEntity;
 
@@ -88,8 +88,8 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      */
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
-        ProActiveSecurityManager securityManager, String vnName, String jobId)
-        throws NodeException;
+        ProActiveSecurityManager nodeSecurityManager, String vnName,
+        String jobId) throws NodeException;
 
     /**
      * Kills all Nodes in this ProActiveRuntime
@@ -319,6 +319,13 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException;
 
+    /**
+     * @ see ProActiveRuntime#getProcessToDeploy(String, String)
+     */
+    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+        throws ProActiveException;
+
+    // SECURITY
     public String getVNName(String Nodename) throws ProActiveException;
 
     /**

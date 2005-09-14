@@ -28,12 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime;
+package org.objectweb.proactive.core.body.rmi;
 
-import java.io.Serializable;
+import org.objectweb.proactive.core.body.RemoteBodyForwarder;
 
 
-public abstract class ProActiveRuntimeAdapter implements ProActiveRuntime,
-    Serializable {
-    protected VMInformation vmInformation;
+public interface RmiRemoteBodyForwarder extends RemoteBodyForwarder,
+    java.rmi.Remote {
 }

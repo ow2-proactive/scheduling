@@ -32,6 +32,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
@@ -42,6 +43,7 @@ import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
+import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshallerDecorator;
@@ -86,6 +88,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new OARProcessHandler(proActiveDescriptor));
         this.addHandler(OARGRID_PROCESS_TAG,
             new OARGRIDProcessHandler(proActiveDescriptor));
+        this.addHandler(HIERARCHICAL_PROCESS_TAG,
+            new HierarchicalProcessHandler(proActiveDescriptor));
+
         ProcessListHandler handler = new ProcessListHandler(proActiveDescriptor);
         this.addHandler(PROCESS_LIST_TAG, handler);
         this.addHandler(PROCESS_LIST_BYHOST_TAG, handler);
@@ -107,6 +112,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     public Object getResultObject() throws SAXException {
         ExternalProcess result = targetProcess;
         targetProcess = null;
+
         return result;
     }
 
@@ -135,25 +141,33 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             String className = attributes.getValue("class");
+
             if (!checkNonEmpty(className)) {
                 throw new org.xml.sax.SAXException(
                     "Process defined without specifying the class");
             }
+
             try {
                 targetProcess = proActiveDescriptor.createProcess(id, className);
             } catch (ProActiveException e) {
                 //e.printStackTrace();
                 throw new org.xml.sax.SAXException(e.getMessage());
             }
+
             String closeStream = attributes.getValue("closeStream");
+
             if (checkNonEmpty(closeStream) && closeStream.equals("yes")) {
                 targetProcess.closeStream();
             }
+
             String hostname = attributes.getValue("hostname");
+
             if (checkNonEmpty(hostname)) {
                 targetProcess.setHostname(hostname);
             }
+
             String username = attributes.getValue("username");
+
             if (checkNonEmpty(username)) {
                 targetProcess.setUsername(username);
             }
@@ -180,6 +194,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     throw new org.xml.sax.SAXException(
                         "found a Process defined inside a non composite process");
                 }
+
                 ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
                 Object result = activeHandler.getResultObject();
                 proActiveDescriptor.registerProcess(cep, (String) result);
@@ -213,13 +228,16 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 } else {
                     int n = variables.size();
                     String[] result = new String[n];
+
                     if (n > 0) {
                         variables.toArray(result);
                     }
+
                     setResultObject(result);
                     variables.clear();
                     variables = null;
                 }
+
                 return super.getResultObject();
             }
 
@@ -228,6 +246,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 if (name.equals(VARIABLE_TAG)) {
                     String vName = attributes.getValue("name");
                     String vValue = attributes.getValue("value");
+
                     if (checkNonEmpty(vName) && (vValue != null)) {
                         logger.info("Found environment variable name=" + vName +
                             " value=" + vValue);
@@ -266,16 +285,19 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             throws org.xml.sax.SAXException {
             int padding = 0;
             String className = attributes.getValue("class");
+
             if (!checkNonEmpty(className)) {
                 throw new org.xml.sax.SAXException(
                     "Process defined without specifying the class");
             }
+
             try {
                 targetProcess = proActiveDescriptor.createProcess(id, className);
             } catch (ProActiveException e) {
                 //e.printStackTrace();
                 throw new org.xml.sax.SAXException(e.getMessage());
             }
+
             String closeStream = attributes.getValue("closeStream");
 
             String fixedName = attributes.getValue("fixedName");
@@ -283,21 +305,27 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             String domain = attributes.getValue("domain");
             String spadding = attributes.getValue("padding");
             String hostlist = attributes.getValue("hostlist");
+
             if (checkNonEmpty(spadding)) {
                 padding = Integer.parseInt(spadding);
             }
+
             if (checkNonEmpty(fixedName) && checkNonEmpty(list)) {
                 ((AbstractListProcessDecorator) targetProcess).setHostConfig(fixedName,
                     list, domain, padding);
             }
+
             if (checkNonEmpty(hostlist)) {
                 ((AbstractListProcessDecorator) targetProcess).setHostList(hostlist,
                     domain);
             }
+
             if (checkNonEmpty(closeStream) && closeStream.equals("yes")) {
                 targetProcess.closeStream();
             }
+
             String username = attributes.getValue("username");
+
             if (checkNonEmpty(username)) {
                 targetProcess.setUsername(username);
             }
@@ -309,13 +337,16 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public PrunProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
             this.addHandler(PRUN_OPTIONS_TAG, new PrunOptionHandler());
+
             //	System.out.println("ProcessDefinitionHandler.PrunProcessHandler()");
         }
 
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
+
             String queueName = (attributes.getValue("queue"));
+
             if (checkNonEmpty(queueName)) {
                 ((PrunSubProcess) targetProcess).setQueueName(queueName);
             }
@@ -336,9 +367,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
+
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
+
                 //    this.addHandler(SCRIPT_PATH_TAG, bch);
             }
 
@@ -360,6 +393,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     prunSubProcess.setHostsNumber((String) activeHandler.getResultObject());
                 } else if (name.equals(PROCESSOR_PER_NODE_TAG)) {
                     prunSubProcess.setProcessorPerNodeNumber((String) activeHandler.getResultObject());
+
                     //                } else if (name.equals(SCRIPT_PATH_TAG)) {
                     //                    prunSubProcess.setScriptLocation((String)
                     // activeHandler.getResultObject());
@@ -384,11 +418,15 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
+
             String interactive = (attributes.getValue("interactive"));
+
             if (checkNonEmpty(interactive)) {
                 ((PBSSubProcess) targetProcess).setInteractive(interactive);
             }
+
             String queueName = (attributes.getValue("queue"));
+
             if (checkNonEmpty(queueName)) {
                 ((PBSSubProcess) targetProcess).setQueueName(queueName);
             }
@@ -404,6 +442,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
+
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -418,6 +457,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
                 PBSSubProcess pbsSubProcess = (PBSSubProcess) targetProcess;
+
                 if (name.equals(HOST_LIST_TAG)) {
                     pbsSubProcess.setHostList((String) activeHandler.getResultObject());
                 } else if (name.equals(HOSTS_NUMBER_TAG)) {
@@ -447,6 +487,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
+
             //  String queueName = (attributes.getValue("queue"));
             //        if (checkNonEmpty(queueName)) {
             //            ((PBSSubProcess) targetProcess).setQueueName(queueName);
@@ -461,10 +502,12 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
                 this.addHandler(PARALLEL_ENVIRONMENT_TAG,
                     new SingleValueUnmarshaller());
+
                 //   this.addHandler(PROCESSOR_TAG, new
                 // SingleValueUnmarshaller());
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
+
                 //   this.addHandler(PRUN_OUTPUT_FILE, new
                 // SingleValueUnmarshaller());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
@@ -481,6 +524,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
                 GridEngineSubProcess geSubProcess = (GridEngineSubProcess) targetProcess;
+
                 if (name.equals(HOST_LIST_TAG)) {
                     geSubProcess.setHostList((String) activeHandler.getResultObject());
                 } else if (name.equals(HOSTS_NUMBER_TAG)) {
@@ -507,15 +551,21 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
+
             String interactive = (attributes.getValue("interactive"));
+
             if (checkNonEmpty(interactive)) {
                 ((OARSubProcess) targetProcess).setInteractive(interactive);
             }
+
             String queueName = (attributes.getValue("queue"));
+
             if (checkNonEmpty(queueName)) {
                 ((OARSubProcess) targetProcess).setQueueName(queueName);
             }
+
             String accessProtocol = (attributes.getValue("bookedNodesAccess"));
+
             if (checkNonEmpty(accessProtocol)) {
                 ((OARSubProcess) targetProcess).setAccessProtocol(accessProtocol);
             }
@@ -573,10 +623,13 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             super.startContextElement(name, attributes);
 
             String queueName = (attributes.getValue("queue"));
+
             if (checkNonEmpty(queueName)) {
                 ((OARGRIDSubProcess) targetProcess).setQueueName(queueName);
             }
+
             String accessProtocol = (attributes.getValue("bookedNodesAccess"));
+
             if (checkNonEmpty(accessProtocol)) {
                 ((OARGRIDSubProcess) targetProcess).setAccessProtocol(accessProtocol);
             }
@@ -590,6 +643,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(OAR_RESOURCE_TAG, new SingleValueUnmarshaller());
                 this.addHandler(OARGRID_WALLTIME_TAG,
                     new SingleValueUnmarshaller());
+
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -618,10 +672,50 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         }
     }
 
+    protected class HierarchicalProcessHandler extends ProcessHandler {
+        public HierarchicalProcessHandler(
+            ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            addHandler(HIERARCHICIAL_REFERENCE_TAG,
+                new ProcessReferenceHandler());
+        }
+
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws SAXException {
+            if (name.equals(HIERARCHICIAL_REFERENCE_TAG)) {
+                if (!(targetProcess instanceof HierarchicalProcess)) {
+                    throw new org.xml.sax.SAXException(
+                        "found a hierarchical reference inside a non hierarchical process");
+                }
+
+                HierarchicalProcess hp = (HierarchicalProcess) targetProcess;
+                Object result = activeHandler.getResultObject();
+                proActiveDescriptor.registerHierarchicalProcess(hp,
+                    (String) result);
+            } else {
+                super.notifyEndActiveHandler(name, activeHandler);
+            }
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            String hostname = attributes.getValue("hostname");
+            String internal_ip = attributes.getValue("internal_ip");
+
+            if (checkNonEmpty(internal_ip) && checkNonEmpty(hostname)) {
+                HostsInfos.setSecondaryName(internal_ip, hostname);
+            }
+
+            super.startContextElement(name, attributes);
+        }
+    }
+
     protected class JVMProcessHandler extends ProcessHandler {
         public JVMProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
+
             UnmarshallerHandler pathHandler = new PathHandler();
+
             {
                 CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
                 cu.addHandler(ABS_PATH_TAG, pathHandler);
@@ -631,10 +725,12 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(BOOT_CLASSPATH_TAG, cu);
                 this.addHandler(JVMPARAMETERS_TAG, cu);
             }
+
             BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
             bch.addHandler(ABS_PATH_TAG, pathHandler);
             bch.addHandler(REL_PATH_TAG, pathHandler);
             bch.addHandler(JVMPARAMETER_TAG, new BasicUnmarshaller());
+
             //  this.addHandler(JVMPARAMETERS_TAG, bch);
             this.addHandler(JAVA_PATH_TAG, bch);
             this.addHandler(POLICY_FILE_TAG, bch);
@@ -643,6 +739,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
             this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
             this.addHandler(EXTENDED_JVM_TAG, new ExtendedJVMHandler());
+
             // this.addHandler(JVMPARAMETERS_TAG, new
             // SingleValueUnmarshaller());
         }
@@ -664,28 +761,34 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
             if (name.equals(CLASSPATH_TAG)) {
                 String[] paths = (String[]) activeHandler.getResultObject();
+
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
                     String pathSeparator = System.getProperty("path.separator");
                     sb.append(paths[0].trim());
+
                     //we call trim method to avoid whitespace at the beginning
                     // or end of a path
                     for (int i = 1; i < paths.length; i++) {
                         sb.append(pathSeparator);
                         sb.append(paths[i].trim());
                     }
+
                     jvmProcess.setClasspath(sb.toString());
                 }
             } else if (name.equals(BOOT_CLASSPATH_TAG)) {
                 String[] paths = (String[]) activeHandler.getResultObject();
+
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
                     String pathSeparator = System.getProperty("path.separator");
                     sb.append(paths[0].trim());
+
                     for (int i = 1; i < paths.length; i++) {
                         sb.append(pathSeparator);
                         sb.append(paths[i].trim());
                     }
+
                     jvmProcess.setBootClasspath(sb.toString());
                 }
             } else if (name.equals(JVMPARAMETERS_TAG)) {
@@ -693,11 +796,13 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
+
                     for (int i = 0; i < paths.length; i++) {
                         //  sb.append(pathSeparator);
                         sb.append(paths[i]);
                         sb.append(" ");
                     }
+
                     jvmProcess.setJvmOptions(sb.toString());
                 }
             } else if (name.equals(JAVA_PATH_TAG)) {
@@ -733,7 +838,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             public void startContextElement(String name, Attributes attributes)
                 throws org.xml.sax.SAXException {
                 super.startContextElement(name, attributes);
+
                 String overwrite = attributes.getValue("overwriteParameters");
+
                 if ((overwrite != null) && overwrite.equals("yes")) {
                     ((JVMProcess) targetProcess).setOverwrite(true);
                 }
@@ -752,6 +859,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     protected class MapRshProcessHandler extends ProcessHandler {
         public MapRshProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
+
             UnmarshallerHandler pathHandler = new PathHandler();
             BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
             bch.addHandler(ABS_PATH_TAG, pathHandler);
@@ -765,7 +873,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             // in map rsh handler!!!
             //MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
             super.startContextElement(name, attributes);
+
             String parallelize = attributes.getValue("parallelize");
+
             if (checkNonEmpty(parallelize)) {
                 ((MapRshProcess) targetProcess).setParallelization(
                     "parallelize");
@@ -810,11 +920,15 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             // in map rsh handler!!!
             //MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
             super.startContextElement(name, attributes);
+
             String interactive = (attributes.getValue("interactive"));
+
             if (checkNonEmpty(interactive)) {
                 ((LSFBSubProcess) targetProcess).setInteractive(interactive);
             }
+
             String queueName = (attributes.getValue("queue"));
+
             if (checkNonEmpty(queueName)) {
                 ((LSFBSubProcess) targetProcess).setQueueName(queueName);
             }
@@ -830,6 +944,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
                 this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
                 this.addHandler(RES_REQ_TAG, new SimpleValueHandler());
+
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -846,6 +961,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 // we know that it is a bsub process since we are
                 // in bsub option!!!
                 LSFBSubProcess bSubProcess = (LSFBSubProcess) targetProcess;
+
                 if (name.equals(HOST_LIST_TAG)) {
                     bSubProcess.setHostList((String) activeHandler.getResultObject());
                 } else if (name.equals(PROCESSOR_TAG)) {
@@ -889,6 +1005,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 // we know that it is a globus process since we are
                 // in globus option!!!
                 GlobusProcess globusProcess = (GlobusProcess) targetProcess;
+
                 if (name.equals(GLOBUS_COUNT_TAG)) {
                     globusProcess.setCount((String) activeHandler.getResultObject());
                 } else if (name.equals(GLOBUS_MAXTIME_TAG)) {
@@ -927,6 +1044,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
             cu.addHandler(ABS_PATH_TAG, pathHandler);
             cu.addHandler(REL_PATH_TAG, pathHandler);
+
             //cu.addHandler(JVMPARAMETER_TAG, new SimpleValueHandler());
             this.addHandler(UNICORE_IMPORTFILES_TAG, cu);
         }
@@ -936,21 +1054,25 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             super.startContextElement(name, attributes);
 
             String jobName = (attributes.getValue("jobname"));
+
             if (checkNonEmpty(jobName)) {
                 ((UnicoreProcess) targetProcess).uParam.setUsiteName(jobName);
             }
 
             String keyPassword = (attributes.getValue("keypassword"));
+
             if (checkNonEmpty(keyPassword)) {
                 ((UnicoreProcess) targetProcess).uParam.setKeyPassword(keyPassword);
             }
 
             String submitJob = (attributes.getValue("submitjob"));
+
             if (checkNonEmpty(submitJob)) {
                 ((UnicoreProcess) targetProcess).uParam.setSubmitJob(submitJob);
             }
 
             String saveJob = (attributes.getValue("savejob"));
+
             if (checkNonEmpty(saveJob)) {
                 ((UnicoreProcess) targetProcess).uParam.setSaveJob(saveJob);
             }
@@ -964,6 +1086,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 ((UnicoreProcess) targetProcess).uParam.setKeyFilePath((String) activeHandler.getResultObject());
             } else if (name.equals(UNICORE_IMPORTFILES_TAG)) {
                 String[] files = (String[]) activeHandler.getResultObject();
+
                 for (int i = 0; i < files.length; i++) {
                     ((UnicoreProcess) targetProcess).uParam.addImportFile(files[i].trim());
                 }
@@ -1008,14 +1131,19 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 super.startContextElement(name, attributes);
 
                 String usiteName = (attributes.getValue("name"));
+
                 if (checkNonEmpty(usiteName)) {
                     ((UnicoreProcess) targetProcess).uParam.setUsiteName(usiteName);
                 }
+
                 String type = (attributes.getValue("type"));
+
                 if (checkNonEmpty(type)) {
                     ((UnicoreProcess) targetProcess).uParam.setUsiteType(type);
                 }
+
                 String url = (attributes.getValue("url"));
+
                 if (checkNonEmpty(url)) {
                     ((UnicoreProcess) targetProcess).uParam.setUsiteUrl(url);
                 }
@@ -1031,31 +1159,41 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 super.startContextElement(name, attributes);
 
                 String vsiteName = (attributes.getValue("name"));
+
                 if (checkNonEmpty(vsiteName)) {
                     ((UnicoreProcess) targetProcess).uParam.setVsiteName(vsiteName);
                 }
+
                 String nodes = (attributes.getValue("nodes"));
+
                 if (checkNonEmpty(nodes)) {
                     ((UnicoreProcess) targetProcess).uParam.setVsiteNodes(Integer.parseInt(
                             nodes));
                 }
+
                 String processors = (attributes.getValue("processors"));
+
                 if (checkNonEmpty(processors)) {
                     ((UnicoreProcess) targetProcess).uParam.setVsiteProcessors(Integer.parseInt(
                             processors));
                 }
+
                 String memory = (attributes.getValue("memory"));
+
                 if (checkNonEmpty(memory)) {
                     ((UnicoreProcess) targetProcess).uParam.setVsiteMemory(Integer.parseInt(
                             memory));
                 }
+
                 String runtime = (attributes.getValue("runtime"));
+
                 if (checkNonEmpty(runtime)) {
                     ((UnicoreProcess) targetProcess).uParam.setVsiteRuntime(Integer.parseInt(
                             runtime));
                 }
 
                 String priority = (attributes.getValue("priority"));
+
                 if (checkNonEmpty(priority)) {
                     ((UnicoreProcess) targetProcess).uParam.setVsitePriority(priority);
                 }

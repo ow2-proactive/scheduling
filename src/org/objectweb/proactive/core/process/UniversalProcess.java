@@ -160,4 +160,9 @@ public interface UniversalProcess extends java.io.Serializable {
      * @return the path of the command to be executed by this process
      */
     public String getCommandPath();
+
+    /**
+     * Returns true if and only if this process is hierarchical
+     */
+    public boolean isHierarchical();
 }

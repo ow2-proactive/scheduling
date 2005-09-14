@@ -36,7 +36,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterForwarderImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -48,6 +50,7 @@ public class RmiRuntimeFactory extends RuntimeFactory {
     protected static RegistryHelper registryHelper = new RegistryHelper();
     protected static ClassServerHelper classServerHelper = new ClassServerHelper();
     protected static ProActiveRuntime defaultRmiRuntime = null;
+    protected static ProActiveRuntimeForwarder defaultRmiRuntimeForwarder = null;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -95,7 +98,13 @@ public class RmiRuntimeFactory extends RuntimeFactory {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-            defaultRmiRuntime = createRuntimeAdapter();
+
+            String val = System.getProperty("proactive.hierarchicalRuntime");
+            if ((val != null) && val.equals("true")) {
+                defaultRmiRuntime = createRuntimeAdapterForwarder();
+            } else {
+                defaultRmiRuntime = createRuntimeAdapter();
+            }
         }
 
         return defaultRmiRuntime;
@@ -119,7 +128,7 @@ public class RmiRuntimeFactory extends RuntimeFactory {
         }
     }
 
-    protected ProActiveRuntimeAdapter createRuntimeAdapter()
+    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         RmiProActiveRuntimeImpl impl;
         try {
@@ -130,7 +139,21 @@ public class RmiRuntimeFactory extends RuntimeFactory {
         } catch (java.rmi.AlreadyBoundException e) {
             throw new ProActiveException("Cannot bind remoteProactiveRuntime", e);
         }
-        return new ProActiveRuntimeAdapter(impl);
+        return new ProActiveRuntimeAdapterImpl(impl);
+    }
+
+    protected ProActiveRuntimeAdapterForwarderImpl createRuntimeAdapterForwarder()
+        throws ProActiveException {
+        RmiProActiveRuntimeForwarderImpl impl;
+        try {
+            impl = new RmiProActiveRuntimeForwarderImpl();
+        } catch (java.rmi.RemoteException e) {
+            throw new ProActiveException("Cannot create the RemoteProActiveRuntimeImpl",
+                e);
+        } catch (java.rmi.AlreadyBoundException e) {
+            throw new ProActiveException("Cannot bind remoteProactiveRuntime", e);
+        }
+        return new ProActiveRuntimeAdapterForwarderImpl(impl);
     }
 
     public static RegistryHelper getRegistryHelper() {

@@ -77,6 +77,7 @@ public interface ProActiveDescriptorConstants {
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
+    public static final String HIERARCHICAL_PROCESS_TAG = "hierarchicalProcess";
     public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
     public static final String GRID_ENGINE_OPTIONS_TAG = "gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
@@ -84,6 +85,7 @@ public interface ProActiveDescriptorConstants {
     public static final String EXTENDED_JVM_TAG = "extendedJvm";
     public static final String PROCESS_REFERENCE_TAG = "processReference";
     public static final String SERVICE_REFERENCE_TAG = "serviceReference";
+    public static final String HIERARCHICIAL_REFERENCE_TAG = "hierarchicalReference";
     public static final String COMMAND_PATH_TAG = "commandPath";
     public static final String ENVIRONMENT_TAG = "environment";
     public static final String HOST_LIST_TAG = "hostlist";

@@ -33,7 +33,8 @@ package org.objectweb.proactive.core.runtime.http;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
@@ -74,9 +75,9 @@ public class HttpRuntimeFactory extends RuntimeFactory {
     /**
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#createRuntimeAdapter()
      */
-    protected ProActiveRuntimeAdapter createRuntimeAdapter()
+    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         RemoteProActiveRuntime remoteProActiveRuntime = new HttpProActiveRuntime();
-        return new ProActiveRuntimeAdapter(remoteProActiveRuntime);
+        return new ProActiveRuntimeAdapterImpl(remoteProActiveRuntime);
     }
 }

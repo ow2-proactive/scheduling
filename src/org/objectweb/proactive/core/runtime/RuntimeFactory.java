@@ -215,10 +215,10 @@ public abstract class RuntimeFactory {
      * @return the newly created Adpater for the given RemoteProActiveRuntime
      * @throws ProActiveException if a pb occurs during the creation
      */
-    protected ProActiveRuntimeAdapter createRuntimeAdapter(
+    protected ProActiveRuntimeAdapterImpl createRuntimeAdapter(
         RemoteProActiveRuntime remoteProActiveRuntime)
         throws ProActiveException {
-        return new ProActiveRuntimeAdapter(remoteProActiveRuntime);
+        return new ProActiveRuntimeAdapterImpl(remoteProActiveRuntime);
     }
 
     /**
@@ -242,7 +242,7 @@ public abstract class RuntimeFactory {
      * @return the newly created Adapter
      * @throws ProActiveException if a pb occurs during the creation
      */
-    protected abstract ProActiveRuntimeAdapter createRuntimeAdapter()
+    protected abstract ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException;
 
     //

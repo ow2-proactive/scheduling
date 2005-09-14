@@ -338,6 +338,11 @@ public abstract class AbstractListProcessDecorator
         return finished;
     }
 
+    /* XXX Erk ! */
+    public boolean isHierarchical() {
+        return false;
+    }
+
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#setCommandPath(java.lang.String)
      */

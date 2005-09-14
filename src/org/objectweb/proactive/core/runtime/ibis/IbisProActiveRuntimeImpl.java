@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -108,6 +109,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         try {
             //first we build a well-formed url
             nodeURL = buildNodeURL(nodeName);
+
             //then take the name of the node
             String name = UrlBuilder.getNameFromUrl(nodeURL);
 
@@ -118,7 +120,9 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + nodeURL, e);
         }
+
         nodesArray.add(nodeURL);
+
         return nodeURL;
     }
 
@@ -127,6 +131,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
             String url = (String) nodesArray.get(i);
             killNode(url);
         }
+
         proActiveRuntime.killAllNodes();
     }
 
@@ -134,6 +139,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         throws RemoteException, ProActiveException {
         String nodeUrl = null;
         String name = null;
+
         try {
             nodeUrl = buildNodeURL(nodeName);
             name = UrlBuilder.getNameFromUrl(nodeUrl);
@@ -141,6 +147,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (UnknownHostException e) {
             throw new RemoteException("Host unknown in " + nodeUrl, e);
         }
+
         proActiveRuntime.killNode(name);
     }
 
@@ -210,6 +217,11 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.killRT(false);
     }
 
+    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+        throws ProActiveException {
+        return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+    }
+
     public String getURL() {
         return proActiveRuntimeURL;
     }
@@ -236,11 +248,13 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         try {
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualNodeName);
+
             //register it with the url
             register(virtualNodeURL, replacePreviousBinding);
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + virtualNodeURL, e);
         }
+
         vnNodesArray.add(virtualNodeURL);
     }
 
@@ -249,6 +263,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         String virtualNodeURL = null;
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualnodeName));
+
         try {
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualnodeName);
@@ -256,6 +271,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + virtualNodeURL, e);
         }
+
         vnNodesArray.remove(virtualNodeURL);
     }
 
@@ -408,6 +424,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
             } else {
                 Naming.bind(UrlBuilder.removeProtocol(url, "ibis:"), this);
             }
+
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " successfully bound in registry at " +
                     url);
@@ -423,6 +440,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     private void unregister(String url) throws RemoteException {
         try {
             Naming.unbind(UrlBuilder.removeProtocol(url, "ibis:"));
+
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " unbound in registry");
             }
@@ -454,6 +472,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
                                                          .getInetAddress());
             int port = IbisRuntimeFactory.getRegistryHelper()
                                          .getRegistryPortNumber();
+
             return UrlBuilder.buildUrl(host, url, "ibis:", port);
         } else {
             return UrlBuilder.checkUrl(url);
