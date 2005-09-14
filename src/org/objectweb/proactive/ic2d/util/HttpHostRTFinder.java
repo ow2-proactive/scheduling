@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.http.HttpProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
@@ -53,9 +53,9 @@ public class HttpHostRTFinder implements HostRTFinder {
         throws IOException {
         logger.log("Exploring " + host + " with HTTP on port " + port);
         ArrayList runtimeArray = new ArrayList();
-        ProActiveRuntimeAdapter adapter;
+        ProActiveRuntimeAdapterImpl adapter;
         try {
-            adapter = new ProActiveRuntimeAdapter(new HttpProActiveRuntime(
+            adapter = new ProActiveRuntimeAdapterImpl(new HttpProActiveRuntime(
                         UrlBuilder.buildUrl(host, "", "http:", port)));
             runtimeArray.add(adapter);
         } catch (ProActiveException e) {

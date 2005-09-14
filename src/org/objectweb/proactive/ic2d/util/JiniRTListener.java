@@ -36,7 +36,7 @@ import java.rmi.RMISecurityManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 import net.jini.core.discovery.LookupLocator;
@@ -100,7 +100,7 @@ public class JiniRTListener implements DiscoveryListener {
                                     log4jlogger.warn("Service : NULL !!!");
                                 } else {
                                     runtime = (RemoteProActiveRuntime) matches.items[i].service;
-                                    ProActiveRuntime part = new ProActiveRuntimeAdapter(runtime);
+                                    ProActiveRuntime part = new ProActiveRuntimeAdapterImpl(runtime);
                                     runtimes.add(part);
                                 }
                             } catch (ProActiveException e) {
@@ -166,7 +166,7 @@ public class JiniRTListener implements DiscoveryListener {
                                 log4jlogger.warn("Service : NULL !!!");
                             } else {
                                 runtime = (RemoteProActiveRuntime) matches.items[i].service;
-                                ProActiveRuntime part = new ProActiveRuntimeAdapter(runtime);
+                                ProActiveRuntime part = new ProActiveRuntimeAdapterImpl(runtime);
                                 runtimes.add(part);
                             }
                         }

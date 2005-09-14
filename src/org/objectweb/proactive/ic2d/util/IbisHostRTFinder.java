@@ -34,7 +34,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.IbisProperties;
 
@@ -96,7 +96,7 @@ public class IbisHostRTFinder implements HostRTFinder {
 
                 try {
                     RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
-                    part = new ProActiveRuntimeAdapter(r);
+                    part = new ProActiveRuntimeAdapterImpl(r);
                     runtimeArray.add(part);
                 } catch (Exception e) {
                     log(e.getMessage(), e);
