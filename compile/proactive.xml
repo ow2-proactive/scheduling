@@ -113,7 +113,7 @@
       ==
       ================================================================
 	-->
-	<target name="all" depends="ic2d, p2p, examples"/>
+	<target name="all" depends="ic2d, bnb, p2p, examples"/>
 	<!--
 	   ================================================================
 	   ==
@@ -178,6 +178,19 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 			<include name="${proactive.ext.dir}/**/*.java"/>
+		</javac>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile Branch and Bound
+      ==
+      ================================================================
+	-->
+	<target name="bnb" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
+			<classpath refid="project.classpath"/>
+			<include name="${proactive.dir}/branchnbound/**/*.java"/>
 		</javac>
 	</target>
 	<!--
