@@ -168,6 +168,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         createTask.setFactoryProviderTask(typeTask);
 
         tasks.addTask("create", container, createTask);
+       
     }
 
     // TODO change visibility of this inner class in ImplementationCompiler 

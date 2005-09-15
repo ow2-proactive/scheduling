@@ -40,7 +40,10 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.adl.ADL2NComponentFactory;
 import org.objectweb.proactive.core.component.adl.RegistryManager;
+import org.objectweb.proactive.core.component.adl.component.ADL2NComponent;
+import org.objectweb.proactive.core.component.adl.component.ADL2NComponentImpl;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
@@ -49,21 +52,28 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author Matthieu Morel
+ * Called by the parser to create the component tree
+ * @author Dalmasso Nicolas
  */
-public class ProActiveImplementationBuilderImpl
+public class ADL2NImplementationBuilderImpl
     implements ProActiveImplementationBuilder, BindingController {
+	/**Binding with the registry manager*/
     public final static String REGISTRY_BINDING = "registry";
+    /**Registry manager*/
     public RegistryManager registry;
+    /**Logger*/
     private static Logger logger = ProActiveLogger.getLogger("components.adl");
 
-    // --------------------------------------------------------------------------
-    // Implementation of the BindingController interface
-    // --------------------------------------------------------------------------
+    /**
+     * List of all bindings
+     */
     public String[] listFc() {
         return new String[] { REGISTRY_BINDING };
     }
 
+    /**
+     * Looks up for a binding
+     */
     public Object lookupFc(final String itf) {
         if (itf.equals(REGISTRY_BINDING)) {
             return registry;
@@ -71,26 +81,35 @@ public class ProActiveImplementationBuilderImpl
         return null;
     }
 
+    /**
+     * Bind with the registry
+     */
     public void bindFc(final String itf, final Object value) {
         if (itf.equals(REGISTRY_BINDING)) {
             registry = (RegistryManager) value;
         }
     }
 
+    /**
+     * Unbind with the registry
+     */
     public void unbindFc(final String itf) {
         if (itf.equals(REGISTRY_BINDING)) {
             registry = null;
         }
     }
 
-    //  --------------------------------------------------------------------------
-    // Implementation of the Implementation Builder and ProActiveImplementationBuilder interfaces
-    // --------------------------------------------------------------------------
+    /**
+     * Unused here
+     */
     public Object createComponent(Object arg0, String arg1, String arg2,
         Object arg3, Object arg4, Object arg5) throws Exception {
         return null;
     }
 
+    /**
+     * Creates a component and place him in the tree
+     */
     public Object createComponent(Object type, String name, String definition,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Map context) throws Exception {
@@ -115,7 +134,8 @@ public class ProActiveImplementationBuilderImpl
                 // 	TODO add self exported virtual node ?
                 // for the moment, just add a leaf to the linked vns
                 ExportedVirtualNodesList.instance().addLeafVirtualNode(name,
-                    adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
+                    adlVN.getName(),
+                    adlVN.getCardinality());  // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
                 org.objectweb.proactive.core.descriptor.data.VirtualNode proactive_vn =
@@ -146,10 +166,12 @@ public class ProActiveImplementationBuilderImpl
             }
         }
 
-        Component result = Fractal.getGenericFactory(bootstrap).newFcInstance((ComponentType) type,
+        Component result = ADL2NComponentFactory.instance().newFcInstance((ComponentType) type,
                 controllerDesc, contentDesc);
-        registry.addComponent(result); // the registry can handle groups
-        
+       if(result instanceof ADL2NComponent){
+    	   ((ADL2NComponentImpl)result).setName(name);
+    	   ((ADL2NComponentImpl)result).setDefinition(definition == null ? "None" : definition);
+       }
        return result;
     }
 }

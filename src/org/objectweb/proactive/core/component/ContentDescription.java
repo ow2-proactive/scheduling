@@ -223,7 +223,7 @@ public class ContentDescription {
     /**
      * setter (visibility is reduced)
      */
-    void setFactory(MetaObjectFactory factory) {
+    public void setFactory(MetaObjectFactory factory) {
         this.factory = factory;
     }
 

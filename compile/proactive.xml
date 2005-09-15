@@ -128,6 +128,9 @@
 				<include name="**/*.fractal"/>
 				<include name="**/*.properties"/>
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd"/>
+				<include name="org/objectweb/proactive/core/component/adl/xml/ADL2N.dtd"/>
+				<include name="org/objectweb/proactive/core/component/adl/ADL2N.policy"/>
+				<include name="org/objectweb/proactive/core/component/adl/ADL2N_log.conf"/>
 			</fileset>
 		</copy>
 	</target>
