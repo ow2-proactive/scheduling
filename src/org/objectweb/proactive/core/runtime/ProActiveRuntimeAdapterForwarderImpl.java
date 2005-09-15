@@ -501,10 +501,12 @@ public class ProActiveRuntimeAdapterForwarderImpl
         }
     }
 
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException {
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException {
         try {
-            return proActiveRuntime.getProcessToDeploy(urid, padURL, vmname);
+            return proActiveRuntime.getProcessToDeploy(urid,
+                proActiveRuntimeDist, creatorID, vmName, padURL);
         } catch (IOException e) {
             throw new ProActiveException(e);
         }

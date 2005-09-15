@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -104,6 +105,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** index of the last associated jvm used */
     private int lastVirtualMachineIndex;
+
+    /** the list of RuntimeForwarder that have been created */
+    private ArrayList createdRuntimeF;
 
     /** the list of nodes linked to this VirtualNode that have been created*/
     private java.util.ArrayList createdNodes;
@@ -189,6 +193,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         virtualMachines = new java.util.ArrayList(5);
         localVirtualMachines = new java.util.ArrayList();
         createdNodes = new java.util.ArrayList();
+        createdRuntimeF = new ArrayList();
         awaitedVirtualNodes = new Hashtable();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
@@ -613,6 +618,19 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             proActiveRuntimeImpl.unregisterVirtualNode(this.name);
         }
+
+        for (int i = 0; i < createdRuntimeF.size(); i++) {
+            part = (ProActiveRuntime) createdRuntimeF.get(i);
+            try {
+                part.killRT(true);
+            } catch (Exception e) {
+                logger.info(" Forwarder " + part.getVMInformation().getVMID() +
+                    " on host " +
+                    UrlBuilder.getHostNameorIP(part.getVMInformation()
+                                                   .getInetAddress()) +
+                    " terminated!!!");
+            }
+        }
     }
 
     public void createNodeOnCurrentJvm(String protocol) {
@@ -677,7 +695,42 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
-    public synchronized void runtimeRegistered(RuntimeRegistrationEvent event) {
+    public void runtimeRegistered(RuntimeRegistrationEvent event) {
+        switch (event.getType()) {
+        case RuntimeRegistrationEvent.RUNTIME_REGISTERED:
+            runtimeRegisteredPerform(event);
+            break;
+        case RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED:
+            forwarderRuntimeRegisteredPerform(event);
+            break;
+        default:
+            logger.info("unhandled event type");
+            break;
+        }
+    }
+
+    private synchronized void forwarderRuntimeRegisteredPerform(
+        RuntimeRegistrationEvent event) {
+        VirtualMachine virtualMachine = null;
+        for (int i = 0; i < virtualMachines.size(); i++) {
+            if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
+                virtualMachine = (VirtualMachine) virtualMachines.get(i);
+            }
+        }
+
+        //Check if it this virtualNode that originates the process
+        if ((event.getCreatorID().equals(this.name)) &&
+                (virtualMachine != null)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("forwarder " + event.getCreatorID() +
+                    " registered on virtualnode " + this.name);
+            }
+        }
+        createdRuntimeF.add(event.getRegisteredRuntime());
+    }
+
+    private synchronized void runtimeRegisteredPerform(
+        RuntimeRegistrationEvent event) {
         String nodeName;
         ProActiveRuntime proActiveRuntimeRegistered;
         String nodeHost;

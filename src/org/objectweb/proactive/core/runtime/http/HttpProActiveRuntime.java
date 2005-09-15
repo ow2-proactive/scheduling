@@ -117,11 +117,16 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException {
+    
+    public ExternalProcess getProcessToDeploy(
+            ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+            String padURL) throws ProActiveException {
+
         ArrayList params = new ArrayList();
+        params.add(proActiveRuntimeDist);
+        params.add(creatorID);
+        params.add(vmName);
         params.add(padURL);
-        params.add(vmname);
         try {
             new RuntimeRequest("getProcessToDeploy", params, this.url).send();
         } catch (Exception e) {

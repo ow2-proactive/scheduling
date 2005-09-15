@@ -145,7 +145,8 @@ public class StartHierarchical {
                                 creatorID,
                                 System.getProperty("proactive.communication.protocol") + ":",
                                 vmName); */
-            ExternalProcess process = PART.getProcessToDeploy(padURL, vmName);
+            ExternalProcess process = PART.getProcessToDeploy(proActiveRuntime,
+                    creatorID, vmName, padURL);
 
             if (process == null) {
                 logger.info("getProcessToDeploy failed. Aborting");

@@ -501,11 +501,13 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
             throw new ProActiveException(e);
         }
     }
-
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
+    
+    public ExternalProcess getProcessToDeploy(
+            ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+            String padURL)
         throws ProActiveException {
         try {
-            return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+            return proActiveRuntime.getProcessToDeploy(proActiveRuntimeDist, creatorID, vmName, padURL);
         } catch (IOException e) {
             throw new ProActiveException(e);
         }

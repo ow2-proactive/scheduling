@@ -416,15 +416,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             proActiveRuntimeDist, creatorID, creationProtocol, vmName);
     }
 
-    public void register(RemoteProActiveRuntimeForwarder proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,
-        String vmName) {
-        System.err.println("Putting: " + proActiveRuntimeName + " " +
-            proActiveRuntimeDist);
-        proActiveRuntimeForwarderMap.put(proActiveRuntimeName,
-            proActiveRuntimeDist);
-    }
-
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
@@ -1234,8 +1225,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return runtimeSecurityManager.getCertificateEncoded();
     }
 
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException {
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException {
         ProActiveDescriptor pad = (ProActiveDescriptor) descriptorMap.get(padURL);
 
         if (pad == null) {
@@ -1243,8 +1235,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             return null;
         }
-
-        return pad.getHierarchicalProcess(vmname);
+        notifyListeners(this,
+            RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED,
+            proActiveRuntimeDist, creatorID, null, vmName);
+        return pad.getHierarchicalProcess(vmName);
     }
 
     public String getVNName(String nodename) throws ProActiveException {

@@ -115,9 +115,10 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
         String nodeName, Checkpoint ckpt, int inc)
         throws IOException, ProActiveException;
 
-    public ExternalProcess getProcessToDeploy(UniqueRuntimeID ruid, String vn,
-        String vmname) throws ProActiveException, IOException;
-
+    public ExternalProcess getProcessToDeploy(UniqueRuntimeID urid,
+            ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+            String padURL) throws ProActiveException, IOException;
+    
     /**
      * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
      */

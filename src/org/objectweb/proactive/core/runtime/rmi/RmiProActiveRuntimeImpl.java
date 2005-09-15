@@ -130,9 +130,11 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException {
-        return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException, IOException {
+        return proActiveRuntime.getProcessToDeploy(proActiveRuntimeDist,
+            creatorID, vmName, padURL);
     }
 
     public String createLocalNode(String nodeName,

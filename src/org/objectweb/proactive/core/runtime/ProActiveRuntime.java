@@ -322,8 +322,9 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
     /**
      * @ see ProActiveRuntime#getProcessToDeploy(String, String)
      */
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException;
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException;
 
     // SECURITY
     public String getVNName(String Nodename) throws ProActiveException;

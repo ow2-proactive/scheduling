@@ -224,7 +224,8 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
      * @see ProActiveRuntime#getProcessToDeploy(String, String)
      */
     public ExternalProcess getProcessToDeploy(UniqueRuntimeID urid,
-        String padURL, String vmname) throws ProActiveException;
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException;
 
     /**
      * @see ProActiveRuntime#getClassDataFromThisRuntime(String)

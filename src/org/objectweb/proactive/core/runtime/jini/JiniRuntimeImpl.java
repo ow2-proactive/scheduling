@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.security.SecureRandom;
 import java.util.Hashtable;
@@ -38,6 +39,7 @@ import java.util.Vector;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
@@ -116,9 +118,11 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //
     // -- Implements JiniRuntime -----------------------------------------------
     //
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException {
-        return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException, IOException {
+        return proActiveRuntime.getProcessToDeploy(proActiveRuntimeDist,
+            creatorID, vmName, padURL);
     }
 
     public String createLocalNode(String nodeName,

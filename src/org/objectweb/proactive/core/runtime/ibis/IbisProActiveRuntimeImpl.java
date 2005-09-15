@@ -217,9 +217,11 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.killRT(false);
     }
 
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname)
-        throws ProActiveException {
-        return proActiveRuntime.getProcessToDeploy(padURL, vmname);
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException {
+        return proActiveRuntime.getProcessToDeploy(proActiveRuntimeDist,
+            creatorID, vmName, padURL);
     }
 
     public String getURL() {

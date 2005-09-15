@@ -146,8 +146,9 @@ public interface RemoteProActiveRuntime extends Serializable {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws IOException, ProActiveException;
 
-    public ExternalProcess getProcessToDeploy(String vn, String vmname)
-        throws ProActiveException, IOException;
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException, IOException;
 
     /**
      * @see ProActiveRuntime#getClassDataFromParentRuntime(String)

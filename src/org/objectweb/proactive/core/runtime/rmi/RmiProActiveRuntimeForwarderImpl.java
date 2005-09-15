@@ -173,8 +173,9 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
     }
 
     public ExternalProcess getProcessToDeploy(UniqueRuntimeID urid,
-        String padURL, String vmname) throws ProActiveException, IOException {
-        return proActiveRuntimeF.getProcessToDeploy(urid, padURL, vmname);
+            ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+            String padURL) throws ProActiveException, IOException {
+    	return proActiveRuntimeF.getProcessToDeploy(urid, proActiveRuntimeDist, creatorID, vmName, padURL);
     }
 
     public String getURL(UniqueRuntimeID urid)

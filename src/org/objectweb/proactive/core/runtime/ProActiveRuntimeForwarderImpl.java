@@ -182,9 +182,11 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return padURL + "??" + vmName;
     }
 
-    public ExternalProcess getProcessToDeploy(String padURL, String vmname) {
+    public ExternalProcess getProcessToDeploy(
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) {
         HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
-                    padURL, vmname));
+                    padURL, vmName));
 
         if (hp != null) {
             return hp.getHierarchicalProcess();
@@ -654,14 +656,17 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     }
 
     public ExternalProcess getProcessToDeploy(UniqueRuntimeID urid,
-        String padURL, String vmname) throws ProActiveException {
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException {
         if (urid == null) {
-            return this.getProcessToDeploy(padURL, vmname);
+            return this.getProcessToDeploy(proActiveRuntimeDist, creatorID,
+                vmName, padURL);
         } else {
             ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
 
             if (part != null) {
-                return part.getProcessToDeploy(padURL, vmname);
+                return part.getProcessToDeploy(proActiveRuntimeDist, creatorID,
+                    vmName, padURL);
             } else {
                 logger.warn("No runtime associated to this urid (" + urid +
                     ")");
