@@ -1,56 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!--  The following element  defines the root of the schema -->
 
+     <xs:element name="Policy" type="SecurityDescriptorType">
+  		<xs:annotation>
+			<xs:documentation>Application Security Policies Descriptor</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+		
+		<xs:complexType name="SecurityDescriptorType">
+			<xs:sequence>
+				<xs:element name="ApplicationName" minOccurs="1" maxOccurs="1" type="xs:string" />
+				<xs:element name="PKCS12Certificate" minOccurs="1" maxOccurs="1" type="xs:string" />
+				<xs:element name="CertificationAuthority" minOccurs="1"
+					maxOccurs="1"  type="xs:string"  />
+				<xs:element name ="TrustedCertificationAuthority"
+					minOccurs="1" maxOccurs="1"  type="xs:string" />
+				<xs:element name="Rules" minOccurs="1" maxOccurs="1" />
+			</xs:sequence>
+		</xs:complexType>
+
+
 	<xs:simpleType name="AttributesValueType">
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="authorized"/>
-					<xs:enumeration value="optional"/>
-					<xs:enumeration value="denied"/>
-				</xs:restriction>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="required" />
+			<xs:enumeration value="optional" />
+			<xs:enumeration value="denied" />
+		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="AuthorizedDeniedType">
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="authorized"/>
-					<xs:enumeration value="denied"/>
-				</xs:restriction>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="authorized" />
+			<xs:enumeration value="denied" />
+		</xs:restriction>
 	</xs:simpleType>
 
-	<xs:complexType name="AttributesType>
-		<xs:attribute name="authentication" type="AttributesValueType"/>
-	        <xs:attribute name="integrity" type="AttributesValueType"/>
-	        <xs:attribute name="confidentiality" type="AttributesValueType"/>
+	<xs:complexType name="AttributesType">
+		<xs:attribute name="authentication" type="AttributesValueType" />
+		<xs:attribute name="integrity" type="AttributesValueType" />
+		<xs:attribute name="confidentiality" type="AttributesValueType" />
 	</xs:complexType>
-	
 
-	<xs:complexType name="RequestReplyType>
+
+	<xs:complexType name="RequestReplyType">
 		<xs:sequence>
-			<xs:element name="Attributes" type="AttributesType"/>	
+			<xs:element name="Attributes" type="AttributesType" />
 		</xs:sequence>
-		<xs:attribute name="value" type="AuthorizedDeniedType"/>
+		<xs:attribute name="value" type="AuthorizedDeniedType" />
 	</xs:complexType>
 
-	<xs:complexType name="EntityType>
-		<xs:attribute name="type" type=""xs:string"/>
-		<xs:attribute name="name" type=""xs:string"/>
+	<xs:element name="EntityType">
+	<xs:complexType>
+		<xs:attribute name="type" type="xs:string" />
+		<xs:attribute name="name" type="xs:string" />
 	</xs:complexType>
-
-
-	<xs:element name="Policy" type="ProActivePolicyType">
-	 <xs:complexType>
-	 </xs:complexType>
 	</xs:element>
-             
-	
-              
-		<xs:element  name="Communication">
-			<xs:complexType>
-				<xs:sequence>
-					<xs:element name="Request" type="RequestReplyType">
-					<xs:element name="Reply" type="RequestReplyType">
-				</xs:sequence>		
-			</xs:complexType>
-		</xs:element>
+
+	<xs:element name="Communication">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Outgoing" type="RequestReplyType" />
+				<xs:element name="Incoming" type="RequestReplyType" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="Rules">
+		<xs:complexType>
+		 <xs:sequence>
+			 <xs:element ref="Rule" minOccurs="1" maxOccurs="unbounded" />
+		 </xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+    <xs:element name="EntitiesFrom">
+    	<xs:complexType> 
+    	   <xs:sequence>
+    	     <xs:element ref="EntityType" maxOccurs="unbounded" minOccurs="1"/>
+    	   </xs:sequence>
+    	</xs:complexType>
+    </xs:element>
+    
+     <xs:element name="EntitiesTo">
+    	<xs:complexType> 
+    	   <xs:sequence>
+    	     <xs:element ref="EntityType" maxOccurs="unbounded" minOccurs="1"/>
+    	   </xs:sequence>
+    	</xs:complexType>
+    </xs:element>
+     
+
+    <xs:element name="Rule">
+        <xs:complexType>
+			<xs:sequence>
+			   <xs:element ref="EntitiesFrom"/>
+			    <xs:element ref="EntitiesTo"/>
+			    <xs:element ref="Communication"/>
+			    <xs:element name="Migration" type="AuthorizedDeniedType"/>  
+			    <xs:element name="ActiveObjectCreation" type="AuthorizedDeniedType"/>  
+			</xs:sequence>        	
+        </xs:complexType>
+    </xs:element>
+    
 
 </xs:schema>
