@@ -104,7 +104,7 @@ public class ServiceThread extends Thread {
                     ((VirtualNodeImpl) vn).setTimeout(TIMEOUT, false);
                 }
 
-                long step = 500;
+                long step = 100;
                 while (askForNodes() &&
                         ((nodeRequested == MAX_NODE) ? true
                                                          : (System.currentTimeMillis() < this.expirationTime))) {
@@ -130,23 +130,21 @@ public class ServiceThread extends Thread {
                     }
 
                     // Sleeping with FastStart algo
-                    if (askForNodes() &&
+                    if (askForNodes() && (this.nodeCount == 0)) {
+                        // still no node
+                        Thread.sleep(step);
+                        step += 100;
+                    } else if (askForNodes() &&
                             (nodeRequested == P2PConstants.MAX_NODE)) {
                         // Askig max nodes
                         Thread.sleep(LOOK_UP_FREQ);
-                    } else if (askForNodes() && (this.nodeCount == 0)) {
-                        // still no node
-                        Thread.sleep(step);
-                        step += 500;
                     } else if (askForNodes()) {
                         // normal waiting
-                        if (step == LOOK_UP_FREQ) {
-                            Thread.sleep(LOOK_UP_FREQ);
-                        } else if (step > LOOK_UP_FREQ) {
+                        if (step >= LOOK_UP_FREQ) {
                             step = LOOK_UP_FREQ;
                             Thread.sleep(LOOK_UP_FREQ);
                         } else {
-                            step += 500;
+                            step += 100;
                             Thread.sleep(step);
                         }
                     }
