@@ -92,18 +92,6 @@ public interface Node {
     public int getNumberOfActiveObjects() throws NodeException;
 
     /**
-     * Returns the name of the VirtualNode this Node belongs to
-     * @return the name of the VirtualNode this Node belongs to
-     */
-    public String getVnName();
-
-    /**
-     * Sets the name of the VirtualNode this Node belongs to
-     * @param virtualNodeName
-     */
-    public void setVnName(String virtualNodeName);
-
-    /**
      * Terminate body of all node's active objects.
      * @throws NodeException
      * @throws IOException
