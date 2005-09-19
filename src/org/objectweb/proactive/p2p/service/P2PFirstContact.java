@@ -110,7 +110,8 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants {
                 Node distNode = NodeFactory.getNode(peerUrl);
                 P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
 
-                if (!peer.equals(this.localP2pService)) {
+                if (!peer.equals(this.localP2pService) &&
+                        !this.acqGroup.contains(peer).booleanValue()) {
                     // Send a message to the remote peer to record me
                     peer.register(this.localP2pService);
                     // Add the peer in my group of acquaintances

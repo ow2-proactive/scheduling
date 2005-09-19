@@ -85,7 +85,6 @@ public class StartP2PService implements P2PConstants {
         private String ttl = System.getProperty(PROPERTY_TTL);
         private String msg_capacity = System.getProperty(PROPERTY_MSG_MEMORY);
         private String expl_msg = System.getProperty(PROPERTY_EXPLORING_MSG);
-        private String booking_max = System.getProperty(PROPERTY_BOOKING_MAX);
         private String nodes_acq_to = System.getProperty(PROPERTY_NODES_ACQUISITION_T0);
         private String lookup_freq = System.getProperty(PROPERTY_LOOKUP_FREQ);
         private String multi_proc_nodes = System.getProperty(PROPERTY_MULTI_PROC_NODES);
@@ -192,14 +191,6 @@ public class StartP2PService implements P2PConstants {
                 parsed.expl_msg = args[index];
                 index++;
                 continue;
-            } else if ("-booking".equalsIgnoreCase(argname)) {
-                index++;
-                if (index > args.length) {
-                    usage(argname);
-                }
-                parsed.booking_max = args[index];
-                index++;
-                continue;
             } else if ("-node_acq".equalsIgnoreCase(argname)) {
                 index++;
                 if (index > args.length) {
@@ -248,7 +239,6 @@ public class StartP2PService implements P2PConstants {
         System.setProperty(PROPERTY_TTL, parsed.ttl);
         System.setProperty(PROPERTY_MSG_MEMORY, parsed.msg_capacity);
         System.setProperty(PROPERTY_EXPLORING_MSG, parsed.expl_msg);
-        System.setProperty(PROPERTY_BOOKING_MAX, parsed.booking_max);
         System.setProperty(PROPERTY_NODES_ACQUISITION_T0, parsed.nodes_acq_to);
         System.setProperty(PROPERTY_LOOKUP_FREQ, parsed.lookup_freq);
         System.setProperty(PROPERTY_MULTI_PROC_NODES, parsed.multi_proc_nodes);

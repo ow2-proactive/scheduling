@@ -218,7 +218,6 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         if (logger.isDebugEnabled()) {
             logger.debug("P2P node manager is running at " +
                 this.p2pServiceNode.getNodeInformation().getURL());
-
             logger.debug("ProActiveRuntime at " +
                 this.proactiveRuntime.getURL());
         }
@@ -232,54 +231,6 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
 
         logger.debug("Exiting initActivity");
     }
-
-    //    /**
-    //     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-    //     */
-    //    public void runActivity(Body body) {
-    //        Service service = new Service(body);
-    //        while (body.isActive()) {
-    //            long currentTime = System.currentTimeMillis();
-    //            int index = 0;
-    //            while (index < this.bookedNodes.size()) {
-    //                Booking bookedNode = (Booking) this.bookedNodes.get(index);
-    //                try {
-    //                    // Searching expired booking
-    //                    if ((bookedNode.getNode().getNumberOfActiveObjects() == 0) &&
-    //                            (currentTime > bookedNode.getExpirationTime())) {
-    //                        // Cancel booking
-    //                        this.bookedNodes.remove(bookedNode);
-    //                        String nodeUrl = bookedNode.getNode()
-    //                                                   .getNodeInformation().getURL();
-    //                        this.proactiveRuntime.killNode(nodeUrl);
-    //                        this.createNewNode();
-    //                        logger.info("Node at " + nodeUrl + " killed");
-    //                    } else if (bookedNode.getNode().getNumberOfActiveObjects() != 0) {
-    //                        // Move booked nodes to used nodes
-    //                        this.bookedNodes.remove(bookedNode);
-    //                        this.usingNodes.add(bookedNode.getNode());
-    //                    } else {
-    //                        index++;
-    //                    }
-    //                } catch (NodeException e) {
-    //                    logger.debug("Problem with a shared node: " +
-    //                        e.getMessage());
-    //                } catch (ActiveObjectCreationException e) {
-    //                    logger.debug("Problem with a shared node: " +
-    //                        e.getMessage());
-    //                } catch (ProActiveException e) {
-    //                    logger.debug("Problem with a shared node: " +
-    //                        e.getMessage());
-    //                }
-    //            }
-    //
-    //            // Serving request
-    //            service.blockingServeOldest(MAX_TIME);
-    //            while (service.hasRequestToServe()) {
-    //                service.serveOldest();
-    //            }
-    //        }
-    //    }
 
     /**
      * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
@@ -386,8 +337,6 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     // -------------------------------------------------------------------------
     // Inner class
     // -------------------------------------------------------------------------
-    private static final long MAX_TIME = Long.parseLong(System.getProperty(
-                P2PConstants.PROPERTY_BOOKING_MAX));
 
     /**
      *
@@ -399,8 +348,6 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      */
     private class Booking {
         private Node node = null;
-        private long bookingTime = 0;
-        private long expirationTime = 0;
 
         /**
          * Construct a new <code>Booking</code> for a node.
@@ -408,15 +355,6 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
          */
         public Booking(Node node) {
             this.node = node;
-            this.bookingTime = System.currentTimeMillis();
-            this.expirationTime = this.bookingTime + MAX_TIME;
-        }
-
-        /**
-         * @return Returns the expiration time for this booking.
-         */
-        public long getExpirationTime() {
-            return this.expirationTime;
         }
 
         /**

@@ -169,7 +169,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 "p2p", System.getProperty(PROPERTY_ACQUISITION) + ":",
                 remoteRuntime.getVMInformation().getName());
         } catch (Exception e) {
-            logger.warn("Couldn't leave node @" + node, e);
+            logger.info("Node @" + node + " already down");
         } finally {
             this.nodesToKillList.remove(node);
         }

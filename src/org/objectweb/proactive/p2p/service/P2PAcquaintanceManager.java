@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
@@ -142,38 +141,45 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                         logger.debug("Explorating message sent");
                     }
                 }
-
-                // Waiting TTU & serving requests
-                logger.debug("Waiting for " + TTU + "ms");
-                long endTime = System.currentTimeMillis() + TTU;
-                service.blockingServeOldest(TTU);
-                while (System.currentTimeMillis() < endTime) {
-                    try {
-                        service.blockingServeOldest(endTime -
-                            System.currentTimeMillis());
-                    } catch (ProActiveRuntimeException e) {
-                        logger.debug("Certainly because the body is not active",
-                            e);
-                    }
-                }
-                logger.debug("End waiting");
             } catch (ExceptionListException e) {
-                // Removing bad peers
-                logger.debug("Some peers to remove from group");
-                Iterator it = e.iterator();
-                while (it.hasNext()) {
-                    try {
-                        // Remove bad peers
-                        ExceptionInGroup ex = (ExceptionInGroup) it.next();
-                        Object peer = ex.getObject();
-                        this.groupOfAcquaintances.remove(peer);
-                        logger.debug("Peer removed");
-                    } catch (Exception concEx) {
-                        // NullPointer or ConcurrentModification
-                        // No peer localized for the excpetion => nothing to do
-                        logger.debug(concEx);
-                    }
+                removingAllExcpetedPeers(e);
+            }
+
+            // Waiting TTU & serving requests
+            logger.debug("Waiting for " + TTU + "ms");
+            long endTime = System.currentTimeMillis() + TTU;
+            service.blockingServeOldest(TTU);
+            while (System.currentTimeMillis() < endTime) {
+                try {
+                    service.blockingServeOldest(endTime -
+                        System.currentTimeMillis());
+                } catch (ProActiveRuntimeException e) {
+                    logger.debug("Certainly because the body is not active", e);
                 }
+            }
+            logger.debug("End waiting");
+        }
+    }
+
+    /**
+     * @param theExcpetionList
+     */
+    public void removingAllExcpetedPeers(
+        ExceptionListException theExcpetionList) {
+        // Removing bad peers
+        logger.debug("Some peers to remove from group");
+        Iterator it = theExcpetionList.iterator();
+        while (it.hasNext()) {
+            try {
+                // Remove bad peers
+                ExceptionInGroup ex = (ExceptionInGroup) it.next();
+                Object peer = ex.getObject();
+                this.groupOfAcquaintances.remove(peer);
+                logger.debug("Peer removed");
+            } catch (Exception concEx) {
+                // NullPointer or ConcurrentModification
+                // No peer localized for the excpetion => nothing to do
+                logger.debug(concEx);
             }
         }
     }
@@ -192,9 +198,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void add(P2PService peer) {
         try {
             if (!this.groupOfAcquaintances.contains(peer)) {
-                boolean result = this.groupOfAcquaintances.add(peer);
-                if (logger.isInfoEnabled()) {
-                    String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
+                String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
+                if (!peerUrl.matches(".*cannot contact the body.*")) {
+                    boolean result = this.groupOfAcquaintances.add(peer);
                     logger.info("Acquaintance " + peerUrl + " " + result +
                         " added");
                 }
@@ -208,7 +214,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void remove(P2PService peer) {
         boolean result = this.groupOfAcquaintances.remove(peer);
         if (result) {
-            logger.debug("Peer successfully removed");
+            logger.info("Peer successfully removed");
         } else {
             logger.debug("Peer not removed");
         }

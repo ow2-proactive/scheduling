@@ -95,8 +95,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
     private static final int TTL = Integer.parseInt(System.getProperty(
                 P2PConstants.PROPERTY_TTL));
-    private static final long ACK_TO = Long.parseLong(System.getProperty(
-                P2PConstants.PROPERTY_NODE_ACK_TO));
+    private static final long ACQ_TO = Long.parseLong(System.getProperty(
+                P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
     private static final boolean WITH_BALANCE = Boolean.getBoolean(P2PConstants.PROPERTY_LOAD_BAL);
 
     /**
@@ -114,6 +114,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * A collection of not full <code>P2PNodeLookup</code>.
      */
     private Vector waitingNodesLookup = new Vector();
+    private Vector waitingMaximunNodesLookup = new Vector();
     private P2PService stubOnThis = null;
 
     /**
@@ -182,15 +183,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param service the remote P2P service.
      */
     public void register(P2PService service) {
-        if (!this.stubOnThis.equals(service)) {
-            this.acquaintanceManager.add(service);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Remote peer localy registered: " +
-                    ProActive.getActiveObjectNodeUrl(service));
-            }
+        try {
+            if (!this.stubOnThis.equals(service)) {
+                this.acquaintanceManager.add(service);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Remote peer localy registered: " +
+                        ProActive.getActiveObjectNodeUrl(service));
+                }
 
-            // Wake up all node accessor, because new peers are know
-            this.wakeUpEveryBody();
+                // Wake up all node accessor, because new peers are know
+                this.wakeUpEveryBody();
+            }
+        } catch (Exception e) {
+            logger.debug("The remote P2P service is certainly down", e);
         }
     }
 
@@ -303,7 +308,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 }
 
                 // Waitng the ACK
-                long endTime = System.currentTimeMillis() + ACK_TO;
+                long endTime = System.currentTimeMillis() + ACQ_TO;
                 while ((System.currentTimeMillis() < endTime) &&
                         ProActive.isAwaited(nodeAck)) {
                     if (this.service.hasRequestToServe()) {
@@ -321,6 +326,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 if (ProActive.isAwaited(nodeAck)) {
                     // Do not forward the message
                     // Prevent from deadlock
+                    this.nodeManager.noMoreNodeNeeded(nodeAvailable);
                     return;
                 }
 
@@ -328,7 +334,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 if (nodeAck.ackValue()) {
                     // Setting vnInformation and JobId
                     if (vnName != null) {
-                        nodeAvailable.setVnName(vnName);
                         try {
                             nodeAvailable.getProActiveRuntime()
                                          .registerVirtualNode(vnName, true);
@@ -366,9 +371,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 logger.debug("Generating uuid for askingNode message");
                 uuid = generateUuid();
             }
-            this.acquaintances.askingNode(ttl, uuid, remoteService,
-                numberOfNodes, lookup, vnName, jobId);
-            logger.debug("Broadcast askingNode message with #" + uuid);
+            try {
+                this.acquaintances.askingNode(ttl, uuid, remoteService,
+                    numberOfNodes, lookup, vnName, jobId);
+                logger.debug("Broadcast askingNode message with #" + uuid);
+            } catch (ExceptionListException e) {
+                logger.debug("Some peers to remove from askingNode");
+                this.acquaintanceManager.removingAllExcpetedPeers(e);
+            }
         }
         uuid = null;
     }
@@ -414,7 +424,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
                     params, this.p2pServiceNode);
             ProActive.enableAC(lookup);
-            this.waitingNodesLookup.add(lookup);
+            if (numberOfNodes == MAX_NODE) {
+                this.waitingMaximunNodesLookup.add(lookup);
+            } else {
+                this.waitingNodesLookup.add(lookup);
+            }
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't create an active lookup", e);
             return null;
@@ -726,9 +740,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param <code>remoteNodeAddress</code> the reference to the remote machine
      * @return none
      */
-	public void ImStealingYou(double ranking, String remoteNodeAddress) {
-		this.p2pLoadBalancer.ImStealingYou(ranking,remoteNodeAddress);
-	}
+    public void ImStealingYou(double ranking, String remoteNodeAddress) {
+        this.p2pLoadBalancer.ImStealingYou(ranking, remoteNodeAddress);
+    }
+
     /**
      * This method is remotely called by an underloaded peer to start the load balancing.
      * @param <code>Node</code> is the new place for the active objects
@@ -756,9 +771,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param myNodeAddress addres of the local node
      * @return none
      */
-	public void startStealingNeighbors(double ranking, String myNodeAddress) {
-		this.acquaintanceManager.chooseNneighborsAndStealTheirWork(LoadBalancingConstants.NEIGHBORS_TO_STEAL,
-				ranking,myNodeAddress);
-		}
-
+    public void startStealingNeighbors(double ranking, String myNodeAddress) {
+        this.acquaintanceManager.chooseNneighborsAndStealTheirWork(LoadBalancingConstants.NEIGHBORS_TO_STEAL,
+            ranking, myNodeAddress);
+    }
 }
