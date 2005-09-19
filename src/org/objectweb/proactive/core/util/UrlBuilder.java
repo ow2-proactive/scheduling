@@ -67,9 +67,7 @@ public class UrlBuilder {
     public static String checkUrl(String url)
         throws java.net.UnknownHostException {
         String protocol = getProtocol(url);
-        String username = getUsername(url);
-        String noProtocolUrl = internalCheck(removeProtocol(removeUsername(
-                        url, username), protocol));
+        String noProtocolUrl = internalCheck(removeProtocol(url, protocol));
         return readHostAndName(noProtocolUrl, protocol);
     }
 
@@ -187,23 +185,6 @@ public class UrlBuilder {
         if (n <= 0) {
             return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
         }
-
-        int j = nodeURL.indexOf("@");
-        return nodeURL.substring((j <= 0) ? 0 : (j + 1), n + 1);
-    }
-
-    /**
-     * Return the username specified in the string
-     * The same convention as in URL is used
-     */
-    public static String getUsername(String nodeURL) {
-        if (nodeURL == null) {
-            return "";
-        }
-        int n = nodeURL.indexOf("@");
-        if (n <= 0) {
-            return "";
-        }
         return nodeURL.substring(0, n + 1);
     }
 
@@ -214,17 +195,6 @@ public class UrlBuilder {
         protocol = checkProtocol(protocol);
         if (url.startsWith(protocol)) {
             return url.substring(protocol.length());
-        }
-        return url;
-    }
-
-    /**
-     * Returns the url without username
-     */
-    public static String removeUsername(String url, String username) {
-        username = checkUsername(username);
-        if (url.startsWith(username)) {
-            return url.substring(username.length());
         }
         return url;
     }
@@ -249,13 +219,6 @@ public class UrlBuilder {
             return protocol.concat(":");
         }
         return protocol;
-    }
-
-    public static String checkUsername(String username) {
-        if (username.indexOf("@") == -1) {
-            return username.concat("@");
-        }
-        return username;
     }
 
     public static String removePortFromHost(String hostname) {
@@ -303,6 +266,25 @@ public class UrlBuilder {
         } else {
             return address.getCanonicalHostName();
         }
+    }
+
+    public static String removeUsername(String url) {
+        //this method is used to extract the username, that might be necessary for the callback
+        //it updates the hostable.
+        int index = url.indexOf("@");
+
+        if (index >= 0) {
+            String username = url.substring(0, index);
+            url = url.substring(index + 1, url.length());
+
+            try {
+                HostsInfos.setUserName(getHostNameFromUrl(url), username);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return url;
     }
 
     //

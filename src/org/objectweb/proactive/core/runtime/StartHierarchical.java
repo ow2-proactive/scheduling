@@ -72,14 +72,8 @@ public class StartHierarchical {
         if (args.length != 0) {
             this.nodeURL = args[0];
             this.creatorID = args[0].trim();
-
-            //System.out.println(creatorID);
-            this.defaultRuntimeURL = args[1];
-
-            //this.acquisitionMethod = args[2];
+            this.defaultRuntimeURL = UrlBuilder.removeUsername(args[1]);
             this.sNodeNumber = args[2];
-
-            //   this.portNumber = Integer.parseInt(args[4]);
             this.nodeNumber = (new Integer(sNodeNumber)).intValue();
             this.protocolId = args[3];
             this.vmName = args[4];
@@ -105,7 +99,7 @@ public class StartHierarchical {
         ProActiveConfiguration.load();
 
         try {
-            logger.info("**** Starting jvm on " +
+            logger.info("**** Starting hierarchical jvm on " +
                 UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
 
             if (logger.isDebugEnabled()) {
@@ -122,22 +116,20 @@ public class StartHierarchical {
     }
 
     private void run() {
+        System.setProperty("proactive.hierarchicalRuntime", "true");
+        padURL = System.getProperty("proactive.pad");
+
+        ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        impl.getVMInformation().setCreationProtocolID(protocolId);
+
         try {
-            System.setProperty("proactive.hierarchicalRuntime", "true");
-            padURL = System.getProperty("proactive.pad");
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
             LocalProActiveRuntime localPart = (LocalProActiveRuntime) ProActiveRuntimeImpl.getProActiveRuntime();
             localPart.setParent(defaultRuntimeURL);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
 
-            //we can still try to register if for instance an Alreadybound exception occurs
-        }
-
-        try {
             ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
                     UrlBuilder.getProtocol(defaultRuntimeURL));
 

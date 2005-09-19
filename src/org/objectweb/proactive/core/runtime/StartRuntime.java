@@ -33,13 +33,11 @@ package org.objectweb.proactive.core.runtime;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
@@ -82,7 +80,7 @@ public class StartRuntime {
             this.creatorID = args[0].trim();
 
             //System.out.println(creatorID);
-            this.defaultRuntimeURL = parse(args[1]);
+            this.defaultRuntimeURL = UrlBuilder.removeUsername(args[1]);
 
             //this.acquisitionMethod = args[2];
             this.nodeNumber = args[2];
@@ -167,25 +165,5 @@ public class StartRuntime {
             // if we cannot register, this jvm is useless
             System.exit(0);
         }
-    }
-
-    private String parse(String url) {
-        //this method is used to extract the username, that might be necessary for the callback
-        //it updates the hostable.
-        int index = url.indexOf("@");
-
-        if (index >= 0) {
-            String username = url.substring(0, index);
-            url = url.substring(index + 1, url.length());
-
-            try {
-                HostsInfos.setUserName(UrlBuilder.getHostNameFromUrl(url),
-                    username);
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return url;
     }
 }
