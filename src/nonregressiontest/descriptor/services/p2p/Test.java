@@ -31,6 +31,7 @@
 package nonregressiontest.descriptor.services.p2p;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -99,14 +100,19 @@ public class Test extends FunctionalTest {
 
     public boolean postConditions() throws Exception {
         boolean resultTest = (nodeTab.length == 3);
-        this.process.stopProcess();
-        this.process1.stopProcess();
-        this.pad.killall(false);
-        Node p2pNode = NodeFactory.getNode("//localhost/" +
-                P2PConstants.P2P_NODE_NAME);
-        p2pNode.killAllActiveObjects();
-        ProActiveRuntime part = p2pNode.getProActiveRuntime();
-        part.killNode(p2pNode.getNodeInformation().getURL());
+        try {
+            this.process.stopProcess();
+            this.process1.stopProcess();
+            this.pad.killall(false);
+            Node p2pNode = NodeFactory.getNode("//localhost/" +
+                    P2PConstants.P2P_NODE_NAME);
+            p2pNode.killAllActiveObjects();
+            ProActiveRuntime part = p2pNode.getProActiveRuntime();
+            part.killNode(p2pNode.getNodeInformation().getURL());
+        } catch (ProActiveRuntimeException e) {
+            // Problem with killing local node
+            logger.debug("Impossible to clean local P2P node");
+        }
         return resultTest;
     }
 
