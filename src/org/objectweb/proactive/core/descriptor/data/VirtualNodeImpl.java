@@ -696,17 +696,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
     public void runtimeRegistered(RuntimeRegistrationEvent event) {
-        switch (event.getType()) {
-        case RuntimeRegistrationEvent.RUNTIME_REGISTERED:
-            runtimeRegisteredPerform(event);
-            break;
-        case RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED:
-            forwarderRuntimeRegisteredPerform(event);
-            break;
-        default:
-            logger.info("unhandled event type");
-            break;
-        }
+    	if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
+    		forwarderRuntimeRegisteredPerform(event);
+    	} else {
+            runtimeRegisteredPerform(event);	
+    	}
     }
 
     private synchronized void forwarderRuntimeRegisteredPerform(
