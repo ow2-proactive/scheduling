@@ -71,7 +71,7 @@ public class FileTransferWorkShop implements Serializable{
 		//Verification of ilegal name for processDefault=="processDefault"
 		if(processDefault == null || processDefault.length()<=0 ||
 				processDefault.equalsIgnoreCase(PROCESSDEFAULT_KEYWORD)){
-			logger.error("Illegal processDefault value in "+
+			logger.error("Illegal processDefault value="+processDefault+" in "+
 					this.getClass()+". Falling back to dummy.");
 			this.processDefault="dummy";
 		}
@@ -255,8 +255,8 @@ public class FileTransferWorkShop implements Serializable{
 	public boolean check(){
 		FileTransfer ft;
 		
-		if(fileTransfers.size()<=0){
-			logger.info("No file transfer requiered.");
+		if(fileTransfers.size()<=0 && logger.isDebugEnabled()){
+			logger.debug("No file transfer required.");
 			return false;
 		}
 		
