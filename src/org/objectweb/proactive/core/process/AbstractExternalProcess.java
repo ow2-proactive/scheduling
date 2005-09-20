@@ -55,7 +55,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     private ThreadActivityMonitor errThreadMonitor;
     private FileTransferWorkShop ftsDeploy = null;
     private FileTransferWorkShop ftsRetrieve = null;
-    protected String FILE_TRANSFER_DEFAULT_PROTOCOL=null;
+    protected String FILE_TRANSFER_DEFAULT_PROTOCOL="dummy";
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
