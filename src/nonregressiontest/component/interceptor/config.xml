@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <componentConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="file:../../../org/objectweb/proactive/core/component/config/controllers-config.xsd" name="interception">
+ xsi:noNamespaceSchemaLocation="../../../org/objectweb/proactive/core/component/config/component-config.xsd" name="interception">
     <controllers>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
