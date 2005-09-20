@@ -62,6 +62,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
         addHandler(INFRASTRUCTURE_TAG,
             new InfrastructureHandler(proActiveDescriptor));
+        addHandler(FILE_TRANSFER_DEFINITIONS_TAG, new FileTransferDefinitionsHandler(proActiveDescriptor));
         addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
         {
             PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
