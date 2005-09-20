@@ -55,6 +55,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -111,7 +113,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** the list of nodes linked to this VirtualNode that have been created*/
     private java.util.ArrayList createdNodes;
-
+    
+    /** the list of file transfers to deploy*/
+    //TODO check if this is the best place to init
+    private java.util.ArrayList fileTransferDeploy = new ArrayList();
+    
+    /** the list of file transfers to retrieve*/
+    private java.util.ArrayList fileTransferRetrieve = new ArrayList();
+    
     /** index of the last node used */
     private int lastNodeIndex;
 
@@ -273,7 +282,28 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 " with VirtualMachine=" + virtualMachine.getName());
         }
     }
+    
+    public void addFileTransferDeploy(FileTransfer ft){
+    	if(ft==null) return;
+    	
+    	fileTransferDeploy.add(ft);
+    	
+    	if (logger.isDebugEnabled()) {
+            logger.debug("mapped VirtualNode=" + name +
+                " with FileTransferDeploy id=" + ft.getId());
+        }
+    }
 
+    public void addFileTransferRetrieve(FileTransfer ft){
+    	if(ft==null) return;
+    	
+    	fileTransferRetrieve.add(ft);
+    	
+    	if (logger.isDebugEnabled()) {
+            logger.debug("mapped VirtualNode=" + name +
+                " with FileTransferRetrieve id=" + ft.getId());
+        }
+    }
     public VirtualMachine getVirtualMachine() {
         if (virtualMachines.isEmpty()) {
             return null;
@@ -1115,6 +1145,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (this.ftService != null) {
                 jvmProcess.setJvmOptions(this.ftService.buildParamsLine());
             }
+        }
+        
+        /* Setting the file transfer definitions to be copied */
+        FileTransferWorkShop ftsDeploy=process.getFileTransferWorkShopDeploy();
+        FileTransferWorkShop ftsRetrieve=process.getFileTransferWorkShopRetrieve();
+        
+        if(ftsDeploy.isImplicit()){
+        	for(int i=0;i<fileTransferDeploy.size();i++)
+        		ftsDeploy.addFileTransfer((FileTransfer)fileTransferDeploy.get(i));
+        }
+        
+        if(ftsRetrieve.isImplicit()){
+        	for(int i=0;i<fileTransferRetrieve.size();i++)
+        		ftsRetrieve.addFileTransfer((FileTransfer)fileTransferRetrieve.get(i));
         }
     }
 

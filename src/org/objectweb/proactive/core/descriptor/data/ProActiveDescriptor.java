@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
 
@@ -218,7 +219,16 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      */
     public ExternalProcess createProcess(String processID,
         String processClassName) throws ProActiveException;
-
+    
+    /**
+     * Gets an instance of the FileTransfer description. If
+     * an instance for this ID was already exists inside the pad
+     * then this one is returned, else a new one is created.
+     * @param fileTransferID The ID of the filetransfer
+     * @return New or existing instance for the ID
+     */
+    public FileTransfer getFileTransfer(String fileTransferID);
+    
     /**
      * Updates with the effective service, all objects that are mapped with the serviceID.
      * It updates the table where is stored the mapping serviceID/service and link the

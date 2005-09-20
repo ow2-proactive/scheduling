@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
@@ -95,6 +96,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     /** map process id and service updater for later update of the service */
     private java.util.HashMap pendingServiceMapping;
 
+    /** map filetransfer-id and filetransfer */
+    private java.util.HashMap fileTransferMapping;
+    
     /** Location of the xml file */
     private String url;
     private String jobID;
@@ -122,6 +126,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         pendingProcessMapping = new java.util.HashMap();
         serviceMapping = new java.util.HashMap();
         pendingServiceMapping = new java.util.HashMap();
+        fileTransferMapping = new java.util.HashMap();
         this.url = url;
         mainDefined = false;
     }
@@ -309,7 +314,26 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public UniversalService getService(String serviceID) {
         return (UniversalService) serviceMapping.get(serviceID);
     }
-
+    
+    /**
+     * Creates a new FileTransfer definition, and maps this definition
+     * in the PAD internal mapping. Direct usage of this function is 
+     * discouraged, since no pre-existance checking of the definition 
+     * is made. Instead use the public method getFileTransfer(String) 
+     * factory.
+     * @param fileTransferID
+     * @return a new FileTransfer definition
+     */
+    protected FileTransfer createFileTransferDefinition(String fileTransferID){
+    	FileTransfer ft = new FileTransfer(fileTransferID);
+		fileTransferMapping.put(fileTransferID,ft);
+		
+        if (logger.isDebugEnabled()) {
+            logger.debug("created FileTransfer id=" + fileTransferID);
+        }
+        
+        return ft;
+    }
     public VirtualNode createVirtualNode(String vnName, boolean lookup) {
         return createVirtualNode(vnName, lookup, false);
     }
@@ -407,6 +431,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
+    public synchronized FileTransfer getFileTransfer(String fileTransferID){ 
+    	//TODO throw new ProActiveException 
+    	//if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
+    	
+    	FileTransfer ft = (FileTransfer) fileTransferMapping.get(fileTransferID);
+    
+    	if(ft == null){
+    		ft = createFileTransferDefinition(fileTransferID);
+    		fileTransferMapping.put(fileTransferID,ft);
+    		
+            if (logger.isDebugEnabled()) {
+                logger.debug("created FileTransfer id=" + fileTransferID);
+            }
+    	}
+
+    	return ft;
+    } 
+    
     public void registerProcess(ExternalProcessDecorator compositeProcess,
         String processID) {
         ExternalProcess process = getProcess(processID);
