@@ -280,6 +280,28 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     }
 
     /**
+     * Reurn all nodes asked until the timeout.
+     * @param timeout the timeout in milliseconds.
+     * @return A Collection of nodes.
+     */
+    public Vector getNodes(long timeout) {
+        long endTime = System.currentTimeMillis() + timeout;
+        Service service = new Service(ProActive.getBodyOnThis());
+        while (!this.allArrived() && (System.currentTimeMillis() < endTime)) {
+            this.localP2pService.askingNode(TTL, null, this.localP2pService,
+                this.numberOfAskedNodes - this.acquiredNodes, stub,
+                this.vnName, this.jobId);
+
+            // Serving request
+            service.blockingServeOldest(LOOKUP_FREQ);
+            while (service.hasRequestToServe()) {
+                service.serveOldest();
+            }
+        }
+        return this.getAndRemoveNodes();
+    }
+
+    /**
      * Migrate the P2P node lookup tyo a new node.
      *
      * @param nodeUrl the URL of the destination node.
