@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./env.sh
+. ../env.sh
 
 if [ $# -ne 1 ]; then
    echo 1>&2 Usage: $0 hosts_file
