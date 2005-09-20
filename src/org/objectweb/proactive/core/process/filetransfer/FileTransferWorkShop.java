@@ -255,8 +255,8 @@ public class FileTransferWorkShop implements Serializable{
 	public boolean check(){
 		FileTransfer ft;
 		
-		if(fileTransfers.size()<=0 && logger.isDebugEnabled()){
-			logger.debug("No file transfer required.");
+		if(fileTransfers.size()<=0){
+			if(logger.isDebugEnabled()) logger.debug("No file transfer required.");
 			return false;
 		}
 		
