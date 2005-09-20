@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.exceptions.manager;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -7,7 +8,7 @@ import java.util.LinkedList;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 
-public class NFEListenerList implements NFEProducer {
+public class NFEListenerList implements NFEProducer, Serializable {
 
     /* The registered handlers */
     private Collection listeners;
