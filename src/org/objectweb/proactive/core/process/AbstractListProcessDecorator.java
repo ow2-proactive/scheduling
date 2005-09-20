@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.process;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 
@@ -137,7 +138,28 @@ public abstract class AbstractListProcessDecorator
             ((ExternalProcessDecorator) processes.get(i)).setCompositionType(compositionType);
         }
     }
+    
+    public FileTransferWorkShop getFileTransferWorkShopRetrieve(){
+    	/* TODO Check if this is the correct place
+    	 * implement this. Then implement it
+    	 */
 
+    	return null;
+    }
+
+    public FileTransferWorkShop getFileTransferWorkShopDeploy(){
+    	/* TODO Check if this is the correct place
+    	 * implement this. Then implement it
+    	 */
+
+    	return null;
+    }
+    
+    public void startFileTransfer(){
+    	/* TODO Check if this is the correct place
+    	 * implement this. Then implement it
+    	 */
+    }
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
      */

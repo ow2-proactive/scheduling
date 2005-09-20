@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class RSHProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_RSHPATH = "/usr/bin/rsh ";
+    public final static String DEFAULT_RSH_COPYPROTOCOL = "rcp";
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -70,6 +71,8 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
      */
     public RSHProcess() {
         super();
+        
+        FILE_TRANSFER_DEFAULT_PROTOCOL=DEFAULT_RSH_COPYPROTOCOL;
         this.command_path = DEFAULT_RSHPATH;
     }
 
@@ -80,6 +83,8 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
      */
     public RSHProcess(ExternalProcess targetProcess) {
         super(targetProcess);
+        
+        FILE_TRANSFER_DEFAULT_PROTOCOL=DEFAULT_RSH_COPYPROTOCOL;
         this.command_path = DEFAULT_RSHPATH;
     }
 

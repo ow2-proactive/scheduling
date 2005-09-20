@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
@@ -73,7 +74,34 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
             return buildCommand();
         }
     }
+    
+    public void startFileTransfer(){
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("Starting FileTransfer");
+    	}
+    	
+    	FileTransferWorkShop ftwDeploy = getFileTransferWorkShopDeploy();
+    	FileTransferWorkShop ftwRetrieve = getFileTransferWorkShopRetrieve();
+    	
+    	//Set process envirorment information into the FileTransferWorkshop
+    	pushProcessAttributes(ftwDeploy.dstInfoParams);
+    	pushProcessAttributes(ftwRetrieve.srcInfoParams);
+    	
+    	internalStartFileTransfer(ftwDeploy);
+    }
+    
+    
+    /**
+	 * @return A FileTransferWorkShop instance for the deploy queue
+	 */
+	abstract FileTransferWorkShop getFileTransferWorkShopDeploy();
+	
+	/**
+	 * @return A FileTransferWorkShop instance for the retrieve queue
+	 */
+	abstract FileTransferWorkShop getFileTransferWorkShopRetrieve();
 
+    
     public void setEnvironment(String[] environment) {
         checkStarted();
         this.environment = environment;
@@ -110,6 +138,10 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         if (username != null) {
             HostsInfos.setUserName(hostname, username);
         }
+        
+        //before starting the process we execute the filetransfer
+        startFileTransfer();
+        
         if (logger.isDebugEnabled()) {
             logger.debug(getCommand());
         }
@@ -195,10 +227,37 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     protected abstract void internalStartProcess(String commandToExecute)
         throws java.io.IOException;
 
+    /**
+     * Starts the FileTransfer specified by the parameter.
+     */
+    protected abstract void internalStartFileTransfer(FileTransferWorkShop fts);
+
     protected abstract void internalStopProcess();
 
     protected abstract int internalWaitFor() throws InterruptedException;
 
+    /**
+     * This method sets attributes into the FileTransferWorkshop.StructureInformation
+     * For now:  : hostname, username
+     * 
+     * If the attributes already exists then it remains unchanged.
+     * 
+     * This method should be overriden if the process want's to set
+     * specific parameters to the FileTransferWorkshop before starting
+     * the FileTransfer.
+     * @param ftw
+     */
+    protected void pushProcessAttributes(FileTransferWorkShop.StructureInformation infoParams){
+    	
+    	if(infoParams.getUsername().length()<=0 && 
+    			username!=null && username.length()>0 )
+    		infoParams.setUsername(username);
+    	
+    	if(infoParams.getHostname().length()<=0 && 
+    			hostname!=null && hostname.length()>0 && !hostname.equalsIgnoreCase(DEFAULT_HOSTNAME))
+    		infoParams.setHostname(hostname);
+    }
+    
     // -- PRIVATE METHODS -----------------------------------------------
     //
     private static String getLocalHost() {

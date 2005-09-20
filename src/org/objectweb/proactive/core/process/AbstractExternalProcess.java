@@ -33,12 +33,16 @@ package org.objectweb.proactive.core.process;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.process.filetransfer.CopyProtocol;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     implements ExternalProcess {
     protected static Logger clogger = Logger.getLogger(AbstractExternalProcess.class.getName());
+    protected static Logger fileTransferLogger = Logger.getLogger(Loggers.FILETRANSFER);
     protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty(
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
@@ -49,6 +53,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     protected MessageSink outputMessageSink;
     private ThreadActivityMonitor inThreadMonitor;
     private ThreadActivityMonitor errThreadMonitor;
+    private FileTransferWorkShop ftsDeploy = null;
+    private FileTransferWorkShop ftsRetrieve = null;
+    protected String FILE_TRANSFER_DEFAULT_PROTOCOL=null;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -108,7 +115,27 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         checkStarted();
         this.outputMessageSink = outputMessageSink;
     }
-
+    
+    public FileTransferWorkShop getFileTransferWorkShopDeploy(){
+    	
+    	if(ftsDeploy==null)
+    		ftsDeploy = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
+    	
+		return ftsDeploy;
+    }
+    
+    public FileTransferWorkShop getFileTransferWorkShopRetrieve(){
+    	
+    	if(ftsRetrieve==null)
+    		ftsRetrieve = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
+    	
+		return ftsRetrieve;
+    }
+    
+    public String getFileTransferDefaultCopyProtocol(){
+    	return FILE_TRANSFER_DEFAULT_PROTOCOL;
+    }
+    
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -179,6 +206,57 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return externalProcess.waitFor();
     }
 
+    /**
+     * Try all the protocols until one is successful.
+     */
+    protected void internalStartFileTransfer(FileTransferWorkShop fts){
+    	
+    	CopyProtocol[] copyProtocol=fts.getCopyProtocols();
+    	boolean success=false;
+    	
+    	if(fileTransferLogger.isDebugEnabled())
+    		fileTransferLogger.debug("Using the following FileTransferWorkShop:\n"+fts);
+    	
+    	if(!fts.check()) return; //No files to transfer or some error.
+    	
+    	/* Try all the protocols for this FileTransferStructure
+    	 * until one of them is successful */
+    	for(int i=0; i<copyProtocol.length && !success; i++){
+    		fileTransferLogger.info("Trying copyprotocol: "+copyProtocol[i].getProtocolName());
+    		if(!copyProtocol[i].checkProtocol()){
+    			logger.error("Protocol check failed");
+    			continue;
+    		}
+    		//if can't handle the default protocol 
+    		//then try the internal file transfer
+    		if(copyProtocol[i].isDefaultProtocol()
+    				&& copyProtocol[i].isDummyProtocol()) {
+    			if(fileTransferLogger.isDebugEnabled())
+    				fileTransferLogger.debug("Trying protocol internal filetransfer");
+    			success=internalFileTransferDefaultProtocol();
+    		}
+    		//else simply try to start the filetransfer
+    		else 
+    			success=copyProtocol[i].startFileTransfer();
+    	}
+
+    	if(success)
+    		fileTransferLogger.info("FileTransfer was successful");
+    	else
+    		fileTransferLogger.info("FileTransfer faild");
+    }
+
+    /**
+     * This method should be redefined on every protocol that 
+     * internaly implements the file transfer. Ex: Unicore
+     * @return true if and only if successful.
+     */
+    protected boolean internalFileTransferDefaultProtocol(){
+    	
+    	//The default is false, to keep on trying the protocols
+    	return false;
+    }
+    
     protected void handleProcess(java.io.BufferedReader in,
         java.io.BufferedWriter out, java.io.BufferedReader err) {
         if (closeStream) {

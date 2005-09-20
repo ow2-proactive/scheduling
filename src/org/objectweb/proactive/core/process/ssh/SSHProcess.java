@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class SSHProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_SSHPATH = "ssh";
+    public final static String DEFAULT_SSH_COPYPROTOCOL = "scp";
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -66,6 +67,8 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
      */
     public SSHProcess() {
         super();
+        
+        FILE_TRANSFER_DEFAULT_PROTOCOL=DEFAULT_SSH_COPYPROTOCOL;
         this.command_path = DEFAULT_SSHPATH;
     }
 
@@ -76,6 +79,8 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
      */
     public SSHProcess(ExternalProcess targetProcess) {
         super(targetProcess);
+        
+        FILE_TRANSFER_DEFAULT_PROTOCOL=DEFAULT_SSH_COPYPROTOCOL;
         this.command_path = DEFAULT_SSHPATH;
     }
 

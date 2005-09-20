@@ -123,6 +123,11 @@ public interface UniversalProcess extends java.io.Serializable {
     public void startProcess() throws java.io.IOException;
 
     /**
+     * Starts the FileTransfer if defined for this process.
+     */
+    public void startFileTransfer();
+    
+    /**
      * Stops the running process. If called on a stopped process this
      * method has no effect.
      */

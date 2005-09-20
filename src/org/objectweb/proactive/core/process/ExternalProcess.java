@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 
@@ -79,4 +80,26 @@ public interface ExternalProcess extends UniversalProcess {
      * @param outputMessageSink the handler of the output stream of the process
      */
     public void setOutputMessageSink(MessageSink outputMessageSink);
+    
+    /**
+     * This method returns a single FileTransferStructure instance
+     * for this process. If many invocations to this method are done, 
+     * the same instance of FileTransferStructure will be returned. 
+     * This means, that changes made to the structure will be reflected 
+     * on all the references obtained through this method for this process.
+     * Note that different process do not share a FileTransferStructure,
+     * and thus changes made to one will not reflect on the other.
+     */
+    public FileTransferWorkShop getFileTransferWorkShopDeploy();
+    
+    /**
+     * This method returns a single FileTransferStructure instance
+     * for this process. If many invocations to this method are done, 
+     * the same instance of FileTransferStructure will be returned. 
+     * This means, that changes made to the structure will be reflected 
+     * on all the references obtained through this method for this process.
+     * Note that different process do not share a FileTransferStructure,
+     * and thus changes made to one will not reflect on the other.
+     */
+    public FileTransferWorkShop getFileTransferWorkShopRetrieve();
 }
