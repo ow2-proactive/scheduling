@@ -38,6 +38,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -61,7 +62,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  *
  */
 public class P2PAcquaintanceManager implements InitActive, RunActive,
-    Serializable, P2PConstants {
+    Serializable, P2PConstants, ProActiveInternalObject {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
     private P2PService localService = null;
     private P2PService acquaintances = null;

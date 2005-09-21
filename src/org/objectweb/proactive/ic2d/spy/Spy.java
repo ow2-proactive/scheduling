@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.spy;
 import java.io.IOException;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -43,7 +44,7 @@ import org.objectweb.proactive.core.node.Node;
 /**
  * The master Spy class
  */
-public class Spy implements org.objectweb.proactive.RunActive {
+public class Spy implements org.objectweb.proactive.RunActive, ProActiveInternalObject {
 
     /** Timeout between updates */
     protected long updateFrequence = 3000;

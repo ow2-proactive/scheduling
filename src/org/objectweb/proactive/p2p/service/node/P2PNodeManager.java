@@ -40,6 +40,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -62,7 +63,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * Created on Jan 12, 2005
  */
 public class P2PNodeManager implements Serializable, InitActive, EndActive,
-    P2PConstants {
+    P2PConstants, ProActiveInternalObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Object localService = null;

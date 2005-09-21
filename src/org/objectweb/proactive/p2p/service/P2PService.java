@@ -41,6 +41,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
@@ -70,7 +71,7 @@ import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
  * @author Alexandre di Costanzo
  *
  */
-public class P2PService implements InitActive, P2PConstants, Serializable {
+public class P2PService implements InitActive, P2PConstants, Serializable, ProActiveInternalObject {
 
     /** Logger. */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SERVICE);

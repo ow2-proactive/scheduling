@@ -39,6 +39,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
@@ -59,7 +60,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * Created on Jan 18, 2005
  */
 public class P2PNodeLookup implements InitActive, RunActive, EndActive,
-    P2PConstants, Serializable {
+    P2PConstants, Serializable, ProActiveInternalObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private Vector waitingNodesList;
     private Vector nodesToKillList;
