@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -71,14 +70,15 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  * It handles the logic of asking renderers to draw partial images. It then forwards them to the users.
  * It also allows users to hold conversations, in a chat-like way.
  */
-public class C3DDispatcher implements RunActive, InitActive, Serializable {
+public class C3DDispatcher implements RunActive, InitActive, Serializable,
+    Dispatcher, DispatcherLogic {
     private static Logger logger = Logger.getLogger(Loggers.EXAMPLES);
     private static int IMAGE_HEIGHT = 500;
     private static int IMAGE_WIDTH = 500;
 
     /**  Stores the users in a bag containing ref to active object, name and identifier */
     private UserBag userBag = new UserBag();
-    private int i_lastuser = 0;
+    protected int lastUserID = 0;
 
     /**  connects an Engine to its name, and other way round, without asking the remote object */
     private Vector engineAndStringTable = new Vector();
@@ -104,7 +104,7 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
 
     /** The unique GUI reference. All GUI actions use this pointer. */
     private transient DispatcherGUI gui;
-    private transient C3DDispatcher me;
+    private transient Dispatcher me;
 
     // needed for benchmark to check no stopping order is issued. 
     private BlockingRequestQueue requestQueue;
@@ -126,14 +126,15 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
      * Creates the renderers, and the GUI
      */
     public void go() {
-        this.me = (C3DDispatcher) ProActive.getStubOnThis();
+        this.me = (Dispatcher) ProActive.getStubOnThis();
         try {
             ProActive.register(me, "//localhost/Dispatcher");
         } catch (IOException e1) {
             e1.printStackTrace();
         }
 
-        this.gui = new DispatcherGUIImpl("C3D Dispatcher", this.me);
+        this.gui = new DispatcherGUIImpl("C3D Dispatcher",
+                (DispatcherLogic) this.me);
         try {
             if (engineAndStringTable.size() == 0) { // ==0 when starting, not when migrating
 
@@ -143,7 +144,7 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
 
                     // toString() is to express the change, even though rendererNodes are Strings... 
                     Object[] param = { engineName }; // engine name = engineNode name
-                    C3DRenderingEngine tmpEngine = (C3DRenderingEngine) ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DRenderingEngine",
+                    RenderingEngine tmpEngine = (RenderingEngine) ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DRenderingEngine",
                             param, this.rendererNodes[i]);
 
                     log("New rendering engine " + i + " created at " +
@@ -210,7 +211,7 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
         // Benchmarking stuff...
         long startTime = System.currentTimeMillis();
 
-        C3DRenderingEngine[] engine = (C3DRenderingEngine[]) engineVector.toArray(new C3DRenderingEngine[0]);
+        RenderingEngine[] engine = (RenderingEngine[]) engineVector.toArray(new RenderingEngine[0]);
 
         int nbTasks = 3 * engine.length;
         log("Creating " + nbTasks + " intervals");
@@ -415,17 +416,14 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
         }
     }
 
-    /**
-     * Method called when leaving the current host, for example when migrating.
-     */
+    /** Method called when leaving the current host, for example when migrating. 
+     * Made public because put in the request queue */
     public void leaveHost() {
         this.gui.trash();
         // should we call a ProActive.unregister("//localhost/Dispatcher"); ? 
     }
 
-    /**
-     * check a demand for rotation is valid, and then possibly starts election
-     */
+    /** check a demand for rotation is valid, and then possibly starts election */
     public void processRotate(Body body, Request r) {
         int i_user = 0;
         Vec rotateVec = null;
@@ -524,21 +522,21 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
     /** Register a user, so he can join the fun */
 
     //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
-    public int[] registerUser(C3DUser c3duser, String userName) {
+    public int[] registerUser(User c3duser, String userName) {
         c3duser.log("-> Remote call-back: dispatcher found, user registered");
-        log("New user " + userName + "(" + this.i_lastuser + ") has joined");
+        log("New user " + userName + "(" + this.lastUserID + ") has joined");
 
         // Informs the other users of the new user
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
-            this.userBag.currentUser().informNewUser(this.i_lastuser, userName);
+            this.userBag.currentUser().informNewUser(this.lastUserID, userName);
             c3duser.informNewUser(this.userBag.currentKey(),
                 this.userBag.currentName());
         }
 
         // Adds this User to the list 
-        this.userBag.add(this.i_lastuser, c3duser, userName);
-        this.gui.addUser(userName + " (" + this.i_lastuser + ")");
+        this.userBag.add(this.lastUserID, c3duser, userName);
+        this.gui.addUser(userName + " (" + this.lastUserID + ")");
 
         //  Do some initialization, if this was the first consumer to register
         if (this.userBag.size() == 1) {
@@ -557,14 +555,14 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
         }
 
         // return user_id, image_width & image_height;
-        int[] result = new int[] { this.i_lastuser++, IMAGE_WIDTH, IMAGE_HEIGHT };
+        int[] result = new int[] { this.lastUserID++, IMAGE_WIDTH, IMAGE_HEIGHT };
         return result;
     }
 
     public void registerMigratedUser(int userNumber) {
         String name = this.userBag.getName(userNumber);
         log("User " + name + "(" + userNumber + ") has migrated ");
-        C3DUser c3duser = this.userBag.getUser(userNumber);
+        User c3duser = this.userBag.getUser(userNumber);
 
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
@@ -600,7 +598,7 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
 
         // if no more users, reset all numbers to zero
         if (this.userBag.size() == 0) {
-            this.i_lastuser = 0;
+            this.lastUserID = 0;
         }
     }
 
@@ -695,8 +693,8 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
     public void exit() {
         allLog("Dispatcher closed, Exceptions may be generated...");
         try {
-            proActiveDescriptor.killall(true);
             gui.trash();
+            proActiveDescriptor.killall(true);
             System.exit(0);
         } catch (Exception e) {
             logger.info(
@@ -760,6 +758,54 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
         log("End benchmark : file written " + benchFileName);
     }
 
+    /** given an engine, adds it up to the engines available to the Dispatcher */
+    public void addEngine(RenderingEngine engine, String name) {
+        engineAndStringTable.add(new Object[] { engine, name });
+        updateGUI();
+    }
+
+    /** given an engine, removes it from the engines used or left available by the Dispatcher */
+    public void removeEngine(RenderingEngine engine) {
+        int length = engineAndStringTable.size();
+        String name = null;
+        for (int i = 0; i < length; i++) {
+            Object[] couple = (Object[]) engineAndStringTable.get(i);
+            if (couple[0].equals(engine)) {
+                name = (String) couple[1];
+                engineAndStringTable.remove(i);
+                if (engineVector.remove(engine)) {
+                    System.out.println("Found engine in vector, removed!");
+                } else {
+                    System.out.println("engine not found in vector!");
+                }
+                break;
+            }
+        }
+        updateGUI();
+        if (name == null) {
+            throw new ArrayIndexOutOfBoundsException("Can't remove engine " +
+                engine);
+        }
+    }
+
+    /** Add to the GUI all the engines that where bound to the Dispatcher.
+    * This also sets all engines to "available". */
+    protected void updateGUI() {
+        if (this.gui != null) {
+            this.engineVector.removeAllElements();
+            this.gui.noEngines();
+
+            int length = engineAndStringTable.size();
+            System.out.println("Adding " + length + " engines to GUI");
+            for (int i = 0; i < length; i++) {
+                Object[] couple = (Object[]) engineAndStringTable.get(i);
+                gui.addUsedEngine((String) couple[1]);
+                turnOnEngine((String) couple[1]);
+            }
+            System.out.println("Added engines to GUI");
+        }
+    }
+
     /** Makes the engine participate in the computation of images */
     public void turnOnEngine(String engineName) {
         this.engineVector.add(nameToEngine(engineName));
@@ -774,12 +820,12 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
      * Transforms a String representing an Engine to the C3DRenderingEngine associated.
      * @throws ArrayIndexOutOfBoundsException if no engine with such name
      */
-    private C3DRenderingEngine nameToEngine(String name) {
+    private RenderingEngine nameToEngine(String name) {
         int length = engineAndStringTable.size();
         for (int i = 0; i < length; i++) {
             Object[] couple = (Object[]) engineAndStringTable.get(i);
             if (couple[1].equals(name)) {
-                return (C3DRenderingEngine) couple[0];
+                return (RenderingEngine) couple[0];
             }
         }
         throw new ArrayIndexOutOfBoundsException("Can't find engine named " +
@@ -790,7 +836,7 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable {
      * Transforms an Engine into its String, WITHOUT asking the Engine (which is remote)
      * @throws ArrayIndexOutOfBoundsException if engine is not registered
      */
-    private String engineToName(C3DRenderingEngine engine) {
+    private String engineToName(RenderingEngine engine) {
         int length = engineAndStringTable.size();
         for (int i = 0; i < length; i++) {
             Object[] couple = (Object[]) engineAndStringTable.get(i);
