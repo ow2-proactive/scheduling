@@ -40,7 +40,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -64,16 +63,17 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  * This class does not do gui related work, which is cast back to UserGUI.
  * It only handles the logic parts, ie specifies the behavior.
  */
-public class C3DUser implements InitActive, java.io.Serializable {
+public class C3DUser implements InitActive, java.io.Serializable, User,
+    UserLogic {
 
     /** useful for showing information, if no GUI is available, or for error messages*/
     private static final Logger logger = Logger.getLogger(Loggers.EXAMPLES);
 
     /** reference to the dispatcher logic, for image generation and message forwarding */
-    private C3DDispatcher c3ddispatcher;
+    protected Dispatcher c3ddispatcher;
 
     /** AsyncRefto self, needed to add method on own queue */
-    private transient C3DUser me;
+    private transient User me;
 
     /** The chosen name of the user*/
     private String userName;
@@ -101,7 +101,7 @@ public class C3DUser implements InitActive, java.io.Serializable {
     /** The initialization and linkage is made in this method, instead of using the constructor */
     public void go() {
         // active Object related fields
-        this.me = (C3DUser) org.objectweb.proactive.ProActive.getStubOnThis();
+        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
 
         // ask user through Dialog for userName & host 
         String localHost = getLocalHostString();
@@ -123,8 +123,8 @@ public class C3DUser implements InitActive, java.io.Serializable {
         wait.destroy();
 
         // Create user Frame  
-        this.gui = new UserGUIImpl("C3D user display", this.me, pictureWidth,
-                pictureHeight);
+        this.gui = new UserGUIImpl("C3D user display", (UserLogic) this.me,
+                pictureWidth, pictureHeight);
         String[] values = new String[] {
                 "", "", Integer.toString(pictureWidth),
                 Integer.toString(pictureHeight)
@@ -156,10 +156,10 @@ public class C3DUser implements InitActive, java.io.Serializable {
 
     // shouldn't be called from outside the class. 
     public void rebuild() {
-        this.me = (C3DUser) org.objectweb.proactive.ProActive.getStubOnThis();
+        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
         this.c3ddispatcher.registerMigratedUser(i_user);
 
-        this.gui = new UserGUIImpl("C3D user display", this.me,
+        this.gui = new UserGUIImpl("C3D user display", (UserLogic) this.me,
                 Integer.parseInt(this.savedGuiValues[2]),
                 Integer.parseInt(this.savedGuiValues[3]));
         this.gui.setValues(getMachineRelatedValues(), this.savedGuiValues);
@@ -179,9 +179,14 @@ public class C3DUser implements InitActive, java.io.Serializable {
      * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild
      */
     public void initActivity(Body body) {
-        MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
-        myStrategyManager.onArrival("rebuild");
-        myStrategyManager.onDeparture("leaveHost");
+		// FIXME : this test should be stripped, only put here to circumvent component bug
+        if (body == null) {
+            System.err.println("in C3DUser.initActivity, Body is " + body);
+        } else {
+            MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
+            myStrategyManager.onArrival("rebuild");
+            myStrategyManager.onDeparture("leaveHost");
+        }
     }
 
     /** shows a String as a log */
