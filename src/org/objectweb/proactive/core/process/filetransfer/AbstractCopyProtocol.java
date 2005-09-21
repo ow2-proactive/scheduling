@@ -27,7 +27,6 @@
  */
 package org.objectweb.proactive.core.process.filetransfer;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -250,15 +249,4 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
 		return sb.toString();
 	}
 	
-	/**
-	 * Returns true if the file can be read.
-	 * @param filename The filename try
-	 * @return True if the it is readable.
-	 */
-	protected boolean isReadable(String filenamepath){
-		
-		File f = new File(filenamepath);
-		
-		return f.canRead();
-	}
 }

@@ -53,7 +53,7 @@ public class FileTransferWorkShop implements Serializable{
 	public static final String PROCESSDEFAULT_KEYWORD = "processDefault";
 	public static final String IMPLICIT_KEYWORD = "implicit";
 	public static final String[] ALLOWED_COPY_PROTOCOLS = {PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp"};
-	
+	public static final String[] URLPROTOCOLS= {"file://", "http://", "ftp://"};
 	protected static Logger logger = Logger.getLogger(Loggers.FILETRANSFER);
 	
 	/* Reference to filetransfer definitions */
@@ -344,8 +344,10 @@ public class FileTransferWorkShop implements Serializable{
 		 */
 		
 		// -case1: filename starts from root path, nothing to do
-		// -case2: no prefix, nothing to do
+		// -case2: filename starts with procol "http://", "ftp://", nothing to do
+		// -case3: no prefix, nothing to do
 		if(filename.charAt(0)==fileSep.charAt(0) ||
+				begginsWithProtocol(filename) ||
 				prefix.length()<=0)
 			return filename; 
 		
@@ -353,6 +355,16 @@ public class FileTransferWorkShop implements Serializable{
 		StringBuffer sb = new StringBuffer();
 		sb.append(prefix).append(fileSep).append(filename);
 		return sb.toString();
+	}
+	
+	public static boolean begginsWithProtocol(String s){
+	
+		for(int i=0; i < URLPROTOCOLS.length; i++){
+			if(s.startsWith(URLPROTOCOLS[i]))
+				return true;
+		}
+	
+		return false;
 	}
 	
 	public boolean checkLocalFileExistance(FileTransfer ft){
@@ -365,6 +377,20 @@ public class FileTransferWorkShop implements Serializable{
 		for(int i=0;i<files.length;i++){
 			
 			filefullname = buildSrcFilePathString(files[i].getSrcName());
+			
+			if(begginsWithProtocol(filefullname)){
+				
+				/* Can't yet check existance for http:// or ftp://
+				 * Therefore, we suppose the file exists. 
+				 * But we can check: file://
+				 */
+				if(!filefullname.startsWith("file://")){
+					atLeastOneFile=true;
+					continue;
+				}
+				
+				filefullname=stripProtocol(filefullname);
+			}
 			
 			f= new File(filefullname);
 
@@ -383,10 +409,28 @@ public class FileTransferWorkShop implements Serializable{
 	}
 	
 	public static boolean isLocalReadable(String filenamepath){
-					
-			File f = new File(filenamepath);
+		
+		if(begginsWithProtocol(filenamepath)){
 			
-			return f.canRead();
+			if(!filenamepath.startsWith("file://"))
+				return false;
+			
+			filenamepath = stripProtocol(filenamepath);
+		}
+		
+		File f = new File(filenamepath);
+		
+		return f.canRead();
+	}
+	
+	public static String stripProtocol(String filename){
+		
+		int i=filename.indexOf("://");
+		
+		if(filename.length() - i - 3 > 0)
+			return filename.substring(i+3);
+		
+		return "";
 	}
 	
 	public class StructureInformation implements Serializable{

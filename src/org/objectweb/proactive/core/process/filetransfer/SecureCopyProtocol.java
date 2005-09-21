@@ -116,7 +116,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
 				FileTransferWorkShop.buildFilePathString(srcInfoParams,files[i].getSrcName());
 			
 			//Skip unreadable file
-			if(!isReadable(fullfilename)){
+			if(!FileTransferWorkShop.isLocalReadable(fullfilename)){
 				//Skip unreadable file		
 				if(logger.isDebugEnabled())
 					logger.debug("Skipping: "+ fullfilename);
@@ -147,7 +147,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
 				FileTransferWorkShop.buildFilePathString(srcInfoParams,files[i].getSrcName());
 			
 			//Skip unreadable file
-			if(!isReadable(fullfilename)){
+			if(!FileTransferWorkShop.isLocalReadable(fullfilename)){
 				if(logger.isDebugEnabled())
 					logger.debug("Skipping: "+ fullfilename);
 				continue;
