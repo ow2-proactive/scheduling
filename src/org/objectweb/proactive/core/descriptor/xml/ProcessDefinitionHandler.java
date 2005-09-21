@@ -29,11 +29,6 @@ package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.xml.ProcessDefinitionHandler.ProcessHandler.FileTransferStructureHandler;
-import org.objectweb.proactive.core.descriptor.xml.ProcessDefinitionHandler.ProcessHandler.FileTransferStructureHandler.InfoAttributeHandler;
-import org.objectweb.proactive.core.descriptor.xml.ProcessDefinitionHandler.UnicoreProcessHandler.UnicoreOptionHandler;
-import org.objectweb.proactive.core.descriptor.xml.ProcessDefinitionHandler.UnicoreProcessHandler.UsiteHandler;
-import org.objectweb.proactive.core.descriptor.xml.ProcessDefinitionHandler.UnicoreProcessHandler.VsiteHandler;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
