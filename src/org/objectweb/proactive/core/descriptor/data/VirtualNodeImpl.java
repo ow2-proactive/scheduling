@@ -1151,12 +1151,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         FileTransferWorkShop ftsDeploy=process.getFileTransferWorkShopDeploy();
         FileTransferWorkShop ftsRetrieve=process.getFileTransferWorkShopRetrieve();
         
-        if(ftsDeploy.isImplicit()){
+        if( ftsDeploy != null && ftsDeploy.isImplicit()){
         	for(int i=0;i<fileTransferDeploy.size();i++)
         		ftsDeploy.addFileTransfer((FileTransfer)fileTransferDeploy.get(i));
         }
         
-        if(ftsRetrieve.isImplicit()){
+        if(ftsRetrieve !=null && ftsRetrieve.isImplicit()){
         	for(int i=0;i<fileTransferRetrieve.size();i++)
         		ftsRetrieve.addFileTransfer((FileTransfer)fileTransferRetrieve.get(i));
         }
