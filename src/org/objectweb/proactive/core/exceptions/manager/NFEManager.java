@@ -38,7 +38,7 @@ public class NFEManager {
 
     public static int fireAndThrowNFE(NonFunctionalException nfe, Exception e,
         AbstractProxy proxy) throws Exception {
-        fireNFE(nfe, proxy);
+        //fireNFE(nfe, proxy);
         throw e;
     }
 
