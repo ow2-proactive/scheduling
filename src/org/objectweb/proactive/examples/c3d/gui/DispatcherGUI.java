@@ -299,4 +299,10 @@ public abstract class DispatcherGUI implements ActionListener {
     public void clearLog() {
         logArea.setText("");
     }
+
+    /** Removes all engines from the GUI. */
+    public void noEngines() {
+        this.availableEngineListModel.removeAllElements();
+        this.usedEngineListModel.removeAllElements();
+    }
 }

@@ -43,7 +43,8 @@ import org.objectweb.proactive.examples.c3d.prim.View;
  * Rendering Engine used by C3D.
  * When fed a scene and an Interval, returns a 2D picture of the 3D scene.
  */
-public class C3DRenderingEngine implements java.io.Serializable {
+public class C3DRenderingEngine implements java.io.Serializable,
+    RenderingEngine {
     private static final double INFINITE = 1e6;
 
     // Alpha channel
@@ -64,11 +65,9 @@ public class C3DRenderingEngine implements java.io.Serializable {
     private Vec tmpVec = new Vec();
 
     // used by toString to show a better value than C3DRenderingEngine@11d2572 
-    private String name;
+    protected String name;
 
-    /**
-     * Default constructor needed by ProActive
-     */
+    /** Default constructor needed by ProActive */
     public C3DRenderingEngine() {
     }
 
@@ -77,18 +76,13 @@ public class C3DRenderingEngine implements java.io.Serializable {
         this.name = name;
     }
 
-    /**
-     * Creates the local objects used in the rendering
-     */
+    /** Creates the local objects used in the rendering  */
     public void setScene(Scene scene) {
         this.scene = scene;
     }
 
-    /**
-     * Trace
-     * and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
-     * @return the partial Image that was asked for
-     */
+    /** Trace and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
+     * @return the partial Image that was asked for */
     public Image2D render(int engineNb, Interval interval) {
         int[] row = new int[interval.totalImageWidth * (interval.yto -
             interval.yfrom)];
@@ -163,10 +157,8 @@ public class C3DRenderingEngine implements java.io.Serializable {
         return (new Image2D(row, interval, engineNb));
     }
 
-    /**
-     * Find closest Ray, return initialized Isect with intersection information.
-     * @returns true if intersection is found
-     */
+    /** Find closest Ray, return initialized Isect with intersection information.
+     * @returns true if intersection is found */
     private boolean intersect(Ray r, double maxt) {
         int nhits = 0;
         this.inter.t = maxt;
@@ -185,16 +177,12 @@ public class C3DRenderingEngine implements java.io.Serializable {
         return nhits > 0;
     }
 
-    /**
-     * Checks if there is a shadow
-     */
+    /** Checks if there is a shadow  */
     private boolean shadow(Ray r, double tmax) {
         return !intersect(r, tmax);
     }
 
-    /**
-     * Return the Vector's reflection direction
-     */
+    /** Return the Vector's reflection direction  */
     private Vec specularDirection(Vec I, Vec N) {
         Vec r;
         r = Vec.comb(1.0 / Math.abs(Vec.dot(I, N)), I, 2.0, N);
@@ -202,9 +190,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
         return r;
     }
 
-    /**
-     * Return the Vector's transmission direction
-     */
+    /** Return the Vector's transmission direction */
     private Vec transDir(Surface m1, Surface m2, Vec I, Vec N) {
         double n1 = (m1 == null) ? 1.0 : m1.ior;
         double n2 = (m2 == null) ? 1.0 : m2.ior;
@@ -219,9 +205,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
         return r;
     }
 
-    /**
-     * Returns the shaded color
-     */
+    /** Returns the shaded color */
     private Vec shade(int level, double weight, Vec P, Vec N, Vec I, Isect hit) {
         Vec tcol;
         Vec R;
@@ -290,11 +274,8 @@ public class C3DRenderingEngine implements java.io.Serializable {
         return col;
     }
 
-    /**
-     * Launches a ray.
-     * Please note, as return may be this.voidVec, the return
-     * value should not be modified, once returned!
-     */
+    /** Launches a ray. Please note, as return may be this.voidVec,
+     * the return value should not be modified, once returned! */
     private Vec trace(int level, double weight, Ray ray) {
         Vec P;
         Vec N;
@@ -319,6 +300,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
         return this.voidVec;
     }
 
+    /** A textual representation of the renderer */
     public String toString() {
         return this.name;
     }

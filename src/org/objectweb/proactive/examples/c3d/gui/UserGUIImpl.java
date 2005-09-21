@@ -34,7 +34,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.objectweb.proactive.examples.c3d.C3DUser;
+import org.objectweb.proactive.examples.c3d.User;
+import org.objectweb.proactive.examples.c3d.UserLogic;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
@@ -42,7 +43,7 @@ import org.objectweb.proactive.examples.c3d.geom.Vec;
  * An implementation of User GUI, which handles all the generated events.
  */
 public class UserGUIImpl extends UserGUI {
-    private C3DUser c3dUser;
+    private UserLogic c3dUser;
 
     /** Event handler, which transforms events into method calls */
     public void actionPerformed(ActionEvent e) {
@@ -93,7 +94,7 @@ public class UserGUIImpl extends UserGUI {
     }
 
     /** Constructor, which mostly adds a window Listener */
-    public UserGUIImpl(String title, final C3DUser c3dUser, final int width,
+    public UserGUIImpl(String title, final UserLogic c3dUser, final int width,
         final int height) {
         super(title, width, height);
         this.c3dUser = c3dUser;

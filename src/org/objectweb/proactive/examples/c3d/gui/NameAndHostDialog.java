@@ -48,6 +48,7 @@ import javax.swing.JTextField;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
+import org.objectweb.proactive.examples.c3d.Dispatcher;
 
 
 /**
@@ -64,7 +65,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
     private JOptionPane optionPane;
     private String enterButtonString = "Enter";
     private String cancelButtonString = "Cancel";
-    private C3DDispatcher c3dDispatcher;
+    private Dispatcher c3dDispatcher;
 
     public NameAndHostDialog(String localHost) {
         super();
@@ -147,7 +148,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
                 this.hostName = hostNameTextField.getText();
 
                 try {
-                    this.c3dDispatcher = (C3DDispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
+                    this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
                             "//" + hostName + "/Dispatcher");
                     setVisible(false);
                 } catch (UnknownHostException exception) {
@@ -190,7 +191,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
      * @return a dispatcher if information provided was correct, and null if coudn't find one.
      * It is up to the programmer to check for null values.
      */
-    public C3DDispatcher getValidatedDispatcher() {
+    public Dispatcher getValidatedDispatcher() {
         return this.c3dDispatcher;
     }
 }

@@ -49,7 +49,7 @@ public class UserBag implements Serializable {
     /**
      * Does not erase previous equal key, only makes another pair with this key.
      */
-    public void add(int key, C3DUser value, String name) {
+    public void add(int key, User value, String name) {
         list.add(new Troika(key, value, name));
     }
 
@@ -64,7 +64,7 @@ public class UserBag implements Serializable {
      * The C3DUser which is attached to the FIRST occurence of this key in the Bag.
      * @returns null if no element corresponds
      */
-    public C3DUser getUser(int key) {
+    public User getUser(int key) {
         for (Iterator iter = list.iterator(); iter.hasNext();) {
             Troika pair = (Troika) iter.next();
             if (pair.key == key) {
@@ -94,7 +94,7 @@ public class UserBag implements Serializable {
      * To get the name, first use a getName().
      * @return the associated C3DUser, if there was one (null otherwise).
      */
-    public C3DUser remove(int key) {
+    public User remove(int key) {
         int max = size();
         for (int i = 0; i < max; i++) {
             Troika pair = (Troika) list.get(i);
@@ -128,7 +128,7 @@ public class UserBag implements Serializable {
         return currentTroika.key;
     }
 
-    public C3DUser currentUser() {
+    public User currentUser() {
         return currentTroika.user;
     }
 
@@ -144,13 +144,13 @@ public class UserBag implements Serializable {
     // A container for (int -> C3DUser -> String)
     private class Troika implements Serializable {
         int key;
-        C3DUser user;
+        User user;
         String name;
 
         public Troika() {
         }
 
-        public Troika(int key, C3DUser value, String name) {
+        public Troika(int key, User value, String name) {
             this.key = key;
             this.user = value;
             this.name = name;
