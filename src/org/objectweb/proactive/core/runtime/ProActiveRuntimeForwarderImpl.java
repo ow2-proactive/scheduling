@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
+import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIServerSocketFactory;
@@ -204,6 +205,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
      */
     protected void setProcessesToDeploy(String padURL, String vmName,
         ExternalProcess process) {
+        JVMProcess jvmProcess = (JVMProcess) process.getFinalProcess();
+        jvmProcess.resetParameters();
         hierarchicalProcesses.put(buildKey(padURL, vmName), process);
     }
 

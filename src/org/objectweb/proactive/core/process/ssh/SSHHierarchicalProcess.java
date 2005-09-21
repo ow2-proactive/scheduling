@@ -63,11 +63,11 @@ public class SSHHierarchicalProcess extends SSHProcess
     }
 
     public void startProcess() throws IOException {
-        JVMProcess jp = (JVMProcess) getFinalProcess();
-
-        // Hierarchical deployment : We need a RuntimeForwarder on the forwarder.
-        jp.setClassname(
+        JVMProcess finalProcess = (JVMProcess) getFinalProcess();
+        String bClass = finalProcess.getClassname();
+        finalProcess.setClassname(
             "org.objectweb.proactive.core.runtime.StartHierarchical");
         super.startProcess();
+        finalProcess.setClassname(bClass);
     }
 }

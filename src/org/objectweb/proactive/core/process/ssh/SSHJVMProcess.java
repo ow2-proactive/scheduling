@@ -221,6 +221,14 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
     }
 
     /**
+     * Reset to empty value parameters associated to the class that this process 
+     * is going to start
+     */
+    public void resetParameters() {
+    	jvmProcess.resetParameters();
+    }
+    
+    /**
      * Sets the parameters of the jvm to start with the given parameters for the target JVMProcess
      * @param parameters Paramaters to be given in order to start the jvm
      */

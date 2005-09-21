@@ -230,6 +230,10 @@ public class JVMProcessImpl extends AbstractExternalProcess
         return parameters.toString();
     }
 
+    public void resetParameters() {
+    	this.parameters = new StringBuffer();
+    }
+    
     public void setParameters(String parameters) {
         checkStarted();
         this.parameters.append(parameters + " ");

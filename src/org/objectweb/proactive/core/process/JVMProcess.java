@@ -114,6 +114,12 @@ public interface JVMProcess extends ExternalProcess {
     public void setClassname(String classname);
 
     /**
+     * Reset to empty value parameters associated to the class that this process 
+     * is going to start
+     */
+    public void resetParameters();
+
+    /**
      * Returns parameters associated to the class that this process is going to start
      * @return String The value of the parameters of the class
      */
