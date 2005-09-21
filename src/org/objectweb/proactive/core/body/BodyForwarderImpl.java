@@ -31,16 +31,12 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Vector;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -51,10 +47,7 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
@@ -63,7 +56,10 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** Cached bodies, key = BodyID */
-    private HashMap bodies = new HashMap();
+    private HashMap bodies;
+
+    /** Bodies which have been created through this forwarder */
+    private HashMap createdBodies;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -74,6 +70,8 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
      * Used for serialization.
      */
     public BodyForwarderImpl() {
+        bodies = new HashMap();
+        createdBodies = new HashMap();
     }
 
     public void createShortcut(UniqueID id, Shortcut shortcut)
@@ -84,6 +82,10 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         if (!bodies.containsKey(rBody.getID())) {
             bodies.put(rBody.getID(), rBody);
         }
+    }
+
+    public synchronized void addcreatedBody(UniqueID id) {
+        createdBodies.put(id, null);
     }
 
     public void disableAC(UniqueID id) throws IOException {
@@ -276,6 +278,13 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
             Object o = bodies.get(id);
             BodyAdapter rbody = (BodyAdapter) o;
             if (rbody != null) {
+                ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+                if (createdBodies.containsKey(request.getSender().getID()) &&
+                        createdBodies.containsKey(rbody.getID())) {
+                    // We assume that these two bodies can talk directly.
+                    request.getSender().updateLocation(id, rbody);
+                }
+
                 return rbody.receiveRequest(request);
             } else {
                 throw new IOException("No BodyAdapter associated to id=" + id);

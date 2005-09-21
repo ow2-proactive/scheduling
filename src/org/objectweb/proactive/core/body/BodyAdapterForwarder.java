@@ -93,7 +93,6 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
 
         String prop = System.getProperty("proactive.hierarchicalRuntime");
         if ((prop != null) && prop.equals("true")) {
-            // 
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             try {

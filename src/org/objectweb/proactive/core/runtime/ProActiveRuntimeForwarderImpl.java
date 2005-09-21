@@ -223,13 +223,10 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             return null;
         }
 
-        // create the body on the remote node and get a reference on it
         UniversalBody rBody = part.createBody(nodeName, bodyConstructorCall,
                 isNodeLocal);
 
-        // Create a forwarder on it
-        //        bodyForwarder.add(rBody);
-        //        BodyAdapterForwarder baf =  new BodyAdapterForwarder(bodyAdapterForwarder, (BodyAdapterImpl)rBody, rBody.getID());
+        bodyForwarder.addcreatedBody(rBody.getID());
         return rBody;
     }
 
