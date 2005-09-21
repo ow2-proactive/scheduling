@@ -260,7 +260,7 @@ public class MetaObjectInterfaceClassGenerator
             body += (IMPL_FIELD_NAME + ")." + reifiedMethods[i].getName() +
             "(");
             for (int j = 0; j < paramTypes.length; j++) {
-                body += ("(" + paramTypes[j].getName() + ")" + ("$" + j));
+                body += ("(" + paramTypes[j].getName() + ")" + ("$" + (j +1)));
                 if (j < (paramTypes.length - 1)) {
                     body += ",";
                 }
