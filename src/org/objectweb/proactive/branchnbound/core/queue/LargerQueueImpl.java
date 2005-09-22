@@ -30,10 +30,18 @@
  */
 package org.objectweb.proactive.branchnbound.core.queue;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Vector;
 
 import org.objectweb.proactive.branchnbound.core.Task;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
@@ -41,6 +49,8 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 public class LargerQueueImpl implements TaskQueue {
     private Vector queue = new Vector();
     private int size = 0;
+    private int hungryLevel;
+    private Task rootTask = null;
 
     public LargerQueueImpl() {
     }
@@ -55,7 +65,7 @@ public class LargerQueueImpl implements TaskQueue {
             if (logger.isInfoEnabled()) {
                 Task t = ((Task) tasks.iterator().next());
                 logger.info("Task provider just received and added " +
-                    tasks.size() + " of group " + t.getTag());
+                    tasks.size());
             }
         }
     }
@@ -101,5 +111,59 @@ public class LargerQueueImpl implements TaskQueue {
         this.queue.removeAllElements();
         this.current = 0;
         this.size = 0;
+    }
+
+    public BooleanWrapper isHungry() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Queue size is " + this.size + " - Hungry level is " +
+                hungryLevel);
+        }
+        return new BooleanWrapper(this.size < hungryLevel);
+    }
+
+    public void setHungryLevel(int level) {
+        this.hungryLevel = level;
+    }
+
+    public void backupTasks(Task rootTask) {
+        File currentBck = new File(backupTaskFile);
+        File oldBck = new File(backupTaskFile + "~");
+        if (currentBck.exists()) {
+            oldBck.delete();
+            currentBck.renameTo(oldBck);
+        }
+        currentBck = new File(backupTaskFile);
+        try {
+            FileOutputStream fos = new FileOutputStream(currentBck);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(rootTask);
+            oos.writeObject(this.queue);
+            fos.close();
+            oos.close();
+        } catch (FileNotFoundException e) {
+            logger.warn("Backup tasks failed", e);
+        } catch (IOException e) {
+            logger.warn("Backup tasks failed", e);
+        }
+    }
+
+    public void loadTasks(File taskFile) {
+        try {
+            FileInputStream fis = new FileInputStream(taskFile);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            this.rootTask = (Task) ois.readObject();
+            while (ois.available() > 0) {
+                this.queue = (Vector) ois.readObject();
+            }
+            ois.close();
+            fis.close();
+        } catch (Exception e) {
+            logger.fatal("Failed to read tasks", e);
+            throw new ProActiveRuntimeException(e);
+        }
+    }
+
+    public Task getRootTaskFromBackup() {
+        return this.rootTask;
     }
 }

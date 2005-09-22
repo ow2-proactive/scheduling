@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
@@ -56,7 +57,6 @@ public class Worker implements Serializable {
     private Result bestCurrentResult = null;
     private TaskQueue taskProvider = null;
     private String workerNodeUrl = null;
-    private String currentTaskTag;
     private Group workerGroupCollection = null;
 
     /**
@@ -98,7 +98,6 @@ public class Worker implements Serializable {
             exception = e;
         }
         if (activedTask != null) {
-            this.currentTaskTag = activedTask.getTag();
             activedTask.initLowerBound();
             activedTask.initUpperBound();
 
@@ -167,15 +166,15 @@ public class Worker implements Serializable {
     }
 
     public void sendSubTasksToTheManager(Vector subTaskList) {
-        for (int i = 0; i < subTaskList.size(); i++) {
-            Task current = (Task) subTaskList.get(i);
-            current.setTag(this.currentTaskTag + "-" + i);
-        }
         logger.info("The task sends " + subTaskList.size() + " sub tasks");
         this.taskProvider.addAll(subTaskList);
     }
 
     public void addMember(Worker newWorker) {
         this.workerGroupCollection.add(newWorker);
+    }
+
+    public BooleanWrapper isHungry() {
+        return this.taskProvider.isHungry();
     }
 }

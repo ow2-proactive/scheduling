@@ -55,7 +55,6 @@ public abstract class Task implements Serializable, Comparable {
     protected Result initLowerBound;
     protected Result initUpperBound;
     protected Worker worker = null;
-    private String tag = null;
 
     /**
      * The no arg constructor for ProActive.
@@ -129,14 +128,6 @@ public abstract class Task implements Serializable, Comparable {
         this.worker = worker;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
-    }
-
-    public String getTag() {
-        return this.tag;
-    }
-
     /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
@@ -144,7 +135,7 @@ public abstract class Task implements Serializable, Comparable {
         Task t = (Task) arg;
         if (this.equals(t)) {
             return 0;
-        } else if (this.tag.lastIndexOf('-') > t.tag.lastIndexOf('-')) {
+        } else if (this.hashCode() > t.hashCode()) {
             return -1;
         } else {
             return 1;

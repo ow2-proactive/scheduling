@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.branchnbound.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
@@ -127,5 +130,27 @@ public class Result implements Serializable {
      */
     public boolean isAnException() {
         return this.exception != null;
+    }
+
+    // Serialization ----------------------------------------------------------
+    private static final String NORESULT = "--No result--";
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        if (this.theResult instanceof NoResultsException) {
+            out.write(NORESULT.getBytes());
+        } else {
+            out.writeObject(this.theResult);
+        }
+    }
+
+    private void readObject(ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+        Object readObject = in.readObject();
+        if (readObject instanceof String &&
+                (((String) readObject).compareTo(NORESULT) == 0)) {
+            this.theResult = new NoResultsException();
+        } else {
+            this.theResult = readObject;
+        }
     }
 }

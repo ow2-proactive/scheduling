@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.branchnbound.core.queue;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -43,6 +44,8 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 public interface TaskQueue extends Serializable {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
+    public static final String backupTaskFile = System.getProperty("user.home") +
+        System.getProperty("file.separator") + "framework.tasks.backup"; // TODO turn it configurable 
 
     public abstract void addAll(Collection tasks);
 
@@ -51,6 +54,16 @@ public interface TaskQueue extends Serializable {
     public abstract BooleanWrapper hasNext();
 
     public abstract Task next();
-    
+
     public abstract void flushAll();
+
+    public abstract BooleanWrapper isHungry();
+
+    public abstract void setHungryLevel(int level);
+
+    public abstract void backupTasks(Task rootTask);
+
+    public abstract void loadTasks(File taskFile);
+
+    public abstract Task getRootTaskFromBackup();
 }
