@@ -81,7 +81,7 @@ public class A implements Serializable {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
         }
-        return new StringWrapper("Alexandre dC is a famous coder :)");
+        return new StringWrapper("Alexandre dC is a famous coder who thinks that the test lasts less than 1 sec :)");
     }
 
     public FloatWrapper testFloatWrapper() {
