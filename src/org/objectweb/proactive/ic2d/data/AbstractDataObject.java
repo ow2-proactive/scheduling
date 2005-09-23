@@ -49,6 +49,7 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
     protected boolean monitoringReplySender;
     protected boolean viewingInEventList;
     protected MessageMonitoringListener messageMonitoringListener;
+    private boolean alive;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -67,6 +68,7 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
         this.controller = parent.getController();
         initializeMonitoring(parent);
         childs = new java.util.HashMap();
+        alive = true;
     }
 
     protected AbstractDataObject(AbstractDataObject parent) {
@@ -126,6 +128,18 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
     }
 
     public abstract void destroyObject();
+
+    /**
+     * true if object is responding
+     * @return true if object is responding
+     */
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
+    }
 
     //
     // -- implements MessageMonitoringController -----------------------------------------------

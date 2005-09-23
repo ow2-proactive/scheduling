@@ -118,6 +118,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
 
     public void vmNotResponding() {
         setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+        vmObject.setAlive(false);
         repaint();
         Iterator it = childsIterator();
 

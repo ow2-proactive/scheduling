@@ -152,6 +152,7 @@ public class NodePanel extends AbstractDataObjectPanel
     public void nodeNotResponding() {
         setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
         repaint();
+        nodeObject.setAlive(false);
         Iterator it = childsIterator();
 
         // all children (active objects) are also not responding
