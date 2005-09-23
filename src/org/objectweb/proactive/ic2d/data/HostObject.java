@@ -42,6 +42,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.util.HostRTFinder;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
 /**
@@ -105,10 +106,19 @@ public class HostObject extends AbstractDataObject {
             controller.warn("No Node objects were found on host " + hostname +
                 " !");
         }
+        boolean hideP2PNode = new Boolean(System.getProperty(
+                    P2PConstants.HIDE_P2PNODE_MONITORING)).booleanValue();
+
         while (iter.hasNext()) {
             MonitoredNode monitoredNode = (MonitoredNode) iter.next();
             Node node = monitoredNode.getNode();
             String nodeName = node.getNodeInformation().getName();
+
+            if (hideP2PNode &&
+                    (nodeName.compareTo(P2PConstants.P2P_NODE_NAME) == 0)) {
+                continue;
+            }
+
             VMObject vmObject = findVMObjectHavingExistingNode(nodeName);
 
             if (vmObject == null) {

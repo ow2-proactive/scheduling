@@ -86,9 +86,6 @@ public interface P2PConstants {
     /** Percentage of agree response. */
     public static final String PROPERTY_EXPLORING_MSG = "proactive.p2p.expl_msg";
 
-    /** Expiration time for booking without use a shared node. */
-    public static final String PROPERTY_BOOKING_MAX = "proactive.p2p.booking_max";
-
     /** Timeout for node acquisition. */
     public static final String PROPERTY_NODES_ACQUISITION_T0 = "proactive.p2p.nodes_acq_to";
 
@@ -101,9 +98,14 @@ public interface P2PConstants {
     /** Path of the xml deployment descriptor, for deploying shared nodes. */
     public static final String PROPERPY_XML_PATH = "proactive.p2p.xml_path";
 
-    /** Timeout for waiting node ack. */
-    public static final String PROPERTY_NODE_ACK_TO = "proactive.p2p.ack_to";
-
     /** Boolean for using or not p2p load balanced. */
     public static final String PROPERTY_LOAD_BAL = "proactive.p2p.loadbalancing";
+
+    // -------------------------------------------------------------------------
+    // IC2D P2P Property
+    // -------------------------------------------------------------------------
+
+    /** Enable or not the P2P Node monitoring with IC2D.
+     * This property takes a Java boolean value.*/
+    public static final String HIDE_P2PNODE_MONITORING = "proactive.ic2d.hidep2pnode";
 }
