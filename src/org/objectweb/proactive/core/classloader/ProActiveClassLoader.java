@@ -22,10 +22,7 @@ import sun.misc.URLClassPath;
  */
 public class ProActiveClassLoader extends URLClassLoader {
     boolean runtimeReady = false;
-    private Object classCache;
-    private Object registeredRuntime;
     private Object helper;
-    private Method classCache_getClass;
     private Method helper_getClassData;
 
     public ProActiveClassLoader() {
@@ -105,13 +102,18 @@ public class ProActiveClassLoader extends URLClassLoader {
             // class does not exist
             throw new ClassNotFoundException(name);
         }
+        // FIXME temporary walkaround
+        if (name.endsWith("_Skel")) {
+            // do not attempt to download any 1.2- rmi skeleton
+            throw new ClassNotFoundException(name);
+        }
         c = findClass(name);
         if (name.equals(
                     "org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl")) {
             runtimeReady = true;
         }
         if (c != null) {
-            //            /System.out.println("ProActiveClassloader loaded class : " + name);
+            // System.out.println("ProActiveClassloader loaded class : " + name);
         } else {
             throw new ClassNotFoundException(name);
         }
