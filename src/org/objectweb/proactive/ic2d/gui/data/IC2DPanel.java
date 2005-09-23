@@ -136,7 +136,7 @@ public class IC2DPanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected AbstractDataObject getAbstractDataObject() {
+    public AbstractDataObject getAbstractDataObject() {
         return ic2dObject;
     }
 

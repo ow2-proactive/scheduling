@@ -89,7 +89,7 @@ public class ActiveObjectCommunicationRecorder {
             return;
         }
 
-        if (source.isDestroyed() || dest.isDestroyed()) {
+        if (source.isDestroyed() || dest.isDestroyed() || !(source.getAbstractDataObject().isAlive())) {
             return;
         }
 

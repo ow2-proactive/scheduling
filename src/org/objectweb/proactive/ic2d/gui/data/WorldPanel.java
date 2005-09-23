@@ -333,7 +333,7 @@ public class WorldPanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected AbstractDataObject getAbstractDataObject() {
+    public AbstractDataObject getAbstractDataObject() {
         return worldObject;
     }
 

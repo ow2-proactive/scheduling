@@ -215,7 +215,7 @@ public class HostPanel extends AbstractDataObjectPanel
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected AbstractDataObject getAbstractDataObject() {
+    public AbstractDataObject getAbstractDataObject() {
         return hostObject;
     }
 

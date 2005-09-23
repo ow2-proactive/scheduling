@@ -235,7 +235,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         repaint();
     }
 
-    protected AbstractDataObject getAbstractDataObject() {
+    public AbstractDataObject getAbstractDataObject() {
         return activeObject;
     }
 

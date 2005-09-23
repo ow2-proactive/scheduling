@@ -162,7 +162,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected AbstractDataObject getAbstractDataObject() {
+    public AbstractDataObject getAbstractDataObject() {
         return vmObject;
     }
 
