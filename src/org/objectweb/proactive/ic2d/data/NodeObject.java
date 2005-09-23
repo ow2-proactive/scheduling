@@ -117,6 +117,10 @@ public class NodeObject extends AbstractDataObject {
         return node.getNodeInformation().getProtocol();
     }
 
+    public Node getNode() {
+        return node;
+    }
+
     //
     // ActiveObject related methods
     //
