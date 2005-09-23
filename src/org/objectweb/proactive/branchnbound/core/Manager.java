@@ -281,7 +281,7 @@ public class Manager implements Serializable, InitActive,
     private void backupAll(Task rootTask) throws IOException {
         logger.info("Backuping");
         this.backupResults();
-        this.taskProvider.backupTasks(rootTask);
+        this.taskProvider.backupTasks(rootTask, this.pendingTaskList);
     }
 
     private void backupResults() throws IOException {
@@ -346,6 +346,7 @@ public class Manager implements Serializable, InitActive,
         }
         this.taskProvider.loadTasks(taskFile);
         this.taskProvider.getRootTaskFromBackup();
+        this.pendingTaskList = this.taskProvider.getPendingTasksFromBackup();
         try {
             this.rootTask = (Task) ProActive.turnActive(this.taskProvider.getRootTaskFromBackup(),
                     ProActive.getBodyOnThis().getNodeURL());

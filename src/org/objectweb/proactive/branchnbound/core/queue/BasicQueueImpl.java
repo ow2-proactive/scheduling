@@ -47,9 +47,11 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 public class BasicQueueImpl implements TaskQueue {
+    private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
     private Vector queue = new Vector();
     private int hungryLevel;
-    private Task rootTask = null;
+    private Task rootTaskFromBackup = null;
+    private Vector pendingTasksFromBackup = new Vector();
 
     public BasicQueueImpl() {
     }
@@ -102,7 +104,7 @@ public class BasicQueueImpl implements TaskQueue {
         this.hungryLevel = level;
     }
 
-    public void backupTasks(Task rootTask) {
+    public void backupTasks(Task rootTask, Vector pendingTasks) {
         File currentBck = new File(backupTaskFile);
         File oldBck = new File(backupTaskFile + "~");
         if (currentBck.exists()) {
@@ -114,6 +116,10 @@ public class BasicQueueImpl implements TaskQueue {
             FileOutputStream fos = new FileOutputStream(currentBck);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(rootTask);
+            for (int j = 0; j < pendingTasks.size(); j++) {
+                oos.writeObject(pendingTasks.get(j));
+            }
+            oos.writeObject(BCK_SEPARTOR);
             for (int i = 0; i < this.queue.size(); i++) {
                 oos.writeObject(this.queue.get(i));
             }
@@ -130,9 +136,19 @@ public class BasicQueueImpl implements TaskQueue {
         try {
             FileInputStream fis = new FileInputStream(taskFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            this.rootTask = (Task) ois.readObject();
+            this.rootTaskFromBackup = (Task) ois.readObject();
+            boolean separationReached = false;
             while (ois.available() > 0) {
-                this.queue.add((Task) ois.readObject());
+                Object read = ois.readObject();
+                if (!separationReached && read instanceof String &&
+                        (((String) read).compareTo(BCK_SEPARTOR) == 0)) {
+                    separationReached = true;
+                }
+                if (!separationReached) {
+                    this.pendingTasksFromBackup.add((Task) read);
+                } else {
+                    this.queue.add((Task) read);
+                }
             }
             ois.close();
             fis.close();
@@ -143,6 +159,10 @@ public class BasicQueueImpl implements TaskQueue {
     }
 
     public Task getRootTaskFromBackup() {
-        return this.rootTask;
+        return this.rootTaskFromBackup;
+    }
+
+    public Vector getPendingTasksFromBackup() {
+        return this.pendingTasksFromBackup;
     }
 }

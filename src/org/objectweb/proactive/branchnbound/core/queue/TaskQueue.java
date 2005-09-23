@@ -33,6 +33,7 @@ package org.objectweb.proactive.branchnbound.core.queue;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.branchnbound.core.Task;
@@ -61,9 +62,11 @@ public interface TaskQueue extends Serializable {
 
     public abstract void setHungryLevel(int level);
 
-    public abstract void backupTasks(Task rootTask);
+    public abstract void backupTasks(Task rootTask, Vector pendingTasks);
 
     public abstract void loadTasks(File taskFile);
 
     public abstract Task getRootTaskFromBackup();
+
+    public abstract Vector getPendingTasksFromBackup();
 }

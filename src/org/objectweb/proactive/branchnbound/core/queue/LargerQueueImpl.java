@@ -47,10 +47,13 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 public class LargerQueueImpl implements TaskQueue {
+    private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
     private Vector queue = new Vector();
     private int size = 0;
     private int hungryLevel;
-    private Task rootTask = null;
+    private int current = 0;
+    private Vector pendingTasksFromBackup = new Vector();
+    private Task rootTaskFromBackup = null;
 
     public LargerQueueImpl() {
     }
@@ -83,8 +86,6 @@ public class LargerQueueImpl implements TaskQueue {
     public BooleanWrapper hasNext() {
         return new BooleanWrapper(this.size > 0);
     }
-
-    private int current = 0;
 
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#next()
@@ -125,7 +126,7 @@ public class LargerQueueImpl implements TaskQueue {
         this.hungryLevel = level;
     }
 
-    public void backupTasks(Task rootTask) {
+    public void backupTasks(Task rootTask, Vector pendingTasks) {
         File currentBck = new File(backupTaskFile);
         File oldBck = new File(backupTaskFile + "~");
         if (currentBck.exists()) {
@@ -137,6 +138,10 @@ public class LargerQueueImpl implements TaskQueue {
             FileOutputStream fos = new FileOutputStream(currentBck);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(rootTask);
+            for (int i = 0; i < pendingTasks.size(); i++) {
+                oos.writeObject(pendingTasks.get(i));
+            }
+            oos.writeObject(BCK_SEPARTOR);
             oos.writeObject(this.queue);
             fos.close();
             oos.close();
@@ -151,10 +156,19 @@ public class LargerQueueImpl implements TaskQueue {
         try {
             FileInputStream fis = new FileInputStream(taskFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            this.rootTask = (Task) ois.readObject();
-            while (ois.available() > 0) {
-                this.queue = (Vector) ois.readObject();
+            this.rootTaskFromBackup = (Task) ois.readObject();
+            boolean separationReached = false;
+            while (!separationReached) {
+                Object read = ois.readObject();
+                if (!separationReached && read instanceof String &&
+                        (((String) read).compareTo(BCK_SEPARTOR) == 0)) {
+                    separationReached = true;
+                    continue;
+                }
+                this.pendingTasksFromBackup.add((Task) read);
             }
+            this.queue = (Vector) ois.readObject();
+
             ois.close();
             fis.close();
         } catch (Exception e) {
@@ -164,6 +178,10 @@ public class LargerQueueImpl implements TaskQueue {
     }
 
     public Task getRootTaskFromBackup() {
-        return this.rootTask;
+        return this.rootTaskFromBackup;
+    }
+
+    public Vector getPendingTasksFromBackup() {
+        return this.pendingTasksFromBackup;
     }
 }
