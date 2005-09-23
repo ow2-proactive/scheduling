@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.core.body.future;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
@@ -91,6 +95,24 @@ public class FuturePool extends Object implements java.io.Serializable {
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
     static private java.util.Hashtable bodyDestination;
+    
+    // map of threads that are running a body forwarder 
+    static private Map forwarderThreads;
+
+    // Add the current thread as a body forwarder
+    static public void addMeAsBodyForwarder() {
+        forwarderThreads.put(Thread.currentThread(), null);
+    }
+
+    // Remove the current thread from the list of body forwarders
+    static public void removeMeFromBodyForwarders() {
+        forwarderThreads.remove(Thread.currentThread());
+    }
+
+    // Return true if the current thread is executing a body forwarder 
+    static public boolean isInsideABodyForwarder() {
+        return forwarderThreads.containsKey(Thread.currentThread());
+    }
 
     // to register in the table
     static public void registerBodyDestination(UniversalBody dest) {
@@ -137,6 +159,8 @@ public class FuturePool extends Object implements java.io.Serializable {
     static {
         bodyDestination = new java.util.Hashtable();
         incomingFutures = new java.util.Hashtable();
+        // A HashTable cannot contain null as value so we use a syncrhonized HashMap
+        forwarderThreads = Collections.synchronizedMap(new HashMap());
     }
 
     //

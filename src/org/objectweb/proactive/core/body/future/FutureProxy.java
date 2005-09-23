@@ -561,35 +561,38 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     private synchronized void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        //if continuation is already set, we are in a forwarder
-        //else if a destination is available in destTable, set the continuation tag
-        if (!continuation) {
-            continuation = (FuturePool.getBodyDestination() != null);
-        }
-
-        // We wait until the result is available
-        if ((!migration) && (!continuation)) {
-            waitFor();
-        }
-
-        // Registration in case of continuation
-        if (continuation && isAwaited()) {
-            // get the sender body
-            Body sender = LocalBodyStore.getInstance().getLocalBody(senderID);
-
-            // it's a halfbody...
-            if (sender == null) {
-                sender = LocalBodyStore.getInstance().getLocalHalfBody(senderID);
+        if (!FuturePool.isInsideABodyForwarder()) {
+            // Ok we are not inside a body forwarder	
+            //if continuation is already set, we are in a forwarder
+            //else if a destination is available in destTable, set the continuation tag
+            if (!continuation) {
+                continuation = (FuturePool.getBodyDestination() != null);
             }
-            if (sender != null) {
-                UniversalBody dest = FuturePool.getBodyDestination();
-                if (dest != null) {
-                    sender.getFuturePool().addAutomaticContinuation(ID,
-                        creatorID, dest);
+
+            // We wait until the result is available
+            if ((!migration) && (!continuation)) {
+                waitFor();
+            }
+
+            // Registration in case of continuation
+            if (continuation && isAwaited()) {
+                // get the sender body
+                Body sender = LocalBodyStore.getInstance().getLocalBody(senderID);
+
+                // it's a halfbody...
+                if (sender == null) {
+                    sender = LocalBodyStore.getInstance().getLocalHalfBody(senderID);
                 }
-            }
+                if (sender != null) {
+                    UniversalBody dest = FuturePool.getBodyDestination();
+                    if (dest != null) {
+                        sender.getFuturePool().addAutomaticContinuation(ID,
+                            creatorID, dest);
+                    }
+                }
 
-            // if sender is still null, it's a forwarder !!
+                // if sender is still null, it's a forwarder !!
+            }
         }
 
         // Pass the result

@@ -39,6 +39,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
@@ -259,6 +260,9 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     }
 
     public int receiveReply(UniqueID id, Reply r) throws IOException {
+        // a FuturProxy can be present inside r and must know if it is running
+        // on a body forwarder or not. See FuturProxy.writeObject
+        FuturePool.addMeAsBodyForwarder();
         try {
             BodyAdapter rbody = (BodyAdapter) bodies.get(id);
             if (rbody != null) {
@@ -269,11 +273,16 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new IOException("No BodyAdapter associated to id=" + id);
+        } finally {
+            FuturePool.removeMeFromBodyForwarders();
         }
     }
 
     public int receiveRequest(UniqueID id, Request request)
         throws IOException, RenegotiateSessionException {
+        // a FuturProxy can be present inside r and must know if it is running
+        // on a body forwarder or not. See FuturProxy.writeObject
+        FuturePool.addMeAsBodyForwarder();
         try {
             Object o = bodies.get(id);
             BodyAdapter rbody = (BodyAdapter) o;
@@ -291,6 +300,8 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
             }
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new IOException("No BodyAdapter associated to id=" + id);
+        } finally {
+            FuturePool.removeMeFromBodyForwarders();
         }
     }
 
