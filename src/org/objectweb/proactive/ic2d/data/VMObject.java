@@ -245,6 +245,10 @@ public class VMObject extends AbstractDataObject {
         }
     }
 
+    public String getVMUrl() {
+        return baseNode.getProActiveRuntime().getURL();
+    }
+
     public void destroyObject() {
         getTypedParent().removeVMObject(vmid);
     }
@@ -327,7 +331,7 @@ public class VMObject extends AbstractDataObject {
         //    ". Now removing the VM from IC2D.", e);
         controller.log("VM " + vmid + " is not responding ...");
         if (listener != null) {
-            listener.vmNotResponding(this);
+            listener.vmNotResponding();
         }
 
         if (lastNotRespondingTime < 0) {
@@ -345,12 +349,10 @@ public class VMObject extends AbstractDataObject {
                    controller.log("Now removing the VM from IC2D") ;
                    System.out.println ("remove " + vmid + " VM") ;
                    //getTypedParent().removeVMObject(vmid) ;
-
                    killVM() ;
                    //destroyObject();
                    destroy() ;
                    lastNotRespondingTime = -1 ;
-
            }
          */
 

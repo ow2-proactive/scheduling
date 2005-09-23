@@ -178,6 +178,21 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         // paintChildren(g2);
     }
 
+    public void activeObjectNotResponding() {
+        setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+        repaint();
+        if (activeObject.isAlive()) {
+            // reset topology
+            WorldPanel wp = (WorldPanel) (getParent().getParent().getParent()
+                                              .getParent());
+            wp.getCommunicationRecorder().clear();
+            wp.repaint();
+        }
+
+        // active object is dead
+        activeObject.setAlive(false);
+    }
+
     //
     // -- implements ActiveObjectListener -----------------------------------------------
     //
@@ -216,6 +231,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
     //
     protected void cancelMigration() {
         isGhost = false;
+        setBackground(COLOR_WHEN_WAITING_REQUEST);
         repaint();
     }
 

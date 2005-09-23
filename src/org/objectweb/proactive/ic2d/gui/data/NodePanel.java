@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.util.Iterator;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
@@ -106,10 +108,14 @@ public class NodePanel extends AbstractDataObjectPanel
                 }
             });
         popup.addSeparator();
+
+        final VMPanel parentPanel = (VMPanel) getParentDataObjectPanel();
         popup.add(new javax.swing.AbstractAction("Stop monitoring this node",
                 null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     nodeObject.destroyObject();
+                    //System.out.println (parentPanel) ;
+                    //parentPanel.stopMonitorNode(nodeObject); // TODO next commit
                 }
             });
 
@@ -130,11 +136,29 @@ public class NodePanel extends AbstractDataObjectPanel
         if (activeObject.isViewedInEventList()) {
             activeObjectWatcher.addActiveObject(activeObject);
         }
+
+        // refresh automatically
+        ((WorldPanel) ((HostPanel) ((VMPanel) getParent()).getParent()).getParent()).getMonitorThread()
+         .updateHosts();
     }
 
     public void activeObjectRemoved(ActiveObject activeObject) {
         removeChild(activeObject);
         activeObjectWatcher.removeActiveObject(activeObject);
+        //      refresh automatically
+        //((WorldPanel)((HostPanel)((VMPanel) getParent()).getParent()).getParent()).getMonitorThread().updateHosts() ;
+    }
+
+    public void nodeNotResponding() {
+        setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+        repaint();
+        Iterator it = childsIterator();
+
+        // all children (active objects) are also not responding
+        while (it.hasNext()) {
+            ActiveObjectPanel aoPanel = (ActiveObjectPanel) it.next();
+            aoPanel.activeObjectNotResponding();
+        }
     }
 
     //

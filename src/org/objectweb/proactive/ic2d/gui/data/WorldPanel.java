@@ -279,6 +279,10 @@ public class WorldPanel extends AbstractDataObjectPanel
         return worldObject;
     }
 
+    public ActiveObjectCommunicationRecorder getCommunicationRecorder() {
+        return communicationRecorder;
+    }
+
     /**
      * stop to monitor an host
      * @param hostObject host to do not monitor anymore.

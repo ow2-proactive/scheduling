@@ -214,8 +214,8 @@ public class MonitorThread {
         }
     }
 
-    public void removeAsso(MonitoredHost hostObject) {
-        asso.removeItem(hostObject);
+    public void removeAsso(BasicMonitoredObject object) {
+        asso.removeItem(object);
     }
 
     /**

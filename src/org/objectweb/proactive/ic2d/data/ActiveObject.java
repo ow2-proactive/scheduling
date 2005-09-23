@@ -47,6 +47,7 @@ public class ActiveObject extends AbstractDataObject {
     public static final int STATUS_WAITING_BY_NECESSITY_WHILE_SERVING = 4;
     public static final int STATUS_ACTIVE = 5;
     public static final int STATUS_NOT_RESPONDING = 6;
+    private boolean alive;
 
     /**
      * Every so often we cleanup the cache
@@ -75,6 +76,7 @@ public class ActiveObject extends AbstractDataObject {
         if (isMonitoring()) {
             monitoringMessageEventChanged(this, true);
         }
+        alive = true;
     }
 
     //
@@ -188,6 +190,18 @@ public class ActiveObject extends AbstractDataObject {
 
     public int getServingStatus() {
         return servingStatus;
+    }
+
+    /**
+     * true if active object is responding
+     * @return true if active object is responding
+     */
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public void setAlive(boolean alive) {
+        this.alive = alive;
     }
 
     //

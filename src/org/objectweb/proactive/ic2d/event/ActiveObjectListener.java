@@ -38,4 +38,6 @@ public interface ActiveObjectListener extends MessageMonitoringListener {
     public void servingStatusChanged(int value);
 
     public void requestQueueLengthChanged(int value);
+
+    public void activeObjectNotResponding();
 }

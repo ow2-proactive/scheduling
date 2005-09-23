@@ -31,12 +31,15 @@
 package org.objectweb.proactive.ic2d.gui.data;
 
 import java.awt.Color;
+import java.util.Iterator;
 
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.spy.Spy;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
 
@@ -80,13 +83,16 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
                 }
             });
         popup.addSeparator();
+        final HostPanel parentPanel = parent;
         popup.add(new javax.swing.AbstractAction("Stop monitoring this VM", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     vmObject.destroyObject();
+                    //parentPanel.stopMonitorVM(vmObject);// TODO next commit
                 }
             });
         popup.add(new javax.swing.AbstractAction("Kill this VM", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
+                    //parentPanel.stopMonitorVM(vmObject); // TODO next commit
                     vmObject.killVM();
                 }
             });
@@ -110,9 +116,16 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         removeChild(nodeObject);
     }
 
-    public void vmNotResponding(VMObject vmObject) {
+    public void vmNotResponding() {
         setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
         repaint();
+        Iterator it = childsIterator();
+
+        //      all children (nodes) are also not responding
+        while (it.hasNext()) {
+            NodePanel nodePanel = (NodePanel) it.next();
+            nodePanel.nodeNotResponding();
+        }
     }
 
     // ebe 06/2004
@@ -128,6 +141,21 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         }
         revalidate();
         repaint();
+    }
+
+    /**
+     * stop to monitor a specific node
+     * the MonitoredNode object referring to this node is
+     * put in the skipped objects list
+     * @param nodeObject node to ignore
+     */
+    public void stopMonitorNode(NodeObject nodeObject) {
+        MonitoredNode object = new MonitoredNode(nodeObject.getNode(),
+                vmObject.getVMUrl());
+        HostPanel parentPanel = (HostPanel) getParentDataObjectPanel();
+        WorldPanel wp = (WorldPanel) parentPanel.getParentDataObjectPanel();
+        wp.getMonitorThread().addObjectToSkip(object);
+        wp.getMonitorThread().removeAsso(object);
     }
 
     //

@@ -40,4 +40,6 @@ public interface NodeObjectListener extends MessageMonitoringListener {
     public void activeObjectAdded(ActiveObject activeObject);
 
     public void activeObjectRemoved(ActiveObject activeObject);
+
+    public void nodeNotResponding();
 }
