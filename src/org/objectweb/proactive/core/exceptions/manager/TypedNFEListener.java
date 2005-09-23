@@ -13,7 +13,7 @@ public class TypedNFEListener implements NFEListener {
         this.listener = listener;
         this.isRootNFEClass = exceptionClass == NonFunctionalException.class;
 
-        if (NonFunctionalException.class.isAssignableFrom(exceptionClass)) {
+        if (!NonFunctionalException.class.isAssignableFrom(exceptionClass)) {
             throw new IllegalArgumentException(
                 "The exception class must be a NFE class");
         }
