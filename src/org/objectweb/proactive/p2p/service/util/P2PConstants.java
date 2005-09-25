@@ -100,6 +100,9 @@ public interface P2PConstants {
 
     /** Boolean for using or not p2p load balanced. */
     public static final String PROPERTY_LOAD_BAL = "proactive.p2p.loadbalancing";
+    
+    /** Boolean value for disable node sharing. */
+    public static final String PROPERTY_NO_SHARING = "proactive.p2p.nosharing";
 
     // -------------------------------------------------------------------------
     // IC2D P2P Property

@@ -288,6 +288,11 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         if (!new Boolean(System.getProperty(PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
             nodes = 1;
         }
+        
+        // No sharing enable
+        if (new Boolean(System.getProperty(PROPERTY_NO_SHARING)).booleanValue()) {
+            nodes = 0;
+        }
 
         // Starting default shared nodes
         for (int procNumber = 0; procNumber < nodes; procNumber++) {

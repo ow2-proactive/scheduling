@@ -55,6 +55,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * Created on Jan 4, 2005
  */
 public class StartP2PService implements P2PConstants {
+    // TODO Disable node sharing when starting a p2p sevice
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_STARTSERVICE);
 
     static {
@@ -75,7 +76,8 @@ public class StartP2PService implements P2PConstants {
         " -node_acq Timeout for node acquisition\n" +
         " -lookup Lookup frequency for nodes\n" +
         " -no_multi_proc_nodes to share only a node. Otherwise, 1 node by CPU\n" +
-        " -xml_path Deployment descriptor path";
+        " -xml_path Deployment descriptor path\n"+
+        " -no_sharing Start the service with none shared nodes";
 
     private static class Args {
         private String acquisitionMethod = System.getProperty(PROPERTY_ACQUISITION);
@@ -91,6 +93,7 @@ public class StartP2PService implements P2PConstants {
         private String xml_path = System.getProperty(PROPERPY_XML_PATH);
         private String peerListFile = null;
         private Vector peers = new Vector();
+        private String no_sharing = System.getProperty(PROPERTY_NO_SHARING);
     }
 
     /**
@@ -219,6 +222,10 @@ public class StartP2PService implements P2PConstants {
                 parsed.multi_proc_nodes = "false";
                 index++;
                 continue;
+            } else if ("-no_sharing".equalsIgnoreCase(argname)) {
+                parsed.no_sharing = "true";
+                index++;
+                continue;
             }
 
             usage("Unknow argumnent " + argname);
@@ -245,6 +252,8 @@ public class StartP2PService implements P2PConstants {
         if (parsed.xml_path != null) {
             System.setProperty(PROPERPY_XML_PATH, parsed.xml_path);
         }
+        System.setProperty(PROPERTY_NO_SHARING,
+                (parsed.no_sharing == null)?"flase":parsed.no_sharing);
     }
 
     // -------------------------------------------------------------------------
