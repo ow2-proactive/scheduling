@@ -10,8 +10,11 @@ goto end
 
 
 :doit
-SETLOCAL
-call init.bat
+SETLOCAL enabledelayedexpansion
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
+
+call %PROACTIVE%\scripts\windows\init.bat
+
 %JAVA_CMD%  -Dproactive.ic2d.hidep2pnode=true org.objectweb.proactive.ic2d.IC2D
 ENDLOCAL
 
