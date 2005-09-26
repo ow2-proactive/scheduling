@@ -28,23 +28,32 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
+package org.objectweb.proactive.core.body.ft.servers.resource;
 
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * An object implementing this interface provides services for storing and retreiving
+ * ProActive nodes. These ressources are used for recovering failed active objects.
+ * This server is an RMI object.
  * @author cdelbe
  * @since ProActive 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public interface ResourceServer extends Remote {
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * Add a new node usable for recovery.
+     * @param n the node to add
      */
-    public Object handleFTMessage(FTManager ftm);
+    public void addFreeNode(Node n) throws RemoteException;
+
+    /**
+     * Return the next available node for recovery
+     * @return an available node
+     */
+    public Node getFreeNode() throws RemoteException;
 }

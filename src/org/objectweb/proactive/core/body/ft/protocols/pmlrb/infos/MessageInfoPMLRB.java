@@ -28,23 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
+package org.objectweb.proactive.core.body.ft.protocols.pmlrb.infos;
 
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.exception.NotImplementedException;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
+import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public class MessageInfoPMLRB implements MessageInfo {
+    public long sentSequenceNumber;
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()
      */
-    public Object handleFTMessage(FTManager ftm);
+    public int getProtocolType() {
+        return FTManagerFactory.PROTO_PML;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#isFromHalfBody()
+     */
+    public boolean isFromHalfBody() {
+        throw new NotImplementedException();
+    }
 }

@@ -164,7 +164,7 @@ public class Checkpoint implements java.io.Serializable {
      * checkpoint server codebase.
      * @author cdelbe
      */
-    private class CheckpointingOutputStream extends ObjectOutputStream {
+    private static class CheckpointingOutputStream extends ObjectOutputStream {
         private String codebase;
 
         public CheckpointingOutputStream(OutputStream out, String codebase)

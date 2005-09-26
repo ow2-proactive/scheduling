@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.body.ft.internalmsg;
 
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.ft.protocols.cic.FTManagerCIC;
+import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
 
 
 /**
@@ -54,7 +54,7 @@ public class GlobalStateCompletion implements FTMessage {
         return this.index;
     }
 
-    public int handleFTMessage(FTManager ftm) {
-        return ((FTManagerCIC) ftm).HandlingGSCEEvent(this);
+    public Object handleFTMessage(FTManager ftm) {
+        return ((FTManagerCIC) ftm).handlingGSCEEvent(this);
     }
 }

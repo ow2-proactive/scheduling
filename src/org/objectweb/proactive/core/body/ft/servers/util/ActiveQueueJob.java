@@ -28,23 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
-
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+package org.objectweb.proactive.core.body.ft.servers.util;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * This interface must be implemented by jobs submitted to an ActiveQueue.
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public interface ActiveQueueJob {
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * Do the needed stuff.
      */
-    public Object handleFTMessage(FTManager ftm);
+    public void doTheJob();
 }

@@ -28,23 +28,45 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
-
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+package org.objectweb.proactive.core.body.ft.exception;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public class NotImplementedException extends RuntimeException {
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     *
      */
-    public Object handleFTMessage(FTManager ftm);
+    public NotImplementedException() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param arg0
+     */
+    public NotImplementedException(String arg0) {
+        super(arg0);
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param arg0
+     */
+    public NotImplementedException(Throwable arg0) {
+        super(arg0);
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @param arg0
+     * @param arg1
+     */
+    public NotImplementedException(String arg0, Throwable arg1) {
+        super(arg0, arg1);
+        // TODO Auto-generated constructor stub
+    }
 }

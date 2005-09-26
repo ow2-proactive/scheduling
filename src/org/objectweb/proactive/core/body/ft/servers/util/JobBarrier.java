@@ -28,23 +28,34 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
-
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+package org.objectweb.proactive.core.body.ft.servers.util;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public class JobBarrier {
+    private boolean isCompleted;
+    private ActiveQueueJob job;
 
-    /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
-     */
-    public Object handleFTMessage(FTManager ftm);
+    public JobBarrier(ActiveQueueJob job) {
+        this.isCompleted = false;
+        this.job = job;
+    }
+
+    public synchronized void waitForJobCompletion() {
+        try {
+            while (!isCompleted) {
+                wait();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void signalJobCompletion() {
+        this.isCompleted = true;
+        notifyAll();
+    }
 }

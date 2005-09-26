@@ -28,23 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
+package org.objectweb.proactive.core.body.ft.message;
 
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import java.io.Serializable;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * Marker interface for message log.
  * @author cdelbe
  * @since ProActive 2.2
  */
-public interface FTMessage extends java.io.Serializable {
-
-    /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
-     */
-    public Object handleFTMessage(FTManager ftm);
+public interface MessageLog extends Serializable {
 }

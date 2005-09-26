@@ -28,23 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
+package org.objectweb.proactive.core.body.ft.message;
 
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import java.io.Serializable;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * Interface for piggybacked informations on messages.
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public interface MessageInfo extends Serializable {
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * Return the protocol used by the sender of the attached message
+     * @return the protocol used by the sender of the attached message
      */
-    public Object handleFTMessage(FTManager ftm);
+    public int getProtocolType();
+
+    /**
+     * Return true if the attached message is sent from a halfbody
+     * @return true if the attached message is sent from a halfbody
+     */
+    public boolean isFromHalfBody();
 }

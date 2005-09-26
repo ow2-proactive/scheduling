@@ -28,23 +28,32 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
-
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+package org.objectweb.proactive.core.body.ft.protocols;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * Factory for creating Fault-tolerance manager
  * @author cdelbe
- * @since ProActive 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public interface FTManagerFactory {
+
+    /** Communication induced checkpointing protocol selector value. */
+    public static final int PROTO_CIC = 1;
+
+    /** Pessimistic message logging protocol selector value. */
+    public static final int PROTO_PML = 2;
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * Return a fault-tolerance manager for a body
+     * @param protocolSelector specify the protocol that must be handled by the returned manager
+     * @return a fault-tolerance manager for a body
      */
-    public Object handleFTMessage(FTManager ftm);
+    public FTManager newFTManager(int protocolSelector);
+
+    /**
+     * Return a fault-tolerance manager for a halfbody
+     * @param protocolSelector specify the protocol that must be handled by the returned manager
+     * @return a fault-tolerance manager for a halfbody
+     */
+    public FTManager newHalfFTManager(int protocolSelector);
 }

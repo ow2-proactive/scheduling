@@ -31,20 +31,34 @@
 package org.objectweb.proactive.core.body.ft.internalmsg;
 
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * This class defines a message send to all processes (by the server) when one
+ * of the process of the group is sending a message to the outside world (i.e. an
+ * external element or a process belonging to another group)
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public class OutputCommit implements FTMessage {
+    private long lastIndexToRetreive;
+    private long firstIndexToRetreive;
 
-    /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
-     */
-    public Object handleFTMessage(FTManager ftm);
+    public OutputCommit(long firstIndex, long lastIndex) {
+        this.firstIndexToRetreive = firstIndex;
+        this.lastIndexToRetreive = lastIndex;
+    }
+
+    public Object handleFTMessage(FTManager ftm) {
+        return ((FTManagerCIC) ftm).handlingOCEvent(this);
+    }
+
+    public long getLastIndexToRetreive() {
+        return this.lastIndexToRetreive;
+    }
+
+    public long getFirstIndexToRetreive() {
+        return this.firstIndexToRetreive;
+    }
 }

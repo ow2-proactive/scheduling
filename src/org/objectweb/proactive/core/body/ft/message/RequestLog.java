@@ -28,23 +28,46 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
+package org.objectweb.proactive.core.body.ft.message;
 
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.request.Request;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * This class is used for logging a request.
+ * It contains its original destination.
  * @author cdelbe
  * @since ProActive 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public class RequestLog implements MessageLog {
+    // Logged message and its destination
+    private UniversalBody destination;
+    private Request request;
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * Create a request log.
+     * @param r The request to log
+     * @param d The destination body
      */
-    public Object handleFTMessage(FTManager ftm);
+    public RequestLog(Request r, UniversalBody d) {
+        this.destination = d;
+        this.request = r;
+    }
+
+    /**
+     * Return the logged request
+     * @return the logged request
+     */
+    public Request getRequest() {
+        return request;
+    }
+
+    /**
+     * Return the destination of this request
+     * @return the destination of this request
+     */
+    public UniversalBody getDestination() {
+        return destination;
+    }
 }

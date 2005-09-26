@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.body.ft.internalmsg;
 
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.ft.protocols.cic.FTManagerCIC;
 
 
 /**
@@ -48,7 +47,7 @@ public class Heartbeat implements FTMessage {
     public Heartbeat() {
     }
 
-    public int handleFTMessage(FTManager ftm) {
-        return ((FTManagerCIC) ftm).HandleHBEvent(this);
+    public Object handleFTMessage(FTManager ftm) {
+        return ftm.handleHBEvent(this);
     }
 }

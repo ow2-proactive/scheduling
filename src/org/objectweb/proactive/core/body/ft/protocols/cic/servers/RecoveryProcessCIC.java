@@ -28,23 +28,32 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.internalmsg;
+package org.objectweb.proactive.core.body.ft.protocols.cic.servers;
 
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl;
 
 
 /**
- * A class implementing this interface is a non-fonctional message that can
- * be handled by a FTManager.
+ * Defines the recovery behavior for the CIC protocol.
  * @author cdelbe
- * @since ProActive 2.2
+ * @since 2.2
  */
-public interface FTMessage extends java.io.Serializable {
+public class RecoveryProcessCIC extends RecoveryProcessImpl {
 
     /**
-     * DoubleDispatch pattern. Use to select the handler in the FTManager
-     * @param ftm the FTManager that have to handle this message
-     * @return depend on the message type
+     * @param server
      */
-    public Object handleFTMessage(FTManager ftm);
+    public RecoveryProcessCIC(FTServer server) {
+        super(server);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recoverFrom(org.objectweb.proactive.core.UniqueID)
+     */
+    protected void recover(UniqueID failed) {
+        CheckpointServerCIC ckptServer = (CheckpointServerCIC) (this.server.getCheckpointServer());
+        ckptServer.internalRecover(failed);
+    }
 }

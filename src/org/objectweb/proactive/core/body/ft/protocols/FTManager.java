@@ -30,19 +30,24 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
-import org.objectweb.proactive.core.body.ft.util.location.LocationServer;
-import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
-import org.objectweb.proactive.core.body.ft.util.storage.CheckpointServer;
+import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
+import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
+import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
+import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -55,6 +60,8 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * @since ProActive 2.2
  */
 public abstract class FTManager implements java.io.Serializable {
+    //logger
+    protected final static Logger logger = Logger.getLogger(FTManager.class.getName());
 
     /** This value is sent by an active object that is not fault tolerant*/
     public static final int NON_FT = -30;
@@ -68,11 +75,18 @@ public abstract class FTManager implements java.io.Serializable {
     /** Value returned by an object if the received message is orphan */
     public static final int ORPHAN_REPLY = -2;
 
+    /** Time to wait between a send and a resend in ms*/
+    public static final long TIME_TO_RESEND = 3000;
+
+    /** Error message when calling uncallable method on a halfbody */
+    public static final String HALF_BODY_EXCEPTION_MESSAGE = "Cannot perform this call on a FTManager of a HalfBody";
+
     // true is this is a checkpoint
     private boolean isACheckpoint;
 
     // body attached to this manager
-    public AbstractBody owner;
+    protected AbstractBody owner;
+    protected UniqueID ownerID;
 
     // server adresses
     protected CheckpointServer storage;
@@ -86,6 +100,20 @@ public abstract class FTManager implements java.io.Serializable {
     protected int ttc;
 
     /**
+     * Return the selector value for a given protocol.
+     * @param protoName the name of the protocol (cic or pml).
+     * @return the selector value for a given protocol.
+     */
+    public static int getProtoSelector(String protoName) {
+        if ("cic".equals(protoName)) {
+            return FTManagerFactory.PROTO_CIC;
+        } else if ("pml".equals(protoName)) {
+            return FTManagerFactory.PROTO_PML;
+        }
+        return 0;
+    }
+
+    /**
      * Initialize the FTManager. This method establihes all needed connections with the servers.
      * The owner object is registred in the location server (@see xxx).
      * @param owner The object linked to this FTManager
@@ -94,6 +122,7 @@ public abstract class FTManager implements java.io.Serializable {
      */
     public int init(AbstractBody owner) throws ProActiveException {
         this.owner = owner;
+        this.ownerID = owner.getID();
         try {
             String ttcValue = ProActiveConfiguration.getTTCValue();
             if (ttcValue != null) {
@@ -124,6 +153,16 @@ public abstract class FTManager implements java.io.Serializable {
             // the additional codebase is added to normal codebase 
             // ONLY during serialization for checkpoint !
             this.additionalCodebase = this.storage.getServerCodebase();
+
+            // registration in the recovery process and in the localisation server
+            try {
+                this.recovery.register(ownerID);
+                this.location.updateLocation(ownerID, owner.getRemoteAdapter());
+            } catch (RemoteException e) {
+                logger.error("**ERROR** Unable to register in location server");
+                throw new ProActiveException("Unable to register in location server",
+                    e);
+            }
         } catch (MalformedURLException e) {
             throw new ProActiveException("Unable to init FTManager : FT is disable.",
                 e);
@@ -135,6 +174,20 @@ public abstract class FTManager implements java.io.Serializable {
                 e);
         }
         return 0;
+    }
+
+    /**
+     * Unregister this activity from the fault-tolerance mechanism. This method must be called
+     * when an active object ends its activity normally.
+     */
+    public void termination() throws ProActiveException {
+        try {
+            this.recovery.unregister(this.ownerID);
+        } catch (RemoteException e) {
+            logger.error("**ERROR** Unable to register in location server");
+            throw new ProActiveException("Unable to unregister in location server",
+                e);
+        }
     }
 
     /**
@@ -153,6 +206,110 @@ public abstract class FTManager implements java.io.Serializable {
      */
     public void setCheckpointTag(boolean tag) {
         this.isACheckpoint = tag;
+    }
+
+    /**
+     * Common behavior when a communication with another active object failed.
+     * The location server is contacted.
+     * @param suspect the uniqueID of the callee
+     * @param suspectLocation the supposed location of the callee
+     * @param e the exception raised during the communication
+     * @return the actual location of the callee
+     */
+    public UniversalBody communicationFailed(UniqueID suspect,
+        UniversalBody suspectLocation, Exception e) {
+        try {
+            // send an adapter to suspectLocation: the suspected body could be local
+            UniversalBody newLocation = this.location.searchObject(suspect,
+                    suspectLocation.getRemoteAdapter(), this.ownerID);
+            if (newLocation == null) {
+                while (newLocation == null) {
+                    try {
+                        // suspected is failed or is recovering
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("[CIC] Waiting for recovery of " +
+                                suspect);
+                        }
+                        Thread.sleep(TIME_TO_RESEND);
+                    } catch (InterruptedException e2) {
+                        e2.printStackTrace();
+                    }
+                    newLocation = this.location.searchObject(suspect,
+                            suspectLocation.getRemoteAdapter(), this.ownerID);
+                }
+                return newLocation;
+            } else {
+                // newLocation is the new location of suspect
+                return newLocation;
+            }
+        } catch (RemoteException e1) {
+            logger.error("**ERROR** Location server unreachable");
+            e1.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Fault-tolerant sending: this send notices fault tolerance servers if the destination is
+     * unreachable and resent the message until destination is reachable.
+     * @param r the reply to send
+     * @param destination the destination of the reply
+     * @return the value returned by the sending
+     */
+    public int sendReply(Reply r, UniversalBody destination) {
+        try {
+            this.onSendReplyBefore(r);
+            int res = r.send(destination);
+            this.onSendReplyAfter(r, res, destination);
+            return res;
+        } catch (IOException e) {
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
+                destination.getID() + " SUSPECTED ON REPLY SENDING : " +
+                e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(),
+                    destination, e);
+            return this.sendReply(r, newDestination);
+        }
+    }
+
+    /**
+     * Fault-tolerant sending: this send notices fault tolerance servers if the destination is
+     * unreachable and resent the message until destination is reachable.
+     * @param r the request to send
+     * @param destination the destination of the request
+     * @return the value returned by the sending
+     * @throws RenegotiateSessionException
+     */
+    public int sendRequest(Request r, UniversalBody destination)
+        throws RenegotiateSessionException {
+        try {
+            this.onSendRequestBefore(r);
+            int res = r.send(destination);
+            this.onSendRequestAfter(r, res, destination);
+            return res;
+        } catch (IOException e) {
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
+                destination.getID() + " SUSPECTED ON REQUEST SENDING : " +
+                e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(),
+                    destination, e);
+            return this.sendRequest(r, newDestination);
+        } catch (RenegotiateSessionException e1) {
+            throw e1;
+        }
+    }
+
+    /**
+     * Heartbeat message. Send state value to the fault detector.
+     * @param fte heartbeat message.
+     * @return FaultDetector.OK if active object is alive, FaultDetector.IS_DEAD otherwise.
+     */
+    public Object handleHBEvent(Heartbeat fte) {
+        if (this.owner.isAlive()) {
+            return FaultDetector.OK;
+        } else {
+            return FaultDetector.IS_DEAD;
+        }
     }
 
     //////////////////////
@@ -241,29 +398,9 @@ public abstract class FTManager implements java.io.Serializable {
     public abstract int beforeRestartAfterRecovery(CheckpointInfo ci, int inc);
 
     /**
-     * Fault-tolerant sending: this send notices fault tolerance servers if the destination is
-     * unreachable and resent the message until destination is reachable.
-     * @param r the request to send
-     * @param destination the destination of the request
-     * @return the value returned by the sending
-     * @throws RenegotiateSessionException
-     */
-    public abstract int sendRequest(Request r, UniversalBody destination)
-        throws RenegotiateSessionException;
-
-    /**
-     * Fault-tolerant sending: this send notices fault tolerance servers if the destination is
-     * unreachable and resent the message until destination is reachable.
-     * @param r the reply to send
-     * @param destination the destination of the reply
-     * @return the value returned by the sending
-     */
-    public abstract int sendReply(Reply r, UniversalBody destination);
-
-    /**
      * This method is called when a non fonctionnal fault-tolerance message is received
      * @param fte the received message
-     * @return still not used
+     * @return depend on the message meaning
      */
-    public abstract int handleFTMessage(FTMessage fte);
+    public abstract Object handleFTMessage(FTMessage fte);
 }
