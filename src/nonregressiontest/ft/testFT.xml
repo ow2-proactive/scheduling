@@ -53,6 +53,7 @@
 		 <services>
                         <serviceDefinition id="appli">
                                 <faultTolerance>
+                                		<protocol type="cic"></protocol>
                                         <globalServer url="rmi://localhost:1100/FTServer"></globalServer>
                                         <ttc value="5"></ttc>
                                 </faultTolerance>
@@ -60,6 +61,7 @@
 
                         <serviceDefinition id="resource">
                                 <faultTolerance>
+                                        <protocol type="cic"></protocol>
                                         <globalServer url="rmi://localhost:1100/FTServer"></globalServer>
 					<resourceServer url="rmi://localhost:1100/FTServer"></resourceServer>
                                         <ttc value="5"></ttc>

@@ -245,7 +245,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    public int receiveFTMessage(UniqueID id, FTMessage ev)
+    public Object receiveFTMessage(UniqueID id, FTMessage ev)
         throws IOException {
         try {
             BodyAdapter rbody = (BodyAdapter) bodies.get(id);

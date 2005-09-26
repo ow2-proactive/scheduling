@@ -197,6 +197,10 @@ public class ProActiveConfiguration {
         return System.getProperty("proactive.ft.server.resource");
     }
 
+    public static String getFTProtocol(){
+        return System.getProperty("proactive.ft.protocol");
+    }
+    
     //To be used for the launcher 
     //    /**
     //     * Sets the value of proactive.home if not already set

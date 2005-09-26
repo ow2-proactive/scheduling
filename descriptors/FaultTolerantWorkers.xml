@@ -15,6 +15,10 @@
 					<vmName value="Jvm2"/>
 					<vmName value="Jvm3"/>
 					<vmName value="Jvm4"/>
+	                                <vmName value="Jvm5"/>
+					<vmName value="Jvm6"/>
+					<vmName value="Jvm7"/>
+					<vmName value="Jvm8"/>
 				</jvmSet>
 			</map>
 			<map virtualNode="Failed">
@@ -45,6 +49,26 @@
 					<processReference refid="jvmAppli4"/>
 				</creation>
 			</jvm>
+	                <jvm name="Jvm5">
+				<creation>
+					<processReference refid="jvmAppli5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm6">
+				<creation>
+					<processReference refid="jvmAppli6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm7">
+				<creation>
+					<processReference refid="jvmAppli7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm8">
+				<creation>
+					<processReference refid="jvmAppli8"/>
+				</creation>
+			</jvm>
 			<jvm name="JvmS1">
 				<creation>
 					<processReference refid="jvmFailed1"/>
@@ -61,36 +85,71 @@
 		<processes>
 			<processDefinition id="jvmProcess">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				 <classpath>
+                                                <absolutePath value="/user/cdelbe/home/ProActive/classes:/user/cdelbe/home/ProActive/lib/components/fractal-swing.jar:/user/cdelbe/home/ProActive/lib/components/SVGGraphics.jar:/user/cdelbe/home/ProActive/lib/components/dtdparser.jar:/user/cdelbe/home/ProActive/lib/components/fractal-adl.jar:/user/cdelbe/home/ProActive/lib/components/fractal-gui.jar:/user/cdelbe/home/ProActive/lib/components/julia-asm.jar:/user/cdelbe/home/ProActive/lib/components/fractal.jar:/user/cdelbe/home/ProActive/lib/components/julia-runtime.jar:/user/cdelbe/home/ProActive/lib/components/julia-mixins.jar:/user/cdelbe/home/ProActive/lib/components/ow_deployment_scheduling.jar:/user/cdelbe/home/ProActive/lib/examples/clibwrapper_jiio.jar:/user/cdelbe/home/ProActive/lib/examples/jai_codec.jar:/user/cdelbe/home/ProActive/lib/examples/jai_core.jar:/user/cdelbe/home/ProActive/lib/examples/jai_imageio.jar:/user/cdelbe/home/ProActive/lib/examples/mlibwrapper_jai.jar:/user/cdelbe/home/ProActive/lib/activation.jar:/user/cdelbe/home/ProActive/lib/asm.jar:/user/cdelbe/home/ProActive/lib/axis.jar:/user/cdelbe/home/ProActive/lib/bcel.jar:/user/cdelbe/home/ProActive/lib/bouncycastle.jar:/user/cdelbe/home/ProActive/lib/cog-jglobus.jar:/user/cdelbe/home/ProActive/lib/cog-ogce.jar:/user/cdelbe/home/ProActive/lib/cryptix-asn1.jar:/user/cdelbe/home/ProActive/lib/cryptix.jar:/user/cdelbe/home/ProActive/lib/cryptix32.jar:/user/cdelbe/home/ProActive/lib/ibis.jar:/user/cdelbe/home/ProActive/lib/jaxrpc.jar:/user/cdelbe/home/ProActive/lib/jini-core.jar:/user/cdelbe/home/ProActive/lib/jini-ext.jar:/user/cdelbe/home/ProActive/lib/jsch.jar:/user/cdelbe/home/ProActive/lib/log4j.jar:/user/cdelbe/home/ProActive/lib/mail.jar:/user/cdelbe/home/ProActive/lib/puretls.jar:/user/cdelbe/home/ProActive/lib/reggie.jar:/user/cdelbe/home/ProActive/lib/saaj-api.jar:/user/cdelbe/home/ProActive/lib/servlet-api.jar:/user/cdelbe/home/ProActive/lib/soap.jar:/user/cdelbe/home/ProActive/lib/wsdl4j.jar:/user/cdelbe/home/ProActive/lib/xercesImpl.jar:."/>
+
+                                        </classpath>
+                                        <javaPath>
+                                                <absolutePath value="/user/cdelbe/home/bin/j2sdk1.4.2_04/bin/java"/> <!-- -Xms64m -Xmx128m"/> -->
+                                        </javaPath>
+
+                                        <log4jpropertiesFile>
+                                                <absolutePath value="/user/cdelbe/home/ProActive/scripts/proactive-log4j"/>
+                                        </log4jpropertiesFile>
+                                        <jvmParameters>
+                                                <parameter value="-Dproactive.future.ac=enable -Dproactive.rmi.port=1102"/>
+                                                <!-- -Dproactive.ft=enable -Dproactive.ft.server.global=rmi://trinidad.inria.fr:1100/CheckpointServer"/>-->
+                                        </jvmParameters>
 				</jvmProcess>
 			</processDefinition>
 			<!-- HOSTNAMES MUST BE SET HERE -->
 			<processDefinition id="jvmAppli1">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="psychoquack">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="oriens">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli2">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="noadcoco">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="noadcoco">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli3">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="nahuel">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="nahuel">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli4">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="nahuel">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe">
+					<processReference refid="jvmProcess"/>
+				</rshProcess>
+			</processDefinition>
+                	<processDefinition id="jvmAppli5">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sidonie">
+					<processReference refid="jvmProcess"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="jvmAppli6">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sea">
+					<processReference refid="jvmProcess"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="jvmAppli7">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sidonie">
+					<processReference refid="jvmProcess"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="jvmAppli8">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="macyavel">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed1">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="apple">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed2">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amda">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
@@ -98,16 +157,18 @@
 		<services>
 			<serviceDefinition id="appli">
 				<faultTolerance>
-					<globalServer url="rmi://trinidad:1100/FTServer"></globalServer>
-					<ttc value="5"></ttc>
+					<protocol type="cic"></protocol>
+					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
+					<ttc value="10"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
 
 			<serviceDefinition id="ressource">
 				<faultTolerance>
-					<globalServer url="rmi://trinidad:1100/FTServer"></globalServer>
-					<resourceServer url="rmi://trinidad:1100/FTServer"></resourceServer>
-					<ttc value="5"></ttc>
+					<protocol type="cic"></protocol>
+					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
+					<resourceServer url="rmi://trinidad:1334/FTServer"></resourceServer>
+					<ttc value="10"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
 		</services>

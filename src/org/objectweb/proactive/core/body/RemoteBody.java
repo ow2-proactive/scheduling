@@ -148,10 +148,10 @@ public interface RemoteBody extends Serializable, SecurityEntity {
     /**
      * For sending a message to the FTManager linked to this object
      * @param fte the message
-     * @return still not used
+     * @return depends on the message meaning
      * @exception java.io.IOException if an exception occured during the remote communication
      */
-    public int receiveFTMessage(FTMessage fte) throws IOException;
+    public Object receiveFTMessage(FTMessage fte) throws IOException;
 
     /**
      * Change the body referenced by this adapter

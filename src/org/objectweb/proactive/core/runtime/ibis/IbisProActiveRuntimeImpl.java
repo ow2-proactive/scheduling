@@ -298,9 +298,9 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+    public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt,
         int inc) throws RemoteException, ProActiveException {
-        return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
+        return proActiveRuntime.receiveCheckpoint(nodeURL, ckpt, inc);
     }
 
     public String getVNName(String nodename)

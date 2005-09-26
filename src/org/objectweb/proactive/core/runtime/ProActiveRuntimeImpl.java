@@ -677,24 +677,25 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(String, Checkpoint, int)
      */
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+    public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt,
         int inc) {
         runtimeLogger.debug("Receive a checkpoint for recovery");
 
         // the recovered body
         Body ret = ckpt.recover();
+        
+        // update node url
+        ret.updateNodeURL(nodeURL);
+        
+        String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
 
-        //update the nodeURL in the registred body 
-        String newURL = UrlBuilder.buildUrlFromProperties(vmInformation.getInetAddress()
-                                                                       .getHostName(),
-                nodeName);
-        ret.updateNodeURL(newURL);
-
-        // set ftm.owner and call beforeRecoery()
-        ((AbstractBody) ret).getFTManager().owner = ((AbstractBody) ret);
+        // need to register as thread of the corresponding active object: this thread
+        // may send looged requests or logged replies
+        LocalBodyStore.getInstance().setCurrentThreadBody(ret);
         ((AbstractBody) ret).getFTManager().beforeRestartAfterRecovery(ckpt.getCheckpointInfo(),
             inc);
-
+        LocalBodyStore.getInstance().setCurrentThreadBody(null);
+        
         // register the body
         this.registerBody(nodeName, ret);
 

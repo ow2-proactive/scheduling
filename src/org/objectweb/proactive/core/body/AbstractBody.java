@@ -295,7 +295,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * FuturePool.incomingFutures during their deserialization. This effective registration must be perform
      * AFTER entering in the ThreadStore.
      */
-    private void registerIncomingFutures() {
+    public void registerIncomingFutures() {
         // get list of futures that should be deserialized and registred "behind the ThreadStore"
         java.util.ArrayList incomingFutures = FuturePool.getIncomingFutures();
 
@@ -861,9 +861,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //            return null;
     //        }
     //    }
-    public int receiveFTMessage(FTMessage fte) {
+    public Object receiveFTMessage(FTMessage fte) {
         // delegate to the FTManger
-        int res = 0;
+        Object res = null;
         if (this.ftmanager != null) {
             res = this.ftmanager.handleFTMessage(fte);
         }

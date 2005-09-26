@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body;
 
 import java.util.Map;
 
+import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestFactory;
@@ -140,4 +141,12 @@ public interface MetaObjectFactory {
     public void setProActiveSecurityManager(ProActiveSecurityManager psm);
 
     public Object clone() throws CloneNotSupportedException;
+    
+    // FAULT-TOLERANCE
+    
+    /**
+     * Creates the fault-tolerance manager.
+     * @return the fault-tolerance manager.
+     */
+    public FTManagerFactory newFTManagerFactory();
 }

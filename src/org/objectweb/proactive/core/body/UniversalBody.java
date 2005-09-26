@@ -184,8 +184,8 @@ public interface UniversalBody extends NFEProducer, Job, Serializable,
     /**
      * For sending a non fonctional message to the FTManager linked to this object.
      * @param ev the message to send
-     * @return still not used
+     * @return depends on the message meaning
      * @exception java.io.IOException if a pb occurs during this method call
      */
-    public int receiveFTMessage(FTMessage ev) throws IOException;
+    public Object receiveFTMessage(FTMessage ev) throws IOException;
 }

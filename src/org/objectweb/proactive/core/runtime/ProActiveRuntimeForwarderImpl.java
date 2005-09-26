@@ -638,14 +638,14 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     }
 
     public UniversalBody receiveCheckpoint(UniqueRuntimeID urid,
-        String nodeName, Checkpoint ckpt, int inc) throws ProActiveException {
+        String nodeURL, Checkpoint ckpt, int inc) throws ProActiveException {
         if (urid == null) {
-            return this.receiveCheckpoint(nodeName, ckpt, inc);
+            return this.receiveCheckpoint(nodeURL, ckpt, inc);
         } else {
             ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
 
             if (part != null) {
-                return part.receiveCheckpoint(nodeName, ckpt, inc);
+                return part.receiveCheckpoint(nodeURL, ckpt, inc);
             } else {
                 logger.warn("No runtime associated to this urid (" + urid +
                     ")");

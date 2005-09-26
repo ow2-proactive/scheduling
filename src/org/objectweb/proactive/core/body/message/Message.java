@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.message;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
 
@@ -83,15 +84,16 @@ public interface Message {
 
     /**
      * Returns fault-tolerance infos piggybacked on this message
-     * @return an array of chars that contains fault-tolerance infos
+     * @return a MessageInfo object that contains fault-tolerance infos OR null
+     * if the attached message has been sent by a non fault-tolerant object
      */
-    public char[] getMessageInfo();
+    public MessageInfo getMessageInfo();
 
     /**
      * Set fault-tolerance infos piggybacked on this message
-     * @param mi an array of chars that contains fault-tolerance infos
+     * @param mi a MessageInfo object that contains fault-tolerance infos
      */
-    public void setMessageInfo(char[] mi);
+    public void setMessageInfo(MessageInfo mi);
 
     /**
      * Return true if this message must be ignored by the receiver

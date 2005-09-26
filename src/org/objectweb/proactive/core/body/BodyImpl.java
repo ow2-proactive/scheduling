@@ -34,10 +34,11 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ft.protocols.cic.FTManagerCIC;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.message.MessageEventProducerImpl;
@@ -155,29 +156,31 @@ public abstract class BodyImpl extends AbstractBody
         // FAULT TOLERANCE
         String ftstate = ProActiveConfiguration.getFTState();
         if ("enable".equals(ftstate)) {
-            // if the targetBody is not serilizable, FT is disabled
-            if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
-                try {
-                    // should use a factory ...
-                    this.ftmanager = new FTManagerCIC();
-                    this.ftmanager.init(this);
-                    if (bodyLogger.isDebugEnabled()) {
-                        bodyLogger.debug("Init FTManager on " +
-                            this.getNodeURL());
+            // if the object is a ProActive internal object, FT is disabled
+            if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)){
+                // if the object is not serilizable, FT is disabled
+                if (this.localBodyStrategy.getReifiedObject() instanceof Serializable){
+                    try {
+                        // create the fault tolerance manager
+                        int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getFTProtocol());
+                        this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
+                        this.ftmanager.init(this);
+                        if (bodyLogger.isDebugEnabled()) {
+                            bodyLogger.debug("Init FTManager on " +
+                                    this.getNodeURL());
+                        }
+                    } catch (ProActiveException e) {
+                        bodyLogger.error(
+                                "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                                e);
+                        this.ftmanager = null;
                     }
-
-                    bodyLogger.info("** Fault-Tolerance is enabled **");
-                } catch (ProActiveException e) {
+                } else {
+                    // target body is not serilizable
                     bodyLogger.error(
-                        "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
-                        e);
+                    "**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
                     this.ftmanager = null;
                 }
-            } else {
-                // target body is not serilizable
-                bodyLogger.error(
-                    "**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
-                this.ftmanager = null;
             }
         } else {
             this.ftmanager = null;

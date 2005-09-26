@@ -224,7 +224,7 @@ public class RmiRemoteBodyForwarderImpl
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
      */
-    public int receiveFTMessage(UniqueID id, FTMessage fte)
+    public Object receiveFTMessage(UniqueID id, FTMessage fte)
         throws IOException {
         return this.body.receiveFTMessage(id, fte);
     }

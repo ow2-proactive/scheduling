@@ -382,8 +382,8 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
      */
-    public int receiveFTMessage(FTMessage ev) throws IOException {
-        return 0;
+    public Object receiveFTMessage(FTMessage ev) throws IOException {
+        return null;
     }
 
     public UniversalBody getShortcutTargetBody(

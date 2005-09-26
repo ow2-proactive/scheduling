@@ -578,13 +578,13 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(java.lang.String, org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+    public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt,
         int inc) throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            return localruntime.receiveCheckpoint(nodeName, ckpt, inc);
+            return localruntime.receiveCheckpoint(nodeURL, ckpt, inc);
         }
         ArrayList params = new ArrayList();
-        params.add(nodeName);
+        params.add(nodeURL);
         params.add(ckpt);
         params.add(new Integer(inc));
 

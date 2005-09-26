@@ -37,7 +37,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.ft.util.resource.ResourceServer;
+import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
@@ -55,7 +55,10 @@ public class FaultToleranceService implements UniversalService {
 
     // logger
     protected static Logger logger = Logger.getLogger(FaultToleranceService.class.getName());
-
+    
+    // protocol Type
+    private String protocolType;
+    
     // fault tolerance servers
     private String recoveryProcessURL;
     private String checkpointServerURL;
@@ -113,14 +116,16 @@ public class FaultToleranceService implements UniversalService {
 
         if (this.getTtcValue() != null) {
             line.append(" -Dproactive.ft.ttc=" + this.getTtcValue());
+        }         
+        if (this.getAttachedResourceServer()!=null){
+            line.append(" -Dproactive.ft.server.resource=" + 
+            	this.getAttachedResourceServer());
         }
-
-        if (this.getAttachedResourceServer() != null) {
-            line.append(" -Dproactive.ft.server.ressource=" +
-                this.getAttachedResourceServer());
+        if (this.getProtocolType()!=null){
+            line.append(" -Dproactive.ft.protocol=" + 
+            	this.getProtocolType());
         }
-
-        if (logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()){
             logger.debug("FT config is : " + line);
         }
         return line.toString();
@@ -205,5 +210,11 @@ public class FaultToleranceService implements UniversalService {
 
     public void setTtcValue(String ttcValue) {
         this.ttcValue = ttcValue;
+    }
+    public String getProtocolType() {
+        return protocolType;
+    }
+    public void setProtocolType(String protocolType) {
+        this.protocolType = protocolType;
     }
 }

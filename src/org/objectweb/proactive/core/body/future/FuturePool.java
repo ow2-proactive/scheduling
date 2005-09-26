@@ -252,8 +252,9 @@ public class FuturePool extends Object implements java.io.Serializable {
                     } catch (SecurityNotAvailableException e) {
                         psm = null;
                     }
+                    //the added reply is a deep copy with the isAC tag set to true
                     queueAC.addACRequest(new ACService(bodiesToContinue,
-                            new ReplyImpl(creatorID, id, null, result, psm)));
+                            new ReplyImpl(creatorID, id, null, result, psm, true)));
                 }
             }
 

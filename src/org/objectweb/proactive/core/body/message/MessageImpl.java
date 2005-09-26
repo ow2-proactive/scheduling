@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.message;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
 
@@ -63,7 +64,7 @@ public class MessageImpl implements Message, java.io.Serializable {
     // FAULT TOLERANCE
 
     /** all values piggybacked for fault tolerance stuff */
-    protected char[] messageInfos;
+    protected MessageInfo messageInfos;
 
     /** true if this message can be ignored */
     protected boolean ignoreIt;
@@ -132,11 +133,11 @@ public class MessageImpl implements Message, java.io.Serializable {
     }
 
     // FAULT-TOLERANCE
-    public char[] getMessageInfo() {
+    public MessageInfo getMessageInfo() {
         return this.messageInfos;
     }
 
-    public void setMessageInfo(char[] mi) {
+    public void setMessageInfo(MessageInfo mi) {
         this.messageInfos = mi;
     }
 

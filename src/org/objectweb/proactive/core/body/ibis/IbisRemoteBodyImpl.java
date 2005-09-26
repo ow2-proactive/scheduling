@@ -257,7 +257,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     /**
      * @see org.objectweb.proactive.core.body.ibis.IbisRemoteBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
      */
-    public int receiveFTMessage(FTMessage fte) throws IOException {
+    public Object receiveFTMessage(FTMessage fte) throws IOException {
         return this.body.receiveFTMessage(fte);
     }
 

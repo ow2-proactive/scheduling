@@ -519,8 +519,8 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * STILL NOT IMPLEMENTED
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
      */
-    public int receiveFTMessage(FTMessage ev) throws IOException {
-        return FTManager.NON_FT;
+    public Object receiveFTMessage(FTMessage ev) throws IOException {
+        return null;
     }
 
     /**

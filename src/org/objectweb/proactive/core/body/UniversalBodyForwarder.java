@@ -132,7 +132,7 @@ public interface UniversalBodyForwarder {
         throws SecurityNotAvailableException, IOException;
 
     // FAULT TOLERANCE
-    public int receiveFTMessage(UniqueID id, FTMessage ev)
+    public Object receiveFTMessage(UniqueID id, FTMessage ev)
         throws IOException;
 
     public String getJobID(UniqueID id) throws IOException;

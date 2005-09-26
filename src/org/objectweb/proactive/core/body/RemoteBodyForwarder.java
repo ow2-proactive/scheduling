@@ -154,7 +154,7 @@ public interface RemoteBodyForwarder {
     public void terminateSession(UniqueID id, long sessionID)
         throws SecurityNotAvailableException, IOException;
 
-    public int receiveFTMessage(UniqueID id, FTMessage fte)
+    public Object receiveFTMessage(UniqueID id, FTMessage fte)
         throws IOException;
 
     public void changeProxiedBody(UniqueID id, Body newBody)

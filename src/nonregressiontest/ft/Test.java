@@ -3,6 +3,9 @@ package nonregressiontest.ft;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.exceptions.manager.TypedNFEListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 
@@ -33,7 +36,7 @@ public class Test extends FunctionalTest {
         this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
         this.server.setClassname(
-            "org.objectweb.proactive.core.body.ft.util.StartFTServer");
+            "org.objectweb.proactive.core.body.ft.servers.StartFTServer");
         this.server.startProcess();
         Thread.sleep(3000);
 
@@ -59,6 +62,10 @@ public class Test extends FunctionalTest {
         Collector c = (Collector) ProActive.newActive(Collector.class.getName(),
                 new Object[0]);
 
+        // a *normal* ServiceFailedCalleeNFE could appear; ignore ot for test
+        ProActive.addNFEListenerOnAO(a, new TypedNFEListener(ServiceFailedCalleeNFE.class, NFEListener.NOOP_LISTENER));
+        ProActive.addNFEListenerOnAO(b, new TypedNFEListener(ServiceFailedCalleeNFE.class, NFEListener.NOOP_LISTENER));
+        
         a.initCounter(1);
         b.initCounter(1);
         a.setNeighbour(b);

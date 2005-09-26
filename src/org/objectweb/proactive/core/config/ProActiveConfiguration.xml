@@ -45,7 +45,7 @@
 		<!-- Port number -->
 		<prop key="proactive.p2p.port" value="2410" />
 		<!-- NOA is in number of peers -->
-		<prop key="proactive.p2p.noa" value="10" />
+		<prop key="proactive.p2p.noa" value="3" />
 		<!-- TTU is in ms -->
 		<prop key="proactive.p2p.ttu" value="60000" />
 		<!-- TTL is in hops -->

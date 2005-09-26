@@ -167,6 +167,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             this.addHandler(FT_RESSERVER_TAG, ftch);
             this.addHandler(FT_GLOBALSERVER_TAG, ftch);
             this.addHandler(FT_TTCVALUE_TAG, ftch);
+            this.addHandler(FT_PROTO_TAG, ftch);
         }
 
         public void startContextElement(String name, Attributes attributes)
@@ -199,6 +200,8 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
                 } else if (FT_GLOBALSERVER_TAG.equals(name)) {
                     FaultToleranceHandler.this.ftService.setGlobalServerURL(attributes.getValue(
                             "url"));
+                } else if (FT_PROTO_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setProtocolType(attributes.getValue("type"));
                 }
             }
         }

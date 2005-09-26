@@ -35,6 +35,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +44,12 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
+import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
+import org.objectweb.proactive.core.body.ft.protocols.cic.managers.HalfFTManagerCIC;
+import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.FTManagerPMLRB;
+import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.HalfFTManagerPMLRB;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
@@ -130,6 +137,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected ProActiveSPMDGroupManagerFactory proActiveSPMDGroupManagerFactoryInstance;
     protected ProActiveComponentFactory componentFactoryInstance;
     protected ProActiveSecurityManager proActiveSecurityManager;
+    protected FTManagerFactory ftmanagerFactoryInstance;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -143,6 +151,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
         threadStoreFactoryInstance = newThreadStoreFactorySingleton();
         proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
+        ftmanagerFactoryInstance = newFTManagerFactorySingleton();
     }
 
     /**
@@ -163,6 +172,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
             threadStoreFactoryInstance = newThreadStoreFactorySingleton();
             proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
+            ftmanagerFactoryInstance = newFTManagerFactorySingleton();
         }
     }
 
@@ -223,6 +233,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     public ProActiveComponentFactory newComponentFactory() {
         return componentFactoryInstance;
     }
+    
+    public FTManagerFactory newFTManagerFactory() {
+        return ftmanagerFactoryInstance;
+    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -264,6 +278,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return new ProActiveComponentFactoryImpl(initialComponentParameters);
     }
 
+    protected FTManagerFactory newFTManagerFactorySingleton() {
+        return new FTManagerFactoryImpl();
+    }
+    
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
@@ -403,6 +421,38 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             return new ProActiveComponentImpl(componentParameters, myBody);
         }
     }
+    
+    
+    // FAULT-TOLERANCE
+    protected class FTManagerFactoryImpl implements FTManagerFactory, Serializable {
+        
+        public FTManager newFTManager(int protocolSelector) {
+            switch (protocolSelector) {
+            case FTManagerFactory.PROTO_CIC:
+                return new FTManagerCIC();
+            case FTManagerFactory.PROTO_PML:
+                return new FTManagerPMLRB();
+            default:
+                logger.error("Error while creating fault-tolerance manager : " +
+                		"no protocol is associated to selector value " + protocolSelector);
+            	return null;
+            }
+        }
+        
+        public FTManager newHalfFTManager(int protocolSelector) {
+            switch (protocolSelector) {
+            case FTManagerFactory.PROTO_CIC:
+                return new HalfFTManagerCIC();
+            case FTManagerFactory.PROTO_PML:
+                return new HalfFTManagerPMLRB();
+            default:
+                logger.error("Error while creating fault-tolerance manager : " +
+                		"no protocol is associated to selector value " + protocolSelector);
+            	return null;
+            }
+        }
+    }
+    
 
     // SECURITY
     public void setProActiveSecurityManager(ProActiveSecurityManager psm) {

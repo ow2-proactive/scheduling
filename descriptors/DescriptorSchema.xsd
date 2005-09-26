@@ -497,6 +497,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!-- ftService has -->
 	<xs:complexType name="faultToleranceType">
 		<xs:sequence>
+			<xs:element name="protocol" type="protocolType" minOccurs="1"/>
 			<xs:element name="globalServer" type="serverType" minOccurs="0"/>
 			<xs:element name="locationServer" type="serverType" minOccurs="0"/>
 			<xs:element name="recoveryServer" type="serverType" minOccurs="0"/>
@@ -504,6 +505,16 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="resourceServer" type="serverType" minOccurs="0"/>
 			<xs:element name="ttc" type="ttcType" minOccurs="0"/>
 		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="protocolType">
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="cic"/>
+					<xs:enumeration value="pml"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 	<xs:complexType name="serverType">
 		<xs:attribute name="url" type="xs:string" use="required"/>

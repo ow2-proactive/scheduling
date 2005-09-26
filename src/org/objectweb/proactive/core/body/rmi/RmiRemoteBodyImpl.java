@@ -226,7 +226,7 @@ public class RmiRemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
      */
-    public int receiveFTMessage(FTMessage fte) throws IOException {
+    public Object receiveFTMessage(FTMessage fte) throws IOException {
         return this.body.receiveFTMessage(fte);
     }
 

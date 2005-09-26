@@ -30,11 +30,9 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.security.cert.X509Certificate;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.ft.protocols.cic.HalfFTManagerCIC;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -97,13 +95,13 @@ public class HalfBody extends AbstractBody {
         String ftstate = ProActiveConfiguration.getFTState();
         if ("enable".equals(ftstate)) {
             try {
-                // should use a factory ...
-                this.ftmanager = new HalfFTManagerCIC();
+                // create the fault-tolerance manager
+                int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getFTProtocol());
+                this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
                 this.ftmanager.init(this);
                 if (bodyLogger.isDebugEnabled()) {
                     bodyLogger.debug("Init FTManager on " + this.getNodeURL());
                 }
-                bodyLogger.info("** Fault-Tolerance is enabled **");
             } catch (ProActiveException e) {
                 bodyLogger.error(
                     "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +

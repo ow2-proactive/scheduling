@@ -34,7 +34,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.ft.protocols.cic.FTManagerCIC;
 import org.objectweb.proactive.core.event.*;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
@@ -163,7 +162,7 @@ public class RequestQueueImpl extends AbstractEventProducer
         //System.out.println("  --> RequestQueue.add m="+request.getMethodName());
         // FAULT-TOLERANCE  
         int ftres = FTManager.NON_FT;
-        FTManagerCIC ftm = (FTManagerCIC) (request.getFTManager());
+        FTManager ftm = request.getFTManager();
         if (ftm != null) {
             // null if FT is disable OR if request is an awaited request         
             ftres = ftm.onDeliverRequest(request);

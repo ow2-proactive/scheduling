@@ -28,37 +28,54 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.reply;
+package org.objectweb.proactive.core.util;
 
-import java.io.IOException;
+import java.io.Serializable;
 
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.body.message.Message;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+/**
+ * Defines a mutable, serializable and not final Long.
+ * @author cdelbe
+ */
+public class MutableLong implements Serializable {
 
-
-public interface Reply extends Message {
-    public FutureResult getResult();
-
-    /**
-     * Sends this reply to the body destination
-     * @param destinationBody the body destination of this reply
-     * @return value used by fault-tolerance mechanism.
-     * @exception java.io.IOException if the reply fails to be sent
-     */
-    public int send(UniversalBody destinationBody) throws IOException;
-
-    // SECURITY
-    public boolean isCiphered();
-
-    public long getSessionId();
-
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
+    private long value;
     
-    // AUTOMATIC CONTINUATION
-    public boolean isAutomaticContinuation();        
+    public MutableLong(){}
+    
+    public MutableLong(long value) {
+        this.value = value;
+    }
+
+    public long getValue(){
+        return this.value;
+    }
+    
+    public void setValue(long value){
+        this.value = value;
+    }
+    
+    
+    public long add(long toAdd){
+        this.value+=toAdd;
+        return this.value;
+    }
+      
+    public boolean isLessThan(MutableLong l){
+        return this.value<l.getValue();
+    }
+    
+    public int hashCode(){
+        return (int)this.value;
+    }
+    
+    public boolean equals(Object mi){
+        if (mi instanceof MutableLong) {
+            return this.value==((MutableLong)mi).getValue();
+        } else {
+            return false;
+        }
+    }
+    
+    
     
 }

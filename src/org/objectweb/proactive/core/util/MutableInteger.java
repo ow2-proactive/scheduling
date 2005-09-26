@@ -28,37 +28,48 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.reply;
+package org.objectweb.proactive.core.util;
 
-import java.io.IOException;
+import java.io.Serializable;
 
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureResult;
-import org.objectweb.proactive.core.body.message.Message;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+/**
+ * Defines a mutable, serializable and not final Integer.
+ * @author cdelbe
+ */
+public class MutableInteger implements Serializable {
 
-
-public interface Reply extends Message {
-    public FutureResult getResult();
-
-    /**
-     * Sends this reply to the body destination
-     * @param destinationBody the body destination of this reply
-     * @return value used by fault-tolerance mechanism.
-     * @exception java.io.IOException if the reply fails to be sent
-     */
-    public int send(UniversalBody destinationBody) throws IOException;
-
-    // SECURITY
-    public boolean isCiphered();
-
-    public long getSessionId();
-
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
+    private int value;
     
-    // AUTOMATIC CONTINUATION
-    public boolean isAutomaticContinuation();        
+    public MutableInteger(){}
+    
+    public MutableInteger(int value) {
+        this.value = value;
+    }
+
+    public int getValue(){
+        return this.value;
+    }
+    
+    public void setValue(int value){
+        this.value = value;
+    }
+    
+    
+    public int add(int toAdd){
+        this.value+=toAdd;
+        return this.value;
+    }
+ 
+    public int hashCode(){
+        return this.value;
+    }
+    
+    public boolean equals(Object mi){
+        if (mi instanceof MutableInteger) {
+            return this.value==((MutableInteger)mi).getValue();
+        } else {
+            return false;
+        }
+    }
     
 }

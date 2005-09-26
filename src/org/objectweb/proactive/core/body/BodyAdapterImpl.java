@@ -402,7 +402,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     /* (non-Javadoc)
       * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
       */
-    public int receiveFTMessage(FTMessage ev) throws IOException {
+    public Object receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(ev);
     }
 

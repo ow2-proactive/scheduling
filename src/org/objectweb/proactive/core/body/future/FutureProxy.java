@@ -615,6 +615,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         ID = (long) in.readLong();
         creatorID = (UniqueID) in.readObject();
 
+        // THIS MUST BE DONE WHEN THE SERVER SEND LOGS !!
+        
         if (continuation && isAwaited()) {
             continuation = false;
             FuturePool.registerIncomingFuture(this);

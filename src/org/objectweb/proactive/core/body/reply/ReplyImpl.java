@@ -65,6 +65,10 @@ public class ReplyImpl extends MessageImpl implements Reply,
     protected byte[][] encryptedResult;
     protected boolean ciphered;
 
+    
+    // true if this reply is sent by automatic continuation
+    private boolean isAC;
+    
     /*
      * the session ID used to find the key and decrypt the reply
      */
@@ -76,6 +80,13 @@ public class ReplyImpl extends MessageImpl implements Reply,
         super(senderID, sequenceNumber, true, methodName);
         this.result = result;
         this.psm = psm;
+        this.isAC = false;
+    }
+    
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
+            FutureResult result, ProActiveSecurityManager psm, boolean isAutomaticContinuation) {
+        this(senderID, sequenceNumber, methodName, result, psm);
+        this.isAC = isAutomaticContinuation;
     }
 
     public FutureResult getResult() {
@@ -165,4 +176,14 @@ public class ReplyImpl extends MessageImpl implements Reply,
     public long getSessionId() {
         return sessionID;
     }
+
+    /**
+     * @see org.objectweb.proactive.core.body.reply.Reply#isAutomaticContinuation()
+     */
+    public boolean isAutomaticContinuation() {
+        return this.isAC;
+    }
+
+
+
 }
