@@ -113,14 +113,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** the list of nodes linked to this VirtualNode that have been created*/
     private java.util.ArrayList createdNodes;
-    
+
     /** the list of file transfers to deploy*/
+
     //TODO check if this is the best place to init
     private java.util.ArrayList fileTransferDeploy = new ArrayList();
-    
+
     /** the list of file transfers to retrieve*/
     private java.util.ArrayList fileTransferRetrieve = new ArrayList();
-    
+
     /** index of the last node used */
     private int lastNodeIndex;
 
@@ -282,28 +283,33 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 " with VirtualMachine=" + virtualMachine.getName());
         }
     }
-    
-    public void addFileTransferDeploy(FileTransfer ft){
-    	if(ft==null) return;
-    	
-    	fileTransferDeploy.add(ft);
-    	
-    	if (logger.isDebugEnabled()) {
+
+    public void addFileTransferDeploy(FileTransfer ft) {
+        if (ft == null) {
+            return;
+        }
+
+        fileTransferDeploy.add(ft);
+
+        if (logger.isDebugEnabled()) {
             logger.debug("mapped VirtualNode=" + name +
                 " with FileTransferDeploy id=" + ft.getId());
         }
     }
 
-    public void addFileTransferRetrieve(FileTransfer ft){
-    	if(ft==null) return;
-    	
-    	fileTransferRetrieve.add(ft);
-    	
-    	if (logger.isDebugEnabled()) {
+    public void addFileTransferRetrieve(FileTransfer ft) {
+        if (ft == null) {
+            return;
+        }
+
+        fileTransferRetrieve.add(ft);
+
+        if (logger.isDebugEnabled()) {
             logger.debug("mapped VirtualNode=" + name +
                 " with FileTransferRetrieve id=" + ft.getId());
         }
     }
+
     public VirtualMachine getVirtualMachine() {
         if (virtualMachines.isEmpty()) {
             return null;
@@ -726,11 +732,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
     public void runtimeRegistered(RuntimeRegistrationEvent event) {
-    	if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
-    		forwarderRuntimeRegisteredPerform(event);
-    	} else {
-            runtimeRegisteredPerform(event);	
-    	}
+        if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
+            forwarderRuntimeRegisteredPerform(event);
+        } else {
+            runtimeRegisteredPerform(event);
+        }
     }
 
     private synchronized void forwarderRuntimeRegisteredPerform(
@@ -994,8 +1000,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Waits until all Nodes mapped to this VirtualNode in the XML Descriptor are created
      */
-    private synchronized void waitForAllNodesCreation()
-        throws NodeException {
+    private void waitForAllNodesCreation() throws NodeException {
         int tempNodeCount = nbMappedNodes;
 
         if (tempNodeCount != P2PConstants.MAX_NODE) {
@@ -1011,35 +1016,42 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 e2.printStackTrace();
             }
         } else {
-            // check if we can release the vn before all nodes expected, are created
-            // i.e the minNumber of nodes is set
-            if (minNumberOfNodes != 0) {
-                tempNodeCount = minNumberOfNodes;
-            }
-
-            while (nbCreatedNodes < tempNodeCount) {
-                if (!timeoutExpired()) {
-                    try {
-                        wait(getTimeToSleep());
-                    } catch (InterruptedException e2) {
-                        e2.printStackTrace();
-                    } catch (IllegalStateException e) {
-                        // it may happen that we entered in the loop and just after
-                        // the timeToSleep is < 0. It means that the timeout expired
-                        // that is why we catch the runtime exception
-                        throw new NodeException("After many retries, only " +
-                            nbCreatedNodes + " nodes are created on " +
-                            tempNodeCount + " expected ");
-                    }
-                } else {
-                    throw new NodeException("After many retries, only " +
-                        nbCreatedNodes + " nodes are created on " +
-                        tempNodeCount + " expected");
-                }
-            }
+            //behavior has to be moved in a synchronized method to avoid useless lock
+            // when sleeping
+            internalWait(tempNodeCount);
         }
 
         return;
+    }
+
+    private synchronized void internalWait(int tempNodeCount)
+        throws NodeException {
+        // check if we can release the vn before all nodes expected, are created
+        // i.e the minNumber of nodes is set
+        if (minNumberOfNodes != 0) {
+            tempNodeCount = minNumberOfNodes;
+        }
+
+        while (nbCreatedNodes < tempNodeCount) {
+            if (!timeoutExpired()) {
+                try {
+                    wait(getTimeToSleep());
+                } catch (InterruptedException e2) {
+                    e2.printStackTrace();
+                } catch (IllegalStateException e) {
+                    // it may happen that we entered in the loop and just after
+                    // the timeToSleep is < 0. It means that the timeout expired
+                    // that is why we catch the runtime exception
+                    throw new NodeException("After many retries, only " +
+                        nbCreatedNodes + " nodes are created on " +
+                        tempNodeCount + " expected ");
+                }
+            } else {
+                throw new NodeException("After many retries, only " +
+                    nbCreatedNodes + " nodes are created on " + tempNodeCount +
+                    " expected");
+            }
+        }
     }
 
     private boolean timeoutExpired() {
@@ -1146,19 +1158,21 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 jvmProcess.setJvmOptions(this.ftService.buildParamsLine());
             }
         }
-        
+
         /* Setting the file transfer definitions to be copied */
-        FileTransferWorkShop ftsDeploy=process.getFileTransferWorkShopDeploy();
-        FileTransferWorkShop ftsRetrieve=process.getFileTransferWorkShopRetrieve();
-        
-        if( ftsDeploy != null && ftsDeploy.isImplicit()){
-        	for(int i=0;i<fileTransferDeploy.size();i++)
-        		ftsDeploy.addFileTransfer((FileTransfer)fileTransferDeploy.get(i));
+        FileTransferWorkShop ftsDeploy = process.getFileTransferWorkShopDeploy();
+        FileTransferWorkShop ftsRetrieve = process.getFileTransferWorkShopRetrieve();
+
+        if ((ftsDeploy != null) && ftsDeploy.isImplicit()) {
+            for (int i = 0; i < fileTransferDeploy.size(); i++)
+                ftsDeploy.addFileTransfer((FileTransfer) fileTransferDeploy.get(
+                        i));
         }
-        
-        if(ftsRetrieve !=null && ftsRetrieve.isImplicit()){
-        	for(int i=0;i<fileTransferRetrieve.size();i++)
-        		ftsRetrieve.addFileTransfer((FileTransfer)fileTransferRetrieve.get(i));
+
+        if ((ftsRetrieve != null) && ftsRetrieve.isImplicit()) {
+            for (int i = 0; i < fileTransferRetrieve.size(); i++)
+                ftsRetrieve.addFileTransfer((FileTransfer) fileTransferRetrieve.get(
+                        i));
         }
     }
 
