@@ -48,6 +48,8 @@ import testsuite.test.FunctionalTest;
  *
  */
 public abstract class FunctionalTestManager extends AbstractManager {
+    private int runs = 0;
+    private int errors = 0;
 
     /**
      *
@@ -119,8 +121,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 continue;
             }
 
-            int runs = 0;
-            int errors = 0;
             for (int i = 0; i < getNbRuns(); i++) {
                 Iterator itTest = group.iterator();
                 while (itTest.hasNext()) {
@@ -137,13 +137,13 @@ public abstract class FunctionalTestManager extends AbstractManager {
                                 logger.debug("Result from test " +
                                     test.getName() + " is [FAILED]");
                             }
-                            errors++;
+                            this.errors++;
                         } else {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Result from test " +
                                     test.getName() + " is [SUCCESS]");
                             }
-                            runs++;
+                            this.runs++;
                         }
                     }
                 }
@@ -182,8 +182,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
                     continue;
                 }
 
-                int runs = 0;
-                int errors = 0;
                 for (int i = 0; i < getNbRuns(); i++) {
                     Iterator itTest = group.iterator();
                     while (itTest.hasNext()) {
@@ -195,13 +193,13 @@ public abstract class FunctionalTestManager extends AbstractManager {
                                 logger.debug("Result from test " +
                                     test.getName() + " is [FAILED]");
                             }
-                            errors++;
+                            this.errors++;
                         } else {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Result from test " +
                                     test.getName() + " is [SUCCESS]");
                             }
-                            runs++;
+                            this.runs++;
                         }
                     }
                 }
@@ -235,14 +233,16 @@ public abstract class FunctionalTestManager extends AbstractManager {
         results.add(AbstractResult.IMP_MSG, "... Finish");
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
+            logger.info(">>> Succeeded tests: " + this.runs + " / " +
+                (this.runs + this.errors));
+        }
+        if (this.errors > 0) {
+            logger.fatal(">>> Failed tests: " + this.errors);
         }
 
         // Show Results
         this.showResult();
     }
-
-    private int runs = 0;
-    private int errors = 0;
 
     private void execCascadingTests(ResultsCollections results,
         FunctionalTest test) {
@@ -256,13 +256,13 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 logger.debug("Result from test " + test.getName() +
                     " is [FAILED]");
             }
-            errors++;
+            this.errors++;
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("Result from test " + test.getName() +
                     " is [SUCCESS]");
             }
-            runs++;
+            this.runs++;
         }
     }
 
@@ -332,8 +332,14 @@ public abstract class FunctionalTestManager extends AbstractManager {
         }
 
         results.add(AbstractResult.IMP_MSG, "... Finish");
+        results.add(AbstractResult.IMP_MSG, "... Finish");
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
+            logger.info(">>> Succeeded tests: " + this.runs + " / " +
+                (this.runs + this.errors));
+        }
+        if (this.errors > 0) {
+            logger.fatal(">>> Failed tests: " + this.errors);
         }
     }
 
@@ -371,8 +377,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 continue;
             }
 
-            int runs = 0;
-            int errors = 0;
             for (int i = 0; i < getNbRuns(); i++) {
                 Iterator itTest = group.iterator();
                 while (itTest.hasNext()) {
@@ -418,8 +422,14 @@ public abstract class FunctionalTestManager extends AbstractManager {
         }
 
         results.add(AbstractResult.IMP_MSG, "... Finish");
+        results.add(AbstractResult.IMP_MSG, "... Finish");
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
+            logger.info(">>> Succeeded tests: " + this.runs + " / " +
+                (this.runs + this.errors));
+        }
+        if (this.errors > 0) {
+            logger.fatal(">>> Failed tests: " + this.errors);
         }
 
         this.showResult();
