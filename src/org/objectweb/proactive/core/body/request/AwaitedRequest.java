@@ -34,9 +34,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
@@ -115,16 +117,25 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     private synchronized void waitForRequest() {
         while (!isArrived) {
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Waiting for a request from " +
+//                //if (logger.isDebugEnabled()) {
+//                UniqueID waiter = ProActive.getBodyOnThis().getID();
+//                    logger.info("[WAIT] " + waiter + " is waiting for a request from " +
+//                        this.awaitedSender);
+//                //}
+                this.wait(3000);
+                
+                if (!isArrived){
+                    UniqueID waiter = ProActive.getBodyOnThis().getID();
+                    logger.info("[WAIT] " + waiter + " is waiting for a request from " +
                         this.awaitedSender);
                 }
-                this.wait();
+                
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
+
 
     //// WRAPPED METHODS
     public MethodCall getMethodCall() {
@@ -191,11 +202,11 @@ public class AwaitedRequest implements Request, java.io.Serializable {
         }
     }
 
-    public void setMessageInfo(char[] mi) {
+    public void setMessageInfo(MessageInfo mi) {
         wrappedRequest.setMessageInfo(mi);
     }
 
-    public char[] getMessageInfo() {
+    public MessageInfo getMessageInfo() {
         if (!this.isArrived) {
             return null;
         } else {
