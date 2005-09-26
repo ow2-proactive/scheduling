@@ -292,9 +292,12 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             this.localP2pService.askingNode(TTL, null, this.localP2pService,
                 this.numberOfAskedNodes - this.acquiredNodes, stub,
                 this.vnName, this.jobId);
-
             // Serving request
-            service.blockingServeOldest(LOOKUP_FREQ);
+            if (timeout < LOOKUP_FREQ) {
+                service.blockingServeOldest(500);
+            } else {
+                service.blockingServeOldest(LOOKUP_FREQ);
+            }
             while (service.hasRequestToServe()) {
                 service.serveOldest();
             }
