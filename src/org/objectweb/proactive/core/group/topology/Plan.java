@@ -203,13 +203,12 @@ public class Plan extends Line { // implements Topology2D {
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
-        int begining = column;
         for (int i = 0; i < this.getHeight(); i++) {
             tmp.add(this.get(column + (i * this.getWidth())));
         }
         Line result = null;
         try {
-            result = new Line((Group) tmp, this.getWidth());
+            result = new Line((Group) tmp, this.getHeight());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
