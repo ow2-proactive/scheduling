@@ -217,7 +217,7 @@ public abstract class BenchmarkManager extends AbstractManager {
         createBenchGraph(location.getParentFile());
         createBarCharts(location.getParentFile());
         if (logger.isInfoEnabled()) {
-            logger.info("Create HMTL file ...");
+            logger.info("Creating HTML file ...");
         }
         String xslPath = "/" +
             AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",

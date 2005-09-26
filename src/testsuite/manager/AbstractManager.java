@@ -280,7 +280,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
         if (logger.isInfoEnabled()) {
-            logger.info("Create HMTL file ...");
+            logger.info("Creating HTML file ...");
         }
         String xslPath = "/" +
             AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
