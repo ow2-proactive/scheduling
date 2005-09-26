@@ -267,9 +267,6 @@ public class Manager implements Serializable, InitActive,
         logger.info("Total of results = " + this.allResults.size());
         logger.info("Total of tasks = " + this.taskProvider.size());
         // Set the final result
-        if (this.virtualNode != null) {
-            this.virtualNode.killAll(false);
-        }
         return this.rootTask.gather((Result[]) this.allResults.toArray(
                 new Result[this.allResults.size()]));
     }
@@ -376,5 +373,9 @@ public class Manager implements Serializable, InitActive,
             logger.fatal("Problem to read result file.");
             throw new ProActiveRuntimeException(e);
         }
+    }
+    
+    public VirtualNode getBackVn() {
+    	return this.virtualNode;
     }
 }
