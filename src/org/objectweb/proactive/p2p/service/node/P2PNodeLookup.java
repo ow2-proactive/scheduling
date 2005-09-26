@@ -277,7 +277,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 service.serveOldest();
             }
         }
-        return this.getAndRemoveNodes();
+        return ((P2PNodeLookup) ProActive.getStubOnThis()).getAndRemoveNodes();
     }
 
     /**
@@ -299,7 +299,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 service.serveOldest();
             }
         }
-        return this.getAndRemoveNodes();
+        return ((P2PNodeLookup) ProActive.getStubOnThis()).getAndRemoveNodes();
     }
 
     /**
