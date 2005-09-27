@@ -205,7 +205,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             if (this.spmdManager == null) {
                 this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
             }
-            return this.barrierBlockingRemoveOldest(timeout);
+            return this.barrierBlockingRemove(); // the oospmd way ...
         }
 
         long timeStartWaiting = 0;
@@ -315,6 +315,32 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
                     RequestQueueEvent.REMOVE_REQUEST));
         }
         return r;
+    }
+    
+    /**
+     * Blocks the calling thread until there is a request available
+     * Returns immediately if there is already one. The request returned is non
+     * null unless the thread has been asked not to wait anymore.
+     * @return the request found in the queue.
+     */
+    protected Request barrierBlockingRemove() {
+        while (((this.isEmpty() && this.shouldWait) || this.suspended ||
+                (this.indexOfRequestToServe() == -1)) &&
+                !this.specialExecution) {
+            if (this.hasListeners()) {
+                this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
+                        RequestQueueEvent.WAIT_FOR_REQUEST));
+            }
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+            }
+        }
+        if (this.specialExecution) {
+            this.specialExecution = false;
+            return this.blockingRemoveOldest(this.specialMethod);
+        }
+        return this.barrierRemoveOldest();
     }
 
     /**
