@@ -45,6 +45,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public interface UniversalProcess extends java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
 
+    /* Node count cannot be known  */
+    public static int UNKNOWN_NODE_NUMBER = -19;
+
     /**
      * Returns the current environment for this process. Each
      * cell of the array contains the definition of one variable in a
@@ -105,7 +108,8 @@ public interface UniversalProcess extends java.io.Serializable {
     /**
      * Returns the number of nodes targeted
      * @return the number of nodes targeted. Represents the number of nodes expected to use
-     * when starting this process
+     * when starting this process. If this number cannot be known, waiting for all available nodes
+     * for example, UNKNOWN_NODE_NUMBER is returned.
      */
     public int getNodeNumber();
 
@@ -126,7 +130,7 @@ public interface UniversalProcess extends java.io.Serializable {
      * Starts the FileTransfer if defined for this process.
      */
     public void startFileTransfer();
-    
+
     /**
      * Stops the running process. If called on a stopped process this
      * method has no effect.

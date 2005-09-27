@@ -69,8 +69,12 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
         int num = 0;
 
         //if(oarsite==null) return 0;
-        for (int i = 0; i < oarsite.length; i++)
+        for (int i = 0; i < oarsite.length; i++) {
+            if (oarsite[i].getNodes() == UniversalProcess.UNKNOWN_NODE_NUMBER) {
+                return UniversalProcess.UNKNOWN_NODE_NUMBER;
+            }
             num += (oarsite[i].getNodes() * oarsite[i].getWeight());
+        }
         return num;
     }
 
@@ -333,8 +337,13 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
                 if (resTab[i].indexOf("=") < 0) { //Clustername has no "="
                     clusterName = resTab[i];
                 } else if (resTab[i].indexOf("nodes=") >= 0) {
-                    nodes = Integer.parseInt(resTab[i].substring(resTab[i].indexOf(
-                                    "=") + 1));
+                    String count = resTab[i].substring(resTab[i].indexOf("=") +
+                            1);
+                    if (count.equals("all")) {
+                        nodes = UniversalProcess.UNKNOWN_NODE_NUMBER;
+                    } else {
+                        nodes = Integer.parseInt(count);
+                    }
                 } else if (resTab[i].indexOf("weight=") >= 0) {
                     weight = Integer.parseInt(resTab[i].substring(resTab[i].indexOf(
                                     "=") + 1));

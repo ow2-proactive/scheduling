@@ -123,6 +123,10 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
+        if (hostNumber.equals("all")) {
+            return UniversalProcess.UNKNOWN_NODE_NUMBER;
+        }
+
         return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
     }
 
@@ -318,7 +322,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         }
 
         public void log(String message) {
-            int nbProcessor = (new Integer(hostNumber)).intValue();
+            // int nbProcessor = (new Integer(hostNumber)).intValue();
             String h = parseHostname(message);
         }
 

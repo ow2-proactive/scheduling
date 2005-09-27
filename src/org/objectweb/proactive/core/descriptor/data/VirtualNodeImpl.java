@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -1117,7 +1118,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         protocolId = process.getProcessId();
 
-        increaseNumberOfNodes(process.getNodeNumber() * nodeNumber);
+        int cnt = process.getNodeNumber();
+        if (cnt == UniversalProcess.UNKNOWN_NODE_NUMBER) {
+            waitForTimeout = true;
+        } else {
+            increaseNumberOfNodes(cnt * nodeNumber);
+        }
 
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
