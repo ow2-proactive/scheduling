@@ -116,11 +116,11 @@ public class CNLSFProcess extends LSFBSubProcess {
         bSubCommand.append(targetProcess.getCommand());
         bSubCommand.append(" > ");
         bSubCommand.append(executable);
-        bSubCommand.append(" ; chmod 744 " + executable + "'");
+        bSubCommand.append(" ; chmod 744 " + executable + " ; ");
         bSubCommand.append(command_path);
         bSubCommand.append(" -n " + processor + " ");
         if (getCompositionType() == GIVE_COMMAND_AS_PARAMETER) {
-            bSubCommand.append(scriptLocation + " ");
+            bSubCommand.append(scriptLocation + " '");
         }
         return bSubCommand.toString();
     }
