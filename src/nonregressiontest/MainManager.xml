@@ -66,6 +66,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
+			<unitTest exclude="no" class="nonregressiontest.forwarder.interfaceConsistency.Test" />
 		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
