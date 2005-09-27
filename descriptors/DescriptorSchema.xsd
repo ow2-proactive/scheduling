@@ -1055,7 +1055,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"/>
-					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.RSHHierarchicalProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHHierarchicalProcess"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
