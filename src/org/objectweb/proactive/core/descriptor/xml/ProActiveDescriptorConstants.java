@@ -76,6 +76,7 @@ public interface ProActiveDescriptorConstants {
     public static final String PRUN_PROCESS_TAG = "prunProcess";
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
+    public static final String NG_PROCESS_TAG = "ngProcess";
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String HIERARCHICAL_PROCESS_TAG = "hierarchicalProcess";
     public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
@@ -93,7 +94,7 @@ public interface ProActiveDescriptorConstants {
     public static final String RES_REQ_TAG = "resourceRequirement";
     public static final String SCRIPT_PATH_TAG = "scriptPath";
     public static final String GLOBUS_OPTIONS_TAG = "globusOption";
-    public static final String GLOBUS_COUNT_TAG = "count";
+    public static final String COUNT_TAG = "count";
     public static final String GLOBUS_MAXTIME_TAG = "maxTime";
     public static final String PRUN_OPTIONS_TAG = "prunOption";
     public static final String PROCESSOR_TAG = "processor";
@@ -109,6 +110,8 @@ public interface ProActiveDescriptorConstants {
     public static final String OARGRID_OPTIONS_TAG = "oarGridOption";
     public static final String OAR_RESOURCE_TAG = "resources";
     public static final String OARGRID_WALLTIME_TAG = "walltime";
+    public static final String NG_OPTIONS_TAG = "ngOption";
+    public static final String EXECUTABLE_TAG = "executable";
 
     //public static final String OAR_PROPERTY_TAG="properties";
     public static final String VARIABLE_TAG = "variable";

@@ -590,6 +590,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="prunProcess" type="prunProcessType"/>
 			<xs:element name="gridEngineProcess" type="sgeProcessType"/>
 			<xs:element name="unicoreProcess" type="unicoreProcessType"/>
+			<xs:element name="ngProcess" type="NGProcessType"/>
 			<xs:element name="hierarchicalProcess" type="hierarchicalProcessType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
@@ -801,9 +802,17 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="bsubOption" type="BsubOptionType" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"/>
+		<xs:attribute name="class" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.lsf.CNLSFProcess"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
+		<xs:attribute name="jobname" type="xs:string" use="optional"/>
 		<xs:attribute name="queue" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -1043,7 +1052,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
-		<xs:simpleType>
+			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess"/>
 					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.RSHHierarchicalProcess"/>
@@ -1054,5 +1063,29 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 		<xs:attribute name="internal_ip" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="NGProcessType">
+		<xs:sequence>
+			<xs:element ref="environment" minOccurs="0"/>
+			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="ngOption" type="NGOptionType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.nordugrid.NGProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+		<xs:attribute name="hostname" type="xs:string" use="required"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
+		<xs:attribute name="jobname" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<!--globusOption element has one child count element-->
+	<xs:complexType name="NGOptionType">
+		<xs:sequence>
+			<xs:element name="executable" type="FilePathType" minOccurs="0"/>
+			<xs:element name="count" type="xs:positiveInteger" minOccurs="0"/>
+			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
+			<xs:element name="errorFile" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

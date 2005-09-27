@@ -60,9 +60,9 @@ import org.objectweb.proactive.core.util.MessageLogger;
  * @since   ProActive 0.9.4
  */
 public class LSFBSubProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
+    protected static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
+    protected static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
             "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
         "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
         FILE_SEPARATOR + "startRuntime.sh ";
@@ -82,6 +82,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     protected String processor = DEFAULT_PROCESSOR_NUMBER;
     protected String interactive = "false";
     protected String res_requirement = "";
+    protected String jobname;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -283,6 +284,9 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
         if (hostList != null) {
             bSubCommand.append("-m " + hostList + " ");
         }
+        if(jobname != null){
+        	bSubCommand.append("-J " + jobname + " ");
+        }
         if (getCompositionType() == GIVE_COMMAND_AS_PARAMETER) {
             bSubCommand.append(getRes_requirement() + scriptLocation + " " +
                 getTargetProcess().getCommand());
@@ -435,4 +439,12 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
         public void log(String message, Throwable t) {
         }
     } // end inner class CompositeMessageLogger
+
+	public String getJobname() {
+		return jobname;
+	}
+
+	public void setJobname(String jobname) {
+		this.jobname = jobname;
+	}
 }

@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.nordugrid.NGProcess;
 import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
 import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
@@ -97,6 +98,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         this.addHandler(PROCESS_LIST_BYHOST_TAG, handler);
         this.addHandler(UNICORE_PROCESS_TAG,
             new UnicoreProcessHandler(proActiveDescriptor));
+        this.addHandler(NG_PROCESS_TAG,
+            new NGProcessHandler(proActiveDescriptor));
     }
 
     /**
@@ -137,8 +140,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             addHandler(ENVIRONMENT_TAG, new EnvironmentHandler());
             addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
             addHandler(COMMAND_PATH_TAG, new CommandPathHanlder());
-			addHandler(FILE_TRANSFER_DEPLOY_TAG, new FileTransferStructureHandler("deploy"));
-			addHandler(FILE_TRANSFER_RETRIEVE_TAG, new FileTransferStructureHandler("retrieve"));
+            addHandler(FILE_TRANSFER_DEPLOY_TAG,
+                new FileTransferStructureHandler("deploy"));
+            addHandler(FILE_TRANSFER_RETRIEVE_TAG,
+                new FileTransferStructureHandler("retrieve"));
         }
 
         public void startContextElement(String name, Attributes attributes)
@@ -277,84 +282,87 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
         }
 
-		protected class FileTransferStructureHandler extends PassiveCompositeUnmarshaller {
-			
-			/* Specifies the queue to use in the FileTransferStructure
-			 * For now this queues are:
-			 * 		FileTransferStructure.DEPLOY
-			 * 		FileTransferStructure.RETRIEVE
-			 */
-			protected String fileTransferQueue;
-			protected FileTransferWorkShop fileTransferStructure;
-			
-			public FileTransferStructureHandler(String queue){
-				super();
-				fileTransferQueue=queue;
-				fileTransferStructure=null; //defined later in the startContextElement
-				
-				addHandler(FILE_TRANSFER_COPY_PROTOCOL_TAG, new SingleValueUnmarshaller());
-				addHandler(FILE_TRANSFER_SRC_INFO_TAG, new InfoAttributeHandler());
-				addHandler(FILE_TRANSFER_DST_INFO_TAG, new InfoAttributeHandler());	
-			}
+        protected class FileTransferStructureHandler
+            extends PassiveCompositeUnmarshaller {
 
-			protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
-					throws org.xml.sax.SAXException {
-				
-				if (name.equals(FILE_TRANSFER_COPY_PROTOCOL_TAG)) {
-					fileTransferStructure.setFileTransferCopyProtocol(
-							(String)activeHandler.getResultObject());
-				}
-			}
-			
-			public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException {
-				
-				if(fileTransferQueue.equalsIgnoreCase("deploy"))
-					fileTransferStructure=targetProcess.getFileTransferWorkShopDeploy();
-				else //if(fileTransferQueue.equalsIgnoreCase("retrieve"))
-					fileTransferStructure=targetProcess.getFileTransferWorkShopRetrieve();
-				
-				String ftRefId = attributes.getValue("refid");
-				if (!checkNonEmpty(ftRefId)) {
-					throw new org.xml.sax.SAXException(
-							name+" defined without 'refid' attribute");
-				}
-				
-				if(ftRefId.equalsIgnoreCase(FILE_TRANSFER_IMPLICT_KEYWORD)){
-					fileTransferStructure.setImplicit(true);
-				}
-				else{
-					fileTransferStructure.setImplicit(false);
-					fileTransferStructure.addFileTransfer(proActiveDescriptor.getFileTransfer(ftRefId));
-				}
-			}
-			
-			protected class InfoAttributeHandler extends BasicUnmarshaller {
-				public void startContextElement(String name, Attributes attributes)
-						throws org.xml.sax.SAXException {
-					
-					String[] parameter = {"prefix", "hostname", "username", "password"};
-					
-					for(int i=0; i<parameter.length;i++){
-						String value = attributes.getValue(parameter[i]);
-						
-						if(checkNonEmpty(value)){
-							
-							if(name.equals(FILE_TRANSFER_SRC_INFO_TAG))
-								fileTransferStructure.setFileTransferStructureSrcInfo(
-									parameter[i], value);
-							else if(name.equals(FILE_TRANSFER_DST_INFO_TAG))
-								fileTransferStructure.setFileTransferStructureDstInfo(
-										parameter[i], value);
-							else
-								System.err.println("Error skipping unknown tag name:"+name);
-						}
-					}
-				}
-				
-				
-			} //end InfoAttributeHandler class
-		} //end FileTransferStructure class        
+            /* Specifies the queue to use in the FileTransferStructure
+             * For now this queues are:
+             *                 FileTransferStructure.DEPLOY
+             *                 FileTransferStructure.RETRIEVE
+             */
+            protected String fileTransferQueue;
+            protected FileTransferWorkShop fileTransferStructure;
+
+            public FileTransferStructureHandler(String queue) {
+                super();
+                fileTransferQueue = queue;
+                fileTransferStructure = null; //defined later in the startContextElement
+
+                addHandler(FILE_TRANSFER_COPY_PROTOCOL_TAG,
+                    new SingleValueUnmarshaller());
+                addHandler(FILE_TRANSFER_SRC_INFO_TAG,
+                    new InfoAttributeHandler());
+                addHandler(FILE_TRANSFER_DST_INFO_TAG,
+                    new InfoAttributeHandler());
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                if (name.equals(FILE_TRANSFER_COPY_PROTOCOL_TAG)) {
+                    fileTransferStructure.setFileTransferCopyProtocol((String) activeHandler.getResultObject());
+                }
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                if (fileTransferQueue.equalsIgnoreCase("deploy")) {
+                    fileTransferStructure = targetProcess.getFileTransferWorkShopDeploy();
+                } else { //if(fileTransferQueue.equalsIgnoreCase("retrieve"))
+                    fileTransferStructure = targetProcess.getFileTransferWorkShopRetrieve();
+                }
+
+                String ftRefId = attributes.getValue("refid");
+                if (!checkNonEmpty(ftRefId)) {
+                    throw new org.xml.sax.SAXException(name +
+                        " defined without 'refid' attribute");
+                }
+
+                if (ftRefId.equalsIgnoreCase(FILE_TRANSFER_IMPLICT_KEYWORD)) {
+                    fileTransferStructure.setImplicit(true);
+                } else {
+                    fileTransferStructure.setImplicit(false);
+                    fileTransferStructure.addFileTransfer(proActiveDescriptor.getFileTransfer(
+                            ftRefId));
+                }
+            }
+
+            protected class InfoAttributeHandler extends BasicUnmarshaller {
+                public void startContextElement(String name,
+                    Attributes attributes) throws org.xml.sax.SAXException {
+                    String[] parameter = {
+                            "prefix", "hostname", "username", "password"
+                        };
+
+                    for (int i = 0; i < parameter.length; i++) {
+                        String value = attributes.getValue(parameter[i]);
+
+                        if (checkNonEmpty(value)) {
+                            if (name.equals(FILE_TRANSFER_SRC_INFO_TAG)) {
+                                fileTransferStructure.setFileTransferStructureSrcInfo(parameter[i],
+                                    value);
+                            } else if (name.equals(FILE_TRANSFER_DST_INFO_TAG)) {
+                                fileTransferStructure.setFileTransferStructureDstInfo(parameter[i],
+                                    value);
+                            } else {
+                                System.err.println(
+                                    "Error skipping unknown tag name:" + name);
+                            }
+                        }
+                    }
+                }
+            } //end InfoAttributeHandler class
+        } //end FileTransferStructure class        
     }
 
     public class ProcessListHandler extends ProcessHandler
@@ -1014,6 +1022,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             if (checkNonEmpty(queueName)) {
                 ((LSFBSubProcess) targetProcess).setQueueName(queueName);
             }
+            String jobName = (attributes.getValue("jobname"));
+
+            if (checkNonEmpty(jobName)) {
+                ((LSFBSubProcess) targetProcess).setJobname(jobName);
+            }
         }
 
         protected class BsubOptionHandler extends PassiveCompositeUnmarshaller {
@@ -1070,7 +1083,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
         protected class GlobusOptionHandler extends PassiveCompositeUnmarshaller {
             public GlobusOptionHandler() {
-                this.addHandler(GLOBUS_COUNT_TAG, new SingleValueUnmarshaller());
+                this.addHandler(COUNT_TAG, new SingleValueUnmarshaller());
                 this.addHandler(GLOBUS_MAXTIME_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
@@ -1088,7 +1101,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 // in globus option!!!
                 GlobusProcess globusProcess = (GlobusProcess) targetProcess;
 
-                if (name.equals(GLOBUS_COUNT_TAG)) {
+                if (name.equals(COUNT_TAG)) {
                     globusProcess.setCount((String) activeHandler.getResultObject());
                 } else if (name.equals(GLOBUS_MAXTIME_TAG)) {
                     globusProcess.setMaxTime((String) activeHandler.getResultObject());
@@ -1106,167 +1119,237 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     //end of inner class GlobusProcessHandler
+    protected class UnicoreProcessHandler extends ProcessHandler {
+        public UnicoreProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            this.addHandler(UNICORE_OPTIONS_TAG, new UnicoreOptionHandler());
 
-	protected class UnicoreProcessHandler extends ProcessHandler {
-		public UnicoreProcessHandler(ProActiveDescriptor proActiveDescriptor) {
-			super(proActiveDescriptor);
-			this.addHandler(UNICORE_OPTIONS_TAG, new UnicoreOptionHandler());
+            UnmarshallerHandler pathHandler = new PathHandler();
+            BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+            bch.addHandler(ABS_PATH_TAG, pathHandler);
+            bch.addHandler(REL_PATH_TAG, pathHandler);
+            this.addHandler(UNICORE_DIR_PATH_TAG, bch);
 
-			UnmarshallerHandler pathHandler = new PathHandler();
-			BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
-			bch.addHandler(ABS_PATH_TAG, pathHandler);
-			bch.addHandler(REL_PATH_TAG, pathHandler);
-			this.addHandler(UNICORE_DIR_PATH_TAG, bch);
+            pathHandler = new PathHandler();
+            bch = new BasicUnmarshallerDecorator();
+            bch.addHandler(ABS_PATH_TAG, pathHandler);
+            bch.addHandler(REL_PATH_TAG, pathHandler);
+            this.addHandler(UNICORE_KEYFILE_PATH_TAG, bch);
 
-			pathHandler = new PathHandler();
-			bch = new BasicUnmarshallerDecorator();
-			bch.addHandler(ABS_PATH_TAG, pathHandler);
-			bch.addHandler(REL_PATH_TAG, pathHandler);
-			this.addHandler(UNICORE_KEYFILE_PATH_TAG, bch);
-			
-			CollectionUnmarshaller cu = new CollectionUnmarshaller(
-					String.class);
-			cu.addHandler(ABS_PATH_TAG, pathHandler);
-			cu.addHandler(REL_PATH_TAG, pathHandler);
-			//cu.addHandler(JVMPARAMETER_TAG, new SimpleValueHandler());
-		}
+            CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
+            cu.addHandler(ABS_PATH_TAG, pathHandler);
+            cu.addHandler(REL_PATH_TAG, pathHandler);
 
-		public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException {
-			super.startContextElement(name, attributes);
+            //cu.addHandler(JVMPARAMETER_TAG, new SimpleValueHandler());
+        }
 
-			String jobName = (attributes.getValue("jobname"));
-			if (checkNonEmpty(jobName)) {
-				((UnicoreProcess) targetProcess).uParam.setUsiteName(jobName);
-			}
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            super.startContextElement(name, attributes);
 
-			String keyPassword = (attributes.getValue("keypassword"));
-			if (checkNonEmpty(keyPassword)) {
-				((UnicoreProcess) targetProcess).uParam.setKeyPassword(keyPassword);
-			}
+            String jobName = (attributes.getValue("jobname"));
 
-			String submitJob = (attributes.getValue("submitjob"));
-			if (checkNonEmpty(submitJob)) {
-				((UnicoreProcess) targetProcess).uParam.setSubmitJob(submitJob);
-			}
+            if (checkNonEmpty(jobName)) {
+                ((UnicoreProcess) targetProcess).uParam.setUsiteName(jobName);
+            }
 
-			String saveJob = (attributes.getValue("savejob"));
-			if (checkNonEmpty(saveJob)) {
-				((UnicoreProcess) targetProcess).uParam.setSaveJob(saveJob);
-			}
-		}
+            String keyPassword = (attributes.getValue("keypassword"));
 
-		protected void notifyEndActiveHandler(String name,
-				UnmarshallerHandler activeHandler)
-				throws org.xml.sax.SAXException {
+            if (checkNonEmpty(keyPassword)) {
+                ((UnicoreProcess) targetProcess).uParam.setKeyPassword(keyPassword);
+            }
 
-			if (name.equals(UNICORE_DIR_PATH_TAG)) {
-				((UnicoreProcess) targetProcess).uParam.setUnicoreDir((String)
-						activeHandler.getResultObject());
-			}
-			else if (name.equals(UNICORE_KEYFILE_PATH_TAG)) {
-				((UnicoreProcess) targetProcess).uParam.setKeyFilePath((String)
-						activeHandler.getResultObject());
-			} 
-			else {
-				super.notifyEndActiveHandler(name, activeHandler);
-			}
+            String submitJob = (attributes.getValue("submitjob"));
 
-		}
+            if (checkNonEmpty(submitJob)) {
+                ((UnicoreProcess) targetProcess).uParam.setSubmitJob(submitJob);
+            }
 
-		protected class UnicoreOptionHandler extends
-				PassiveCompositeUnmarshaller {
-			public UnicoreOptionHandler() {
+            String saveJob = (attributes.getValue("savejob"));
 
-				this.addHandler(UNICORE_USITE_TAG,
-						new UsiteHandler());
-				this.addHandler(UNICORE_VSITE_TAG,
-						new VsiteHandler());
-			}
+            if (checkNonEmpty(saveJob)) {
+                ((UnicoreProcess) targetProcess).uParam.setSaveJob(saveJob);
+            }
+        }
 
-			public void startContextElement(String name, Attributes attributes)
-					throws org.xml.sax.SAXException {
-			}
-/*
-			protected void notifyEndActiveHandler(String name,
-					UnmarshallerHandler activeHandler)
-					throws org.xml.sax.SAXException {
-				//OARGRIDSubProcess oarGridSubProcess = (OARGRIDSubProcess)
-				// targetProcess;
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            if (name.equals(UNICORE_DIR_PATH_TAG)) {
+                ((UnicoreProcess) targetProcess).uParam.setUnicoreDir((String) activeHandler.getResultObject());
+            } else if (name.equals(UNICORE_KEYFILE_PATH_TAG)) {
+                ((UnicoreProcess) targetProcess).uParam.setKeyFilePath((String) activeHandler.getResultObject());
+            } else {
+                super.notifyEndActiveHandler(name, activeHandler);
+            }
+        }
 
-				if (name.equals(UNICORE_USITE_TAG)) {
-					//  oarGridSubProcess.setResources((String)
-					// activeHandler.getResultObject());
-					System.out.println(activeHandler.getResultObject());
-				} else {
-					super.notifyEndActiveHandler(name, activeHandler);
-				}
-			}*/
-		}
+        protected class UnicoreOptionHandler
+            extends PassiveCompositeUnmarshaller {
+            public UnicoreOptionHandler() {
+                this.addHandler(UNICORE_USITE_TAG, new UsiteHandler());
+                this.addHandler(UNICORE_VSITE_TAG, new VsiteHandler());
+            }
 
-		protected class UsiteHandler extends PassiveCompositeUnmarshaller {
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
 
-			public UsiteHandler() {
+            /*
+               protected void notifyEndActiveHandler(String name,
+                               UnmarshallerHandler activeHandler)
+                               throws org.xml.sax.SAXException {
+                       //OARGRIDSubProcess oarGridSubProcess = (OARGRIDSubProcess)
+                       // targetProcess;
+                       if (name.equals(UNICORE_USITE_TAG)) {
+                               //  oarGridSubProcess.setResources((String)
+                               // activeHandler.getResultObject());
+                               System.out.println(activeHandler.getResultObject());
+                       } else {
+                               super.notifyEndActiveHandler(name, activeHandler);
+                       }
+               }*/
+        }
 
-			}
+        protected class UsiteHandler extends PassiveCompositeUnmarshaller {
+            public UsiteHandler() {
+            }
 
-			public void startContextElement(String name, Attributes attributes)
-					throws org.xml.sax.SAXException {
-				super.startContextElement(name, attributes);
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                super.startContextElement(name, attributes);
 
-				String usiteName = (attributes.getValue("name"));
-				if (checkNonEmpty(usiteName)) {
-					((UnicoreProcess) targetProcess).uParam.setUsiteName(usiteName);
-				}
-				String type = (attributes.getValue("type"));
-				if (checkNonEmpty(type)) {
-					((UnicoreProcess) targetProcess).uParam.setUsiteType(type);
-				}
-				String url = (attributes.getValue("url"));
-				if (checkNonEmpty(url)) {
-					((UnicoreProcess) targetProcess).uParam.setUsiteUrl(url);
-				}
-			}
-		}
-		
-		protected class VsiteHandler extends PassiveCompositeUnmarshaller {
+                String usiteName = (attributes.getValue("name"));
 
-			public VsiteHandler() {
-			}
+                if (checkNonEmpty(usiteName)) {
+                    ((UnicoreProcess) targetProcess).uParam.setUsiteName(usiteName);
+                }
 
-			public void startContextElement(String name, Attributes attributes)
-					throws org.xml.sax.SAXException {
-				super.startContextElement(name, attributes);
+                String type = (attributes.getValue("type"));
 
-				String vsiteName = (attributes.getValue("name"));
-				if (checkNonEmpty(vsiteName)) {
-					((UnicoreProcess) targetProcess).uParam.setVsiteName(vsiteName);
-				}
-				String nodes = (attributes.getValue("nodes"));
-				if (checkNonEmpty(nodes)) {
-					((UnicoreProcess) targetProcess).uParam.setVsiteNodes(Integer.parseInt(nodes));
-				}
-				String processors = (attributes.getValue("processors"));
-				if (checkNonEmpty(processors)) {
-					((UnicoreProcess) targetProcess).uParam.setVsiteProcessors(Integer.parseInt(processors));
-				}
-				String memory = (attributes.getValue("memory"));
-				if (checkNonEmpty(memory)) {
-					((UnicoreProcess) targetProcess).uParam.setVsiteMemory(Integer.parseInt(memory));
-				}
-				String runtime = (attributes.getValue("runtime"));
-				if (checkNonEmpty(runtime)) {
-					((UnicoreProcess) targetProcess).uParam.setVsiteRuntime(Integer.parseInt(runtime));
-				}
-				
-				String priority = (attributes.getValue("priority"));
-				if (checkNonEmpty(priority)) {
-					((UnicoreProcess) targetProcess).uParam.setVsitePriority(priority);
-				}
-			}
-		}
-	}//end of Unicore Process Handler
-	
+                if (checkNonEmpty(type)) {
+                    ((UnicoreProcess) targetProcess).uParam.setUsiteType(type);
+                }
+
+                String url = (attributes.getValue("url"));
+
+                if (checkNonEmpty(url)) {
+                    ((UnicoreProcess) targetProcess).uParam.setUsiteUrl(url);
+                }
+            }
+        }
+
+        protected class VsiteHandler extends PassiveCompositeUnmarshaller {
+            public VsiteHandler() {
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                super.startContextElement(name, attributes);
+
+                String vsiteName = (attributes.getValue("name"));
+
+                if (checkNonEmpty(vsiteName)) {
+                    ((UnicoreProcess) targetProcess).uParam.setVsiteName(vsiteName);
+                }
+
+                String nodes = (attributes.getValue("nodes"));
+
+                if (checkNonEmpty(nodes)) {
+                    ((UnicoreProcess) targetProcess).uParam.setVsiteNodes(Integer.parseInt(
+                            nodes));
+                }
+
+                String processors = (attributes.getValue("processors"));
+
+                if (checkNonEmpty(processors)) {
+                    ((UnicoreProcess) targetProcess).uParam.setVsiteProcessors(Integer.parseInt(
+                            processors));
+                }
+
+                String memory = (attributes.getValue("memory"));
+
+                if (checkNonEmpty(memory)) {
+                    ((UnicoreProcess) targetProcess).uParam.setVsiteMemory(Integer.parseInt(
+                            memory));
+                }
+
+                String runtime = (attributes.getValue("runtime"));
+
+                if (checkNonEmpty(runtime)) {
+                    ((UnicoreProcess) targetProcess).uParam.setVsiteRuntime(Integer.parseInt(
+                            runtime));
+                }
+
+                String priority = (attributes.getValue("priority"));
+
+                if (checkNonEmpty(priority)) {
+                    ((UnicoreProcess) targetProcess).uParam.setVsitePriority(priority);
+                }
+            }
+        }
+    } //end of Unicore Process Handler
+
+    //end of Unicore Process Handler
+    protected class NGProcessHandler extends ProcessHandler {
+        public NGProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            this.addHandler(NG_OPTIONS_TAG, new NGOptionHandler());
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            super.startContextElement(name, attributes);
+            String jobname = (attributes.getValue("jobname"));
+            if (checkNonEmpty(jobname)) {
+                ((NGProcess) targetProcess).setJobname(jobname);
+            }
+
+            String queueName = (attributes.getValue("queue"));
+            if (checkNonEmpty(queueName)) {
+                ((NGProcess) targetProcess).setQueue(queueName);
+            }
+        }
+
+        protected class NGOptionHandler extends PassiveCompositeUnmarshaller {
+            public NGOptionHandler() {
+                this.addHandler(COUNT_TAG, new SingleValueUnmarshaller());
+                this.addHandler(OUTPUT_FILE, new SingleValueUnmarshaller());
+                this.addHandler(ERROR_FILE, new SingleValueUnmarshaller());
+                BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+                UnmarshallerHandler pathHandler = new PathHandler();
+                bch.addHandler(ABS_PATH_TAG, pathHandler);
+                bch.addHandler(REL_PATH_TAG, pathHandler);
+                this.addHandler(EXECUTABLE_TAG, bch);
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                // we know that it is a globus process since we are
+                // in globus option!!!
+                NGProcess ngProcess = (NGProcess) targetProcess;
+
+                if (name.equals(COUNT_TAG)) {
+                    ngProcess.setCount((String) activeHandler.getResultObject());
+                } else if (name.equals(OUTPUT_FILE)) {
+                    ngProcess.setStdout((String) activeHandler.getResultObject());
+                } else if (name.equals(ERROR_FILE)) {
+                    ngProcess.setStderr((String) activeHandler.getResultObject());
+                } else if (name.equals(EXECUTABLE_TAG)) {
+                    ngProcess.setExecutable((String) activeHandler.getResultObject());
+                } else {
+                    super.notifyEndActiveHandler(name, activeHandler);
+                }
+            }
+        }
+
+        //end of inner class GlobusOptionHandler
+    }
+
     private class SimpleValueHandler extends BasicUnmarshaller {
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
