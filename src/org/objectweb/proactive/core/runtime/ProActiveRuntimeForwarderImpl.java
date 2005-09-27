@@ -940,4 +940,54 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
         return null;
     }
+
+	public String getJobID(UniqueRuntimeID urid) {
+	       if (urid == null) {
+	            return this.getJobID();
+	        } else {
+	            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+
+	            if (part != null) {
+	                return part.getJobID();
+	            } else {
+	                logger.warn("No runtime associated to this urid (" + urid +
+	                    ")");
+	            }
+	        }
+
+	        return null;
+	}
+
+	public void launchMain(UniqueRuntimeID urid, String className, String[] parameters) throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
+	       if (urid == null) {
+	            this.launchMain(className, parameters);
+	        } else {
+	            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+
+	            if (part != null) {
+	                part.launchMain(className, parameters);
+	            } else {
+	                logger.warn("No runtime associated to this urid (" + urid +
+	                    ")");
+	            }
+	        }
+
+		
+	}
+
+	public void newRemote(UniqueRuntimeID urid, String className) throws ClassNotFoundException, ProActiveException {
+	       if (urid == null) {
+	            this.newRemote(className);
+	        } else {
+	            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+
+	            if (part != null) {
+	                part.newRemote(className);
+	            } else {
+	                logger.warn("No runtime associated to this urid (" + urid +
+	                    ")");
+	            }
+	        }
+		
+	}
 }

@@ -147,6 +147,9 @@ public interface UniversalBodyForwarder {
     public int fireNFE(UniqueID id, NonFunctionalException e)
         throws java.io.IOException;
 
+    
+    // These four ones are needed because call is tramsited to the 
+    // original body *adapter* on the forwarder    
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException;
 

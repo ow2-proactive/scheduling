@@ -239,6 +239,20 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
     public byte[] getClassDataFromParentRuntime(UniqueRuntimeID urid,
         String className) throws ProActiveException;
 
+    /**
+     * @see ProActiveRuntime#launchMain(String, String[])
+     */
+    public void launchMain(UniqueRuntimeID urid, String className,
+        String[] parameters)
+        throws ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException;
+
+    /**
+     * @see ProActiveRuntime#newRemote(String)
+     */
+    public void newRemote(UniqueRuntimeID urid, String className)
+        throws ClassNotFoundException, ProActiveException;
+
     // 
     // -- SECURITY
     //    
@@ -287,4 +301,7 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
 
     public ProActiveDescriptor getDescriptor(UniqueRuntimeID urid, String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException;
+
+    // Interface: Job
+    public String getJobID(UniqueRuntimeID urid);
 }
