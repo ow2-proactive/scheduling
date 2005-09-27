@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Vector;
 
 import org.xml.sax.SAXException;
 
@@ -81,7 +82,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
             logger.info("Starting ...");
         }
         ResultsCollections results = getResults();
-
+        Vector listOfFailed = new Vector();
         if (useAttributesFile) {
             try {
                 loadAttributes();
@@ -137,6 +138,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
                                 logger.debug("Result from test " +
                                     test.getName() + " is [FAILED]");
                             }
+                            listOfFailed.add(test.getName());
                             this.errors++;
                         } else {
                             if (logger.isDebugEnabled()) {
@@ -193,6 +195,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
                                 logger.debug("Result from test " +
                                     test.getName() + " is [FAILED]");
                             }
+                            listOfFailed.add(test.getName());
                             this.errors++;
                         } else {
                             if (logger.isDebugEnabled()) {
@@ -237,7 +240,13 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 (this.runs + this.errors));
         }
         if (this.errors > 0) {
-            logger.fatal(">>> Failed tests: " + this.errors);
+            logger.fatal("---------------------------------");
+            logger.fatal(">>> FAILED TESTS: ");
+            Iterator it = listOfFailed.iterator();
+            while (it.hasNext()) {
+                logger.fatal("\t" + it.next());
+            }
+            logger.fatal("---------------------------------");
         }
 
         // Show Results
@@ -349,6 +358,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
         }
         ResultsCollections results = getResults();
 
+        Vector listOfFailed = new Vector();
         results.add(AbstractResult.IMP_MSG, "Starting ...");
         try {
             initManager();
@@ -388,6 +398,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
                             logger.debug("Result from test " + test.getName() +
                                 " is [FAILED]");
                         }
+                        listOfFailed.add(test.getName());
                         errors++;
                     } else {
                         if (logger.isDebugEnabled()) {
@@ -429,7 +440,13 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 (this.runs + this.errors));
         }
         if (this.errors > 0) {
-            logger.fatal(">>> Failed tests: " + this.errors);
+            logger.fatal("---------------------------------");
+            logger.fatal(">>> FAILED TESTS: ");
+            Iterator it = listOfFailed.iterator();
+            while (it.hasNext()) {
+                logger.fatal("\t" + it.next());
+            }
+            logger.fatal("---------------------------------");
         }
 
         this.showResult();
