@@ -30,12 +30,14 @@
  */
 package org.objectweb.proactive.branchnbound.core;
 
-import java.io.Serializable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import java.io.Serializable;
+
+import java.util.Vector;
 
 
 /**
@@ -47,32 +49,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public abstract class Task implements Serializable, Comparable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
-
-    /**
-     * The params of the task.
-     */
-    protected Object[] params = null;
     protected Result initLowerBound;
     protected Result initUpperBound;
     protected Worker worker = null;
+    protected Object bestKnownResult = null;
 
     /**
      * The no arg constructor for ProActive.
      */
     public Task() {
         // nothing to do
-    }
-
-    /**
-     * Construct a new task with given params and pre-computed bounds.
-     * @param params the params of the tasks.
-     * @param initLowerBound the lower bound.
-     * @param initUpperBound the upper bound.
-     */
-    public Task(Object[] params, Result initLowerBound, Result initUpperBound) {
-        this.params = params;
-        this.initLowerBound = initLowerBound;
-        this.initUpperBound = initUpperBound;
     }
 
     /**
@@ -139,6 +125,14 @@ public abstract class Task implements Serializable, Comparable {
             return -1;
         } else {
             return 1;
+        }
+    }
+
+    public void setBestKnownResult(Object newBestKnownResult) {
+        if (this.bestKnownResult != null) {
+            synchronized (this.bestKnownResult) {
+                this.bestKnownResult = newBestKnownResult;
+            }
         }
     }
 }

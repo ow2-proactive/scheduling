@@ -58,6 +58,7 @@ public class Worker implements Serializable {
     private TaskQueue taskProvider = null;
     private String workerNodeUrl = null;
     private Group workerGroupCollection = null;
+    private Task currentTask = null;
 
     /**
      * The active object empty constructor
@@ -90,13 +91,18 @@ public class Worker implements Serializable {
             activedTask = (Task) ProActive.turnActive(ProActive.getFutureValue(
                         task), workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
+            this.currentTask = activedTask;
+            ProActive.setImmediateService(this.currentTask, "setBestKnownResult");
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't actived the task", e);
             exception = e;
         } catch (NodeException e) {
             logger.fatal("A problem with the task's node", e);
             exception = e;
-        }
+        } catch (Exception e) {
+        	logger.fatal("Failed immediate service", e);
+			exception = e;
+		}
         if (activedTask != null) {
             activedTask.initLowerBound();
             activedTask.initUpperBound();
@@ -160,6 +166,14 @@ public class Worker implements Serializable {
         if ((this.bestCurrentResult == null) ||
                 newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
+            if (this.currentTask != null) {
+                try {
+					this.currentTask.setBestKnownResult(this.bestCurrentResult.getResult());
+				} catch (NoResultsException e) {
+					// This catch is never throwed
+					logger.fatal("Houston we have a problem!!");
+				}
+            }
             logger.info("I was informed from a new remote best result: " +
                 this.bestCurrentResult);
         }
