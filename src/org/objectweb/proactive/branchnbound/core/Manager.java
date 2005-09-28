@@ -86,6 +86,10 @@ public class Manager implements Serializable, InitActive,
     private Vector allResults = new Vector();
     private String queueType = null;
     private VirtualNode virtualNode = null;
+    private Vector reallocatedTasks = new Vector();
+    private int reallocatedBase = -1;
+    private Iterator pendingTasksIt = this.pendingTaskList.iterator();
+    private VirtualNode[] arrayOfVirtualNodes = null;
 
     /**
      * The no args constructor for ProActive.
@@ -112,6 +116,11 @@ public class Manager implements Serializable, InitActive,
         this.virtualNode = virtualNode;
     }
 
+    public Manager(VirtualNode[] virtualNodes, String queueType) {
+        this.queueType = queueType;
+        this.arrayOfVirtualNodes = virtualNodes;
+    }
+
     public Manager(Node[] workerNodes, String queueType) {
         this.queueType = queueType;
         this.nodes = workerNodes;
@@ -128,10 +137,27 @@ public class Manager implements Serializable, InitActive,
         this.virtualNode = virtualNode;
     }
 
+    public Manager(Task root, VirtualNode[] virtualNodes, Node myNode,
+        String queueType) {
+        this(root, myNode, queueType);
+        this.arrayOfVirtualNodes = virtualNodes;
+    }
+
     public void initActivity(Body body) {
         if (this.virtualNode != null) {
             ((VirtualNodeImpl) this.virtualNode).addNodeCreationEventListener(this);
             this.virtualNode.activate();
+        } else if (this.arrayOfVirtualNodes != null) {
+            for (int i = 0; i < this.arrayOfVirtualNodes.length; i++) {
+                VirtualNodeImpl currentVn = (VirtualNodeImpl) this.arrayOfVirtualNodes[i];
+                if (currentVn.isActivated()) {
+                    logger.warn("The VN " + currentVn.getName() +
+                        " is already actived");
+                    continue;
+                }
+                currentVn.addNodeCreationEventListener(this);
+                currentVn.activate();
+            }
         }
 
         try {
@@ -237,6 +263,9 @@ public class Manager implements Serializable, InitActive,
             try {
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
                 backupCounter++;
+                if (enableRealloc && (this.reallocatedBase != -1)) {
+                    // TODO check if is a reallocated task
+                }
                 this.allResults.add(this.futureTaskList.remove(index));
                 this.pendingTaskList.remove(index);
                 Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
@@ -257,9 +286,19 @@ public class Manager implements Serializable, InitActive,
                     }
                 }
             } catch (ProActiveException e) {
+                // Reallocating tasks
                 if (enableRealloc && (this.freeWorkerList.size() > 0)) {
-                    // Reallocating tasks
-                    // TODO
+                    if (this.reallocatedBase == -1) {
+                        // Fix the base for using modulo on future list
+                        this.reallocatedBase = this.pendingTaskList.size();
+                    }
+                    Task nextTask = null;
+                    if (!this.pendingTasksIt.hasNext()) {
+                        this.pendingTasksIt = this.pendingTaskList.iterator();
+                    }
+                    nextTask = (Task) this.pendingTasksIt.next();
+                    this.assignTaskToWorker((Worker) this.freeWorkerList.remove(
+                            0), nextTask);
                 }
                 continue;
             }
@@ -374,8 +413,8 @@ public class Manager implements Serializable, InitActive,
             throw new ProActiveRuntimeException(e);
         }
     }
-    
+
     public VirtualNode getBackVn() {
-    	return this.virtualNode;
+        return this.virtualNode;
     }
 }

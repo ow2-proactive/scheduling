@@ -76,6 +76,12 @@ public class ProActiveBranchNBound {
             virtualNode, BasicQueueImpl.class.getName());
     }
 
+    public static Manager newFarm(Task root, VirtualNode[] virtualNodes)
+        throws ActiveObjectCreationException, NodeException {
+        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
+            virtualNodes, BasicQueueImpl.class.getName());
+    }
+
     public static Manager newFarmWithLargerQueue(Task root, Node managerNode,
         Node[] nodes) throws ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
@@ -88,6 +94,13 @@ public class ProActiveBranchNBound {
         assert virtualNode.isActivated() == false : "The virtual must be not actived";
         return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
             virtualNode, LargerQueueImpl.class.getName());
+    }
+
+    public static Manager newFarmWithLargerQueue(Task root,
+        VirtualNode[] virtualNodes)
+        throws ActiveObjectCreationException, NodeException {
+        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
+            virtualNodes, LargerQueueImpl.class.getName());
     }
 
     public static Manager newFarmWithSpecifiedQueue(Task root,
@@ -113,8 +126,20 @@ public class ProActiveBranchNBound {
         return ProActiveBranchNBound.activingTheManager(args);
     }
 
+    public static Manager newFarmWithSpecifiedQueue(Task root,
+        VirtualNode[] virtualNodes, String queueType)
+        throws ActiveObjectCreationException, NodeException {
+        Object[] args = new Object[4];
+        args[0] = root;
+        args[1] = virtualNodes;
+        args[2] = null;
+        args[3] = queueType;
+        return ProActiveBranchNBound.activingTheManager(args);
+    }
+
     public static Manager newFarmFromBackup(File taskFile, File resultFile,
-        Node managerNode, Node[] nodes) throws ActiveObjectCreationException, NodeException {
+        Node managerNode, Node[] nodes)
+        throws ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
             resultFile, managerNode, nodes, BasicQueueImpl.class.getName());
     }
@@ -127,8 +152,17 @@ public class ProActiveBranchNBound {
             resultFile, virtualNode, BasicQueueImpl.class.getName());
     }
 
+    public static Manager newFarmFromBackup(File taskFile, File resultFile,
+        VirtualNode[] virtualNodes)
+        throws IOException, ClassNotFoundException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
+            resultFile, virtualNodes, BasicQueueImpl.class.getName());
+    }
+
     public static Manager newFarmFromBackupWithLargerQueue(File taskFile,
-        File resultFile, Node managerNode, Node[] nodes) throws ActiveObjectCreationException, NodeException {
+        File resultFile, Node managerNode, Node[] nodes)
+        throws ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
             resultFile, managerNode, nodes, LargerQueueImpl.class.getName());
     }
@@ -141,12 +175,33 @@ public class ProActiveBranchNBound {
             resultFile, virtualNode, LargerQueueImpl.class.getName());
     }
 
+    public static Manager newFarmFromBackupWithLargerQueue(File taskFile,
+        File resultFile, VirtualNode[] virtualNodes)
+        throws IOException, ClassNotFoundException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
+            resultFile, virtualNodes, LargerQueueImpl.class.getName());
+    }
+
     public static Manager newFarmFromBackupWithSpecifiedQueue(File taskFile,
         File resultFile, VirtualNode virtualNode, String queueType)
         throws ActiveObjectCreationException, NodeException {
         assert virtualNode.isActivated() == false : "The virtual must be not actived";
         Object[] args = new Object[2];
         args[0] = virtualNode;
+        args[1] = queueType;
+        Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
+                args, NodeFactory.getDefaultNode());
+        manager.loadTasks(taskFile);
+        manager.loadResults(resultFile);
+        return manager;
+    }
+
+    public static Manager newFarmFromBackupWithSpecifiedQueue(File taskFile,
+        File resultFile, VirtualNode[] virtualNodes, String queueType)
+        throws ActiveObjectCreationException, NodeException {
+        Object[] args = new Object[2];
+        args[0] = virtualNodes;
         args[1] = queueType;
         Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
                 args, NodeFactory.getDefaultNode());
@@ -175,7 +230,8 @@ public class ProActiveBranchNBound {
                                              : (Node) args[2];
         args[2] = managerNode;
         assert args[0] instanceof Task : args[0];
-        assert args[1] instanceof Node[] || args[1] instanceof VirtualNode : args[1];
+        assert args[1] instanceof Node[] || args[1] instanceof VirtualNode ||
+        args[1] instanceof VirtualNode[] : args[1];
         assert args[2] instanceof Node : args[2];
         assert args[3] instanceof TaskQueue : args[3];
 
