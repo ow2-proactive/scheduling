@@ -497,7 +497,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!-- ftService has -->
 	<xs:complexType name="faultToleranceType">
 		<xs:sequence>
-			<xs:element name="protocol" type="protocolType" minOccurs="1"/>
+			<xs:element name="protocol" type="protocolType"/>
 			<xs:element name="globalServer" type="serverType" minOccurs="0"/>
 			<xs:element name="locationServer" type="serverType" minOccurs="0"/>
 			<xs:element name="recoveryServer" type="serverType" minOccurs="0"/>
@@ -941,7 +941,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<xs:complexType name="sgeProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
-			<xs:element ref="commandPath"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="gridEngineOption" type="GridEngineOptionType"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess"/>
