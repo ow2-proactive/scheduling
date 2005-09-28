@@ -59,7 +59,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 
 public class ProActiveRuntimeAdapterForwarderImpl
-    extends ProActiveRuntimeAdapter implements Serializable {
+    extends ProActiveRuntimeAdapter implements Serializable, Cloneable {
     private UniqueRuntimeID urid; // Cached for speed issue
     protected RemoteProActiveRuntimeForwarder proActiveRuntime;
     protected String proActiveRuntimeURL;
@@ -116,7 +116,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
             }
 
             try {
-                proActiveRuntime = (RemoteProActiveRuntimeForwarder) RuntimeFactory.getDefaultRuntime();
+                proActiveRuntime = ((ProActiveRuntimeAdapterForwarderImpl) RuntimeFactory.getDefaultRuntime()).proActiveRuntime;
             } catch (ProActiveException e) {
                 runtimeLogger.warn(e);
             }
@@ -154,7 +154,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
         try {
             return proActiveRuntime.createLocalNode(urid, nodeName,
                 replacePreviousBinding, psm, vnName, jobId);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new NodeException(e);
         }
     }
