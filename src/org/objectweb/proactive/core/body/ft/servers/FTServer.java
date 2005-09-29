@@ -387,4 +387,16 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     public void setResourceServer(ResourceServer resourceServer) {
         this.resourceServer = resourceServer;
     }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#initialize()
+     */
+    public void initialize() throws RemoteException {
+        System.out.println("[GLOBAL] Reinitializing server ...");
+        this.checkpointServer.initialize();
+        this.locationServer.initialize();
+        this.recoveryProcess.initialize();
+        this.resourceServer.initialize();
+        System.out.println("[GLOBAL] Server reinitialized");
+    }
 }

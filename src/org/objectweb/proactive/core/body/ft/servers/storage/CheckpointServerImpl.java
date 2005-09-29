@@ -38,7 +38,15 @@ import java.rmi.RemoteException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
+import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
+import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 
 
@@ -50,6 +58,9 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     //logger
     protected static Logger logger = Logger.getLogger(CheckpointServer.class.getName());
 
+    // used memory
+    private final static Runtime runtime = Runtime.getRuntime();
+    
     // global server
     protected FTServer server;
 
@@ -102,5 +113,22 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
             e.printStackTrace();
             return 0;
         }
+    }
+
+    /*
+     * Return the memory actually used
+     * For debugging stuff.
+     */
+    protected long getUsedMem() {
+        return (CheckpointServerImpl.runtime.totalMemory() -
+                CheckpointServerImpl.runtime.freeMemory()) / 1024;
+    }
+    
+    
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#initialize()
+     */
+    public void initialize() throws RemoteException {
+        this.checkpointStorage = new Hashtable();
     }
 }

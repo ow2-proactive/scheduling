@@ -76,4 +76,9 @@ public interface LocationServer extends Remote {
      * @return the current known location of a registred body.
      */
     public UniversalBody getLocation(UniqueID id) throws RemoteException;
+    
+    /**
+     * Reinit the state of the location server.
+     */
+    public void initialize() throws RemoteException;;
 }

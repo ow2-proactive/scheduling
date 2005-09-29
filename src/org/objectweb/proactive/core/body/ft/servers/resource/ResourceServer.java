@@ -56,4 +56,11 @@ public interface ResourceServer extends Remote {
      * @return an available node
      */
     public Node getFreeNode() throws RemoteException;
+    
+  
+    /**
+     * Reinit the state of the resource server.
+     */
+    public void initialize() throws RemoteException;
+    
 }

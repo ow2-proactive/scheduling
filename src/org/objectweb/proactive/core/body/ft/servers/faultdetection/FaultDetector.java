@@ -92,4 +92,10 @@ public interface FaultDetector extends Remote {
      * @throws RemoteException
      */
     public void forceDetection() throws RemoteException;
+    
+    
+    /**
+     * Reinit the state of the fault detector
+     */
+    public void initialize() throws RemoteException;
 }

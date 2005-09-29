@@ -84,7 +84,6 @@ public class ReceptionHistory implements Serializable {
         // replaced by toAdd
         if (toAddBase > (this.lastCommited + 1)) {
             // history is not contigue
-            System.out.println("HISTORIC IS NOT CONTIGUE ??");
             this.elements = toAdd;
             this.base = toAddBase;
             this.lastCommited = toAddLast;
@@ -116,23 +115,16 @@ public class ReceptionHistory implements Serializable {
             throw new ProtocolErrorException(
                 "nextBase is lower than current base !");
         }
-
-        System.out.println("" + id + "goToNextBase from " + this.base + " to " +
-            nextBase + " with size of histo = " + this.elements.size());
-
         int shift = (int) (nextBase - this.base);
-
         // particular case : shift==histo_size
         // minimal histo is empty for this checkpoint
         if (shift == (this.elements.size() + 1)) {
-            System.out.println("" + id + " histo is empty !");
             this.elements.clear();
             this.base = nextBase;
         } else {
             this.elements.subList(0, shift).clear();
             this.base = nextBase;
         }
-        System.out.println("After gnb : histo size = " + this.elements.size());
     }
 
     public void confirmLastUpdate() {
@@ -156,8 +148,6 @@ public class ReceptionHistory implements Serializable {
         if (this.lastCommited == this.lastRecoverable) {
             return this.elements;
         } else {
-            System.out.println(
-                "OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
             Vector toRet = new Vector();
             int histoSize = this.elements.size();
             for (int i = 0; i <= (this.lastRecoverable - this.base); i++) {

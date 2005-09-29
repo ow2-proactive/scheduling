@@ -153,4 +153,11 @@ public interface CheckpointServer extends Remote {
      */
     public void storeReply(UniqueID receiverID, Reply reply)
         throws RemoteException;
+    
+    
+    /**
+     * Reinit the state of the location server.
+     */
+    public void initialize() throws RemoteException;
+
 }

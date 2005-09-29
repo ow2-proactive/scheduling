@@ -63,7 +63,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      */
     public int storeCheckpoint(Checkpoint c, int incarnation)
         throws RemoteException {
-        logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing...");
+        logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." + " (used memory = " + this.getUsedMem() + " Kb)");
         UniqueID caller = c.getBodyID();
         Object already = this.checkpointStorage.get(caller);
 
@@ -126,9 +126,10 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
         if (c != null) {
             CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (c.getCheckpointInfo());
             ci.addRequest(request);
-        } else {
+        } 
+        //else {
             //System.out.println(" ****** NOT LOGGED REQUEST ****** ");
-        }
+        //}
     }
 
     /**

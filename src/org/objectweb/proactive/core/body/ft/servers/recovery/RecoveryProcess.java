@@ -103,4 +103,10 @@ public interface RecoveryProcess extends Remote {
      * @throws RemoteException
      */
     public int getSystemSize() throws RemoteException;
+    
+    
+    /**
+     * Reinit the state of the recovery process.
+     */
+    public void initialize() throws RemoteException;
 }

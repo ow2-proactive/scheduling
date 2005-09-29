@@ -60,7 +60,6 @@ public class RecoveryJob implements ActiveQueueJob {
 
     public void doTheJob() {
         try {
-            // PASSING URL IS OK ?????
             receiver.getProActiveRuntime().receiveCheckpoint(receiver.getNodeInformation()
                                                                      .getURL(),
                 toSend, incarnation);

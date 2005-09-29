@@ -120,7 +120,6 @@ public class FTManagerCIC
 
     // history
     private Vector history;
-
     // cannot lock hisotry itself, because it is modified in synchronized blocks !
     private final Character historyLock = new Character('l');
 
@@ -315,7 +314,7 @@ public class FTManagerCIC
         reply.setMessageInfo(this.forSentReply);
 
         // output commit
-        if (this.isOutputCommit(reply)) {
+        if (FTManagerCIC.isOCEnable && this.isOutputCommit(reply)) {
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug(this.ownerID +
@@ -345,7 +344,7 @@ public class FTManagerCIC
         request.setMessageInfo(this.forSentRequest);
 
         // output commit
-        if (this.isOutputCommit(request)) {
+        if (FTManagerCIC.isOCEnable && this.isOutputCommit(request)) {
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug(this.ownerID +
@@ -664,11 +663,11 @@ public class FTManagerCIC
 
                     // record the next history base index
                     ci.lastRcvdRequestIndex = this.deliveredRequestsCounter;
-                    logger.info("" + this.ownerID + " : Checkpoint " +
-                        this.checkpointIndex + " -> lastReceivedRequest = " +
-                        ci.lastRcvdRequestIndex + " ; Histo size = " +
-                        historyTMP.size() + " ; Queue size : " +
-                        this.owner.getRequestQueue().size()); // + " ; Pending Rq : " + pendingRequest);
+//                    logger.debug("" + this.ownerID + " : Checkpoint " +
+//                        this.checkpointIndex + " -> lastReceivedRequest = " +
+//                        ci.lastRcvdRequestIndex + " ; Histo size = " +
+//                        historyTMP.size() + " ; Queue size : " +
+//                        this.owner.getRequestQueue().size()); // + " ; Pending Rq : " + pendingRequest);
 
                     // checkpoint the active object
                     this.setCheckpointTag(true);
@@ -724,9 +723,6 @@ public class FTManagerCIC
             }
 
             // HISTO COMMIT
-            System.out.println("" + this.ownerID + " is committing from " +
-                (this.lastCommitedIndex + 1) + " up to " + upTo +
-                " for checkpoint " + indexOfCkpt); // ; size of commited = " + histoToCommit.size());
             List histoToCommit = this.getHistoryToCommit(this.lastCommitedIndex +
                     1, upTo);
 

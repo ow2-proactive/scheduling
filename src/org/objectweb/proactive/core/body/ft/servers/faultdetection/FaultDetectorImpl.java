@@ -125,11 +125,20 @@ public class FaultDetectorImpl implements FaultDetector {
      * @author cdelbe
      */
     private class FaultDetectorThread extends Thread {
+        
+        private boolean kill;
+        
         public FaultDetectorThread() {
+            this.kill = false;
             this.setName("FaultDetectorThread");
         }
 
         public synchronized void wakeUp() {
+            notifyAll();
+        }
+        
+        public synchronized void killMe() {
+            this.kill = true;
             notifyAll();
         }
 
@@ -144,12 +153,14 @@ public class FaultDetectorImpl implements FaultDetector {
         public void run() {
             while (true) {
                 try {
+                    if (kill) break;
                     //synchronized (FaultDetectorImpl.this.server){
                     ArrayList al = FaultDetectorImpl.this.server.getAllLocations();
                     Iterator it = al.iterator();
                     logger.info("[FAULT DETECTOR] Scanning " + al.size() +
                         " objects ...");
                     while (it.hasNext()) {
+                        if (kill) break;
                         UniversalBody current = (UniversalBody) (it.next());
 
                         //((RemoteServer)current)
@@ -160,7 +171,7 @@ public class FaultDetectorImpl implements FaultDetector {
                         }
                     }
                     logger.info("[FAULT DETECTOR] End scanning.");
-                    //}
+                    if (kill) break;
                     this.pause();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -169,24 +180,12 @@ public class FaultDetectorImpl implements FaultDetector {
         }
     }
 
-    //	private class HeartbeatSenderJob implements ActiveQueueJob {
-    //
-    //	    private FTServer server;
-    //	    private UniversalBody toTest;
-    //	    
-    //	    public HeartbeatSenderJob (FTServer server, UniversalBody toTest){
-    //	        this.server = server;
-    //	        this.toTest = toTest;
-    //	    }
-    //	    
-    //        /* (non-Javadoc)
-    //         * @see org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob#doTheJob()
-    //         */
-    //        public void doTheJob() {
-    //            // TODO Auto-generated method stub
-    //            
-    //        }
-    //	    
-    //	}
-    //    
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#initialize()
+     */
+    public void initialize() throws RemoteException {
+        this.fdt.killMe();
+        this.fdt = new FaultDetectorThread();
+    }
+
 }

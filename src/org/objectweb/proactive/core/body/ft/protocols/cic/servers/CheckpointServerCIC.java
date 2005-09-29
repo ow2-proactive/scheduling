@@ -74,7 +74,8 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
     /** Period of the checkpoints garbage collection (ms) */
     public static final int DEFAULT_GC_PERIOD = 40000;
-
+    
+    
     //monitoring latest global state
     private Hashtable stateMonitor; //ckpt index -> number of stored checkpoint
     private int lastGlobalState;
@@ -92,6 +93,9 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     // handling histories
     private Hashtable histories;
 
+    // garbage collection
+    private ActiveQueue gc;
+    
     // profiling
     private boolean displayCkptSize;
 
@@ -111,7 +115,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         this.histories = new Hashtable();
 
         // garbage collection
-        ActiveQueue gc = new ActiveQueue("ActiveQueue: GC");
+        this.gc = new ActiveQueue("ActiveQueue: GC");
         gc.start();
         gc.addJob(new GarbageCollectionJob(this, DEFAULT_GC_PERIOD));
 
@@ -167,8 +171,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
 
         //this.checkLastGlobalState();
+        
         logger.info("[CKPT] Receive checkpoint indexed " + index +
-            " from body " + c.getBodyID()); // + "[" + System.currentTimeMillis() + "]");
+                " from body " + c.getBodyID() + " (used memory = " + this.getUsedMem() + " Kb)"); // + "[" + System.currentTimeMillis() + "]");
+        
         if (displayCkptSize) {
             logger.info("[CKPT] Size of ckpt " + index + " before addInfo : " +
                 this.getSize(c) + " bytes");
@@ -176,22 +182,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
         // broadcast history closure if a new globalState is built
         if (this.checkLastGlobalState()) {
-            //		    try {
-            //		        System.out.println("Broadcasting GSCE !!");
-            //		        //this.server.broadcastFTEvent(new GlobalStateCompletion(this.lastGlobalState));
-            //		        
-            //		    } catch (RemoteException e) {
-            //		        // an active object seems to be failed ...
-            //		        this.server.forceDetection();
-            //		    }
             // send a GSC message to all
             Enumeration all = this.checkpointStorage.keys();
             while (all.hasMoreElements()) {
                 UniqueID callee = (UniqueID) (all.nextElement());
-
-                //		        ActiveQueueJob job = new GSCESender(this.server,callee,new GlobalStateCompletion(this.lastGlobalState));
-                //		        ((ActiveQueue)(this.activeQueuePool.get(counter))).addJob(job);
-                //		        counter = ((counter+1)%nbActiveQueues);
                 this.server.submitJob(new GSCESender(this.server, callee,
                         new GlobalStateCompletion(this.lastGlobalState)));
             }
@@ -317,18 +311,11 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     //return true if the recoveryline has changed
     // Recovery increase only 1 by 1 ... TO DO
     private boolean checkRecoveryLine() {
-        System.out.println("CheckpointServerCIC.checkRecoveryLine()");
         try {
             int systemSize = this.server.getSystemSize();
             int lastRecoveryLine = this.recoveryLine;
             MutableInteger nextPossible = (MutableInteger) (this.recoveryLineMonitor.get(new MutableInteger(this.recoveryLine +
                         1)));
-
-            System.out.println("NextPossible = " + nextPossible);
-            if (nextPossible == null) {
-                Thread.dumpStack();
-            }
-
             // THIS PART MUST BE ATOMIC
             if ((nextPossible != null) &&
                     (nextPossible.getValue() == systemSize)) {
@@ -414,14 +401,13 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                 CheckpointInfoCIC cic = (CheckpointInfoCIC) (toSend.getCheckpointInfo());
                 ReceptionHistory histo = ((ReceptionHistory) (this.histories.get(current)));
                 cic.history = (Vector) histo.getRecoverableHistory();
-                System.out.println("Histo SIZE = " +
-                    ((CheckpointInfoCIC) (toSend.getCheckpointInfo())).history.size());
                 // set the last commited index
                 cic.lastCommitedIndex = histo.getLastRecoverable();
 
                 if (current.equals(failed)) {
                     //look for a new Runtime for this oa
                     Node node = this.server.getFreeNode();
+                    //if (node==null)return;
                     barriers.add(this.server.submitJobWithBarrier(
                             new RecoveryJob(toSend, this.globalIncarnation, node)));
                 } else {
@@ -435,6 +421,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                     }
                     if (isDead) {
                         Node node = this.server.getFreeNode();
+                        //if (node==null)return;
                         barriers.add(this.server.submitJobWithBarrier(
                                 new RecoveryJob(toSend, this.globalIncarnation,
                                     node)));
@@ -451,12 +438,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             // MUST WAIT THE TERMINAISON OF THE RECOVERY !
             // FaultDetection thread wait for the completion of the recovery
             // If a failure occurs during rec, it will be detected by an active object
-            System.out.println("BEFORE BARRIER");
             Iterator itBarriers = barriers.iterator();
             while (itBarriers.hasNext()) {
                 ((JobBarrier) (itBarriers.next())).waitForJobCompletion();
             }
-            System.out.println("AFTER BARRIER");
         } catch (NodeException e) {
             logger.error(
                 "[RECOVERY] **ERROR** Unable to send checkpoint for recovery");
@@ -478,12 +463,12 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         Hashtable vectorClock = ((MessageInfoCIC) mi).vectorClock;
 
         // must store at least each histo up to vectorClock[id]       
-        Enumeration enum = vectorClock.keys();
+        Enumeration enumClocks = vectorClock.keys();
 
         // THIS PART MUST BE ATOMIC AND THREADED !
         // <ATOMIC>
-        while (enum.hasMoreElements()) {
-            UniqueID id = (UniqueID) (enum.nextElement());
+        while (enumClocks.hasMoreElements()) {
+            UniqueID id = (UniqueID) (enumClocks.nextElement());
             MutableLong ml = (MutableLong) vectorClock.get(id);
             ReceptionHistory ih = (ReceptionHistory) (this.histories.get(id));
 
@@ -520,6 +505,25 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             element.confirmLastUpdate();
         }
     }
+    
+    
+    public void initialize() throws RemoteException {
+        super.initialize();
+        this.stateMonitor = new Hashtable();
+        this.lastGlobalState = 0;
+        this.greatestCommitedHistory = new Hashtable();
+        this.recoveryLineMonitor = new Hashtable();
+        this.recoveryLine = 0;
+        this.lastRegisteredCkpt = 0;
+        this.globalIncarnation = 1;
+        this.histories = new Hashtable();
+        // kill GC thread
+        gc.killMe();
+        gc = new ActiveQueue("ActiveQueue: GC");
+        gc.start();
+        gc.addJob(new GarbageCollectionJob(this, DEFAULT_GC_PERIOD));
+    }
+    
 
     //////////////////////////////////////////
     ////// JOBS FOR ACTIVE QUEUE /////////////
@@ -572,9 +576,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                         }
                     }
                 }
-                Runtime r = Runtime.getRuntime();
-                long usedMem = (r.totalMemory() - r.freeMemory()) / 1024;
-                System.out.println("[CKPT] Used memory : " + usedMem + " Kb");
             }
         }
     }
@@ -620,134 +621,4 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
     }
 
-    //    /*
-    //	 * This class defines the element of this.histories. We just add the historized index of 
-    //	 * the first and the last element of the vector.
-    //	 * @author cdelbe
-    //	 */
-    //	private static class IndexedHistory implements Serializable{
-    //	    
-    //	    // the elements of the history
-    //	    private List elements;
-    //	    
-    //	    // the historized index of the last element 
-    //	    private long lastCommited; 
-    //	    
-    //	    // the historized index of the first element
-    //	    private long base;
-    //
-    //	    // the last usable elements : the list elements can be longer that needed
-    //	    // if this histo has been updated but not commited
-    //	    private long lastRecoverable;
-    //	    
-    //	    /**
-    //	     * Constructor
-    //	     */
-    //	    public IndexedHistory (){
-    //	        this.elements = new Vector();
-    //	        this.lastCommited = -1;
-    //	        this.lastRecoverable = -1;
-    //	        this.base = 0;
-    //	    }
-    //	    
-    //	    /**
-    //	     * Update this history up to last;
-    //	     * @param base the historized index of the first element of elts
-    //	     * @param last the historized index of the last element of elts
-    //	     * @param elts the elements to add to the history
-    //	     */
-    //	    public void updateHistory(long toAddBase, long toAddLast, List toAdd){
-    //
-    //	        //System.out.println("update histo toAddBase=" + toAddBase + " ; toAddLast=" + toAddLast + " ; this.lastCommited=" + this.lastCommited);
-    //	        
-    //	        // if there is a gap between lastCommited and toAddBase, we can
-    //	        // suppose that this gap is commited. The current history is then 
-    //	        // replaced by toAdd
-    //	        if (toAddBase>this.lastCommited+1){
-    //	            // history is not contigue
-    //	            System.out.println("HISTORIC IS NOT CONTIGUE ??");
-    //	            this.elements = toAdd;
-    //	            this.base = toAddBase;
-    //	            this.lastCommited = toAddLast;
-    //	        } else if (this.lastCommited<toAddLast){
-    //	            // history is contigue 
-    //	            Iterator it=toAdd.iterator();
-    //	            // shift in elts up to this.lastCommited+1
-    //	            for (long i=toAddBase;i<=this.lastCommited;i++){
-    //	                it.next();
-    //	            }
-    //	            // add the rest to this.elements
-    //	            while (it.hasNext()){
-    //	                this.elements.add(it.next());
-    //	            }
-    //	            this.lastCommited = toAddLast;
-    //	        }
-    //	    }
-    //	    
-    //	    /**
-    //	     * This method is called when elements between base and nextBase are no more
-    //	     * usefull : there a included in the state represented by the last recovery line.
-    //	     */
-    //	    // UNIQUEID FOR DEBUGGING
-    //	    public void goToNextBase(UniqueID id, long nextBase){
-    //	        if (nextBase<this.base){
-    //	            throw new ProtocolErrorException("nextBase is lower than current base !");
-    //	        }
-    //	        
-    //	        System.out.println(""+ id + "goToNextBase from " + this.base + " to "+ nextBase + " with size of histo = " + this.elements.size());
-    //	            
-    //	        
-    //	        int shift = (int)(nextBase - this.base);
-    //	        // particular case : shift==histo_size
-    //	        // minimal histo is empty for this checkpoint
-    //	        if ( shift == (this.elements.size()+1)) {
-    //	            System.out.println(""+id+ " histo is empty !");
-    //	            this.elements.clear();
-    //	            this.base = nextBase;
-    //	        } else {      
-    //	            this.elements.subList(0,shift).clear();	        
-    //	            this.base= nextBase;
-    //	        }
-    //	        System.out.println("After gnb : histo size = " + this.elements.size());
-    //	    }
-    //	 
-    //	    
-    //	    public void confirmLastUpdate(){
-    //	        this.lastRecoverable=this.lastCommited;
-    //	    }
-    //	    
-    //	    public long getLastCommited(){
-    //	        return this.lastCommited;
-    //	    }
-    //
-    //	    /**  
-    //	     * Called only on recovery of the system. If recoverable hisotry is different from
-    //	     * stored history, stored history is replaced by recoverable history.
-    //	     * @return the recoverable hisotry;
-    //	     */
-    //	    public List getRecoverableHistory(){
-    //	        if (this.lastCommited == this.lastRecoverable){
-    //	            return this.elements;
-    //	        }else{
-    //	            System.out.println("OKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-    //	            Vector toRet = new Vector();
-    //	            int histoSize = this.elements.size();
-    //	            for (int i = 0; i<=(this.lastRecoverable-this.base);i++){
-    //	                toRet.add(this.elements.get(i));
-    //	            }
-    //	            // DELETE FROM LASTREC TO LASTCOMMITED !!!
-    //	            this.elements = toRet;
-    //	            return toRet;
-    //	        }
-    //	    }
-    //	    
-    //	    
-    //	    // delete hisotry from LastRec to LastCommited
-    //	    public void compactHistory(){
-    //	        if (this.lastCommited>this.lastRecoverable){
-    //	            this.elements.subList((int)(this.lastRecoverable+1-this.base),(int)(this.lastCommited+1-this.base));
-    //	            this.lastCommited = this.lastRecoverable;
-    //	        }
-    //	    }
-    //	}
 }

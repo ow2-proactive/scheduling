@@ -63,6 +63,7 @@ public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
 
             //look for a new Runtime for this oa
             Node node = this.server.getFreeNode();
+            //if (node==null)return;
             RecoveryJob job = new RecoveryJob(toSend,
                     FTManagerPMLRB.DEFAULT_TTC_VALUE, node);
             this.submitJob(job);

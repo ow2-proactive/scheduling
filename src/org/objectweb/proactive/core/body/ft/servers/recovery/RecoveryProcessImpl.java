@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.ft.servers.recovery;
 
 import java.rmi.RemoteException;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -162,4 +163,21 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     public int getSystemSize() throws RemoteException {
         return this.bodies.size();
     }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#initialize()
+     */
+    public void initialize() throws RemoteException {
+        this.bodies = new Hashtable();
+        // killing activeQueues
+        Iterator itAQ = this.activeQueuePool.iterator();
+        while (itAQ.hasNext()){
+            ((ActiveQueue)(itAQ.next())).killMe();
+        }        
+        this.activeQueuePool = new Vector();
+        this.activeQueuesCounter = 0;
+    }
+    
+    
+    
 }

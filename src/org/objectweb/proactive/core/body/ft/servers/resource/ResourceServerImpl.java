@@ -126,8 +126,22 @@ public class ResourceServerImpl implements ResourceServer {
             this.nodeCounter = 0;
             n = getFreeNode();
         }
+//        if (n==null){
+//            // nothing is no more possible -> reinit the system
+//            this.server.initialize();
+//            return null;
+//        }
+        
         logger.info("[RESSOURCE] Return a node : " +
             n.getNodeInformation().getURL());
         return n;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#initialize()
+     */
+    public void initialize() throws RemoteException {
+        this.freeNodes = new ArrayList();
+        this.nodeCounter = 0;
     }
 }

@@ -69,13 +69,14 @@ public class LocationServerImpl implements LocationServer {
             if (currentLocation == null) {
                 logger.error("[LOCATION] **ERROR** " + id +
                     " is not registered !");
+                //throw new RuntimeException("TEST");
                 return null;
             } else if (currentLocation.equals(oldLocation)) {
                 this.server.forceDetection();
                 return null;
             } else {
                 // send the new location of id
-                logger.info("[LOCATION] Return the new location of " + id);
+                logger.debug("[LOCATION] Return the new location of " + id);
                 return currentLocation;
             }
         }
@@ -127,5 +128,12 @@ public class LocationServerImpl implements LocationServer {
         synchronized (this.locations) {
             return (UniversalBody) (this.locations.get(id));
         }
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#initialize()
+     */
+    public void initialize() throws RemoteException {
+        this.locations = new Hashtable();
     }
 }
