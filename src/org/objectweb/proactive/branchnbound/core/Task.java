@@ -30,14 +30,12 @@
  */
 package org.objectweb.proactive.branchnbound.core;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.io.Serializable;
-
-import java.util.Vector;
 
 
 /**
@@ -131,7 +129,10 @@ public abstract class Task implements Serializable, Comparable {
     public void setBestKnownResult(Object newBestKnownResult) {
         if (this.bestKnownResult != null) {
             synchronized (this.bestKnownResult) {
-                this.bestKnownResult = newBestKnownResult;
+                if (((Comparable) this.bestKnownResult).compareTo(
+                            newBestKnownResult) > 0) {
+                    this.bestKnownResult = newBestKnownResult;
+                }
             }
         }
     }
