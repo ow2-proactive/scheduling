@@ -247,8 +247,9 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         //        if (count != "1") {
         //            xRSL_command = xRSL_command + "(count=" + count + ")";
         //        }
-        xRSL_command = xRSL_command + "";
-        System.out.println(xRSL_command);
+        if (logger.isDebugEnabled()) {
+            logger.debug(xRSL_command);
+        }
         command_buffer.add(xRSL_command);
         return xRSL_command;
     }
