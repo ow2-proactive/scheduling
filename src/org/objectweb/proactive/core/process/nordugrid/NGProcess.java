@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.process.nordugrid;
 
 import java.io.BufferedReader;
@@ -5,15 +35,28 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.UniversalProcess;
+import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 
+/**
+ * NorduGrid Process implementation.
+ * This implementation works only for ProActive deployment, and not to submit single commands
+ * @author  ProActive Team
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 2.3
+ */
 public class NGProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
@@ -26,10 +69,16 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     protected String stderr = null;
     protected String stdout = null;
     protected String queue = null;
-    protected String executable = DEFAULT_SCRIPT_LOCATION;
+
+    //protected String executable;
     protected String jobname = null;
-    protected String executable_path;
-    protected File tmp_executable;
+    protected String executable_path = DEFAULT_SCRIPT_LOCATION;
+
+    //protected File tmp_executableFile;
+    protected String tmp_executable;
+    protected String DEFAULT_INPUT_FILE = "(inputfiles = ";
+    protected String inputFiles;
+    protected ArrayList command_buffer;
 
     //===========================================================
     // Constructor
@@ -43,6 +92,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
         this.command_path = DEFAULT_NGPATH;
         this.hostname = null;
+        FILE_TRANSFER_DEFAULT_PROTOCOL = "nordugrid";
     }
 
     public void setCount(String count) {
@@ -67,24 +117,73 @@ public class NGProcess extends AbstractExternalProcessDecorator {
 
     protected String internalBuildCommand() {
         buildExecutable();
+        command_buffer = new ArrayList();
         return buildNGSUBCommand() + " " + buildXRSLCommand();
     }
 
     protected void internalStartProcess(String xRslCommand)
         throws java.io.IOException {
+        String[] ng_command = (String[]) command_buffer.toArray(new String[] {  });
         int j = new Integer(count).intValue();
-        try {
-            for (int i = 0; i < j; i++) {
-                //here we simulate the deployment of // jobs on multiple procs
-                //indeed at this point Ng does support // executions on the site
-                // we have access. This should change with // RTEs
-                super.internalStartProcess(xRslCommand);
+
+        for (int i = 0; i < j; i++) {
+            //here we simulate the deployment of // jobs on multiple procs
+            //indeed at this point Ng does support // executions on the site
+            // we have access. This should change with // RTEs
+            try {
+                externalProcess = Runtime.getRuntime().exec(ng_command);
+                java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
+                            externalProcess.getInputStream()));
+                java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
+                            externalProcess.getErrorStream()));
+                java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
+                            externalProcess.getOutputStream()));
+                handleProcess(in, out, err);
+            } catch (java.io.IOException e) {
+                isFinished = true;
+                //throw e;
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            removeExecutable();
-            throw e;
         }
-        removeExecutable();
+    }
+
+    protected boolean internalFileTransferDefaultProtocol() {
+        FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
+        FileTransfer[] ftDefinitions = fts.getAllFileTransferDefinitions();
+        Logger fileTransferLogger = Logger.getLogger(Loggers.FILETRANSFER);
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < ftDefinitions.length; i++) {
+            //Files and Dirs
+            FileDescription[] files = ftDefinitions[i].getAll();
+            for (int j = 0; j < files.length; j++) {
+                String fullfilename = fts.buildSrcFilePathString(files[j].getSrcName());
+
+                //Skipping non existant local filenames, keep remote files
+                if (!FileTransferWorkShop.isLocalReadable(fullfilename) &&
+                        !FileTransferWorkShop.isRemote(fullfilename)) {
+                    System.out.println(fullfilename);
+                    if (fileTransferLogger.isDebugEnabled()) {
+                        fileTransferLogger.debug(
+                            "Skiping. Unreadable for FileTransfer:" +
+                            fullfilename);
+                    }
+                    continue;
+                }
+
+                sb.append("(\"" + files[j].getDestName() + "\" \"" +
+                    fullfilename + "\")");
+            }
+        }
+        if (fileTransferLogger.isDebugEnabled()) {
+            fileTransferLogger.debug("NorduGrid FileTransfer:" + sb.toString());
+        }
+        if (sb.length() > 0) {
+            inputFiles = sb.toString();
+        }
+
+        //Because FileTransfer will be submited with the process,
+        //we return success so no other protocols will be tried.
+        return true;
     }
 
     public String getProcessId() {
@@ -106,7 +205,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     public static void main(String[] args) {
         try {
             ProActiveDescriptor pad = ProActive.getProactiveDescriptor(
-                    "/0/user/team0/ProActiveNQueens/descriptor/nqueen.xml");
+                    "/user/rquilici/home/ProActive/descriptors/nqueen.xml");
             pad.activateMappings();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
@@ -115,17 +214,20 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     }
 
     public void setExecutable(String exec) {
-        int index = exec.lastIndexOf("/");
-        this.executable = exec.substring(index + 1);
         this.executable_path = exec;
     }
 
     private String buildNGSUBCommand() {
+        command_buffer.add(command_path);
+        command_buffer.add("-c");
+        command_buffer.add(hostname);
         return command_path + " -c " + hostname;
     }
 
     private String buildXRSLCommand() {
-        String xRSL_command = "'&(executable=" + executable + ")";
+        //It is always the temporary file that is sent to NG server
+        //The original executable is kept unchanged
+        String xRSL_command = "&(executable=" + tmp_executable + ")";
         if (jobname != null) {
             xRSL_command = xRSL_command + "(jobname=" + jobname + ")";
         }
@@ -140,25 +242,42 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         if (queue != null) {
             xRSL_command = xRSL_command + "(queue=" + queue + ")";
         }
+        if (inputFiles != null) {
+            xRSL_command = xRSL_command + DEFAULT_INPUT_FILE + inputFiles +
+                ")";
+        }
 
         //following line should be uncommented in case parallel environment
         //        if (count != "1") {
         //            xRSL_command = xRSL_command + "(count=" + count + ")";
         //        }
-        xRSL_command = xRSL_command + "'";
+        xRSL_command = xRSL_command + "";
+        System.out.println(xRSL_command);
+        command_buffer.add(xRSL_command);
         return xRSL_command;
     }
 
     private void buildExecutable() {
-        //first we build the temporary execuable, where we put the initial content
+        File tmp_executableFile;
+        Random random = new Random();
+        int index = executable_path.lastIndexOf("/");
+        String executable = executable_path.substring(index + 1);
+        this.tmp_executable = "tmp_" + executable + random.nextInt();
+        String tmp_executable_path = executable_path.replaceAll(executable,
+                tmp_executable);
+
+        //first we build the temporary execuable, that will be sent
         try {
-            tmp_executable = new File(executable_path.replaceAll(executable,
-                        "tmp_" + executable));
+            tmp_executableFile = new File(tmp_executable_path);
+            if (tmp_executableFile.exists()) {
+                tmp_executableFile.delete();
+            }
+            tmp_executableFile.deleteOnExit();
             BufferedReader reader = new BufferedReader(new FileReader(
                         executable_path));
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(
-                        tmp_executable));
+                        tmp_executableFile));
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {
@@ -168,28 +287,21 @@ public class NGProcess extends AbstractExternalProcessDecorator {
                 writer.newLine();
             }
             reader.close();
+            //we append in the tmp file the java command
+            writer.write(targetProcess.getCommand());
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //Then in the real executable we append the java command
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(
-                        executable_path, true));
-            System.out.println(executable_path);
-            //            writer.newLine();
-            System.out.println("java " + targetProcess.getCommand());
-            writer.write(targetProcess.getCommand());
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!tmp_executable_path.startsWith("file://")) {
+            //check if it follows NG syntax: the local location should start
+            // with file:///, so if not present, the local file must start with /: absolute path
+            //First implementation !
+            tmp_executable_path = "file://" + tmp_executable_path;
         }
-    }
 
-    private void removeExecutable() {
-        File exec = new File(executable_path);
-        boolean  status =  exec.delete();
-        boolean status1 = tmp_executable.renameTo(exec);
+        //then we append the executable in the inputfiles, to be transfered on the server
+        inputFiles = inputFiles + "(\"" + tmp_executable + "\" \"" +
+            tmp_executable_path + "\")";
     }
 }
