@@ -563,6 +563,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
         // Delete unsable checkpoints, i.e. index < currentRecoveryLine
         protected void garbageCollection() {
+            boolean hasGarbaged =  false;
             synchronized (server) {
                 int recLine = server.recoveryLine;
                 int lastGS = server.lastGlobalState;
@@ -571,12 +572,14 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                     ArrayList ckpts = ((ArrayList) (it.next()));
                     for (int i = 0; i < recLine; i++) {
                         if (ckpts.get(i) != null) {
+                            hasGarbaged = true;
                             ckpts.remove(i);
                             ckpts.add(i, null);
                         }
                     }
                 }
             }
+            if (hasGarbaged){System.gc();}
         }
     }
 
