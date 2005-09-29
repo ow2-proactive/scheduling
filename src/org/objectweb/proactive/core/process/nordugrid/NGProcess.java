@@ -69,12 +69,8 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     protected String stderr = null;
     protected String stdout = null;
     protected String queue = null;
-
-    //protected String executable;
     protected String jobname = null;
     protected String executable_path = DEFAULT_SCRIPT_LOCATION;
-
-    //protected File tmp_executableFile;
     protected String tmp_executable;
     protected String DEFAULT_INPUT_FILE = "(inputfiles = ";
     protected String inputFiles;
