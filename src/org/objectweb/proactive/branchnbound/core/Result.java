@@ -118,7 +118,7 @@ public class Result implements Serializable {
      * @return <code>true</code> this is better than the other, else returns <code>false</code>.
      */
     public boolean isBetterThan(Result other) {
-        if (((Comparable) this.theResult).compareTo(other.theResult) == -1) {
+        if (((Comparable) this.theResult).compareTo(other.theResult) < 0) {
             return true;
         } else {
             return false;
