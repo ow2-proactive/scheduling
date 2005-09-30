@@ -97,8 +97,8 @@ public class FTManagerPMLRB extends FTManager {
         this.isRecovering = false;
         this.checkpointIndex = 0;
         //checkpoint timer init: a checkpoint must be taken before any request service
-        // this.checkpointTimer = 0;
-        this.checkpointTimer = System.currentTimeMillis();
+        this.checkpointTimer = 0;
+        // this.checkpointTimer = System.currentTimeMillis();
         this.sendNumber = 0;
         this.replyInfos = new MessageInfoPMLRB();
         this.requestInfos = new MessageInfoPMLRB();
