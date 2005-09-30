@@ -32,12 +32,15 @@ package org.objectweb.proactive.ic2d.gui.data;
 
 import java.util.Iterator;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
 
@@ -48,7 +51,7 @@ public class HostPanel extends AbstractDataObjectPanel
     protected java.awt.Dimension minimumSize = new java.awt.Dimension(150, 80);
     protected PanelPopupMenu popup;
     private WorldPanel parent;
-    public String alignLayout; //keep state of layout H or V
+    public String alignLayout; // keep state of layout H or V
     public javax.swing.ButtonGroup group;
 
     //
@@ -210,6 +213,18 @@ public class HostPanel extends AbstractDataObjectPanel
         createBorder(os);
         popup.setName("Host " + name + " OS " + os);
         repaint();
+    }
+
+    /**
+     * stop to monitor a VM
+     * monitoredJVM representing this VM is now put in
+     * the skippedObjects list
+     * @param vmObject vm to ignore
+     */
+    public void stopMonitorVM(VMObject vmObject) {
+        MonitoredJVM object = new MonitoredJVM(vmObject.getVMUrl(), 1);
+        parent.getMonitorThread().addObjectToSkip(object);
+        parent.getMonitorThread().removeAsso(object);
     }
 
     //

@@ -27,6 +27,7 @@ import org.objectweb.proactive.core.node.NodeException;
  */
 public class Launcher {
     private ProActiveDescriptor pad;
+    private boolean activated;
 
     /**
      * Conctructor for a launcher
@@ -48,6 +49,7 @@ public class Launcher {
 
         // parse and reify the descriptor
         pad = ProActive.getProactiveDescriptor(filePathWithoutSpaces);
+        activated = false;
     }
 
     /**
@@ -77,6 +79,7 @@ public class Launcher {
                     mainDefinition.getParameters(), node);
             }
         }
+        activated = true;
     }
 
     /**
@@ -85,5 +88,13 @@ public class Launcher {
      */
     public ProActiveDescriptor getProActiveDescriptor() {
         return pad;
+    }
+
+    /**
+     * return true if the launcher has ever been activated
+     * @return true if not activated
+     */
+    public boolean isActivated() {
+        return activated;
     }
 }

@@ -38,6 +38,8 @@ import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.NodeObjectListener;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredAO;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 
 
 public class NodePanel extends AbstractDataObjectPanel
@@ -114,8 +116,7 @@ public class NodePanel extends AbstractDataObjectPanel
                 null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     nodeObject.destroyObject();
-                    //System.out.println (parentPanel) ;
-                    //parentPanel.stopMonitorNode(nodeObject); // TODO next commit
+                    parentPanel.stopMonitorNode(nodeObject);
                 }
             });
 
@@ -150,7 +151,7 @@ public class NodePanel extends AbstractDataObjectPanel
     }
 
     public void nodeNotResponding() {
-        setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
+        //setBackground(ActiveObjectPanel.COLOR_WHEN_NOT_RESPONDING);
         repaint();
         nodeObject.setAlive(false);
         Iterator it = childsIterator();
@@ -160,6 +161,24 @@ public class NodePanel extends AbstractDataObjectPanel
             ActiveObjectPanel aoPanel = (ActiveObjectPanel) it.next();
             aoPanel.activeObjectNotResponding();
         }
+    }
+
+    /**
+     * stop the monitoring of an active object. This object is added
+     * to the skipped list
+     * @param aObject
+     */
+    public void stopMonitorAO(ActiveObject aObject) {
+        // TODO it doesn't work, at the next refresh the AO is once again displayed
+        MonitoredAO object = new MonitoredAO(aObject.getClassName(),
+                aObject.getID().toString());
+
+        //System.out.println("---> id is correct ? : " + aObject.getID().toString());
+        //System.out.println("---> classname is correct ? : " + aObject.getClassName());
+        ((WorldPanel) (this.getParent().getParent().getParent())).getMonitorThread()
+         .addObjectToSkip(object);
+        ((WorldPanel) (this.getParent().getParent().getParent())).getMonitorThread()
+         .removeAsso(object);
     }
 
     //

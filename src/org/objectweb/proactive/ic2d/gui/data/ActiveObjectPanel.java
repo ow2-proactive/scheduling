@@ -109,6 +109,21 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
                     }
                 }
             });
+        popup.addSeparator();
+
+        /*
+         *TODO at the next refresh the object is stil displayed
+           final NodePanel parentPanel = (NodePanel) getParentDataObjectPanel();
+           popup.add(new javax.swing.AbstractAction("Stop Monitoring this object",
+                   null) {
+                   public void actionPerformed(java.awt.event.ActionEvent e) {
+                           parentPanel.stopMonitorAO(activeObject);
+                           activeObject.destroyObject();
+        
+        
+                   }
+               });
+         */
         addMouseListener(popup.getMenuMouseListener());
         setVisibleFromFilter();
     }

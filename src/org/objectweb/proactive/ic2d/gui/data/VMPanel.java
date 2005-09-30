@@ -87,12 +87,12 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         popup.add(new javax.swing.AbstractAction("Stop monitoring this VM", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     vmObject.destroyObject();
-                    //parentPanel.stopMonitorVM(vmObject);// TODO next commit
+                    parentPanel.stopMonitorVM(vmObject); // TODO next commit
                 }
             });
         popup.add(new javax.swing.AbstractAction("Kill this VM", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    //parentPanel.stopMonitorVM(vmObject); // TODO next commit
+                    parentPanel.stopMonitorVM(vmObject); // TODO next commit
                     vmObject.killVM();
                 }
             });

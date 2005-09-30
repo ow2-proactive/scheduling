@@ -149,6 +149,11 @@ public class NodeExploration implements JobMonitorConstants {
         try {
             foundRuntimes = runtimeFinder.findPARuntimes(hostname, port);
         } catch (IOException e) {
+            // if time out (probably due to a firewall) the host is skipped
+            if (e.getMessage().contains("Connection timed out")) {
+                skippedObjects.addElement(hostObject);
+            }
+
             log(e);
         }
         if (foundRuntimes != null) {
@@ -224,7 +229,10 @@ public class NodeExploration implements JobMonitorConstants {
                 }
             }
         } catch (ProActiveException e) {
-            log(e);
+            // this test is usefull to avoid to log an exception at each refresh
+            if (!e.getMessage().contains("Connection refused: connect")) {
+                log(e);
+            }
             return;
         }
 
@@ -273,7 +281,7 @@ public class NodeExploration implements JobMonitorConstants {
             //String vnName = node.getVnName();
             MonitoredJob vnJobIDObject = null;
             if (vnName != null) {
-                MonitoredVN vnObject = new MonitoredVN(vnName);
+                MonitoredVN vnObject = new MonitoredVN(vnName, jobID);
                 if (skippedObjects.contains(vnObject)) {
                     return;
                 }

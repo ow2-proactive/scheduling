@@ -51,6 +51,7 @@ import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.gui.util.HostDialog;
 import org.objectweb.proactive.ic2d.gui.util.LauncherFrame;
+import org.objectweb.proactive.ic2d.gui.util.LauncherWindow;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
@@ -79,7 +80,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     private static final String HOME = System.getProperty("user.home");
     private int depthMonitor = 10;
     private JobMonitorFrame jobMonitorFrame;
-    private LauncherFrame launcherFrame;
+    private LauncherWindow launcherFrame;
 
     //
     // -- CONTRUCTORS -----------------------------------------------
@@ -134,7 +135,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         eventListsFrame = createEventListFrame(eventListsPanel);
 
-        launcherFrame = new LauncherFrame();
+        launcherFrame = new LauncherWindow();
 
         //fileChooserFrame = createFileChooserFrame();
         logger.log("IC2D ready !");
