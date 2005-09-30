@@ -42,7 +42,7 @@ public class ClassServer implements Runnable {
     protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
     public static final int DEFAULT_SERVER_BASE_PORT = 2010;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 2;
-    protected static int MAX_RETRY = 50;
+    protected static int MAX_RETRY = 500;
     private static java.util.Random random = new java.util.Random();
     protected static int port;
 
