@@ -150,7 +150,7 @@ public class NodeExploration implements JobMonitorConstants {
             foundRuntimes = runtimeFinder.findPARuntimes(hostname, port);
         } catch (IOException e) {
             // if time out (probably due to a firewall) the host is skipped
-            if (e.getMessage().contains("Connection timed out")) {
+            if (e.getMessage().indexOf("Connection timed out") != -1) {
                 skippedObjects.addElement(hostObject);
             }
 
@@ -230,7 +230,7 @@ public class NodeExploration implements JobMonitorConstants {
             }
         } catch (ProActiveException e) {
             // this test is usefull to avoid to log an exception at each refresh
-            if (!e.getMessage().contains("Connection refused: connect")) {
+            if (e.getMessage().indexOf("Connection refused: connect") == -1) {
                 log(e);
             }
             return;
