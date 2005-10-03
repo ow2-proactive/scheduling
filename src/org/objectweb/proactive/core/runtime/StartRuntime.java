@@ -137,8 +137,17 @@ public class StartRuntime {
         impl.getVMInformation().setCreationProtocolID(protocolId);
 
         if (defaultRuntimeURL != null) {
-            register(defaultRuntimeURL);
-            impl.setParent(defaultRuntimeURL);
+            ProActiveRuntime PART;
+            try {
+                PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
+                        UrlBuilder.getProtocol(defaultRuntimeURL));
+                register(PART);
+                impl.setParent(PART);
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+                //				 if we cannot get the parent, this jvm is useless
+                System.exit(0);
+            }
         }
     }
 
@@ -147,13 +156,10 @@ public class StartRuntime {
      * Performs the registration of a ProActiveRuntime on the runtime that initiated the creation
      * of ProActiveDescriptor.
      */
-    private void register(String hostName) {
+    private void register(ProActiveRuntime PART) {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
-
-            ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
-                    UrlBuilder.getProtocol(defaultRuntimeURL));
 
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
                 creatorID,

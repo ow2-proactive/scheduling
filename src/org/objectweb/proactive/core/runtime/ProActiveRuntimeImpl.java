@@ -152,7 +152,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     // synchronized set of URL to runtimes in which we are registered
     private java.util.Set runtimeAcquaintancesURL;
-    private String parentRuntimeURL;
+    private ProActiveRuntime parentRuntime;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------------------
@@ -242,12 +242,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.LocalProActiveRuntime#setParent(String parentRuntimeName)
+     * @see org.objectweb.proactive.core.runtime.LocalProActiveRuntime#setParent(ProActiveRuntime parentPARuntime)
      */
-    public void setParent(String parentRuntimeName) {
-        if (parentRuntimeURL == null) {
-            parentRuntimeURL = parentRuntimeName;
-            runtimeAcquaintancesURL.add(parentRuntimeURL);
+    public void setParent(ProActiveRuntime parentPARuntime) {
+        if (parentRuntime == null) {
+            parentRuntime = parentPARuntime;
+            runtimeAcquaintancesURL.add(parentPARuntime.getURL());
         } else {
             runtimeLogger.error("Parent runtime already set!");
         }
@@ -273,14 +273,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } else if (!isHierarchicalSearch) {
             return null; // pad == null
         } else { // else search pad in parent runtime
-            if (parentRuntimeURL == null) {
+            if (parentRuntime == null) {
                 throw new IOException(
                     "Descriptor cannot be found hierarchically since this runtime has no parent");
             }
-
-            // get remote runtime
-            ProActiveRuntime parentRuntime = RuntimeFactory.getRuntime(parentRuntimeURL,
-                    UrlBuilder.getProtocol(parentRuntimeURL));
 
             return parentRuntime.getDescriptor(url, true);
         }
@@ -683,10 +679,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         // the recovered body
         Body ret = ckpt.recover();
-        
+
         // update node url
         ret.updateNodeURL(nodeURL);
-        
+
         String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
 
         // need to register as thread of the corresponding active object: this thread
@@ -695,7 +691,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ((AbstractBody) ret).getFTManager().beforeRestartAfterRecovery(ckpt.getCheckpointInfo(),
             inc);
         LocalBodyStore.getInstance().setCurrentThreadBody(null);
-        
+
         // register the body
         this.registerBody(nodeName, ret);
 
@@ -998,15 +994,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         throws ProActiveException {
         byte[] classData = null;
 
-        if (parentRuntimeURL != null) {
-            // get remote runtime
-            ProActiveRuntime runtime = RuntimeFactory.getRuntime(parentRuntimeURL,
-                    UrlBuilder.getProtocol(parentRuntimeURL));
-            classData = runtime.getClassDataFromThisRuntime(className);
+        if (parentRuntime != null) {
+            
+            classData = parentRuntime.getClassDataFromThisRuntime(className);
 
             if (classData == null) {
                 // continue searching
-                classData = runtime.getClassDataFromParentRuntime(className);
+                classData = parentRuntime.getClassDataFromParentRuntime(className);
             }
 
             if (classData != null) {
@@ -1015,7 +1009,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                 if (runtimeLogger.isDebugEnabled()) {
                     runtimeLogger.debug(getURL() + " -- > Returning class " +
-                        className + " found in " + parentRuntimeURL);
+                        className + " found in " + parentRuntime.getURL());
                 }
 
                 return classData;
@@ -1051,7 +1045,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             return classData;
         }
 
-        if (parentRuntimeURL == null) {
+        if (parentRuntime == null) {
             // top of hierarchy of runtimes
             classData = generateStub(className);
 

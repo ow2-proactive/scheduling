@@ -66,35 +66,35 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+
 /**
  * Implementation of ProActiveRuntimeForwarder
- * 
+ *
  * @author ProActive Team
  * @see ProActiveRuntimeForwarder
  */
 public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     implements ProActiveRuntimeForwarder, LocalProActiveRuntime {
-	
-	/** All runtimes known by this forwarder 
-	 * <UniqueRuntimeID, ProActiveRuntimeAdapter> */
+
+    /** All runtimes known by this forwarder
+     * <UniqueRuntimeID, ProActiveRuntimeAdapter> */
     protected HashMap registeredRuntimes;
-    
-    /** Processes to deploy 
+
+    /** Processes to deploy
      * <String, ExternalProcess> */
     private HashMap hierarchicalProcesses;
-    
-    /** The parent of this runtime */ 
+
+    /** The parent of this runtime */
     private ProActiveRuntime parentRuntime = null;
-    
-    /** The BodyForwarder associated to this ProActiveRuntimeForwarder 
-     * There is one and only one BodyForwarder per RuntimeForwarder 
+
+    /** The BodyForwarder associated to this ProActiveRuntimeForwarder
+     * There is one and only one BodyForwarder per RuntimeForwarder
      * (remember a RuntimeForwarder IS a Runtime, a BodyForwarder IS NOT a Body)
      */
     private BodyForwarderImpl bodyForwarder = null;
     private BodyAdapterForwarder bodyAdapterForwarder = null;
     private RemoteBodyForwarder remoteBodyForwarder = null;
 
-    
     protected ProActiveRuntimeForwarderImpl() {
         super();
         registeredRuntimes = new HashMap();
@@ -149,7 +149,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     /* Some methods in proactive.core.body package need to get acces to the BodyForwarder
      * currently running, so the three following methods are public
-     */    
+     */
     public BodyAdapterForwarder getBodyAdapterForwarder() {
         return bodyAdapterForwarder;
     }
@@ -165,26 +165,19 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     //
     // --- OVERIDING SOME METHODS
     //
-    public void setParent(String parentRuntimeName) {
-        try {
-            parentRuntime = RuntimeFactory.getRuntime(parentRuntimeName,
-                    UrlBuilder.getProtocol(parentRuntimeName));
-        } catch (ProActiveException e) {
-            logger.warn(
-                "Cannot retreive my parent runtime. All will go wrong !");
-            parentRuntime = null;
-        }
-
-        super.setParent(parentRuntimeName);
+    public void setParent(ProActiveRuntime parentPARuntime) {
+        this.parentRuntime = parentPARuntime;
+        super.setParent(parentPARuntime);
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
-    	/* Act like a forwarder even if it's not a prefixed method.
-    	 * A forwarder is fully transparent, so a bootstrap is needed. A forwarder insert itself
-    	 * in the chain by intercepting register calls of deployed process
-    	 */
+
+        /* Act like a forwarder even if it's not a prefixed method.
+         * A forwarder is fully transparent, so a bootstrap is needed. A forwarder insert itself
+         * in the chain by intercepting register calls of deployed process
+         */
         try {
             // erk ! 
             ProActiveRuntimeAdapterForwarderImpl adapter = new ProActiveRuntimeAdapterForwarderImpl((ProActiveRuntimeAdapterForwarderImpl) RuntimeFactory.getDefaultRuntime(),
@@ -211,7 +204,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) {
-    	/* Used only in multi-heriarchical deployment. */
+
+        /* Used only in multi-heriarchical deployment. */
         HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
                     padURL, vmName));
 
@@ -967,53 +961,54 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return null;
     }
 
-	public String getJobID(UniqueRuntimeID urid) {
-	       if (urid == null) {
-	            return this.getJobID();
-	        } else {
-	            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+    public String getJobID(UniqueRuntimeID urid) {
+        if (urid == null) {
+            return this.getJobID();
+        } else {
+            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
 
-	            if (part != null) {
-	                return part.getJobID();
-	            } else {
-	                logger.warn("No runtime associated to this urid (" + urid +
-	                    ")");
-	            }
-	        }
+            if (part != null) {
+                return part.getJobID();
+            } else {
+                logger.warn("No runtime associated to this urid (" + urid +
+                    ")");
+            }
+        }
 
-	        return null;
-	}
+        return null;
+    }
 
-	public void launchMain(UniqueRuntimeID urid, String className, String[] parameters) throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
-	       if (urid == null) {
-	            this.launchMain(className, parameters);
-	        } else {
-	            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
+    public void launchMain(UniqueRuntimeID urid, String className,
+        String[] parameters)
+        throws ClassNotFoundException, NoSuchMethodException, 
+            ProActiveException {
+        if (urid == null) {
+            this.launchMain(className, parameters);
+        } else {
+            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
 
-	            if (part != null) {
-	                part.launchMain(className, parameters);
-	            } else {
-	                logger.warn("No runtime associated to this urid (" + urid +
-	                    ")");
-	            }
-	        }
+            if (part != null) {
+                part.launchMain(className, parameters);
+            } else {
+                logger.warn("No runtime associated to this urid (" + urid +
+                    ")");
+            }
+        }
+    }
 
-		
-	}
+    public void newRemote(UniqueRuntimeID urid, String className)
+        throws ClassNotFoundException, ProActiveException {
+        if (urid == null) {
+            this.newRemote(className);
+        } else {
+            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
 
-	public void newRemote(UniqueRuntimeID urid, String className) throws ClassNotFoundException, ProActiveException {
-	       if (urid == null) {
-	            this.newRemote(className);
-	        } else {
-	            ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
-
-	            if (part != null) {
-	                part.newRemote(className);
-	            } else {
-	                logger.warn("No runtime associated to this urid (" + urid +
-	                    ")");
-	            }
-	        }
-		
-	}
+            if (part != null) {
+                part.newRemote(className);
+            } else {
+                logger.warn("No runtime associated to this urid (" + urid +
+                    ")");
+            }
+        }
+    }
 }

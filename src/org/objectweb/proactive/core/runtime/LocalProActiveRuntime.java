@@ -52,7 +52,7 @@ public interface LocalProActiveRuntime {
     /**
      * This method adds a reference to the runtime that created this runtime.
      * It is called when a new runtime is created from another one.
-     * @param parentRuntimeName the name of the creator of this runtime
+     * @param parentPARuntime the creator of this runtime
      */
-    public void setParent(String parentRuntimeName);
+    public void setParent(ProActiveRuntime parentPARuntime);
 }

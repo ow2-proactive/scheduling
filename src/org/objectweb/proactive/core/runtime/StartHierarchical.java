@@ -131,10 +131,11 @@ public class StartHierarchical {
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
             LocalProActiveRuntime localPart = (LocalProActiveRuntime) ProActiveRuntimeImpl.getProActiveRuntime();
-            localPart.setParent(defaultRuntimeURL);
+            
 
             ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
                     UrlBuilder.getProtocol(defaultRuntimeURL));
+            localPart.setParent(PART);
 
             // Retrieve the process to be deployed from the parent runtime
             ExternalProcess process = PART.getProcessToDeploy(proActiveRuntime,
