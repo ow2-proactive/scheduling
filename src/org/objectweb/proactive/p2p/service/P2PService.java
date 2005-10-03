@@ -71,7 +71,8 @@ import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
  * @author Alexandre di Costanzo
  *
  */
-public class P2PService implements InitActive, P2PConstants, Serializable, ProActiveInternalObject {
+public class P2PService implements InitActive, P2PConstants, Serializable,
+    ProActiveInternalObject {
 
     /** Logger. */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SERVICE);
@@ -366,8 +367,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
 
         // My friend needs more nodes, so I'm broadcasting his request to my own
         // friends
+        // Forwarding the message
         if (broadcast) {
-            // Forwarding the message
             if (uuid == null) {
                 logger.debug("Generating uuid for askingNode message");
                 uuid = generateUuid();
@@ -381,7 +382,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable, ProAc
                 this.acquaintanceManager.removingAllExcpetedPeers(e);
             }
         }
-        uuid = null;
     }
 
     /**
