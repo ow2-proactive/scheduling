@@ -118,6 +118,16 @@ if [ -f $PROACTIVE/lib/globus/cog-ogce.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cog-ogce.jar
 fi
+#--------------------------------------------------
+# jar to set when using gLite
+if [ -f $PROACTIVE/lib/glite/classad.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/glite/classad.jar
+fi
+if [ -f $PROACTIVE/lib/glite/glite-wms-jdlj.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/glite/glite-wms-jdlj.jar
+fi
 
 #--------------------------------------------------
 # jar to set when using Ibis
