@@ -116,7 +116,10 @@ public class StartHierarchical {
     }
 
     private void run() {
+    	// It's hard to know if we are on a forwarder or not in some spots 
+    	// (serialization for example), so we set property to help us.
         System.setProperty("proactive.hierarchicalRuntime", "true");
+        
         padURL = System.getProperty("proactive.pad");
 
         ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
@@ -133,6 +136,7 @@ public class StartHierarchical {
             ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
                     UrlBuilder.getProtocol(defaultRuntimeURL));
 
+            // Retrieve the process to be deployed from the parent runtime
             ExternalProcess process = PART.getProcessToDeploy(proActiveRuntime,
                     creatorID, vmName, padURL);
 

@@ -52,7 +52,11 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
-
+/**
+ * 
+ * @author ProActive Team
+ *
+ */
 public interface UniversalBodyForwarder {
     public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
 

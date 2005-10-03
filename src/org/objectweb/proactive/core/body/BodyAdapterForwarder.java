@@ -54,34 +54,63 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
+/**
+ * An adapter for a RemoteBodyForwarder. The Adpater is the generic entry point for remote calls
+ * to a RemoteBodyForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ *
+ * A BodyAdapterForwarder has also an UniqueID which permit to associate an adapter to a body
+ * on the forwarder since forwarder basically works like a multiplexer.
+ *
+ * @author ProActiveTeam
+ * @see org.objectweb.proactive.core.body.BodyForwarderImpl
+ */
 public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     RemoteBody {
 
-    /** The encapsulated RmiRemoteBody */
+    /** The encapsulated RmiRemoteBody
+     * Points to the BodyForwarder running on the forwarder.
+     */
     protected RemoteBodyForwarder proxiedRemoteBody;
 
+    /**
+     * Create an adapter on the local RemoteBodyForwarder.
+     * An adapter created by this constructor must not be send over the network
+     */
     public BodyAdapterForwarder(RemoteBodyForwarder remoteBodyForwarder) {
         this.proxiedRemoteBody = remoteBodyForwarder;
         bodyID = null; // never used for the local adapter
     }
 
+    /**
+     * Create an adapter pointing on remoteBodyForwarder and associated to the id.
+     * @param remoteBodyForwarder the bodyForwarder on the forwarder
+     * @param id the ID of the associated BodyAdapter
+     */
     public BodyAdapterForwarder(RemoteBodyForwarder remoteBodyForwarder,
         UniqueID id) {
         this.proxiedRemoteBody = remoteBodyForwarder;
 
         try {
-            this.bodyID = remoteBodyForwarder.getID(id);
+            this.bodyID = id;
             this.jobID = remoteBodyForwarder.getJobID(id);
         } catch (IOException e) {
-            // XXX cmathieu
+            jobID = null;
+            System.err.println("Connexion to RemoteBodyForwarder(id=" + id +
+                "failled, this BodyAdapterForwarder will be unusable");
             System.err.println(
-                "Woops cannot retrieve bodyID/jobID from the RemoteBodyForwarder");
-            System.err.println("All will probably go bad");
+                "You probably need to check your hierarchical deployment configuration file.");
         }
     }
 
+    /**
+     * Create an adpater pointing on the remoteBody pointed by defaultAdapterForwarder
+     * and associated to the ID contained in remoteAdapter.
+     * @param defaultAdapterForwarder the original adapter
+     * @param remoteAdapter
+     */
     public BodyAdapterForwarder(BodyAdapterForwarder defaultAdapterForwarder,
-        BodyAdapter remoteAdapter, UniqueID id) {
+        BodyAdapter remoteAdapter) {
         this.proxiedRemoteBody = defaultAdapterForwarder.proxiedRemoteBody;
         this.bodyID = remoteAdapter.bodyID;
         this.jobID = remoteAdapter.jobID;
@@ -91,6 +120,16 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
 
+        /*
+         * This adapter forwarder is being deserialized on a forwarder.
+         * This can only happen when a forwarder talks to another forwarder.
+         *
+         * We put this adapter into our cache (multiplexer), and create a new
+         * adapter with the same ID but pointing on the current forwarder.
+         *
+         *  All calls doing on the adapter will be send to the forwarder which
+         *  will forward the call.
+         */
         String prop = System.getProperty("proactive.hierarchicalRuntime");
         if ((prop != null) && prop.equals("true")) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();

@@ -37,6 +37,15 @@ import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 
 
+/**
+ * This process starts a forwarder defined by the target process using RSH.
+ * The hierarchicalProcess will then be deployed for the forwarder.
+ *
+ * The hierarchical process must be set before starting the process.
+ *
+ * @author ProActive Team
+ *
+ */
 public class RSHHierarchicalProcess extends RSHProcess
     implements HierarchicalProcess {
 

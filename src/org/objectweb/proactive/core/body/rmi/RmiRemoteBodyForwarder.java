@@ -32,7 +32,12 @@ package org.objectweb.proactive.core.body.rmi;
 
 import org.objectweb.proactive.core.body.RemoteBodyForwarder;
 
-
+/**
+ * An object implementing this interface provides the minimum service a body forwarder
+ *  offers remotely through RMI.
+ *  @author ProActive Team
+ *  @see org.objectweb.proactive.core.body.UniversalBodyForwarder
+ */
 public interface RmiRemoteBodyForwarder extends RemoteBodyForwarder,
     java.rmi.Remote {
 }

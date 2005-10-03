@@ -66,24 +66,42 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
-
+/**
+ * Implementation of ProActiveRuntimeForwarder
+ * 
+ * @author ProActive Team
+ * @see ProActiveRuntimeForwarder
+ */
 public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     implements ProActiveRuntimeForwarder, LocalProActiveRuntime {
+	
+	/** All runtimes known by this forwarder 
+	 * <UniqueRuntimeID, ProActiveRuntimeAdapter> */
     protected HashMap registeredRuntimes;
+    
+    /** Processes to deploy 
+     * <String, ExternalProcess> */
     private HashMap hierarchicalProcesses;
+    
+    /** The parent of this runtime */ 
     private ProActiveRuntime parentRuntime = null;
+    
+    /** The BodyForwarder associated to this ProActiveRuntimeForwarder 
+     * There is one and only one BodyForwarder per RuntimeForwarder 
+     * (remember a RuntimeForwarder IS a Runtime, a BodyForwarder IS NOT a Body)
+     */
     private BodyForwarderImpl bodyForwarder = null;
     private BodyAdapterForwarder bodyAdapterForwarder = null;
     private RemoteBodyForwarder remoteBodyForwarder = null;
 
+    
     protected ProActiveRuntimeForwarderImpl() {
         super();
         registeredRuntimes = new HashMap();
-
         hierarchicalProcesses = new HashMap();
-
         bodyForwarder = new BodyForwarderImpl();
 
+        // Create the BodyForwarder, protocol specific
         if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is ibis");
@@ -129,6 +147,9 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         bodyAdapterForwarder = new BodyAdapterForwarder(remoteBodyForwarder);
     }
 
+    /* Some methods in proactive.core.body package need to get acces to the BodyForwarder
+     * currently running, so the three following methods are public
+     */    
     public BodyAdapterForwarder getBodyAdapterForwarder() {
         return bodyAdapterForwarder;
     }
@@ -157,9 +178,13 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         super.setParent(parentRuntimeName);
     }
 
-    public synchronized void register(ProActiveRuntime proActiveRuntimeDist,
+    public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
+    	/* Act like a forwarder even if it's not a prefixed method.
+    	 * A forwarder is fully transparent, so a bootstrap is needed. A forwarder insert itself
+    	 * in the chain by intercepting register calls of deployed process
+    	 */
         try {
             // erk ! 
             ProActiveRuntimeAdapterForwarderImpl adapter = new ProActiveRuntimeAdapterForwarderImpl((ProActiveRuntimeAdapterForwarderImpl) RuntimeFactory.getDefaultRuntime(),
@@ -186,6 +211,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) {
+    	/* Used only in multi-heriarchical deployment. */
         HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
                     padURL, vmName));
 

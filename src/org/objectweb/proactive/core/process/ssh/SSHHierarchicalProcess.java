@@ -38,6 +38,11 @@ import org.objectweb.proactive.core.process.JVMProcess;
 
 
 /**
+ * This process starts a forwarder defined by the target process using SSH.
+ * The hierarchicalProcess will then be deployed for the forwarder.
+ *
+ * The hierarchical process must be set before starting the process.
+ *
  * @author ProActive Team
  */
 public class SSHHierarchicalProcess extends SSHProcess
@@ -46,22 +51,27 @@ public class SSHHierarchicalProcess extends SSHProcess
     /** Embded process to be deployed from the forwarder */
     private ExternalProcess hierarchicalProcess;
 
+    /** @see org.objectweb.proactive.core.process.HierarchicalProcess#setHierarchicalProcess(ExternalProcess) */
     public void setHierarchicalProcess(ExternalProcess process) {
         hierarchicalProcess = process;
     }
 
+    /** @see org.objectweb.proactive.core.process.HierarchicalProcess#getHierarchicalProcess() */
     public ExternalProcess getHierarchicalProcess() {
         return hierarchicalProcess;
     }
 
+    /** @see org.objectweb.proactive.core.process.UniversalProcess#isHierarchical() */
     public boolean isHierarchical() {
         return true;
     }
 
+    /** @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber() */
     public int getNodeNumber() {
         return hierarchicalProcess.getNodeNumber();
     }
 
+    /** @see org.objectweb.proactive.core.process.UniversalProcess#startProcess() */
     public void startProcess() throws IOException {
         JVMProcess finalProcess = (JVMProcess) getFinalProcess();
         String bClass = finalProcess.getClassname();

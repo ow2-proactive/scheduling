@@ -448,7 +448,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
                 partf.getBodyForwarder().add((BodyAdapterImpl) this.clone());
 
                 return new BodyAdapterForwarder(partf.getBodyAdapterForwarder(),
-                    this, bodyID);
+                    this);
             } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }

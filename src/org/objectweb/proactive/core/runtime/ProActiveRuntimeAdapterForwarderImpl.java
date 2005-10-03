@@ -57,7 +57,18 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
-
+/**
+ * An adapter for a RemoteProActiveRuntimeForwarder. The Adpater is the generic entry point for remote calls
+ * to a RemoteProActiveRuntimeForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ *
+ * All calls done on a ProActiveRuntimeAdapterForwarderImpl, method1(foo, bar) for example, are
+ * translated into remotePA.method1(urid, foo, bar) where urid is an unique identifiant for runtimes.
+ * The forwarder forwards the call to the right runtime by using this ID. 
+ * 
+ * @author ProActiveTeam
+ *
+ */
 public class ProActiveRuntimeAdapterForwarderImpl
     extends ProActiveRuntimeAdapter implements Serializable, Cloneable {
     private UniqueRuntimeID urid; // Cached for speed issue
@@ -103,12 +114,15 @@ public class ProActiveRuntimeAdapterForwarderImpl
         in.defaultReadObject();
 
         String prop = System.getProperty("proactive.hierarchicalRuntime");
-
         if ((prop != null) && prop.equals("true")) {
+
+        	// on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+
 
             if (!partf.registeredRuntimes.containsKey(urid)) {
                 try {
+                	// Add this unknown runtime to the table of forwarded runtimes
                     partf.registeredRuntimes.put(urid, this.clone());
                 } catch (CloneNotSupportedException e) {
                     runtimeLogger.warn(e);
@@ -116,6 +130,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
             }
 
             try {
+            	// Change the RMI reference to point on this forwarder. That's all, it's automagic !
                 proActiveRuntime = ((ProActiveRuntimeAdapterForwarderImpl) RuntimeFactory.getDefaultRuntime()).proActiveRuntime;
             } catch (ProActiveException e) {
                 runtimeLogger.warn(e);

@@ -562,7 +562,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private synchronized void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         if (!FuturePool.isInsideABodyForwarder()) {
-            // Ok we are not inside a body forwarder	
+            // If we are on a forwarder we want to forward the call, not wait the 
+        	// futur result or whatever
+        	
             //if continuation is already set, we are in a forwarder
             //else if a destination is available in destTable, set the continuation tag
             if (!continuation) {

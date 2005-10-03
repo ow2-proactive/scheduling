@@ -51,7 +51,13 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
-
+/**
+ * An object implementing this interface provides the minimum service a body forwarder offers
+ * remotely. This interface is extended by protocol-specific(RMI, RMI/SSH, IBIS, HTTP, JINI)
+ * remote interfaces to allow the body to be accessed remotely.
+ * @author ProActiveTeam
+ * @see org.objectweb.proactive.core.body.UniversalBodyForwarder
+ */
 public interface RemoteBodyForwarder {
     public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
 
@@ -102,12 +108,21 @@ public interface RemoteBodyForwarder {
      */
     public void disableAC(UniqueID id) throws java.io.IOException;
 
+    /**
+     * @see RemoteBody#setImmediateService(String)
+     */
     public void setImmediateService(UniqueID id, String methodName)
         throws java.io.IOException;
 
+    /**
+     * @see RemoteBody#setImmediateService(String, Class[])
+     */
     public void setImmediateService(UniqueID id, String methodName,
         Class[] parametersTypes) throws IOException;
 
+    /**
+     * @see RemoteBody#removeImmediateService(String, Class[])
+     */
     public void removeImmediateService(UniqueID id, String methodName,
         Class[] parametersTypes) throws IOException;
 
@@ -172,6 +187,9 @@ public interface RemoteBodyForwarder {
     public int fireNFE(UniqueID id, NonFunctionalException e)
         throws java.io.IOException;
 
+    //
+    // -- BodyAdapter
+    //
     public UniversalBody lookup(UniqueID id, String url)
         throws java.io.IOException;
 

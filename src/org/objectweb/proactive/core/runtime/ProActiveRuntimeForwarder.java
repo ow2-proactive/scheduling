@@ -59,8 +59,24 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 
 /**
+ * A ProActiveRuntimeForwarder is a ProActiveRuntime and a forwarder.
+ * 
+ * All ProActiveRuntime methods are inherited, and for each inherited a new one
+ * with the same name, the same return type, same arguments, but prefixed by an argument
+ * of type UniqueRuntimeID is defined.
+ * 
+ * When a method inherited from ProActiveRuntime is called a forwarder behave like a normal
+ * runtime, it's a normal runtime.
+ * 
+ * When a prefixed method is called, the prefix argument is used to forward the call to the
+ * right runtime. To perform the dispatch a forwarder uses a HashTable 
+ * <UniqueRuntimeID, Adapter>, which is filled during deserialization of 
+ * ProActiveRuntimeAdapter objects.
+ * 
+ * @see org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl#readResolve()
+ * @see org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterForwarderImpl#readObject(java.io.ObjectInputStream)
+ * 
  * @author  ProActive Team
- * @version 1.0,  2005/08/23
  */
 public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
