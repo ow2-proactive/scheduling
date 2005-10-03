@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
+import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
+import org.objectweb.proactive.core.mop.Utils;
 
 
 public class StubGenerator {
@@ -93,15 +95,14 @@ public class StubGenerator {
             if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
                 ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(className);
                 data = bsb.create();
-                stubClassName = bsb.getStubClassFullName();
-            } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("BCEL")) {
-                BytecodeStubBuilder bsb = new BytecodeStubBuilder(className);
-                data = bsb.create();
-                stubClassName = bsb.getStubClassFullName();
+                stubClassName = Utils.convertClassNameToStubClassName(className);
+            } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+               data = JavassistByteCodeStubBuilder.create(className);
+               stubClassName = Utils.convertClassNameToStubClassName(className);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to BCEL.");
+                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist.");
                 System.err.println(
                     "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
                 stubClassName = null;

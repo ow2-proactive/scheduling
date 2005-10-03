@@ -7,6 +7,7 @@ import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenera
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
+import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -78,8 +79,7 @@ public class ProActiveClassLoaderHelper {
                 ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
                 class_data = bsb.create();
             } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
-                class_data = bsb.create();
+                class_data = JavassistByteCodeStubBuilder.create(classname);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(
