@@ -494,6 +494,9 @@ public class UnicoreProActiveClient {
 			return;
 		}
 
+    	long beginning=System.currentTimeMillis();
+    	long end = beginning;
+    	
 		SubmitJob submit = new SubmitJob(jc);
 		submit.start();
 		while (jc.getState() != ActionContainer.STATE_SUBMITTED) {
@@ -504,6 +507,13 @@ public class UnicoreProActiveClient {
 				e.printStackTrace();
 			}
 		}
+		
+    	end = System.currentTimeMillis();
+    	
+    	if(logger.isDebugEnabled()){
+    		logger.debug("Job submission took:" + (end-beginning) + "[ms]");
+    	}
+    	
 	}
 
 	/**

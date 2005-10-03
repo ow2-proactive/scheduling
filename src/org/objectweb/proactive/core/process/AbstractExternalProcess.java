@@ -214,6 +214,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     	CopyProtocol[] copyProtocol=fts.getCopyProtocols();
     	boolean success=false;
     	
+    	long beginning=System.currentTimeMillis();
+    	long end = beginning;
+    	
     	if(fileTransferLogger.isDebugEnabled())
     		fileTransferLogger.debug("Using the following FileTransferWorkShop:\n"+fts);
     	
@@ -232,7 +235,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     		if(copyProtocol[i].isDefaultProtocol()
     				&& copyProtocol[i].isDummyProtocol()) {
     			if(fileTransferLogger.isDebugEnabled())
-    				fileTransferLogger.debug("Trying protocol internal filetransfer");
+//    				fileTransferLogger.debug("Trying protocol internal filetransfer");
     			success=internalFileTransferDefaultProtocol();
     		}
     		//else simply try to start the filetransfer
@@ -240,6 +243,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     			success=copyProtocol[i].startFileTransfer();
     	}
 
+    	end = System.currentTimeMillis();
+    	
+    	if(fileTransferLogger.isDebugEnabled()){
+    		fileTransferLogger.debug("FileTransfer spent:" + (end-beginning) + "[ms]");
+    	}
+    	
     	if(success)
     		fileTransferLogger.info("FileTransfer was successful");
     	else
