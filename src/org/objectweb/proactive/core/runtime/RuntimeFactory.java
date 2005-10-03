@@ -79,15 +79,15 @@ public abstract class RuntimeFactory {
 
     //private static ProActiveRuntime defaultRuntime = null;
     //private static RuntimeFactory defaultRuntimeFactory;
-    public static boolean JINI_ENABLED;
-    public static boolean IBIS_ENABLED;
+    //    public static boolean JINI_ENABLED;
+    //    public static boolean IBIS_ENABLED;
     public static boolean XMLHTTP_ENABLED;
 
     static {
         ProActiveConfiguration.load();
         createClassServer();
-        JINI_ENABLED = isJiniEnabled();
-        IBIS_ENABLED = isIbisEnabled();
+        //        JINI_ENABLED = isJiniEnabled();
+        //        IBIS_ENABLED = isIbisEnabled();
         XMLHTTP_ENABLED = isXmlHttpEnabled();
         registerProtocolFactories();
         //getLocalRuntime();
@@ -260,14 +260,11 @@ public abstract class RuntimeFactory {
     }
 
     private static void registerProtocolFactories() {
-        if (JINI_ENABLED) {
-            setFactory(Constants.JINI_PROTOCOL_IDENTIFIER,
-                "org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory");
-        }
-        if (IBIS_ENABLED) {
-            setFactory(Constants.IBIS_PROTOCOL_IDENTIFIER,
-                "org.objectweb.proactive.core.runtime.ibis.IbisRuntimeFactory");
-        }
+        setFactory(Constants.JINI_PROTOCOL_IDENTIFIER,
+            "org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory");
+
+        setFactory(Constants.IBIS_PROTOCOL_IDENTIFIER,
+            "org.objectweb.proactive.core.runtime.ibis.IbisRuntimeFactory");
 
         setFactory(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
             "org.objectweb.proactive.core.runtime.http.HttpRuntimeFactory");
@@ -279,38 +276,36 @@ public abstract class RuntimeFactory {
             "org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory");
     }
 
-    private static boolean isJiniEnabled() {
-        try {
-            // test if Jini is available
-            Class.forName("net.jini.discovery.DiscoveryManagement");
-            if (runtimeLogger.isInfoEnabled()) {
-                runtimeLogger.info("Jini enabled");
-            }
-            return true;
-        } catch (ClassNotFoundException e) {
-            if (runtimeLogger.isInfoEnabled()) {
-                runtimeLogger.info("Jini disabled");
-            }
-            return false;
-        }
-    }
-
-    private static boolean isIbisEnabled() {
-        try {
-            // test if Ibis is available
-            Class.forName("ibis.rmi.server.UnicastRemoteObject");
-            if (runtimeLogger.isInfoEnabled()) {
-                runtimeLogger.info("Ibis enabled");
-            }
-            return true;
-        } catch (ClassNotFoundException e) {
-            if (runtimeLogger.isInfoEnabled()) {
-                runtimeLogger.info("Ibis disabled");
-            }
-            return false;
-        }
-    }
-
+    //    private static boolean isJiniEnabled() {
+    //        try {
+    //            // test if Jini is available
+    //            Class.forName("net.jini.discovery.DiscoveryManagement");
+    //            if (runtimeLogger.isInfoEnabled()) {
+    //                runtimeLogger.info("Jini enabled");
+    //            }
+    //            return true;
+    //        } catch (ClassNotFoundException e) {
+    //            if (runtimeLogger.isInfoEnabled()) {
+    //                runtimeLogger.info("Jini disabled");
+    //            }
+    //            return false;
+    //        }
+    //    }
+    //    private static boolean isIbisEnabled() {
+    //        try {
+    //            // test if Ibis is available
+    //            Class.forName("ibis.rmi.server.UnicastRemoteObject");
+    //            if (runtimeLogger.isInfoEnabled()) {
+    //                runtimeLogger.info("Ibis enabled");
+    //            }
+    //            return true;
+    //        } catch (ClassNotFoundException e) {
+    //            if (runtimeLogger.isInfoEnabled()) {
+    //                runtimeLogger.info("Ibis disabled");
+    //            }
+    //            return false;
+    //        }
+    //    }
     private static boolean isXmlHttpEnabled() {
         return true;
     }

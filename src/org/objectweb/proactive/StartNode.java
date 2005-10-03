@@ -253,7 +253,7 @@ public class StartNode {
         RmiRuntimeFactory.setShouldCreateClassServer(!noClassServer);
         RmiRuntimeFactory.setShouldCreateRegistry(!noRegistry);
         RmiRuntimeFactory.setRegistryPortNumber(registryPortNumber);
-        if (RuntimeFactory.JINI_ENABLED) {
+        if (multicastLocator) {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
         }
 
