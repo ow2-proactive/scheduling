@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+    <componentDefinition>
+        <virtualNodesDefinition>
+            <virtualNode name="plugtest" property="multiple" timeout="3600000" waitForTimeout="false"/>
+        </virtualNodesDefinition>
+    </componentDefinition>
+    <deployment>
+        <mapping>
+            <map virtualNode="plugtest">
+                <jvmSet>
+                    <vmName value="Jvm1"/>
+                    <vmName value="Jvm2"/>
+                    <vmName value="Jvm3"/>
+                    <vmName value="Jvm4"/>
+                    <vmName value="Jvm5"/>
+                    <vmName value="Jvm6"/>
+                    <vmName value="Jvm7"/>
+                    <vmName value="Jvm8"/>
+                    <vmName value="Jvm9"/>
+                    <vmName value="Jvm10"/>
+                    <vmName value="Jvm11"/>
+                    <vmName value="Jvm12"/>
+                    <vmName value="Jvm13"/>
+                    <vmName value="Jvm14"/>
+                    <vmName value="Jvm15"/>
+                    <vmName value="Jvm16"/>
+                    <vmName value="Jvm17"/>
+                    <vmName value="Jvm18"/>
+                    <vmName value="Jvm19"/>
+                    <vmName value="Jvm20"/>
+                    <vmName value="Jvm21"/>
+                    <vmName value="Jvm22"/>
+                    <vmName value="Jvm23"/>
+                    <vmName value="Jvm24"/>
+                    <vmName value="Jvm25"/>
+                    <vmName value="Jvm26"/>
+                    <vmName value="Jvm27"/>
+                    <vmName value="Jvm28"/>
+                    <vmName value="Jvm29"/>
+                    <vmName value="Jvm30"/>
+                    <vmName value="Jvm31"/>
+                    <vmName value="Jvm32"/>
+                    <vmName value="Jvm33"/>
+                    <vmName value="Jvm34"/>
+                    <vmName value="Jvm35"/>
+                    <vmName value="Jvm36"/>
+                    <vmName value="Jvm37"/>
+                    <vmName value="Jvm38"/>
+                    <vmName value="Jvm39"/>
+                    <vmName value="Jvm40"/>
+                    <vmName value="Jvm41"/>
+                    <vmName value="Jvm42"/>
+                    <vmName value="Jvm43"/>
+                    <vmName value="Jvm44"/>
+                    <vmName value="Jvm45"/>
+                    <vmName value="Jvm46"/>
+                    <vmName value="Jvm47"/>
+                    <vmName value="Jvm48"/>
+                    <vmName value="Jvm49"/>
+                    <vmName value="Jvm50"/>
+                    
+                </jvmSet>
+            </map>
+        </mapping>
+        <jvms>
+            <jvm name="Jvm1">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm2">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm3">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm4">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm5">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm6">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm7">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm8">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm9">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm10">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm11">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm12">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm13">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm14">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm15">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm16">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm17">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm18">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm19">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm20">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm21">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm22">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm23">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm24">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm25">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm26">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm27">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm28">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm29">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm30">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm31">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm32">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm33">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm34">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm35">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm36">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm37">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm38">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm39">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm40">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm41">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm42">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm43">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm44">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm45">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm46">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm47">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm48">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm49">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="Jvm50">
+                <creation>
+                    <processReference refid="gLiteProcess"/>
+                </creation>
+            </jvm>
+        </jvms>
+    </deployment>
+    <infrastructure>
+        <processes>
+            <processDefinition id="localJVM">
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>                   
+             </processDefinition>
+            <processDefinition id="gLiteProcess">
+                <gLiteProcess class="org.objectweb.proactive.core.process.glite.GLiteProcess"  virtualOrganisation="gilda"  executable="/usr/java/j2sdk1.4.2_08/bin/java" JDLFileName="job12.jdl"  Type="Job" stdError="error.log" stdOutput="stdout.log" retryCount="3">
+                    <processReference refid="localJVM"/>
+                    <environment>"JAVA_HOME=/usr"</environment>
+                    <requirements>other.GlueCEStateStatus == "Production"</requirements>
+                    <rank>-other.GlueCEStateEstimatedResponseTime</rank>
+                    <gLiteOptions>
+                        <JDLFilePath>
+                            <relativePath origin="user.home" value="public/JDL"/>
+                        </JDLFilePath>
+                        <outputSandbox>error.log stdout.log</outputSandbox>
+                    </gLiteOptions>
+                </gLiteProcess>
+            </processDefinition>
+        </processes>
+    </infrastructure>
+</ProActiveDescriptor>
