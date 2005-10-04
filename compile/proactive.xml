@@ -30,6 +30,7 @@
 			<include name="components/*.jar"/>
 			<include name="ibis/*.jar"/>
 			<include name="unicore/*.jar"/>
+			<include name="glite/*.jar"/>
 		</fileset>
 		<fileset dir="${base}/lib/ws">
 			<include name="*.jar"/>
