@@ -40,6 +40,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -52,6 +53,10 @@ public class BasicQueueImpl implements TaskQueue {
     private int hungryLevel;
     private Task rootTaskFromBackup = null;
     private Vector pendingTasksFromBackup = new Vector();
+    private Vector allResults = new Vector();
+    private Vector pendingTaskList = new Vector();
+    private Vector reallocatedTasks = new Vector();
+    private int reallocatedBase = -1;
 
     public BasicQueueImpl() {
     }
@@ -132,7 +137,7 @@ public class BasicQueueImpl implements TaskQueue {
         }
     }
 
-    public void loadTasks(File taskFile) {
+    public void loadTasks(String taskFile) {
         try {
             FileInputStream fis = new FileInputStream(taskFile);
             ObjectInputStream ois = new ObjectInputStream(fis);
@@ -162,7 +167,60 @@ public class BasicQueueImpl implements TaskQueue {
         return this.rootTaskFromBackup;
     }
 
-    public Vector getPendingTasksFromBackup() {
+    public Collection getPendingTasksFromBackup() {
         return this.pendingTasksFromBackup;
+    }
+
+    // --------------------------------------------------------------
+    // Mananging results
+    // --------------------------------------------------------------
+    public void addResult(Result result) {
+        this.allResults.add(result);
+    }
+
+    public IntWrapper howManyResults() {
+        return new IntWrapper(this.allResults.size());
+    }
+
+    public Collection getAllResults() {
+        return this.allResults;
+    }
+
+    public void backupResults(String backupResultFile) {
+        try {
+            File currentBck = new File(backupResultFile);
+            File oldBck = new File(backupResultFile + "~");
+            if (currentBck.exists()) {
+                oldBck.delete();
+                currentBck.renameTo(oldBck);
+            }
+            currentBck = new File(backupResultFile);
+            FileOutputStream fos = new FileOutputStream(currentBck);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            for (int i = 0; i < this.allResults.size(); i++) {
+                oos.writeObject(this.allResults.get(i));
+            }
+            oos.close();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            logger.fatal("The file is not found", e);
+        } catch (IOException e) {
+            logger.warn("Problem I/O with the reulst backup", e);
+        }
+    }
+
+    public void loadResults(String backupResultFile) {
+        try {
+            FileInputStream fis = new FileInputStream(new File(backupResultFile));
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            while (ois.available() > 0) {
+                this.allResults.add((Result) ois.readObject());
+            }
+            ois.close();
+            fis.close();
+        } catch (Exception e) {
+            logger.fatal("Problem to read result file.");
+            throw new ProActiveRuntimeException(e);
+        }
     }
 }

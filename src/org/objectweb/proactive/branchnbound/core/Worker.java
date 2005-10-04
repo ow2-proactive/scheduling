@@ -100,9 +100,9 @@ public class Worker implements Serializable {
             logger.fatal("A problem with the task's node", e);
             exception = e;
         } catch (Exception e) {
-        	logger.fatal("Failed immediate service", e);
-			exception = e;
-		}
+            logger.fatal("Failed immediate service", e);
+            exception = e;
+        }
         if (activedTask != null) {
             activedTask.initLowerBound();
             activedTask.initUpperBound();
@@ -133,22 +133,24 @@ public class Worker implements Serializable {
      * @param newBest a new best result.
      */
     public void setBestCurrentResult(Result newBest) {
-        if (this.bestCurrentResult == null) {
+        if ((this.bestCurrentResult == null) ||
+                newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             if (this.workerGroup != null) {
                 this.workerGroup.informNewBestResult(this.bestCurrentResult);
+            }
+            if (this.currentTask != null) {
+                try {
+                    this.currentTask.setBestKnownResult(this.bestCurrentResult.getResult());
+                } catch (NoResultsException e) {
+                    // This catch is never throwed
+                    logger.fatal("Houston we have a problem!!");
+                }
             }
             logger.info("A new best result was localy found: " +
                 this.bestCurrentResult);
-        } else if (newBest.isBetterThan(this.bestCurrentResult)) {
-            this.bestCurrentResult = newBest;
-            if (this.workerGroup != null) {
-                this.workerGroup.informNewBestResult(this.bestCurrentResult);
-            }
-            logger.info(
-                "A new best result was localy found and inform others: " +
-                this.bestCurrentResult);
         }
+        logger.debug("The new best result is NOT BETTER");
     }
 
     /**
@@ -168,11 +170,11 @@ public class Worker implements Serializable {
             this.bestCurrentResult = newBest;
             if (this.currentTask != null) {
                 try {
-					this.currentTask.setBestKnownResult(this.bestCurrentResult.getResult());
-				} catch (NoResultsException e) {
-					// This catch is never throwed
-					logger.fatal("Houston we have a problem!!");
-				}
+                    this.currentTask.setBestKnownResult(this.bestCurrentResult.getResult());
+                } catch (NoResultsException e) {
+                    // This catch is never throwed
+                    logger.fatal("Houston we have a problem!!");
+                }
             }
             logger.info("I was informed from a new remote best result: " +
                 this.bestCurrentResult);
@@ -190,5 +192,14 @@ public class Worker implements Serializable {
 
     public BooleanWrapper isHungry() {
         return this.taskProvider.isHungry();
+    }
+
+    public void stopTask() {
+        this.currentTask.terminate();
+        this.currentTask = null;
+    }
+
+    public Task getCurrentTask() {
+        return this.currentTask;
     }
 }

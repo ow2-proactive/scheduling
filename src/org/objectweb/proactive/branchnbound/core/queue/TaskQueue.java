@@ -30,12 +30,12 @@
  */
 package org.objectweb.proactive.branchnbound.core.queue;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -64,9 +64,22 @@ public interface TaskQueue extends Serializable {
 
     public abstract void backupTasks(Task rootTask, Vector pendingTasks);
 
-    public abstract void loadTasks(File taskFile);
+    public abstract void loadTasks(String taskFile);
 
     public abstract Task getRootTaskFromBackup();
 
-    public abstract Vector getPendingTasksFromBackup();
+    public abstract Collection getPendingTasksFromBackup();
+
+    // --------------------------------------------------------------------------
+    // Managing results
+    // --------------------------------------------------------------------------
+    public abstract void addResult(Result result);
+
+    public abstract IntWrapper howManyResults();
+
+    public abstract Collection getAllResults();
+
+    public abstract void backupResults(String backupResultFile);
+
+    public abstract void loadResults(String backupResultFile);
 }

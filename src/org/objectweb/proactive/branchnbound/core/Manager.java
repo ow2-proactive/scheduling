@@ -30,12 +30,7 @@
  */
 package org.objectweb.proactive.branchnbound.core;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -73,23 +68,26 @@ public class Manager implements Serializable, InitActive,
     NodeCreationEventListener {
     private static final boolean enableRealloc = false; // TODO turn it configurable
     private static final int backupTask = 10; // TODO turn it configurable
+    private static final boolean enableAutoSplit = false; // TODO turn it configurable
+    private static final String backupResultFile = System.getProperty(
+            "user.home") + System.getProperty("file.separator") +
+        "framework.results.backup"; // TODO turn it configurable
     private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
     private Task rootTask = null;
     private Node[] nodes = null;
     private Worker workerGroup = null;
     private ListIterator workerGroupListIt = null;
-    private TaskQueue taskProvider = null;
+    private TaskQueue taskProviderQueue = null;
     private Vector futureTaskList = new Vector();
     private Vector pendingTaskList = new Vector();
     private Vector workingWorkerList = new Vector();
     private Vector freeWorkerList = new Vector();
-    private Vector allResults = new Vector();
     private String queueType = null;
     private VirtualNode virtualNode = null;
+    private VirtualNode[] arrayOfVirtualNodes = null;
     private Vector reallocatedTasks = new Vector();
     private int reallocatedBase = -1;
     private Iterator pendingTasksIt = this.pendingTaskList.iterator();
-    private VirtualNode[] arrayOfVirtualNodes = null;
 
     /**
      * The no args constructor for ProActive.
@@ -161,7 +159,7 @@ public class Manager implements Serializable, InitActive,
         }
 
         try {
-            this.taskProvider = (TaskQueue) ProActive.newActive(this.queueType,
+            this.taskProviderQueue = (TaskQueue) ProActive.newActive(this.queueType,
                     null, body.getNodeURL());
         } catch (ActiveObjectCreationException e1) {
             logger.fatal("Couldn't create the Task Provider", e1);
@@ -176,7 +174,7 @@ public class Manager implements Serializable, InitActive,
             if (this.nodes != null) {
                 Object[][] args = new Object[this.nodes.length][1];
                 for (int i = 0; i < args.length; i++) {
-                    args[i][0] = this.taskProvider;
+                    args[i][0] = this.taskProviderQueue;
                 }
                 this.workerGroup = (Worker) ProActiveGroup.newGroup(Worker.class.getName(),
                         args, this.nodes);
@@ -217,7 +215,7 @@ public class Manager implements Serializable, InitActive,
         logger.info("Calling for the first time split on the root task");
         Vector subTaskList = this.rootTask.split();
         logger.info("The ROOT task sends " + subTaskList.size());
-        this.taskProvider.addAll(subTaskList);
+        this.taskProviderQueue.addAll(subTaskList);
     }
 
     public Result start() {
@@ -231,17 +229,17 @@ public class Manager implements Serializable, InitActive,
         int backupCounter = 0;
 
         // Serving requests and waiting for results
-        while (this.taskProvider.hasNext().booleanValue() ||
+        while (this.taskProviderQueue.hasNext().booleanValue() ||
                 (this.pendingTaskList.size() != 0)) {
-            if (this.taskProvider.hasNext().booleanValue()) {
+            if (this.taskProviderQueue.hasNext().booleanValue()) {
                 boolean hasAddedTask = false;
                 if (this.workerGroupListIt.hasNext()) {
                     this.assignTaskToWorker((Worker) this.workerGroupListIt.next(),
-                        this.taskProvider.next());
+                        this.taskProviderQueue.next());
                     hasAddedTask = true;
                 } else if ((this.freeWorkerList.size() > 0)) {
                     this.assignTaskToWorker((Worker) this.freeWorkerList.remove(
-                            0), this.taskProvider.next());
+                            0), this.taskProviderQueue.next());
                     hasAddedTask = true;
                 } else if (this.futureTaskList.size() == 0) {
                     // Waiting workers
@@ -254,8 +252,8 @@ public class Manager implements Serializable, InitActive,
                 if (hasAddedTask && logger.isInfoEnabled()) {
                     logger.info("Pending tasks: " +
                         this.pendingTaskList.size() + " - Achivied tasks: " +
-                        this.allResults.size() + " - Not calculated tasks: " +
-                        this.taskProvider.size());
+                        "No results back" + " - Not calculated tasks: " +
+                        this.taskProviderQueue.size());
                     continue;
                 }
             }
@@ -264,21 +262,49 @@ public class Manager implements Serializable, InitActive,
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
                 backupCounter++;
                 if (enableRealloc && (this.reallocatedBase != -1)) {
-                    // TODO check if is a reallocated task
-                }
-                this.allResults.add(this.futureTaskList.remove(index));
-                this.pendingTaskList.remove(index);
-                Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
-                if (this.taskProvider.hasNext().booleanValue()) {
-                    this.assignTaskToWorker(freeWorker, this.taskProvider.next());
+                    int realIndex = (index > this.reallocatedBase)
+                        ? (index % this.reallocatedBase) : index;
+                    int inc = 0;
+                    boolean alreadyFoundIt = false;
+
+                    // Cleaning future list and pending list and worker list
+                    for (int i = 0; i < this.futureTaskList.size(); i++) {
+                        if (((i - inc) % this.reallocatedBase) == realIndex) {
+                            inc++;
+                            Result currentResult = (Result) this.futureTaskList.remove(i);
+                            Worker workerFree = (Worker) this.workingWorkerList.remove(i);
+                            if (enableAutoSplit) {
+                                Task theTask = workerFree.getCurrentTask();
+                                workerFree.sendSubTasksToTheManager(theTask.split());
+                            }
+                            workerFree.stopTask();
+                            if (!alreadyFoundIt &&
+                                    !ProActive.isAwaited(currentResult)) {
+                                alreadyFoundIt = true;
+                                this.taskProviderQueue.addResult(currentResult);
+                                this.freeWorkerList.add(workerFree);
+                            }
+                            this.pendingTaskList.remove(i);
+                        }
+                    }
                 } else {
-                    this.freeWorkerList.add(freeWorker);
+                    this.taskProviderQueue.addResult((Result) this.futureTaskList.remove(
+                            index));
+                    this.pendingTaskList.remove(index);
+                    Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
+                    if (this.taskProviderQueue.hasNext().booleanValue()) {
+                        this.assignTaskToWorker(freeWorker,
+                            this.taskProviderQueue.next());
+                    } else {
+                        this.freeWorkerList.add(freeWorker);
+                    }
                 }
                 logger.info("Pending tasks: " + this.pendingTaskList.size() +
-                    " - Achivied tasks: " + this.allResults.size() +
-                    " - Not calculated tasks: " + this.taskProvider.size());
+                    " - Achivied tasks: " +
+                    this.taskProviderQueue.howManyResults() +
+                    " - Not calculated tasks: " +
+                    this.taskProviderQueue.size());
                 if ((backupCounter % backupTask) == 0) {
-                    // TODO Turn it as option
                     try {
                         this.backupAll(this.rootTask);
                     } catch (IOException e) {
@@ -303,38 +329,19 @@ public class Manager implements Serializable, InitActive,
                 continue;
             }
         }
-        logger.info("Total of results = " + this.allResults.size());
-        logger.info("Total of tasks = " + this.taskProvider.size());
+        logger.info("Total of results = " +
+            this.taskProviderQueue.howManyResults());
+        logger.info("Total of tasks = " + this.taskProviderQueue.size());
         // Set the final result
-        return this.rootTask.gather((Result[]) this.allResults.toArray(
-                new Result[this.allResults.size()]));
+        return this.rootTask.gather((Result[]) this.taskProviderQueue.getAllResults()
+                                                                     .toArray(new Result[this.taskProviderQueue.howManyResults()
+                                                                                                               .intValue()]));
     }
-
-    private static final String backupResultFile = System.getProperty(
-            "user.home") + System.getProperty("file.separator") +
-        "framework.results.backup"; // TODO turn it configurable
 
     private void backupAll(Task rootTask) throws IOException {
         logger.info("Backuping");
-        this.backupResults();
-        this.taskProvider.backupTasks(rootTask, this.pendingTaskList);
-    }
-
-    private void backupResults() throws IOException {
-        File currentBck = new File(backupResultFile);
-        File oldBck = new File(backupResultFile + "~");
-        if (currentBck.exists()) {
-            oldBck.delete();
-            currentBck.renameTo(oldBck);
-        }
-        currentBck = new File(backupResultFile);
-        FileOutputStream fos = new FileOutputStream(currentBck);
-        ObjectOutputStream oos = new ObjectOutputStream(fos);
-        for (int i = 0; i < this.allResults.size(); i++) {
-            oos.writeObject(this.allResults.get(i));
-        }
-        oos.close();
-        fos.close();
+        this.taskProviderQueue.backupResults(backupResultFile);
+        this.taskProviderQueue.backupTasks(rootTask, this.pendingTaskList);
     }
 
     /**
@@ -349,9 +356,12 @@ public class Manager implements Serializable, InitActive,
     }
 
     public void nodeCreated(NodeCreationEvent event) {
-        logger.info(">>>> New Node");
-        Object[] args = new Object[] { this.taskProvider };
+        Object[] args = new Object[] { this.taskProviderQueue };
         Node createdNode = event.getNode();
+        if (logger.isInfoEnabled()) {
+            logger.info(">>>> New Node: " +
+                createdNode.getNodeInformation().getURL());
+        }
         Worker newWorker = null;
         try {
             newWorker = (Worker) ProActive.newActive(Worker.class.getName(),
@@ -371,20 +381,20 @@ public class Manager implements Serializable, InitActive,
     }
 
     public void setHungryLevel(int level) {
-        assert this.taskProvider != null : "Manager is not active";
-        this.taskProvider.setHungryLevel(level);
+        assert this.taskProviderQueue != null : "Manager is not active";
+        this.taskProviderQueue.setHungryLevel(level);
     }
 
-    public void loadTasks(File taskFile) {
+    public void loadTasks(String taskFile) {
         if (!ProActive.getBodyOnThis().isActive()) {
             logger.fatal("The manager is not active");
             throw new ProActiveRuntimeException("The manager is not active");
         }
-        this.taskProvider.loadTasks(taskFile);
-        this.taskProvider.getRootTaskFromBackup();
-        this.pendingTaskList = this.taskProvider.getPendingTasksFromBackup();
+        this.taskProviderQueue.loadTasks(taskFile);
+        this.taskProviderQueue.getRootTaskFromBackup();
+        this.pendingTaskList = (Vector) this.taskProviderQueue.getPendingTasksFromBackup();
         try {
-            this.rootTask = (Task) ProActive.turnActive(this.taskProvider.getRootTaskFromBackup(),
+            this.rootTask = (Task) ProActive.turnActive(this.taskProviderQueue.getRootTaskFromBackup(),
                     ProActive.getBodyOnThis().getNodeURL());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
@@ -395,26 +405,15 @@ public class Manager implements Serializable, InitActive,
         }
     }
 
-    public void loadResults(File resultFile) {
-        if (!ProActive.getBodyOnThis().isActive()) {
-            logger.fatal("The manager is not active");
-            throw new ProActiveRuntimeException("The manager is not active");
-        }
-        try {
-            FileInputStream fis = new FileInputStream(resultFile);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            while (ois.available() > 0) {
-                this.allResults.add((Result) ois.readObject());
-            }
-            ois.close();
-            fis.close();
-        } catch (Exception e) {
-            logger.fatal("Problem to read result file.");
-            throw new ProActiveRuntimeException(e);
-        }
+    public void loadResults(String resultFile) {
+        this.taskProviderQueue.loadResults(resultFile);
     }
 
     public VirtualNode getBackVn() {
         return this.virtualNode;
+    }
+
+    public VirtualNode[] getBackVns() {
+        return this.arrayOfVirtualNodes;
     }
 }

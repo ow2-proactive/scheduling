@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.branchnbound;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -137,14 +136,14 @@ public class ProActiveBranchNBound {
         return ProActiveBranchNBound.activingTheManager(args);
     }
 
-    public static Manager newFarmFromBackup(File taskFile, File resultFile,
+    public static Manager newFarmFromBackup(String taskFile, String resultFile,
         Node managerNode, Node[] nodes)
         throws ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
             resultFile, managerNode, nodes, BasicQueueImpl.class.getName());
     }
 
-    public static Manager newFarmFromBackup(File taskFile, File resultFile,
+    public static Manager newFarmFromBackup(String taskFile, String resultFile,
         VirtualNode virtualNode)
         throws IOException, ClassNotFoundException, 
             ActiveObjectCreationException, NodeException {
@@ -152,7 +151,7 @@ public class ProActiveBranchNBound {
             resultFile, virtualNode, BasicQueueImpl.class.getName());
     }
 
-    public static Manager newFarmFromBackup(File taskFile, File resultFile,
+    public static Manager newFarmFromBackup(String taskFile, String resultFile,
         VirtualNode[] virtualNodes)
         throws IOException, ClassNotFoundException, 
             ActiveObjectCreationException, NodeException {
@@ -160,31 +159,31 @@ public class ProActiveBranchNBound {
             resultFile, virtualNodes, BasicQueueImpl.class.getName());
     }
 
-    public static Manager newFarmFromBackupWithLargerQueue(File taskFile,
-        File resultFile, Node managerNode, Node[] nodes)
+    public static Manager newFarmFromBackupWithLargerQueue(String taskFile,
+        String resultFile, Node managerNode, Node[] nodes)
         throws ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
             resultFile, managerNode, nodes, LargerQueueImpl.class.getName());
     }
 
-    public static Manager newFarmFromBackupWithLargerQueue(File taskFile,
-        File resultFile, VirtualNode virtualNode)
+    public static Manager newFarmFromBackupWithLargerQueue(String taskFile,
+        String resultFile, VirtualNode virtualNode)
         throws IOException, ClassNotFoundException, 
             ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
             resultFile, virtualNode, LargerQueueImpl.class.getName());
     }
 
-    public static Manager newFarmFromBackupWithLargerQueue(File taskFile,
-        File resultFile, VirtualNode[] virtualNodes)
+    public static Manager newFarmFromBackupWithLargerQueue(String taskFile,
+        String resultFile, VirtualNode[] virtualNodes)
         throws IOException, ClassNotFoundException, 
             ActiveObjectCreationException, NodeException {
         return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
             resultFile, virtualNodes, LargerQueueImpl.class.getName());
     }
 
-    public static Manager newFarmFromBackupWithSpecifiedQueue(File taskFile,
-        File resultFile, VirtualNode virtualNode, String queueType)
+    public static Manager newFarmFromBackupWithSpecifiedQueue(String taskFile,
+        String resultFile, VirtualNode virtualNode, String queueType)
         throws ActiveObjectCreationException, NodeException {
         assert virtualNode.isActivated() == false : "The virtual must be not actived";
         Object[] args = new Object[2];
@@ -197,8 +196,8 @@ public class ProActiveBranchNBound {
         return manager;
     }
 
-    public static Manager newFarmFromBackupWithSpecifiedQueue(File taskFile,
-        File resultFile, VirtualNode[] virtualNodes, String queueType)
+    public static Manager newFarmFromBackupWithSpecifiedQueue(String taskFile,
+        String resultFile, VirtualNode[] virtualNodes, String queueType)
         throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[2];
         args[0] = virtualNodes;
@@ -210,8 +209,8 @@ public class ProActiveBranchNBound {
         return manager;
     }
 
-    public static Manager newFarmFromBackupWithSpecifiedQueue(File taskFile,
-        File resultFile, Node managerNode, Node[] nodes, String queueType)
+    public static Manager newFarmFromBackupWithSpecifiedQueue(String taskFile,
+        String resultFile, Node managerNode, Node[] nodes, String queueType)
         throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[2];
         args[0] = nodes;

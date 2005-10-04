@@ -30,10 +30,12 @@
  */
 package org.objectweb.proactive.branchnbound.core;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -134,6 +136,14 @@ public abstract class Task implements Serializable, Comparable {
                     this.bestKnownResult = newBestKnownResult;
                 }
             }
+        }
+    }
+
+    public void terminate() {
+        try {
+            ProActive.getBodyOnThis().terminate();
+        } catch (IOException e) {
+            logger.fatal("Couldn't terminate the task", e);
         }
     }
 }
