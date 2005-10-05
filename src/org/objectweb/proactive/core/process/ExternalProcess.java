@@ -80,26 +80,35 @@ public interface ExternalProcess extends UniversalProcess {
      * @param outputMessageSink the handler of the output stream of the process
      */
     public void setOutputMessageSink(MessageSink outputMessageSink);
-    
+
     /**
      * This method returns a single FileTransferStructure instance
-     * for this process. If many invocations to this method are done, 
-     * the same instance of FileTransferStructure will be returned. 
-     * This means, that changes made to the structure will be reflected 
+     * for this process. If many invocations to this method are done,
+     * the same instance of FileTransferStructure will be returned.
+     * This means, that changes made to the structure will be reflected
      * on all the references obtained through this method for this process.
      * Note that different process do not share a FileTransferStructure,
      * and thus changes made to one will not reflect on the other.
      */
     public FileTransferWorkShop getFileTransferWorkShopDeploy();
-    
+
     /**
      * This method returns a single FileTransferStructure instance
-     * for this process. If many invocations to this method are done, 
-     * the same instance of FileTransferStructure will be returned. 
-     * This means, that changes made to the structure will be reflected 
+     * for this process. If many invocations to this method are done,
+     * the same instance of FileTransferStructure will be returned.
+     * This means, that changes made to the structure will be reflected
      * on all the references obtained through this method for this process.
      * Note that different process do not share a FileTransferStructure,
      * and thus changes made to one will not reflect on the other.
      */
     public FileTransferWorkShop getFileTransferWorkShopRetrieve();
+
+    /**
+     * Returns the type of this process.
+     * For processes that does not reference another process, the type is NO_COMPOSITION
+     * For other types are APPEND_TO_COMMAND_COMPOSITION or SEND_TO_OUTPUT_STREAM_COMPOSITION or
+     * GIVE_COMMAND_AS_PARAMETER or COPY_FILE_AND_APPEND_COMMAND.
+     * @return the type this process.
+     */
+    public int getCompositionType();
 }

@@ -47,6 +47,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
     private boolean shouldRun;
+    public static final int NO_COMPOSITION = 0;
     protected boolean closeStream = false;
     protected MessageLogger inputMessageLogger;
     protected MessageLogger errorMessageLogger;
@@ -134,6 +135,10 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
     public String getFileTransferDefaultCopyProtocol() {
         return FILE_TRANSFER_DEFAULT_PROTOCOL;
+    }
+    
+    public int getCompositionType() {
+        return NO_COMPOSITION;
     }
 
     //

@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.process.filetransfer.CopyProtocol;
+import org.objectweb.proactive.core.process.filetransfer.FileDependant;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 
@@ -100,6 +103,10 @@ public abstract class AbstractExternalProcessDecorator
             return internalBuildCommand();
         } else {
             if (targetProcess != null) {
+                if (targetProcess.getCompositionType() == COPY_FILE_AND_APPEND_COMMAND) {
+                    handleCopyFile();
+                }
+
                 //we have to process the target command to backslash quotation mark
                 //so that it is not interpreted by the current process but the target one
                 //we avoid already backslashed one
@@ -134,6 +141,22 @@ public abstract class AbstractExternalProcessDecorator
             }
         }
         super.handleOutput(out);
+    }
+
+    protected void handleCopyFile() {
+        FileTransferWorkShop ftw = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
+        ftw.setFileTransferStructureDstInfo("hostname",hostname);
+        ftw.setFileTransferStructureDstInfo("username",username);
+        try {
+            ftw.addFileTransfer(((FileDependant) targetProcess).getFileTransfertDefiniton());
+        } catch (ClassCastException e) {
+            logger.error(
+                "Unable to handle the file transfert dependant process");
+            return;
+        }
+
+        CopyProtocol cp = ftw.copyProtocolFactory(getFileTransferDefaultCopyProtocol());
+        cp.startFileTransfer();
     }
 
     //

@@ -54,6 +54,12 @@ public interface ExternalProcessDecorator extends ExternalProcess {
     public static final int GIVE_COMMAND_AS_PARAMETER = 3;
 
     /**
+     * Composition in which a File transfer takes place in the upper process and
+     * the command of this target process is appended to the upper process command
+     */
+    public static final int COPY_FILE_AND_APPEND_COMMAND = 4;
+
+    /**
      * Returns the process target of this process. The target process is embedded
      * inside the current process.
      * @return the process target of this process
@@ -67,12 +73,7 @@ public interface ExternalProcessDecorator extends ExternalProcess {
      */
     public void setTargetProcess(ExternalProcess targetProcess);
 
-    /**
-     * Returns the type of composition that occurs between the commands of two processes.
-     * Type are APPEND_TO_COMMAND_COMPOSITION or SEND_TO_OUTPUT_STREAM_COMPOSITION.
-     * @return the type of composition that occurs between the commands of two processes
-     */
-    public int getCompositionType();
+   
 
     /**
      * Sets the type of composition that occurs between the commands of two processes.
