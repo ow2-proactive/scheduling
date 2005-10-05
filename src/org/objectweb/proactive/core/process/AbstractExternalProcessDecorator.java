@@ -103,14 +103,13 @@ public abstract class AbstractExternalProcessDecorator
             return internalBuildCommand();
         } else {
             if (targetProcess != null) {
-                if (targetProcess.getCompositionType() == COPY_FILE_AND_APPEND_COMMAND) {
-                    handleCopyFile();
-                }
-
                 //we have to process the target command to backslash quotation mark
                 //so that it is not interpreted by the current process but the target one
                 //we avoid already backslashed one
                 String targetCommand = targetProcess.getCommand();
+                if (targetProcess.getCompositionType() == COPY_FILE_AND_APPEND_COMMAND) {
+                    handleCopyFile();
+                }
                 return internalBuildCommand() + targetCommand;
             } else {
                 return internalBuildCommand();
@@ -145,8 +144,8 @@ public abstract class AbstractExternalProcessDecorator
 
     protected void handleCopyFile() {
         FileTransferWorkShop ftw = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
-        ftw.setFileTransferStructureDstInfo("hostname",hostname);
-        ftw.setFileTransferStructureDstInfo("username",username);
+        ftw.setFileTransferStructureDstInfo("hostname", hostname);
+        ftw.setFileTransferStructureDstInfo("username", username);
         try {
             ftw.addFileTransfer(((FileDependant) targetProcess).getFileTransfertDefiniton());
         } catch (ClassCastException e) {
