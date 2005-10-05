@@ -55,7 +55,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     private ThreadActivityMonitor errThreadMonitor;
     private FileTransferWorkShop ftsDeploy = null;
     private FileTransferWorkShop ftsRetrieve = null;
-    protected String FILE_TRANSFER_DEFAULT_PROTOCOL="dummy";
+    protected String FILE_TRANSFER_DEFAULT_PROTOCOL = "dummy";
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -115,27 +115,27 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         checkStarted();
         this.outputMessageSink = outputMessageSink;
     }
-    
-    public FileTransferWorkShop getFileTransferWorkShopDeploy(){
-    	
-    	if(ftsDeploy==null)
-    		ftsDeploy = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
-    	
-		return ftsDeploy;
+
+    public FileTransferWorkShop getFileTransferWorkShopDeploy() {
+        if (ftsDeploy == null) {
+            ftsDeploy = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
+        }
+
+        return ftsDeploy;
     }
-    
-    public FileTransferWorkShop getFileTransferWorkShopRetrieve(){
-    	
-    	if(ftsRetrieve==null)
-    		ftsRetrieve = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
-    	
-		return ftsRetrieve;
+
+    public FileTransferWorkShop getFileTransferWorkShopRetrieve() {
+        if (ftsRetrieve == null) {
+            ftsRetrieve = new FileTransferWorkShop(getFileTransferDefaultCopyProtocol());
+        }
+
+        return ftsRetrieve;
     }
-    
-    public String getFileTransferDefaultCopyProtocol(){
-    	return FILE_TRANSFER_DEFAULT_PROTOCOL;
+
+    public String getFileTransferDefaultCopyProtocol() {
+        return FILE_TRANSFER_DEFAULT_PROTOCOL;
     }
-    
+
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -209,63 +209,73 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     /**
      * Try all the protocols until one is successful.
      */
-    protected void internalStartFileTransfer(FileTransferWorkShop fts){
-    	
-    	CopyProtocol[] copyProtocol=fts.getCopyProtocols();
-    	boolean success=false;
-    	
-    	long beginning=System.currentTimeMillis();
-    	long end = beginning;
-    	
-    	if(fileTransferLogger.isDebugEnabled())
-    		fileTransferLogger.debug("Using the following FileTransferWorkShop:\n"+fts);
-    	
-    	if(!fts.check()) return; //No files to transfer or some error.
-    	
-    	/* Try all the protocols for this FileTransferStructure
-    	 * until one of them is successful */
-    	for(int i=0; i<copyProtocol.length && !success; i++){
-    		fileTransferLogger.info("Trying copyprotocol: "+copyProtocol[i].getProtocolName());
-    		if(!copyProtocol[i].checkProtocol()){
-    			logger.error("Protocol check failed");
-    			continue;
-    		}
-    		//if can't handle the default protocol 
-    		//then try the internal file transfer
-    		if(copyProtocol[i].isDefaultProtocol()
-    				&& copyProtocol[i].isDummyProtocol()) {
-    			if(fileTransferLogger.isDebugEnabled())
-//    				fileTransferLogger.debug("Trying protocol internal filetransfer");
-    			success=internalFileTransferDefaultProtocol();
-    		}
-    		//else simply try to start the filetransfer
-    		else 
-    			success=copyProtocol[i].startFileTransfer();
-    	}
+    protected void internalStartFileTransfer(FileTransferWorkShop fts) {
+        CopyProtocol[] copyProtocol = fts.getCopyProtocols();
+        boolean success = false;
 
-    	end = System.currentTimeMillis();
-    	
-    	if(fileTransferLogger.isDebugEnabled()){
-    		fileTransferLogger.debug("FileTransfer spent:" + (end-beginning) + "[ms]");
-    	}
-    	
-    	if(success)
-    		fileTransferLogger.info("FileTransfer was successful");
-    	else
-    		fileTransferLogger.info("FileTransfer faild");
+        long beginning = System.currentTimeMillis();
+        long end = beginning;
+
+        if (fileTransferLogger.isDebugEnabled()) {
+            fileTransferLogger.debug(
+                "Using the following FileTransferWorkShop:\n" + fts);
+        }
+
+        if (!fts.check()) {
+            return; //No files to transfer or some error.
+        }
+
+        /* Try all the protocols for this FileTransferStructure
+         * until one of them is successful */
+        for (int i = 0; (i < copyProtocol.length) && !success; i++) {
+            fileTransferLogger.info("Trying copyprotocol: " +
+                copyProtocol[i].getProtocolName());
+            if (!copyProtocol[i].checkProtocol()) {
+                logger.error("Protocol check failed");
+                continue;
+            }
+
+            //if can't handle the default protocol 
+            //then try the internal file transfer
+            if (copyProtocol[i].isDefaultProtocol() &&
+                    copyProtocol[i].isDummyProtocol()) {
+                if (fileTransferLogger.isDebugEnabled()) {
+                    fileTransferLogger.debug(
+                        "Trying protocol internal filetransfer");
+                }
+
+                success = internalFileTransferDefaultProtocol();
+            }
+            //else simply try to start the filetransfer
+            else {
+                success = copyProtocol[i].startFileTransfer();
+            }
+        }
+
+        end = System.currentTimeMillis();
+
+        if (fileTransferLogger.isDebugEnabled()) {
+            fileTransferLogger.debug("FileTransfer spent:" + (end - beginning) +
+                "[ms]");
+        }
+
+        if (success) {
+            fileTransferLogger.info("FileTransfer was successful");
+        } else {
+            fileTransferLogger.info("FileTransfer faild");
+        }
     }
 
     /**
-     * This method should be redefined on every protocol that 
+     * This method should be redefined on every protocol that
      * internaly implements the file transfer. Ex: Unicore
      * @return true if and only if successful.
      */
-    protected boolean internalFileTransferDefaultProtocol(){
-    	
-    	//The default is false, to keep on trying the protocols
-    	return false;
+    protected boolean internalFileTransferDefaultProtocol() {
+        //The default is false, to keep on trying the protocols
+        return false;
     }
-    
+
     protected void handleProcess(java.io.BufferedReader in,
         java.io.BufferedWriter out, java.io.BufferedReader err) {
         if (closeStream) {
