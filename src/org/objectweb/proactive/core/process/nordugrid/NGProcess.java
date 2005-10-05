@@ -298,7 +298,12 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         }
 
         //then we append the executable in the inputfiles, to be transfered on the server
-        inputFiles = inputFiles + "(\"" + tmp_executable + "\" \"" +
-            tmp_executable_path + "\")";
+        if (inputFiles != null) {
+            inputFiles = inputFiles + "(\"" + tmp_executable + "\" \"" +
+                tmp_executable_path + "\")";
+        } else {
+            inputFiles = "(\"" + tmp_executable + "\" \"" +
+                tmp_executable_path + "\")";
+        }
     }
 }
