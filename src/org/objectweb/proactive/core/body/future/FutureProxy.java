@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.future;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -563,8 +564,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         throws java.io.IOException {
         if (!FuturePool.isInsideABodyForwarder()) {
             // If we are on a forwarder we want to forward the call, not wait the 
-        	// futur result or whatever
-        	
+            // futur result or whatever
             //if continuation is already set, we are in a forwarder
             //else if a destination is available in destTable, set the continuation tag
             if (!continuation) {
@@ -595,6 +595,19 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
                 // if sender is still null, it's a forwarder !!
             }
+        } else {
+            // Maybe this FutureProxy has been added into FuturePool by readObject
+            // Remove it and restore continuation
+            ArrayList futures = FuturePool.getIncomingFutures();
+            if (futures != null) {
+                for (int i = 0; i < futures.size(); i++) {
+                    FutureProxy fp = (FutureProxy) futures.get(i);
+                    if (fp.creatorID.equals(creatorID) && (fp.ID == ID)) {
+                        FuturePool.removeIncomingFutures();
+                        continuation = true;
+                    }
+                }
+            }
         }
 
         // Pass the result
@@ -618,8 +631,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         creatorID = (UniqueID) in.readObject();
 
         // THIS MUST BE DONE WHEN THE SERVER SEND LOGS !!
-        
         if (continuation && isAwaited()) {
+            // If we are on a BodyForwarder we DO NOT want to perform the 
+            // following operations but can't avoid them.
+            // There is a hack in writeObject to restore the continuation state        	
             continuation = false;
             FuturePool.registerIncomingFuture(this);
         }
