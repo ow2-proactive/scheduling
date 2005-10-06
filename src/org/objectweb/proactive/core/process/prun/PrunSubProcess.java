@@ -392,7 +392,8 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
             bookingDuration + " ");
 
         if (queueName != null) {
-            prunCommand.append("-native '-q " + queueName + "' ");
+            //prunCommand.append("-native '-q " + queueName + "' ");
+        	prunCommand.append("-q " + queueName + " ");
         }
         
         if (hostList != null) {
