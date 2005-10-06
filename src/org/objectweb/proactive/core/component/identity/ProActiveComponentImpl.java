@@ -204,7 +204,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     private void addControllers(ArrayList interface_references_list,
         ComponentParameters componentParameters, boolean isPrimitive) {
         ComponentConfigurationHandler componentConfiguration = loadComponentConfiguration(componentParameters.getControllerDescription()
-                                                                                                             .getControllersConfigFile());
+                                                                                                             .getControllersConfigFileLocation());
         Map controllers = componentConfiguration.getControllers();
         List inputInterceptorsSignatures = componentConfiguration.getInputInterceptors();
         inputInterceptors.setSize(inputInterceptorsSignatures.size());
