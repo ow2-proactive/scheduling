@@ -99,7 +99,8 @@ public abstract class AbstractExternalProcessDecorator
 
     protected String buildCommand() {
         if ((compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) ||
-                (compositionType == GIVE_COMMAND_AS_PARAMETER)) {
+                (compositionType == GIVE_COMMAND_AS_PARAMETER) ||
+                (compositionType == COPY_FILE_AND_APPEND_COMMAND)) {
             return internalBuildCommand();
         } else {
             if (targetProcess != null) {
