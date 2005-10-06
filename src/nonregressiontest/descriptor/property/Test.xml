@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+
+	<property name="phenri" value="/usr/phenri/home" type="constant"/>
+	<property name="game" value="/lisa/sims" type="overridable"/>
+	<property name="proac_home" value="" type="programset"/>
+	
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="NodeTest"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="NodeTest">
+				<jvmSet>
+					<vmName value="JvmNode"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="JvmNode">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				   <jvmParameters>
+					     <parameter value="-Duser_dir=test${phenri}/ProActive"/>
+						 <parameter value="-Dtest_proac=${proac_home}"/>
+					     <parameter value="-Dlisa.game=${phenri}${game}"/>
+					     <parameter value="-Dlib.home=${phenri}/bin"/>
+					</jvmParameters> 
+				</jvmProcess>
+			</processDefinition>
+			
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

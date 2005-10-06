@@ -78,6 +78,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 vNodesAcqHandler);
             this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
         }
+		this.addHandler(PROPERTY_TAG, new PropertiesHandler());
+		this.addHandler(PROPERTIES_FILE_TAG, new PropertiesFileHandler());
     }
 
     //
@@ -109,7 +111,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             sr.read();
             return (ProActiveDescriptorHandler) h.getResultObject();
         } catch (org.xml.sax.SAXException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             logger.fatal(
                 "a problem occurs when getting the ProActiveDescriptorHandler");
             throw e;
@@ -164,6 +166,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+			// clean properties definitions for current descriptor
+			org.objectweb.proactive.core.xml.XMLProperties.clean();
         }
     }
 

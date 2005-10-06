@@ -915,12 +915,12 @@ public class ProActive {
             part.registerDescriptor(pad.getUrl(), pad);
             return pad;
         } catch (org.xml.sax.SAXException e) {
-            e.printStackTrace();
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
                 "a problem occurs when getting the proActiveDescriptor");
             throw new ProActiveException(e);
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
                 "a problem occurs during the ProActiveDescriptor object creation");
             throw new ProActiveException(e);

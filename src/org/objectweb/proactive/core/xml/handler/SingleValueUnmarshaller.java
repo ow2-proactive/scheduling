@@ -21,10 +21,19 @@ public class SingleValueUnmarshaller extends BasicUnmarshaller {
      * if the data is split into several chunks.
      */
     public void readValue(String value) throws SAXException {
+        if ((value != null) && (value.indexOf("${") >= 0)) {
+            value = org.objectweb.proactive.core.xml.XMLProperties.transform(value);
+        }
         if (resultObject == null) {
             setResultObject(value);
         } else {
             setResultObject(resultObject + value);
         }
+
+        //        if (resultObject == null) {
+        //            setResultObject(value);
+        //        } else {
+        //            setResultObject(resultObject + value);
+        //        }
     }
 }

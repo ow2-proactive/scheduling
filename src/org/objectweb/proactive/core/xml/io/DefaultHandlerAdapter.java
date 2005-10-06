@@ -159,11 +159,22 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
         }
 
         public String getValue(String qName) {
-            return attributes.getValue(qName);
+            String attribute = attributes.getValue(qName);
+            if ((attribute != null) && (attribute.indexOf("${") >= 0)) {
+                return org.objectweb.proactive.core.xml.XMLProperties.transform(attribute);
+            }
+
+            return attribute;
         }
 
         public String getValue(String uri, String localPart) {
-            return attributes.getValue(uri, localPart);
+            String attribut = attributes.getValue(uri, localPart);
+            if ((attribut != null) && (attribut.indexOf("${") >= 0)) {
+                return org.objectweb.proactive.core.xml.XMLProperties.transform(attribut);
+            }
+
+            return attribut;
+            //            return attributes.getValue(uri, localPart);
         }
 
         public int getLength() {

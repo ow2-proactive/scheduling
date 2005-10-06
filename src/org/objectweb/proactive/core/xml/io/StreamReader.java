@@ -109,7 +109,7 @@ public class StreamReader implements XMLReader {
             //parser.setFeature("http://apache.org/xml/features/validation/schema",true);
             parser.parse(inputSource);
         } catch (org.xml.sax.SAXException e) {
-            e.printStackTrace();
+            //e.printStackTrace(); hides errors from properties tests
             throw new java.io.IOException(e.toString());
         }
     }
