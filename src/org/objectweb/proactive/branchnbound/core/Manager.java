@@ -69,6 +69,7 @@ public class Manager implements Serializable, InitActive,
     private static final boolean enableRealloc = false; // TODO turn it configurable
     private static final int backupTask = 10; // TODO turn it configurable
     private static final boolean enableAutoSplit = false; // TODO turn it configurable
+    private static final boolean enableBackup = false; // TODO turn it configurable
     private static final String backupResultFile = System.getProperty(
             "user.home") + System.getProperty("file.separator") +
         "framework.results.backup"; // TODO turn it configurable
@@ -304,7 +305,7 @@ public class Manager implements Serializable, InitActive,
                     this.taskProviderQueue.howManyResults() +
                     " - Not calculated tasks: " +
                     this.taskProviderQueue.size());
-                if ((backupCounter % backupTask) == 0) {
+                if (enableBackup && (backupCounter % backupTask) == 0) {
                     try {
                         this.backupAll(this.rootTask);
                     } catch (IOException e) {
