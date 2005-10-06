@@ -131,7 +131,7 @@ public class ProActiveComponentGroup {
                         componentParameters.getComponentType(),
                         componentParameters.getHierarchicalType(),
                         componentParameters.getControllerDescription()
-                                           .getControllersConfigFile()
+                                           .getControllersConfigFileLocation()
                     });
 
             // build the constructor call for the proxy object to create
@@ -140,7 +140,7 @@ public class ProActiveComponentGroup {
                         componentParameters.getComponentType(),
                         componentParameters.getHierarchicalType(),
                         componentParameters.getControllerDescription()
-                                           .getControllersConfigFile()
+                                           .getControllersConfigFileLocation()
                     });
 
             // Instanciates the proxy object
