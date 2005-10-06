@@ -57,7 +57,7 @@ public class ControllerDescription implements Serializable {
     private String name;
     private boolean synchronous = false;
     public static final String DEFAULT_COMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-component-config.xml";
-    private File controllersConfigFile;
+    private String controllersConfigFileLocation;
 
     /**
      * a no-arg constructor (used in the ProActive parser)
@@ -99,13 +99,8 @@ public class ControllerDescription implements Serializable {
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
             this.synchronous = synchronous;
         }
-        if (controllersConfigFileLocation != null) {
-            controllersConfigFile = new File(controllersConfigFileLocation);
-        } else {
-            controllersConfigFile = new File(getClass()
-                                                 .getResource(DEFAULT_COMPONENT_CONFIG_FILE_LOCATION)
-                                                 .getFile());
-        }
+        this.controllersConfigFileLocation = controllersConfigFileLocation;
+        
     }
 
     /**
@@ -153,7 +148,11 @@ public class ControllerDescription implements Serializable {
         return synchronous;
     }
 
-    public File getControllersConfigFile() {
-        return controllersConfigFile;
+    public String getControllersConfigFileLocation() {
+        if (controllersConfigFileLocation == null) {
+            return controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
+        } else {
+            return controllersConfigFileLocation;
+        }
     }
 }

@@ -79,12 +79,12 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     }
 
     public static ComponentConfigurationHandler createComponentConfigurationHandler(
-        String componentsConfigurationURL)
+        String componentsConfigurationLocation)
         throws IOException, SAXException, ProActiveException {
         try {
             InitialHandler initial_handler = new InitialHandler();
-            String uri = componentsConfigurationURL;
-            StreamReader stream_reader = new StreamReader(new InputSource(uri),
+            String url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation).toString();
+            StreamReader stream_reader = new StreamReader(new InputSource(url),
                     initial_handler);
             stream_reader.read();
             return (ComponentConfigurationHandler) initial_handler.getResultObject();

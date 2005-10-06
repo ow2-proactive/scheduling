@@ -297,12 +297,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * @return
      */
     public static ComponentConfigurationHandler loadComponentConfiguration(
-        File controllerConfigFile) {
+        String controllerConfigFileLocation) {
         try {
-            return ComponentConfigurationHandler.createComponentConfigurationHandler(controllerConfigFile.getPath());
+            return ComponentConfigurationHandler.createComponentConfigurationHandler(controllerConfigFileLocation);
         } catch (Exception e) {
             logger.error("could not load controller config file : " +
-                controllerConfigFile.getAbsolutePath() +
+                    controllerConfigFileLocation +
                 ". Reverting to default controllers configuration.");
             try {
                 return ComponentConfigurationHandler.createComponentConfigurationHandler(ProActiveComponent.class.getResource(
@@ -484,7 +484,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                     org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
                     new Object[] { body }, body.getReifiedObject())).getProxy(),
                 getComponentParameters().getControllerDescription()
-                    .getControllersConfigFile());
+                    .getControllersConfigFileLocation());
         } catch (Exception e) {
             throw new ProActiveRuntimeException("This component could not generate a reference on itself",
                 e);

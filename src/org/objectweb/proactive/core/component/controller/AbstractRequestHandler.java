@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.controller;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import org.objectweb.proactive.core.component.request.ComponentRequest;
@@ -15,7 +16,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
  *
  * @author Matthieu Morel
  */
-public abstract class AbstractRequestHandler implements RequestHandler {
+public abstract class AbstractRequestHandler implements RequestHandler, Serializable {
     private RequestHandler nextHandler = null;
 
     /*

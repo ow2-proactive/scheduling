@@ -100,10 +100,10 @@ public class ProActiveComponentRepresentativeImpl
     private boolean useShortcuts;
 
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
-        String hierarchicalType, File controllersConfigFile) {
+        String hierarchicalType, String controllersConfigFileLocation) {
         this.componentType = componentType;
         this.hierarchicalType = hierarchicalType;
-        ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadComponentConfiguration(controllersConfigFile);
+        ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadComponentConfiguration(controllersConfigFileLocation);
         Map controllersConfiguration = componentConfiguration.getControllers();
 
         useShortcuts = ("true".equals(System.getProperty(

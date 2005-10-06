@@ -45,12 +45,10 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
@@ -229,7 +227,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                                                                                                      .createComponentRepresentative(componentParameters.getComponentType(),
                     componentParameters.getHierarchicalType(), myProxy,
                     componentParameters.getControllerDescription()
-                                       .getControllersConfigFile());
+                                       .getControllersConfigFileLocation());
             representative.setStubOnBaseObject((StubObject) ao);
             return representative;
         } catch (ActiveObjectCreationException e) {

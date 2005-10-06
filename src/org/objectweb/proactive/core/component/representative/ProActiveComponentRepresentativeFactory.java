@@ -73,14 +73,9 @@ public class ProActiveComponentRepresentativeFactory {
      */
     public ProActiveComponentRepresentative createComponentRepresentative(
         ComponentType componentType, String hierarchicalType, Proxy proxy,
-        File controllerConfigFile) {
-        if (controllerConfigFile == null) {
-            controllerConfigFile = new File(getClass()
-                                                .getResource(ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION)
-                                                .getFile());
-        }
+        String controllerConfigFileLocation) {
         ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType,
-                hierarchicalType, controllerConfigFile);
+                hierarchicalType, controllerConfigFileLocation);
         representative.setProxy(proxy);
         return representative;
     }
