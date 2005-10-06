@@ -125,7 +125,7 @@ public class ProActiveComponentGroup {
 
             // create the stub with the appropriate parameters
             Constructor constructor = ProActiveComponentRepresentativeImpl.class.getConstructor(new Class[] {
-                        ComponentType.class, String.class, File.class
+                        ComponentType.class, String.class, String.class
                     });
             result = (ProActiveComponentRepresentative) constructor.newInstance(new Object[] {
                         componentParameters.getComponentType(),
