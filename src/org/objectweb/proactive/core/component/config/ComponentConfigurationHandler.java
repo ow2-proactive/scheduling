@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.config;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -83,7 +84,14 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         throws IOException, SAXException, ProActiveException {
         try {
             InitialHandler initial_handler = new InitialHandler();
-            String url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation).toString();
+            String url = null;
+            if (ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation) != null) {
+                // it's in the classpath
+                url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation).toString();
+            } else {
+                // user-specified
+                url = new File(componentsConfigurationLocation).getAbsolutePath();
+            }
             StreamReader stream_reader = new StreamReader(new InputSource(url),
                     initial_handler);
             stream_reader.read();
