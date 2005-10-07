@@ -58,55 +58,40 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * @author Alexandre di Costanzo
- * 
+ *
  * Created on May 31, 2005
  */
 public class Manager implements Serializable, InitActive,
-        NodeCreationEventListener {
+    NodeCreationEventListener {
     private static final boolean enableRealloc = false; // TODO turn it
                                                         // configurable
-
     private static final int backupTask = 10; // TODO turn it configurable
-
     private static final boolean enableBackup = false; // TODO turn it
-                                                        // configurable
 
-    private static final String backupResultFile = System
-            .getProperty("user.home")
-            + System.getProperty("file.separator") + "framework.results.backup"; // TODO
-                                                                                    // turn
-                                                                                    // it
-                                                                                    // configurable
+    // configurable
+    private static final String backupResultFile = System.getProperty(
+            "user.home") + System.getProperty("file.separator") +
+        "framework.results.backup"; // TODO
 
-    private static Logger logger = ProActiveLogger
-            .getLogger(Loggers.P2P_SKELETONS_MANAGER);
-
+    // turn
+    // it
+    // configurable
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
     private Task rootTask = null;
-
     private Node[] nodes = null;
-
     private Worker workerGroup = null;
-
     private ListIterator workerGroupListIt = null;
-
     private TaskQueue taskProviderQueue = null;
-
     private Vector futureTaskList = new Vector();
-
     private Vector pendingTaskList = new Vector();
-
     private Vector workingWorkerList = new Vector();
-
     private Vector freeWorkerList = new Vector();
-
     private String queueType = null;
-
     private VirtualNode virtualNode = null;
-
     private VirtualNode[] arrayOfVirtualNodes = null;
-
     private Vector toReallocTaskList = new Vector();
 
     /**
@@ -150,28 +135,27 @@ public class Manager implements Serializable, InitActive,
     }
 
     public Manager(Task root, VirtualNode virtualNode, Node myNode,
-            String queueType) {
+        String queueType) {
         this(root, myNode, queueType);
         this.virtualNode = virtualNode;
     }
 
     public Manager(Task root, VirtualNode[] virtualNodes, Node myNode,
-            String queueType) {
+        String queueType) {
         this(root, myNode, queueType);
         this.arrayOfVirtualNodes = virtualNodes;
     }
 
     public void initActivity(Body body) {
         if (this.virtualNode != null) {
-            ((VirtualNodeImpl) this.virtualNode)
-                    .addNodeCreationEventListener(this);
+            ((VirtualNodeImpl) this.virtualNode).addNodeCreationEventListener(this);
             this.virtualNode.activate();
         } else if (this.arrayOfVirtualNodes != null) {
             for (int i = 0; i < this.arrayOfVirtualNodes.length; i++) {
                 VirtualNodeImpl currentVn = (VirtualNodeImpl) this.arrayOfVirtualNodes[i];
                 if (currentVn.isActivated()) {
-                    logger.warn("The VN " + currentVn.getName()
-                            + " is already actived");
+                    logger.warn("The VN " + currentVn.getName() +
+                        " is already actived");
                     continue;
                 }
                 currentVn.addNodeCreationEventListener(this);
@@ -180,8 +164,8 @@ public class Manager implements Serializable, InitActive,
         }
 
         try {
-            this.taskProviderQueue = (TaskQueue) ProActive.newActive(
-                    this.queueType, null, body.getNodeURL());
+            this.taskProviderQueue = (TaskQueue) ProActive.newActive(this.queueType,
+                    null, body.getNodeURL());
         } catch (ActiveObjectCreationException e1) {
             logger.fatal("Couldn't create the Task Provider", e1);
             throw new ProActiveRuntimeException(e1);
@@ -197,14 +181,13 @@ public class Manager implements Serializable, InitActive,
                 for (int i = 0; i < args.length; i++) {
                     args[i][0] = this.taskProviderQueue;
                 }
-                this.workerGroup = (Worker) ProActiveGroup.newGroup(
-                        Worker.class.getName(), args, this.nodes);
+                this.workerGroup = (Worker) ProActiveGroup.newGroup(Worker.class.getName(),
+                        args, this.nodes);
             } else {
-                this.workerGroup = (Worker) ProActiveGroup
-                        .newGroup(Worker.class.getName());
+                this.workerGroup = (Worker) ProActiveGroup.newGroup(Worker.class.getName());
             }
             this.workerGroupListIt = ProActiveGroup.getGroup(this.workerGroup)
-                    .listIterator();
+                                                   .listIterator();
         } catch (ClassNotReifiableException e) {
             logger.fatal("The Worker is not reifiable", e);
             throw new ProActiveRuntimeException(e);
@@ -225,8 +208,7 @@ public class Manager implements Serializable, InitActive,
             logger.debug("Some workers are down", e);
             Iterator it = e.iterator();
             while (it.hasNext()) {
-                groupOfWorkers.remove(((ExceptionInGroup) it.next())
-                        .getObject());
+                groupOfWorkers.remove(((ExceptionInGroup) it.next()).getObject());
             }
         }
 
@@ -251,24 +233,26 @@ public class Manager implements Serializable, InitActive,
 
         int backupCounter = 0;
         int reallocCounter = 0;
+
         // Serving requests and waiting for results
-        while (this.taskProviderQueue.hasNext().booleanValue()
-                || (this.pendingTaskList.size() != 0)
-                || (! this.toReallocTaskList.isEmpty())) {
+        while (this.taskProviderQueue.hasNext().booleanValue() ||
+                (this.pendingTaskList.size() != 0) ||
+                (!this.toReallocTaskList.isEmpty())) {
             boolean hasAddedTask = false;
-            if (! this.toReallocTaskList.isEmpty() && ! this.freeWorkerList.isEmpty()) {
-                this.assignTaskToWorker((Worker) this.freeWorkerList
-                        .remove(0), (Task)this.toReallocTaskList.remove(0));
+            if (!this.toReallocTaskList.isEmpty() &&
+                    !this.freeWorkerList.isEmpty()) {
+                this.assignTaskToWorker((Worker) this.freeWorkerList.remove(0),
+                    (Task) this.toReallocTaskList.remove(0));
                 logger.info("A task just reallocated");
             }
             if (this.taskProviderQueue.hasNext().booleanValue()) {
                 if (this.workerGroupListIt.hasNext()) {
-                    this.assignTaskToWorker((Worker) this.workerGroupListIt
-                            .next(), this.taskProviderQueue.next());
+                    this.assignTaskToWorker((Worker) this.workerGroupListIt.next(),
+                        this.taskProviderQueue.next());
                     hasAddedTask = true;
                 } else if ((this.freeWorkerList.size() > 0)) {
-                    this.assignTaskToWorker((Worker) this.freeWorkerList
-                            .remove(0), this.taskProviderQueue.next());
+                    this.assignTaskToWorker((Worker) this.freeWorkerList.remove(
+                            0), this.taskProviderQueue.next());
                     hasAddedTask = true;
                 } else if (this.futureTaskList.size() == 0) {
                     // Waiting workers
@@ -279,11 +263,11 @@ public class Manager implements Serializable, InitActive,
                     continue;
                 }
                 if (hasAddedTask && logger.isInfoEnabled()) {
-                    logger.info("Pending tasks: " + this.pendingTaskList.size()
-                            + " - Achivied tasks: "
-                            + this.taskProviderQueue.howManyResults()
-                            + " - Not calculated tasks: "
-                            + this.taskProviderQueue.size());
+                    logger.info("Pending tasks: " +
+                        this.pendingTaskList.size() + " - Achivied tasks: " +
+                        this.taskProviderQueue.howManyResults() +
+                        " - Not calculated tasks: " +
+                        this.taskProviderQueue.size());
                     continue;
                 }
             }
@@ -291,28 +275,26 @@ public class Manager implements Serializable, InitActive,
             try {
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
                 backupCounter++;
-                Result currentResult = (Result) this.futureTaskList
-                        .remove(index);
+                Result currentResult = (Result) this.futureTaskList.remove(index);
                 this.taskProviderQueue.addResult(currentResult);
                 this.pendingTaskList.remove(index);
-                Worker freeWorker = (Worker) this.workingWorkerList
-                        .remove(index);
+                Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
                 if (this.taskProviderQueue.hasNext().booleanValue()) {
-                    this.assignTaskToWorker(freeWorker, this.taskProviderQueue
-                            .next());
+                    this.assignTaskToWorker(freeWorker,
+                        this.taskProviderQueue.next());
                 } else {
                     this.freeWorkerList.add(freeWorker);
                 }
                 if (logger.isInfoEnabled()) {
                     logger.info(currentResult);
 
-                    logger.info("Pending tasks: " + this.pendingTaskList.size()
-                            + " - Achivied tasks: "
-                            + this.taskProviderQueue.howManyResults()
-                            + " - Not calculated tasks: "
-                            + this.taskProviderQueue.size());
+                    logger.info("Pending tasks: " +
+                        this.pendingTaskList.size() + " - Achivied tasks: " +
+                        this.taskProviderQueue.howManyResults() +
+                        " - Not calculated tasks: " +
+                        this.taskProviderQueue.size());
                 }
-                if (enableBackup && (backupCounter % backupTask) == 0) {
+                if (enableBackup && ((backupCounter % backupTask) == 0)) {
                     try {
                         this.backupAll(this.rootTask);
                     } catch (IOException e) {
@@ -322,30 +304,30 @@ public class Manager implements Serializable, InitActive,
             } catch (ProActiveException e) {
                 reallocCounter++;
                 // Reallocating tasks
-                if (! this.freeWorkerList.isEmpty() && reallocCounter == 60) {
+                if (!this.freeWorkerList.isEmpty() && (reallocCounter == 60)) {
                     reallocCounter = 0;
-                    for (int i = 0 ; i < this.workingWorkerList.size() ; i++) {
+                    for (int i = 0; i < this.workingWorkerList.size(); i++) {
                         Worker current = (Worker) this.workingWorkerList.get(i);
                         try {
                             current.alive();
                         } catch (Exception down) {
                             this.futureTaskList.remove(i);
                             this.workingWorkerList.remove(i);
-                            this.toReallocTaskList.add(this.pendingTaskList.remove(i));
+                            this.toReallocTaskList.add(this.pendingTaskList.remove(
+                                    i));
                         }
                     }
                 }
                 continue;
             }
         }
-        logger.info("Total of results = "
-                + this.taskProviderQueue.howManyResults());
+        logger.info("Total of results = " +
+            this.taskProviderQueue.howManyResults());
         logger.info("Total of tasks = " + this.taskProviderQueue.size());
         // Set the final result
-        return this.rootTask.gather((Result[]) this.taskProviderQueue
-                .getAllResults().toArray(
-                        new Result[this.taskProviderQueue.howManyResults()
-                                .intValue()]));
+        return this.rootTask.gather((Result[]) this.taskProviderQueue.getAllResults()
+                                                                     .toArray(new Result[this.taskProviderQueue.howManyResults()
+                                                                                                               .intValue()]));
     }
 
     private void backupAll(Task rootTask) throws IOException {
@@ -356,7 +338,7 @@ public class Manager implements Serializable, InitActive,
 
     /**
      * Assign a task to a worker.
-     * 
+     *
      * @param worker
      *            the worker.
      * @param task
@@ -369,29 +351,12 @@ public class Manager implements Serializable, InitActive,
     }
 
     public void nodeCreated(NodeCreationEvent event) {
-        Object[] args = new Object[] { this.taskProviderQueue };
         Node createdNode = event.getNode();
-        if (logger.isInfoEnabled()) {
-            logger.info(">>>> New Node: "
-                    + createdNode.getNodeInformation().getURL());
+        if (logger.isDebugEnabled()) {
+            logger.debug(">>>> New Node: " +
+                createdNode.getNodeInformation().getURL());
         }
-        Worker newWorker = null;
-        try {
-            newWorker = (Worker) ProActive.newActive(Worker.class.getName(),
-                    args, createdNode);
-        } catch (ActiveObjectCreationException e) {
-            logger.warn("Couldn't create a worker", e);
-            return;
-        } catch (NodeException e) {
-            logger.warn(
-                    "Couldn't create a worker, this caused by a node failure",
-                    e);
-            return;
-        }
-        this.workerGroup.addMember(newWorker);
-        this.workerGroupListIt.add(newWorker);
-        newWorker.setWorkerGroup(this.workerGroup);
-        this.freeWorkerList.add(newWorker);
+        new Thread(new NewActiveThread(this, createdNode)).run();
     }
 
     public void setHungryLevel(int level) {
@@ -406,12 +371,10 @@ public class Manager implements Serializable, InitActive,
         }
         this.taskProviderQueue.loadTasks(taskFile);
         this.taskProviderQueue.getRootTaskFromBackup();
-        this.pendingTaskList = (Vector) this.taskProviderQueue
-                .getPendingTasksFromBackup();
+        this.pendingTaskList = (Vector) this.taskProviderQueue.getPendingTasksFromBackup();
         try {
-            this.rootTask = (Task) ProActive.turnActive(this.taskProviderQueue
-                    .getRootTaskFromBackup(), ProActive.getBodyOnThis()
-                    .getNodeURL());
+            this.rootTask = (Task) ProActive.turnActive(this.taskProviderQueue.getRootTaskFromBackup(),
+                    ProActive.getBodyOnThis().getNodeURL());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
@@ -431,5 +394,33 @@ public class Manager implements Serializable, InitActive,
 
     public VirtualNode[] getBackVns() {
         return this.arrayOfVirtualNodes;
+    }
+
+    private class NewActiveThread implements Runnable {
+        private Manager manager;
+        private Node node;
+
+        public NewActiveThread(Manager manager, Node node) {
+            this.manager = manager;
+            this.node = node;
+        }
+
+        public void run() {
+            Object[] args = new Object[] { manager.taskProviderQueue };
+            Worker newWorker = null;
+            try {
+                newWorker = (Worker) ProActive.newActive(Worker.class.getName(),
+                        args, node);
+            } catch (ActiveObjectCreationException e) {
+                logger.warn("Couldn't create a worker", e);
+            } catch (NodeException e) {
+                logger.warn("Couldn't create a worker, this caused by a node failure",
+                    e);
+            }
+            manager.workerGroup.addMember(newWorker);
+            manager.workerGroupListIt.add(newWorker);
+            newWorker.setWorkerGroup(manager.workerGroup);
+            manager.freeWorkerList.add(newWorker);
+        }
     }
 }

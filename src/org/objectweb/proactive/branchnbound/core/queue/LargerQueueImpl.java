@@ -40,6 +40,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -56,6 +57,7 @@ public class LargerQueueImpl implements TaskQueue {
     private Vector pendingTasksFromBackup = new Vector();
     private Task rootTaskFromBackup = null;
     private Vector allResults = new Vector();
+
     public LargerQueueImpl() {
     }
 
@@ -63,6 +65,7 @@ public class LargerQueueImpl implements TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
     public void addAll(Collection tasks) {
+    	tasks = (Collection) ProActive.getFutureValue(tasks);
         if (tasks.size() > 0) {
             this.queue.add(tasks);
             this.size += tasks.size();
