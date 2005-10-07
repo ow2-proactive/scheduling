@@ -35,60 +35,117 @@
 <h2>Overview</h2>
 
 <p class="textNormal">
-
-ProActive provides fault-tolerance capabilities through a
-Communication-Induced Checkpointing protocol. Making a ProActive application
+ProActive can provide fault-tolerance capabilities through two differents
+protocols: a Communication-Induced Checkpointing protocol (CIC) and a
+pessimistic message logging protocol (PML). Making a ProActive application
 fault-tolerant is <b>fully transparent</b>; active objects are turned
 fault-tolerant using Java properties that can be set in the <A
-href="Descriptor.html">deployment descriptor</A>. Persistence of active
-objects is obtained through standard Java serialization; a checkpoint thus
-consists in an object containing a serialized copy of an active object and
-few informations related to the protocol. As a consequence, a fault-tolerant
-active object must be serializable. <BR><BR>
-
-
-Each active object in a fault-tolerant application have to checkpoint at least
-every <b>TTC</b> (Time To Checkpoint) seconds. When all the active objects
-have taken a checkpoint, a <b>global state</b> is formed. If a failure occurs,
-the <i>entire</i> application must restarts from such a global state. The TTC
-value depends mainly on the assessed frequency of failures. A little TTC value
-leads to very frequent global state creation and thus to a little rollback in
-the execution in case of failure. But a little TTC value leads also to a
-bigger overhead between a non-fault-tolerant and a fault-tolerant
-execution. The TTC value can be set by the programmer in the deployment
-descriptor.
-
-
-
-
-
-
-
-
+href="Descriptor.html">deployment descriptor</A> . The programmer can select
+<i>at deployment time</i> the most adapted protocol regarding the application
+and the execution environment.
+<BR>
+Persistence of active objects is obtained through standard Java serialization;
+a checkpoint thus consists in an object containing a serialized copy of an
+active object and few informations related to the protocol. As a consequence,
+a fault-tolerant active object must be serializable.
 </p>
 
-<BR><BR> 
+
+<h3>Communication Induced Checkpointing (CIC)</h3> 
+
+<p class="textNormal">
+Each active object in a CIC fault-tolerant application have to checkpoint at
+least every <b>TTC</b> (Time To Checkpoint) seconds. When all the active
+objects have taken a checkpoint, a <b>global state</b> is formed. If a failure
+occurs, the <i>entire</i> application must restarts from such a global
+state. The TTC value depends mainly on the assessed frequency of failures. A
+little TTC value leads to very frequent global state creation and thus to a
+little rollback in the execution in case of failure. But a little TTC value
+leads also to a bigger overhead between a non-fault-tolerant and a
+fault-tolerant execution. The TTC value can be set by the programmer in the
+deployment descriptor.
+</p>
+
+<p class="textNormal">
+The failure-free overhead induced by the CIC protocol is usually low, and this
+overhead is quasi-independent from the message communication rate. The
+counterpart is that the recovery time could be long since all the application
+must restart after the failure of one or more active object.
+</p>
+
+
+
+<h3>Pessimistic message logging (PML)</h3> 
+
+<p class="textNormal">
+Each active object in a PML fault-tolerant application have to checkpoint at
+least every TTC seconds and all the messages delivered to an active object are
+logged on a stable storage. There is no need for global synchronization as
+with CIC protocol, each checkpoint is independent: if a failure occurs, only
+the faulty process have to recover from its latest checkpoint. As for CIC
+protocol, the TTC value impact the global failure-free overhead, but the
+overhead is more linked to the communication rate of the application.
+</p>
+
+
+<p class="textNormal">
+Regarding the CIC protocol, the PML protocol induces a higher overhead on
+failure-free execution, but the recovery time is lower as a single failure
+does not involve all the system.
+</p>
+
+
+
+<BR>
 <h2>Making a ProActive application fault-tolerant</h2>
+
+
+<h3>Resource Server</h3>
+<p class="textNormal">
+To be able to recover a failed active object, the fault-tolerance system must
+have access to a <i>resource server</i>. A resource server is able to return a
+free node that can host the recovered active object.
+<BR>
+A resource server is implemented in ProActive in
+<code>ft.servers.resource.ResourceServer</code>. This server can store free
+      nodes by two differents way:
+<ul>
+<li> at deployment time: the user can specify in the deployment descriptor a
+resource virtual node. Each node mapped on this virtual node will automaticaly
+register itself as free node at the specified resource server.
+
+<li> at execution time: the resource server can use an <A
+HREF="p2p.html">underlying p2p network</A> to reclaim free nodes when a
+hosting node is needed.
+</ul>
+</p>
+<p class="textNormal">
+Note that those two mechanisms can be combined. In that case, the resource
+server first provides node registered at deployment time, and when no more
+such nodes are available, the p2p network is used.
+</p>
+
 
 
 <h3>Fault-Tolerance servers</h3>
 <p class="textNormal">
 Fault-tolerance mechanism needs servers for the checkpoints storage, the
-localization of the active objects, and the failure detection. This server are
-implemented in the current version as a unique server
-(<code>ft.util.GlobalFTServer</code>), that implements the interfaces of each
-server (<code>ft.util.*.*</code>). This server is still a prototype version:
-it is implemented using Java RMI, and it is not persistent. An enhanced active
-object version with persistence will come soon. 
+localization of the active objects, and the failure detection. Those servers
+are implemented in the current version as a unique server
+(<code>ft.servers.FTServer</code>), that implements the interfaces of each
+server (<code>ft.servers.*.*</code>). This global server also includes a
+resource server.
 <BR>
-This server is also a classfile server for recovered active objects. It must
-thus have access to all classes of the application, i.e. it must be started
-with <b>all classes of the application in its classpath</b>.
+This server is a classfile server for recovered active objects. It must thus
+have access to all classes of the application, i.e. it must be started with
+<b>all classes of the application in its classpath</b>.
 </p>
 <p class="textNormal">
 The global fault-tolerance server can be launched using the
-<code>ProActive/scripts/[unix|windows]/ft/startGlobalFTServer.[sh|bat]</code> script, with 3 optional parameters:
+<code>ProActive/scripts/[unix|windows]/FT/startGlobalFTServer.[sh|bat]</code> script, with 5 optional parameters:
 <ul>
+<li>the protocol: <code>-proto [cic|pml]</code>. Default value is
+	<code>cic</code>.
 <li>the server name: <code>-name &lt;serverName&gt;</code>. The default name
 	is FTServer.
 <li>the port number: <code>-port &lt;portNumber&gt;</code>. The default port
@@ -97,7 +154,13 @@ The global fault-tolerance server can be launched using the
 	  &lt;periodInSec&gt;</code>. This value defines the time between two
 	consecutive fault detection scanning. The default value is 10
 	sec. Note that an active object is considered as faulty when it becomes unreachable,
-	i.e. when it becomes unable to receive a message from another active object.
+	i.e. when it becomes unable to receive a message from another active
+	object.
+
+<li>the URL of a <A HREF="p2p.html">p2p service</A> that can be used by the
+resource server: <code>-p2p &lt;serviceURL&gt;</code>. There is no default value for
+this option.
+
 </ul>
 <p class="textNormal">
 The server can also be directly launched in the java source code, using
@@ -131,8 +194,12 @@ disabled for all the application.
 Fault-tolerance capabilities of a ProActive application are set in the
 deployment descriptor, using the <code>faultTolerance</code> service. This
 service is attached to <i>a virtual node</i>: active objects that are deployed
-on this virtual node are turned fault-tolerant. The service defines <b>servers
-URLs</b> :
+on this virtual node are turned fault-tolerant. This service must first
+defines the protocol that have to be used for this application. The user can
+select the appropriate protocol with the entry <code>&lt;protocol
+type="[cic|pml]"/></code> in the definition of the service.
+<BR>
+The service also defines <b>servers URLs</b> :
 </p>
 <ul>
 <li> <code>&lt;globalServer url="..."/&gt;</code> set the
@@ -148,12 +215,11 @@ URLs</b> :
 <li> <code>&lt;recoveryProcess url="..."/&gt;</code> set the
 	URL of the recovery process, i.e. the process responsible for launching the
 	recovery of the application after a failure.
+<li> <code>&lt;resourceServer url="..."/&gt;</code> set the
+	URL of the resource server, i.e. the server responsible for providing
+	free nodes that can host a recovered active object.
 </ul>
 <p class="textNormal">
-A virtual node can also be a <b>resource node</b>, i.e. a node that can be
-used to recover a failed active object. The fault-tolerance service must set
-the <code>&lt;resourceServer url="..."/&gt;</code>; all the nodes mapped on this
-virtual node are then registered has resource nodes for a recovery.  <BR><BR>
 Finally, the <b>TTC</b> value is set in fault-tolerance service, using <code>
 &lt;ttc value="x"/&gt;</code>, where x is expressed in <i>seconds</i>. If not, the
 default value (30 sec) is used.
@@ -171,7 +237,8 @@ non-fault-tolerant active object (if needed), and one as resource for
 recovery. The two fault-tolerance behaviors correspond to two fault-tolerance
 services, <code>appli</code> and <code>resource</code>. Note that
 non-fault-tolerant active objects can communicate with fault-tolerant active
-objects as usual. TTC is set to 5 sec for all the application.
+objects as usual. Chosen protocol is CIC and TTC is set to 5 sec for all the
+application.
 </p>
 
 <table width="100%">
@@ -240,12 +307,14 @@ objects as usual. TTC is set to 5 sec for all the application.
 &nbsp;&nbsp;&lt;services&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;<b>serviceDefinition id="appli"</b>&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;protocol type="cic"&gt;&lt;/protocol&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;<b>serviceDefinition id="resource"</b>&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;protocol type="cic"&gt;&lt;/protocol&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://localhost:1100/FTServer"&gt;&lt;/resourceServer&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
@@ -474,12 +543,14 @@ started on the host <B>SERVER_HOSTAME</B>:
 &nbsp;&lt;services&gt;<br>
 &nbsp;&nbsp;&lt;serviceDefinition id="appli"&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;protocol type="cic"&gt;&lt;/protocol&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
 &nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
 &nbsp;&nbsp;&lt;serviceDefinition id="ressource"&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;protocol type="cic"&gt;&lt;/protocol&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/resourceServer&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
