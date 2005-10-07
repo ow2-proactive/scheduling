@@ -176,13 +176,17 @@ public class Worker implements Serializable {
                     logger.fatal("Houston we have a problem!!");
                 }
             }
-            logger.info("I was informed from a new remote best result: " +
-                this.bestCurrentResult);
+            if (logger.isDebugEnabled()) {
+                logger.debug("I was informed from a new remote best result: " +
+                        this.bestCurrentResult);
+            }
         }
     }
 
     public void sendSubTasksToTheManager(Vector subTaskList) {
-        logger.info("The task sends " + subTaskList.size() + " sub tasks");
+        if (logger.isDebugEnabled()) {
+            logger.debug("The task sends " + subTaskList.size() + " sub tasks");
+        }
         this.taskProvider.addAll(subTaskList);
     }
 
@@ -201,5 +205,9 @@ public class Worker implements Serializable {
 
     public Task getCurrentTask() {
         return this.currentTask;
+    }
+    
+    public void alive () {
+        // nothing to do here
     }
 }

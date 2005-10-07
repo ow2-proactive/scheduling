@@ -54,9 +54,6 @@ public class BasicQueueImpl implements TaskQueue {
     private Task rootTaskFromBackup = null;
     private Vector pendingTasksFromBackup = new Vector();
     private Vector allResults = new Vector();
-    private Vector pendingTaskList = new Vector();
-    private Vector reallocatedTasks = new Vector();
-    private int reallocatedBase = -1;
 
     public BasicQueueImpl() {
     }
@@ -67,8 +64,10 @@ public class BasicQueueImpl implements TaskQueue {
     public void addAll(Collection tasks) {
         if (tasks.size() > 0) {
             queue.addAll(tasks);
-            logger.info("Task provider just received and added " +
+            if (logger.isDebugEnabled()) {
+            logger.debug("Task provider just received and added " +
                 tasks.size());
+            }
         }
     }
 
@@ -98,8 +97,8 @@ public class BasicQueueImpl implements TaskQueue {
     }
 
     public BooleanWrapper isHungry() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Queue size is " + this.queue.size() +
+        if (logger.isDebugEnabled()) {
+            logger.debug("Queue size is " + this.queue.size() +
                 " - Hungry level is " + this.hungryLevel);
         }
         return new BooleanWrapper(this.queue.size() < this.hungryLevel);

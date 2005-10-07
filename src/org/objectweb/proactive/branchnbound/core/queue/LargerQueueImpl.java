@@ -56,10 +56,6 @@ public class LargerQueueImpl implements TaskQueue {
     private Vector pendingTasksFromBackup = new Vector();
     private Task rootTaskFromBackup = null;
     private Vector allResults = new Vector();
-    private Vector pendingTaskList = new Vector();
-    private Vector reallocatedTasks = new Vector();
-    private int reallocatedBase = -1;
-
     public LargerQueueImpl() {
     }
 
@@ -70,9 +66,8 @@ public class LargerQueueImpl implements TaskQueue {
         if (tasks.size() > 0) {
             this.queue.add(tasks);
             this.size += tasks.size();
-            if (logger.isInfoEnabled()) {
-                Task t = ((Task) tasks.iterator().next());
-                logger.info("Task provider just received and added " +
+            if (logger.isDebugEnabled()) {
+                logger.debug("Task provider just received and added " +
                     tasks.size());
             }
         }
@@ -120,8 +115,8 @@ public class LargerQueueImpl implements TaskQueue {
     }
 
     public BooleanWrapper isHungry() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Queue size is " + this.size + " - Hungry level is " +
+        if (logger.isDebugEnabled()) {
+            logger.debug("Queue size is " + this.size + " - Hungry level is " +
                 hungryLevel);
         }
         return new BooleanWrapper(this.size < hungryLevel);
