@@ -46,7 +46,7 @@ public class MOPClassLoader extends URLClassLoader {
     // ASM is used by default
     public static String BYTE_CODE_MANIPULATOR = (System.getProperty(
             "byteCodeManipulator") != null)
-        ? System.getProperty("byteCodeManipulator") : "javassist";
+        ? System.getProperty("byteCodeManipulator") : "ASM";
     protected static Hashtable classDataCache = new Hashtable();
     protected static MOPClassLoader mopCl = null;
 
