@@ -59,14 +59,16 @@ public class Checkpoint implements java.io.Serializable {
     //checkpointed body and infos
     private byte[] checkpointedBody;
 
-    //index of this checkpoint
-    private int index;
-
     //additionnal infos
     private CheckpointInfo ci;
 
-    // CONSTRUCTORS
-    private Checkpoint(Body bodyToCheckpoint, String additionalCodebase) {
+    /**
+     * Create a checkpoint. The body given as parameter is serialized in this constructor.
+     * @param bodyToCheckpoint the body that have to be checkpointed
+     * @param index the index of the checkpoint
+     * @param additionalCodebase the URL of the CheckpointServer classserver
+     */
+    public Checkpoint(Body bodyToCheckpoint, String additionalCodebase) {
         try {
             this.bodyID = bodyToCheckpoint.getID();
             String codebase = System.getProperty("java.rmi.server.codebase");
@@ -85,18 +87,6 @@ public class Checkpoint implements java.io.Serializable {
         }
     }
 
-    /**
-     * Create a checkpoint. The body given as parameter is serialized in this constructor.
-     * @param bodyToCheckpoint the body that have to be checkpointed
-     * @param index the index of the checkpoint
-     * @param additionalCodebase the URL of the CheckpointServer classserver
-     */
-    public Checkpoint(Body bodyToCheckpoint, int index,
-        String additionalCodebase) {
-        this(bodyToCheckpoint, additionalCodebase);
-        this.index = index;
-    }
-
     // GETTER SETTER
     public UniqueID getBodyID() {
         return bodyID;
@@ -104,14 +94,6 @@ public class Checkpoint implements java.io.Serializable {
 
     public void setBodyID(UniqueID uniqueID) {
         bodyID = uniqueID;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     public void setCheckpointInfo(CheckpointInfo ci) {
@@ -154,7 +136,7 @@ public class Checkpoint implements java.io.Serializable {
      * Pretty printing
      */
     public String toString() {
-        return "Checkpoint " + this.index + " for body " + this.bodyID;
+        return "Checkpoint for body " + this.bodyID;
     }
 
     /*

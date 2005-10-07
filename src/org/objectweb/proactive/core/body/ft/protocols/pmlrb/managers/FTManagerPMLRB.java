@@ -79,9 +79,6 @@ public class FTManagerPMLRB extends FTManager {
     // timer
     private long checkpointTimer;
 
-    // checkpoint index
-    private int checkpointIndex;
-
     //sequence number of sending for any messages
     private char sendNumber;
     private MessageInfoPMLRB replyInfos;
@@ -95,7 +92,6 @@ public class FTManagerPMLRB extends FTManager {
         super.init(owner);
         this.latestReceivedIndex = new Hashtable();
         this.isRecovering = false;
-        this.checkpointIndex = 0;
         //checkpoint timer init: a checkpoint must be taken before any request service
         this.checkpointTimer = 0;
         // this.checkpointTimer = System.currentTimeMillis();
@@ -327,6 +323,8 @@ public class FTManagerPMLRB extends FTManager {
             logger.error("Unable to connect with location server");
             e.printStackTrace();
         }
+        
+        this.checkpointTimer = System.currentTimeMillis();
 
         return 0;
     }
@@ -352,8 +350,7 @@ public class FTManagerPMLRB extends FTManager {
         try {
             this.setCheckpointTag(true);
             // create a checkpoint
-            Checkpoint c = new Checkpoint((Body) owner, this.checkpointIndex,
-                    this.additionalCodebase);
+            Checkpoint c = new Checkpoint((Body) owner, this.additionalCodebase);
 
             // create checkpoint info with the pending request
             CheckpointInfoPMLRB ci = new CheckpointInfoPMLRB(pending);
@@ -366,7 +363,6 @@ public class FTManagerPMLRB extends FTManager {
 
             // reninit checkpoint values
             this.checkpointTimer = System.currentTimeMillis();
-            this.checkpointIndex++;
 
             this.setCheckpointTag(false);
         } catch (RemoteException e) {

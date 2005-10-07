@@ -127,14 +127,17 @@ public class FaultDetectorImpl implements FaultDetector {
     private class FaultDetectorThread extends Thread {
         
         private boolean kill;
+        private boolean wakeUpCalled;
         
         public FaultDetectorThread() {
             this.kill = false;
+            this.wakeUpCalled = false;
             this.setName("FaultDetectorThread");
         }
 
         public synchronized void wakeUp() {
             notifyAll();
+            this.wakeUpCalled = true;
         }
         
         public synchronized void killMe() {
@@ -144,6 +147,7 @@ public class FaultDetectorImpl implements FaultDetector {
 
         public synchronized void pause() {
             try {
+                this.wakeUpCalled=false;
                 this.wait(FaultDetectorImpl.this.faultDetectionPeriod);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -161,9 +165,12 @@ public class FaultDetectorImpl implements FaultDetector {
                         " objects ...");
                     while (it.hasNext()) {
                         if (kill) break;
+                        if (wakeUpCalled) {
+                            // a detection is forced, restart...
+                            it=al.iterator();
+                            this.wakeUpCalled = false;
+                        }
                         UniversalBody current = (UniversalBody) (it.next());
-
-                        //((RemoteServer)current)
                         if (FaultDetectorImpl.this.server.isUnreachable(current)) {
                             FaultDetectorImpl.this.server.failureDetected(current.getID());
                             // other failures may be detected by the recoveryProcess

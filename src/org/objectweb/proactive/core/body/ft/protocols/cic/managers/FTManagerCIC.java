@@ -671,8 +671,7 @@ public class FTManagerCIC
 
                     // checkpoint the active object
                     this.setCheckpointTag(true);
-                    c = new Checkpoint((Body) owner, this.checkpointIndex,
-                            this.additionalCodebase);
+                    c = new Checkpoint((Body) owner, this.additionalCodebase);
                     // add info to checkpoint
                     c.setCheckpointInfo(ci);
 

@@ -156,7 +156,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
 
         // updating monitoring
-        int index = c.getIndex();
+        int index = ((CheckpointInfoCIC)(c.getCheckpointInfo())).checkpointIndex;
         if (index > this.lastRegisteredCkpt) {
             this.lastRegisteredCkpt = index;
         }
