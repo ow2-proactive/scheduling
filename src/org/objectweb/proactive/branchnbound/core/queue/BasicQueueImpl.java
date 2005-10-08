@@ -101,7 +101,7 @@ public class BasicQueueImpl implements TaskQueue {
             logger.debug("Queue size is " + this.queue.size() +
                 " - Hungry level is " + this.hungryLevel);
         }
-        return new BooleanWrapper(this.queue.size() < this.hungryLevel);
+        return new BooleanWrapper(this.queue.size() <= this.hungryLevel);
     }
 
     public void setHungryLevel(int level) {

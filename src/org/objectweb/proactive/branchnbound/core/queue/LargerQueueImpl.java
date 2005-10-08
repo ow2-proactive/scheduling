@@ -122,7 +122,7 @@ public class LargerQueueImpl implements TaskQueue {
             logger.debug("Queue size is " + this.size + " - Hungry level is " +
                 hungryLevel);
         }
-        return new BooleanWrapper(this.size < hungryLevel);
+        return new BooleanWrapper(this.size <= hungryLevel);
     }
 
     public void setHungryLevel(int level) {
