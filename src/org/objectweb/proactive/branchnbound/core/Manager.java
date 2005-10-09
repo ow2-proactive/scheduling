@@ -329,6 +329,31 @@ public class Manager implements Serializable, InitActive,
                                                                      .toArray(new Result[this.taskProviderQueue.howManyResults()
                                                                                                                .intValue()]));
     }
+    
+    public Result start(Task rootTask) {
+            try {
+                this.rootTask = (Task) ProActive.turnActive(rootTask, ProActive.getBodyOnThis().getNodeURL());
+            } catch (ActiveObjectCreationException e) {
+                logger.fatal("Problem with the turn active of the root task", e);
+                throw new RuntimeException(e);
+            } catch (NodeException e) {
+                logger.fatal("Problem with the node of the root task", e);
+                throw new RuntimeException(e);
+            }
+      
+            // Spliting
+            logger.info("Compute the lower bound for the root task");
+            this.rootTask.initLowerBound();
+            logger.info("Compute the upper bound for the root task");
+            this.rootTask.initUpperBound();
+            logger.info("Calling for the first time split on the root task");
+            Vector subTaskList = this.rootTask.split();
+            logger.info("The ROOT task sends " + subTaskList.size());
+            this.taskProviderQueue.addAll(subTaskList);
+            
+            return ((Manager)ProActive.getStubOnThis()).start();
+           
+    }
 
     private void backupAll(Task rootTask) throws IOException {
         logger.info("Backuping");
