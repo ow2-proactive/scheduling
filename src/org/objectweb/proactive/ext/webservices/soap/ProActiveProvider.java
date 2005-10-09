@@ -46,7 +46,9 @@ import org.apache.soap.server.DeploymentDescriptor;
 import org.apache.soap.server.RPCRouter;
 import org.apache.soap.util.Provider;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ext.webservices.WSConstants;
 
 
@@ -58,6 +60,11 @@ public class ProActiveProvider extends WSConstants implements Provider {
 
     static {
         System.setSecurityManager(new java.rmi.RMISecurityManager());
+        try {
+            RuntimeFactory.getDefaultRuntime();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 
     private DeploymentDescriptor dd;
@@ -113,20 +120,22 @@ public class ProActiveProvider extends WSConstants implements Provider {
         boolean isInterfaceComponent = ((String) props.get(ProActiveDeployer.COMPONENT_INTERFACE)).equals(
                 "true");
 
-        //System.out.println("");
+        
         try {
             if (!isInterfaceComponent) {
                 targetObject = HttpMarshaller.unmarshallObject(serObj);
             } else {
-                //Component c = (Component)ProActiveXMLUtils.deserializeObject(serObj);
                 Object o = HttpMarshaller.unmarshallObject(serObj);
+                String actualName = targetObjectURI.substring(targetObjectURI.lastIndexOf(
+                            '_') + 1);
                 Component c = (Component) o;
-                targetObject = c.getFcInterface(targetObjectURI);
+                targetObject = c.getFcInterface(actualName);
             }
         } catch (Exception e) {
-            System.err.println("Exception : " + e.getMessage());
+            System.out.println("Exception : " + e.getMessage());
             e.printStackTrace(System.out);
         }
+   
     }
 
     /**
@@ -145,11 +154,13 @@ public class ProActiveProvider extends WSConstants implements Provider {
         //dd.setProviderClass(targetObject.getClass().getName());
         // Add logic to invoke the service and get back the result here
         try {
+            
             Response resp = RPCRouter.invoke(dd, call, targetObject,
                     reqContext, resContext);
-
+            
             //build the enveloppe that contains the response 	
             Envelope env = resp.buildEnvelope();
+            System.out.println(env);
             StringWriter sw = new StringWriter();
             env.marshall(sw, call.getSOAPMappingRegistry(), resContext);
             resContext.setRootPart(sw.toString(),

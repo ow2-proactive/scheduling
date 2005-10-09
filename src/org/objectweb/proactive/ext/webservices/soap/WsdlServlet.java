@@ -33,6 +33,7 @@ package org.objectweb.proactive.ext.webservices.soap;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,8 +57,7 @@ public class WsdlServlet extends HttpServlet {
 
         try {
             String id = req.getParameter("id");
-            System.out.println("id = " + id);
-
+            
             if (id == null) {
                 error(out);
 
@@ -65,22 +65,15 @@ public class WsdlServlet extends HttpServlet {
             }
 
             Hashtable options = new Hashtable();
-
-            //System.out.println("user dir = " + System.getProperty("user.dir"));
-            options.put("filename", "webapps/soap/DeployedServices.ds");
+            String catalinaBase = System.getProperty("catalina.base");
+            options.put("filename", catalinaBase + "/webapps/soap/DeployedServices.ds");
             cm.setOptions(options);
             cm.loadRegistry();
 
             String[] liste = cm.list();
-            System.out.println("liste = " + liste);
 
-            for (int i = 0; i < liste.length; i++) {
-                System.out.println("**" + liste[i]);
-            }
 
             DeploymentDescriptor dd = cm.query(id);
-            System.out.println("dd = " + dd);
-
             if (dd == null) {
                 error(out);
 
