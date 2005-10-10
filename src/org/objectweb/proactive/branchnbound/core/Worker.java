@@ -91,9 +91,6 @@ public class Worker implements Serializable {
             activedTask = (Task) ProActive.turnActive(ProActive.getFutureValue(
                         task), workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
-			//if (this.currentTask != null) {
-			//	this.stopTask();
-			//}
             this.currentTask = activedTask;
             ProActive.setImmediateService(this.currentTask, "setBestKnownResult");
         } catch (ActiveObjectCreationException e) {
@@ -150,7 +147,7 @@ public class Worker implements Serializable {
                     logger.fatal("Houston we have a problem!!");
                 }
             }
-            logger.info("A new best result was localy found: " +
+            logger.debug("A new best result was localy found: " +
                 this.bestCurrentResult);
         }
         logger.debug("The new best result is NOT BETTER");
