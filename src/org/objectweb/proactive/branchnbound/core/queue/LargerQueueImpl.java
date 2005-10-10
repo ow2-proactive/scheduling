@@ -75,7 +75,17 @@ public class LargerQueueImpl implements TaskQueue {
             }
         }
     }
-
+	
+	public void reset() {
+		queue = new Vector();
+		size = 0;
+	    hungryLevel = 0;
+	    current = 0;
+	    pendingTasksFromBackup = new Vector();
+	    rootTaskFromBackup = null;
+	    allResults = new Vector();
+	}
+	
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#size()
      */

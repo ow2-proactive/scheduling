@@ -69,6 +69,8 @@ public interface TaskQueue extends Serializable {
     public abstract Task getRootTaskFromBackup();
 
     public abstract Collection getPendingTasksFromBackup();
+	
+	public abstract void reset();
 
     // --------------------------------------------------------------------------
     // Managing results

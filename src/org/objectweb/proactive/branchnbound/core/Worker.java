@@ -91,6 +91,9 @@ public class Worker implements Serializable {
             activedTask = (Task) ProActive.turnActive(ProActive.getFutureValue(
                         task), workerNodeUrl);
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
+			//if (this.currentTask != null) {
+			//	this.stopTask();
+			//}
             this.currentTask = activedTask;
             ProActive.setImmediateService(this.currentTask, "setBestKnownResult");
         } catch (ActiveObjectCreationException e) {
@@ -210,4 +213,9 @@ public class Worker implements Serializable {
     public void alive () {
         // nothing to do here
     }
+	
+	public void reset() {
+		this.bestCurrentResult = null;
+		this.currentTask = null;
+	}
 }

@@ -331,6 +331,10 @@ public class Manager implements Serializable, InitActive,
     }
     
     public Result start(Task rootTask) {
+            this.taskProviderQueue.reset();
+		
+			this.workerGroup.reset();
+		
             try {
                 this.rootTask = (Task) ProActive.turnActive(rootTask, ProActive.getBodyOnThis().getNodeURL());
             } catch (ActiveObjectCreationException e) {

@@ -58,6 +58,14 @@ public class BasicQueueImpl implements TaskQueue {
     public BasicQueueImpl() {
     }
 
+	public void reset() {
+	    queue = new Vector();
+	    hungryLevel = 0;
+	    rootTaskFromBackup = null;
+	    pendingTasksFromBackup = new Vector();
+	    allResults = new Vector();
+	}
+	
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
