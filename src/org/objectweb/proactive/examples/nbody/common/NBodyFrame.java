@@ -62,7 +62,7 @@ import javax.swing.event.ChangeListener;
 
 public class NBodyFrame extends JFrame implements Serializable, ActionListener,
     ChangeListener, MouseListener, WindowListener {
-    public final static int SIZE = 800;
+    public final static int SIZE = 600;
     public final static int MAX_HISTO_SIZE = 100;
 
     // functional
