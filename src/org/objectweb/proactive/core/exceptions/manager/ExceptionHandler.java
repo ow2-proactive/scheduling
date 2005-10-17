@@ -85,6 +85,12 @@ public class ExceptionHandler {
             throw (RuntimeException) exception;
         }
 
+        if (exception instanceof Error) {
+
+            /* Maybe an Error should result in an NFE */
+            throw (Error) exception;
+        }
+
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             if (!stack.isCaught(exception.getClass())) {
