@@ -230,4 +230,8 @@ public class BasicQueueImpl implements TaskQueue {
             throw new ProActiveRuntimeException(e);
         }
     }
+
+    public void addTask(Task t) {
+        queue.add(t);
+    }
 }

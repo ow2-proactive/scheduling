@@ -59,6 +59,7 @@ public class Worker implements Serializable {
     private String workerNodeUrl = null;
     private Group workerGroupCollection = null;
     private Task currentTask = null;
+    private Vector allWorkerGroup = new Vector();
 
     /**
      * The active object empty constructor
@@ -138,6 +139,9 @@ public class Worker implements Serializable {
             this.bestCurrentResult = newBest;
             if (this.workerGroup != null) {
                 this.workerGroup.informNewBestResult(this.bestCurrentResult);
+                for (int i = 0 ; i < this.allWorkerGroup.size() ; i++) {
+                    ((Worker)this.allWorkerGroup.get(i)).informNewBestResult(this.bestCurrentResult);
+                }
             }
             if (this.currentTask != null) {
                 try {
@@ -215,4 +219,8 @@ public class Worker implements Serializable {
 		this.bestCurrentResult = null;
 		this.currentTask = null;
 	}
+    
+    public void addGroup(Worker group){
+        this.allWorkerGroup.add(group);
+    }
 }

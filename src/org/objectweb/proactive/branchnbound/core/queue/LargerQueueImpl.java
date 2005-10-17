@@ -250,4 +250,11 @@ public class LargerQueueImpl implements TaskQueue {
             throw new ProActiveRuntimeException(e);
         }
     }
+
+    public void addTask(Task t) {
+        Vector v = new Vector();
+        v.add(t);
+        this.queue.add(v);
+        size++;
+    }
 }

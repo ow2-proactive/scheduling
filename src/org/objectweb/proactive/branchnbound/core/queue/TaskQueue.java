@@ -84,4 +84,6 @@ public interface TaskQueue extends Serializable {
     public abstract void backupResults(String backupResultFile);
 
     public abstract void loadResults(String backupResultFile);
+
+    public abstract void addTask(Task t);
 }
