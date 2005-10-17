@@ -53,7 +53,6 @@ public class Planet implements Serializable {
      */
     public Planet() {
     }
-    ;
 
     /**
      * Builds one Planet within the given frame.
@@ -68,7 +67,6 @@ public class Planet implements Serializable {
         this.vx = 0;
         this.vy = 0;
         this.diameter = (this.mass / 2000) + 3;
-        ;
     }
 
     /**

@@ -49,7 +49,6 @@ public class Info implements Serializable {
 
     public Info() {
     }
-    ;
     public Info(Vector planetVector, Rectangle bounds) {
         this.radius = Math.sqrt((bounds.width * bounds.width) +
                 (bounds.height * bounds.height)) / 2;

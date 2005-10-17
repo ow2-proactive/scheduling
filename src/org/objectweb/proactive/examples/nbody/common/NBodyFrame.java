@@ -36,7 +36,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,49 +54,35 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 
-public class NBodyFrame extends JFrame implements Serializable, ActionListener,
-    ChangeListener, MouseListener, WindowListener {
-    public final static int SIZE = 600;
+public class NBodyFrame extends JFrame implements Serializable, ActionListener, MouseListener,
+    WindowListener {
+    public final static int SIZE = 500;
     public final static int MAX_HISTO_SIZE = 100;
 
     // functional
     private String[] bodyname;
-    int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
-    ArrayList names;
-    int nbBodies;
-    CircularPostionList[] historics;
-    boolean showTrace = false;
-    int histoSize = MAX_HISTO_SIZE;
-    int zoomValue = 1;
-    int xCenter = SIZE / 2;
-    int yCenter = SIZE / 2;
+    private int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
+    private ArrayList names;
+    private int nbBodies;
+    private CircularPostionList[] historics;
+    private boolean showTrace = false;
+    private int histoSize = MAX_HISTO_SIZE;
+    private double zoomValue = 1;
+    private int xCenter = SIZE / 2; // the center of the display
+    private int yCenter = SIZE / 2;
 
     // gui
-    JButton kill;
-    JComboBox listVMs;
-    JComboBox protocol;
-    JCheckBox queue;
-    JPanel main;
-    JPanel gui;
-    JPanel anim;
-    JSlider zoom;
+    private JButton kill;
+    private JComboBox listVMs = new JComboBox();
+    private JComboBox protocol;
+    private JCheckBox queueCheckBox;
+    private JButton zoomIn;
+    private JButton zoomOut;
     private Start killsupport;
 
-    public NBodyFrame() {
-    }
-
-    /**
-     * @param title
-     * @throws java.awt.HeadlessException
-     */
-    public NBodyFrame(String title, int nb, boolean displayft,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport)
-        throws HeadlessException {
+    public NBodyFrame(String title, int nb, boolean displayft, Start killsupport) {
         super(title);
         this.killsupport = killsupport;
         this.nbBodies = nb;
@@ -118,171 +103,57 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
         ClassLoader cl = this.getClass().getClassLoader();
         java.net.URL u = cl.getResource(
                 "org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
-        final Image fond = getToolkit().getImage(u);
-
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        final Image backGround = getToolkit().getImage(u);
         this.addWindowListener(this);
 
-        // panels
-        this.main = new JPanel(new BorderLayout());
+        // the GUI panel (where the buttons are), first the atomic components, then assembling them
+        this.queueCheckBox = new JCheckBox("Show trace", false);
+        this.queueCheckBox.addActionListener(this);
 
-        // Animation panel
-        this.anim = new JPanel() {
-                    int iter = 0;
+        this.zoomIn = new JButton("Zoom in");
+        this.zoomIn.addActionListener(this);
 
-                    public void paintComponent(Graphics g) {
-                        super.paintComponent(g);
-                        this.setSize(SIZE, SIZE);
-                        iter++;
-                        g.drawImage(fond, 0, 0, this);
-                        // draw historics
-                        if (showTrace) {
-                            for (int i = 0; i < nbBodies; i++) {
-                                for (int j = 0; j < histoSize; j++) {
-                                    int diameter = (bodies[i][3] > 10)
-                                        ? (bodies[i][3]) : (6);
-                                    Color c = getColor(i);
-                                    g.setColor(c.darker().darker());
-                                    g.fillOval(historics[i].getX(j) +
-                                        (diameter / 2),
-                                        historics[i].getY(j) + (diameter / 2),
-                                        6, 6);
-                                    g.setColor(Color.DARK_GRAY);
-                                    g.drawOval(historics[i].getX(j) +
-                                        (diameter / 2),
-                                        historics[i].getY(j) + (diameter / 2),
-                                        6, 6);
-                                }
-                            }
-                        }
+        this.zoomOut = new JButton("Zoom out");
+        this.zoomOut.addActionListener(this);
 
-                        g.setFont(g.getFont().deriveFont(Font.ITALIC, 12));
-                        for (int i = 0; i < nbBodies; i++) {
-                            g.setColor(getColor(i));
-                            int diameter = bodies[i][3];
-                            int zoomedX = getZoomedCoord(bodies[i][0]) +
-                                xCenter;
-                            int zoomedY = getZoomedCoord(bodies[i][1]) +
-                                yCenter;
-                            g.fillOval(zoomedX, zoomedY, diameter, diameter);
-                            g.setColor(Color.WHITE);
-                            g.drawOval(zoomedX, zoomedY, diameter, diameter);
-                            g.drawString(bodyname[i], zoomedX + diameter,
-                                zoomedY);
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        buttonsPanel.add(this.zoomIn);
+        buttonsPanel.add(this.zoomOut);
+        buttonsPanel.add(this.queueCheckBox);
+        buttonsPanel.setBorder(BorderFactory.createTitledBorder("Draw control"));
 
-                            //update histo
-                            if ((iter % 8) == 0) {
-                                historics[i].addValues(zoomedX, zoomedY);
-                            }
-                        }
-                    }
-                };
-        this.anim.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
-        this.anim.addMouseListener(this);
-
-        // GUI panel
-        this.gui = new JPanel(new GridLayout(1, 2));
-
-        JPanel killingPanel = new JPanel(new GridLayout(1, 4));
-        this.protocol = new JComboBox(new Object[] { "rsh", "ssh" });
-        this.listVMs = new JComboBox();
-        this.listVMs.addActionListener(this);
-        JLabel cmd = new JLabel(" killall java  ");
-        this.kill = new JButton("Execute");
-        this.kill.addActionListener(this);
-        killingPanel.add(protocol);
-        killingPanel.add(listVMs);
-        killingPanel.add(cmd);
-        killingPanel.add(kill);
-        killingPanel.setBorder(BorderFactory.createTitledBorder(
-                "Execution control"));
-
-        JPanel drawPanel = new JPanel(new FlowLayout());
-        this.queue = new JCheckBox("Show trace", false);
-        this.queue.addActionListener(this);
-        JLabel sliderLabel = new JLabel("ZoomOut", JLabel.CENTER);
-        this.zoom = new JSlider(1, 5, 1);
-        this.zoom.setSnapToTicks(true);
-        this.zoom.setMinorTickSpacing(1);
-        this.zoom.setPaintTicks(true);
-        this.zoom.setValue(1);
-        this.zoom.addChangeListener(this);
-        drawPanel.add(sliderLabel);
-        drawPanel.add(this.zoom);
-        drawPanel.add(this.queue);
-        drawPanel.setBorder(BorderFactory.createTitledBorder("Draw control"));
-
+        JPanel controlPanel = new JPanel(new GridLayout(1, 2));
         if (displayft) {
-            this.gui.add(killingPanel);
+            JPanel killingPanel = new JPanel(new GridLayout(1, 4));
+            this.protocol = new JComboBox(new Object[] { "rsh", "ssh" });
+            this.listVMs.addActionListener(this);
+            JLabel cmd = new JLabel(" killall java  ");
+            this.kill = new JButton("Execute");
+            this.kill.addActionListener(this);
+            killingPanel.add(protocol);
+            killingPanel.add(listVMs);
+            killingPanel.add(cmd);
+            killingPanel.add(kill);
+            killingPanel.setBorder(BorderFactory.createTitledBorder("Execution control"));
+
+            controlPanel.add(killingPanel);
         }
-        this.gui.add(drawPanel);
-        //this.gui.setBorder(BorderFactory.createTitledBorder("Controls"));
-        this.main.add(anim, BorderLayout.NORTH);
-        this.main.add(gui, BorderLayout.SOUTH);
+        controlPanel.add(buttonsPanel);
+
+        // Animation panel, where the planets evolve
+        JPanel anim = new PlanetDisplayPanel(backGround);
+        anim.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+        anim.addMouseListener(this);
+
+        // Assembling it all
+        JPanel main = new JPanel(new BorderLayout());
+        main.add(anim, BorderLayout.CENTER);
+        main.add(controlPanel, BorderLayout.SOUTH);
         setContentPane(main);
         setVisible(true);
     }
 
-    /// EVENT HANDLING
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == this.queue) {
-            this.showTrace = !showTrace;
-        } else if (e.getSource() == this.kill) {
-            try {
-                Runtime.getRuntime().exec("" + this.protocol.getSelectedItem() +
-                    " " + this.listVMs.getSelectedItem() +
-                    " killall -KILL java");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
-
-        // else logger.info("Event not caught : " + e);
-    }
-
-    public void stateChanged(ChangeEvent e) {
-        if (e.getSource() == this.zoom) {
-            if (this.zoom.getValue() != this.zoomValue) {
-                this.zoomValue = this.zoom.getValue();
-                int xRef = 0;
-                int yRef = 0;
-                for (int i = 0; i < this.nbBodies; i++) {
-                    xRef += getZoomedCoord(this.bodies[i][0]);
-                    yRef += getZoomedCoord(this.bodies[i][1]);
-                }
-                this.xCenter = (SIZE / 2) - (xRef / nbBodies);
-                this.yCenter = (SIZE / 2) - (yRef / nbBodies);
-                this.clearTrace();
-            }
-        }
-    }
-
-    public void mouseClicked(MouseEvent e) {
-        int xRef = 0;
-        int yRef = 0;
-        for (int i = 0; i < this.nbBodies; i++) {
-            xRef += getZoomedCoord(this.bodies[i][0]);
-            yRef += getZoomedCoord(this.bodies[i][1]);
-        }
-        this.xCenter = e.getX() - (xRef / nbBodies);
-        this.yCenter = e.getY() - (yRef / nbBodies);
-        this.clearTrace();
-    }
-
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
-    }
-
-    public void mousePressed(MouseEvent e) {
-    }
-
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    public void drawBody(int x, int y, int vx, int vy, int weight, int d,
-        int id, String name) {
+    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id, String name) {
         this.bodies[id][0] = x;
         this.bodies[id][1] = y;
         this.bodies[id][2] = weight;
@@ -298,9 +169,25 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
         repaint();
     }
 
+    private void changeZoom(double d) {
+        this.zoomValue *= d;
+        center(SIZE / 2, SIZE / 2);
+    }
+
+    private void center(int xxx, int yyy) {
+        int xRef = 0;
+        int yRef = 0;
+        for (int i = 0; i < this.nbBodies; i++) {
+            xRef += getZoomedCoord(this.bodies[i][0]);
+            yRef += getZoomedCoord(this.bodies[i][1]);
+        }
+        this.xCenter = xxx - (xRef / nbBodies);
+        this.yCenter = yyy - (yRef / nbBodies);
+        this.clearTrace();
+    }
+
     private int getZoomedCoord(int x) {
-        //return x/zoomValue + (SIZE/2-xCenter) + SIZE/2/this.zoomValue;
-        return (2 * x) / zoomValue;
+        return (int) (x * zoomValue);
     }
 
     private void clearTrace() {
@@ -310,28 +197,57 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
         }
     }
 
-    private Color getColor(int sel) {
-        switch (sel) {
-        case 0:
-            return Color.RED;
-        case 1:
-            return Color.BLUE;
-        case 2:
-            return Color.CYAN;
-        case 3:
-            return Color.GREEN;
-        case 4:
-            return Color.DARK_GRAY;
-        case 5:
-            return Color.MAGENTA;
-        case 6:
-            return Color.ORANGE;
-        case 7:
-            return Color.PINK;
-        case 8:
-            return Color.BLACK;
-        default:
-            return getColor(sel - 8);
+    private class PlanetDisplayPanel extends JPanel {
+        private final Image bkground;
+        private int iter = 0;
+        private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
+
+        private PlanetDisplayPanel(Image bkground) {
+            super();
+            this.bkground = bkground;
+        }
+
+        public void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            iter++;
+            g.drawImage(bkground, 0, 0, this);
+            // draw historics
+            if (showTrace) {
+                for (int i = 0; i < nbBodies; i++) {
+                    for (int j = 0; j < histoSize; j++) {
+                        int diameter = (bodies[i][3] > 10) ? (bodies[i][3]) : (6);
+                        g.setColor(getColor(i));
+                        g.fillOval(
+                            historics[i].getX(j) + (diameter / 2),
+                            historics[i].getY(j) + (diameter / 2), 6, 6);
+                        g.setColor(Color.DARK_GRAY);
+                        g.drawOval(
+                            historics[i].getX(j) + (diameter / 2),
+                            historics[i].getY(j) + (diameter / 2), 6, 6);
+                    }
+                }
+            }
+
+            g.setFont(g.getFont().deriveFont(Font.ITALIC, 12));
+            for (int i = 0; i < nbBodies; i++) {
+                g.setColor(getColor(i));
+                int diameter = bodies[i][3];
+                int zoomedX = getZoomedCoord(bodies[i][0]) + xCenter;
+                int zoomedY = getZoomedCoord(bodies[i][1]) + yCenter;
+                g.fillOval(zoomedX, zoomedY, diameter, diameter);
+                g.setColor(Color.WHITE);
+                g.drawOval(zoomedX, zoomedY, diameter, diameter);
+                g.drawString(bodyname[i], zoomedX + diameter, zoomedY);
+
+                //update histo
+                if ((iter % 8) == 0) {
+                    historics[i].addValues(zoomedX, zoomedY);
+                }
+            }
+        }
+
+        private Color getColor(int sel) {
+            return colors[sel % colors.length];
         }
     }
 
@@ -380,6 +296,27 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
         }
     }
 
+    /// EVENT HANDLING
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == this.zoomIn) {
+            changeZoom(1.5);
+        } else if (e.getSource() == this.zoomOut) {
+            changeZoom(0.66);
+        } else if (e.getSource() == this.queueCheckBox) {
+            this.showTrace = !showTrace;
+        } else if (e.getSource() == this.kill) {
+            try {
+                Runtime.getRuntime().exec(
+                    "" + this.protocol.getSelectedItem() + " " + this.listVMs.getSelectedItem() +
+                    " killall -KILL java");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
+        // else logger.info("Event not caught : " + e);
+    }
+
     // WindowListener methods 
     public void windowOpened(WindowEvent e) {
     }
@@ -403,5 +340,21 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
     }
 
     public void windowDeactivated(WindowEvent e) {
+    }
+
+    public void mouseClicked(MouseEvent e) {
+        center(e.getX(), e.getY());
+    }
+
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    public void mouseExited(MouseEvent e) {
+    }
+
+    public void mousePressed(MouseEvent e) {
+    }
+
+    public void mouseReleased(MouseEvent e) {
     }
 }

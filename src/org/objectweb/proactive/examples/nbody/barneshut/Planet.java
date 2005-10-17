@@ -58,7 +58,6 @@ public class Planet extends Info {
         this.vy = 0;
 
         this.diameter = (this.mass / 2000) + 3;
-        ;
     }
 
     public Planet(double x, double y, double vx, double vy, double mass) {
@@ -70,7 +69,6 @@ public class Planet extends Info {
         this.vy = vy;
 
         this.diameter = (mass / 2000) + 3;
-        ;
         this.radius = 1; // smaller than any possible diameter, from equations above
     }
 

@@ -33,6 +33,9 @@ package org.objectweb.proactive.examples.nbody.common;
 import java.io.Serializable;
 
 
+/** This very limited class is needed as an Active Object class, containing the GUI.
+ * The swing GUI is attached as a field of the Active Object, so it can be recreated
+ * from scratch. */
 public class Displayer implements Serializable {
     private transient NBodyFrame nbf;
     private boolean displayft;
@@ -41,17 +44,15 @@ public class Displayer implements Serializable {
     public Displayer() {
     }
 
-    public Displayer(Integer nbBodies, Boolean displayft,
+    public Displayer(
+        Integer nbBodies, Boolean displayft,
         org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.nbBodies = nbBodies.intValue();
         this.displayft = displayft.booleanValue();
-        this.nbf = new NBodyFrame("ProActive N-Body", this.nbBodies,
-                this.displayft, killsupport);
-        this.nbf.setVisible(true);
+        this.nbf = new NBodyFrame("ProActive N-Body", this.nbBodies, this.displayft, killsupport);
     }
 
-    public void drawBody(int x, int y, int vx, int vy, int weight, int d,
-        int id, String name) {
+    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id, String name) {
         this.nbf.drawBody(x, y, vx, vy, weight, d, id, name);
     }
 }
