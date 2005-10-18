@@ -100,7 +100,7 @@ public class Start {
             // Supervizes the synchronisations
             maestro = (Maestro) ProActive.newActive(Maestro.class.getName(),
                     new Object[] { domainGroup, new Integer(maxIter), killsupport },
-                    nodes[0]);
+                    nodes[nodes.length-1]);
         } catch (ActiveObjectCreationException e) {
             killsupport.abort(e);
         } catch (NodeException e) {
