@@ -97,13 +97,12 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
 	}
 	
 	/**
-	 * Returns an array with the reference to all
+	 * Note that for this only the filename is 
+	 * considered, and not the filepath.
+	 * @return an array with the reference to all
 	 * the Files that are homonymous. That
 	 * is to say, with the same source and
 	 * destination filename.
-	 * Note that for this only the filename is 
-	 * considered, and not the filepath.
-	 * @return
 	 */
 	protected FileDescription[] getHomonymousFiles(){
 		
@@ -121,13 +120,12 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
 	
 	
 	/**
-	 * Returns an array with the reference to all
+	 * Note that for this only the filename is 
+	 * considered, and not the filepath.
+	 * @return an array with the reference to all
 	 * the Files that are heteronymous. That
 	 * is to say, with different src and destination
 	 * filename.
-	 * Note that for this only the filename is 
-	 * considered, and not the filepath.
-	 * @return
 	 */
 	protected FileDescription[] getHeteronymousFiles(){
 		
@@ -144,13 +142,12 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
 	}
 	
 	/**
-	 * Returns an array with the reference to all
+	 * Note that for this only the dirname is 
+	 * considered, and not the dirpath.
+	 * @return an array with the reference to all
 	 * the Dirs that are homonymous. That
 	 * is to say, with the same source and
 	 * destination dirname.
-	 * Note that for this only the dirname is 
-	 * considered, and not the dirpath.
-	 * @return
 	 */
 	protected DirectoryDescription[] getHomonymousDirs(){
 		
@@ -168,13 +165,13 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
 	
 	
 	/**
-	 * Returns an array with the reference to all
+	 * 
+	 * Note that for this only the dirname is 
+	 * considered, and not the dirpath.
+	 * @return an array with the reference to all
 	 * the Directories that are heteronymous. That
 	 * is to say, with different src and destination
 	 * dirname.
-	 * Note that for this only the dirname is 
-	 * considered, and not the dirpath.
-	 * @return
 	 */
 	protected DirectoryDescription[] getHeteronymousDirs(){
 		
