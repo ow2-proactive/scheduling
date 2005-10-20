@@ -444,7 +444,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         if (logger.isInfoEnabled()) {
             if (numberOfNodes != MAX_NODE) {
-                logger.info("Asking for" + numberOfNodes + " nodes");
+                logger.info("Asking for " + numberOfNodes + " nodes");
             } else {
                 logger.info("Asking for maxinum nodes");
             }
@@ -696,7 +696,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * LOAD BALANCING METHODS
      */
     /**
-     * @Answer to remote machines if I'm underloaded.
+     * @return Answer to remote machines if I'm underloaded.
      */
     public boolean amIUnderloaded() {
         return p2pLoadBalancer.AreYouUnderloaded();
@@ -704,7 +704,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /**
      * Ask to the Load Balancer object if the state is underloaded
-     * @param none
+     * @param ranking
      * @return <code>true</code> if the state is underloaded, <code>false</code> else.
      */
     public boolean amIUnderloaded(double ranking) {
@@ -717,9 +717,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /**
      * This method is remotely called by an overloaded peer, looking for a balance.
-     * @param <code>P2PService</code> the reference of the overloaded machine
-     * @param <code>ranking</code> the ranking of the caller
-     * @return none
+     * @param sender the reference of the overloaded machine
+     * @param ranking the ranking of the caller
      */
     public void balanceWithMe(P2PService sender, double ranking) {
         // If I'm not underloaded, I will not reply
@@ -737,9 +736,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /**
      * This method is remotely called by an underloaded peer, looking for a balance.
-     * @param <code>ranking</code> the ranking of the caller
-     * @param <code>remoteNodeAddress</code> the reference to the remote machine
-     * @return none
+     * @param ranking the ranking of the caller
+     * @param remoteNodeAddress the reference to the remote machine
      */
     public void ImStealingYou(double ranking, String remoteNodeAddress) {
         this.p2pLoadBalancer.ImStealingYou(ranking, remoteNodeAddress);
@@ -747,8 +745,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /**
      * This method is remotely called by an underloaded peer to start the load balancing.
-     * @param <code>Node</code> is the new place for the active objects
-     * @return none
+     * @param destNode is the new place for the active objects
      */
     public void P2PloadBalance(Node destNode) {
         this.p2pLoadBalancer.sendActiveObjectsTo(destNode);
@@ -758,7 +755,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * This method is called by the LoadBalancer object in order to send the
      * balance request to its neighbors
      * @param ranking the ranking of the caller
-     * @return none
      */
     public void tellToMyNeighborsThatIWantToShareActiveObjects(double ranking) {
         this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(LoadBalancingConstants.SUBSET_SIZE,
@@ -770,7 +766,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * the work stealing
      * @param ranking the ranking of the caller
      * @param myNodeAddress addres of the local node
-     * @return none
      */
     public void startStealingNeighbors(double ranking, String myNodeAddress) {
         this.acquaintanceManager.chooseNneighborsAndStealTheirWork(LoadBalancingConstants.NEIGHBORS_TO_STEAL,

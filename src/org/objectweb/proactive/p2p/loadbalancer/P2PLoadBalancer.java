@@ -66,8 +66,6 @@ public class P2PLoadBalancer extends LoadBalancer {
     /**
      * This method use the P2P infrastructure to search nodes which can
      * receive its active objects.
-     * @param none
-     * @return none
      */
     public void startBalancing() {
         p2pSer.tellToMyNeighborsThatIWantToShareActiveObjects(ranking);
@@ -76,8 +74,6 @@ public class P2PLoadBalancer extends LoadBalancer {
     /**
      * This method use the P2P infrastructure to search nodes which I
      * can steal work.
-     * @param none
-     * @return none
      */
     public void stealWork() {
         p2pSer.startStealingNeighbors(ranking, myNodeAddress);
@@ -87,7 +83,7 @@ public class P2PLoadBalancer extends LoadBalancer {
      * This method is to know if this machine is underloaded and "better" than
      * who want to send active objects
      * receive its active objects.
-     * @param <code>remoteRanking</code>: ranking of the overloaded machine
+     * @param remoteRanking ranking of the overloaded machine
      * @return <code>true</code> if this machine is underloaded in relation to the overloaded one.
      * Else <code>false</code>.
      */
