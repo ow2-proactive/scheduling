@@ -214,6 +214,28 @@
 			<classpath refid="project.classpath"/>
 			<include name="${proactive.dir}/branchnbound/**/*.java"/>
 		</javac>
+		<!-- BnB API stubs generation -->
+		<echo message="Branch and Bound API stubs generating..." />
+		<property name="stub_bnb.classdir" value="${basedir}${file.separator}..${file.separator}classes"/>
+	    <path id="bnbClassDir">
+	          <pathelement path="${stub_bnb.classdir}"/>
+	    </path>
+		<pathconvert pathsep=" " property="bnbClassesDir" refid="bnbClassDir"/>
+		<path id="bnbClasses">
+			<fileset dir="${classes.dir}/org/objectweb/proactive/branchnbound" >
+		    	<include name="**/*.class"/>
+		        <exclude name="**/*$*"/>
+		    </fileset>
+		</path>
+		<pathconvert pathsep=" " property="bnb-files" refid="bnbClasses">
+			<map from="${bnbClassesDir}" to=""/>
+		</pathconvert>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator"
+			fork="true" >
+			<classpath refid="project.classpath"/>
+			<arg line="-d ${classes.dir}
+				${bnb-files}"/>
+		</java> 
 	</target>
 	<!--
 	   ================================================================
