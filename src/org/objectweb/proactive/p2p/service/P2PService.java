@@ -692,9 +692,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         logger.debug("Exiting initActivity");
     }
 
-    /*********************************
+    /*
      * LOAD BALANCING METHODS
      */
+
     /**
      * @return Answer to remote machines if I'm underloaded.
      */
