@@ -92,6 +92,7 @@ public class Test extends FunctionalTest {
     }
 
     public void endTest() throws Exception {
+        this.ao.terminate();
         this.ao = null;
     }
 }

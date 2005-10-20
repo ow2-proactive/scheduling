@@ -30,8 +30,13 @@
  */
 package nonregressiontest.activeobject.wrapper;
 
+import java.io.IOException;
 import java.io.Serializable;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
@@ -40,55 +45,47 @@ import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
-public class A implements Serializable {
+public class A implements RunActive, Serializable {
     public A() {
     }
 
     public BooleanWrapper testBooleanWrapper() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
         return new BooleanWrapper(false);
     }
 
     public DoubleWrapper testDoubleWrapper() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
         return new DoubleWrapper(0);
     }
 
     public IntWrapper testIntWrapper() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
         return new IntWrapper(0);
     }
 
     public LongWrapper testLongWrapper() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
         return new LongWrapper(0);
     }
 
     public StringWrapper testStringWrapper() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
-        return new StringWrapper("Alexandre dC is a famous coder who thinks that the test lasts less than 1 sec :)");
+        return new StringWrapper("Alexandre dC is a famous coder");
     }
 
     public FloatWrapper testFloatWrapper() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-        }
         return new FloatWrapper(0);
+    }
+
+    public void terminate() {
+        try {
+            ProActive.getBodyOnThis().terminate();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        while (body.isActive()) {
+            service.blockingServeOldest("terminate");
+            return;
+        }
     }
 }
