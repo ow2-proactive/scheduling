@@ -1613,7 +1613,8 @@ public class ProActive {
     /*** <Exceptions> See ExceptionHandler.java for the documentation ***/
     /**
      * This has to be called just before a try block for a single exception.
-     * The parameter is the caught exception type.
+     * 
+     * @param c the caught exception type in the catch block
      */
     public static void tryWithCatch(Class c) {
         tryWithCatch(new Class[] { c });
@@ -1621,7 +1622,8 @@ public class ProActive {
 
     /**
      * This has to be called just before a try block for many exceptions.
-     * The parameter is the array of the caught exception types.
+     *
+     * @param c the caught exception types in the catch block
      */
     public static void tryWithCatch(Class[] c) {
         ExceptionHandler.tryWithCatch(c);
@@ -1658,27 +1660,52 @@ public class ProActive {
         ExceptionHandler.waitForPotentialException();
     }
 
-    /* NFE handlers on the local JVM */
+    /**
+     * Add a listener for NFE reaching the local JVM
+     * 
+     * @param listener The listener to add
+     */
     public static void addNFEListenerOnJVM(NFEListener listener) {
         NFEManager.addNFEListener(listener);
     }
 
+    /**
+     * Remove a listener for NFE reaching the local JVM
+     * 
+     * @param listener The listener to remove
+     */
     public static void removeNFEListenerOnJVM(NFEListener listener) {
         NFEManager.removeNFEListener(listener);
     }
 
-    /* NFE handlers associated to an active object (body) */
+    /**
+     * Add a listener for NFE reaching a given active object
+     * 
+     * @param ao The active object receiving the NFE
+     * @param listener The listener to add
+     */
     public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
         BodyAdapter body = getRemoteBody(ao);
         body.addNFEListener(listener);
     }
 
+    /**
+     * Remove a listener for NFE reaching a given active object
+     * 
+     * @param ao The active object receiving the NFE
+     * @param listener The listener to remove
+     */
     public static void removeNFEListenerOnAO(Object ao, NFEListener listener) {
         BodyAdapter body = getRemoteBody(ao);
         body.removeNFEListener(listener);
     }
 
-    /* NFE handlers associated to a proxy */
+    /**
+     * Add a listener for NFE reaching the client side of a given active object
+     * 
+     * @param ao The active object receiving the NFE
+     * @param listener The listener to add
+     */
     public static void addNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
             ((AbstractProxy) ao).addNFEListener(listener);
@@ -1688,6 +1715,12 @@ public class ProActive {
         }
     }
 
+    /**
+     * Remove a listener for NFE reaching the client side of a given active object
+     * 
+     * @param ao The active object receiving the NFE
+     * @param listener The listener to remove
+     */
     public static void removeNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
             ((AbstractProxy) ao).removeNFEListener(listener);
