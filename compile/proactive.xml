@@ -114,7 +114,7 @@
       ==
       ================================================================
 	-->
-	<target name="all" depends="ic2d, bnb, p2p, examples"/>
+	<target name="all" depends="ic2d, bnb, p2p, examples, trywithcatch"/>
 	<!--
 	   ================================================================
 	   ==
@@ -358,6 +358,21 @@
 	<target name="migration" depends="ext">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on"  source="${source}"  debug="${debug}"/>
 	</target>
+		<!--
+	   ================================================================
+	   ==
+	   ==  Compile TryWithCatch annotator
+	   ==
+	   ================================================================
+	-->
+	<target name="trywithcatch">
+		<javac srcdir="${src.dir}"
+		       destdir="${classes.dir}"
+		       includes="trywithcatch/"
+		       deprecation="on"
+		       source="${source}"
+		       debug="${debug}"/>
+	</target>
 	<!--
 	   ================================================================
 	   ==
@@ -394,7 +409,7 @@
 	<!--
 	   ================================================================
 	   ==
-      ==  Compile All
+      ==  Clean
       ==
       ================================================================
 	-->

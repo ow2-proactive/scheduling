@@ -1,0 +1,127 @@
+package trywithcatch;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
+
+
+public class TryCatch extends Anything {
+    private Terminal tryTerminal;
+    private Block tryBlock;
+    private List catchBlocks;
+    private Block finallyBlock;
+    public static boolean addPackageName = false;
+    public static final String PACKAGE = "org.objectweb.proactive";
+    private static final String TRY_WITH_CATCH = "ProActive.tryWithCatch";
+    private static final String END_TRY_WITH_CATCH = "ProActive.endTryWithCatch();";
+    private static final String REMOVE_TRY_WITH_CATCH = "ProActive.removeTryWithCatch();";
+
+    public TryCatch(Terminal tt, Block tb, List cb, Block fb) {
+        tryTerminal = tt;
+        tryBlock = tb;
+        catchBlocks = cb;
+        finallyBlock = fb;
+    }
+
+    public static void setAddPackageName(boolean value) {
+        addPackageName = value;
+    }
+
+    private String getPackageName() {
+        return addPackageName ? (PACKAGE + ".") : "";
+    }
+
+    public String toString() {
+        return "" + tryTerminal + tryBlock + catchBlocks + finallyBlock;
+    }
+
+    protected void prettyPrint(int indent) {
+        super.prettyPrint(indent);
+        System.out.print("tryWithCatch (");
+        Iterator iter = catchBlocks.iterator();
+        while (iter.hasNext()) {
+            Catch c = (Catch) iter.next();
+            System.out.print(c.getClassName() + ", ");
+        }
+        System.out.println(")");
+
+        tryTerminal.prettyPrint(indent);
+
+        tryBlock.prettyPrint(indent);
+
+        super.prettyPrint(indent);
+        System.out.print("catch blocks:");
+        iter = catchBlocks.iterator();
+        while (iter.hasNext()) {
+            Catch c = (Catch) iter.next();
+            System.out.print(c.getBlock() + ", ");
+        }
+
+        if (finallyBlock != null) {
+            System.out.println();
+            super.prettyPrint(indent);
+            System.out.print("finally: " + finallyBlock);
+        }
+
+        System.out.println();
+    }
+
+    private String getTryWithCatchCall() {
+        String call = getPackageName() + TRY_WITH_CATCH + "(";
+        Catch firstCatch = (Catch) catchBlocks.get(0);
+        if (catchBlocks.size() == 1) {
+            call += ("" + firstCatch.getClassName());
+        } else {
+            call += ("new Class[] {" + firstCatch.getClassName());
+            Iterator iter = catchBlocks.iterator();
+            iter.next(); // The first one is already done
+            while (iter.hasNext()) {
+                Catch ca = (Catch) iter.next();
+                call += (", " + ca.getClassName());
+            }
+            call += "}";
+        }
+
+        return call + ");";
+    }
+
+    public void work(Catcher c) throws IOException {
+        if (!catchBlocks.isEmpty()) {
+            String call = getTryWithCatchCall();
+            String indent = Catcher.getNewline(tryTerminal);
+            c.addAtOffset(tryTerminal.getLeft(), call + indent);
+        }
+
+        tryBlock.work(c);
+        String indent = Catcher.getNewline(tryBlock.getEnd());
+        c.addAtOffset(tryBlock.getEnd().getLeft(),
+            Catcher.INDENT + getPackageName() + END_TRY_WITH_CATCH + indent);
+
+        Iterator iter = catchBlocks.iterator();
+        Catch ca = null;
+        while (iter.hasNext()) {
+            ca = (Catch) iter.next();
+            ca.work(c);
+        }
+
+        if (finallyBlock == null) {
+            Block lastBlock;
+            if (ca != null) {
+                lastBlock = ca.getBlock();
+            } else {
+                lastBlock = tryBlock;
+            }
+
+            indent = Catcher.getNewline(lastBlock.getEnd());
+            c.addAtOffset(lastBlock.getEnd().getRight(),
+                " finally {" + indent + Catcher.INDENT + getPackageName() +
+                REMOVE_TRY_WITH_CATCH + indent + "}");
+        } else {
+            indent = Catcher.getNewline(finallyBlock.getEnd()) +
+                Catcher.INDENT;
+            c.addAtOffset(finallyBlock.getStart().getRight(),
+                indent + getPackageName() + REMOVE_TRY_WITH_CATCH);
+            finallyBlock.work(c);
+        }
+    }
+}
