@@ -34,4 +34,11 @@ import java.io.Serializable;
 
 
 public class NoResultsException extends Exception implements Serializable {
+    public NoResultsException() {
+        super();
+    }
+
+    public NoResultsException(String arg0) {
+        super(arg0);
+    }
 }

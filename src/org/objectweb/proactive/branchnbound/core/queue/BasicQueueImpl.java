@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.branchnbound.core.queue;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -58,14 +57,14 @@ public class BasicQueueImpl implements TaskQueue {
     public BasicQueueImpl() {
     }
 
-	public void reset() {
-	    queue = new Vector();
-	    hungryLevel = 0;
-	    rootTaskFromBackup = null;
-	    pendingTasksFromBackup = new Vector();
-	    allResults = new Vector();
-	}
-	
+    public void reset() {
+        queue = new Vector();
+        hungryLevel = 0;
+        rootTaskFromBackup = null;
+        pendingTasksFromBackup = new Vector();
+        allResults = new Vector();
+    }
+
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addAll(java.util.Collection)
      */
@@ -73,8 +72,8 @@ public class BasicQueueImpl implements TaskQueue {
         if (tasks.size() > 0) {
             queue.addAll(tasks);
             if (logger.isDebugEnabled()) {
-            logger.debug("Task provider just received and added " +
-                tasks.size());
+                logger.debug("Task provider just received and added " +
+                    tasks.size());
             }
         }
     }
@@ -116,17 +115,10 @@ public class BasicQueueImpl implements TaskQueue {
         this.hungryLevel = level;
     }
 
-    public void backupTasks(Task rootTask, Vector pendingTasks) {
-        File currentBck = new File(backupTaskFile);
-        File oldBck = new File(backupTaskFile + "~");
-        if (currentBck.exists()) {
-            oldBck.delete();
-            currentBck.renameTo(oldBck);
-        }
-        currentBck = new File(backupTaskFile);
+    public void backupTasks(Task rootTask, Vector pendingTasks,
+        OutputStream backupOutputStream) {
         try {
-            FileOutputStream fos = new FileOutputStream(currentBck);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(backupOutputStream);
             oos.writeObject(rootTask);
             for (int j = 0; j < pendingTasks.size(); j++) {
                 oos.writeObject(pendingTasks.get(j));
@@ -135,8 +127,8 @@ public class BasicQueueImpl implements TaskQueue {
             for (int i = 0; i < this.queue.size(); i++) {
                 oos.writeObject(this.queue.get(i));
             }
-            fos.close();
             oos.close();
+            backupOutputStream.close();
         } catch (FileNotFoundException e) {
             logger.warn("Backup tasks failed", e);
         } catch (IOException e) {
@@ -144,10 +136,9 @@ public class BasicQueueImpl implements TaskQueue {
         }
     }
 
-    public void loadTasks(String taskFile) {
+    public void loadTasks(InputStream taskInputStream) {
         try {
-            FileInputStream fis = new FileInputStream(taskFile);
-            ObjectInputStream ois = new ObjectInputStream(fis);
+            ObjectInputStream ois = new ObjectInputStream(taskInputStream);
             this.rootTaskFromBackup = (Task) ois.readObject();
             boolean separationReached = false;
             while (ois.available() > 0) {
@@ -157,13 +148,13 @@ public class BasicQueueImpl implements TaskQueue {
                     separationReached = true;
                 }
                 if (!separationReached) {
-                    this.pendingTasksFromBackup.add((Task) read);
+                    this.pendingTasksFromBackup.add(read);
                 } else {
-                    this.queue.add((Task) read);
+                    this.queue.add(read);
                 }
             }
             ois.close();
-            fis.close();
+            taskInputStream.close();
         } catch (Exception e) {
             logger.fatal("Failed to read tasks", e);
             throw new ProActiveRuntimeException(e);
@@ -193,22 +184,14 @@ public class BasicQueueImpl implements TaskQueue {
         return this.allResults;
     }
 
-    public void backupResults(String backupResultFile) {
+    public void backupResults(OutputStream backupResultOutputStream) {
         try {
-            File currentBck = new File(backupResultFile);
-            File oldBck = new File(backupResultFile + "~");
-            if (currentBck.exists()) {
-                oldBck.delete();
-                currentBck.renameTo(oldBck);
-            }
-            currentBck = new File(backupResultFile);
-            FileOutputStream fos = new FileOutputStream(currentBck);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(backupResultOutputStream);
             for (int i = 0; i < this.allResults.size(); i++) {
                 oos.writeObject(this.allResults.get(i));
             }
             oos.close();
-            fos.close();
+            backupResultOutputStream.close();
         } catch (FileNotFoundException e) {
             logger.fatal("The file is not found", e);
         } catch (IOException e) {
@@ -216,15 +199,14 @@ public class BasicQueueImpl implements TaskQueue {
         }
     }
 
-    public void loadResults(String backupResultFile) {
+    public void loadResults(InputStream backupResultInputStream) {
         try {
-            FileInputStream fis = new FileInputStream(new File(backupResultFile));
-            ObjectInputStream ois = new ObjectInputStream(fis);
+            ObjectInputStream ois = new ObjectInputStream(backupResultInputStream);
             while (ois.available() > 0) {
-                this.allResults.add((Result) ois.readObject());
+                this.allResults.add(ois.readObject());
             }
             ois.close();
-            fis.close();
+            backupResultInputStream.close();
         } catch (Exception e) {
             logger.fatal("Problem to read result file.");
             throw new ProActiveRuntimeException(e);

@@ -30,15 +30,11 @@
  */
 package org.objectweb.proactive.branchnbound;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.Manager;
 import org.objectweb.proactive.branchnbound.core.Task;
-import org.objectweb.proactive.branchnbound.core.queue.BasicQueueImpl;
-import org.objectweb.proactive.branchnbound.core.queue.LargerQueueImpl;
 import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -50,6 +46,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
+ * <p>This class contains all static methods to get <i>Manager</i> for
+ * solving the Branch and Bound porblem with a given root task.</p>
+ * <p>The returned <i>Manager</i> is a ProActive Active Object. This object aims
+ * to configure and to handle the computation.</p>
+ *
+ * @see org.objectweb.proactive.branchnbound.core.Manager
+ *
  * @author Alexandre di Costanzo
  *
  * Created on Apr 20, 2005
@@ -62,179 +65,180 @@ public class ProActiveBranchNBound {
         ProActiveConfiguration.load();
     }
 
-    public static Manager newFarm(Task root, Node managerNode, Node[] nodes)
-        throws ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
-            managerNode, nodes, BasicQueueImpl.class.getName());
-    }
+    // -------------------------------------------------------------------------
+    // Manager static constructor
+    // -------------------------------------------------------------------------
 
-    public static Manager newFarm(Task root, VirtualNode virtualNode)
-        throws ActiveObjectCreationException, NodeException {
-        assert virtualNode.isActivated() == false : "The virtual must be not actived";
-        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
-            virtualNode, BasicQueueImpl.class.getName());
-    }
-
-    public static Manager newFarm(Task root, VirtualNode[] virtualNodes)
-        throws ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
-            virtualNodes, BasicQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmWithLargerQueue(Task root, Node managerNode,
-        Node[] nodes) throws ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
-            managerNode, nodes, LargerQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmWithLargerQueue(Task root,
-        VirtualNode virtualNode)
-        throws ActiveObjectCreationException, NodeException {
-        assert virtualNode.isActivated() == false : "The virtual must be not actived";
-        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
-            virtualNode, LargerQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmWithLargerQueue(Task root,
-        VirtualNode[] virtualNodes)
-        throws ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmWithSpecifiedQueue(root,
-            virtualNodes, LargerQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmWithSpecifiedQueue(Task root,
-        Node managerNode, Node[] nodes, String queueType)
-        throws ActiveObjectCreationException, NodeException {
+    /**
+     * Create a new activate Manager with the given root task.
+     *
+     * @param root the root Task.
+     * @param managerNode the Node where the Manager will be activate.
+     * @param nodes an array of Nodes for distributing the computation.
+     * @param queueType the Java class name of the Branch and Bound Queue. This
+     * class must implement the interface TaskQueue.
+     *
+     * @return a ProActive Active Object which is the Manager.
+     *
+     * @throws ActiveObjectCreationException a problem occured while activating
+     * the Manager.
+     * @throws NodeException a problem with <code>managerNode</code>.
+     *
+     * @see org.objectweb.proactive.branchnbound.core.Manager
+     * @see Task
+     * @see TaskQueue
+     */
+    public static Manager newBnB(Task root, Node managerNode, Node[] nodes,
+        String queueType) throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[4];
         args[0] = root;
-        args[1] = nodes;
-        args[2] = managerNode;
+        args[1] = managerNode;
+        args[2] = nodes;
         args[3] = queueType;
         return ProActiveBranchNBound.activingTheManager(args);
     }
 
-    public static Manager newFarmWithSpecifiedQueue(Task root,
-        VirtualNode virtualNode, String queueType)
-        throws ActiveObjectCreationException, NodeException {
-        assert virtualNode.isActivated() == false : "The virtual must be not actived";
+    /**
+     * Create a new activate Manager with the given root task. The Manager is
+     * activate in the local default node of the current JVM.
+     *
+     * @param root the root Task.
+     * @param virtualNode this contains a set of Nodes for distributing the
+     * computation.
+     * @param queueType the Java class name of the Branch and Bound Queue. This
+     * class must implement the interface TaskQueue.
+     *
+     * @return a ProActive Active Object which is the Manager.
+     *
+     * @throws ActiveObjectCreationException a problem occured while activating
+     * the Manager.
+     * @throws NodeException a problem with the default node.
+     *
+     * @see org.objectweb.proactive.branchnbound.core.Manager
+     * @see Task
+     * @see TaskQueue
+     */
+    public static Manager newBnB(Task root, VirtualNode virtualNode,
+        String queueType) throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[4];
         args[0] = root;
-        args[1] = virtualNode;
-        args[2] = null;
+        args[1] = null;
+        args[2] = virtualNode.getNodes();
         args[3] = queueType;
         return ProActiveBranchNBound.activingTheManager(args);
     }
 
-    public static Manager newFarmWithSpecifiedQueue(Task root,
-        VirtualNode[] virtualNodes, String queueType)
-        throws ActiveObjectCreationException, NodeException {
+    /**
+     * Create a new activate Manager with the given root task. Using hierachic
+     * ProActive group communication.
+     *
+     * @param root the root Task.
+     * @param managerNode the Node where the Manager will be activate.
+     * @param nodes an array of array of Nodes for distributing the computation
+     * with using hierachic group communication, with <code>node[i][j]</code>
+     * is a sub-group.
+     * @param queueType the Java class name of the Branch and Bound Queue. This
+     * class must implement the interface TaskQueue.
+     *
+     * @return a ProActive Active Object which is the Manager.
+     *
+     * @throws ActiveObjectCreationException a problem occured while activating
+     * the Manager.
+     * @throws NodeException a problem with <code>managerNode</code>.
+     *
+     * @see org.objectweb.proactive.branchnbound.core.Manager
+     * @see Task
+     * @see TaskQueue
+     */
+    public static Manager newBnB(Task root, Node managerNode, Node[][] nodes,
+        String queueType) throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[4];
         args[0] = root;
-        args[1] = virtualNodes;
-        args[2] = null;
+        args[1] = managerNode;
+        args[2] = nodes;
         args[3] = queueType;
         return ProActiveBranchNBound.activingTheManager(args);
     }
 
-    public static Manager newFarmFromBackup(String taskFile, String resultFile,
-        Node managerNode, Node[] nodes)
-        throws ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
-            resultFile, managerNode, nodes, BasicQueueImpl.class.getName());
+    /**
+     * Create a new activate Manager with the given root task. Using hierachic
+     * ProActive group communication. The Manager is activate in the local
+     * default node of the current JVM.
+     *
+     * @param root the root Task.
+     * @param virtualNodes for distributing the computation with using hierachic
+     * group communication, with <code>virtualNodes[i]</code> is a sub-group.
+     * @param queueType e Java class name of the Branch and Bound Queue. This
+     * class must implement the interface TaskQueue.
+     *
+     * @return a ProActive Active Object which is the Manager.
+     *
+     * @throws ActiveObjectCreationException a problem occured while activating
+     * the Manager.
+     * @throws NodeException a problem with the default node.
+     *
+     * @see org.objectweb.proactive.branchnbound.core.Manager
+     * @see Task
+     * @see TaskQueue
+     */
+    public static Manager newBnB(Task root, VirtualNode[] virtualNodes,
+        String queueType) throws ActiveObjectCreationException, NodeException {
+        Object[] args = new Object[4];
+        args[0] = root;
+        args[1] = null;
+        Node[][] nodes = new Node[virtualNodes.length][];
+        for (int i = 0; i < virtualNodes.length; i++) {
+            nodes[i] = virtualNodes[i].getNodes();
+        }
+        args[2] = nodes;
+        args[3] = queueType;
+        return ProActiveBranchNBound.activingTheManager(args);
     }
 
-    public static Manager newFarmFromBackup(String taskFile, String resultFile,
-        VirtualNode virtualNode)
-        throws IOException, ClassNotFoundException, 
-            ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
-            resultFile, virtualNode, BasicQueueImpl.class.getName());
-    }
+    // -------------------------------------------------------------------------
+    // Private methods
+    // -------------------------------------------------------------------------
 
-    public static Manager newFarmFromBackup(String taskFile, String resultFile,
-        VirtualNode[] virtualNodes)
-        throws IOException, ClassNotFoundException, 
-            ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
-            resultFile, virtualNodes, BasicQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmFromBackupWithLargerQueue(String taskFile,
-        String resultFile, Node managerNode, Node[] nodes)
-        throws ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
-            resultFile, managerNode, nodes, LargerQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmFromBackupWithLargerQueue(String taskFile,
-        String resultFile, VirtualNode virtualNode)
-        throws IOException, ClassNotFoundException, 
-            ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
-            resultFile, virtualNode, LargerQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmFromBackupWithLargerQueue(String taskFile,
-        String resultFile, VirtualNode[] virtualNodes)
-        throws IOException, ClassNotFoundException, 
-            ActiveObjectCreationException, NodeException {
-        return ProActiveBranchNBound.newFarmFromBackupWithSpecifiedQueue(taskFile,
-            resultFile, virtualNodes, LargerQueueImpl.class.getName());
-    }
-
-    public static Manager newFarmFromBackupWithSpecifiedQueue(String taskFile,
-        String resultFile, VirtualNode virtualNode, String queueType)
-        throws ActiveObjectCreationException, NodeException {
-        assert virtualNode.isActivated() == false : "The virtual must be not actived";
-        Object[] args = new Object[2];
-        args[0] = virtualNode;
-        args[1] = queueType;
-        Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
-                args, NodeFactory.getDefaultNode());
-        manager.loadTasks(taskFile);
-        manager.loadResults(resultFile);
-        return manager;
-    }
-
-    public static Manager newFarmFromBackupWithSpecifiedQueue(String taskFile,
-        String resultFile, VirtualNode[] virtualNodes, String queueType)
-        throws ActiveObjectCreationException, NodeException {
-        Object[] args = new Object[2];
-        args[0] = virtualNodes;
-        args[1] = queueType;
-        Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
-                args, NodeFactory.getDefaultNode());
-        manager.loadTasks(taskFile);
-        manager.loadResults(resultFile);
-        return manager;
-    }
-
-    public static Manager newFarmFromBackupWithSpecifiedQueue(String taskFile,
-        String resultFile, Node managerNode, Node[] nodes, String queueType)
-        throws ActiveObjectCreationException, NodeException {
-        Object[] args = new Object[2];
-        args[0] = nodes;
-        args[1] = queueType;
-        Manager manager = (Manager) ProActive.newActive(Manager.class.getName(),
-                args, managerNode);
-        manager.loadTasks(taskFile);
-        manager.loadResults(resultFile);
-        return manager;
-    }
-
+    /**
+     * Activate a Manager with given arguments.
+     *
+     * @param args an array in 4 length, with as elements:
+     * <ul>
+     *         <li><code>args[0]</code>: is the root Task.</li>
+     *         <li><code>args[1]</code>: is the manager Node or null, in that case
+     * the current JVM default Node is used.</li>
+     *         <li><code>args[2]</code>: is  nodes for distributing the computation
+     * (Node[], Node[][]).</li>
+     *         <li><code>args[3]</code>: is a String which is the class name of the
+     * queue</li>
+     * </ul>
+     *
+     * @return a ProActive Active Object which is the Manager.
+     *
+     * @throws ActiveObjectCreationException a problem occured while activating
+     * the Manager.
+     * @throws NodeException a problem with the manager node.
+     *
+     * @see org.objectweb.proactive.branchnbound.core.Manage
+     */
     private static Manager activingTheManager(Object[] args)
         throws ActiveObjectCreationException, NodeException {
         assert args.length == 4 : args;
-        Node managerNode = (args[2] == null) ? NodeFactory.getDefaultNode()
-                                             : (Node) args[2];
-        args[2] = managerNode;
+        if (logger.isDebugEnabled()) {
+            logger.debug("New Active Manager with these arguments:\n" + "\t" +
+                args[0].getClass().getName() + "\n" + "\t" +
+                args[1].getClass().getName() + "\n" + "\t" +
+                args[2].getClass().getName() + "\n" + "\t" +
+                args[3].getClass().getName() + "\n");
+        }
         assert args[0] instanceof Task : args[0];
-        assert args[1] instanceof Node[] || args[1] instanceof VirtualNode ||
-        args[1] instanceof VirtualNode[] : args[1];
-        assert args[2] instanceof Node : args[2];
-        assert args[3] instanceof TaskQueue : args[3];
+        args[1] = (args[1] == null) ? NodeFactory.getDefaultNode()
+                                    : (Node) args[1];
+        assert args[1] instanceof Node : args[1];
+        assert args[2] instanceof Node[] || args[2] instanceof Node[][] : args[2];
+        assert args[3] instanceof String : args[3];
 
         return (Manager) ProActive.newActive(Manager.class.getName(), args,
-            managerNode);
+            (Node) args[1]);
     }
 }

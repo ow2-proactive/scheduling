@@ -44,7 +44,7 @@ import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
  * Created on May 2, 2005
  */
 public class Result implements Serializable {
-    private Object theResult = null;
+    private Object theSolution = null;
     private Exception exception = null;
 
     /**
@@ -55,11 +55,11 @@ public class Result implements Serializable {
 
     /**
      * Construct a new result with an attached value. The value must implement Comparable.
-     * @param theResult the value of the result.
+     * @param theSolution the value of the result.
      */
-    public Result(Object theResult) {
-        assert theResult instanceof Comparable;
-        this.theResult = theResult;
+    public Result(Object theSolution) {
+        assert theSolution instanceof Comparable;
+        this.theSolution = theSolution;
     }
 
     public Result(Exception e) {
@@ -70,8 +70,8 @@ public class Result implements Serializable {
      * @return the value of the result or <code>null</code> if no value is
      * attached.
      */
-    public Object getResult() throws NoResultsException {
-        return this.theResult;
+    public Object getSolution() {
+        return this.theSolution;
     }
 
     public Exception getException() {
@@ -80,11 +80,11 @@ public class Result implements Serializable {
 
     /**
      * Attach a value to this result. The value must implement Comparable.
-     * @param theResult the value.
+     * @param theSolution the value.
      */
-    public void setResult(Object theResult) {
-        assert theResult instanceof Comparable;
-        this.theResult = theResult;
+    public void setSolution(Object theSolution) {
+        assert theSolution instanceof Comparable;
+        this.theSolution = theSolution;
     }
 
     /**
@@ -94,22 +94,17 @@ public class Result implements Serializable {
      * @return the best result.
      */
     public Result returnTheBest(Result other) {
-        try {
-            if (((Comparable) this.theResult).compareTo(other.getResult()) <= 0) {
-                return this;
-            } else {
-                return other;
-            }
-        } catch (NoResultsException e) {
+        if (((Comparable) this.theSolution).compareTo(other.getSolution()) <= 0) {
             return this;
         }
+        return other;
     }
 
     /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return this.theResult.toString();
+        return this.theSolution.toString();
     }
 
     /**
@@ -118,11 +113,10 @@ public class Result implements Serializable {
      * @return <code>true</code> this is better than the other, else returns <code>false</code>.
      */
     public boolean isBetterThan(Result other) {
-        if (((Comparable) this.theResult).compareTo(other.theResult) < 0) {
+        if (((Comparable) this.theSolution).compareTo(other.theSolution) < 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -136,10 +130,10 @@ public class Result implements Serializable {
     private static final String NORESULT = "--No result--";
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        if (this.theResult instanceof NoResultsException) {
+        if (this.theSolution instanceof NoResultsException) {
             out.write(NORESULT.getBytes());
         } else {
-            out.writeObject(this.theResult);
+            out.writeObject(this.theSolution);
         }
     }
 
@@ -148,9 +142,9 @@ public class Result implements Serializable {
         Object readObject = in.readObject();
         if (readObject instanceof String &&
                 (((String) readObject).compareTo(NORESULT) == 0)) {
-            this.theResult = new NoResultsException();
+            this.theSolution = new NoResultsException();
         } else {
-            this.theResult = readObject;
+            this.theSolution = readObject;
         }
     }
 }

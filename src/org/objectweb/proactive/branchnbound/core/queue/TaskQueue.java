@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.branchnbound.core.queue;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Vector;
@@ -45,8 +47,6 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 public interface TaskQueue extends Serializable {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
-    public static final String backupTaskFile = System.getProperty("user.home") +
-        System.getProperty("file.separator") + "framework.tasks.backup"; // TODO turn it configurable 
 
     public abstract void addAll(Collection tasks);
 
@@ -62,15 +62,16 @@ public interface TaskQueue extends Serializable {
 
     public abstract void setHungryLevel(int level);
 
-    public abstract void backupTasks(Task rootTask, Vector pendingTasks);
+    public abstract void backupTasks(Task rootTask, Vector pendingTasks,
+        OutputStream backupOutputStream);
 
-    public abstract void loadTasks(String taskFile);
+    public abstract void loadTasks(InputStream taskFile);
 
     public abstract Task getRootTaskFromBackup();
 
     public abstract Collection getPendingTasksFromBackup();
-	
-	public abstract void reset();
+
+    public abstract void reset();
 
     // --------------------------------------------------------------------------
     // Managing results
@@ -81,9 +82,9 @@ public interface TaskQueue extends Serializable {
 
     public abstract Collection getAllResults();
 
-    public abstract void backupResults(String backupResultFile);
+    public abstract void backupResults(OutputStream backupResultFile);
 
-    public abstract void loadResults(String backupResultFile);
+    public abstract void loadResults(InputStream backupResultFile);
 
     public abstract void addTask(Task t);
 }

@@ -53,16 +53,14 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  */
 public class Worker implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_WORKER);
-    private Worker workerGroup = null;
+    private Worker selfWorkerGroup = null;
     private Result bestCurrentResult = null;
     private TaskQueue taskProvider = null;
     private String workerNodeUrl = null;
-    private Group workerGroupCollection = null;
     private Task currentTask = null;
-    private Vector allWorkerGroup = new Vector();
 
     /**
-     * The active object empty constructor
+     * The active object empty constructor.
      */
     public Worker() {
         // The emplty constructor
@@ -94,6 +92,7 @@ public class Worker implements Serializable {
             activedTask.setWorker((Worker) ProActive.getStubOnThis());
             this.currentTask = activedTask;
             ProActive.setImmediateService(this.currentTask, "setBestKnownResult");
+            ProActive.setImmediateService(this.currentTask, "immediateTerminate");
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't actived the task", e);
             exception = e;
@@ -109,23 +108,17 @@ public class Worker implements Serializable {
             activedTask.initUpperBound();
 
             return activedTask.execute();
-        } else {
-            logger.fatal("The task was not actived");
-            if (exception == null) {
-                return new Result(new NoResultsException());
-            } else {
-                return new Result(exception);
-            }
         }
+        logger.fatal("The task was not actived");
+        if (exception == null) {
+            return new Result(new NoResultsException("The task was not actived"));
+        }
+        return new Result(exception);
     }
 
     public void setWorkerGroup(Worker workerGroup) {
-        this.workerGroupCollection = ProActiveGroup.getGroup(workerGroup);
-        if (!this.workerGroupCollection.remove(ProActive.getStubOnThis()) &&
-                (this.workerGroupCollection.size() > 0)) {
-            this.bestCurrentResult = ((Worker) this.workerGroupCollection.get(0)).getBestCurrentResult();
-        }
-        this.workerGroup = workerGroup;
+        Group group = ProActiveGroup.getGroup(workerGroup);
+        this.selfWorkerGroup = workerGroup;
     }
 
     /**
@@ -137,19 +130,12 @@ public class Worker implements Serializable {
         if ((this.bestCurrentResult == null) ||
                 newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
-            if (this.workerGroup != null) {
-                this.workerGroup.informNewBestResult(this.bestCurrentResult);
-                for (int i = 0 ; i < this.allWorkerGroup.size() ; i++) {
-                    ((Worker)this.allWorkerGroup.get(i)).informNewBestResult(this.bestCurrentResult);
-                }
+            if (this.selfWorkerGroup != null) {
+                this.selfWorkerGroup.informNewBestResult(this.bestCurrentResult);
+                // TODO if i am at the top of a group
             }
             if (this.currentTask != null) {
-                try {
-                    this.currentTask.setBestKnownResult(this.bestCurrentResult.getResult());
-                } catch (NoResultsException e) {
-                    // This catch is never throwed
-                    logger.fatal("Houston we have a problem!!");
-                }
+                this.currentTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
             }
             logger.debug("A new best result was localy found: " +
                 this.bestCurrentResult);
@@ -162,10 +148,9 @@ public class Worker implements Serializable {
      */
     public Result getBestCurrentResult() {
         if (this.bestCurrentResult == null) {
-            return new Result((Exception) new NoResultsException());
-        } else {
-            return this.bestCurrentResult;
+            return new Result(new NoResultsException());
         }
+        return this.bestCurrentResult;
     }
 
     public void informNewBestResult(Result newBest) {
@@ -173,16 +158,12 @@ public class Worker implements Serializable {
                 newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             if (this.currentTask != null) {
-                try {
-                    this.currentTask.setBestKnownResult(this.bestCurrentResult.getResult());
-                } catch (NoResultsException e) {
-                    // This catch is never throwed
-                    logger.fatal("Houston we have a problem!!");
-                }
+                this.currentTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
+                // TODO Broadcast result if i am at the top of a group
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("I was informed from a new remote best result: " +
-                        this.bestCurrentResult);
+            if (logger.isInfoEnabled()) {
+                logger.info("I was informed from a new remote best result: " +
+                    this.bestCurrentResult);
             }
         }
     }
@@ -194,33 +175,25 @@ public class Worker implements Serializable {
         this.taskProvider.addAll(subTaskList);
     }
 
-    public void addMember(Worker newWorker) {
-        this.workerGroupCollection.add(newWorker);
-    }
-
     public BooleanWrapper isHungry() {
         return this.taskProvider.isHungry();
     }
 
-    public void stopTask() {
-        this.currentTask.terminate();
+    public void immediateStopComputation() {
+        this.currentTask.immediateTerminate();
         this.currentTask = null;
     }
 
     public Task getCurrentTask() {
         return this.currentTask;
     }
-    
-    public void alive () {
+
+    public void alive() {
         // nothing to do here
     }
-	
-	public void reset() {
-		this.bestCurrentResult = null;
-		this.currentTask = null;
-	}
-    
-    public void addGroup(Worker group){
-        this.allWorkerGroup.add(group);
+
+    public void reset() {
+        this.bestCurrentResult = null;
+        this.currentTask = null;
     }
 }

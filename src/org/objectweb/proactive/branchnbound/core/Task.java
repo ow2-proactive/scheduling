@@ -52,7 +52,7 @@ public abstract class Task implements Serializable, Comparable {
     protected Result initLowerBound;
     protected Result initUpperBound;
     protected Worker worker = null;
-    protected Object bestKnownResult = null;
+    protected Object bestKnownSolution = null;
 
     /**
      * The no arg constructor for ProActive.
@@ -86,9 +86,8 @@ public abstract class Task implements Serializable, Comparable {
             if (best == null) {
                 if (current.isAnException()) {
                     continue;
-                } else {
-                    best = current;
                 }
+                best = current;
             } else {
                 best = best.returnTheBest(current);
             }
@@ -128,18 +127,18 @@ public abstract class Task implements Serializable, Comparable {
         }
     }
 
-    public void setBestKnownResult(Object newBestKnownResult) {
-        if (this.bestKnownResult != null) {
-            synchronized (this.bestKnownResult) {
-                if (((Comparable) this.bestKnownResult).compareTo(
+    public void setBestKnownSolution(Object newBestKnownResult) {
+        if (this.bestKnownSolution != null) {
+            synchronized (this.bestKnownSolution) {
+                if (((Comparable) this.bestKnownSolution).compareTo(
                             newBestKnownResult) > 0) {
-                    this.bestKnownResult = newBestKnownResult;
+                    this.bestKnownSolution = newBestKnownResult;
                 }
             }
         }
     }
 
-    public void terminate() {
+    public void immediateTerminate() {
         try {
             ProActive.getBodyOnThis().terminate();
         } catch (IOException e) {
