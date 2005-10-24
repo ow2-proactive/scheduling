@@ -36,9 +36,9 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.exceptions.proxy.FutureCreationException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.proxy.SendRequestCommunicationException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -125,27 +125,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
                 e.getTargetException());
-        } catch (Throwable t) {
-            if (t instanceof NonFunctionalException) {
-                throw (NonFunctionalException) t;
-            } else if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            } else if (t instanceof Error) {
-                throw (Error) t;
-            } else {
-                // check now which exception can be safely thrown
-                Class[] declaredExceptions = methodCall.getReifiedMethod()
-                                                       .getExceptionTypes();
-                for (int i = 0; i < declaredExceptions.length; i++) {
-                    Class exceptionClass = declaredExceptions[i];
-                    if (exceptionClass.isAssignableFrom(t.getClass())) {
-                        throw t;
-                    }
-                }
-
-                // Here we should extend the behavior to accept exception Handler
-                throw new ProActiveRuntimeException(t);
-            }
         }
     }
 
@@ -160,11 +139,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // old stuff
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsOneWay while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception
-            NonFunctionalException nfe = new SendRequestCommunicationException(
+            ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
                     "Exception occured in reifyAsOneWay while sending request for methodcall = " +
                     methodCall.getName(), e);
 
-            NFEManager.fireAndThrowNFE(nfe, e, this);
+            NFEManager.fireNFE(nfe, this);
         }
     }
 
@@ -196,54 +175,36 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             }
         } catch (MOPException e) {
             // Create a non functional exception encapsulating the network exception
-            NonFunctionalException nfe = new FutureCreationException(
+            ProxyNonFunctionalException nfe = new FutureCreationException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
                     methodCall.getName(), e);
 
-            NFEManager.fireAndThrowNFE(nfe, e, this);
+            NFEManager.fireNFE(nfe, this);
         } catch (ClassNotFoundException e) {
             // Create a non functional exception encapsulating the network exception
-            NonFunctionalException nfe = new FutureCreationException(
+            ProxyNonFunctionalException nfe = new FutureCreationException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
                     methodCall.getName(), e);
 
-            NFEManager.fireAndThrowNFE(nfe, e, this);
+            NFEManager.fireNFE(nfe, this);
         }
 
         // Set the id of the body creator in the created future
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
         fp.setCreatorID(bodyID);
+        fp.setOriginatingProxy(this);
 
-        //        // AHA : Associate handler to future automatically
-        //        HashMap handlermap = null;
-        //        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
-        //                        this.getClass().toString())) != null) {
-        //            Set keyset = handlermap.keySet();
-        //            while (keyset.iterator().hasNext()) {
-        //                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
-        //                                                                            .next();
-        //                try {
-        //                    fp.setExceptionHandler((Handler) handlermap.get(
-        //                            nfe.getClass()), nfe.getClass());
-        //                } catch (IOException e) {
-        //                    logger.debug(
-        //                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
-        //                        fp.getClass());
-        //                }
-        //            }
-        //        }
-        // Send the request
         try {
-            sendRequest(methodCall, (Future) futureobject.getProxy());
+            sendRequest(methodCall, fp);
         } catch (java.io.IOException e) {
             // old stuff
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception
-            NonFunctionalException nfe = new SendRequestCommunicationException(
+            ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
                     "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
                     methodCall.getName(), e);
 
-            NFEManager.fireAndThrowNFE(nfe, e, this);
+            NFEManager.fireNFE(nfe, this);
         }
 
         // And return the future object
@@ -253,47 +214,28 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     protected Object reifyAsSynchronous(MethodCall methodCall)
         throws Throwable, Exception, RenegotiateSessionException {
         // Setting methodCall.res to null means that we do not use the future mechanism
-        Future f = FutureProxy.getFutureProxy();
-        f.setCreatorID(bodyID);
+        FutureProxy fp = FutureProxy.getFutureProxy();
+        fp.setCreatorID(bodyID);
+        fp.setOriginatingProxy(this);
 
-        //        // AHA : Associate handler to future automatically
-        //        HashMap handlermap = null;
-        //        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
-        //                        this.getClass().toString())) != null) {
-        //            Set keyset = handlermap.keySet();
-        //            while (keyset.iterator().hasNext()) {
-        //                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
-        //                                                                            .next();
-        //                try {
-        //                    FutureProxy.getFutureProxy().setExceptionHandler((Handler) handlermap.get(
-        //                            nfe.getClass()), nfe.getClass());
-        //                } catch (IOException e) {
-        //                    logger.debug(
-        //                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
-        //                        FutureProxy.getFutureProxy().getClass());
-        //                }
-        //            }
-        //        }
-        // Set it as the 'thing' to send results to methodCall.res = f;
-        // Send the request
         try {
-            sendRequest(methodCall, f);
+            sendRequest(methodCall, fp);
         } catch (java.io.IOException e) {
             // old stuff 
             // throw new MethodCallExecutionFailedException("Exception occured in reifyAsSynchronous while sending request for methodcall ="+methodCall.getName(), e);
             // Create a non functional exception encapsulating the network exception
-            NonFunctionalException nfe = new SendRequestCommunicationException(
+            ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
                     "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
                     methodCall.getName(), e);
 
-            NFEManager.fireAndThrowNFE(nfe, e, this);
+            NFEManager.fireNFE(nfe, this);
         }
 
         // Returns the result (exception returned is a functional one -> NFE is not needed)
-        if (f.getRaisedException() != null) {
-            throw f.getRaisedException();
+        if (fp.getRaisedException() != null) {
+            throw fp.getRaisedException();
         } else {
-            return f.getResult();
+            return fp.getResult();
         }
     }
 

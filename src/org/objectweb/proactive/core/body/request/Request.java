@@ -34,7 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.security.Securizable;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
@@ -112,9 +112,10 @@ public interface Request extends Message, Securizable {
     /**
      * Create a fake but valid reply by encapsulating a non functional exception instead of a result
      * @param targetBody the body destination of the call
+     * @param nfe the exception for the proxy
      * @return the fake reply built using the non functional exception
      */
-    public Reply serveAlternate(Body targetBody, NonFunctionalException nfe);
+    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe);
 
     /**
      * Notifies the request that it has been received by the destination.

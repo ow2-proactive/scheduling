@@ -34,7 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -109,7 +109,7 @@ public class BodyRequest extends MessageImpl implements Request,
         return null;
     }
 
-    public Reply serveAlternate(Body targetBody, NonFunctionalException nfe) {
+    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe) {
         return null;
     }
 

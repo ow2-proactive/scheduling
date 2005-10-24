@@ -2,8 +2,8 @@ package org.objectweb.proactive.core.body.future;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 
 
 /**
@@ -19,10 +19,10 @@ public class FutureResult implements Serializable {
     private Throwable exception;
 
     /** It may contain a NFE */
-    private NonFunctionalException nfe;
+    private ProxyNonFunctionalException nfe;
 
     public FutureResult(Object result, Throwable exception,
-        NonFunctionalException nfe) {
+        ProxyNonFunctionalException nfe) {
         this.result = result;
         this.exception = exception;
         this.nfe = nfe;
@@ -32,7 +32,7 @@ public class FutureResult implements Serializable {
         return exception;
     }
 
-    public NonFunctionalException getNFE() {
+    public ProxyNonFunctionalException getNFE() {
         return nfe;
     }
 

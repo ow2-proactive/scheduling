@@ -43,12 +43,14 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.event.FutureEvent;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.exceptions.proxy.FutureTimeoutException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -135,9 +137,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private ExceptionMaskLevel exceptionLevel;
 
     /**
-     * Get NFE logger
+     * The proxy that created this future. Set as transient to avoid
+     * adding remote references when sending the future. Migration is
+     * thus not supported.
      */
-    protected static Logger logger = Logger.getLogger("NFE");
+    private transient AbstractProxy originatingProxy;
 
     /**
      * Max timeout when waiting for a future
@@ -237,11 +241,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         target = obj;
         ExceptionHandler.addResult(this);
-        NonFunctionalException nfe = target.getNFE();
+        ProxyNonFunctionalException nfe = target.getNFE();
         if (nfe != null) {
-            NFEManager.fireNFE(nfe);
+            NFEManager.fireNFE(nfe, originatingProxy);
         }
 
+        originatingProxy = null;
         this.notifyAll();
     }
 
@@ -290,40 +295,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     /**
      * Blocks the calling thread until the future object is available.
      */
-
-    /*    public synchronized void waitFor() {
-       if (isAvailable()) {
-           return;
-       }
-       UniqueID id = null;
-       // send WAIT_BY_NECESSITY event to listeners if there are any
-       if (futureEventProducer != null) {
-           id = ProActive.getBodyOnThis().getID();
-           if (LocalBodyStore.getInstance().getLocalBody(id) != null) {
-               // send event only if ActiveObject, not for HalfBodies
-               futureEventProducer.notifyListeners(id, getCreatorID(),
-                   FutureEvent.WAIT_BY_NECESSITY);
-           } else {
-               id = null;
-           }
-       }
-       while (!isAvailable()) {
-           try {
-               this.wait();
-           } catch (InterruptedException e) {
-           }
-       }
-       // send RECEIVED_FUTURE_RESULT event to listeners if there are any
-       if (id != null) {
-           futureEventProducer.notifyListeners(id, getCreatorID(),
-               FutureEvent.RECEIVED_FUTURE_RESULT);
-       }
-       }
-     */
-
-    /**
-     * Blocks the calling thread until the future object is available.
-     */
     public synchronized void waitFor() {
         if (futureMaxDelay == -1) {
 
@@ -341,11 +312,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         try {
             waitFor(futureMaxDelay);
         } catch (ProActiveException e) {
-            NonFunctionalException nfe = new FutureTimeoutException(
+            ProxyNonFunctionalException nfe = new FutureTimeoutException(
                     "Exception after waiting for " + futureMaxDelay + "ms", e);
 
-            /* TODO: mettre une NFE a la place */
-            target = new FutureResult(null, e, null);
+            target = new FutureResult(null, null, nfe);
             notifyAll();
         }
     }
@@ -416,6 +386,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         senderID = i;
     }
 
+    public void setOriginatingProxy(AbstractProxy p) {
+    	originatingProxy = p;
+    }
+    
     //
     // -- Implements Proxy -----------------------------------------------
     //
@@ -449,17 +423,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         //		}
         waitFor();
 
-        // The object is available, but it may be a NFE that signal a service exception
-        //System.out.println("GET FUTURE");
-
-        /*if (this.isNFE) {
-           System.out.println("GET NFE");
-           Handler handler = ProActive.searchExceptionHandler((NonFunctionalException) this.target,
-                   this);
-           handler.handle((NonFunctionalException) this.target, c);
-           //throw ((InvocationTargetException) this.target);
-           }*/
-
         // Now that the object is available, execute the call
         Object resultObject = target.getResult();
         try {
@@ -480,61 +443,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         return result;
     }
 
-    //    /**
-    //     * Get information about the handlerizable object
-    //     * @return information about the handlerizable object
-    //     */
-    //    public String getHandlerizableInfo() throws java.io.IOException {
-    //        return "FUTURE (ID=" + this.ID + ") of CLASS [" + this.getClass() +
-    //        "]";
-    //    }
-    //
-    //    /** Give a reference to a local map of handlers
-    //    * @return A reference to a map of handlers
-    //    */
-    //    public HashMap getHandlersLevel() throws java.io.IOException {
-    //        return futureLevel;
-    //    }
-    //
-    //    /**
-    //         * Clear the local map of handlers
-    //         */
-    //    public void clearHandlersLevel() throws java.io.IOException {
-    //        futureLevel.clear();
-    //    }
-    //
-    //    /** Set a new handler within the table of the Handlerizable Object
-    //         * @param handler A handler associated with a class of non functional exception.
-    //         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-    //         */
-    //    public void setExceptionHandler(Handler handler, Class exception)
-    //        throws java.io.IOException {
-    //        // add handler to future level
-    //        if (futureLevel == null) {
-    //            futureLevel = new HashMap();
-    //        }
-    //        futureLevel.put(exception, handler);
-    //    }
-    //
-    //    /** Remove a handler from the table of the Handlerizable Object
-    //         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-    //         * @return The removed handler or null
-    //         */
-    //    public Handler unsetExceptionHandler(Class exception)
-    //        throws java.io.IOException {
-    //        // remove handler from future level
-    //        if (futureLevel != null) {
-    //            Handler handler = (Handler) futureLevel.remove(exception);
-    //            return handler;
-    //        } else {
-    //            if (logger.isDebugEnabled()) {
-    //                logger.debug("[NFE_WARNING] No handler for [" +
-    //                    exception.getName() + "] can be removed from FUTURE level");
-    //            }
-    //            return null;
-    //        }
-    //    }
-    //
     // -- PROTECTED METHODS -----------------------------------------------
     //
     protected void finalize() {

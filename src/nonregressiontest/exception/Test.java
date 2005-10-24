@@ -31,6 +31,8 @@
 package nonregressiontest.exception;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 
 import testsuite.test.FunctionalTest;
 
@@ -49,7 +51,7 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        if (counter == 11) {
+        if (counter == 13) {
             return true;
         } else {
             System.out.println("counter == " + counter);
@@ -129,6 +131,17 @@ public class Test extends FunctionalTest {
             ProActive.removeTryWithCatch();
         }
 
+        /* futureExc() synchronous */
+        try {
+        	r.futureExc();
+        } catch (Exception e) {
+        	if (e.getMessage().startsWith("Test")) {
+                good();
+            } else {
+                bad();
+            }
+        }
+        
         ProActive.tryWithCatch(Exception.class);
         Exc res = r.futureExc();
         try {
@@ -153,6 +166,15 @@ public class Test extends FunctionalTest {
 
         /* Client */
         /* voidRT() */
+        ProActive.addNFEListenerOnAO(r, new NFEListener() {
+        	public boolean canHandleNFE(NonFunctionalException e) {
+        		return e.toString().indexOf("Test") > 0;
+        	}
+        	
+        	public void handleNFE(NonFunctionalException e) {
+        		good();
+        	}
+        });
         r.voidRT();
 
         /* futureRT() */

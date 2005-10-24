@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
@@ -117,25 +117,23 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     private synchronized void waitForRequest() {
         while (!isArrived) {
             try {
-//                //if (logger.isDebugEnabled()) {
-//                UniqueID waiter = ProActive.getBodyOnThis().getID();
-//                    logger.info("[WAIT] " + waiter + " is waiting for a request from " +
-//                        this.awaitedSender);
-//                //}
+                //                //if (logger.isDebugEnabled()) {
+                //                UniqueID waiter = ProActive.getBodyOnThis().getID();
+                //                    logger.info("[WAIT] " + waiter + " is waiting for a request from " +
+                //                        this.awaitedSender);
+                //                //}
                 this.wait(3000);
-                
-                if (!isArrived){
+
+                if (!isArrived) {
                     UniqueID waiter = ProActive.getBodyOnThis().getID();
-                    logger.info("[WAIT] " + waiter + " is waiting for a request from " +
-                        this.awaitedSender);
+                    logger.info("[WAIT] " + waiter +
+                        " is waiting for a request from " + this.awaitedSender);
                 }
-                
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
-
 
     //// WRAPPED METHODS
     public MethodCall getMethodCall() {
@@ -229,7 +227,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
         return null;
     }
 
-    public Reply serveAlternate(Body targetBody, NonFunctionalException nfe) {
+    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe) {
         return this.wrappedRequest.serveAlternate(targetBody, nfe);
     }
 

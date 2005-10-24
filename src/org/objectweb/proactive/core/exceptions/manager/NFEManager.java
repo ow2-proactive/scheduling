@@ -1,11 +1,11 @@
 package org.objectweb.proactive.core.exceptions.manager;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.HalfBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -28,25 +28,15 @@ public class NFEManager {
         }
     }
 
-    public static int fireNFE(NonFunctionalException e) {
-        return fireNFE(e, ProActive.getBodyOnThis());
-    }
-
-    public static int fireNFE(NonFunctionalException e, UniversalBody body) {
+    public static int fireNFE(BodyNonFunctionalException e, UniversalBody body) {
         return fireNFE(e, body, null);
     }
 
-    public static int fireAndThrowNFE(NonFunctionalException nfe, Exception e,
-        AbstractProxy proxy) throws Exception {
-        //fireNFE(nfe, proxy);
-        throw e;
-    }
-
-    public static int fireNFE(NonFunctionalException e, AbstractProxy proxy) {
+    public static int fireNFE(ProxyNonFunctionalException e, AbstractProxy proxy) {
         return fireNFE(e, null, proxy);
     }
 
-    public static int fireNFE(NonFunctionalException e, UniversalBody body,
+    private static int fireNFE(NonFunctionalException e, UniversalBody body,
         AbstractProxy proxy) {
         int nbListeners = 0;
 
@@ -70,13 +60,14 @@ public class NFEManager {
     }
 
     public static void defaultNFEHandler(NonFunctionalException nfe) {
+        try {
+            throw nfe;
+        } catch (BodyNonFunctionalException bnfe) {
 
-        /* Hack to avoid killing an active object */
-        if (ProActive.getBodyOnThis() instanceof HalfBody) {
-            logger.warn("NFE in a HalfBody", nfe);
-            //throw nfe;
-        } else {
+            /* Avoid killing an AO */
             logger.warn("NFE in a Body", nfe);
+
+            /* But the exception will be thrown if it's on the proxy */
         }
     }
 }

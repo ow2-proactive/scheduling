@@ -55,10 +55,11 @@ import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.body.BodyNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
 import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
@@ -157,28 +158,29 @@ public abstract class BodyImpl extends AbstractBody
         String ftstate = ProActiveConfiguration.getFTState();
         if ("enable".equals(ftstate)) {
             // if the object is a ProActive internal object, FT is disabled
-            if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)){
+            if (!(this.localBodyStrategy.getReifiedObject() instanceof ProActiveInternalObject)) {
                 // if the object is not serilizable, FT is disabled
-                if (this.localBodyStrategy.getReifiedObject() instanceof Serializable){
+                if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                     try {
                         // create the fault tolerance manager
                         int protocolSelector = FTManager.getProtoSelector(ProActiveConfiguration.getFTProtocol());
-                        this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
+                        this.ftmanager = factory.newFTManagerFactory()
+                                                .newFTManager(protocolSelector);
                         this.ftmanager.init(this);
                         if (bodyLogger.isDebugEnabled()) {
                             bodyLogger.debug("Init FTManager on " +
-                                    this.getNodeURL());
+                                this.getNodeURL());
                         }
                     } catch (ProActiveException e) {
                         bodyLogger.error(
-                                "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
-                                e);
+                            "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                            e);
                         this.ftmanager = null;
                     }
                 } else {
                     // target body is not serilizable
                     bodyLogger.error(
-                    "**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
+                        "**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
                     this.ftmanager = null;
                 }
             }
@@ -355,14 +357,14 @@ public abstract class BodyImpl extends AbstractBody
                     }
                 } catch (ServeException e) {
                     // Create a non functional exception encapsulating the service exception
-                    NonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
+                    BodyNonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
                             "Exception occured while serving pending request = " +
                             request.getMethodName(), e, this,
                             ProActive.getBodyOnThis());
                     NFEManager.fireNFE(calleeNFE, BodyImpl.this);
 
                     // Create a non functional exception encapsulating the service exception
-                    NonFunctionalException callerNFE = new ServiceFailedCallerNFE(
+                    ProxyNonFunctionalException callerNFE = new ServiceFailedCallerNFE(
                             "Exception occured while serving pending request = " +
                             request.getMethodName(), e);
 
@@ -430,7 +432,7 @@ public abstract class BodyImpl extends AbstractBody
                 this.getFuturePool().removeDestination();
             } catch (java.io.IOException e) {
                 // Create a non functional exception encapsulating the network exception
-                NonFunctionalException nfe = new SendReplyCommunicationException(
+                BodyNonFunctionalException nfe = new SendReplyCommunicationException(
                         "Exception occured in while sending reply to request = " +
                         request.getMethodName(), e);
 

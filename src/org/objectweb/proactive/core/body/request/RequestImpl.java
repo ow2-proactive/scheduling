@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -120,7 +120,7 @@ public class RequestImpl extends MessageImpl implements Request,
         return createReply(targetBody, result);
     }
 
-    public Reply serveAlternate(Body targetBody, NonFunctionalException nfe) {
+    public Reply serveAlternate(Body targetBody, ProxyNonFunctionalException nfe) {
         if (loggerNFE.isDebugEnabled()) {
             loggerNFE.debug("*** Serving an alternate version of " +
                 this.getMethodName());
