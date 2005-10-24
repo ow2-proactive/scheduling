@@ -114,30 +114,7 @@
       ==
       ================================================================
 	-->
-	<target name="all" depends="ic2d, bnb, p2p, examples, trywithcatch">
-		<!-- Java primitive type wrapper stubs generation -->
-		<echo message="Java primitive type wrapper stubs generating..." />
-		<property name="stub_wrapper.classdir" value="${basedir}${file.separator}..${file.separator}classes"/>
-	    <path id="wrapperClassDir">
-	          <pathelement path="${stub_wrapper.classdir}"/>
-	    </path>
-		<pathconvert pathsep=" " property="wrapperClassesDir" refid="wrapperClassDir"/>
-		<path id="wrapperClasses">
-			<fileset dir="${classes.dir}/org/objectweb/proactive/core/util/wrapper" >
-		    	<include name="**/*.class"/>
-		        <exclude name="**/*$*"/>
-		    </fileset>
-		</path>
-		<pathconvert pathsep=" " property="wrapper-files" refid="wrapperClasses">
-			<map from="${wrapperClassesDir}" to=""/>
-		</pathconvert>
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator"
-			fork="true" >
-			<classpath refid="project.classpath"/>
-			<arg line="-d ${classes.dir}
-				${wrapper-files}"/>
-		</java> 
-	</target>
+	<target name="all" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper" />
 	<!--
 	   ================================================================
 	   ==
@@ -685,6 +662,31 @@
              </classpath>
 	       <arg line="-d ${stub.classdir} ${test-files}"/>
 	 </java> 
+	</target>
+	
+	<target name="stub_wrapper" depends="ext">
+		<!-- Java primitive type wrapper stubs generation -->
+		<echo message="Java primitive type wrapper stubs generating..." />
+		<property name="stub_wrapper.classdir" value="${basedir}${file.separator}..${file.separator}classes"/>
+	    <path id="wrapperClassDir">
+	          <pathelement path="${stub_wrapper.classdir}"/>
+	    </path>
+		<pathconvert pathsep=" " property="wrapperClassesDir" refid="wrapperClassDir"/>
+		<path id="wrapperClasses">
+			<fileset dir="${classes.dir}/org/objectweb/proactive/core/util/wrapper" >
+		    	<include name="**/*.class"/>
+		        <exclude name="**/*$*"/>
+		    </fileset>
+		</path>
+		<pathconvert pathsep=" " property="wrapper-files" refid="wrapperClasses">
+			<map from="${wrapperClassesDir}" to=""/>
+		</pathconvert>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator"
+			fork="true" >
+			<classpath refid="project.classpath"/>
+			<arg line="-d ${classes.dir}
+				${wrapper-files}"/>
+		</java> 
 	</target>
 	<!--
 	   ================================================================
