@@ -169,9 +169,9 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public ExternalProcess getProcess(String name);
 
     /**
-     * Returns the process to hierarchically deploy
+     * Returns the process to deploy hierarchically
      * @param vmname
-     * @return
+     * @return the process to deploy hierarchically
      */
     public ExternalProcess getHierarchicalProcess(String vmname);
 

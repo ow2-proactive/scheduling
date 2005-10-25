@@ -109,7 +109,7 @@ public class MainDefinition implements Serializable {
     /**
      * return the i-th virtual node of the list
      * @param i index of the virtual node to get
-     * @return
+     * @return the i-th virtual node of the list
      */
     public VirtualNode getVirtualNode(int i) {
         return (VirtualNode) virtualNodeList.get(i);
@@ -125,7 +125,7 @@ public class MainDefinition implements Serializable {
 
     /**
      * return a table of String containing all the parameters to apply to the main method
-     * @returna table of String containing all the parameters to apply to the main method
+     * @return a table of String containing all the parameters to apply to the main method
      */
     public String[] getParameters() {
         String[] result = new String[parameters.size()];

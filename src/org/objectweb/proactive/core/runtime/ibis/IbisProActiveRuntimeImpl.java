@@ -176,7 +176,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     /**
      * @throws ProActiveException
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     * @see org.objectweb.proactive.core.runtime.RemoteProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
@@ -371,7 +371,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     /**
      * @throws ProActiveException
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getJobID(java.lang.String)
+     * @see org.objectweb.proactive.core.runtime.RemoteProActiveRuntime#getJobID(java.lang.String)
      */
     public String getJobID(String nodeUrl)
         throws RemoteException, ProActiveException {

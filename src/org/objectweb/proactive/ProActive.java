@@ -1404,7 +1404,7 @@ public class ProActive {
      * current services, so it is the programmer responsibility to ensure that Immediate Services 
      * do not interfere with any other methods.
      * @param obj the object on which to set this immediate service
-     * @param the name of the method
+     * @param methodName the name of the method
      * @throws IOException
      */
     public static void setImmediateService(Object obj, String methodName)

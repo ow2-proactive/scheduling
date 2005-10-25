@@ -278,7 +278,6 @@ public class JavassistByteCodeStubBuilder {
     /**
      * @param generatedClass
      * @param reifiedMethods
-     * @param superClass
      * @param classesIndexer
      * @throws CannotCompileException
      * @throws NotFoundException

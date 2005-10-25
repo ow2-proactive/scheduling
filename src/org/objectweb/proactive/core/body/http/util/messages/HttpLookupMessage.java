@@ -58,7 +58,7 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
 
     /**
      * Get the returned object.
-     * @return
+     * @return the returned object
      */
     public UniversalBody getReturnedObject() {
         return (UniversalBody) this.returnedObject;

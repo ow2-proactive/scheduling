@@ -32,9 +32,6 @@ package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
@@ -46,16 +43,8 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.SecurityEntity;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**

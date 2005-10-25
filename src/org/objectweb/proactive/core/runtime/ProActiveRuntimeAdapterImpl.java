@@ -149,7 +149,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
 
     /**
      * @throws NodeException
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(java.lang.String, boolean, org.objectweb.proactive.ext.security.PolicyServer, java.lang.String, java.lang.String)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(java.lang.String, boolean, ProActiveSecurityManager, java.lang.String, java.lang.String)
      */
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, ProActiveSecurityManager policyServer,

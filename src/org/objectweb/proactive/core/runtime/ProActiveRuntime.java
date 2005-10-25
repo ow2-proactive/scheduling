@@ -320,7 +320,14 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
         int inc) throws ProActiveException;
 
     /**
-     * @ see ProActiveRuntime#getProcessToDeploy(String, String)
+     * Ask proActiveRuntimeDist for the process with given ids: padURL, creatorID, vmName.
+     * Used for hierarchical deployment.
+     * @param proActiveRuntimeDist
+     * @param creatorID
+     * @param vmName
+     * @param padURL
+     * @return the process with given ids: padURL, creatorID, vmName
+     * @throws ProActiveException
      */
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
@@ -373,8 +380,8 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
 
     /**
      * return the pad matching with the given url or parse it from the file system
-     * @param xmlDescriptorUrl url of the pad
-     * @param hierarchicalSearch if yes search for the pad hierarchically
+     * @param url url of the pad
+     * @param isHierarchicalSearch if yes search for the pad hierarchically
      * @return the pad found or a new pad parsed from xmlDescriptorUrl
      * @throws ProActiveException
      * @throws IOException

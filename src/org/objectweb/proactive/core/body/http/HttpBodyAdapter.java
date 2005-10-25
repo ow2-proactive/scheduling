@@ -76,7 +76,6 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
 
     /**
      * Registers an active object into the table of body.
-     * @param paBody the body of the active object to register.
      * @param urn The urn of the body (in fact his url + his name)
      * @exception java.io.IOException if the remote body cannot be registered
      */

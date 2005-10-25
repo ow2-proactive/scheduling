@@ -47,7 +47,6 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  *  This class is used to encapsulate  a request into an HTTP message
  * @author jbrocoll
  * @see java.io.Serializable
- * @see org.objectweb.proactive.ext.webservices.utils.ReflectRequest
  */
 public class BodyRequest extends ReflectRequest implements Serializable {
     private static Logger logger = Logger.getLogger("XML_HTTP");

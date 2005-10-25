@@ -372,7 +372,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
+     * @see org.objectweb.proactive.ext.security.SecurityEntity#publicKeyExchange(long, byte[], byte[], byte[])
      */
     public byte[][] publicKeyExchange(long sessionID, byte[] my_pub,
         byte[] my_cert, byte[] sig_code)
@@ -517,7 +517,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
 
     /**
      * STILL NOT IMPLEMENTED
-     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(FTMessage)
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException {
         return null;

@@ -25,7 +25,7 @@ public class HttpMarshaller {
     /**
      *
      * @param o
-     * @return
+     * @return byte array representation of the object o 
      */
     public static byte[] marshallObject(Object o) {
         String result = null;

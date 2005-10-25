@@ -398,7 +398,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see UniversalBody# */
+    /** @see org.objectweb.proactive.Job#getJobID() */
     public String getJobID(UniqueID id) throws IOException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
@@ -430,7 +430,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
         }
     }
 
-    /** @see UniversalBody# */
+    /** @see BodyAdapter#changeProxiedBody(Body) */
     public void changeProxiedBody(UniqueID id, Body newBody)
         throws IOException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);

@@ -57,8 +57,6 @@ public abstract class HttpMessage implements Serializable {
     public abstract Object processMessage() throws Exception;
 
     /**
-     *
-     * @param url
      * @throws HTTPRemoteException
      */
     public final void send() throws HTTPRemoteException {

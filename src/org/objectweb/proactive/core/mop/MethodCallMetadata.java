@@ -26,8 +26,7 @@ public class MethodCallMetadata implements Serializable {
 
     /**
      * @param runtimeExceptionHandled
-     * @param NFEHandled
-     * @param asynchronousException
+     * @param exceptionAsynchronously
      */
     public MethodCallMetadata(boolean runtimeExceptionHandled,
         boolean exceptionAsynchronously) {

@@ -85,19 +85,17 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         this.hostname = null;
         jad = new GLiteJobAd();
     }
-    
-    
+
     public static void main(String[] args) {
-		ProActiveDescriptor pad;
-		try {
-			pad = ProActive.getProactiveDescriptor(args[0]);
-			pad.activateMappings();
-		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+        ProActiveDescriptor pad;
+        try {
+            pad = ProActive.getProactiveDescriptor(args[0]);
+            pad.activateMappings();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Create the jdl file with all the options specified in the descriptor
@@ -258,7 +256,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attributes to add to the GliteJobAd object
+     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrValue value of the atributes
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
@@ -267,7 +266,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attributes to add to the GliteJobAd object
+     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
@@ -277,7 +277,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attributes to add to the GliteJobAd object
+     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
@@ -287,7 +288,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attributes to add to the GliteJobAd object
+     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
@@ -297,7 +299,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attributes to add to the GliteJobAd object
+     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
@@ -368,7 +371,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
 
     public FileTransfer getFileTransfertDefiniton() {
         FileTransfer ft = new FileTransfer("gliteProcess");
-        ft.addFile(filePath+"/"+fileName, remoteFilePath+"/"+fileName);
+        ft.addFile(filePath + "/" + fileName, remoteFilePath + "/" + fileName);
         return ft;
     }
 

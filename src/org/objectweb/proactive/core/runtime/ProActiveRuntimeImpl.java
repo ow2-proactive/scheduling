@@ -856,21 +856,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return (PolicyServer) nodeSecurityManagerMap.get(nodeName);
     }
 
-    /** (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
-     */
-    public X509Certificate getNodeCertificate(String nodeName) {
-        ProActiveSecurityManager nodeSecurityManager = null;
-
-        nodeSecurityManager = (ProActiveSecurityManager) nodeSecurityManagerMap.get(nodeName);
-
-        if (nodeSecurityManager != null) {
-            return nodeSecurityManager.getCertificate();
-        }
-
-        return null;
-    }
-
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
      */
@@ -995,7 +980,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         byte[] classData = null;
 
         if (parentRuntime != null) {
-            
             classData = parentRuntime.getClassDataFromThisRuntime(className);
 
             if (classData == null) {

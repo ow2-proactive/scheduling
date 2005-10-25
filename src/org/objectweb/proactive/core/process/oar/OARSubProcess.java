@@ -161,7 +161,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     /**
      * Set the resource option in the OAR command.
      * Represents the -l option of OAR
-     * @param d duration
+     * @param res resources to set
      */
     public void setResources(String res) {
         checkStarted();

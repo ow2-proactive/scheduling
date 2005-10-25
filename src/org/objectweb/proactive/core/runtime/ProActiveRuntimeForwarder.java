@@ -60,29 +60,29 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 /**
  * A ProActiveRuntimeForwarder is a ProActiveRuntime and a forwarder.
- * 
+ *
  * All ProActiveRuntime methods are inherited, and for each inherited a new one
  * with the same name, the same return type, same arguments, but prefixed by an argument
  * of type UniqueRuntimeID is defined.
- * 
+ *
  * When a method inherited from ProActiveRuntime is called a forwarder behave like a normal
  * runtime, it's a normal runtime.
- * 
+ *
  * When a prefixed method is called, the prefix argument is used to forward the call to the
- * right runtime. To perform the dispatch a forwarder uses a HashTable 
- * <UniqueRuntimeID, Adapter>, which is filled during deserialization of 
+ * right runtime. To perform the dispatch a forwarder uses a HashTable
+ * <UniqueRuntimeID, Adapter>, which is filled during deserialization of
  * ProActiveRuntimeAdapter objects.
- * 
+ *
+ * Check org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterForwarderImpl#readObject(java.io.ObjectInputStream)
  * @see org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl#readResolve()
- * @see org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterForwarderImpl#readObject(java.io.ObjectInputStream)
- * 
+ *
  * @author  ProActive Team
  */
 public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean, PolicyServer, String, String)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean, ProActiveSecurityManager, String, String)
      */
     public String createLocalNode(UniqueRuntimeID urid, String nodeName,
         boolean replacePreviousBinding, ProActiveSecurityManager psm,
@@ -237,7 +237,7 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
         String nodeName, Checkpoint ckpt, int inc) throws ProActiveException;
 
     /**
-     * @see ProActiveRuntime#getProcessToDeploy(String, String)
+     * @see ProActiveRuntime#getProcessToDeploy(ProActiveRuntime, String, String, String)
      */
     public ExternalProcess getProcessToDeploy(UniqueRuntimeID urid,
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,

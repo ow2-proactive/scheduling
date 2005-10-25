@@ -43,7 +43,6 @@ public class HttpMessageSender {
     /**
      *
      * @param message
-     * @return
      */
     public Object sendMessage(HttpMessage message) throws HTTPRemoteException {
         byte[] bytes = HttpMarshaller.marshallObject(message);

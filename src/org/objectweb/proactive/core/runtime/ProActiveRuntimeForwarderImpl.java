@@ -220,7 +220,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
      * Add process to process list to be hierarchically deployed,
      * if we launched a forwarder it will ask for it using register().
      * @param padURL  URL of the ProActive Descriptor
-     * @param urid  Virtual Machine associated to process
+     * @param vmName  Virtual Machine associated to process
      * @param process The process
      */
     protected void setProcessesToDeploy(String padURL, String vmName,

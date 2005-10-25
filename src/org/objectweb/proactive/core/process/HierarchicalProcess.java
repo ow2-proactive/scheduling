@@ -63,8 +63,8 @@ public interface HierarchicalProcess {
     public void setHierarchicalProcess(ExternalProcess process);
 
     /**
-     * Get the Processto be deployed from the forwarder
-     * @return
+     * Get the Process to be deployed from the forwarder
+     * @return the Process to be deployed from the forwarder
      */
     public ExternalProcess getHierarchicalProcess();
 }
