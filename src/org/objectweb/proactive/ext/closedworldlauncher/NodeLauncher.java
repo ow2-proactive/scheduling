@@ -1,6 +1,6 @@
 package org.objectweb.proactive.ext.closedworldlauncher;
 
-import org.objectweb.proactive.StartNode;
+import org.objectweb.proactive.core.node.StartNode;
 
 
 public class NodeLauncher extends AbstractLauncher {
