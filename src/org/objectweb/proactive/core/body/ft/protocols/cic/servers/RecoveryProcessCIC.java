@@ -50,7 +50,7 @@ public class RecoveryProcessCIC extends RecoveryProcessImpl {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recoverFrom(org.objectweb.proactive.core.UniqueID)
+     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recover(org.objectweb.proactive.core.UniqueID)
      */
     protected void recover(UniqueID failed) {
         CheckpointServerCIC ckptServer = (CheckpointServerCIC) (this.server.getCheckpointServer());

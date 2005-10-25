@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.ft.protocols.pmlrb.servers;
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
@@ -43,16 +44,24 @@ import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServerImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
+ * This class defines a checkpoint server for PMLRB protcol.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class CheckpointServerPMLRB extends CheckpointServerImpl {
 
+    
+    //logger
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
+    
     /**
-     * @param server
+     * Constructor.
+     * @param server the corresponding global server.
      */
     public CheckpointServerPMLRB(FTServer server) {
         super(server);
@@ -63,17 +72,13 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      */
     public int storeCheckpoint(Checkpoint c, int incarnation)
         throws RemoteException {
-        logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." + " (used memory = " + this.getUsedMem() + " Kb)");
+        logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." +
+            " (used memory = " + this.getUsedMem() + " Kb)");
         UniqueID caller = c.getBodyID();
         Object already = this.checkpointStorage.get(caller);
 
         // delete old checkpoint if any
         if (already != null) {
-            //TMP
-            //Checkpoint tmp = (Checkpoint)already;
-            //System.out.println("Last request logs size :" + ((CheckpointInfoPMLRB)(tmp.getCheckpointInfo())).getRequestLog().size());
-            //System.out.println("Storage size " + this.getSize(this.checkpointStorage));
-            //TMP
             this.checkpointStorage.remove(caller);
         }
 
@@ -126,9 +131,10 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
         if (c != null) {
             CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (c.getCheckpointInfo());
             ci.addRequest(request);
-        } 
+        }
+
         //else {
-            //System.out.println(" ****** NOT LOGGED REQUEST ****** ");
+        //System.out.println(" ****** NOT LOGGED REQUEST ****** ");
         //}
     }
 
@@ -151,7 +157,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.UniqueID, int, long, long, java.util.List)
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      */
     public void commitHistory(HistoryUpdater rh) throws RemoteException {
         // nothing to do         

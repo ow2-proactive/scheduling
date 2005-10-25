@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.body.request.Request;
  * Checkpoint additional informations for the PMLRB protocol. Contains message logs
  * used to recover the activity state
  * @author cdelbe
+ * @since ProActive 3.0
  */
 public class CheckpointInfoPMLRB implements CheckpointInfo {
     // message logs

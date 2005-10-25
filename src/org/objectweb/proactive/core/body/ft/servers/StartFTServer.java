@@ -24,7 +24,7 @@ import org.objectweb.proactive.core.rmi.RegistryHelper;
 
 /**
  * This class is a main that creates and starts a ft.util.FTServer.
- * Usage : ~>startGlobalFTServer [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]
+ * Usage : ~>startGlobalFTServer [-proto {cic|pml}] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]
  * @author cdelbe
  * @since ProActive 2.2
  */
@@ -110,15 +110,12 @@ public class StartFTServer {
             Naming.rebind("rmi://" + host + ":" + port + "/" + name, server);
             System.out.println("Fault-tolerance server is bound on rmi://" +
                 host + ":" + port + "/" + name);
-            
-            
+
             // wait for reinit
             while (true) {
                 StartFTServer.printMessageAndWait("Reset");
                 server.initialize();
             }
-            
-            
         } catch (RemoteException e) {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
@@ -130,16 +127,16 @@ public class StartFTServer {
             e.printStackTrace();
         }
     }
-    
+
     private static void printMessageAndWait(String msg) {
         java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(
-                System.in));
+                    System.in));
         System.out.println(msg);
-        System.out.println("   --> Press <return> to reinitilize the server ...");
+        System.out.println(
+            "   --> Press <return> to reinitilize the server ...");
         try {
             d.readLine();
         } catch (Exception e) {
         }
     }
-    
 }

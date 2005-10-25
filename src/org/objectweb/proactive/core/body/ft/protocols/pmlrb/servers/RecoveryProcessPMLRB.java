@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.ft.protocols.pmlrb.servers;
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.FTManagerPMLRB;
@@ -39,16 +40,23 @@ import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryJob;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
+ * This class defines a recovery process for PMLRB protocol.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
 
+    //logger
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
+    
     /**
-     * @param server
+     * Constructor.
+     * @param server the corresponding global server.
      */
     public RecoveryProcessPMLRB(FTServer server) {
         super(server);
@@ -63,6 +71,7 @@ public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
 
             //look for a new Runtime for this oa
             Node node = this.server.getFreeNode();
+
             //if (node==null)return;
             RecoveryJob job = new RecoveryJob(toSend,
                     FTManagerPMLRB.DEFAULT_TTC_VALUE, node);

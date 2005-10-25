@@ -72,6 +72,8 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.core.util.MutableLong;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -91,18 +93,18 @@ public class FTManagerCIC
     public static final int RECOVER = -4;
 
     //logger
-    protected static Logger logger = Logger.getLogger(FTManagerCIC.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_CIC);
 
     // local runtime
-    private static final Runtime runtime = Runtime.getRuntime();
-
+    // private static final Runtime runtime = Runtime.getRuntime();
     // FT Values
     private int incarnation;
     private int lastRecovery; // index of the last ckpt used for recovery
     private int checkpointIndex; //index of the latest perfomred checkpoint
     private long checkpointTimer;
     private int nextMax;
-    private int nextMin;
+
+    // private int nextMin;
     private int historyIndex; // index of the latest closed history
 
     // logged messages
@@ -120,6 +122,7 @@ public class FTManagerCIC
 
     // history
     private Vector history;
+
     // cannot lock hisotry itself, because it is modified in synchronized blocks !
     private final Character historyLock = new Character('l');
 
@@ -140,7 +143,7 @@ public class FTManagerCIC
         this.checkpointIndex = 0;
         this.historyIndex = 0;
         this.nextMax = 1;
-        this.nextMin = 0;
+        //this.nextMin = 0;
         this.lastRecovery = 0;
         this.checkpointTimer = System.currentTimeMillis();
         this.requestToResend = new Hashtable();
@@ -400,18 +403,17 @@ public class FTManagerCIC
             try {
                 Reply toLog = null;
 
-                //                SECURITY COMPATIBILITY !!
-                //                try {
-                //                    toLog = new ReplyImpl(reply.getSourceBodyID(),
-                //                            reply.getSequenceNumber(), reply.getMethodName(),
-                //                            (FutureResult) Utils.makeDeepCopy(reply.getResult()),
-                //                            owner.getProActiveSecurityManager());
-                //                } catch (SecurityNotAvailableException e1) {
+                //try {
+                //    toLog = new ReplyImpl(reply.getSourceBodyID(),
+                //            reply.getSequenceNumber(), reply.getMethodName(),
+                //            (FutureResult) Utils.makeDeepCopy(reply.getResult()),
+                //            owner.getProActiveSecurityManager());
+                //} catch (SecurityNotAvailableException e1) {
                 toLog = new ReplyImpl(reply.getSourceBodyID(),
                         reply.getSequenceNumber(), reply.getMethodName(),
                         (FutureResult) Utils.makeDeepCopy(reply.getResult()),
                         null);
-                //                }
+                //}
                 MessageLog log = new ReplyLog(toLog,
                         destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
@@ -565,8 +567,6 @@ public class FTManagerCIC
     private boolean updateAwaitedRequests(Request r) {
         AwaitedRequest ar = null;
         Iterator it = this.awaitedRequests.iterator();
-        UniqueID sender = r.getSourceBodyID();
-
         while (it.hasNext()) {
             AwaitedRequest arq = (AwaitedRequest) (it.next());
             if ((arq.getAwaitedSender()).equals(r.getSourceBodyID())) {
@@ -612,10 +612,11 @@ public class FTManagerCIC
         // synchronized on hisotry to avoid hisot commit during checkpoint
         synchronized (this.historyLock) {
             Checkpoint c;
-            long start;
-            long end;
+
+            //long start;
+            //long end;
             try {
-                start = System.currentTimeMillis();
+                //start = System.currentTimeMillis();
                 //System.out.println("BEGIN CHECKPOINT : used mem = " + this.getUsedMem() );
                 synchronized (this) {
                     if (logger.isDebugEnabled()) {
@@ -663,12 +664,6 @@ public class FTManagerCIC
 
                     // record the next history base index
                     ci.lastRcvdRequestIndex = this.deliveredRequestsCounter;
-//                    logger.debug("" + this.ownerID + " : Checkpoint " +
-//                        this.checkpointIndex + " -> lastReceivedRequest = " +
-//                        ci.lastRcvdRequestIndex + " ; Histo size = " +
-//                        historyTMP.size() + " ; Queue size : " +
-//                        this.owner.getRequestQueue().size()); // + " ; Pending Rq : " + pendingRequest);
-
                     // checkpoint the active object
                     this.setCheckpointTag(true);
                     c = new Checkpoint((Body) owner, this.additionalCodebase);
@@ -676,8 +671,7 @@ public class FTManagerCIC
                     c.setCheckpointInfo(ci);
 
                     // send it to server
-                    int resStorage = this.storage.storeCheckpoint(c,
-                            this.incarnation);
+                    this.storage.storeCheckpoint(c, this.incarnation);
                     this.setCheckpointTag(false);
 
                     // restore current informations               
@@ -692,7 +686,8 @@ public class FTManagerCIC
                     // reninit checkpoint values
                     this.checkpointTimer = System.currentTimeMillis();
                 }
-                end = System.currentTimeMillis();
+
+                //end = System.currentTimeMillis();
                 //System.out.println("[BENCH] Cumulated Ckpt time at " + this.checkpointIndex + " : " + this.cumulatedCheckpointTime + " ms");// + System.currentTimeMillis() + "]");
                 //System.out.println("END CHECKPOINTING : used mem = " + this.getUsedMem());
                 return c;
@@ -897,11 +892,11 @@ public class FTManagerCIC
      * Return the memory actually used
      * For debugging stuff.
      */
-    private long getUsedMem() {
-        return (FTManagerCIC.runtime.totalMemory() -
-        FTManagerCIC.runtime.freeMemory()) / 1024;
-    }
 
+    //private long getUsedMem() {
+    //    return (FTManagerCIC.runtime.totalMemory() -
+    //    FTManagerCIC.runtime.freeMemory()) / 1024;
+    //}
     //////////////////////////////////////////////////////////////////////////////////
     ///////// HANDLING EVENTS ////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////
@@ -939,7 +934,6 @@ public class FTManagerCIC
         // commit history up to upTo
         long upTo = fte.getLastIndexToRetreive();
 
-        //System.out.println("" + this.ownerID + " OUTPUT COMMIT : retreiving history up to " + upTo + " (base= " + this.historyBaseIndex + ")");
         // this hisotry must be attached to the current checkpoint, except if the current 
         // checkpoint is not completed with its minimal history
         int attachedIndex = (this.completingCheckpoint)

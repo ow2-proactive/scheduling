@@ -35,6 +35,7 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -47,6 +48,8 @@ import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -54,9 +57,13 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * This class implements a Pessimistic Message Logging protocol for ProActive.
  * This FTManager is linked non active object communicating with fault-tolerant active objects.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class HalfFTManagerPMLRB extends FTManager {
+    
+    //logger
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
+    
     //sequence number of sending for any messages
     private char sendNumber;
     private MessageInfoPMLRB requestInfos;

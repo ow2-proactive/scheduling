@@ -36,7 +36,7 @@ import java.util.Hashtable;
 /**
  * This class is a generic job queue.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class ActiveQueue extends Thread {
     private java.util.ArrayList queue;
@@ -44,9 +44,6 @@ public class ActiveQueue extends Thread {
     private boolean kill;
     private Hashtable barriers;
 
-    /**
-     *
-     */
     public ActiveQueue(String name) {
         queue = new java.util.ArrayList();
         counter = 0;
@@ -61,14 +58,15 @@ public class ActiveQueue extends Thread {
 
     /**
      * return the current queue of jobs to perform
+     * @return the current queue of jobs to perform
      */
     public java.util.ArrayList getQueue() {
         return queue;
     }
 
     /**
-     * Add a ACservice in the active queue.
-     * @return the sequence number of the job
+     * Add a job in the active queue.
+     * @param j the job to add.
      */
     public synchronized void addJob(ActiveQueueJob j) {
         queue.add(j);
@@ -76,8 +74,14 @@ public class ActiveQueue extends Thread {
         notifyAll();
     }
 
+    /**
+     * Add a job in the active queue. A barrier is created for this job; waiting on this 
+     * barrier is blocking until the job j ends.
+     * @param j the job to add.
+     * @return a barrier on the job j;
+     */
     public synchronized JobBarrier addJobWithBarrier(ActiveQueueJob j) {
-        JobBarrier b = new JobBarrier(j);
+        JobBarrier b = new JobBarrier();
         this.barriers.put(j, b); // hash method of job !!!
         queue.add(j);
         counter++;
@@ -87,20 +91,26 @@ public class ActiveQueue extends Thread {
 
     /**
      * Return the oldest job in queue and remove it from the queue
+     * @return the oldest job in queue and remove it from the queue
      */
     public synchronized ActiveQueueJob removeJob() {
         counter--;
         return (ActiveQueueJob) (queue.remove(0));
     }
 
+    
     /**
-     * To stop the thread.
+     * Stop the thread.
      */
     public synchronized void killMe() {
         kill = true;
         notifyAll();
     }
 
+    /**
+     * The run method of the thread. Serve jobs in a FIFO manner until
+     * <code>killMe()</code> is called.
+     */
     public void run() {
         while (true) {
             // if there is no job to do, wait...

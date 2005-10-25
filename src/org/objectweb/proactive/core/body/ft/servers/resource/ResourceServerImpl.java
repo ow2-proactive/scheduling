@@ -39,6 +39,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
@@ -50,8 +52,9 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @since 2.2
  */
 public class ResourceServerImpl implements ResourceServer {
+    
     //logger
-    protected static Logger logger = Logger.getLogger(ResourceServer.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // global server
     private FTServer server;
@@ -126,12 +129,6 @@ public class ResourceServerImpl implements ResourceServer {
             this.nodeCounter = 0;
             n = getFreeNode();
         }
-//        if (n==null){
-//            // nothing is no more possible -> reinit the system
-//            this.server.initialize();
-//            return null;
-//        }
-        
         logger.info("[RESSOURCE] Return a node : " +
             n.getNodeInformation().getURL());
         return n;

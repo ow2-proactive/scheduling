@@ -34,12 +34,13 @@ package org.objectweb.proactive.core.body.ft.servers.util;
 /**
  * This interface must be implemented by jobs submitted to an ActiveQueue.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public interface ActiveQueueJob {
 
     /**
-     * Do the needed stuff.
+     * This method contains the main code of the job. It is called by the active queue
+     * when the job is served.
      */
     public void doTheJob();
 }

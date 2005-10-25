@@ -104,14 +104,9 @@ public interface CheckpointServer extends Remote {
         throws RemoteException;
 
     /**
-     * Add the request reception history <code>history</code> to the checkpoint
-     * <code>indexOfCheckpoint</code>
-     * @param caller id of the caller
-     * @param incarnation incarnation number of the caller
-     * @param indexOfCheckpoint index of the checkpoint associated with the passed history
-     * @param base reception index of the first element of <code>history</code>
-     * @param last reception index of the last element of <code>history</code>
-     * @param history the history to add
+     * Add an history to a checkpoint. Informations about the corresponding checkpoint
+     * are stored in the HistoryUpdater object.
+     * @param rh the history updater.
      * @throws RemoteException
      */
     public void commitHistory(HistoryUpdater rh) throws RemoteException;
@@ -147,7 +142,7 @@ public interface CheckpointServer extends Remote {
     /**
      * The reply passed in paramter must be synchronously logged on the server. It must
      * be associated with the ID passed in parameter.
-     * @param receiverId the ID associated to the reply.
+     * @param receiverID the ID associated to the reply.
      * @param reply the reply to log.
      * @throws RemoteException If communication with server fails.
      */

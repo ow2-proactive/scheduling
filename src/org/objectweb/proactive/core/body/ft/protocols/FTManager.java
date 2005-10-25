@@ -51,6 +51,8 @@ import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -60,8 +62,9 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * @since ProActive 2.2
  */
 public abstract class FTManager implements java.io.Serializable {
+    
     //logger
-    protected final static Logger logger = Logger.getLogger(FTManager.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     /** This value is sent by an active object that is not fault tolerant*/
     public static final int NON_FT = -30;

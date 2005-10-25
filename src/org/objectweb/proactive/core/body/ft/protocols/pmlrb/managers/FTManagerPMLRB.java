@@ -36,6 +36,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -53,6 +54,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.util.MutableLong;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -60,6 +63,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * This class defines the fault-tolerance manager for the Pessimistic Message Logging protocol,
  * Receiver Based approach.
  * @author cdelbe
+ * @since 3.0
  */
 public class FTManagerPMLRB extends FTManager {
 
@@ -69,6 +73,9 @@ public class FTManagerPMLRB extends FTManager {
     /** Value returned if the message is ignored */
     public static final int IGNORED_MSG = -1;
 
+    //logger
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
+    
     // index of the latest received messae per senderID
     // UniqueID <-> MutableLong
     private Hashtable latestReceivedIndex;
@@ -225,7 +232,7 @@ public class FTManagerPMLRB extends FTManager {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendReplyAfter(org.objectweb.proactive.core.body.reply.Reply)
+     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendReplyAfter(org.objectweb.proactive.core.body.reply.Reply, int, org.objectweb.proactive.core.body.UniversalBody)
      */
     public int onSendReplyAfter(Reply reply, int rdvValue,
         UniversalBody destination) {
@@ -242,7 +249,7 @@ public class FTManagerPMLRB extends FTManager {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendRequestAfter(org.objectweb.proactive.core.body.request.Request)
+     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendRequestAfter(org.objectweb.proactive.core.body.request.Request, int, org.objectweb.proactive.core.body.UniversalBody)
      */
     public int onSendRequestAfter(Request request, int rdvValue,
         UniversalBody destination) throws RenegotiateSessionException {
@@ -323,7 +330,7 @@ public class FTManagerPMLRB extends FTManager {
             logger.error("Unable to connect with location server");
             e.printStackTrace();
         }
-        
+
         this.checkpointTimer = System.currentTimeMillis();
 
         return 0;
@@ -358,8 +365,7 @@ public class FTManagerPMLRB extends FTManager {
             // attach infos
             c.setCheckpointInfo(ci);
             // send it to server
-            int resStorage = this.storage.storeCheckpoint(c,
-                    FTManagerPMLRB.DEFAULT_TTC_VALUE); // SEE INC VALUE !
+            this.storage.storeCheckpoint(c, FTManagerPMLRB.DEFAULT_TTC_VALUE); // SEE INC VALUE !
 
             // reninit checkpoint values
             this.checkpointTimer = System.currentTimeMillis();

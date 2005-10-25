@@ -34,6 +34,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -51,15 +52,21 @@ import org.objectweb.proactive.core.body.ft.servers.util.JobBarrier;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * This server contains one instance of each needed servers for fault tolerance, and
  * delegates each method call to the concerned subserver.
  * @author cdelbe
+ * @since 3.0
  */
 public class FTServer extends UnicastRemoteObject implements FaultDetector,
     LocationServer, RecoveryProcess, ResourceServer, CheckpointServer {
+    
+    //logger
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     /** Default server port */
     public static final int DEFAULT_PORT = 1100;
@@ -82,6 +89,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
      */
     public FTServer() throws RemoteException {
         super();
+        // this.killingQueue.start();
     }
 
     /**
@@ -109,7 +117,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#startFailureDetector(org.objectweb.proactive.core.body.ft.servers.location.LocationServer, org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess)
+     * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#startFailureDetector()
      */
     public void startFailureDetector() throws RemoteException {
         this.faultDetector.startFailureDetector();
@@ -217,13 +225,6 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#broadcastFTEvent(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
-     */
-    public void broadcastFTEvent(FTMessage fte) throws RemoteException {
-        //this.recoveryProcess.broadcastFTEvent(fte);
-    }
-
-    /**
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#addFreeNode(org.objectweb.proactive.core.node.Node)
      */
     public void addFreeNode(Node n) throws RemoteException {
@@ -240,8 +241,33 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
+  
+    // Commented code is used to benchmark recovery time. A failure is triggered
+    // artifially by sending a kill message to one active object.
+    
+    //public static final int numCkpt = 4; // totalWorker * failureFrequency
+    //public static final int numberOfWorker = 4;
+    //public static final long timeToWait = 45000; // TTC/2
+    //public static final int totalFailure = 1;
+    
+    //private int ckptCounter = 1;
+    //private int failureCounter = 1;
+    //private int firstCkptCounter = numberOfWorker;
+    //private ActiveQueue killingQueue = new ActiveQueue("Killing thread");
+    
     public int storeCheckpoint(Checkpoint c, int incarnation)
         throws RemoteException {
+        //this.firstCkptCounter--;
+        //if (this.firstCkptCounter < 0){
+        //    if ((this.failureCounter <= totalFailure) && 
+        //            ((ckptCounter) == numCkpt)) {
+        //        this.killingQueue.addJob(
+        //                new KillerJob(this,this.getLocation(c.getBodyID()),timeToWait));
+        //        this.ckptCounter=0; // the following ++ set it to 1 ...
+        //        this.failureCounter++;
+        //    }
+        //    this.ckptCounter++;
+        //}
         return this.checkpointServer.storeCheckpoint(c, incarnation);
     }
 
@@ -278,7 +304,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(int, long, long, java.util.List)
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      */
     public void commitHistory(HistoryUpdater rh) throws RemoteException {
         this.checkpointServer.commitHistory(rh);
@@ -392,11 +418,11 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#initialize()
      */
     public void initialize() throws RemoteException {
-        System.out.println("[GLOBAL] Reinitializing server ...");
+        logger.info("[GLOBAL] Reinitializing server ...");
         this.checkpointServer.initialize();
         this.locationServer.initialize();
         this.recoveryProcess.initialize();
         this.resourceServer.initialize();
-        System.out.println("[GLOBAL] Server reinitialized");
+        logger.info("[GLOBAL] Server reinitialized");
     }
 }

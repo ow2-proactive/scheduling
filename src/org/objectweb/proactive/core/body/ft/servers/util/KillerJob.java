@@ -28,32 +28,56 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.protocols.pmlrb.infos;
+package org.objectweb.proactive.core.body.ft.servers.util;
 
-import org.objectweb.proactive.core.body.ft.exception.NotImplementedException;
-import org.objectweb.proactive.core.body.ft.message.MessageInfo;
-import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
+import java.io.IOException;
+import java.rmi.RemoteException;
 
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.Killer;
+import org.objectweb.proactive.core.body.ft.servers.FTServer;
 
 /**
- * Informations piggybacked on messages with the PMLRB protocol.
+ * A job that kill a given active object
  * @author cdelbe
- * @since 3.0
+ * @since 2.2
  */
-public class MessageInfoPMLRB implements MessageInfo {
-    public long sentSequenceNumber;
+public class KillerJob implements ActiveQueueJob {
 
+    
+    private FTServer server;
+    private UniversalBody toKill;
+    private long toWait;
+    
     /**
-     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()
+     * 
      */
-    public int getProtocolType() {
-        return FTManagerFactory.PROTO_PML;
+    public KillerJob(FTServer server, UniversalBody toKill, long toWait) {
+        this.server = server;
+        this.toKill = toKill;
+        this.toWait = toWait;
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#isFromHalfBody()
+     * @see org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob#doTheJob()
      */
-    public boolean isFromHalfBody() {
-        throw new NotImplementedException();
+    public void doTheJob() {
+        try {
+            // wait before killing
+            Thread.sleep(toWait);
+            toKill.receiveFTMessage(new Killer());
+        } catch (IOException e) {
+            //nothing
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        try {
+            this.server.forceDetection();
+        } catch (RemoteException e1) {
+            e1.printStackTrace();
+        }
     }
 }
+
+

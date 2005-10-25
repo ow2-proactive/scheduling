@@ -32,18 +32,21 @@ package org.objectweb.proactive.core.body.ft.servers.util;
 
 
 /**
+ * This class defines a barrier on a Job. Waiting on a barrier is blocking until
+ * the completion of the corresponding job.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class JobBarrier {
     private boolean isCompleted;
-    private ActiveQueueJob job;
 
-    public JobBarrier(ActiveQueueJob job) {
+    public JobBarrier() {
         this.isCompleted = false;
-        this.job = job;
     }
 
+    /**
+     * Wait until the completion of the corresponding job.
+     */
     public synchronized void waitForJobCompletion() {
         try {
             while (!isCompleted) {
@@ -54,6 +57,9 @@ public class JobBarrier {
         }
     }
 
+    /**
+     * Called when the corresponding job is finished.
+     */
     public synchronized void signalJobCompletion() {
         this.isCompleted = true;
         notifyAll();

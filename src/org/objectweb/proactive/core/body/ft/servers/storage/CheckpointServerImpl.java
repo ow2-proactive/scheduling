@@ -38,16 +38,10 @@ import java.rmi.RemoteException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
-import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
-import org.objectweb.proactive.core.body.ft.message.MessageInfo;
-import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
-import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -55,8 +49,9 @@ import org.objectweb.proactive.core.rmi.ClassServerHelper;
  * @since 2.2
  */
 public abstract class CheckpointServerImpl implements CheckpointServer {
+    
     //logger
-    protected static Logger logger = Logger.getLogger(CheckpointServer.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // used memory
     private final static Runtime runtime = Runtime.getRuntime();

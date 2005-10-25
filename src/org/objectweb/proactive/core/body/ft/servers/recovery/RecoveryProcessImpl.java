@@ -42,6 +42,8 @@ import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueue;
 import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob;
 import org.objectweb.proactive.core.body.ft.servers.util.JobBarrier;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -52,9 +54,9 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
 
     /** Maximum number of active queues */
     public static final int MAX_ACTIVE_QUEUES = 50;
-
+  
     //logger
-    protected static Logger logger = Logger.getLogger(RecoveryProcess.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // global server
     protected FTServer server;
@@ -131,16 +133,11 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
         logger.info("[RECOVERY]  " + id + " is updating its state : " + state);
         this.bodies.put(id, new Integer(state));
     }
+    
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#broadcastFTEvent(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
-     */
-    public void broadcastFTEvent(FTMessage fte) throws RemoteException {
-        //new BroadcastThread(fte).start();
-    }
-
-    /**
-     * @see XXX
+     * Submit an ActiveQueueJob to the active queue of the recovery process.
+     * @param job the job to submit.
      */
     public void submitJob(ActiveQueueJob job) {
         synchronized (this.activeQueuePool) {
@@ -149,6 +146,12 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
         }
     }
 
+    /**
+     * Submit an ActiveQueueJob to the active queue of the recovery process. A job barrier is
+     * returned. Waiting on this barrier is blocking until the job is finished.
+     * @param job the job to submit.
+     * @return the corresponding barrier.
+     */
     public JobBarrier submitJobWithBarrier(ActiveQueueJob job) {
         synchronized (this.activeQueuePool) {
             JobBarrier b = ((ActiveQueue) (this.activeQueuePool.get(this.activeQueuesCounter))).addJobWithBarrier(job);

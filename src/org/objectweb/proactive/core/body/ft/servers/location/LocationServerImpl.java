@@ -38,6 +38,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -45,8 +47,9 @@ import org.objectweb.proactive.core.body.ft.servers.FTServer;
  * @author cdelbe
  */
 public class LocationServerImpl implements LocationServer {
+    
     //logger
-    protected static Logger logger = Logger.getLogger(LocationServer.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // global server
     private FTServer server;

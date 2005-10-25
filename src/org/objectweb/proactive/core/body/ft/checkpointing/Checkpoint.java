@@ -65,7 +65,6 @@ public class Checkpoint implements java.io.Serializable {
     /**
      * Create a checkpoint. The body given as parameter is serialized in this constructor.
      * @param bodyToCheckpoint the body that have to be checkpointed
-     * @param index the index of the checkpoint
      * @param additionalCodebase the URL of the CheckpointServer classserver
      */
     public Checkpoint(Body bodyToCheckpoint, String additionalCodebase) {

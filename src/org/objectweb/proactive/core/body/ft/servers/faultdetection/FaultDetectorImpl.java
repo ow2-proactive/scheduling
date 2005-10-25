@@ -40,7 +40,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.exception.NotImplementedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
-import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -48,8 +49,9 @@ import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob;
  * @author cdelbe
  */
 public class FaultDetectorImpl implements FaultDetector {
+    
     //logger
-    protected static Logger logger = Logger.getLogger(FaultDetector.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // global server
     private FTServer server;
@@ -93,7 +95,7 @@ public class FaultDetectorImpl implements FaultDetector {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#startFailureDetector(org.objectweb.proactive.core.body.ft.servers.location.LocationServer, org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess)
+     * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#startFailureDetector()
      */
     public void startFailureDetector() throws RemoteException {
         this.fdt.start();

@@ -39,12 +39,17 @@ import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
  * of the process of the group is sending a message to the outside world (i.e. an
  * external element or a process belonging to another group)
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class OutputCommit implements FTMessage {
     private long lastIndexToRetreive;
     private long firstIndexToRetreive;
 
+    /**
+     * Create an output commit message.
+     * @param firstIndex first index of history that must be commited
+     * @param lastIndex last index of history that must be commited
+     */
     public OutputCommit(long firstIndex, long lastIndex) {
         this.firstIndexToRetreive = firstIndex;
         this.lastIndexToRetreive = lastIndex;

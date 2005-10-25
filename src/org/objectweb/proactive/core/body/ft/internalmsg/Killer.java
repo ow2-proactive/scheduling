@@ -28,32 +28,26 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.protocols.pmlrb.infos;
+package org.objectweb.proactive.core.body.ft.internalmsg;
 
-import org.objectweb.proactive.core.body.ft.exception.NotImplementedException;
-import org.objectweb.proactive.core.body.ft.message.MessageInfo;
-import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
-
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
 /**
- * Informations piggybacked on messages with the PMLRB protocol.
+ * The vm is killed on reception of this message.
+ * For benchmarking use !
  * @author cdelbe
- * @since 3.0
+ * @since 2.2
  */
-public class MessageInfoPMLRB implements MessageInfo {
-    public long sentSequenceNumber;
+public class Killer implements FTMessage {
+
+    public Killer() {}
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()
+     * @see org.objectweb.proactive.core.body.ft.internalmsg.FTMessage#handleFTMessage(org.objectweb.proactive.core.body.ft.protocols.FTManager)
      */
-    public int getProtocolType() {
-        return FTManagerFactory.PROTO_PML;
+    public Object handleFTMessage(FTManager ftm) {
+        System.exit(111);
+        return null;
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#isFromHalfBody()
-     */
-    public boolean isFromHalfBody() {
-        throw new NotImplementedException();
-    }
 }

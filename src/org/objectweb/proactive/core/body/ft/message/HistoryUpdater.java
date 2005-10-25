@@ -37,10 +37,10 @@ import org.objectweb.proactive.core.UniqueID;
 
 
 /**
- * This structure defines a part of a recpetion history. It is used to
- * update a RecpetionHistory.
+ * This structure defines a part of a reception history. It is used to
+ * update a ReceptionHistory object.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class HistoryUpdater implements Serializable {
 

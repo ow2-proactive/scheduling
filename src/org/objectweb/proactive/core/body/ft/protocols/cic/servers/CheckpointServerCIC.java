@@ -38,6 +38,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -64,9 +65,12 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.MutableInteger;
 import org.objectweb.proactive.core.util.MutableLong;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
+ * This class define a checkpoint server for the CIC protocol.
  * @author cdelbe
  * @since 2.2
  */
@@ -75,12 +79,13 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /** Period of the checkpoints garbage collection (ms) */
     public static final int DEFAULT_GC_PERIOD = 40000;
     
+    //logger
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_CIC);
     
     //monitoring latest global state
     private Hashtable stateMonitor; //ckpt index -> number of stored checkpoint
     private int lastGlobalState;
     private int lastRegisteredCkpt;
-    private int lastUpdatedCkpt;
 
     // current incarnation 
     private int globalIncarnation;
@@ -99,9 +104,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     // profiling
     private boolean displayCkptSize;
 
-    /**
-     *
-     */
+ 
     public CheckpointServerCIC(FTServer server) {
         super(server);
 
@@ -220,7 +223,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(int, long, long, java.util.List)
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      **/
     public synchronized void commitHistory(HistoryUpdater rh)
         throws RemoteException {
@@ -313,7 +316,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     private boolean checkRecoveryLine() {
         try {
             int systemSize = this.server.getSystemSize();
-            int lastRecoveryLine = this.recoveryLine;
             MutableInteger nextPossible = (MutableInteger) (this.recoveryLineMonitor.get(new MutableInteger(this.recoveryLine +
                         1)));
             // THIS PART MUST BE ATOMIC
@@ -328,7 +330,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                     long nextBase = ((CheckpointInfoCIC) (this.getCheckpoint(key,
                             this.recoveryLine + 1).getCheckpointInfo())).lastRcvdRequestIndex +
                         1;
-                    cur.goToNextBase(key, nextBase);
+                    cur.goToNextBase(nextBase);
                     cur.confirmLastUpdate();
                 }
 
@@ -456,8 +458,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#outputCommit(org.objectweb.proactive.core.body.ft.message.MessageInfo)
      */
-
-    // SYNCHRONY OF HISTORY ACCESSES
     public synchronized void outputCommit(MessageInfo mi)
         throws RemoteException {
         Hashtable vectorClock = ((MessageInfoCIC) mi).vectorClock;
@@ -465,7 +465,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         // must store at least each histo up to vectorClock[id]       
         Enumeration enumClocks = vectorClock.keys();
 
-        // THIS PART MUST BE ATOMIC AND THREADED !
         // <ATOMIC>
         while (enumClocks.hasMoreElements()) {
             UniqueID id = (UniqueID) (enumClocks.nextElement());
@@ -496,8 +495,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
         // </ATOMIC>
         // wait for completion of histo retreiving
-        //  DEADLOCK => FTM is locked by beforeSending, and histo retreive need the lock
-        // ==> lock sur l'hisot uniquement 
         // here we can commit alteration on histories
         Enumeration allHisto = this.histories.elements();
         while (allHisto.hasMoreElements()) {
@@ -506,7 +503,9 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
     }
     
-    
+    /**
+     * Reintialize the server.
+     */
     public void initialize() throws RemoteException {
         super.initialize();
         this.stateMonitor = new Hashtable();
@@ -566,7 +565,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             boolean hasGarbaged =  false;
             synchronized (server) {
                 int recLine = server.recoveryLine;
-                int lastGS = server.lastGlobalState;
                 Iterator it = server.checkpointStorage.values().iterator();
                 while (it.hasNext()) {
                     ArrayList ckpts = ((ArrayList) (it.next()));
@@ -583,6 +581,9 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
     }
 
+    /*
+     * This class define a job for sending a global state completion notification.
+     */
     private static class GSCESender implements ActiveQueueJob {
         private FTServer server;
         private UniqueID callee;
@@ -597,10 +598,8 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         public void doTheJob() {
             try {
                 UniversalBody destination = server.getLocation(callee);
-
                 // THIS CALL MUST BE FT !!!!
                 HistoryUpdater histo = (HistoryUpdater) (destination.receiveFTMessage(toSend));
-
                 // histo could be null : nothing to commit
                 if (histo != null) {
                     server.commitHistory(histo);
@@ -614,14 +613,4 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             }
         }
     }
-
-    private static class OCSender implements ActiveQueueJob {
-        private FTServer server;
-        private UniqueID callee;
-        private OutputCommit toSend;
-
-        public void doTheJob() {
-        }
-    }
-
 }

@@ -35,14 +35,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 
 
 /**
- * This class represent an ordered list of reception event.
+ * This class represent an ordered list of reception events.
  * @author cdelbe
- * @since 2.2
+ * @since 3.0
  */
 public class ReceptionHistory implements Serializable {
     // the elements of the history
@@ -59,7 +58,7 @@ public class ReceptionHistory implements Serializable {
     private long lastRecoverable;
 
     /**
-     * Constructor
+     * Create a new reception history
      */
     public ReceptionHistory() {
         this.elements = new Vector();
@@ -70,9 +69,7 @@ public class ReceptionHistory implements Serializable {
 
     /**
      * Update this history up to last;
-     * @param base the historized index of the first element of elts
-     * @param last the historized index of the last element of elts
-     * @param elts the elements to add to the history
+     * @param hu the history updater that must be used.
      */
     public void updateHistory(HistoryUpdater hu) {
         long toAddBase = hu.base;
@@ -107,15 +104,16 @@ public class ReceptionHistory implements Serializable {
     /**
      * This method is called when elements between base and nextBase are no more
      * usefull : there a included in the state represented by the last recovery line.
+     * Then the base of the history (i.e. the first usefull element) is nextBase.
+     * @param nextBase the new base of history.
      */
-
-    // UNIQUEID FOR DEBUGGING
-    public void goToNextBase(UniqueID id, long nextBase) {
+    public void goToNextBase(long nextBase) {
         if (nextBase < this.base) {
             throw new ProtocolErrorException(
                 "nextBase is lower than current base !");
         }
         int shift = (int) (nextBase - this.base);
+
         // particular case : shift==histo_size
         // minimal histo is empty for this checkpoint
         if (shift == (this.elements.size() + 1)) {
@@ -127,6 +125,10 @@ public class ReceptionHistory implements Serializable {
         }
     }
 
+    /**
+     * Called when an update is confirmed. In this case, the commited history becomes
+     * the recoverable history, i.e an history that can be used for recovery.
+     */
     public void confirmLastUpdate() {
         this.lastRecoverable = this.lastCommited;
     }
@@ -140,27 +142,26 @@ public class ReceptionHistory implements Serializable {
     }
 
     /**
-     * Called only on recovery of the system. If recoverable hisotry is different from
+     * Called only on recovery of the system. If recoverable history is different from
      * stored history, stored history is replaced by recoverable history.
-     * @return the recoverable hisotry;
+     * @return the recoverable history;
      */
     public List getRecoverableHistory() {
         if (this.lastCommited == this.lastRecoverable) {
             return this.elements;
         } else {
             Vector toRet = new Vector();
-            int histoSize = this.elements.size();
             for (int i = 0; i <= (this.lastRecoverable - this.base); i++) {
                 toRet.add(this.elements.get(i));
             }
-
-            // DELETE FROM LASTREC TO LASTCOMMITED !!!
             this.elements = toRet;
             return toRet;
         }
     }
 
-    // delete hisotry from LastRec to LastCommited
+    /**
+     * Called to delete unusefull elements in this history.
+     */
     public void compactHistory() {
         if (this.lastCommited > this.lastRecoverable) {
             this.elements.subList((int) ((this.lastRecoverable + 1) -
