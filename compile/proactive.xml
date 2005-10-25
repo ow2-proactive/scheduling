@@ -520,6 +520,20 @@
 	<!--
 	   ================================================================
 	   ==
+      ==  Add Copyright. The target copyright_format, first change the copyright and format with jalopy
+      ==
+      ================================================================
+	-->
+	<target name="copyright_format" depends="copyright, format"></target>
+	<target name="copyright" depends="util">
+		<java classname="util.AddCopyright" fork="true">
+			<classpath refid="project.classpath"/>
+			<arg value="${src.dir}/org/objectweb/proactive"/>
+			</java>
+	</target>
+	<!--
+	   ================================================================
+	   ==
       ==  Create one html file for the Manual
       ==
       ================================================================
@@ -958,7 +972,7 @@
 
 	    <jalopy classpathref="project.classpath"
 	            style="proactiveJalopy.xml">
-	      <fileset dir="${src.dir}">
+	      <fileset dir="${src.dir}/org/objectweb/proactive">
 	        <include name="**/*.java" />
 	      </fileset>
 	    	
