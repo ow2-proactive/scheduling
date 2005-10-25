@@ -167,12 +167,9 @@ public class Test extends FunctionalTest {
         /* Client */
         /* voidRT() */
         ProActive.addNFEListenerOnAO(r, new NFEListener() {
-        	public boolean canHandleNFE(NonFunctionalException e) {
-        		return e.toString().indexOf("Test") > 0;
-        	}
-        	
-        	public void handleNFE(NonFunctionalException e) {
+        	public boolean handleNFE(NonFunctionalException e) {
         		good();
+        		return true;
         	}
         });
         r.voidRT();

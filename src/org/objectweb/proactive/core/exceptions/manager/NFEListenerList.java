@@ -31,8 +31,7 @@ public class NFEListenerList implements NFEProducer, Serializable {
         Iterator iter = listeners.iterator();
         while (iter.hasNext()) {
             NFEListener listener = (NFEListener) iter.next();
-            if (listener.canHandleNFE(e)) {
-                listener.handleNFE(e);
+            if (listener.handleNFE(e)) {
                 nbListeners++;
             }
         }
