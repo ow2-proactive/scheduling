@@ -9,7 +9,7 @@ class NoOpNFEListener implements NFEListener {
     public boolean handleNFE(NonFunctionalException e) {
 
         /* do nothing */
-    	return true;
+        return true;
     }
 }
 

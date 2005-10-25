@@ -124,7 +124,7 @@ import ibis.rmi.RemoteException;
  * waitForPotentialException()
  * waitForTheNth(Vector, int)
  * Previous methods provide also the ability to pass a timeout value
- * 
+ *
  * allAwaited(Vector)
  * getFutureValue(Object)
  * isException(Object)
@@ -154,7 +154,7 @@ import ibis.rmi.RemoteException;
  * removeNFEListenerOnJVM(NFEListener)
  * removeNFEListenerOnProxy(Object, NFEListener)
  * </pre>
- 
+
  * </p>
   * <p><a href="doc-files/exceptions.html">Functionnal Exceptions</a>
  * <pre>
@@ -176,7 +176,7 @@ import ibis.rmi.RemoteException;
  * exposeComponentAsWebService(Component, String, String)
  * </pre>
  * </p>
- * 
+ *
  *
  * @author  ProActive Team
  * @since   ProActive 0.7
@@ -1775,6 +1775,8 @@ public class ProActive {
      * @param listener The listener to add
      */
     public static void addNFEListenerOnAO(Object ao, NFEListener listener) {
+
+        /* Security hazard: arbitrary code execution by the ao... */
         BodyAdapter body = getRemoteBody(ao);
         body.addNFEListener(listener);
     }

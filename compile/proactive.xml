@@ -555,6 +555,7 @@
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/Descriptor.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/SSHTunneling.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/AC.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/exceptions.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/intro.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/architecture.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/Security.html"/>
