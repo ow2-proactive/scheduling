@@ -67,5 +67,13 @@ public interface Loggers {
     public static final String SECURITY_NODE = SECURITY + ".node";
     public static final String SECURITY_SESSION = SECURITY + ".session";
 
+    
+    
+    // Fault-tolerance loggers
+    public static final String FAULT_TOLERANCE = "proactive.ft";
+    public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
+    public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
+    
+    
     // -------------------------------------------------------------------------
 }
