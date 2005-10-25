@@ -10,7 +10,7 @@
 
 <!-- Header : end -->
 <table align="center" border="1" width="40%">
-	<t>
+	<tbody>
 		<tr>
 		<th align="center">ProActive ReferenceCard</th>	
 		</tr>
@@ -617,6 +617,84 @@ pad.killall(boolean softly);
 			</td>
 	</tbody>
 </table><br></br>
+
+<table summary="Exceptions" width="100%" border="1">
+	<tbody>
+		<tr>
+			<th>Exceptions</th>
+		</tr>
+		<tr>
+			<td>
+			<b> Functional exceptions with asynchrony </b>
+<pre>
+ProActive.tryWithCatch(MyException.class);<FONT ID="SingleLineComment">// Just before the <b class="java">try</b></FONT>
+<b class="java">try</b> {
+    <FONT ID="FormalComment">// Some asynchronous calls with exceptions
+    // One can use ProActive.throwArrivedException() and
+    // ProActive.waitForPotentialException() here</FONT>    
+    ProActive.endTryWithCatch();<FONT ID="SingleLineComment">// At the end of the <b class="java">try</b></FONT>
+} <b class="java">catch</b> (MyException e) {
+    <FONT ID="SingleLineComment">// ...</FONT>
+} <b class="java">finally</b> {
+    ProActive.removeTryWithCatch();<FONT ID="SingleLineComment">// At the beginning of the <b class="java">finally</b></FONT>
+}
+</pre>  
+
+<b>Non-Functional Exceptions</b>
+
+<p class="textNormal">
+Adding a handler to an active object on its side:
+</p><pre>
+ProActive.addNFEListenerOnAO(myAO, <b class="java">new</b> NFEListener() {
+    <b class="java">public boolean</b> handleNFE(NonFunctionalException nfe) {
+        <FONT ID="SingleLineComment">// Do something with the exception...</FONT>
+        <FONT ID="SingleLineComment">// Return true if we were able to handle it</FONT>
+        <b class="java">return true</b>;
+    }
+});
+</pre>
+
+<p class="textNormal">
+Handlers can also be added to the client side of an active object with
+</p>
+
+<pre>ProActive.addNFEListenerOnProxy(ao, handler)</pre>
+<p class="textNormal">or to a JVM with</p>
+<pre>ProActive.addNFEListenerOnJVM(handler)</pre>
+
+<p class="textNormal">
+These handlers can also be removed with
+</p>
+
+<pre>ProActive.removeNFEListenerOnAO(ao, handler),
+ProActive.removeNFEListenerOnProxy(ao, handler),
+ProActive.removeNFEListenerOnJVM(handler)</pre>
+
+<p class="textNormal">
+It's possible to define an handler only for some exception types, for example:
+</p>
+
+<pre>
+ProActive.addNFEListenerOnJVM(<b class="java">new</b> TypedNFEListener(
+    SendRequestCommunicationException.<b class="java">class</b>,
+    <b class="java">new</b> NFEListener() {
+    <b class="java">public boolean</b> handleNFE(NonFunctionalException e) {
+        <FONT ID="SingleLineComment">// Do something with the SendRequestCommunicationException...</FONT>
+        <FONT ID="SingleLineComment">// Return true if we were able to handle it</FONT>
+        <b class="java">return true</b>;
+    }
+}));
+</pre>
+
+<p class="textNormal">
+The behaviour of the default handler (if none could handle the exception) is to throw
+the exception if it's on the proxy side, or log it if it's on the body side.
+</p>
+			</td>
+	</tbody>
+</table><br></br>
+
+
 <table width="100%" border="1">
 	<tbody>
 		<tr>
