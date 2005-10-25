@@ -13,6 +13,12 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.mop.Utils;
 
 
+/**
+ * This class provides static methods to manipulate the java representation of XML descriptors
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 3.0
+ * @author ProActive team
+ */
 public class RefactorPAD {
 
     /**

@@ -94,6 +94,96 @@ import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
 import ibis.rmi.RemoteException;
 
 
+/**
+ * Provides static methods to manipulate or use Active Objects(creation, exception handling, migration,...), futures,
+ * deployment descritpors, components, groups.
+ * This class is the central point of the library.
+ * <p><a href="doc-files/ActiveObjectCreation.html">Active Object Creation</a>
+ * <pre>
+ * newActive(...)
+ * turnActive(...)
+ * </pre>
+ * </p>
+ * <p>Active Object Manipulation
+ * <pre>
+ * getBodyOnThis()
+ * getActiveObjectNodeUrl(Object)
+ * getStubOnThis()
+ * migrateTo(...)
+ * lookupActive(String, String)
+ * register(Object, String)
+ * setImmediateService(...)
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/FutureObjectCreation.html">Synchronization, Futures</a>
+ * <pre>
+ * isAwaited(Object)
+ * waitFor(Object)
+ * waitForAll(Vector)
+ * waitForAny(Vector)
+ * waitForPotentialException()
+ * waitForTheNth(Vector, int)
+ * Previous methods provide also the ability to pass a timeout value
+ * 
+ * allAwaited(Vector)
+ * getFutureValue(Object)
+ * isException(Object)
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/TypedGroupCommunication.html">Groups Creation</a>
+ * <pre>
+ * newActiveAsGroup(...)
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/components/intro.html">Components</a>
+ * <pre>
+ * newActiveComponent(...)
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/Descriptor.html">XML Descritpors</a>
+ * <pre>
+ * getProactiveDescriptor(String)
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/exceptions.html">Non Functionnal Exceptions</a>
+ * <pre>
+ * addNFEListenerOnAO(Object, NFEListener)
+ * addNFEListenerOnJVM(NFEListener)
+ * addNFEListenerOnProxy(Object, NFEListener)
+ * removeNFEListenerOnAO(Object, NFEListener)
+ * removeNFEListenerOnJVM(NFEListener)
+ * removeNFEListenerOnProxy(Object, NFEListener)
+ * </pre>
+ 
+ * </p>
+  * <p><a href="doc-files/exceptions.html">Functionnal Exceptions</a>
+ * <pre>
+ * tryWithCatch(Class)
+ * removeTryWithCatch()
+ * endTryWithCatch()
+ * throwArrivedException()
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/AC.html">Automatic Continuations</a>
+ * <pre>
+ * enableAC(Object)
+ * disableAC(Object)
+ * </pre>
+ * </p>
+ * <p><a href="doc-files/WSDoc.html">Web Services</a>
+ * <pre>
+ * exposeAsWebService(Object, String, String, String[])
+ * exposeComponentAsWebService(Component, String, String)
+ * </pre>
+ * </p>
+ * 
+ *
+ * @author  ProActive Team
+ * @since   ProActive 0.7
+ * @see ProActiveDescriptor
+ * @see ProActiveGroup
+ *
+ */
 public class ProActive {
     protected final static Logger logger = Logger.getLogger(ProActive.class.getName());
     public final static Logger loggerGroup = Logger.getLogger("GROUP");
@@ -121,7 +211,7 @@ public class ProActive {
 
     /**
      *
-     * launch the main method of the main class through the node node
+     * Launches the main method of the main class through the node node
      * @param classname classname of the main method to launch
      * @param mainParameters parameters
      * @param node node in which launch the main method
@@ -138,8 +228,8 @@ public class ProActive {
     }
 
     /**
-     * return an instance of the remote class. This insctance is
-     * obtained by the default constructor
+     * Creates an instance of the remote class. This instance is
+     * created with the default constructor
      * @param classname
      * @param node
      * @return new instance
@@ -836,8 +926,9 @@ public class ProActive {
     }
 
     /**
-     *
-     * @return the pad associated to the current runtime
+     * Returns a <code>ProActiveDescriptor</code> that gives an object representation
+     * of the XML document located at the url given by proactive.pad system's property.
+     * @return the pad located at the url given by proactive.pad system's property
      * @throws ProActiveException
      * @throws RemoteException
      */
@@ -1395,13 +1486,12 @@ public class ProActive {
         body.disableAC();
     }
 
-
     /**
-     * Set an immediate execution for the target active object obj of the method String, 
-     * ie request of name methodName will be executed right away upon arrival at the target 
+     * Set an immediate execution for the target active object obj of the method String,
+     * ie request of name methodName will be executed right away upon arrival at the target
      * AO context.
-     * Warning: the execution of an Immediate Service method is achieved in parallel of  the 
-     * current services, so it is the programmer responsibility to ensure that Immediate Services 
+     * Warning: the execution of an Immediate Service method is achieved in parallel of  the
+     * current services, so it is the programmer responsibility to ensure that Immediate Services
      * do not interfere with any other methods.
      * @param obj the object on which to set this immediate service
      * @param methodName the name of the method
@@ -1414,11 +1504,11 @@ public class ProActive {
     }
 
     /**
-     * Set an immediate execution for the target active object obj of the method String, 
-     * ie request of name methodName will be executed right away upon arrival at the target 
+     * Set an immediate execution for the target active object obj of the method String,
+     * ie request of name methodName will be executed right away upon arrival at the target
      * AO context.
-     * Warning: the execution of an Immediate Service method is achieved in parallel of  the 
-     * current services, so it is the programmer responsibility to ensure that Immediate Services 
+     * Warning: the execution of an Immediate Service method is achieved in parallel of  the
+     * current services, so it is the programmer responsibility to ensure that Immediate Services
      * do not interfere with any other methods.
      * @param obj the object on which to set this immediate service
      * @param methodName the name of the method
@@ -1613,7 +1703,7 @@ public class ProActive {
     /*** <Exceptions> See ExceptionHandler.java for the documentation ***/
     /**
      * This has to be called just before a try block for a single exception.
-     * 
+     *
      * @param c the caught exception type in the catch block
      */
     public static void tryWithCatch(Class c) {
@@ -1662,7 +1752,7 @@ public class ProActive {
 
     /**
      * Add a listener for NFE reaching the local JVM
-     * 
+     *
      * @param listener The listener to add
      */
     public static void addNFEListenerOnJVM(NFEListener listener) {
@@ -1671,7 +1761,7 @@ public class ProActive {
 
     /**
      * Remove a listener for NFE reaching the local JVM
-     * 
+     *
      * @param listener The listener to remove
      */
     public static void removeNFEListenerOnJVM(NFEListener listener) {
@@ -1680,7 +1770,7 @@ public class ProActive {
 
     /**
      * Add a listener for NFE reaching a given active object
-     * 
+     *
      * @param ao The active object receiving the NFE
      * @param listener The listener to add
      */
@@ -1691,7 +1781,7 @@ public class ProActive {
 
     /**
      * Remove a listener for NFE reaching a given active object
-     * 
+     *
      * @param ao The active object receiving the NFE
      * @param listener The listener to remove
      */
@@ -1702,7 +1792,7 @@ public class ProActive {
 
     /**
      * Add a listener for NFE reaching the client side of a given active object
-     * 
+     *
      * @param ao The active object receiving the NFE
      * @param listener The listener to add
      */
@@ -1717,7 +1807,7 @@ public class ProActive {
 
     /**
      * Remove a listener for NFE reaching the client side of a given active object
-     * 
+     *
      * @param ao The active object receiving the NFE
      * @param listener The listener to remove
      */

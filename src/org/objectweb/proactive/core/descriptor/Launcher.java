@@ -13,17 +13,16 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
- *
- * @author Terence FERUT - ProActive team
- * August 2005
- *
- * this class provides the stuff useful to launch an
+ * This class provides the stuff useful to launch an
  * application directly from a proactive descriptor XML file.
  *
  * be careful, your xml file must define a mainDefinition tag
  * that contains the main class path, otherwise the application will
  * not be launched.
- *
+ * 
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 3.0
+ * @author ProActive team
  */
 public class Launcher {
     private ProActiveDescriptor pad;

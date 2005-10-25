@@ -6,7 +6,17 @@ import java.util.List;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-
+/**
+ * <p>
+ * A <code>MainDefinition</code> is an internal representation of XML mainDefinition element.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
+ * @see VirtualNode
+ * @see VirtualMachine
+ */
 public class MainDefinition implements Serializable {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
