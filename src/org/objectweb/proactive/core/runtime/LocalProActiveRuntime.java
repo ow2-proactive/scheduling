@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
  * be called locally.
  * @author  ProActive Team
  * @version 1.0
- * @since   ProActive 2.2
+ * @since   ProActive 3.0
  */
 public interface LocalProActiveRuntime {
 
