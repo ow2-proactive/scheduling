@@ -37,6 +37,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 
 
+/**
+ * An adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
+ * to a RemoteBody using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ * @author ProActiveTeam
+ * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
+ */
 public abstract class BodyAdapter implements UniversalBody, Serializable {
 
     /**
@@ -50,14 +58,14 @@ public abstract class BodyAdapter implements UniversalBody, Serializable {
     protected String jobID;
 
     /**
-    * Looks-up an active object previously registered in a registry. In fact it is the
-    * remote version of the body of an active object that can be registered into the
-    * Registry under a given URL.
-    * @param url the url the remote Body is registered to
-    * @return a UniversalBody
-    * @exception java.io.IOException if the remote body cannot be found under the given url
-    *      or if the object found is not of type RemoteBody
-    */
+     * Looks-up an active object previously registered in a registry. In fact it is the
+     * remote version of the body of an active object that can be registered into the
+     * Registry under a given URL.
+     * @param url the url the remote Body is registered to
+     * @return a UniversalBody
+     * @exception java.io.IOException if the remote body cannot be found under the given url
+     *      or if the object found is not of type RemoteBody
+     */
     public abstract UniversalBody lookup(String url) throws java.io.IOException;
 
     /**
