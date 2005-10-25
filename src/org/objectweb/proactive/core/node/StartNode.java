@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
  * This class has a main method and can be used directly from the java command.
  * <br>
  * use<br>
- * &nbsp;&nbsp;&nbsp;java org.objectweb.proactive.StartNode<br>
+ * &nbsp;&nbsp;&nbsp;java org.objectweb.proactive.core.node.StartNode<br>
  * to print the options from command line or see the java doc of the main method.
  * </p><p>
  * A node represents the minimum services ProActive needs to work with a remote JVM.
@@ -137,7 +137,7 @@ public class StartNode {
 
     /**
      * Starts a ProActive node on the localhost host
-     * usage: java org.objectweb.proactive.StartNode &lt;node URL> [options]<br>
+     * usage: java org.objectweb.proactive.core.node.StartNode &lt;node URL> [options]<br>
      * where options are amongst<br>
      * <ul>
      * <li>noClassServer : indicates not to create a ClassServer for JINI.
@@ -147,8 +147,8 @@ public class StartNode {
      *                     node to the RMIRegistry. If a node of the same name
      *                     already exists, the creation of the new node will fail.</li>
      * </ul>
-     * for instance: java org.objectweb.proactive.StartNode //localhost/node1<br>
-     *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
+     * for instance: java org.objectweb.proactive.core.node.StartNode //localhost/node1<br>
+     *               java org.objectweb.proactive.core.node.StartNode //localhost/node2 -noClassServer -noRebind<br>
      */
     public static void main(String[] args) {
         try {

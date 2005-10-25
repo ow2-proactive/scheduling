@@ -49,13 +49,13 @@ import org.objectweb.proactive.core.util.MessageLogger;
  * <pre>
  * .............
  * JVMProcessImpl process = new JVMProcessImpl(new StandardOutputMessageLogger());
- * process.setClassname("org.objectweb.proactive.StartNode");
+ * process.setClassname("org.objectweb.proactive.core.node.StartNode");
  * process.setParameters("nodeName");
  * process.startProcess();
  * .............
  * </pre>
  * <p>
- * This piece of code launches the ProActive java class org.objectweb.proactive.StartNode
+ * This piece of code launches the ProActive java class org.objectweb.proactive.core.node.StartNode
  * with nodeName as parameter.
  * </p>
  * @author  ProActive Team
@@ -91,7 +91,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
         }
     }
 
-    public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.StartNode";
+    public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.core.node.StartNode";
     public final static String DEFAULT_JVMPARAMETERS = "";
     protected String classpath = DEFAULT_CLASSPATH;
     protected String bootClasspath;
@@ -154,7 +154,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public static void main(String[] args) {
         try {
             JVMProcessImpl rsh = new JVMProcessImpl(new StandardOutputMessageLogger());
-            rsh.setClassname("org.objectweb.proactive.StartNode");
+            rsh.setClassname("org.objectweb.proactive.core.node.StartNode");
             rsh.setParameters(args[0]);
             rsh.startProcess();
         } catch (Exception e) {

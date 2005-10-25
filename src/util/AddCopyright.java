@@ -7,8 +7,8 @@ public class AddCopyright {
         " * ProActive: The Java(TM) library for Parallel, Distributed, " +
         "\n" + " *            Concurrent computing with Security and Mobility" +
         "\n" + " * " + "\n" +
-        " * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis" +
-        "\n" + " * Contact: proactive-support@inria.fr" + "\n" + " * " + "\n" +
+        " * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis" +
+        "\n" + " * Contact: proactive@objectweb.org" + "\n" + " * " + "\n" +
         " * This library is free software; you can redistribute it and/or" +
         "\n" + " * modify it under the terms of the GNU Lesser General Public" +
         "\n" +
@@ -35,24 +35,28 @@ public class AddCopyright {
         "\n" + " */ " + "\n";
 
     public static void main(String[] arg) throws java.io.IOException {
-        java.io.File sourceDir = new java.io.File(
-                "D:\\cygwin\\home\\lmestre\\ProActive\\src\\org\\objectweb\\proactive");
+        java.io.File sourceDir = new java.io.File(arg[0]);
         addCopyrightToDir(sourceDir);
     }
 
     private static void addCopyrightToFile(java.io.File file)
         throws java.io.IOException {
         String name = file.getName();
-        System.out.println("Processing " + file);
+
         if (!name.endsWith(".java")) {
             return;
         }
         byte[] b = getBytesFromInputStream(new java.io.FileInputStream(file));
         String program = new String(b);
+
+        //        if(program.indexOf("Copyright (C)")!= -1){
+        //        	return;
+        //        }
         int packageStart = program.indexOf("package");
         if (packageStart == -1) {
             return;
         }
+        System.out.println("Processing " + file);
         String uncopyrightedProgram = program.substring(packageStart);
         String copyrightedProgram = copyright + uncopyrightedProgram;
         b = copyrightedProgram.getBytes();
