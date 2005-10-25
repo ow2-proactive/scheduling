@@ -60,7 +60,7 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 public interface ProActiveDescriptor extends java.io.Serializable {
 
     /**
-     * return the Url of the pad
+     * Returns the Url of the pad
      * @return String in fact it is an identifire for the pad that is returned.
      * This identifier is build from the pad url appended with the pad's jobId.
      */
@@ -69,26 +69,26 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public void setMainDefined(boolean mainDefined);
 
     /**
-     * create a new MainDefinition object and add it to the map
+     * Creates a new MainDefinition object and add it to the map
      *
      */
     public void createMainDefinition(String id);
 
     /**
-     * set the mainClass attribute of the last defined mainDefinition
+     * Sets the mainClass attribute of the last defined mainDefinition
      * @param mainClass fully qualified name of the mainclass
      */
     public void mainDefinitionSetMainClass(String mainClass);
 
     /**
-     * add the parameter parameter to the parameters of the last
+     * Adds the parameter parameter to the parameters of the last
      * defined mainDefinition
      * @param parameter parameter to add
      */
     public void mainDefinitionAddParameter(String parameter);
 
     /**
-     * add a VirtualNode virtualNode to the last defined mainDefinition
+     * Adds a VirtualNode virtualNode to the last defined mainDefinition
      * @param virtualNode VirtualNode to add
      */
     public void mainDefinitionAddVirtualNode(VirtualNode virtualNode);
@@ -100,19 +100,19 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public boolean isMainDefined();
 
     /**
-     * activates all mains of mainDefinitions defined
+     * Activates all mains of mainDefinitions defined
      *
      */
     public void activateMains();
 
     /**
-     * activates the main of the id-th mainDefinition
+     * Activates the main of the id-th mainDefinition
      * @param mainDefinitionId key identifying a mainDefinition
      */
     public void activateMain(String mainDefinitionId);
 
     /**
-     * return a table containing all the parameters of the last
+     * Returns a table containing all the parameters of the last
      * defined mainDefinition
      * @param mainDefinitionId key identifying a mainDefinition
      * @return a table of String containing all the parameters of the mainDefinition
@@ -120,13 +120,13 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public String[] mainDefinitionGetParameters(String mainDefinitionId);
 
     /**
-     * return the main definitions mapping
+     * Returns the main definitions mapping
      * @return Map
      */
     public Map getMainDefinitionMapping();
 
     /**
-     * return the virtual nodes mapping
+     * Returns the virtual nodes mapping
      * @return Map
      */
     public Map getVirtualNodeMapping();
@@ -136,7 +136,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public void setVirtualNodeMapping(HashMap newMapping);
 
     /**
-     *
+     * Returns a table containing all mainDefinitions conserving order
      * @return a table containing all mainDefinitions conserving order
      */
     public MainDefinition[] getMainDefinitions();

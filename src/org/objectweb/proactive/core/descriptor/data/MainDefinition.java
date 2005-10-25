@@ -12,8 +12,8 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
  * </p>
  *
  * @author  ProActive Team
- * @version 1.0,  2002/09/20
- * @since   ProActive 0.9.3
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 3.0
  * @see VirtualNode
  * @see VirtualMachine
  */
