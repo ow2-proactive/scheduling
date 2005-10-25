@@ -1,0 +1,125 @@
+<html>
+<head>
+<title>Exception Handling</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="MOP.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FAQ.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<H1>Exception Handling</h1>
+
+<h2>Exceptions and Asynchrony</h2>
+<p class="textNormal">
+In the asynchronous environment provided by ProActive, exceptions cannot be
+handled the same as in a sequential environment. Let's see the problem with
+exceptions and asynchrony in a piece of code:
+</p>
+
+<pre>
+1  <b class="java">try</b> {
+2     Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
+3     // ...
+4     doSomethingWith(r);
+5 } <b class="java">catch</b> (SomeException se) {
+6     doSomethingWithMyException(se);
+7 }
+</pre>
+
+<p class="textNormal">
+In this piece of code, as the method call in line 2 is asynchronous, we don't wait
+for its completion and continue the execution. So, it's possible the control flow
+exits the <b class="java">try</b>. In this case, if the method call ends up with
+an exception, we cannot throw it anymore back in the code because we are no more
+in the <b class="java">try</b> block. That's why, by default, ProActive method calls
+with potential exceptions are handled synchronously.
+</p>
+
+<h3>Barriers around <b class="java">try</b> blocks</h3>
+
+<p class="textNormal">
+The ProActive solution to this problem is to put barriers around
+<b class="java">try</b>/<b class="java">catch</b> blocks. This way,
+the control flow cannot exit the block, the exception can be
+handled in the appropriate <b class="java">catch</b> block, and the
+call is asynchronous within the block.
+</p>
+
+<p class="textNormal">
+Let's reuse the previous example to see how to use these barriers
+</p>
+
+<pre>
+1    <b>ProActive.tryWithCatch(SomeException.class);</b>
+2    <b class="java">try</b> {
+3       Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
+4       // ...
+5       doSomethingWith(r);
+6       <b>ProActive.endTryWithCatch();</b>
+7    } <b class="java">catch</b> (SomeException se) {
+8       doSomethingWithMyException(se);
+9    } <b>finally {</b>
+10      <b>ProActive.removeTryWithCatch();</b>
+11   <b>}</b>
+</pre>
+
+<p class="textNormal">
+With this code, the call in line 3 will be asynchronous, and the exception will be
+handled in the correct <b class="java">catch</b> block. Even if this implies waiting
+at the end of the <b class="java">try</b> block for the completion of the call.
+</p>
+
+<p class="textNormal">
+Let's see in detail the needed modifications to the code:
+</p>
+
+<ul>
+<li>ProActive.tryWithCatch() call right before the <b class="java">try</b> block.
+The parameter is either the caught exception class or an array of these classes
+if there are many</li>
+<li>ProActive.endWithTry() at the end of the <b class="java">try</b> block</li>
+<li>ProActive.removeTryWithCatch() at the beginning of the
+<b class="java">finally</b> block, so the block becomes mandatory</li>
+</ul>
+
+<h3>TryWithCatch Annotator</h3>
+
+<p class="textNormal">
+These needed annotations can be seen as cumbersome, so we provide a tool
+to add them automatically to a given source file. It transforms the first
+example code in the second. Here is a sample session with the tool:
+</p>
+
+<pre>
+$ ProActive/scripts/unix/trywithcatch.sh MyClass.java # A backup will be 
+
+</pre>
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &copy; 2005 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>
