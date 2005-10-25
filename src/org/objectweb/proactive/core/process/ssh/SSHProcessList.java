@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 
 
 /**
- * This class contains a list of RSHProcess processes
+ * This class contains a list of SSHProcess processes
  * @author ProActiveTeam
  * @version 1.0, 2 mars 2005
  * @since ProActive 2.2

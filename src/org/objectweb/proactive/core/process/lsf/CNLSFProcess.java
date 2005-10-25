@@ -38,9 +38,10 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 
 
 /**
+ * Custom implementation of LSFProcess for CHINA GRID
  * @author  ProActive Team
- * @version 1.0
- * @since   ProActive 2.2
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 3.0
  */
 public class CNLSFProcess extends LSFBSubProcess {
     protected String queueName;

@@ -42,10 +42,11 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 
 
 /**
- * @author rquilici
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * Globus Process implementation.
+ * This implementation works only for ProActive deployment, and not to submit single commands
+ * @author  ProActive Team
+ * @version 2.0,  2005/09/20
+ * @since   ProActive 3.0
  */
 public class GlobusProcess extends AbstractExternalProcessDecorator {
     protected JVMProcessImpl jvmProcess;
@@ -254,11 +255,11 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         this.queue = queue;
     }
 
-	public String getMaxTime() {
-		return maxTime;
-	}
+    public String getMaxTime() {
+        return maxTime;
+    }
 
-	public void setMaxTime(String maxTime) {
-		this.maxTime = maxTime;
-	}
+    public void setMaxTime(String maxTime) {
+        this.maxTime = maxTime;
+    }
 }

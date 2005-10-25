@@ -21,10 +21,11 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 
 
 /**
- * @author  marc ozonne
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * GLite Process implementation.
+ * This implementation works only for ProActive deployment, and not to submit single commands
+ * @author  ProActive Team
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 3.0
  */
 public class GLiteProcess extends AbstractExternalProcessDecorator
     implements FileDependant {

@@ -284,8 +284,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
         if (hostList != null) {
             bSubCommand.append("-m " + hostList + " ");
         }
-        if(jobname != null){
-        	bSubCommand.append("-J " + jobname + " ");
+        if (jobname != null) {
+            bSubCommand.append("-J " + jobname + " ");
         }
         if (getCompositionType() == GIVE_COMMAND_AS_PARAMETER) {
             bSubCommand.append(getRes_requirement() + scriptLocation + " " +
@@ -440,11 +440,11 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
         }
     } // end inner class CompositeMessageLogger
 
-	public String getJobname() {
-		return jobname;
-	}
+    public String getJobname() {
+        return jobname;
+    }
 
-	public void setJobname(String jobname) {
-		this.jobname = jobname;
-	}
+    public void setJobname(String jobname) {
+        this.jobname = jobname;
+    }
 }

@@ -18,10 +18,13 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 
 
 /**
- * @author mleyton
- *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ * <p>
+ * The OARGRIDSubProcess class is able to start any class, of the ProActive library,
+ * on a cluster managed by OARGRID protocol.
+ * It is strongly advised to use XML Deployment files to run such processes
+ * @author  ProActive Team
+ * @version 1.0,  2005/09/20
+ * @since   ProActive 3.0
  */
 public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
