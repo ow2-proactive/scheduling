@@ -177,6 +177,103 @@ successfully, so no exception can be thrown from the previous calls.
 </p>
 
 <h2>Non-Functional Exceptions</h2>
+
+<h3>Overview</h3>
+
+<p class="textNormal">
+In the first part, we were concerned with functional exception. That is, exceptions
+originating from "business" code. The middleware adds its set of exceptions that we
+call Non-Functional Exceptions (NFE): network errors, ... ProActive has a mechanism
+for dealing with these exceptions.
+</p>
+
+<h3>Exception types</h3>
+
+<p class="textNormal">
+We have classified the non functional exceptions in two categories: those on the
+proxy, and those on the body. So, exceptions concerning the proxy are in the
+org.objectweb.proactive.core.exceptions.proxy package and inherits from the
+ProxyNonFunctionalException package.
+</p>
+
+<h3>Exception handlers</h3>
+
+<p class="textNormal">
+The NFE mechanism in ProActive calls user defined handlers when a NFE is thrown. A
+handler implements the following interface:
+</p>
+
+<pre>
+public interface NFEListener {
+    public boolean handleNFE(NonFunctionalException e);
+}
+</pre>
+
+<p class="textNormal">
+The handleNFE method is called with the exception to handle as parameter. The boolean
+return code indicates if the handler could do something with the exception. This way,
+if no handler could do anything with a given exception, the default behavior is used.
+</p>
+
+<p class="textNormal">
+If the exception is on the proxy side, the default behaviour is to throw the exception
+which is a RuntimeException. But on the proxy side, the default behaviour is to log
+the exception with its stack trace to avoid killing an active object.
+</p>
+
+<h4>Association</h4>
+
+<p class="textNormal">
+These handlers are associated to entities generating exceptions. These are: an active
+object proxy, a body, a JVM. Given a NFE, the handlers on the local JVM will be executed,
+then either those associated to the proxy or the body depending on the exception.
+</p>
+
+<p class="textNormal">
+Here is an example about how to add a handler to an active object on its side (body):
+</p><pre>
+ProActive.addNFEListenerOnAO(myAO, <b class="java">new</b> NFEListener() {
+    <b class="java">public boolean</b> handleNFE(NonFunctionalException nfe) {
+        <FONT ID="SingleLineComment">// Do something with the exception...</FONT>
+        <FONT ID="SingleLineComment">// Return true if we were able to handle it</FONT>
+        <b class="java">return true</b>;
+    }
+});
+</pre>
+
+<p class="textNormal">
+Handlers can also be added to the client side (proxy) of an active object with
+</p>
+
+<pre>ProActive.addNFEListenerOnProxy(ao, handler)</pre>
+<p class="textNormal">or to a JVM with</p>
+<pre>ProActive.addNFEListenerOnJVM(handler)</pre>
+
+<p class="textNormal">
+These handlers can also be removed with
+</p>
+
+<pre>ProActive.removeNFEListenerOnAO(ao, handler),
+ProActive.removeNFEListenerOnProxy(ao, handler),
+ProActive.removeNFEListenerOnJVM(handler)</pre>
+
+<p class="textNormal">
+It's also possible to define an handler only for some exception types, for example:
+</p>
+
+<pre>
+ProActive.addNFEListenerOnJVM(<b class="java">new</b> TypedNFEListener(
+    SendRequestCommunicationException.<b class="java">class</b>,
+    <b class="java">new</b> NFEListener() {
+    <b class="java">public boolean</b> handleNFE(NonFunctionalException e) {
+        <FONT ID="SingleLineComment">// Do something with the SendRequestCommunicationException...</FONT>
+        <FONT ID="SingleLineComment">// Return true if we were able to handle it</FONT>
+        <b class="java">return true</b>;
+    }
+}));
+</pre>
+
+
 <!--
  Footer : start 
 ~~~ -->
