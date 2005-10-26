@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import testsuite.exception.BrowsePackageException;
 import testsuite.manager.AbstractManager;
@@ -76,14 +77,14 @@ public class Group {
     /** To construct a new group with default params.
      */
     public Group() {
-        logger = Logger.getLogger(getClass().getName());
+        logger = ProActiveLogger.getLogger("testsuite");
     }
 
     /** To construct a new group from an another group.
      * @param group an ancestor group.
      */
     public Group(Group group) {
-        logger = Logger.getLogger(getClass().getName());
+        logger = ProActiveLogger.getLogger("testsuite");
         this.results = new ResultsCollections(group.getResults());
         this.tests = new ArrayList(group.tests);
         this.name = group.name;
@@ -95,7 +96,7 @@ public class Group {
      * @param description a string description for a group.
      */
     public Group(String name, String description) {
-        logger = Logger.getLogger(getClass().getName());
+        logger = ProActiveLogger.getLogger("testsuite");
         this.name = name;
         this.description = description;
     }
@@ -112,7 +113,7 @@ public class Group {
     public Group(String name, String description, File directory,
         String packageName, Object[] params, boolean useInitFile,
         AbstractManager manager) throws BrowsePackageException {
-        logger = Logger.getLogger(getClass().getName());
+        logger = ProActiveLogger.getLogger("testsuite");
         this.name = name;
         this.description = description;
 
@@ -123,7 +124,7 @@ public class Group {
     public Group(File directory, String packageName, Object[] params,
         boolean useInitFile, AbstractManager manager)
         throws BrowsePackageException {
-        logger = Logger.getLogger(getClass().getName());
+        logger = Logger.getLogger("testsuite");
 
         addTests(directory, packageName, packageName, params, useInitFile,
             manager);

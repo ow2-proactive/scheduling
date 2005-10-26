@@ -56,6 +56,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.WriterAppender;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -79,7 +80,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private String name = "AbstractManager with no name";
     private String description = "AbstractManager with no description.";
     private ArrayList groups = new ArrayList();
-    protected static Logger logger = Logger.getLogger(AbstractManager.class);
+    protected static Logger logger = ProActiveLogger.getLogger("testsuite");
 
     //protected static Logger logger = Logger.getRootLogger();
     private int nbRuns = 1;

@@ -40,6 +40,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import testsuite.bean.Beanable;
 import testsuite.manager.AbstractManager;
@@ -79,7 +80,7 @@ public abstract class AbstractTest implements Serializable, Beanable {
      * Construct a new <code>AbstractTest</code> with defaults settings and a default logger.
      */
     public AbstractTest() {
-        logger = Logger.getLogger(getClass().getName());
+        logger = ProActiveLogger.getLogger("testsuite");
     }
 
     /**
@@ -88,7 +89,7 @@ public abstract class AbstractTest implements Serializable, Beanable {
      * @param name name of this test
      */
     public AbstractTest(String name) {
-        logger = Logger.getLogger(getClass().getName());
+        logger = Logger.getLogger("testsuite");
         this.name = name;
     }
 
@@ -99,7 +100,7 @@ public abstract class AbstractTest implements Serializable, Beanable {
      * @param description description of this test
      */
     public AbstractTest(String name, String description) {
-        logger = Logger.getLogger(getClass().getName());
+        logger = ProActiveLogger.getLogger("testsuite");
         this.name = name;
         this.description = description;
     }
