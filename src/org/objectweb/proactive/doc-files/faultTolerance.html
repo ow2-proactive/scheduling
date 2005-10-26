@@ -36,7 +36,7 @@
 
 <p class="textNormal">
 ProActive can provide fault-tolerance capabilities through two differents
-protocols: a Communication-Induced Checkpointing protocol (CIC) and a
+protocols: a Communication-Induced Checkpointing protocol (CIC) or a
 pessimistic message logging protocol (PML). Making a ProActive application
 fault-tolerant is <b>fully transparent</b>; active objects are turned
 fault-tolerant using Java properties that can be set in the <A
@@ -94,7 +94,12 @@ failure-free execution, but the recovery time is lower as a single failure
 does not involve all the system.
 </p>
 
-
+<p class="textNormal">
+<br><br>
+<b>Warning:</b> For the version 3.0, those two protocols are not compatible: a fault-tolerance
+application can use <b>only</b> one of the two protocols. This compatibility
+will be provide in the next version.
+</p>
 
 <BR>
 <h2>Making a ProActive application fault-tolerant</h2>
