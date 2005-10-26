@@ -94,7 +94,7 @@ public class Test extends ComponentTest {
     }
 
     public boolean preConditions() throws Exception {
-        remoteHost = TestNodes.getRemoteHostname();
+        remoteHost = TestNodes.getRemoteACVMNode().getNodeInformation().getHostName();
         return (super.preConditions() && (remoteHost != null));
     }
 
