@@ -91,7 +91,7 @@ public class Test extends FunctionalTest {
         this.server.stopProcess();
         pad.killall(false);
 
-        System.out.println(" ---------> RES = " + r.getValue()); 
+        //System.out.println(" ---------> RES = " + r.getValue()); 
     }
 
     public boolean postConditions() throws Exception {
