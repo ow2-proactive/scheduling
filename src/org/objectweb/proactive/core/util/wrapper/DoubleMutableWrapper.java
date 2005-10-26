@@ -90,8 +90,8 @@ public class DoubleMutableWrapper implements Serializable {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object arg0) {
-		if (arg0 instanceof Double) {
-			return ((Double)arg0).doubleValue() == this.value;
+		if (arg0 instanceof DoubleMutableWrapper) {
+			return ((DoubleMutableWrapper)arg0).doubleValue() == this.value;
 		}
 		return false;
 	}

@@ -90,8 +90,8 @@ public class LongMutableWrapper implements Serializable {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object arg0) {
-		if (arg0 instanceof Long) {
-			return ((Long)arg0).longValue() == this.value;
+		if (arg0 instanceof LongMutableWrapper) {
+			return ((LongMutableWrapper)arg0).longValue() == this.value;
 		}
 		return false;
 	}

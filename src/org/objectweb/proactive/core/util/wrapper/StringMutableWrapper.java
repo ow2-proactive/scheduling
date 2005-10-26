@@ -90,7 +90,10 @@ public class StringMutableWrapper implements Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object arg0) {
-        return this.value.equals(arg0);
+		if (arg0 instanceof StringMutableWrapper) {
+			return  this.value.equals(((StringMutableWrapper)arg0).stringValue());
+		}
+		return false;
     }
 
     /**

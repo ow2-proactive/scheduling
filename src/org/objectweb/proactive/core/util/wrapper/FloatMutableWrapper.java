@@ -90,8 +90,8 @@ public class FloatMutableWrapper implements Serializable {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object arg0) {
-		if (arg0 instanceof Float) {
-			return ((Float)arg0).floatValue() == this.value;
+		if (arg0 instanceof FloatMutableWrapper) {
+			return ((FloatMutableWrapper)arg0).floatValue() == this.value;
 		}
 		return false;
 	}

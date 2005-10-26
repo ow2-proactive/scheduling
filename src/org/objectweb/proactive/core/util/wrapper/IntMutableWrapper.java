@@ -90,8 +90,8 @@ public class IntMutableWrapper implements Serializable {
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	public boolean equals(Object arg0) {
-		if (arg0 instanceof Integer) {
-			return ((Integer)arg0).intValue() == this.value;
+		if (arg0 instanceof IntMutableWrapper) {
+			return ((IntMutableWrapper)arg0).intValue() == this.value;
 		}
 		return false;
 	}
