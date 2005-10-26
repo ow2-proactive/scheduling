@@ -37,7 +37,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueue;
 import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob;

@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
-import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
