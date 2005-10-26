@@ -23,7 +23,7 @@ and
 <b>concurrent</b> computing, also featuring <b>mobility</b> and <b>security</b>
 in a uniform framework.
 <b>ProActive</b> provides a
-comprehensive API and a graphical interface.</b>
+comprehensive API and a graphical interface.
 The library is based on an Active Object pattern that is a uniform way
 to encapsulate:
 </p>
@@ -511,7 +511,7 @@ Component newActiveComponent("A", params, VirtualNode, ComponentParameters);
    // name of component, interfaces (server and client), etc.
    // Returns a reference to a component, as defined in the Fractal API </FONT>
 </pre>
-</p>
+
 <p>In the class org.objectweb.proactive.core.component.Fractive :
 <pre>
 ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature);
@@ -520,7 +520,7 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
    // This collective interface is a typed ProActive group.
 
 </pre>
-</p>
+
 			</td>
 	</tbody>
 </table><br></br><br></br>
@@ -761,11 +761,11 @@ ProActive.exposeAsWebService(a,"http://localhost:8080","a",methods);
 
 ProActive.unExposeAsWebService("a", "http://localhost:8080"); 
 <FONT ID="FormalComment"> //Undeploy the service "a" on the web server located at http://localhost:8080 </FONT>
+</pre>
 </td>
 </tbody>
 </table><br></br>
 
-</p>
 
 
 
@@ -818,9 +818,134 @@ mapped on this virtual node<br>
 
 </td>
 </tbody>
-</table><br></br>
+</table>
 
-</p>
+<table border="1" width="100%">
+
+  <tbody>
+
+    <tr>
+
+      <th>Peer-to-Peer Infrastructure</th>
+
+    </tr>
+
+    <tr>
+
+      <td>
+      <p class="textNormal">This aims to help you to
+create a P2P
+infrastructure over your desktop workstations network. It is
+self-organized and configurable. The infrastructure maintains a dynamic
+JVMs network for deploying computational applications.</p>
+
+      <p class="textNormal"></p>
+
+      <h3>Deploying the Infrastructure:</h3>
+
+      <p class="textNormal">Firstly, you have to start P2P
+Services on each shared machine:</p>
+
+      <p class="textNormal textSmall">$ cd
+ProActive/scripts/unix/p2p</p>
+
+      <p class="textNormal textSmall">$ ./startP2PService
+[-acq acquisitionMethod] [-port portNumber] [-s Peer ...]</p>
+
+      <p class="textNormal">With that parameters (all are
+optionals):</p>
+
+      <ul>
+
+        <li>-acq is the ProActive Runtime communication protocol
+used &nbsp;by the peer. Examples: rmi, http, ibis,... By default it
+is rmi.</li>
+
+        <li>-port is the port number where the P2P Service
+listens. By default it is 2410.</li>
+
+        <li>-s specify addresses of peers which are used to join
+the P2P infrastructure. Example: rmi://applepie.proactive.org:8080</li>
+
+      </ul>
+
+      <p><b>A simple example:</b></p>
+
+      <p>&nbsp;&nbsp;&nbsp; <span class="textSmall">first.peer.host$ ./startP2PService.sh</span></p>
+
+      <p class="textSmall">&nbsp;&nbsp;&nbsp;
+second.peer.host$ ./startP2PService.sh -s //first.peer.host</p>
+
+      <p class="textNormal"><span class="textSmall">&nbsp;&nbsp;&nbsp;
+third.peer.host$ ./startP2PService.sh -s //second.peer.host</span></p>
+
+      <h3>Acquiring Nodes:</h3>
+
+      <p>Now you have a P2P Infrastructure running, you might
+want to deploy your ProActive application on it. That is simple, just
+modify the XML deployment descriptor:</p>
+
+      <pre class="xml">
+	...
+	&lt;jvms&gt;
+		&lt;jvm name="Jvm1"&gt;
+			&lt;acquisition&gt;
+				&lt;serviceReference refid="p2plookup"/&gt;
+			&lt;/acquisition&gt;
+		&lt;/jvm&gt;
+		...
+	&lt;/jvms&gt;
+	...
+	&lt;infrastructure&gt;
+		...
+		&lt;services&gt;
+			&lt;serviceDefinition id="p2plookup"&gt;
+				&lt;P2PService nodesAsked="2" acq="rmi" port="6666"&gt;
+					&lt;peerSet&gt;
+						&lt;peer&gt;//second.peer.host&lt;/peer&gt;
+					&lt;/peerSet&gt;
+				&lt;/P2PService&gt;
+			&lt;/serviceDefinition&gt;
+			...
+		&lt;/services&gt;
+		...
+	&lt;/infrastructure&gt;
+	...
+	</pre>
+    
+    <p>In the <b>nodesAsked</b> argument, a special value <b>MAX</b> is
+    allowed. When it is used, the P2P infrastructure returns the maximun
+    number of nodes avilable, and continue while the application running to
+    return new nodes to the application. To use all the benefit of that
+    feature, you might add a nodes creation event listener to your application.</p>
+    
+    <p><b>Usage Example:</b></p>
+    <pre class="java">
+    <font id="FormalComment">// getting the p2p virtual node</font>
+    VirtualNode vn = pad.getVirtualNode("p2pvn");
+    <font id="FormalComment">// adding "this" as a listener</font>
+    ((VirtualNodeImpl) vn).addNodeCreationEventListener(<b class="java">this</b>);
+    <font id="FormalComment">// then activate the virtual node</font>
+    vn.activate();
+    </pre>
+    <p>"this" has to implement the NodeCreationEventListener interface:</p>
+    <pre class="java">
+	<b class="java">public void</b> nodeCreated(NodeCreationEvent event) {
+		<font id="FormalComment">// get the node</font>
+ 		Node newNode = event.getNode();
+		<font id="FormalComment">// now you can create an active object on your node.</font>
+	}
+    </pre>
+      </td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+<br></br>
+
+<p></p>
 
 
 
@@ -833,8 +958,7 @@ mapped on this virtual node<br>
 <br>
 <hr>
 <div class="textSmall" align="right">Copyright &copy; April 2005
-INRIA All Rights Reserved.
+INRIA All Rights Reserved.</div>
 <!-- Footer : end -->
-</div>
 </body>
 </html>
