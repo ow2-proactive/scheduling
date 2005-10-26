@@ -31,11 +31,17 @@
 package nonregressiontest.activeobject.wrapper;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.DoubleMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.core.util.wrapper.FloatMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.LongMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import testsuite.test.FunctionalTest;
@@ -49,6 +55,12 @@ import testsuite.test.FunctionalTest;
  */
 public class Test extends FunctionalTest {
     private A ao;
+    private BooleanMutableWrapper boolMutable;
+    private DoubleMutableWrapper dbleMutable;
+    private IntMutableWrapper integerMutable;
+    private LongMutableWrapper longNumberMutable;
+    private StringMutableWrapper stringMutable;
+    private FloatMutableWrapper fltMutable;
     private BooleanWrapper bool;
     private DoubleWrapper dble;
     private IntWrapper integer;
@@ -73,6 +85,13 @@ public class Test extends FunctionalTest {
     }
 
     public void action() throws Exception {
+        this.boolMutable = this.ao.testBooleanMutableWrapper();
+        this.dbleMutable = this.ao.testDoubleMutableWrapper();
+        this.integerMutable = this.ao.testIntMutableWrapper();
+        this.longNumberMutable = this.ao.testLongMutableWrapper();
+        this.stringMutable = this.ao.testStringMutableWrapper();
+        this.fltMutable = this.ao.testFloatMutableWrapper();
+
         this.bool = this.ao.testBooleanWrapper();
         this.dble = this.ao.testDoubleWrapper();
         this.integer = this.ao.testIntWrapper();
@@ -85,7 +104,12 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#preConditions()
      */
     public boolean postConditions() throws Exception {
-        return ProActive.isAwaited(this.bool) &&
+        return ProActive.isAwaited(this.boolMutable) &&
+        ProActive.isAwaited(this.dbleMutable) &&
+        ProActive.isAwaited(this.integerMutable) &&
+        ProActive.isAwaited(this.longNumberMutable) &&
+        ProActive.isAwaited(this.stringMutable) &&
+        ProActive.isAwaited(this.fltMutable) && ProActive.isAwaited(this.bool) &&
         ProActive.isAwaited(this.dble) && ProActive.isAwaited(this.integer) &&
         ProActive.isAwaited(this.longNumber) &&
         ProActive.isAwaited(this.string) && ProActive.isAwaited(this.flt);

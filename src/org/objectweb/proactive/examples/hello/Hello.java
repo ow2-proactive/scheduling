@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 
 
 /** A stripped-down Active Object example.
@@ -56,8 +56,8 @@ public class Hello implements java.io.Serializable {
 
     /** The Active Object creates and returns information on its location
      * @return a StringWrapper which is a Serialized version, for asynchrony */
-    public StringWrapper sayHello() {
-        return new StringWrapper(this.message + "\n from " + getHostName() +
+    public StringMutableWrapper sayHello() {
+        return new StringMutableWrapper(this.message + "\n from " + getHostName() +
             "\n at " + dateFormat.format(new java.util.Date()));
     }
 
@@ -85,7 +85,7 @@ public class Hello implements java.io.Serializable {
                 nodes[0]); // which jvm should be used to hold the Active Object
 
         // get and display a value 
-        StringWrapper received = hello.sayHello(); // possibly remote call
+        StringMutableWrapper received = hello.sayHello(); // possibly remote call
         logger.info("On " + getHostName() + ", a message was received: " +
             received); // potential wait-by-necessity 
     }

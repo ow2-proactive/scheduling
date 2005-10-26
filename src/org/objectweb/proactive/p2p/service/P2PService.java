@@ -95,8 +95,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 P2PConstants.PROPERTY_NOA));
     private static final int EXPL_MSG = Integer.parseInt(System.getProperty(
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
-    private static final int TTL = Integer.parseInt(System.getProperty(
-                P2PConstants.PROPERTY_TTL));
     private static final long ACQ_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
     private static final boolean WITH_BALANCE = Boolean.getBoolean(P2PConstants.PROPERTY_LOAD_BAL);
@@ -125,7 +123,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     private P2PLoadBalancer p2pLoadBalancer;
 
     // For asking nodes
-    private Body body = null;
     private Service service = null;
     private RequestFilter filter = new RequestFilter() {
 
@@ -136,9 +133,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 String requestName = request.getMethodName();
                 if (requestName.compareToIgnoreCase("askingNode") == 0) {
                     return false;
-                } else {
-                    return true;
                 }
+                return true;
             }
         };
 
@@ -235,7 +231,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (this.shouldBeAcquaintance(remoteService)) {
             this.register(remoteService);
             try {
-                remoteService.register((P2PService) this.stubOnThis);
+                remoteService.register(this.stubOnThis);
             } catch (Exception e) {
                 logger.debug("Trouble with registering remote peer", e);
                 this.acquaintanceManager.remove(remoteService);
@@ -567,19 +563,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 return true;
             }
             return false;
-        } else {
-            // it is an old message: nothing to do
-            // NO REMOVE the isDebugEnabled message
-            if (logger.isDebugEnabled()) {
-                if (isAnOldMessage) {
-                    logger.debug("Old message request with #" + uuid);
-                } else {
-                    logger.debug("The peer is me: " + remoteNodeUrl);
-                }
-            }
-
-            throw new P2POldMessageException();
         }
+
+        // it is an old message: nothing to do
+        // NO REMOVE the isDebugEnabled message
+        if (logger.isDebugEnabled()) {
+            if (isAnOldMessage) {
+                logger.debug("Old message request with #" + uuid);
+            } else {
+                logger.debug("The peer is me: " + remoteNodeUrl);
+            }
+        }
+
+        throw new P2POldMessageException();
     }
 
     /**
@@ -597,16 +593,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (this.acquaintanceManager.size().intValue() < NOA) {
             logger.debug("NOA not reached: I should be an acquaintance");
             return true;
-        } else {
-            int random = randomizer.nextInt(100);
-            if (random < EXPL_MSG) {
-                logger.debug("Random said: I should be an acquaintance");
-                return true;
-            } else {
-                logger.debug("Random said: I should not be an acquaintance");
-                return false;
-            }
         }
+        int random = randomizer.nextInt(100);
+        if (random < EXPL_MSG) {
+            logger.debug("Random said: I should be an acquaintance");
+            return true;
+        }
+        logger.debug("Random said: I should not be an acquaintance");
+        return false;
     }
 
     /**
@@ -620,13 +614,12 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         }
         if (oldMessageList.contains(uuid)) {
             return true;
-        } else {
-            if (oldMessageList.size() == MSG_MEMORY) {
-                oldMessageList.remove(0);
-            }
-            oldMessageList.add(uuid);
-            return false;
         }
+        if (oldMessageList.size() == MSG_MEMORY) {
+            oldMessageList.remove(0);
+        }
+        oldMessageList.add(uuid);
+        return false;
     }
 
     /**
@@ -648,7 +641,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     public void initActivity(Body body) {
         logger.debug("Entering initActivity");
 
-        this.body = body;
         this.service = new Service(body);
 
         try {
@@ -711,9 +703,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     public boolean amIUnderloaded(double ranking) {
         if (ranking >= 0) {
             return p2pLoadBalancer.AreYouUnderloaded(ranking);
-        } else {
-            return p2pLoadBalancer.AreYouUnderloaded();
         }
+        return p2pLoadBalancer.AreYouUnderloaded();
     }
 
     /**

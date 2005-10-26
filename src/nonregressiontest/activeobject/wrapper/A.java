@@ -37,16 +37,46 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.DoubleMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.core.util.wrapper.FloatMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.LongMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class A implements RunActive, Serializable {
     public A() {
+    }
+
+    public BooleanMutableWrapper testBooleanMutableWrapper() {
+        return new BooleanMutableWrapper(false);
+    }
+
+    public DoubleMutableWrapper testDoubleMutableWrapper() {
+        return new DoubleMutableWrapper(0);
+    }
+
+    public IntMutableWrapper testIntMutableWrapper() {
+        return new IntMutableWrapper(0);
+    }
+
+    public LongMutableWrapper testLongMutableWrapper() {
+        return new LongMutableWrapper(0);
+    }
+
+    public StringMutableWrapper testStringMutableWrapper() {
+        return new StringMutableWrapper("Alexandre dC is a famous coder");
+    }
+
+    public FloatMutableWrapper testFloatMutableWrapper() {
+        return new FloatMutableWrapper(0);
     }
 
     public BooleanWrapper testBooleanWrapper() {

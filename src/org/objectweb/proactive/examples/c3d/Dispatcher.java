@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 
@@ -58,7 +58,7 @@ public interface Dispatcher {
     public abstract void unregisterConsumer(int number);
 
     /** Get the list of users in an asynchronous call, entries being separated by \n */
-    public abstract StringWrapper getUserList();
+    public abstract StringMutableWrapper getUserList();
 
     /** Find the name of the machine this Dispatcher is running on */
     public abstract String getMachineName();

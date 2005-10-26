@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 import org.objectweb.proactive.examples.c3d.gui.UserGUI;
@@ -307,7 +307,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     /** Displays the list of users connected to the dispatcher */
     public void getUserList() {
-        StringWrapper list = c3ddispatcher.getUserList();
+        StringMutableWrapper list = c3ddispatcher.getUserList();
         gui.log("List of current users:\n" + list.toString());
     }
 

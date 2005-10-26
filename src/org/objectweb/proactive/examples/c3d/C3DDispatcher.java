@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Scene;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.gui.DispatcherGUI;
@@ -667,13 +667,13 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
     }
 
     /** Get the list of users in an asynchronous call, entries being separated by \n */
-    public StringWrapper getUserList() {
+    public StringMutableWrapper getUserList() {
         StringBuffer s_list = new StringBuffer();
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
             s_list.append("  " + this.userBag.currentName() + "\n");
         }
-        return new StringWrapper(s_list.toString());
+        return new StringMutableWrapper(s_list.toString());
     }
 
     /** transforms an id in a name */

@@ -50,8 +50,8 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
@@ -226,8 +226,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      *
      * @return the number of elements in this group.
      */
-    public IntWrapper size() {
-        return new IntWrapper(this.groupOfAcquaintances.size());
+    public IntMutableWrapper size() {
+        return new IntMutableWrapper(this.groupOfAcquaintances.size());
     }
 
     /**
@@ -240,8 +240,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return <tt>true</tt> if this collection contains the specified
      *         element.
      */
-    public BooleanWrapper contains(P2PService service) {
-        return new BooleanWrapper(this.groupOfAcquaintances.contains(service));
+    public BooleanMutableWrapper contains(P2PService service) {
+        return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(service));
     }
 
     /**
