@@ -111,11 +111,6 @@ public class StartFTServer {
             System.out.println("Fault-tolerance server is bound on rmi://" +
                 host + ":" + port + "/" + name);
 
-            // wait for reinit
-            while (true) {
-                StartFTServer.printMessageAndWait("Reset");
-                server.initialize();
-            }
         } catch (RemoteException e) {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
@@ -125,18 +120,6 @@ public class StartFTServer {
         } catch (UnknownHostException e) {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
-        }
-    }
-
-    private static void printMessageAndWait(String msg) {
-        java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(
-                    System.in));
-        System.out.println(msg);
-        System.out.println(
-            "   --> Press <return> to reinitilize the server ...");
-        try {
-            d.readLine();
-        } catch (Exception e) {
         }
     }
 }
