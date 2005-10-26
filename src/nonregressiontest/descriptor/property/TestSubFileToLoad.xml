@@ -1,0 +1,4 @@
+
+	<property name="phenri" value="/usr/phenri/home" type="constant"/>
+	<property name="game" value="/lisa/sims" type="overridableInXML"/>
+	
