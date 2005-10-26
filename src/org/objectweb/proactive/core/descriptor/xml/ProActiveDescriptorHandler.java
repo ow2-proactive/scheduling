@@ -78,8 +78,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 vNodesAcqHandler);
             this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
         }
-		this.addHandler(PROPERTY_TAG, new PropertiesHandler());
-		this.addHandler(PROPERTIES_FILE_TAG, new PropertiesFileHandler());
+		this.addHandler(VARIABLES_TAG, new VariablesHandler());
     }
 
     //

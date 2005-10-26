@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../descriptors/DescriptorSchema.xsd">
 
-	<propertiesFile location="${testfile}"/>
-	<property name="testfile" value="" type="programset"/>
-	<property name="proac_home" value="" type="programset"/>
+	<variables>
+		<propertiesFile location="${testfile}"/>
+		<property name="testfile" value="" type="setInProgram"/>
+		<property name="proac_home" value="" type="setInProgram"/>
+	</variables>
 	
 	<componentDefinition>
 		<virtualNodesDefinition>

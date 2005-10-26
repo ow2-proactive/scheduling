@@ -10,89 +10,105 @@ import org.objectweb.proactive.core.xml.XMLProperties;
 
 import testsuite.test.FunctionalTest;
 
-
 public class Test extends FunctionalTest {
-    static final long serialVersionUID = 1;
-    private static String XML_LOCATION = Test.class.getResource(
-            "/nonregressiontest/descriptor/property/Test.xml").getPath();
+	static final long serialVersionUID = 1;
 
-    //    private static String XML_LOCATION = "/user/phenri/home/ProActive/src/nonregressiontest/descriptor/property/Test.xml";
-    private ProActiveDescriptor pad = null;
-    private TestProperty property = null;
+	private static String XML_LOCATION = Test.class.getResource(
+			"/nonregressiontest/descriptor/property/Test.xml").getPath();
 
-    public Test() {
-        super("Simple properties in deployment descriptors", "Simple properties in deployment descriptors");
-    }
+	private ProActiveDescriptor pad = null;
 
-    public boolean postConditions() throws Exception {
-        if (property == null) {
-            return false;
-        }
+	private TestProperty property = null;
 
-        String control = property.getProperty("user_dir");
-        if (!control.equals("test/usr/phenri/home/ProActive")) {
-            return false;
-        }
+	public Test() {
+		super("Simple properties in deployment descriptors",
+				"Simple properties in deployment descriptors");
+	}
 
-        control = property.getProperty("test_proac");
-        if (!control.equals("/user/ProActive")) {
-            return false;
-        }
+	public boolean postConditions() throws Exception {
+		if (property == null) {
+			return false;
+		}
 
-        control = property.getProperty("lisa.game");
-        if (!control.equals("/usr/phenri/home/lisa/sims")) {
-            return false;
-        }
+		String control = property.getProperty("user_dir");
+		if (!control.equals("test/usr/phenri/home/ProActive")) {
+			return false;
+		}
 
-        control = property.getProperty("lib.home");
-        if (!control.equals("/usr/phenri/home/bin")) {
-            return false;
-        }
+		control = property.getProperty("test_proac");
+		if (!control.equals("/user/ProActive")) {
+			return false;
+		}
 
-        return true;
-    }
+		control = property.getProperty("lisa.game");
+		if (!control.equals("/usr/phenri/home/lisa/sims")) {
+			return false;
+		}
 
-    public void initTest() throws Exception {
-    }
+		control = property.getProperty("lib.home");
+		if (!control.equals("/usr/phenri/home/bin")) {
+			return false;
+		}
 
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(true);
-        }
-    }
+		control = property.getProperty("test_user_d");
+		String result = System.getProperty("user.name") + "/toto";
+		if (!control.equals(result)) {
+			return false;
+		}
 
-    public void action() throws Exception {
-        XMLProperties.clean();
-        HashMap map = new HashMap();
-        map.put("proac_home", "/user/ProActive");
-        XMLProperties.setVariableValue(map);
+		return true;
+	}
 
-        pad = ProActive.getProactiveDescriptor(XML_LOCATION);
-        //Thread.sleep(1000);
-        VirtualNode vnNode = pad.getVirtualNode("NodeTest");
-        vnNode.activate();
-        //Thread.sleep(1000);
-        Node[] nodeTab = vnNode.getNodes();
+	public void initTest() throws Exception {
+	}
 
-        Object[] param = new Object[1];
-        param[0] = new String("Test user properties.");
+	private String oldUserDir;
+	
+	public void endTest() throws Exception {
+		System.setProperty("user.dir", oldUserDir);
+		if (pad != null) {
+			pad.killall(true);
+		}
+	}
 
-        property = (TestProperty) ProActive.newActive(TestProperty.class.getName(),
-                param, nodeTab[0]);
-    }
+	public void action() throws Exception {
+		XMLProperties.clean();
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.initTest();
-            test.action();
-            test.postConditions();
-            test.endTest();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+		oldUserDir = System.getProperty("user.dir");
+		System.setProperty("user.dir", "test_user_dir");
+
+		HashMap map = new HashMap();
+		map.put("proac_home", "/user/ProActive");
+		XMLProperties.setVariableValue(map, "setInProgram");
+		
+		XMLProperties.setVariableValue( "game", "", "overridableInXML");
+
+		pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+		// Thread.sleep(1000);
+		VirtualNode vnNode = pad.getVirtualNode("NodeTest");
+		vnNode.activate();
+		// Thread.sleep(1000);
+		Node[] nodeTab = vnNode.getNodes();
+
+		Object[] param = new Object[1];
+		param[0] = new String("Test user properties.");
+
+		property = (TestProperty) ProActive.newActive(TestProperty.class
+				.getName(), param, nodeTab[0]);
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Test test = new Test();
+		try {
+			test.initTest();
+			test.action();
+			test.postConditions();
+			test.endTest();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

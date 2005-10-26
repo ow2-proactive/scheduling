@@ -32,11 +32,11 @@ package org.objectweb.proactive.core.xml;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Set;
+
+import org.objectweb.proactive.core.descriptor.xml.MasterPropertiesFileHandler;
 
 
 /**
@@ -82,10 +82,17 @@ public class XMLProperties {
      * @param value        Text to swap with coding property name.
      * @throws org.xml.sax.SAXException
      */
-    public static void setVariableValue(String name, String value)
-        throws org.xml.sax.SAXException {
+    public static void setVariableValue(String name, String value,
+        String typeName) throws org.xml.sax.SAXException {
+        int type = instance.type(typeName);
+        if ((type != XMLPropertiesType.PROGRAM_SET) &&
+                (type != XMLPropertiesType.OVERRIDABLE_IN_PROG) &&
+                (type != XMLPropertiesType.OVERRIDABLE_IN_XML)) {
+            throw new org.xml.sax.SAXException("Property XML " + name +
+                " have no valid type for using in program !");
+        }
         try {
-            instance.add(name, value, XMLPropertiesType.PROGRAM_SET);
+            instance.add(name, value, type);
         } catch (org.xml.sax.SAXException ex) {
             throw ex;
         }
@@ -96,19 +103,13 @@ public class XMLProperties {
      * @param map        HashMap with key=name:String and value=textToSwap:String.
      * @throws org.xml.sax.SAXException
      */
-    public static void setVariableValue(HashMap map)
+    public static void setVariableValue(HashMap map, String type)
         throws org.xml.sax.SAXException {
-        try {
-            String name;
-            String value;
-            java.util.Iterator it = map.keySet().iterator();
-            while (it.hasNext()) {
-                name = (String) it.next();
-                value = (String) map.get(name);
-                instance.add(name, value, XMLPropertiesType.PROGRAM_SET);
-            }
-        } catch (org.xml.sax.SAXException ex) {
-            throw ex;
+        String name;
+        java.util.Iterator it = map.keySet().iterator();
+        while (it.hasNext()) {
+            name = (String) it.next();
+            XMLProperties.setVariableValue(name, (String) map.get(name), type);
         }
     }
 
@@ -155,6 +156,10 @@ public class XMLProperties {
             value = properties.getProperty(name);
             instance.addFromDescriptor(name, value, XMLPropertiesType.CONSTANT);
         }
+    }
+
+    public static void loadXML(String file) throws org.xml.sax.SAXException {
+        MasterPropertiesFileHandler.createMasterFileHandler(file);
     }
 
     private String transformValue(String text) {
@@ -217,7 +222,40 @@ public class XMLProperties {
                     " already exist in the list of properties !");
             }
             break;
-        case XMLPropertiesType.OVERRIDABLE:
+        case XMLPropertiesType.JAVA_PROPERTY:
+            if (list.containsKey(name)) {
+                throw new org.xml.sax.SAXException("Property XML " + name +
+                    " already exist in the list of properties !");
+            }
+            try {
+                String jvmValue = System.getProperty(value);
+                value = new String(jvmValue);
+            } catch (Exception ex) {
+                throw new org.xml.sax.SAXException("Property XML " + name +
+                    " is an unknown Java properties !");
+            }
+            break;
+        case XMLPropertiesType.OVERRIDABLE_IN_XML:
+            if (!list.containsKey(name)) {
+                throw new org.xml.sax.SAXException("Property XML " + name +
+                    " with type overridableInXML not exist in the list of properties !");
+            }
+            if (value.equals("")) {
+                return;
+            }
+            break;
+        case XMLPropertiesType.OVERRIDABLE_IN_PROG:
+            if (!list.containsKey(name)) {
+                throw new org.xml.sax.SAXException("Property XML " + name +
+                    " with type overridableInProgram not exist in the list of properties !");
+            }
+            if (value.equals("")) {
+                return;
+            }
+            PropertiesDatas datas = (PropertiesDatas) list.get(name);
+            if (!datas.value.equals("")) {
+                return;
+            }
             break;
         case XMLPropertiesType.PROGRAM_SET:
             // if the property is not in the list of properties
@@ -265,11 +303,15 @@ public class XMLProperties {
     }
 
     private int type(String text) {
-        if (text.equalsIgnoreCase("constant")) {
+        if (text.equals("constant")) {
             return XMLPropertiesType.CONSTANT;
-        } else if (text.equalsIgnoreCase("overridable")) {
-            return XMLPropertiesType.OVERRIDABLE;
-        } else if (text.equalsIgnoreCase("programset")) {
+        } else if (text.equals("javaProperty")) {
+            return XMLPropertiesType.JAVA_PROPERTY;
+        } else if (text.equals("overridableInXML")) {
+            return XMLPropertiesType.OVERRIDABLE_IN_XML;
+        } else if (text.equals("overridableInProgram")) {
+            return XMLPropertiesType.OVERRIDABLE_IN_PROG;
+        } else if (text.equals("setInProgram")) {
             return XMLPropertiesType.PROGRAM_SET;
         }
         return -1;

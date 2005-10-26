@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../descriptors/DescriptorSchema.xsd">
 
-	<property name="phenri" value="/usr/phenri/home" type="constant"/>
-	<property name="game" value="/lisa/sims" type="overridable"/>
-	<property name="proac_home" value="" type="programset"/>
-	
-	<componentDefinition>
+	<variables>
+		<property name="phenri" value="/usr/phenri/home" type="constant"/>
+		<property name="game" value="/lisa/sims" type="overridableInXML"/>
+		<property name="proac_home" value="" type="setInProgram"/>
+		<property name="test_dir" value="${proac_home}" type="constant"/>
+		<property name="userName" value="user.name" type="javaProperty"/>
+	</variables>
+		
+		<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="NodeTest"/>
 		</virtualNodesDefinition>
@@ -35,6 +39,7 @@
 						 <parameter value="-Dtest_proac=${proac_home}"/>
 					     <parameter value="-Dlisa.game=${phenri}${game}"/>
 					     <parameter value="-Dlib.home=${phenri}/bin"/>
+					     <parameter value="-Dtest_user_d=${userName}/toto"/>
 					</jvmParameters> 
 				</jvmProcess>
 			</processDefinition>

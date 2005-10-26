@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
 
-	<property name="phenri" value="/usr/phenri/home" type="constant"/>
-	<property name="game" value="/lisa/sims" type="overridable"/>
-	<property name="phenri" value="/usr/phenri/homebis" type="overridable"/>
+	<variables>
+		<property name="phenri" value="/usr/phenri/home" type="constant"/>
+		<property name="game" value="/lisa/sims" type="overridableInXML"/>
+		<property name="phenri" value="/usr/phenri/homebis" type="overridableInXML"/>
+	</variables>
 	
 	<componentDefinition>
 		<virtualNodesDefinition>

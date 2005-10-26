@@ -10,94 +10,126 @@ import org.objectweb.proactive.core.xml.XMLProperties;
 
 import testsuite.test.FunctionalTest;
 
-
 public class TestFile extends FunctionalTest {
-    static final long serialVersionUID = 1;
-    private static String XML_LOCATION = Test.class.getResource(
-            "/nonregressiontest/descriptor/property/TestProFile.xml").getPath();
-    private static String PROPERTIES_FILE = Test.class.getResource(
-            "/nonregressiontest/descriptor/property/TestFile.properties")
-                                                      .getPath();
+	static final long serialVersionUID = 1;
 
-    //    private static String XML_LOCATION = "/user/phenri/home/ProActive/src/nonregressiontest/descriptor/property/Test.xml";
-    private ProActiveDescriptor pad = null;
-    private TestProperty property = null;
+	private static String XML_LOCATION = Test.class.getResource(
+			"/nonregressiontest/descriptor/property/TestProFile.xml").getPath();
 
-    public TestFile() {
-        super("Properties from property files in deployment descriptors",
-            "Properties from property files in deployment descriptors");
-    }
+	private static String PROPERTIES_FILE = Test.class.getResource(
+			"/nonregressiontest/descriptor/property/TestFile.properties")
+			.getPath();
 
-    public boolean postConditions() throws Exception {
-        if (property == null) {
-            return false;
-        }
+	private static String XML_SUBFILE = Test.class.getResource(
+			"/nonregressiontest/descriptor/property/TestSubFile.xml").getPath();
 
-        String control = property.getProperty("user_dir");
-        if (!control.equalsIgnoreCase("test/usr/phenri/home/ProActive")) {
-            return false;
-        }
+	private ProActiveDescriptor pad = null;
 
-        control = property.getProperty("test_proac");
-        if (!control.equalsIgnoreCase("/user/ProActive")) {
-            return false;
-        }
+	private TestProperty property = null;
 
-        control = property.getProperty("lisa.game");
-        if (!control.equalsIgnoreCase("/usr/phenri/home/lisa/sims")) {
-            return false;
-        }
+	public TestFile() {
+		super("Properties from property files in deployment descriptors",
+				"Properties from property files in deployment descriptors");
+	}
 
-        control = property.getProperty("lib.home");
-        if (!control.equalsIgnoreCase("/usr/phenri/home/bin")) {
-            return false;
-        }
+	public boolean postConditions() throws Exception {
+		if (property == null) {
+			return false;
+		}
 
-        return true;
-    }
+		String control = property.getProperty("user_dir");
+		if (!control.equalsIgnoreCase("test/usr/phenri/home/ProActive")) {
+			return false;
+		}
 
-    public void initTest() throws Exception {
-    }
+		control = property.getProperty("test_proac");
+		if (!control.equalsIgnoreCase("/user/ProActive")) {
+			return false;
+		}
 
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(true);
-        }
-    }
+		control = property.getProperty("lisa.game");
+		if (!control.equalsIgnoreCase("/usr/phenri/home/lisa/sims")) {
+			return false;
+		}
 
-    public void action() throws Exception {
-        XMLProperties.clean();
-        HashMap map = new HashMap();
-        map.put("proac_home", "/user/ProActive");
-        map.put("testfile", PROPERTIES_FILE);
-        XMLProperties.setVariableValue(map);
+		control = property.getProperty("lib.home");
+		if (!control.equalsIgnoreCase("/usr/phenri/home/bin")) {
+			return false;
+		}
 
-        pad = ProActive.getProactiveDescriptor(XML_LOCATION);
-        //Thread.sleep(1000);
-        VirtualNode vnNode = pad.getVirtualNode("NodeTest");
-        vnNode.activate();
-        //Thread.sleep(1000);
-        Node[] nodeTab = vnNode.getNodes();
+		return true;
+	}
 
-        Object[] param = new Object[1];
-        param[0] = new String("Test user properties.");
+	public void initTest() throws Exception {
+	}
 
-        property = (TestProperty) ProActive.newActive(TestProperty.class.getName(),
-                param, nodeTab[0]);
-    }
+	public void endTest() throws Exception {
+		if (pad != null) {
+			pad.killall(true);
+		}
+	}
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.initTest();
-            test.action();
-            test.postConditions();
-            test.endTest();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	public void action() throws Exception {
+
+		// Test properties defined in sun properties file
+		XMLProperties.clean();
+		HashMap map = new HashMap();
+		map.put("proac_home", "/user/ProActive");
+		map.put("testfile", PROPERTIES_FILE);
+		map.put("testSubFile", XML_SUBFILE);
+		XMLProperties.setVariableValue(map, "setInProgram");
+
+		pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+		// Thread.sleep(1000);
+		VirtualNode vnNode = pad.getVirtualNode("NodeTest");
+		vnNode.activate();
+		// Thread.sleep(1000);
+		Node[] nodeTab = vnNode.getNodes();
+
+		Object[] param = new Object[1];
+		param[0] = new String("Test user properties.");
+
+		property = (TestProperty) ProActive.newActive(TestProperty.class
+				.getName(), param, nodeTab[0]);
+
+		if (postConditions() == false)
+			throw new Exception(
+					"Properties from property files in deployment descriptors");
+
+		// Test properties in disjoint XML file
+		XMLProperties.clean();
+		map = new HashMap();
+		map.put("proac_home", "/user/ProActive");
+		map.put("testSubFile", XML_SUBFILE);
+		XMLProperties.setVariableValue(map, "setInProgram");
+
+		pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+		// Thread.sleep(1000);
+		vnNode = pad.getVirtualNode("NodeTest");
+		vnNode.activate();
+		// Thread.sleep(1000);
+		nodeTab = vnNode.getNodes();
+
+		param = new Object[1];
+		param[0] = new String("Test user properties.");
+
+		property = (TestProperty) ProActive.newActive(TestProperty.class
+				.getName(), param, nodeTab[0]);
+
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Test test = new Test();
+		try {
+			test.initTest();
+			test.action();
+			test.postConditions();
+			test.endTest();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

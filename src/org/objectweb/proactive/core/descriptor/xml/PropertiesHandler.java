@@ -12,12 +12,12 @@ public class PropertiesHandler extends BasicUnmarshaller {
     public void startContextElement(String tag, Attributes attributes)
         throws org.xml.sax.SAXException {
         // First control if it's a file tag
-//        String file = attributes.getValue("propertiesFile");
-//        if (checkNonEmpty(file)) {
-//            // Specific processing for loading file
-//            XMLProperties.load(file);
-//            return;
-//        }
+        String file = attributes.getValue("file");
+        if (checkNonEmpty(file)) {
+            // Specific processing for loading file
+            XMLProperties.loadXML(file);
+            return;
+        }
 
         // get datas
         String name = attributes.getValue("name");
@@ -30,9 +30,13 @@ public class PropertiesHandler extends BasicUnmarshaller {
                 " have no type !");
         }
         String value = attributes.getValue("value");
-        if ((!checkNonEmpty(value)) && (!type.equalsIgnoreCase("programset"))) {
-            throw new org.xml.sax.SAXException("Tag property " + name +
-                " have no value !");
+
+        //        if ((!checkNonEmpty(value)) && (!type.equalsIgnoreCase("setInProgram"))) {
+        //            throw new org.xml.sax.SAXException("Tag property " + name +
+        //                " have no value !");
+        //        }
+        if (value == null) {
+            value = "";
         }
 
         // add property informations to list
