@@ -579,7 +579,46 @@ Various protocols can be specified to create JVMs onto machines (ssh,
 Globus, LSF, PBS, rsh, rlogin, Web Services, etc.). 
 After activation, a VN contains a set of nodes, living in a set of JVMs. 
 Overall, VNs and deployment descriptors allow to abstract away from source 
-code: machines, creation, lookup and registry protocols.
+code: machines, creation, lookup and registry protocols.<br></br>
+<b>Descriptor example: creates one jvm on the local machine</b><br></br>
+&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;<br>
+    &nbsp;&lt;componentDefinition&gt;<br>
+    &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<b>Dispatcher</b>"/&gt;<br>
+    &nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- Name of the Virtual Node that will be used in program source --&gt; </FONT><br>
+    &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;<br>
+    &nbsp;&lt;componentDefinition/&gt;<br>
+    &nbsp;&lt;deployment&gt;<br>
+    &nbsp;&nbsp;&lt;mapping&gt;<br>
+    &nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- This part contains the mapping VNs -- JVMs --&gt; </FONT><br>
+    &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<b>Dispatcher</b>"&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<b>Jvm1</b>"/&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- Virtual Node Dispatcher is mapped onto Jvm1 --&gt; </FONT><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;/map&gt;<br>
+    &nbsp;&nbsp;&lt;/mapping&gt;<br>
+    &nbsp;&nbsp;&lt;jvms&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;jvm name="<b>Jvm1</b>"&gt;<br>
+    &nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- This part defines how the jvm will be obtained: creation or acquisition: creation in this example --&gt; </FONT><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<b>creationProcess</b>"/&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- Jvm1 will be created using creationProcess defined below --&gt; </FONT><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;<br>
+    &nbsp;&nbsp;&lt;/jvms&gt;<br>
+    &nbsp;&lt;/deployment&gt;<br>
+    &nbsp;&lt;infrastructure&gt;<br>
+    &nbsp;&nbsp;&lt;processes&gt;<br>
+    &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<b>creationProcess</b>"&gt;<br>
+    &nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- Definition of creationProcess referenced above --&gt; </FONT><br> 
+    &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- creationProcess is a jvmProcess. The jvm will be created on the local machine using default settings (classpath, java path,...) --&gt; </FONT><br>
+    &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;<br>
+    &nbsp;&nbsp;&lt;/processes&gt;<br>
+    &nbsp;&lt;/infrastructure&gt;<br>
+    &lt;/ProActiveDescriptor&gt;<br></br><br></br>
+<b>Deployment API</b><br></br>
 <pre>
 ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String File);
 <FONT ID="FormalComment">   // Returns a ProActiveDescriptor object from the xml
