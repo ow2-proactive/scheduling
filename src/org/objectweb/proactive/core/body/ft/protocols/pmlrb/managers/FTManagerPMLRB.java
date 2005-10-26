@@ -39,6 +39,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -75,7 +76,7 @@ public class FTManagerPMLRB extends FTManager {
 
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
-    
+
     // index of the latest received messae per senderID
     // UniqueID <-> MutableLong
     private Hashtable latestReceivedIndex;
@@ -91,6 +92,12 @@ public class FTManagerPMLRB extends FTManager {
     private MessageInfoPMLRB replyInfos;
     private MessageInfoPMLRB requestInfos;
 
+    // After a recovery, the last message of the log could be resend by its sender:
+    // if the failure has occured between the logging and the end of the RDV.
+    // Identify possible duplicatas
+    private transient UniqueID potentialDuplicataSender;
+    private transient long potentialDuplicataSequence;
+
     /**
      * FTManager initialization.
      * @param owner the attached body.
@@ -105,6 +112,8 @@ public class FTManagerPMLRB extends FTManager {
         this.sendNumber = 0;
         this.replyInfos = new MessageInfoPMLRB();
         this.requestInfos = new MessageInfoPMLRB();
+        this.potentialDuplicataSender = null;
+        this.potentialDuplicataSequence = 0;
         logger.info(" PML fault-tolerance is enabled for body " + this.ownerID);
         return 0;
     }
@@ -217,9 +226,18 @@ public class FTManagerPMLRB extends FTManager {
      * Return true if this message has already been received
      */
     private boolean alreadyReceived(Message m) {
-        long msgIndex = ((MessageInfoPMLRB) (m.getMessageInfo())).sentSequenceNumber;
-        MutableLong index = (MutableLong) (this.latestReceivedIndex.get(m.getSourceBodyID()));
-        return (index != null) && (msgIndex <= index.getValue());
+        if ((this.potentialDuplicataSender != null) &&
+                (m.getSourceBodyID().equals(this.potentialDuplicataSender)) &&
+                (m.getSequenceNumber() == this.potentialDuplicataSequence)) {
+            // this message has been already logged just before the failure of this.
+            // no more such message can appear...
+            this.potentialDuplicataSender = null;
+            return true;
+        } else {
+            long msgIndex = ((MessageInfoPMLRB) (m.getMessageInfo())).sentSequenceNumber;
+            MutableLong index = (MutableLong) (this.latestReceivedIndex.get(m.getSourceBodyID()));
+            return (index != null) && (msgIndex <= index.getValue());
+        }
     }
 
     /**
@@ -287,10 +305,16 @@ public class FTManagerPMLRB extends FTManager {
         List replies = ((CheckpointInfoPMLRB) ci).getReplyLog();
         List request = ((CheckpointInfoPMLRB) ci).getRequestLog();
 
+        // deal with potential duplicata of request
+        // duplicata of replies are not treated since they are automaticaly ignored.
+        Request potentialDuplicata = (Request) (request.get(request.size() - 1));
+        this.potentialDuplicataSender = potentialDuplicata.getSourceBodyID();
+        this.potentialDuplicataSequence = potentialDuplicata.getSequenceNumber();
+
         // add messages in the body context
-        // requests
         Iterator itRequest = request.iterator();
         BlockingRequestQueue queue = owner.getRequestQueue();
+
         while (itRequest.hasNext()) {
             queue.add((Request) (itRequest.next()));
         }
