@@ -50,9 +50,7 @@ public class Agent implements Serializable {
 
         if (iter < max) {
             neighbour.startComputation(max);
-            //if (iter%50 == 0) {System.out.println("Avance ... " + iter);}
         } else {
-            //System.out.println("RESULTAT SUR AGENT= " + this.counter);
             this.launcher.finished(this.counter);
         }
     }

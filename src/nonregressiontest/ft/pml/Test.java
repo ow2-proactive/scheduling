@@ -1,4 +1,8 @@
-package nonregressiontest.ft;
+package nonregressiontest.ft.pml;
+
+import nonregressiontest.ft.Agent;
+import nonregressiontest.ft.Collector;
+import nonregressiontest.ft.ReInt;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -16,14 +20,14 @@ public class Test extends FunctionalTest {
     private int result = 0;
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = Test.class.getResource(
-            "/nonregressiontest/ft/testFT.xml").getPath();
+            "/nonregressiontest/ft/testFT_PML.xml").getPath();
     private static int AWAITED_RESULT = -395585227;
 
     /**
      *
      */
     public Test() {
-        super("Active Object failure and recovery. (This test can be quite long ...)",
+        super("Active Object failure and recovery with PML protocol. (This test can be quite long ...)",
             "AO fails during the computation, and is restarted. " +
             "Communications between passive object, non-ft active object and ft active object.");
     }
@@ -37,21 +41,19 @@ public class Test extends FunctionalTest {
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
         this.server.setClassname(
             "org.objectweb.proactive.core.body.ft.servers.StartFTServer");
+        this.server.setParameters("-proto pml");
         this.server.startProcess();
         Thread.sleep(3000);
 
         // ProActive descriptor
         ProActiveDescriptor pad;
         VirtualNode vnode;
-        VirtualNode vnodeFailed;
 
         //	create nodes
         pad = ProActive.getProactiveDescriptor(Test.FT_XML_LOCATION_UNIX);
         pad.activateMappings();
         vnode = pad.getVirtualNode("Workers");
-        vnodeFailed = pad.getVirtualNode("Failed");
         Node[] nodes = vnode.getNodes();
-        Node[] nodesFailed = vnodeFailed.getNodes();
 
         Agent a = (Agent) ProActive.newActive(Agent.class.getName(),
                 new Object[0], nodes[0]);
@@ -77,7 +79,7 @@ public class Test extends FunctionalTest {
         //failure in 11 sec...
         Thread.sleep(11000);
         try {
-            nodes[1].getProActiveRuntime().killRT(false);
+            nodes[0].getProActiveRuntime().killRT(false);
         } catch (Exception e) {
             //e.printStackTrace();
         }
@@ -89,7 +91,7 @@ public class Test extends FunctionalTest {
         this.server.stopProcess();
         pad.killall(false);
 
-        //System.out.println(" ---------> RES = " + r.getValue()); //1771014405
+        System.out.println(" ---------> RES = " + r.getValue()); 
     }
 
     public boolean postConditions() throws Exception {
