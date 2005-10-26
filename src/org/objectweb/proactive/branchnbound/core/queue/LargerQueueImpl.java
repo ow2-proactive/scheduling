@@ -42,11 +42,11 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public class LargerQueueImpl implements TaskQueue {
+public class LargerQueueImpl extends TaskQueue {
     private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
     private Vector queue = new Vector();
     private int size = 0;
@@ -87,15 +87,15 @@ public class LargerQueueImpl implements TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#size()
      */
-    public IntWrapper size() {
-        return new IntWrapper(this.size);
+    public IntMutableWrapper size() {
+        return new IntMutableWrapper(this.size);
     }
 
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#hasNext()
      */
-    public BooleanWrapper hasNext() {
-        return new BooleanWrapper(this.size > 0);
+    public BooleanMutableWrapper hasNext() {
+        return new BooleanMutableWrapper(this.size > 0);
     }
 
     /**
@@ -124,12 +124,12 @@ public class LargerQueueImpl implements TaskQueue {
         this.size = 0;
     }
 
-    public BooleanWrapper isHungry() {
+    public BooleanMutableWrapper isHungry() {
         if (logger.isDebugEnabled()) {
             logger.debug("Queue size is " + this.size + " - Hungry level is " +
                 hungryLevel);
         }
-        return new BooleanWrapper(this.size <= hungryLevel);
+        return new BooleanMutableWrapper(this.size <= hungryLevel);
     }
 
     public void setHungryLevel(int level) {
@@ -194,8 +194,8 @@ public class LargerQueueImpl implements TaskQueue {
         this.allResults.add(result);
     }
 
-    public IntWrapper howManyResults() {
-        return new IntWrapper(this.allResults.size());
+    public IntMutableWrapper howManyResults() {
+        return new IntMutableWrapper(this.allResults.size());
     }
 
     public Collection getAllResults() {

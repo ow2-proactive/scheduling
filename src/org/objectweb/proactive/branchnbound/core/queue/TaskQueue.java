@@ -39,26 +39,28 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
+import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public interface TaskQueue extends Serializable {
+public abstract class TaskQueue implements Serializable {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
+    private Result bestCurrentResult;
 
     public abstract void addAll(Collection tasks);
 
-    public abstract IntWrapper size();
+    public abstract IntMutableWrapper size();
 
-    public abstract BooleanWrapper hasNext();
+    public abstract BooleanMutableWrapper hasNext();
 
     public abstract Task next();
 
     public abstract void flushAll();
 
-    public abstract BooleanWrapper isHungry();
+    public abstract BooleanMutableWrapper isHungry();
 
     public abstract void setHungryLevel(int level);
 
@@ -78,7 +80,7 @@ public interface TaskQueue extends Serializable {
     // --------------------------------------------------------------------------
     public abstract void addResult(Result result);
 
-    public abstract IntWrapper howManyResults();
+    public abstract IntMutableWrapper howManyResults();
 
     public abstract Collection getAllResults();
 
@@ -87,4 +89,22 @@ public interface TaskQueue extends Serializable {
     public abstract void loadResults(InputStream backupResultFile);
 
     public abstract void addTask(Task t);
+
+    public void informNewBestResult(Result newBest) {
+        if ((this.bestCurrentResult == null) ||
+                newBest.isBetterThan(this.bestCurrentResult)) {
+            this.bestCurrentResult = newBest;
+            if (logger.isInfoEnabled()) {
+                logger.info("A new best result was found: " +
+                    this.bestCurrentResult);
+            }
+        }
+    }
+
+    public Result getBestCurrentResult() {
+        if (this.bestCurrentResult != null) {
+            return this.bestCurrentResult;
+        }
+        return new Result(new NoResultsException());
+    }
 }

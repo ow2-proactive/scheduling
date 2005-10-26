@@ -38,12 +38,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
 import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 
 
 /**
@@ -66,13 +64,8 @@ public class Worker implements Serializable {
         // The emplty constructor
     }
 
-    /**
-     * Construct a new Worker with its name.
-     * @param name the Worker's name.
-     */
     public Worker(TaskQueue taskProvider) {
         this.taskProvider = taskProvider;
-        logger.debug("Worker successfully created");
     }
 
     /**
@@ -80,6 +73,9 @@ public class Worker implements Serializable {
      * @return the result or a result with the exception.
      */
     public Result execute(Task task) {
+        if (this.bestCurrentResult == null) {
+            this.bestCurrentResult = this.taskProvider.getBestCurrentResult();
+        }
         Exception exception = null;
         Task activedTask = null;
         try {
@@ -103,7 +99,12 @@ public class Worker implements Serializable {
             logger.fatal("Failed immediate service", e);
             exception = e;
         }
+        
+        if (this.bestCurrentResult.getException() != null){
+        	this.bestCurrentResult = null;
+        }
         if (activedTask != null) {
+            activedTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
             activedTask.initLowerBound();
             activedTask.initUpperBound();
 
@@ -116,8 +117,10 @@ public class Worker implements Serializable {
         return new Result(exception);
     }
 
+    //    public void setWorkerGroup(Worker workerGroup) {
+    //        this.selfWorkerGroup = workerGroup;
+    //    }
     public void setWorkerGroup(Worker workerGroup) {
-        Group group = ProActiveGroup.getGroup(workerGroup);
         this.selfWorkerGroup = workerGroup;
     }
 
@@ -132,7 +135,7 @@ public class Worker implements Serializable {
             this.bestCurrentResult = newBest;
             if (this.selfWorkerGroup != null) {
                 this.selfWorkerGroup.informNewBestResult(this.bestCurrentResult);
-                // TODO if i am at the top of a group
+                this.taskProvider.informNewBestResult(this.bestCurrentResult);
             }
             if (this.currentTask != null) {
                 this.currentTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
@@ -159,7 +162,6 @@ public class Worker implements Serializable {
             this.bestCurrentResult = newBest;
             if (this.currentTask != null) {
                 this.currentTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
-                // TODO Broadcast result if i am at the top of a group
             }
             if (logger.isInfoEnabled()) {
                 logger.info("I was informed from a new remote best result: " +
@@ -175,7 +177,7 @@ public class Worker implements Serializable {
         this.taskProvider.addAll(subTaskList);
     }
 
-    public BooleanWrapper isHungry() {
+    public BooleanMutableWrapper isHungry() {
         return this.taskProvider.isHungry();
     }
 

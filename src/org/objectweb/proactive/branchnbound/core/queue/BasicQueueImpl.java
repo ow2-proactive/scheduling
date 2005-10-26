@@ -42,11 +42,11 @@ import java.util.Vector;
 import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public class BasicQueueImpl implements TaskQueue {
+public class BasicQueueImpl extends TaskQueue {
     private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
     private Vector queue = new Vector();
     private int hungryLevel;
@@ -81,15 +81,15 @@ public class BasicQueueImpl implements TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#size()
      */
-    public IntWrapper size() {
-        return new IntWrapper(this.queue.size());
+    public IntMutableWrapper size() {
+        return new IntMutableWrapper(this.queue.size());
     }
 
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#hasNext()
      */
-    public BooleanWrapper hasNext() {
-        return new BooleanWrapper(this.queue.size() > 0);
+    public BooleanMutableWrapper hasNext() {
+        return new BooleanMutableWrapper(this.queue.size() > 0);
     }
 
     /**
@@ -103,12 +103,12 @@ public class BasicQueueImpl implements TaskQueue {
         this.queue.removeAllElements();
     }
 
-    public BooleanWrapper isHungry() {
+    public BooleanMutableWrapper isHungry() {
         if (logger.isDebugEnabled()) {
             logger.debug("Queue size is " + this.queue.size() +
                 " - Hungry level is " + this.hungryLevel);
         }
-        return new BooleanWrapper(this.queue.size() <= this.hungryLevel);
+        return new BooleanMutableWrapper(this.queue.size() <= this.hungryLevel);
     }
 
     public void setHungryLevel(int level) {
@@ -176,8 +176,8 @@ public class BasicQueueImpl implements TaskQueue {
         this.allResults.add(result);
     }
 
-    public IntWrapper howManyResults() {
-        return new IntWrapper(this.allResults.size());
+    public IntMutableWrapper howManyResults() {
+        return new IntMutableWrapper(this.allResults.size());
     }
 
     public Collection getAllResults() {

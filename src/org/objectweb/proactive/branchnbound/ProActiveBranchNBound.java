@@ -120,6 +120,7 @@ public class ProActiveBranchNBound {
      */
     public static Manager newBnB(Task root, VirtualNode virtualNode,
         String queueType) throws ActiveObjectCreationException, NodeException {
+        virtualNode.activate();
         Object[] args = new Object[4];
         args[0] = root;
         args[1] = null;
@@ -161,9 +162,14 @@ public class ProActiveBranchNBound {
     }
 
     /**
-     * Create a new activate Manager with the given root task. Using hierachic
+     * <p>Create a new activate Manager with the given root task. Using hierachic
      * ProActive group communication. The Manager is activate in the local
-     * default node of the current JVM.
+     * default node of the current JVM.</p>
+     * <p><b>It is strongly recommended to **NOT ACTIVATE** the passed virtual
+     * nodes. Because, the framework uses an optimzed way to deploying the
+     * computation.</b></p>
+     * <p><b>Also, we recomend to you that to use a vitural node by clusters or
+     * sites for optimizing communication and active object creation.</b></p>
      *
      * @param root the root Task.
      * @param virtualNodes for distributing the computation with using hierachic
@@ -186,11 +192,7 @@ public class ProActiveBranchNBound {
         Object[] args = new Object[4];
         args[0] = root;
         args[1] = null;
-        Node[][] nodes = new Node[virtualNodes.length][];
-        for (int i = 0; i < virtualNodes.length; i++) {
-            nodes[i] = virtualNodes[i].getNodes();
-        }
-        args[2] = nodes;
+        args[2] = virtualNodes;
         args[3] = queueType;
         return ProActiveBranchNBound.activingTheManager(args);
     }
@@ -235,7 +237,8 @@ public class ProActiveBranchNBound {
         args[1] = (args[1] == null) ? NodeFactory.getDefaultNode()
                                     : (Node) args[1];
         assert args[1] instanceof Node : args[1];
-        assert args[2] instanceof Node[] || args[2] instanceof Node[][] : args[2];
+        assert args[2] instanceof Node[] || args[2] instanceof Node[][] ||
+        args[2] instanceof VirtualNode[] : args[2];
         assert args[3] instanceof String : args[3];
 
         return (Manager) ProActive.newActive(Manager.class.getName(), args,
