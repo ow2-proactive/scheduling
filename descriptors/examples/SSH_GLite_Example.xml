@@ -10,17 +10,11 @@
             <map virtualNode="plugtest">
                 <jvmSet>
                     <vmName value="Jvm1"/>
-                    <vmName value="Jvm2"/>
                 </jvmSet>
             </map>
         </mapping>
         <jvms>
             <jvm name="Jvm1">
-                <creation>
-                    <processReference refid="localJVM"/>
-                </creation>
-            </jvm>
-            <jvm name="Jvm2">
                 <creation>
                     <processReference refid="sshProcess"/>
                 </creation>

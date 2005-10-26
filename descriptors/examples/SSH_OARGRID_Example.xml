@@ -9,7 +9,6 @@
         <mapping>
             <map virtualNode="Test">
                 <jvmSet>
-                    <!--vmName value="JvmOARGrid"/-->
 		    <vmName value="JvmSSH"/>
                 </jvmSet>
             </map>
@@ -78,18 +77,12 @@
 			</oarGridProcess>
 		</processDefinition>
 			
-		<processDefinition id="sshProcess">
-			<!-- Testing -->
-			<!--sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost"-->
+		<processDefinition id="sshProcess">			
 			<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="oar.grenoble.grid5000.fr">
 			<processReference refid="oarGridProcess"/>
-			<!--processReference refid="JVMProcess"/-->
 			</sshProcess>
 		</processDefinition>
-		
-		<processDefinition id="JVMProcess">
-			<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-		</processDefinition>
+	
 	  </processes>
     </infrastructure>
 </ProActiveDescriptor>

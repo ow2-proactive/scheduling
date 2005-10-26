@@ -16,7 +16,7 @@
 		<jvms>
 			<jvm name="newJvm">
 				<creation>
-					<processReference refid="sshimag"/>
+					<processReference refid="sshProcess"/>
 				</creation>
 			</jvm>
 		</jvms>
@@ -56,7 +56,7 @@
 					</oarOption>
 				</oarProcess>
 			</processDefinition>
-			<processDefinition id="sshimag">
+			<processDefinition id="sshProcess">
 				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="oar.sophia.grid5000.fr">
 					<processReference refid="oarCluster"/>
 				</sshProcess>

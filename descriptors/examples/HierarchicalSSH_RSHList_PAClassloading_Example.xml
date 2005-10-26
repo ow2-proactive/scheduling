@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="plugtest"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="plugtest">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="ssh_hierarchical"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<classpath>
+						<absolutePath value="/home/ProActive/lib/ProActive.jar"/>
+						<absolutePath value="/home/ProActive/lib/asm.jar"/>
+						<absolutePath value="/home/ProActive/lib/log4j.jar"/>
+						<absolutePath value="/home/ProActive/lib/fractal.jar"/>
+						<absolutePath value="/home/ProActive/lib/bouncycastle.jar"/>
+						<absolutePath value="/home/ProActive/lib/xercesImpl.jar"/>
+						<absolutePath value="/home/ProActive/lib/jsch.jar"/>
+						<absolutePath value="/home/ProActive/lib/javassist.jar"/>
+						<absolutePath value="/home/ProActive/lib/nqueen.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="/home/j2sdk1.4.2_09/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath value="/home/ProActive/scripts/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="/home/ProActive/scripts/proactive-log4j"/>
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter value="-Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader"/>
+						<parameter value="-Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi"/>
+						<parameter value="-Dlog4j.defaultInitOverride=true"/>
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="localJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<extendedJvm refid="localJVM"/>
+					<jvmParameters>
+						<parameter value="-Dproactive.communication.protocol=rmissh"/>
+						<parameter value="-Djava.rmi.server.hostname=gnode1"/>
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="rsh_list">
+				<processList class="org.objectweb.proactive.core.process.rsh.RSHProcessList" fixedName="gnode" list="[28-38]" domain="">
+					<processReference refid="localJVM"></processReference>
+				</processList>
+			</processDefinition>
+			<processDefinition id="ssh_hierarchical">
+				<hierarchicalProcess class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess" hostname="frontend_name" internal_ip="gnode1" username="plugtests">
+				<processReference refid="localJVM1"></processReference>
+				<hierarchicalReference refid="rsh_list"></hierarchicalReference>
+			</hierarchicalProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

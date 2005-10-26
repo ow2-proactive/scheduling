@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="plugtest" timeout="120000"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="plugtest">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="sshProcess"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="linuxJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="/home1/rquilici/ProActive/lib/ProActive.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/asm.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/fractal.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/bouncycastle.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/log4j.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/xercesImpl.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/jsch.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/javassist.jar"/>
+						<absolutePath value="/home1/rquilici/ProActive/lib/nqueen.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="/home1/rquilici/j2sdk1.4.2_05/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath value="/home1/rquilici/ProActive/scripts/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="/home1/rquilici/ProActive/scripts/proactive-log4j"/>
+					</log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="prunCluster">
+				<prunProcess class="org.objectweb.proactive.core.process.prun.PrunSubProcess" queue="plugtest">
+					<processReference refid="linuxJVM1"/>
+					<commandPath value="/usr/local/VU/reserve.sge/bin/prun"/>
+					<prunOption>
+						<hostsNumber>20</hostsNumber> 
+						<processorPerNode>2</processorPerNode>
+						<bookingDuration>02:00:00</bookingDuration>
+					</prunOption>
+				</prunProcess>
+			</processDefinition>
+			<processDefinition id="sshProcess">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="frontend" username="rquilici">
+					<processReference refid="prunCluster"/>
+				</sshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

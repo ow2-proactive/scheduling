@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="plugtest" timeout="160000"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="plugtest">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="sshInriaCluster"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/ProActive.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/asm.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/log4j.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/fractal.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/xercesImpl.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/bouncycastle.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/jsch.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/javassist.jar"/>
+						<absolutePath value="/net/home/plugtest/ProActive/lib/nqueen.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="/net/home/plugtest/j2sdk1.4.2_05/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath value="/net/home/plugtest/ProActive/scripts/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="/net/home/plugtest/ProActive/scripts/proactive-log4j"/>
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter value="-Dproactive.communication.protocol=rmissh"/>
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="bsubInriaCluster">
+				<bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
+					<processReference refid="localJVM1"/>
+					<bsubOption>
+						<processor>60</processor> 
+						<resourceRequirement value="span[ptile=2]"/>
+						<scriptPath>
+							<absolutePath value="/net/home/plugtest/ProActive/scripts/unix/cluster/startRuntime.sh"/>
+						</scriptPath>
+					</bsubOption>
+				</bsubProcess>
+			</processDefinition>
+			<processDefinition id="sshInriaCluster">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="frontend" username="plugtest">
+					<processReference refid="bsubInriaCluster"/>
+				</sshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
