@@ -727,6 +727,66 @@ ProActive.unExposeAsWebService("a", "http://localhost:8080");
 </table><br></br>
 
 </p>
+
+
+
+
+<table width="100%" border="1">
+	<tbody>
+		<tr>
+			<th>Deploying a fault-tolerant application</th>
+		</tr>
+		<tr>
+			<td>
+			<p class="textNormal">
+ProActive can provide fault-tolerance capabilities through two differents
+protocols: a Communication-Induced Checkpointing protocol (CIC) or a
+pessimistic message logging protocol (PML). Making a ProActive application
+fault-tolerant is <b>fully transparent</b>; active objects are turned
+fault-tolerant using Java properties that can be set in the deployment
+descriptor. The programmer can select <i>at deployment time</i> the most
+adapted protocol regarding the application and the execution environment.
+<BR><BR>
+
+<b>A Fault-tolerant deployment descriptor</b><BR><BR><code>
+&lt;ProActiveDescriptor&gt;
+&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&lt;virtualNodesDefinition&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;virtualNode name="NonFT-Workers" property="multiple"/&gt;<br>    
+&nbsp;&nbsp;&nbsp;&lt;virtualNode name="FT-Workers" property="multiple" ftServiceId="appli"/&gt; <br>
+&nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;<br>
+&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;&lt;serviceDefinition id="appli"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- Protocol selection : cic or pml --&gt; </FONT><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;protocol type="cic"&gt;&lt;/protocol&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- URL of the fault-tolerance server --&gt; </FONT> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- URL of the resource server; all the nodes
+mapped on this virtual node<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;will be registred in as resource nodes for recovery --&gt; </FONT><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://localhost:1100/FTServer"&gt;&lt;/resourceServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<FONT ID="FormalComment">&lt;!-- Average time between two consecutive checkpoints for each object --&gt; </FONT><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<FONT ID="FormalComment">&lt;!-- in seconds --&gt; </FONT><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
+&nbsp;&nbsp;&lt;/services&gt;<br>
+&nbsp;&nbsp;...<br>
+&lt;/ProActiveDescriptor&gt;<br>
+</code>
+
+
+
+</td>
+</tbody>
+</table><br></br>
+
+</p>
+
+
+
+
+
 <!--
 <!--
  Footer : start 
