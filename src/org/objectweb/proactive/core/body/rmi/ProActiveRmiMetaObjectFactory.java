@@ -36,11 +36,13 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.RemoteBodyFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ProActiveRmiMetaObjectFactory extends ProActiveMetaObjectFactory
     implements java.io.Serializable {
-    protected static Logger logger = Logger.getLogger(ProActiveRmiMetaObjectFactory.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -21,7 +22,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
  *
  */
 public class ClassDataCache {
-    private static Logger logger = Logger.getLogger(Loggers.CLASSLOADER);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     private static ClassDataCache classCache = null;
     private static Map classStorage;
     private static String runtimeURL = null;

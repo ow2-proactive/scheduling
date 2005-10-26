@@ -42,6 +42,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
 
@@ -54,7 +56,7 @@ import org.objectweb.proactive.osgi.OsgiParameters;
  * For example, when a request for a class file incomes, the thread calls the FileProcess.
  */
 public class HTTPRequestHandler extends Thread {
-    protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     private Socket socket;
     private String paths;
     private InputStream in;

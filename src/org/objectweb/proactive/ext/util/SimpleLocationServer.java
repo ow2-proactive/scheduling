@@ -39,6 +39,8 @@ import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 
 
@@ -47,7 +49,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
  */
 public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
     LocationServer {
-    static Logger logger = Logger.getLogger(SimpleLocationServer.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     private BodyMap table;
     private String url;
 

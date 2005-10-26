@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.process;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -60,7 +60,7 @@ public class JVMNodeProcess extends JVMProcessImpl implements Serializable {
      * Creates a new instance of JVMNodeProcess
      * @param messageLogger The logger that handles input and error stream of this process
      */
-    public JVMNodeProcess(MessageLogger messageLogger) {
+    public JVMNodeProcess(RemoteProcessMessageLogger messageLogger) {
         super(messageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }
@@ -70,8 +70,8 @@ public class JVMNodeProcess extends JVMProcessImpl implements Serializable {
      * @param inputMessageLogger The logger that handles input stream of this process
      * @param errorMessageLogger The logger that handles error stream of this process
      */
-    public JVMNodeProcess(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger) {
+    public JVMNodeProcess(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }

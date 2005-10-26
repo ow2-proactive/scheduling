@@ -32,6 +32,8 @@ package org.objectweb.proactive.examples.garden;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -48,7 +50,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  *
  */
 public class Flower {
-    static Logger logger = Logger.getLogger(Flower.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private String myName;
 
     public Flower() {

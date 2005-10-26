@@ -35,11 +35,13 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 public class ClassServer implements Runnable {
-    protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     public static final int DEFAULT_SERVER_BASE_PORT = 2010;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 2;
     protected static int MAX_RETRY = 500;

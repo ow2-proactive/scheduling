@@ -40,6 +40,8 @@ import org.objectweb.fractal.gui.repository.api.Storage;
 import org.objectweb.fractal.gui.repository.lib.FractalAdlWriter;
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 
 
@@ -48,7 +50,7 @@ import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
  *
  */
 public class ProActiveAdlWriter extends FractalAdlWriter {
-    protected static Logger logger = Logger.getLogger("components.gui");
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GUI);
 
     public void saveComponent(final Component c, final AdlNode comp,
         final String name, final boolean internalType, final Map sharing)

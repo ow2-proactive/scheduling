@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.DefaultProActiveSecurityManager;
@@ -168,12 +169,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         if ((psm = factory.getProActiveSecurityManager()) == null) {
             isSecurityOn = false;
-            ProActiveLogger.getLogger("security.body").debug("Active Object security Off");
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("Active Object security Off");
         } else {
             isSecurityOn = true;
-            ProActiveLogger.getLogger("security.body").debug("Active Object security On application is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("Active Object security On application is " +
                 psm.getPolicyServer().getApplicationName());
-            ProActiveLogger.getLogger("security.body").debug("current thread is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("current thread is " +
                 Thread.currentThread().getName());
         }
 
@@ -769,7 +770,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                         byte[] certE = destinationBody.getCertificateEncoded();
 
                         X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                        ProActiveLogger.getLogger("security.body").debug("send Request AbstractBody " +
+                        ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("send Request AbstractBody " +
                             this + ", method " + methodCall.getName() +
                             " cert " + cert.getSubjectDN() + " " +
                             cert.getPublicKey());
@@ -790,7 +791,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             localBodyStrategy.sendRequest(methodCall, future, destinationBody);
         } catch (RenegotiateSessionException e) {
             if (e.getUniversalBody() != null) {
-                ProActiveLogger.getLogger("security.crypto").debug("renegotiate session " +
+                ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO).debug("renegotiate session " +
                     sessionID);
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
                 psm.terminateSession(sessionID);

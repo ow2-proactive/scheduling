@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.xml.handler;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.XMLHandler;
 
@@ -44,7 +46,7 @@ import org.objectweb.proactive.core.xml.io.XMLHandler;
  *
  */
 public interface UnmarshallerHandler extends XMLHandler {
-    static Logger logger = Logger.getLogger(UnmarshallerHandler.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.XML);
 
     /**
      * Returns the object resulting of the processing of the SAX events.

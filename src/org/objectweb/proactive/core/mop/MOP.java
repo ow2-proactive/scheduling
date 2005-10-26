@@ -36,6 +36,8 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -48,7 +50,7 @@ public abstract class MOP {
      */
     protected static String STUB_OBJECT_INTERFACE_NAME = "org.objectweb.proactive.core.mop.StubObject";
     protected static Class STUB_OBJECT_INTERFACE;
-    protected static Logger logger = Logger.getLogger(MOP.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     /**
      * The root interface of all metabehaviors

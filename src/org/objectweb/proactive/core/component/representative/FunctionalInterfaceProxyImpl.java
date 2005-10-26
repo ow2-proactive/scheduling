@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
     Serializable, Cloneable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     private static Field universalBodyField;
     private static Field bodyIDField;
     Proxy bodyProxyDelegatee = null;

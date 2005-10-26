@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component.body;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
@@ -44,6 +45,8 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /** This class has been inserted into the bodies hierarchy in order to instantiate the
@@ -52,6 +55,7 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     private ProActiveComponent componentIdentity = null;
     private Map shortcutsOnThis = null; // key = functionalItfName, value = shortcut
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     //    private RequestFilter filterOnNFRequests;
     private boolean insideFunctionalActivity = false;

@@ -42,6 +42,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
 import org.objectweb.proactive.ic2d.event.SpyEventListener;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
@@ -55,7 +57,7 @@ import org.objectweb.proactive.ic2d.util.MonitorThread;
  * Holder class for the host data representation
  */
 public class VMObject extends AbstractDataObject {
-    static Logger log4jlogger = Logger.getLogger(VMObject.class.getName());
+    static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
     private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
     private static Node SPY_LISTENER_NODE;
     private static int NOT_RESPONDING_MAX_TRIES = 3; // actually not used

@@ -35,6 +35,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -56,7 +57,7 @@ public class FileTransferWorkShop implements Serializable {
             PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp", "nordugrid"
         };
     public static final String[] URLPROTOCOLS = { "file://", "http://", "ftp://" };
-    protected static Logger logger = Logger.getLogger(Loggers.FILETRANSFER);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 
     /* Reference to filetransfer definitions */
     private HashMap fileTransfers;

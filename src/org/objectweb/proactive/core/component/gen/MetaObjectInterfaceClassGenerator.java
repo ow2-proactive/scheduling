@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -96,9 +97,9 @@ public class MetaObjectInterfaceClassGenerator
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
-            if (ProActiveLogger.getLogger("components.bytecodegeneration")
+            if (ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION)
                                    .isDebugEnabled()) {
-                ProActiveLogger.getLogger("components.bytecodegeneration")
+                ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION)
                                .debug("generating metaobject interface reference");
             }
 

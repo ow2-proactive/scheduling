@@ -54,6 +54,8 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
@@ -63,7 +65,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     java.io.Serializable {
 
     /** The logger for the Class */
-    protected static Logger logger = Logger.getLogger(ProxyForGroup.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
 
     /** The name of the Class : all members of the group are "className" assignable */
     protected String className;

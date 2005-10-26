@@ -40,13 +40,15 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
 public class RequestWithMixedLocation extends RequestImpl
     implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(RequestWithMixedLocation.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     private static final int MAX_TRIES = 15;
     private static int counter = 0;
     private int tries;

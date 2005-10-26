@@ -40,6 +40,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -51,7 +53,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * @version ProActive 1.0 (March 2002)
  */
 public class SimpleObjectMigration implements Serializable {
-    static Logger logger = Logger.getLogger(SimpleObjectMigration.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static final int SLEEP_TIME = 9000;
     private String name; // The name of the instance
     private String hi = " say hello from "; // The 'hello' sentence

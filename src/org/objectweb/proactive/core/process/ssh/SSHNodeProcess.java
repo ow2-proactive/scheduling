@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.process.ssh;
 
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -56,7 +56,7 @@ public class SSHNodeProcess extends SSHJVMProcess {
      * Creates a new instance of SSHNodeProcess.
      * @param messageLogger The logger that handles input and error stream of the target JVMProcess
      */
-    public SSHNodeProcess(MessageLogger messageLogger) {
+    public SSHNodeProcess(RemoteProcessMessageLogger messageLogger) {
         super(messageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }
@@ -66,8 +66,8 @@ public class SSHNodeProcess extends SSHJVMProcess {
      * @param inputMessageLogger The logger that handles input stream of the target JVMProcess
      * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
      */
-    public SSHNodeProcess(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger) {
+    public SSHNodeProcess(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }

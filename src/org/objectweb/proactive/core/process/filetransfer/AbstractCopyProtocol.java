@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransfer.DirectoryD
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop.StructureInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * AbstractCopyProtocol implements default behaviour of methods
@@ -48,7 +49,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
  */
 public abstract class AbstractCopyProtocol implements CopyProtocol {
 	
-	protected static Logger logger = Logger.getLogger(Loggers.FILETRANSFER);
+	protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 	
 	protected boolean isDefaultProtocol=false;
 	protected String name;

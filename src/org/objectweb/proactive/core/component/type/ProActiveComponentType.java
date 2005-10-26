@@ -38,6 +38,8 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -47,7 +49,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
  *
  */
 public class ProActiveComponentType implements ComponentType, Serializable {
-    protected static Logger logger = Logger.getLogger(ProActiveComponentType.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
      * The types of the interfaces of components of this type.

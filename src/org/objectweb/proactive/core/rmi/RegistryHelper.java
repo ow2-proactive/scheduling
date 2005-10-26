@@ -32,10 +32,12 @@ package org.objectweb.proactive.core.rmi;
  * ################################################################
  */
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RegistryHelper {
-    protected static Logger logger = Logger.getLogger(RegistryHelper.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.RMI);
     protected final static int DEFAULT_REGISTRY_PORT = 1099;
 
     /**

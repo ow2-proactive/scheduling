@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
@@ -62,7 +64,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 public class AwaitedRequest implements Request, java.io.Serializable {
 
     /** Logger */
-    public static Logger logger = Logger.getLogger(AwaitedRequest.class.getName());
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
 
     // awaited sender
     private UniqueID awaitedSender;

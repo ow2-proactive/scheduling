@@ -35,6 +35,8 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -46,7 +48,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
  *
  */
 public class ProActiveTypeFactory implements TypeFactory {
-    protected static Logger logger = Logger.getLogger(ProActiveTypeFactory.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     // SINGLETON implementation
     static private ProActiveTypeFactory instance = null;

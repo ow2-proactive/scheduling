@@ -72,6 +72,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
@@ -81,7 +83,7 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 public class C3DUser implements org.objectweb.proactive.RunActive,
     java.io.Serializable {
-    static Logger logger = Logger.getLogger(C3DUser.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
      * The array of random colors

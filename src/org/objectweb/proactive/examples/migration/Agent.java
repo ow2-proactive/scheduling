@@ -39,6 +39,8 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -46,7 +48,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  */
 public class Agent implements InitActive, RunActive, EndActive,
     java.io.Serializable {
-    static Logger logger = Logger.getLogger(Agent.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private String name;
     private String nodename;
     private String hostname;

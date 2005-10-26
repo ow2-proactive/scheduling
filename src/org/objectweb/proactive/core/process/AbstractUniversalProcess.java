@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.process;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public abstract class AbstractUniversalProcess implements UniversalProcess {
@@ -76,8 +78,8 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     }
     
     public void startFileTransfer(){
-    	if (logger.isDebugEnabled()) {
-    		logger.debug("Starting FileTransfer");
+    	if (ProActiveLogger.getLogger(Loggers.FILETRANSFER).isDebugEnabled()) {
+            ProActiveLogger.getLogger(Loggers.FILETRANSFER).debug("FileTransfer initializations ");
     	}
     	
     	FileTransferWorkShop ftwDeploy = getFileTransferWorkShopDeploy();
@@ -245,7 +247,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
      * This method should be overriden if the process want's to set
      * specific parameters to the FileTransferWorkshop before starting
      * the FileTransfer.
-     * @param infoParams
+     * @param ftw
      */
     protected void pushProcessAttributes(FileTransferWorkShop.StructureInformation infoParams){
     	

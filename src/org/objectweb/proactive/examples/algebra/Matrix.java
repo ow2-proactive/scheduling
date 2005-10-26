@@ -31,10 +31,12 @@
 package org.objectweb.proactive.examples.algebra;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class Matrix implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(Matrix.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     int m; // height
     int n; // width
     double[][] elements; // values

@@ -24,8 +24,7 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive,
     RunActive, EndActive {
     public final static String MESSAGE = "-->a";
     public final static String I2_ITF_NAME = "i2";
-    protected static Logger logger = ProActiveLogger.getLogger(
-            "nonregressiontests.components");
+    private static Logger logger = ProActiveLogger.getLogger("nonregressiontest");
     I2 i2;
 
     /**

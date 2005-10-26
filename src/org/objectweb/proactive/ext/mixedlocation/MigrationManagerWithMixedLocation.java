@@ -12,13 +12,15 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverForwarder;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverForwarder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
 public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
     implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(MigrationManagerWithMixedLocation.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     protected UniversalBodyWrapper wrapper;
     transient protected LocationServer locationServer;
     protected int migrationCounter;

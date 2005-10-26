@@ -10,6 +10,8 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ssh.SshParameters;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import com.jcraft.jsch.*;
 
@@ -27,7 +29,7 @@ import com.jcraft.jsch.*;
  * methods
  */
 public class SshTunnel {
-    private static Logger logger = Logger.getLogger(SshTunnel.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private static Random _random = new Random();
     private int _localPort;
     private Session _session;

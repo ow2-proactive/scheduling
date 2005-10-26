@@ -35,6 +35,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -44,7 +46,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
  *
  */
 public class ProActiveInterfaceType implements InterfaceType, Serializable {
-    protected static Logger logger = Logger.getLogger(ProActiveInterfaceType.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
      * The generatedClassName of the interface described by this type.

@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -114,7 +115,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
         FileTransfer[] ftDefinitions = fts.getAllFileTransferDefinitions();
 
-        Logger fileTransferLogger = Logger.getLogger(Loggers.FILETRANSFER);
+        Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 
         for (int i = 0; i < ftDefinitions.length; i++) {
             //Files and Dirs

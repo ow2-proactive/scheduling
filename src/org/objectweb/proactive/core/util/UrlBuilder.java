@@ -35,6 +35,8 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
 
@@ -46,7 +48,7 @@ public class UrlBuilder {
             "///", "//localhost.localdomain", "//localhost", "//127.0.0.1"
         };
     private final static int DEFAULT_REGISTRY_PORT = 1099;
-    protected static Logger logger = Logger.getLogger(UrlBuilder.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
 
     //
     //------------Constructor--------------------------------

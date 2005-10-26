@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.util;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -50,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class CircularArrayList extends java.util.AbstractList
     implements java.util.List, java.io.Serializable {
-    static Logger logger = Logger.getLogger(CircularArrayList.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
     private static final int DEFAULT_SIZE = 5;
     protected Object[] array;
 

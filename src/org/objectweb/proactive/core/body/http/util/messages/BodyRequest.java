@@ -40,6 +40,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
@@ -49,7 +51,6 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @see java.io.Serializable
  */
 public class BodyRequest extends ReflectRequest implements Serializable {
-    private static Logger logger = Logger.getLogger("XML_HTTP");
     private static HashMap hMapMethods;
 
     static {

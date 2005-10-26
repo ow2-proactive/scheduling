@@ -78,8 +78,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * isAsynchronousCall for every call, but only once for a given method
      */
     private static transient java.util.Hashtable REIF_AND_EXCEP = new java.util.Hashtable();
-    private static Logger logger = Logger.getLogger(MethodCall.class.getName());
-
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
     /**
      *        The size of the pool we use for recycling MethodCall objects.
      */
@@ -248,11 +247,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * possible name of the functional interface invoked).
      * @param reifiedMethod
      * @param effectiveArguments
-     * @param interfaceName fractal interface name, whose value is :
+     * @param componentInterfaceName fractal interface name, whose value is :
      *  - null if the call is non-functional
      *  - the name of the functional interface otherwise
      * @param priority TODO
-     * @param isFunctional
      * @return MethodCall
      */
     public synchronized static MethodCall getComponentMethodCall(
@@ -260,7 +258,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         String interfaceName, boolean isFunctional, short priority) {
         MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
         if (MethodCall.componentLogger == null) {
-            MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
+            MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
         }
         mc.isComponentMethodCall = true;
         mc.isFunctionalComponentMethodCall = isFunctional;

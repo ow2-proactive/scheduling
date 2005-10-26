@@ -42,11 +42,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
@@ -63,8 +65,7 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         throws Exception {
         super(vide);
         sessions = new Hashtable();
-        logger = Logger.getLogger(
-                "org.objectweb.proactive.ext.security.DefaultProActiveSecurityManager");
+        logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
@@ -138,7 +139,6 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
         in.defaultReadObject();
 
         //System.out.println("reconstruit un DPSM");
-        logger = Logger.getLogger(
-                "org.objectweb.proactive.ext.security.DefaultProActiveSecurityManager");
+        logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     }
 }

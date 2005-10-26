@@ -19,10 +19,11 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public abstract class AbstractInterfaceClassGenerator {
-    protected static final Logger logger = Logger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION);
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION);
     protected static ClassPool pool = ClassPool.getDefault();
     protected static Hashtable generatedClassesCache = new Hashtable();
 

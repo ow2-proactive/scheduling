@@ -1,6 +1,8 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /*
@@ -40,7 +42,7 @@ import org.apache.log4j.Logger;
  * One prime number. This object is owned by an ActivePrimeContainer.
  */
 public class PrimeNumberImpl implements PrimeNumber, java.io.Serializable {
-    static Logger logger = Logger.getLogger(PrimeNumberImpl.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private long value;
     private PrimeNumber next;
     private ActivePrimeContainer container;

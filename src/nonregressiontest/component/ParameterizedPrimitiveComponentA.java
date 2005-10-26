@@ -16,8 +16,7 @@ public class ParameterizedPrimitiveComponentA extends PrimitiveComponentA
     implements AttributeController {
     public String message;
     public final static String I2_ITF_NAME = "i2";
-    private static Logger logger = ProActiveLogger.getLogger(
-            "nonregressiontests.components");
+    private static Logger logger = ProActiveLogger.getLogger("nonregressiontest");
     I2 i2;
 
     /**

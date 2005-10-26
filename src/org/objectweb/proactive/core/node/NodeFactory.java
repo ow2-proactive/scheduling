@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
@@ -75,7 +76,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  *
  */
 public class NodeFactory {
-    protected static Logger logger = Logger.getLogger(NodeFactory.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     private static final String DEFAULT_NODE_NAME;
     private static Node defaultNode = null;
 

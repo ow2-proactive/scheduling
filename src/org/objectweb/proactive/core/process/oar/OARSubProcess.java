@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -99,7 +99,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     //  ----------------------------------------------------------------------------------------
     //-----------------------Extends AbstractExternalProcessDecorator-------------------------
     //  ----------------------------------------------------------------------------------------
-    public void setErrorMessageLogger(MessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
         super.setErrorMessageLogger(new CompositeMessageLogger(
                 new ParserMessageLogger(), errorMessageLogger));
     }
@@ -311,9 +311,9 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     }
 
     /**
-     * Implementation of a MessageLogger that look for the jobID of the launched job
+     * Implementation of a RemoteProcessMessageLogger that look for the jobID of the launched job
      */
-    public class ParserMessageLogger implements MessageLogger,
+    public class ParserMessageLogger implements RemoteProcessMessageLogger,
         java.io.Serializable {
         private boolean foundJobID;
         private boolean foundHostname;

@@ -47,6 +47,8 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -71,7 +73,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 public class ProActiveGroup {
 
     /** The logger for the Class */
-    protected static Logger logger = Logger.getLogger(ProActiveGroup.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
 
     /** The name of the default proxy for group communication */
     public static final Class DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;

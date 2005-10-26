@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentRunActive;
 import org.objectweb.proactive.core.component.body.NFRequestFilterImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
@@ -59,7 +60,7 @@ import java.util.Vector;
  */
 public class DispatcherImpl extends C3DDispatcher implements Dispatcher, DispatcherLogic,
     DispatcherAttributes, BindingController, ComponentRunActive {
-    private static Logger logger = Logger.getLogger(Loggers.EXAMPLES);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     // component bindings
     private Hashtable engines = new Hashtable();

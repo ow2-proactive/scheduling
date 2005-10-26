@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 
 
@@ -45,7 +46,7 @@ import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
  * The object has only one public method, sayHello()
  * The object does nothing but reflect the host its on. */
 public class Hello implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(Loggers.EXAMPLES);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private final String message = "Hello World!";
     private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat(
             "dd/MM/yyyy HH:mm:ss");

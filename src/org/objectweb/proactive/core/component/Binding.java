@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Interface;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -44,7 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class Binding implements Serializable {
-    private static Logger logger = ProActiveLogger.getLogger("components");
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private final ProActiveInterface clientInterface;
     private final ProActiveInterface serverInterface;
     private final String clientInterfaceName;

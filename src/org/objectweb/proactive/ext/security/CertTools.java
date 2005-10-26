@@ -88,6 +88,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -95,7 +97,7 @@ import org.bouncycastle.x509.X509V3CertificateGenerator;
  *
  */
 public class CertTools {
-    private static Logger log = Logger.getLogger(CertTools.class);
+    static Logger log = ProActiveLogger.getLogger(Loggers.SECURITY);
     public static final String EMAIL = "rfc822name";
     public static final String EMAIL1 = "email";
     public static final String EMAIL2 = "EmailAddress";

@@ -41,10 +41,12 @@ import org.objectweb.proactive.core.body.migration.MigrationManagerImpl;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
-    static Logger logger = Logger.getLogger(MigrationManagerWithLocationServer.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     transient private LocationServer locationServer;
     protected Body myBody;
 

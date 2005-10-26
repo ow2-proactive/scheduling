@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.SecurityContext;
@@ -52,7 +53,8 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 public class MigratableBody extends BodyImpl implements Migratable,
     java.io.Serializable {
-    protected static Logger logger = Logger.getLogger(MigratableBody.class.getName());
+    protected static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
+    protected static Logger migrationLogger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -113,8 +115,12 @@ public class MigratableBody extends BodyImpl implements Migratable,
     protected void activityStarted() {
         super.activityStarted();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Body run on node " + nodeURL + " migration=" +
+        if (migrationLogger.isDebugEnabled()) {
+            migrationLogger.debug("Body run on node " + nodeURL + " migration=" +
+                hasJustMigrated);
+        }
+        if (bodyLogger.isDebugEnabled()) {
+            bodyLogger.debug("Body run on node " + nodeURL + " migration=" +
                 hasJustMigrated);
         }
         if (hasJustMigrated) {
@@ -170,7 +176,7 @@ public class MigratableBody extends BodyImpl implements Migratable,
                         result = psm.getPolicy(sc);
 
                         if (!result.isMigration()) {
-                            ProActiveLogger.getLogger("security").info("NOTE : Security manager forbids the migration");
+                            ProActiveLogger.getLogger(Loggers.SECURITY).info("NOTE : Security manager forbids the migration");
                             return this;
                         }
                     } else {
@@ -178,12 +184,12 @@ public class MigratableBody extends BodyImpl implements Migratable,
                         result = runtimeDestination.getPolicy(sc);
 
                         if (!result.isMigration()) {
-                            ProActiveLogger.getLogger("security").info("NOTE : Security manager forbids the migration");
+                            ProActiveLogger.getLogger(Loggers.SECURITY).info("NOTE : Security manager forbids the migration");
                             return this;
                         }
                     }
                 } catch (SecurityNotAvailableException e1) {
-                    logger.debug("Security not availaible");
+                    bodyLogger.debug("Security not available");
                     e1.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -257,16 +263,16 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("stream =  " + out);
+        if (migrationLogger.isDebugEnabled()) {
+            migrationLogger.debug("stream =  " + out);
         }
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("stream =  " + in);
+        if (migrationLogger.isDebugEnabled()) {
+            migrationLogger.debug("stream =  " + in);
         }
         in.defaultReadObject();
         hasJustMigrated = true;

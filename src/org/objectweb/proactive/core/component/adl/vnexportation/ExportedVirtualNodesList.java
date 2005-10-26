@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -56,7 +57,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ExportedVirtualNodesList {
     public static final String COMPOSING_VIRTUAL_NODES_REGEX = "[^.;]+[.][^.;]+[;]?";
-    private Logger logger = ProActiveLogger.getLogger("components.adl");
+    private Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
     private static ExportedVirtualNodesList instance = null;
     static Map linkedVirtualNodes;
     public static final String EMPTY_COMPOSING_VIRTUAL_NODES = "composing_virtual_nodes";

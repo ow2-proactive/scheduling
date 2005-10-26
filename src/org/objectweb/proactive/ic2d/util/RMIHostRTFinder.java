@@ -38,10 +38,12 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RMIHostRTFinder implements HostRTFinder {
-    static Logger log4jlogger = Logger.getLogger(RMIHostRTFinder.class.getName());
+    static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
     private static final int DEFAULT_RMI_PORT = 1099;
     private IC2DMessageLogger logger;
 

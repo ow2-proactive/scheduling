@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -27,8 +28,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
  *
  */
 public class ProActiveClassLoaderHelper {
-    private static Logger logger = Logger.getLogger(Loggers.CLASSLOADER);
-    private Hashtable localClassDataCache = new Hashtable();
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     private ClassDataCache classCache;
 
     public ProActiveClassLoaderHelper() {

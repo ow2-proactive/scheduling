@@ -70,6 +70,8 @@ import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
@@ -115,7 +117,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     java.io.Serializable, Cloneable {
     public static final String COMPONENT_PARAMETERS_KEY = "component-parameters";
     public static final String SYNCHRONOUS_COMPOSITE_COMPONENT_KEY = "synchronous-composite";
-    protected static Logger logger = Logger.getLogger(ProActiveMetaObjectFactory.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -361,25 +363,25 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                 if ("ibis".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Factory is ibis");
+                        logger.debug("Using ibis factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
                 } else if ("http".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Factory is http");
+                        logger.debug("Using http factory for creating remote body");
                     }
 
                     return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
                 } else if ("rmissh".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Factory is rmissh");
+                        logger.debug("Using rmissh factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Factory is rmi");
+                        logger.debug("Using rmi factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
                 }

@@ -24,7 +24,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     public final static int SHORTCUT = 1;
 
     public SynchronousComponentRequestReceiver() {

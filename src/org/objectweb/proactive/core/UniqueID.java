@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -51,7 +53,7 @@ public class UniqueID implements java.io.Serializable {
 
     //the Unique ID of the JVM
     private static java.rmi.dgc.VMID uniqueVMID = new java.rmi.dgc.VMID();
-    protected static Logger logger = Logger.getLogger(UniqueID.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
     //
     // -- CONSTRUCTORS -----------------------------------------------

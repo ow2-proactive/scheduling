@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
@@ -67,7 +68,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     UserLogic {
 
     /** useful for showing information, if no GUI is available, or for error messages*/
-    private static final Logger logger = Logger.getLogger(Loggers.EXAMPLES);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** reference to the dispatcher logic, for image generation and message forwarding */
     protected Dispatcher c3ddispatcher;

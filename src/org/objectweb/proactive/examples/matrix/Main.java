@@ -5,10 +5,12 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class Main {
-    static Logger logger = Logger.getLogger(Main.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     public static void main(String[] args) {
         if (args.length != 2) {

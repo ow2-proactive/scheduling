@@ -9,6 +9,8 @@ import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.SshTunnelFactory;
 import org.objectweb.proactive.core.ssh.TryCache;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -18,7 +20,7 @@ import org.objectweb.proactive.core.ssh.TryCache;
  * to automagically close the SshTunnels whenever the Socket is closed.
  */
 public class SshSocket extends Socket {
-    private static Logger logger = Logger.getLogger(SshSocket.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private SshTunnel _tunnel;
     private Socket _socket;
     static private TryCache _tryCache = null;

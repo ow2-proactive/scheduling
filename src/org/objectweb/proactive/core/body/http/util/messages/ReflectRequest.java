@@ -36,13 +36,15 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * @author jbroccol
  */
 public abstract class ReflectRequest extends HttpMessage {
-    private static Logger logger = Logger.getLogger("XML_HTTP");
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTP_TRANSPORT);
 
     public ReflectRequest(String url) {
         super(url);

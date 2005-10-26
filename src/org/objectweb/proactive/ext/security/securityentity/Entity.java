@@ -36,6 +36,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 
 
@@ -46,7 +48,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurity;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public abstract class Entity implements Serializable {
-    protected static Logger logger = Logger.getLogger(Entity.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     protected X509Certificate applicationCertificate;
     protected byte[] encodedApplicationCertificate;
     protected X509Certificate certificate;

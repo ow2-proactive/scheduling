@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.unicore.User;
 import org.unicore.Vsite;
 import org.unicore.resources.CapacityResource;
@@ -68,7 +69,7 @@ import com.pallas.unicore.resourcemanager.ResourceTray;
  */
 public class UnicoreProActiveClient {
 
-	static Logger logger = Logger.getLogger(Loggers.DEPLOYMENT_PROCESS);
+	static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
 
 	private JobContainer jc;
 

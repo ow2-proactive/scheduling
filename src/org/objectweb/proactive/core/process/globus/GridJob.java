@@ -38,13 +38,15 @@ import org.globus.io.gass.server.*;
 import org.globus.util.deactivator.Deactivator;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * Java CoG Job submission class
  */
 public class GridJob implements GramJobListener {
-    static Logger logger = Logger.getLogger(GridJob.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
     private GassServer m_gassServer; // GASS Server: required to get job output
     private String m_gassURL = null; // URL of the GASS server
     private GramJob m_job = null; // GRAM JOB to be executed

@@ -68,6 +68,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
@@ -79,7 +81,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
  */
 public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     Serializable {
-    static Logger logger = Logger.getLogger(C3DDispatcher.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
      * Uses active objects if set to true

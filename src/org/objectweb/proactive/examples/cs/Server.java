@@ -32,6 +32,8 @@ package org.objectweb.proactive.examples.cs;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -51,7 +53,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  *
  */
 public class Server {
-    static Logger logger = Logger.getLogger(Server.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected String messageOfTheDay;
     protected java.util.ArrayList clients;
 

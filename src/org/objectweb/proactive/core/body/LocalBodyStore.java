@@ -35,6 +35,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEventProducerImpl;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -55,7 +57,7 @@ public class LocalBodyStore {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
-    static Logger logger = Logger.getLogger(LocalBodyStore.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
     private static LocalBodyStore instance = new LocalBodyStore();
 
     //
@@ -222,7 +224,7 @@ public class LocalBodyStore {
     //
     void registerBody(AbstractBody body) {
         if (localBodyMap.getBody(body.getID()) != null) {
-            logger.warn("WARNING Body already registered in the body map");
+            logger.warn("Body already registered in the body map");
         }
         localBodyMap.putBody(body.bodyID, body);
         bodyEventProducer.fireBodyCreated(body);
@@ -247,7 +249,7 @@ public class LocalBodyStore {
     public void registerForwarder(AbstractBody body) {
         if (localForwarderMap.getBody(body.bodyID) != null) {
             logger.debug(
-                "DEBUUUUUUUUUUUUG1 Forwarder already registered in the body map");
+                "Forwarder already registered in the body map");
             localForwarderMap.removeBody(body.bodyID);
         }
         localForwarderMap.putBody(body.bodyID, body);

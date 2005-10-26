@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.process.rsh;
 
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -56,7 +56,7 @@ public class RSHNodeProcess extends RSHJVMProcess {
      * Creates a new instance of RSHNodeProcess.
      * @param messageLogger The logger that handles input and error stream of the target JVMProcess
      */
-    public RSHNodeProcess(MessageLogger messageLogger) {
+    public RSHNodeProcess(RemoteProcessMessageLogger messageLogger) {
         super(messageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }
@@ -66,8 +66,8 @@ public class RSHNodeProcess extends RSHJVMProcess {
      * @param inputMessageLogger The logger that handles input stream of the target JVMProcess
      * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
      */
-    public RSHNodeProcess(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger) {
+    public RSHNodeProcess(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }

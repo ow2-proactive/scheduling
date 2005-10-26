@@ -45,6 +45,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -66,7 +68,7 @@ public class ServiceThread extends Thread {
     int nodeCount = 0;
     long timeout = 0;
     int nodeRequested;
-    public static Logger loggerDeployment = Logger.getLogger("DEPLOYMENT");
+    public static Logger loggerDeployment = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     private static final long TIMEOUT = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
     private long expirationTime;

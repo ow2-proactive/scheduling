@@ -39,12 +39,14 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public abstract class AbstractProxy implements Proxy, java.io.Serializable,
     NFEProducer {
     // Get logger
-    protected static Logger logger = Logger.getLogger("NFE");
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.NFE);
 
     // table of handlers associated to proxy
     private HashMap proxyLevel;

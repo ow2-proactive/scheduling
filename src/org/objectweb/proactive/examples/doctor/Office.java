@@ -31,10 +31,12 @@
 package org.objectweb.proactive.examples.doctor;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class Office {
-    static Logger logger = Logger.getLogger(Office.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     //Number of patients being created at startup 
     public static final int NB_PAT = 15;

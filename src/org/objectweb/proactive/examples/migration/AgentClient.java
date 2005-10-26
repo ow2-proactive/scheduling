@@ -35,13 +35,15 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * This class is a client for a migratable Agent
  */
 public class AgentClient {
-    static Logger logger = Logger.getLogger(AgentClient.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     public static void main(String[] args) {
         Agent myServer;

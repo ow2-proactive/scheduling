@@ -16,13 +16,15 @@ import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.SshTunnelFactory;
 import org.objectweb.proactive.core.ssh.TryCache;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * @author mlacage
  */
 public class HttpSshUrlConnection extends java.net.HttpURLConnection {
-    private static Logger logger = Logger.getLogger(HttpSshUrlConnection.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private SshTunnel _tunnel;
     private HttpURLConnection _httpConnection;
     private java.util.Hashtable _properties;

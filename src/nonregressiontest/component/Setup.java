@@ -24,7 +24,7 @@ import nonregressiontest.descriptor.defaultnodes.TestNodes;
  * @author Matthieu Morel
  */
 public class Setup {
-    private static ComponentType D_TYPE = null;
+    private static ComponentType d_type = null;
     private static ComponentType A_TYPE = null;
     private static ComponentType B_TYPE = null;
     private static GenericFactory CF = null;
@@ -65,8 +65,8 @@ public class Setup {
 
     private static void createTypeD() throws Exception {
         init();
-        if (D_TYPE == null) {
-            D_TYPE = TF.createFcType(new InterfaceType[] {
+        if (d_type == null) {
+            d_type = TF.createFcType(new InterfaceType[] {
                         TF.createFcItfType("i1", I1.class.getName(),
                             TypeFactory.SERVER, TypeFactory.MANDATORY,
                             TypeFactory.SINGLE),
@@ -105,7 +105,7 @@ public class Setup {
 
     public static Component createPrimitiveDbis() throws Exception {
         createTypeD();
-        return CF.newFcInstance(D_TYPE,
+        return CF.newFcInstance(d_type,
             new ControllerDescription("primitiveDbis", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentDbis.class.getName(),
                 new Object[] {  }));
@@ -113,7 +113,7 @@ public class Setup {
 
     public static Component createPrimitiveD() throws Exception {
         createTypeD();
-        return CF.newFcInstance(D_TYPE,
+        return CF.newFcInstance(d_type,
             new ControllerDescription("primitiveD", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentD.class.getName(),
                 new Object[] {  }));

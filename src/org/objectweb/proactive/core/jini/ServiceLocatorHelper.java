@@ -36,6 +36,8 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
@@ -59,7 +61,7 @@ import net.jini.discovery.LookupDiscovery;
  *
  */
 public class ServiceLocatorHelper implements DiscoveryListener {
-    protected static Logger logger = Logger.getLogger(ServiceLocatorHelper.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.JINI);
     protected static int MAX_RETRY = 8;
     protected static long MAX_WAIT = 10000L;
     private static String DEFAULT_POLICY = System.getProperty("user.dir") +

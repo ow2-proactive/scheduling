@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.process;
 
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -46,16 +46,16 @@ public interface ExternalProcess extends UniversalProcess {
     public void closeStream();
 
     /**
-     * Returns the MessageLogger handling the input stream of the process
-     * @return the MessageLogger handling the input stream of the process
+     * Returns the RemoteProcessMessageLogger handling the input stream of the process
+     * @return the RemoteProcessMessageLogger handling the input stream of the process
      */
-    public MessageLogger getInputMessageLogger();
+    public RemoteProcessMessageLogger getInputMessageLogger();
 
     /**
-     * Returns the MessageLogger handling the error stream of the process
-     * @return the MessageLogger handling the error stream of the process
+     * Returns the RemoteProcessMessageLogger handling the error stream of the process
+     * @return the RemoteProcessMessageLogger handling the error stream of the process
      */
-    public MessageLogger getErrorMessageLogger();
+    public RemoteProcessMessageLogger getErrorMessageLogger();
 
     /**
      * Returns the MessageSink handling the output stream of the process
@@ -64,16 +64,16 @@ public interface ExternalProcess extends UniversalProcess {
     public MessageSink getOutputMessageSink();
 
     /**
-     * sets the MessageLogger handling the input stream of the process
+     * sets the RemoteProcessMessageLogger handling the input stream of the process
      * @param inputMessageLogger the handler of the input stream of the process
      */
-    public void setInputMessageLogger(MessageLogger inputMessageLogger);
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger);
 
     /**
-     * sets the MessageLogger handling the error stream of the process
+     * sets the RemoteProcessMessageLogger handling the error stream of the process
      * @param errorMessageLogger the handler of the error stream of the process
      */
-    public void setErrorMessageLogger(MessageLogger errorMessageLogger);
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger);
 
     /**
      * sets the MessageSink handling the output stream of the process

@@ -41,6 +41,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
 
+import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -212,6 +213,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } catch (IOException e) {
             e.printStackTrace();
         }
+        // logging info
+        MDC.remove("runtime");
+        MDC.put("runtime", getURL());
     }
 
     protected static synchronized int getNextInt() {
@@ -315,7 +319,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         nodeJobIdMap.put(nodeName, jobId);
 
         if (nodeSecurityManager != null) {
-            ProActiveLogger.getLogger("security.runtime").debug("Local Node : " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug("Local Node : " +
                 nodeName + " VN name : " + vnName + " policyserver for app :" +
                 nodeSecurityManager.getPolicyServer().getApplicationName());
 
@@ -328,7 +332,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // registering the security manager
             nodeSecurityManagerMap.put(nodeName, nodeSecurityManager);
 
-            ProActiveLogger.getLogger("security.runtime").debug("registering node certificate for VN " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug("registering node certificate for VN " +
                 vnName);
         }
 
@@ -634,7 +638,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             e.printStackTrace();
         }
 
-        ProActiveLogger.getLogger("runtime").debug("nodeName " + nodeName);
+        ProActiveLogger.getLogger(Loggers.RUNTIME).debug("nodeName " + nodeName);
         registerBody(nodeName, localBody);
 
         if (isLocal) {
@@ -1063,7 +1067,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if (Utils.isStubClassName(className)) {
             try {
                 // do not use directly MOP methods (avoid classloader cycles)
-                //                /Logger.getLogger(Loggers.CLASSLOADER).debug("Generating class : " + className);
+                //                /Logger.getLogger(Loggers.CLASSLOADING).debug("Generating class : " + className);
                 //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(className);
 

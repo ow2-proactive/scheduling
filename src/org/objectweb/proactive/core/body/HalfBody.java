@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
@@ -81,7 +82,7 @@ public class HalfBody extends AbstractBody {
             psm.setBody(this);
             isSecurityOn = psm.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
-            ProActiveLogger.getLogger("security.manager").debug("  ------> HalfBody Security is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("  ------> HalfBody Security is " +
                 isSecurityOn);
         }
 

@@ -8,6 +8,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -16,7 +18,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * @author Jerome+Sylvain
  */
 public class MiniDescrClient {
-    static Logger logger = Logger.getLogger(MiniDescrClient.class);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static final int NB_THREADS = 10;
     private static final int NB_CALLS_PER_THREAD = 10;
 

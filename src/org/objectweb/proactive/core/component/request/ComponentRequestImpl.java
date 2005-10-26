@@ -72,7 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ComponentRequestImpl extends RequestImpl
     implements ComponentRequest, Serializable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
 
     //private int shortcutCounter = 0;
     //private Shortcut shortcut;

@@ -76,6 +76,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
@@ -99,7 +100,7 @@ import sun.rmi.server.MarshalOutputStream;
  * a given SecurityEntity.
  */
 public class ProActiveSecurityManager implements Serializable, SecurityEntity {
-    protected static Logger logger = Logger.getLogger(ProActiveSecurityManager.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
     /* contains all active sessions for the current active object */
     protected Hashtable sessions;
@@ -160,7 +161,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     /**
      * @param keyStore
-     * @param policyServer
+     * @param policyServer2
      */
     public ProActiveSecurityManager(KeyStore keyStore, PolicyServer policyServer) {
         this();
@@ -307,14 +308,14 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                     session.setDistantOACertificate(distantBodyCertificate);
                     sessions.put(new Long(sessionID), session);
                     sessionAccepted = true;
-                    ProActiveLogger.getLogger("security.manager").debug("adding new session " +
+                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("adding new session " +
                         sessionID);
                 } else if (this.getCertificate().equals(distantBodyCertificate)) {
                     // send a secured message to myself ... why not
                     //session.distantSecureEntity = distantSecurityEntity;
                     session.setDistantOACertificate(distantBodyCertificate);
                     sessionAccepted = true;
-                    ProActiveLogger.getLogger("security.manager").debug("adding new session : " +
+                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("adding new session : " +
                         sessionID);
                 }
 
@@ -330,11 +331,11 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             if (distantBodyCertificate != null) {
                 session.setDistantOAPublicKey(distantBodyCertificate.getPublicKey());
             } else {
-                ProActiveLogger.getLogger("security.psm").debug("WARNING remote object scertificate is null");
+                ProActiveLogger.getLogger(Loggers.SECURITY_PSM).debug("WARNING remote object scertificate is null");
                 session.setDistantOAPublicKey(distantSecurityEntity.getPublicKey());
             }
 
-            ProActiveLogger.getLogger("security.manager").debug("adding new session " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("adding new session " +
                 sessionID + " distant object is " +
                 distantSecurityEntity.getCertificate().getSubjectDN() +
                 "\n local object is " + this.getCertificate().getSubjectDN());
@@ -377,7 +378,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     /**
      * @param communicationPolicy
-     * @return session id
+     * @return
      */
     public synchronized long startNewSession(Communication communicationPolicy) {
         long id = 0;
@@ -404,7 +405,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             e.printStackTrace();
         }
 
-        ProActiveLogger.getLogger("security").debug("starting a new session : " +
+        ProActiveLogger.getLogger(Loggers.SECURITY).debug("starting a new session : " +
             id);
         return id;
     }
@@ -426,7 +427,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                     Thread.sleep(50);
                 }
 
-                ProActiveLogger.getLogger("security").debug("Ciphering object, session is " +
+                ProActiveLogger.getLogger(Loggers.SECURITY).debug("Ciphering object, session is " +
                     sessionID);
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
                 MarshalOutputStream out = new MarshalOutputStream(bout);
@@ -1385,8 +1386,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        logger = Logger.getLogger(
-                "org.objectweb.proactive.ext.security.ProActiveSecurityManager");
+        logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
         randomLongGenerator = new RandomLongGenerator();
 
@@ -1437,7 +1437,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         //  	System.out.println(o + "Target :" + cert.getSubjectDN());
         Session session = null;
         if (sessions == null) {
-            ProActiveLogger.getLogger("security.crypto").debug("sessions field is null");
+            ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO).debug("sessions field is null");
             return (long) 0;
         }
 
@@ -1636,7 +1636,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             KeyPair siblingKeyPair = KeyTools.genKeys(1024);
             X509Certificate cert;
 
-            ProActiveLogger.getLogger("security.securitymanager").debug("generate sibling scurity manager for " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug("generate sibling scurity manager for " +
                 siblingName);
 
             cert = CertTools.genCert(siblingName, 65 * 24 * 360L, null,

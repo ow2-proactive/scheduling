@@ -39,6 +39,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -59,7 +61,7 @@ public class StartRuntime {
     //Name of the runtime that launched this class reading the ProActiveDescriptor
     //private static final String DefaultRuntimeName = "PART_DEFAULT";
     //Name of the runtime's host that launched this class reading the ProActiveDescriptor
-    static Logger logger = Logger.getLogger(StartRuntime.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
     protected String defaultRuntimeURL;
     protected String nodeURL;
     protected String creatorID;

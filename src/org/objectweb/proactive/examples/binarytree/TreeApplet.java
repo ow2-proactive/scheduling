@@ -36,6 +36,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -52,7 +54,7 @@ import org.objectweb.proactive.core.node.NodeException;
  *
  */
 public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
-    static Logger logger = Logger.getLogger(TreeApplet.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private javax.swing.JPanel rootPanel;
     private javax.swing.Box pCmd;
     private javax.swing.JPanel searchResult;

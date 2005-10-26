@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -55,7 +56,7 @@ public class ProActiveImplementationBuilderImpl
     implements ProActiveImplementationBuilder, BindingController {
     public final static String REGISTRY_BINDING = "registry";
     public RegistryManager registry;
-    private static Logger logger = ProActiveLogger.getLogger("components.adl");
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     // --------------------------------------------------------------------------
     // Implementation of the BindingController interface

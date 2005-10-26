@@ -40,6 +40,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -49,7 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class Registry {
-    private static Logger logger = ProActiveLogger.getLogger("components.adl");
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
     static private Registry instance = null;
     private Hashtable table;
 

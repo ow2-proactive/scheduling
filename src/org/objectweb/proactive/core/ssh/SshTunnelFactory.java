@@ -3,6 +3,8 @@ package org.objectweb.proactive.core.ssh;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.UnusedTunnel;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -17,7 +19,7 @@ import org.objectweb.proactive.core.ssh.UnusedTunnel;
  * Otherwise, tunnels are created and destroyed purely on a need-to basis.
  */
 public class SshTunnelFactory {
-    private static Logger logger = Logger.getLogger(SshTunnelFactory.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private java.util.Hashtable _unused;
     static private SshTunnelFactory _factory = null;
 

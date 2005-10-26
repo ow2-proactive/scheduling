@@ -36,6 +36,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /** This class sends increasing numbers to the first PrimeNumber for testing.
@@ -45,7 +47,7 @@ import org.objectweb.proactive.Service;
  * @author Jonathan Streit
  */
 public class NumberSource implements java.io.Serializable, RunActive, Slowable {
-    static Logger logger = Logger.getLogger(NumberSource.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private PrimeOutputListener outputListener;
     private ActivePrimeContainer first;
     private boolean pause;

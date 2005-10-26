@@ -43,12 +43,14 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RequestWithLocationServer extends RequestImpl
     implements java.io.Serializable {
     private static final int MAX_TRIES = 30;
-    static Logger logger = Logger.getLogger(RequestWithLocationServer.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
     /**
      * the number of time we try before reporting a failure

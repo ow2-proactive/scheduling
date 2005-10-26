@@ -31,6 +31,8 @@
 package org.objectweb.proactive.examples.hello;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -38,7 +40,7 @@ import org.apache.log4j.Logger;
  * which may have been created by another application.
  */
 public class HelloClient {
-    static Logger logger = Logger.getLogger(HelloClient.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** Looks for a Hello Active Object bepending on args, and calls a method on it */
     public static void main(String[] args) {

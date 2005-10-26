@@ -40,6 +40,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -54,7 +56,7 @@ public class FaultToleranceService implements UniversalService {
     public static final String DEFAULT_PARAM_LINE = "-Dproactive.ft=disable";
 
     // logger
-    protected static Logger logger = Logger.getLogger(FaultToleranceService.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
     
     // protocol Type
     private String protocolType;

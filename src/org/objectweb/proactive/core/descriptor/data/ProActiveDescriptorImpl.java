@@ -49,6 +49,8 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -72,7 +74,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
-    protected static Logger logger = Logger.getLogger(ProActiveDescriptorImpl.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     private String lastMainDefinitionID;
 
     /** map keys with mainDefinitions */

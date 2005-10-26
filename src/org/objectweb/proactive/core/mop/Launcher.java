@@ -31,10 +31,12 @@
 package org.objectweb.proactive.core.mop;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class Launcher {
-    static Logger logger = Logger.getLogger(Launcher.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     public static void main(String[] args) throws Throwable {
         if (args.length == 0) {

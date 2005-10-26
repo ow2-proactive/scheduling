@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.config.xml.MasterFileHandler;
 
 
 public class ProActiveConfiguration {
-    //protected static Logger logger = Logger.getLogger(ProActiveConfiguration.class);
     protected HashMap loadedProperties;
     protected HashMap addedProperties;
     protected static ProActiveConfiguration singleton;
@@ -244,7 +243,7 @@ public class ProActiveConfiguration {
     private void loadLogger() {
         //if logger is not defined create default logger with level info that logs
         // on the console
-        Logger logger = Logger.getLogger("org.objectweb.proactive");
+        Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
         logger.setAdditivity(false);
         logger.setLevel(Level.INFO);
         logger.addAppender(new ConsoleAppender(new PatternLayout()));

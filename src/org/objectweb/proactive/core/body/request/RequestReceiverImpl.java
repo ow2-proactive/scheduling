@@ -40,11 +40,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RequestReceiverImpl implements RequestReceiver,
     java.io.Serializable {
-    public static Logger logger = Logger.getLogger(RequestReceiverImpl.class.getName());
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
     private static final String ANY_PARAMETERS = "any-parameters";
 
     //private java.util.Vector immediateServices;

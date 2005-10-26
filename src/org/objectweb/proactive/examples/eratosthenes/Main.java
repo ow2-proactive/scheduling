@@ -49,6 +49,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -64,7 +66,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * temporarily the NumberSource.
  * */
 public class Main implements ActivePrimeContainerCreator, InitActive {
-    static Logger logger = Logger.getLogger(Main.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private PrimeOutputListener outputListener;
     private NumberSource source;
     private VirtualNode containersVirtualNode;

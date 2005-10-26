@@ -35,6 +35,8 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -42,7 +44,7 @@ import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGe
  *
  */
 public class FileProcess {
-    protected static Logger logger = Logger.getLogger(FileProcess.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     private java.io.File[] codebases;
     protected RequestInfo info;
 

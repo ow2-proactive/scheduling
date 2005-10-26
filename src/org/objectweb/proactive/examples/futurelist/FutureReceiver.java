@@ -31,11 +31,13 @@
 package org.objectweb.proactive.examples.futurelist;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.util.FutureList;
 
 
 public class FutureReceiver implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(FutureReceiver.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     int etape = 0; // this is to count the jumps we have made so far
     BlockedObject blocked;
     java.util.Vector waitingFutures = new java.util.Vector();

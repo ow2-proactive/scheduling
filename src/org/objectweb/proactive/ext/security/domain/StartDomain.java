@@ -37,6 +37,8 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 
 
@@ -47,7 +49,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurity;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class StartDomain {
-    static Logger logger = Logger.getLogger("security.domain");
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_DOMAIN);
     private String securityFileLocation = null;
     private String domainName = null;
     private SecurityDomain domain = null;

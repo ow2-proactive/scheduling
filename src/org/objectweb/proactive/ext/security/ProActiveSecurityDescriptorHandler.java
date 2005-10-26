@@ -40,6 +40,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -68,7 +69,7 @@ public class ProActiveSecurityDescriptorHandler
     protected String applicationPrivateKeyPath = null;
     protected String applicationCertificatePath = null;
     protected ArrayList policyRules = null;
-    protected static Logger logger = Logger.getLogger(ProActiveSecurityDescriptorHandler.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     protected static String PROACTIVE_SECURITY_TAG = "Policy";
     protected String RULE_TAG = "Rule";
     protected String ENTITY_TAG = "Entity";
@@ -488,7 +489,7 @@ public class ProActiveSecurityDescriptorHandler
             return (PolicyServer) h.getResultObject();
         } catch (Exception e) {
             e.printStackTrace();
-            ProActiveLogger.getLogger("security").warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler");
+            ProActiveLogger.getLogger(Loggers.SECURITY).warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler");
             throw new InvalidPolicyFile(e);
         }
     }

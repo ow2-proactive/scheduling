@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.io.Attributes;
@@ -597,7 +598,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
 public class Daemon {
     private WorkTime work;
     private Vector url;
-    private static Logger logger = ProActiveLogger.getLogger("daemon");
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_DAEMON);
 
     /* Logging */
     private static final String LOG_DIR = ".." + File.separator + "logs" +

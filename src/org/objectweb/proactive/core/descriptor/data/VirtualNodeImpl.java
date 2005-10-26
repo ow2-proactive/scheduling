@@ -63,6 +63,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
@@ -84,7 +85,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         NodeCreationEventListener, ServiceUser {
 
     /** Logger */
-    private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
+    private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     public static int counter = 0;
 
     //
@@ -1113,7 +1114,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("askedNodes " + nodeNumber);
+            logger.debug("asked for " + nodeNumber + " nodes");
         }
 
         protocolId = process.getProcessId();

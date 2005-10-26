@@ -38,6 +38,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
@@ -49,7 +51,7 @@ import net.jini.discovery.LookupDiscovery;
 
 
 public class JiniRTListener implements DiscoveryListener {
-    static Logger log4jlogger = Logger.getLogger(JiniRTListener.class.getName());
+    static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
     protected java.util.ArrayList runtimes = new java.util.ArrayList();
     private String host;
     private IC2DMessageLogger logger;

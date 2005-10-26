@@ -47,19 +47,15 @@ import org.objectweb.proactive.core.mop.MethodCall;
 
 public class BlockingRequestQueueImpl extends RequestQueueImpl
     implements java.io.Serializable, BlockingRequestQueue {
-    public static Logger logger = Logger.getLogger(BlockingRequestQueueImpl.class.getName());
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
     protected boolean shouldWait;
     private transient ProActiveSPMDGroupManager spmdManager = null;
-    private boolean firstBarrierCallEncountered = false;
     private boolean suspended = false;
     private boolean specialExecution = false;
     private String specialMethod = "";
-    private int awaitedBarrierCall = 0;
-    private HashMap currentBarriers = new HashMap();
     private LinkedList methodBarriers = new LinkedList();
 
     //
@@ -101,7 +97,6 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             Iterator it = this.methodBarriers.iterator();
             boolean methodFound = false;
             MethodBarrier mb;
-            int i = 1;
             while (it.hasNext() && !methodFound) {
                 mb = (MethodBarrier) it.next();
                 methodFound = mb.checkMethod(r.getMethodName());

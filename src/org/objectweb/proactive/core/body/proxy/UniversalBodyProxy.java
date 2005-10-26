@@ -53,12 +53,14 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 public class UniversalBodyProxy extends AbstractBodyProxy
     implements java.io.Serializable {
-    protected static Logger logger = Logger.getLogger(UniversalBodyProxy.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle
     // the serialization by ourselve
@@ -310,13 +312,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         Body localBody = LocalBodyStore.getInstance().getLocalBody(bodyID);
-        if (logger.isDebugEnabled()) {
-            logger.debug(" XXXXX  UniversalBodyProxy XXXXX ");
-        }
 
         // Thread.dumpStack();
         if (logger.isDebugEnabled()) {
-            logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
             logger.debug("Local body is " + localBody);
         }
         if (localBody != null) {

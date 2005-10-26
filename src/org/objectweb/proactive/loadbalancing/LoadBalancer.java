@@ -38,6 +38,8 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 
 
@@ -58,7 +60,7 @@ import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
  *
  */
 public class LoadBalancer {
-    protected static Logger logger = Logger.getLogger(P2PLoadBalancer.class.getName());
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
     protected boolean underloaded = false;
     protected LoadMonitor lm;
     protected double normalization = 1;

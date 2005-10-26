@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -146,7 +147,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     protected boolean internalFileTransferDefaultProtocol() {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
         FileTransfer[] ftDefinitions = fts.getAllFileTransferDefinitions();
-        Logger fileTransferLogger = Logger.getLogger(Loggers.FILETRANSFER);
+        Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < ftDefinitions.length; i++) {
             //Files and Dirs

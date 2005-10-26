@@ -133,7 +133,7 @@ public class P2PLoadBalancer extends LoadBalancer {
         }
 
         if (candidateBody.isActive()) {
-            logger.debug("[Loadbalancer] Migrating from " +
+            logger.debug("Migrating from " +
                 candidateBody.getNodeURL() + " to " + remoteNodeAddress);
 
             try {

@@ -37,10 +37,12 @@ import java.net.URLClassLoader;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MOPClassLoader extends URLClassLoader {
-    static Logger logger = Logger.getLogger(MOPClassLoader.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     // retreives the optionnal byteCodeManipulator JVM arg
     // ASM is used by default

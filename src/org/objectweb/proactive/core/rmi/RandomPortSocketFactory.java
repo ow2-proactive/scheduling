@@ -39,6 +39,8 @@ import java.rmi.server.RMIServerSocketFactory;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -47,7 +49,7 @@ import org.apache.log4j.Logger;
  */
 public class RandomPortSocketFactory implements RMIServerSocketFactory,
     RMIClientSocketFactory, Serializable {
-    static Logger logger = Logger.getLogger(RandomPortSocketFactory.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.RMI);
     static protected final int MAX = 5;
     static protected Random random = new Random();
     protected int basePort = 35000;

@@ -36,7 +36,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -64,7 +66,7 @@ import org.objectweb.proactive.core.util.MessageLogger;
  */
 public class JVMProcessImpl extends AbstractExternalProcess
     implements JVMProcess, Serializable {
-    protected static Logger logger = Logger.getLogger(JVMProcessImpl.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
 
@@ -132,7 +134,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
      * Creates a new JVMProcess
      * @param messageLogger The logger that handles input and error stream of this process
      */
-    public JVMProcessImpl(MessageLogger messageLogger) {
+    public JVMProcessImpl(RemoteProcessMessageLogger messageLogger) {
         super(messageLogger);
         this.modifiedOptions = new ArrayList();
     }
@@ -142,8 +144,8 @@ public class JVMProcessImpl extends AbstractExternalProcess
      * @param inputMessageLogger The logger that handles input stream of this process
      * @param errorMessageLogger The logger that handles error stream of this process
      */
-    public JVMProcessImpl(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger) {
+    public JVMProcessImpl(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         this.modifiedOptions = new ArrayList();
     }

@@ -51,6 +51,8 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -66,7 +68,7 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author Matthieu Morel
  */
 public class ProActiveComponentGroup {
-    protected static Logger logger = Logger.getLogger(ProActiveComponentGroup.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
      * creates an empty group able to contain ProActiveInterfaceImpl objects of the given type..

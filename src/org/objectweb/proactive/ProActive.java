@@ -185,8 +185,8 @@ import ibis.rmi.RemoteException;
  *
  */
 public class ProActive {
-    protected final static Logger logger = Logger.getLogger(ProActive.class.getName());
-    public final static Logger loggerGroup = Logger.getLogger("GROUP");
+    protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+    public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);
 
     /** Used for profiling */
     private static CompositeAverageMicroTimer timer;

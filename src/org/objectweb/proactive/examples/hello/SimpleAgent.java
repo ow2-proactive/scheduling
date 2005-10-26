@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -42,7 +44,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * and moves it to user-specified node (node must be created manually previously)
  */
 public class SimpleAgent implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(SimpleAgent.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** ProActive compulsory empty no-args constructor */
     public SimpleAgent() {

@@ -35,22 +35,23 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.process.filetransfer.CopyProtocol;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     implements ExternalProcess {
-    protected static Logger clogger = Logger.getLogger(AbstractExternalProcess.class.getName());
-    protected static Logger fileTransferLogger = Logger.getLogger(Loggers.FILETRANSFER);
+    protected static Logger clogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
+    protected static Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty(
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
     private boolean shouldRun;
     public static final int NO_COMPOSITION = 0;
     protected boolean closeStream = false;
-    protected MessageLogger inputMessageLogger;
-    protected MessageLogger errorMessageLogger;
+    protected RemoteProcessMessageLogger inputMessageLogger;
+    protected RemoteProcessMessageLogger errorMessageLogger;
     protected MessageSink outputMessageSink;
     private ThreadActivityMonitor inThreadMonitor;
     private ThreadActivityMonitor errThreadMonitor;
@@ -64,17 +65,17 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     protected AbstractExternalProcess() {
     }
 
-    public AbstractExternalProcess(MessageLogger messageLogger) {
+    public AbstractExternalProcess(RemoteProcessMessageLogger messageLogger) {
         this(messageLogger, messageLogger, null);
     }
 
-    public AbstractExternalProcess(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger) {
+    public AbstractExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger) {
         this(inputMessageLogger, errorMessageLogger, null);
     }
 
-    public AbstractExternalProcess(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger, MessageSink outputMessageSink) {
+    public AbstractExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger, MessageSink outputMessageSink) {
         this.inputMessageLogger = inputMessageLogger;
         this.errorMessageLogger = errorMessageLogger;
         this.outputMessageSink = outputMessageSink;
@@ -90,11 +91,11 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         this.closeStream = true;
     }
 
-    public MessageLogger getInputMessageLogger() {
+    public RemoteProcessMessageLogger getInputMessageLogger() {
         return inputMessageLogger;
     }
 
-    public MessageLogger getErrorMessageLogger() {
+    public RemoteProcessMessageLogger getErrorMessageLogger() {
         return errorMessageLogger;
     }
 
@@ -102,12 +103,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return outputMessageSink;
     }
 
-    public void setInputMessageLogger(MessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
         checkStarted();
         this.inputMessageLogger = inputMessageLogger;
     }
 
-    public void setErrorMessageLogger(MessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
         checkStarted();
         this.errorMessageLogger = errorMessageLogger;
     }
@@ -380,9 +381,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     /**
-     * Implementation of a MessageLogger that output all messages to the standard output
+     * Implementation of a RemoteProcessMessageLogger that output all messages to the standard output
      */
-    public static class StandardOutputMessageLogger implements MessageLogger,
+    public static class StandardOutputMessageLogger implements RemoteProcessMessageLogger,
         java.io.Serializable {
         public StandardOutputMessageLogger() {
             //messageLogger.addAppender(new ConsoleAppender(new PatternLayout("%-5p %m %n")));
@@ -405,9 +406,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     // end inner class StandardOutputMessageLogger
 
     /**
-     * Implementation of a MessageLogger that discard all output
+     * Implementation of a RemoteProcessMessageLogger that discard all output
      */
-    public static class NullMessageLogger implements MessageLogger,
+    public static class NullMessageLogger implements RemoteProcessMessageLogger,
         java.io.Serializable {
         public NullMessageLogger() {
         }
@@ -478,15 +479,15 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
     /**
      * This class reads all messages from an input and log them using a
-     * MessageLogger
+     * RemoteProcessMessageLogger
      */
     protected class ProcessInputHandler implements Runnable {
         private java.io.BufferedReader in;
-        private MessageLogger logger;
+        private RemoteProcessMessageLogger logger;
         private ThreadActivityMonitor threadMonitor;
 
         public ProcessInputHandler(java.io.BufferedReader in,
-            MessageLogger logger, ThreadActivityMonitor threadMonitor) {
+            RemoteProcessMessageLogger logger, ThreadActivityMonitor threadMonitor) {
             this.in = in;
             this.logger = logger;
             this.threadMonitor = threadMonitor;

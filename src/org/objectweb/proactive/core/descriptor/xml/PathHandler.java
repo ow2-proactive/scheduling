@@ -63,7 +63,6 @@ public class PathHandler extends BasicUnmarshaller
     private static final String fileSeparator = System.getProperty(
             "file.separator");
 
-    //static Logger logger = Logger.getLogger(PathHandler.class.getName());
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //

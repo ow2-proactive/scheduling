@@ -31,6 +31,8 @@
 package org.objectweb.proactive.ext.migration;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -40,7 +42,7 @@ import org.apache.log4j.Logger;
  */
 public class MigrationStrategyImpl implements java.io.Serializable,
     MigrationStrategy {
-    static Logger logger = Logger.getLogger(MigrationStrategyImpl.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     private java.util.Vector table;
     private int index;
 

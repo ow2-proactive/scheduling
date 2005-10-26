@@ -10,6 +10,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -18,7 +20,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * @author Jerome+Sylvain
  */
 public class MiniDescr {
-    static Logger logger = Logger.getLogger(MiniDescr.class);
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     MiniDescrActive minidesca = null;
 
     public MiniDescr(String location) {

@@ -42,10 +42,12 @@ import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ASMBytecodeStubBuilder implements Constants {
-    protected static Logger logger = Logger.getLogger(ASMBytecodeStubBuilder.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     // Those fields contain information about the class
     // for which we are building a wrapper

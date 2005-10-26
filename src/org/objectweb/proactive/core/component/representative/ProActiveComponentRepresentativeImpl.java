@@ -61,6 +61,7 @@ import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
@@ -85,7 +86,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, Serializable {
-    private static Logger logger = ProActiveLogger.getLogger("components");
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     //private Interface[] interfaceReferences;
     private Map fcInterfaceReferences;

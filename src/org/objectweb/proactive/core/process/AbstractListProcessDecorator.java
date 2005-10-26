@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -172,14 +172,14 @@ public abstract class AbstractListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getInputMessageLogger()
      */
-    public MessageLogger getInputMessageLogger() {
+    public RemoteProcessMessageLogger getInputMessageLogger() {
         return baseProcess.getInputMessageLogger();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getErrorMessageLogger()
      */
-    public MessageLogger getErrorMessageLogger() {
+    public RemoteProcessMessageLogger getErrorMessageLogger() {
         return baseProcess.getErrorMessageLogger();
     }
 
@@ -191,18 +191,18 @@ public abstract class AbstractListProcessDecorator
     }
 
     /**
-     * @see org.objectweb.proactive.core.process.ExternalProcess#setInputMessageLogger(org.objectweb.proactive.core.util.MessageLogger)
+     * @see org.objectweb.proactive.core.process.ExternalProcess#setInputMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setInputMessageLogger(MessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcessDecorator) processes.get(i)).setInputMessageLogger(inputMessageLogger);
         }
     }
 
     /**
-     * @see org.objectweb.proactive.core.process.ExternalProcess#setErrorMessageLogger(org.objectweb.proactive.core.util.MessageLogger)
+     * @see org.objectweb.proactive.core.process.ExternalProcess#setErrorMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setErrorMessageLogger(MessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcessDecorator) processes.get(i)).setErrorMessageLogger(errorMessageLogger);
         }

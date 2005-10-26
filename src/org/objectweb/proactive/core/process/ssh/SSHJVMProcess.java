@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.process.ssh;
 
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -77,7 +77,7 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
      * Creates a new SSHJVMProcess
      * @param messageLogger The logger that handles input and error stream of the target JVMProcess
      */
-    public SSHJVMProcess(MessageLogger messageLogger) {
+    public SSHJVMProcess(RemoteProcessMessageLogger messageLogger) {
         this(messageLogger, messageLogger);
     }
 
@@ -86,8 +86,8 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
      * @param inputMessageLogger The logger that handles input stream of the target JVMProcess
      * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
      */
-    public SSHJVMProcess(MessageLogger inputMessageLogger,
-        MessageLogger errorMessageLogger) {
+    public SSHJVMProcess(RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger) {
         super(new JVMProcessImpl(inputMessageLogger, errorMessageLogger));
         jvmProcess = (JVMProcessImpl) targetProcess;
     }

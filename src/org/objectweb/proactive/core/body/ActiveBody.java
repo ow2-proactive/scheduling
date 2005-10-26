@@ -55,11 +55,13 @@ import org.objectweb.proactive.core.component.body.ComponentActivity;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ActiveBody extends ComponentBodyImpl implements Runnable,
     java.io.Serializable {
-    protected static Logger logger = Logger.getLogger(ActiveBody.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     //
     // -- STATIC MEMBERS -----------------------------------------------

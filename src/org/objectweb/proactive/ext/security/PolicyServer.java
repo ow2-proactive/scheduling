@@ -48,6 +48,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.ComputePolicyException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
@@ -61,7 +62,7 @@ import org.objectweb.proactive.ext.security.securityentity.Entity;
  *
  */
 public class PolicyServer implements Serializable, Cloneable {
-    protected static Logger logger = Logger.getLogger(PolicyServer.class.getName());
+    static Logger log = ProActiveLogger.getLogger(Loggers.SECURITY);
     private static int REQUIRED = 1;
     private static int DENIED = -1;
     private static int OPTIONAL = 0;
@@ -108,7 +109,7 @@ public class PolicyServer implements Serializable, Cloneable {
         ArrayList entitiesTo = securityContext.getEntitiesTo();
 
         if (policyRules == null) {
-            ProActiveLogger.getLogger("security.policy").debug("trying to find a policy whereas none has been set" +
+            ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug("trying to find a policy whereas none has been set" +
                 this + "    " + policyRules);
             throw new SecurityNotAvailableException();
         }
@@ -134,14 +135,14 @@ public class PolicyServer implements Serializable, Cloneable {
         matchingFrom = matchingTo = matchingFromDefault = matchingToDefault = false;
         int length = policyRules.size();
 
-        if (ProActiveLogger.getLogger("security.policyserver").isDebugEnabled()) {
+        if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).isDebugEnabled()) {
             String s = "================================\nFrom :";
             for (int i = 0; i < entitiesFrom.size(); i++)
                 s += (((Entity) entitiesFrom.get(i)) + " ");
             s += "\nTo :";
             for (int i = 0; i < entitiesTo.size(); i++)
                 s += (((Entity) entitiesTo.get(i)) + " ");
-            ProActiveLogger.getLogger("security.policyserver").debug(s +
+            ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).debug(s +
                 "\n=================================\n");
         }
 
@@ -199,7 +200,7 @@ public class PolicyServer implements Serializable, Cloneable {
             //       " -- matchingToDefault " + matchingToDefault);
             if (matchingFrom && matchingTo) {
                 matchingPolicy = policy;
-                ProActiveLogger.getLogger("security.policy").debug("matching policy is " +
+                ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug("matching policy is " +
                     policy);
                 break;
             }
@@ -217,10 +218,10 @@ public class PolicyServer implements Serializable, Cloneable {
         }
 
         if (matchingPolicy == null) {
-            ProActiveLogger.getLogger("security.policy").warn("default Policy is null !!!!!!!!!!!!!!");
+            ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).warn("default Policy is null !!!!!!!!!!!!!!");
         }
 
-        ProActiveLogger.getLogger("security.policy").debug("Found Policy : " +
+        ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug("Found Policy : " +
             matchingPolicy);
 
         //  TODOSECURITY split receive of a request or a reply 
@@ -232,7 +233,7 @@ public class PolicyServer implements Serializable, Cloneable {
             securityContext.setReceiveRequest(communication);
         } else {
             communication = matchingPolicy.getCommunicationRequest();
-            ProActiveLogger.getLogger("security.policy").debug("communication is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug("communication is " +
                 communication);
             communication.setCommunication(1);
             securityContext.setSendReply(communication);
@@ -391,7 +392,7 @@ public class PolicyServer implements Serializable, Cloneable {
      * @param policies
      */
     public void setPolicies(ArrayList policies) {
-        ProActiveLogger.getLogger("security.policy").info("storing policies");
+        ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).info("storing policies");
         this.policyRules = policies;
     }
 

@@ -33,6 +33,8 @@ package org.objectweb.proactive.loadbalancing;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
 
 
@@ -50,7 +52,7 @@ import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
  *
  */
 public class LoadMonitor implements Runnable {
-    private static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
     protected double load = 0;
     protected LoadBalancer lb;
 

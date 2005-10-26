@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.event;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -65,7 +67,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    protected static Logger logger = Logger.getLogger(AbstractEventProducer.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.EVENTS);
 
     /** flag specifying if the list of listeners should be serialized */
     protected boolean shouldSerializeListeners;

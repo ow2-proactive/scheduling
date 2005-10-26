@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -33,7 +34,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
  * @author Matthieu Morel
  */
 public class Shortcut implements Serializable {
-    public static Logger logger = Logger.getLogger(Loggers.COMPONENTS_REQUEST);
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     private transient UniversalBody sender;
     private List steps; // the list of crossed membranes; TODO_M transient 
 

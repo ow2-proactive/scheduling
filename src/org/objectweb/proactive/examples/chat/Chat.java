@@ -16,6 +16,8 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 
@@ -25,7 +27,7 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  * @author Laurent Baduel
  */
 public class Chat implements java.io.Serializable, RunActive {
-    static Logger logger = Logger.getLogger(Chat.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** The name of the user */
     private String name = "";

@@ -8,6 +8,8 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ssh.SshParameters;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -15,7 +17,8 @@ import com.jcraft.jsch.Session;
 
 
 public class JSchSingleton {
-    private static Logger logger = Logger.getLogger(JSchSingleton.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
+
 
     private JSchSingleton() {
     }

@@ -41,6 +41,8 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
 import org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
@@ -88,7 +90,7 @@ public class StartNode {
 
     static {
         ProActiveConfiguration.load();
-        logger = Logger.getLogger(StartNode.class.getName());
+        Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
         if (logger.isDebugEnabled()) {
             logger.debug("Loading ProActive class");
         }

@@ -50,6 +50,8 @@ import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.*;
 import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.jce.interfaces.*;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -57,7 +59,7 @@ import org.bouncycastle.jce.interfaces.*;
  *
  */
 public class KeyTools {
-    private static Logger log = Logger.getLogger(KeyTools.class);
+    static Logger log = ProActiveLogger.getLogger(Loggers.SECURITY);
 
     /**
      * Prevent from creating new KeyTools object

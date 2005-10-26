@@ -31,6 +31,8 @@
 package org.objectweb.proactive.loadbalancing;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -38,7 +40,7 @@ import org.apache.log4j.Logger;
  *
  */
 public abstract interface CPURanking {
-    static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
 
     public double getRanking();
 

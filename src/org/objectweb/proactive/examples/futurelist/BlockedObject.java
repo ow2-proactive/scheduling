@@ -31,11 +31,13 @@
 package org.objectweb.proactive.examples.futurelist;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class BlockedObject implements org.objectweb.proactive.RunActive,
     java.io.Serializable {
-    static Logger logger = Logger.getLogger(BlockedObject.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     public BlockedObject() {
     }

@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -60,8 +61,8 @@ import sun.rmi.server.MarshalInputStream;
 
 public class RequestImpl extends MessageImpl implements Request,
     java.io.Serializable {
-    public static Logger logger = Logger.getLogger(RequestImpl.class.getName());
-    public static Logger loggerNFE = Logger.getLogger("NFE");
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
+    public static Logger loggerNFE = ProActiveLogger.getLogger(Loggers.NFE);
     protected MethodCall methodCall;
     protected boolean ciphered;
 
@@ -215,7 +216,7 @@ public class RequestImpl extends MessageImpl implements Request,
         UniversalBody destinationBody) throws RenegotiateSessionException {
         try {
             if (logger.isDebugEnabled()) {
-                ProActiveLogger.getLogger("security.request").debug(" sending request " +
+                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(" sending request " +
                     methodCall.getName());
             }
             if (!ciphered && !hasBeenForwarded()) {
@@ -234,7 +235,7 @@ public class RequestImpl extends MessageImpl implements Request,
                     ciphered = true;
                     methodCall = null;
                     if (logger.isDebugEnabled()) {
-                        ProActiveLogger.getLogger("security.request").debug("methodcallciphered " +
+                        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug("methodcallciphered " +
                             methodCallCiphered + ", ciphered " + ciphered +
                             ", methodCall " + methodCall);
                     }
@@ -278,13 +279,13 @@ public class RequestImpl extends MessageImpl implements Request,
         throws RenegotiateSessionException {
         //  String localCodeBase = null;
         //     if (ciphered) {
-        ProActiveLogger.getLogger("security.request").debug(" RequestImpl " +
+        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(" RequestImpl " +
             sessionID + " decrypt : methodcallciphered " + methodCallCiphered +
             ", ciphered " + ciphered + ", methodCall " + methodCall);
 
         if ((ciphered) && (psm != null)) {
             try {
-                ProActiveLogger.getLogger("security.request").debug("ReceiveRequest : this body is " +
+                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug("ReceiveRequest : this body is " +
                     psm.getCertificate().getSubjectDN() + " " +
                     psm.getCertificate().getPublicKey());
                 byte[] decryptedMethodCall = psm.decrypt(sessionID,

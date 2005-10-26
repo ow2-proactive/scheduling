@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Scene;
@@ -72,7 +73,7 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  */
 public class C3DDispatcher implements RunActive, InitActive, Serializable,
     Dispatcher, DispatcherLogic {
-    private static Logger logger = Logger.getLogger(Loggers.EXAMPLES);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static int IMAGE_HEIGHT = 500;
     private static int IMAGE_WIDTH = 500;
 

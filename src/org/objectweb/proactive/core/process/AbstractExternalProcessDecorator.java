@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.process;
 import org.objectweb.proactive.core.process.filetransfer.CopyProtocol;
 import org.objectweb.proactive.core.process.filetransfer.FileDependant;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 public abstract class AbstractExternalProcessDecorator
@@ -164,15 +164,15 @@ public abstract class AbstractExternalProcessDecorator
     //
 
     /**
-     * Implementation of a MessageLogger that feeds two MessageLoggers
+     * Implementation of a RemoteProcessMessageLogger that feeds two MessageLoggers
      */
-    public static class CompositeMessageLogger implements MessageLogger,
+    public static class CompositeMessageLogger implements RemoteProcessMessageLogger,
         java.io.Serializable {
-        private MessageLogger messageLogger1;
-        private MessageLogger messageLogger2;
+        private RemoteProcessMessageLogger messageLogger1;
+        private RemoteProcessMessageLogger messageLogger2;
 
-        public CompositeMessageLogger(MessageLogger messageLogger1,
-            MessageLogger messageLogger2) {
+        public CompositeMessageLogger(RemoteProcessMessageLogger messageLogger1,
+            RemoteProcessMessageLogger messageLogger2) {
             this.messageLogger1 = messageLogger1;
             this.messageLogger2 = messageLogger2;
         }

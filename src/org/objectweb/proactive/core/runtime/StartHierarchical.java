@@ -42,6 +42,8 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -54,7 +56,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @author  ProActive Team
  */
 public class StartHierarchical {
-    static Logger logger = Logger.getLogger(StartHierarchical.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
     protected String nodeURL;
     protected String creatorID;
     protected String defaultRuntimeURL;

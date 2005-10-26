@@ -12,6 +12,8 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -24,7 +26,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 //the Unique instance of HostInfos
 public class HostsInfos {
     private static HostsInfos hostsInfos = new HostsInfos();
-    private static Logger logger = Logger.getLogger(HostsInfos.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
     private static Hashtable hostsTable;
 
     private HostsInfos() {

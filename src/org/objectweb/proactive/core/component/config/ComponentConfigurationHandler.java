@@ -39,6 +39,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
@@ -57,7 +59,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     Map controllers = new HashMap();
     List inputInterceptors = new ArrayList();
     List outputInterceptors = new ArrayList();
-    public static Logger logger = Logger.getLogger(ComponentConfigurationHandler.class.getName());
+    public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     //private ComponentsDescriptor componentsDescriptor;
     //private ComponentsCache componentsCache;

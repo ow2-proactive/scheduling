@@ -342,7 +342,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                                 TypeFactory.class.getName(), false, false, false)
                         });
             } catch (InstantiationException e) {
-                ProActiveLogger.getLogger("components").error(e.getMessage());
+                ProActiveLogger.getLogger(Loggers.COMPONENTS).error(e.getMessage());
                 return null;
             }
         } else {

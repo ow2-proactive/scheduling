@@ -37,6 +37,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.IbisProperties;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import ibis.rmi.registry.LocateRegistry;
 import ibis.rmi.registry.Registry;
@@ -46,7 +48,7 @@ import ibis.rmi.registry.Registry;
  * This class talks to ProActive nodes
  */
 public class IbisHostRTFinder implements HostRTFinder {
-    static Logger log4jlogger = Logger.getLogger(IbisHostRTFinder.class.getName());
+    static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
 
     static {
         IbisProperties.load();

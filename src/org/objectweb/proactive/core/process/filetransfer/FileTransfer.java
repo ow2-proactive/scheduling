@@ -32,6 +32,7 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class stores the FileTransfer Definition abstraction
@@ -41,7 +42,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
  * @since   ProActive 2.3
  */
 public class FileTransfer implements Serializable {
-	protected static Logger logger = Logger.getLogger(Loggers.FILETRANSFER);
+	protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 	
 	private ArrayList all;
 	private ArrayList files, homonymousFiles, heteronymousFiles;

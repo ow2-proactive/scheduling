@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.xml.io;
 import org.apache.log4j.Logger;
 import org.apache.xerces.parsers.SAXParser;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
@@ -46,7 +48,7 @@ import org.xml.sax.SAXNotSupportedException;
  *
  */
 public class StreamReader implements XMLReader {
-    static Logger logger = Logger.getLogger(StreamReader.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.XML);
     private org.xml.sax.XMLReader parser;
     private org.xml.sax.InputSource inputSource;
 

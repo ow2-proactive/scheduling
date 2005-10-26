@@ -46,11 +46,13 @@ import org.objectweb.proactive.core.event.ProActiveListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MigrationManagerImpl extends AbstractEventProducer
     implements MigrationManager, java.io.Serializable {
-    protected static Logger logger = Logger.getLogger(MigrationManagerImpl.class.getName());
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
     //
     // -- CONSTRUCTORS -----------------------------------------------

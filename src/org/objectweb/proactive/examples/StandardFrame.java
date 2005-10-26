@@ -37,6 +37,8 @@ import javax.swing.border.*;
 import javax.swing.text.*;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -49,7 +51,7 @@ import org.apache.log4j.Logger;
  * @version 1.1
  */
 public abstract class StandardFrame extends javax.swing.JFrame {
-    static Logger logger = Logger.getLogger(StandardFrame.class.getName());
+    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected final static int MESSAGE_ZONE_HEIGHT = 250;
     protected String name;
     protected int width;

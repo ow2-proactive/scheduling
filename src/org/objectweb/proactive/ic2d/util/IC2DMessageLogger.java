@@ -30,10 +30,15 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public interface IC2DMessageLogger extends MessageLogger {
+public interface IC2DMessageLogger extends RemoteProcessMessageLogger {
+    static Logger messageLogger = ProActiveLogger.getLogger(Loggers.IC2D);
+
     public void warn(String message);
 
     public void log(String message, Throwable e, boolean dialog);
