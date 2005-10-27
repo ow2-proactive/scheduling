@@ -1,7 +1,7 @@
 package modelisation.util;
 
 import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
-import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 public class RSHNodeProcessImpl extends RSHJVMProcess {
@@ -13,7 +13,7 @@ public class RSHNodeProcessImpl extends RSHJVMProcess {
         //this(new NullMessageLogger());
     }
 
-    public RSHNodeProcessImpl(MessageLogger messageLogger) {
+    public RSHNodeProcessImpl(RemoteProcessMessageLogger messageLogger) {
         super(messageLogger);
     }
 
