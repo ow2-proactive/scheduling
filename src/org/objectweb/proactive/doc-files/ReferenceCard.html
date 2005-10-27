@@ -888,27 +888,27 @@ modify the XML deployment descriptor:</p>
       <pre class="xml">
 	...
 	&lt;jvms&gt;
-		&lt;jvm name="Jvm1"&gt;
-			&lt;acquisition&gt;
-				&lt;serviceReference refid="p2plookup"/&gt;
-			&lt;/acquisition&gt;
-		&lt;/jvm&gt;
-		...
+	  &lt;jvm name="Jvm1"&gt;
+	    &lt;acquisition&gt;
+	      &lt;serviceReference refid="p2plookup"/&gt;
+	    &lt;/acquisition&gt;
+	  &lt;/jvm&gt;
+	  ...
 	&lt;/jvms&gt;
 	...
 	&lt;infrastructure&gt;
-		...
-		&lt;services&gt;
-			&lt;serviceDefinition id="p2plookup"&gt;
-				&lt;P2PService nodesAsked="2" acq="rmi" port="6666"&gt;
-					&lt;peerSet&gt;
-						&lt;peer&gt;//second.peer.host&lt;/peer&gt;
-					&lt;/peerSet&gt;
-				&lt;/P2PService&gt;
-			&lt;/serviceDefinition&gt;
-			...
-		&lt;/services&gt;
-		...
+	  ...
+	  &lt;services&gt;
+	    &lt;serviceDefinition id="p2plookup"&gt;
+	      &lt;P2PService nodesAsked="2" acq="rmi" port="6666"&gt;
+	        &lt;peerSet&gt;
+	          &lt;peer&gt;//second.peer.host&lt;/peer&gt;
+	        &lt;/peerSet&gt;
+	      &lt;/P2PService&gt;
+	    &lt;/serviceDefinition&gt;
+	    ...
+	  &lt;/services&gt;
+	  ...
 	&lt;/infrastructure&gt;
 	...
 	</pre>
@@ -936,6 +936,108 @@ modify the XML deployment descriptor:</p>
 		<font id="FormalComment">// now you can create an active object on your node.</font>
 	}
     </pre>
+      </td>
+
+    </tr>
+
+  </tbody>
+</table>
+<table border="1" width="100%">
+
+  <tbody>
+
+    <tr>
+
+      <th>Branch and Bound API</th>
+
+    </tr>
+
+    <tr>
+
+      <td>
+      <p class="textNormal">Firstly, create your own task:</p>
+<pre class="java">
+<b class="java">import</b> org.objectweb.proactive.branchnbound.core.Task;
+<b class="java">public class</b> YourTask <b class="java">extends</b> Task {
+  
+  <b class="java">public</b> Result execute() {
+    <font id="FormalComment">// Your code here for computing a solution</font>
+  }
+
+  <b class="java">public</b> Vector split() {
+    <font id="FormalComment">// Your code for generating sub-tasks</font>
+  }
+
+  <b class="java">public Result</b> gather(Result[] results) {
+  	<font id="FormalComment">// Override optional</font>
+  	<font id="FormalComment">// Default behavior based on the smallest gave by the compareTo</font>
+  }
+
+  <b class="java">public void</b> initLowerBound() {
+  	<font id="FormalComment">// Your code here for computing a lower bound</font>
+  }
+
+  <b class="java">public void</b> initUpperBound() {
+    <font id="FormalComment">// Your code here for computing a lower bound</font>
+  }
+
+  <b class="java">public int</b> compareTo(Object arg) {
+	<font id="FormalComment">// Strongly recommended to override this method</font>
+	<font id="FormalComment">// with your behavior</font>
+  }
+}
+</pre>
+      <p class="textNormal">How to interact with the framework from inside a task:</p>
+<ul>
+	<li>Some class variables:
+<pre class="java">
+<b class="java">protected</b> Result initLowerBound; <font id="FormalComment">// to store your lower bound</font>
+<b class="java">protected</b> Result initUpperBound; <font id="FormalComment">// to store you upper bound</font>
+<b class="java">protected</b> Object bestKnownSolution; <font id="FormalComment">// set by the framework with the best current solution</font>
+<b class="java">protected</b> Worker worker; <font id="FormalComment">// to interact with the framework (see below)</font>
+</pre>
+</li>
+	<li>Interact with the framework (inside a Task):
+<pre class="java">
+<b class="java">this</b>.worker.setBestCurrentResult(newBestSolution); <font id="FormalComment">// the worker will broadcast the solution in all Tasks</font>
+<b class="java">this</b>.worker.sendSubTasksToTheManager(subTaskList); <font id="FormalComment">// send a set of sub-tasks for computation to the framework</font>
+BooleanWrapper workersAvailable = <b class="java">this</b>.worker.isHungry(); <font id="FormalComment">// for a smart split, check for free workers</font>
+</pre>	
+	</li>
+</ul>
+      <p class="textNormal">Secondly, choose your task queue:</p>
+      <ul>
+      	<li>BasicQueueImpl: execute task in FIFO order.</li>
+      	<li>LargerQueueIml: execute task in larger order.</li>
+      	<li>Extend TaskQueue: your own one.</li>
+      </ul>
+
+      <p class="textNormal">Finally, start the compution:</p>
+<pre class="java">
+Task task = <b class="java">new</b> YourTask(someArguments);
+
+Manager manager =  ProActiveBranchNBound.newBnB(task,
+                        nodes,
+                        LargerQueueImpl.class.getName());
+
+Result futureResult = manager.start(); <font id="FormalComment">// this call is asynchronous</font>
+...
+</pre>
+      <p class="textNormal">Keep in mind that is only "initLower/UpperBound" and
+      "split" methods are called on the root task. The "execute" method is called
+      on the root task's splitted task. Here the methods order execution:</p>
+      <ol>
+      	<li class="java">rootTask.initLowerBound(); <font id="FormalComment">// compute a first lower bound</font></li>
+      	<li class="java">rootTask.initUpperBound(); <font id="FormalComment">// compute a first upper bound</font></li>
+      	<li class="java">Task splitted = rootTask.split(); <font id="FormalComment">// generate a set of tasks</font></li>
+      	<li class="java"><b class="java">for</b> i <b class="java">in</b> splitted <b class="java">do in parallel</b>
+<pre class="java">splitted[i].initLowerBound();
+splitted[i].initUpperBound();
+Result ri = splitted.execute();
+</pre></li>
+		<li class="java">Result final = rootTask.gather(Result[] ri); <font id="FormalComment">// gathering all result</font></li>
+      </ol>
+
       </td>
 
     </tr>
