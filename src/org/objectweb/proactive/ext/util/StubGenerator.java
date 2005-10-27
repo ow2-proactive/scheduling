@@ -25,8 +25,12 @@ public class StubGenerator {
         } else {
             tmp = name.substring(0, i);
         }
-
-        String tmp2 = tmp.replace('/', '.');
+        String tmp2 = null;
+        if (tmp.indexOf('/') != -1){
+        tmp2 = tmp.replace('/', '.');
+        } else {
+        	tmp2 = tmp.replace('\\', '.');
+        }
 
         if (tmp2.indexOf('.') == 0) {
             return tmp2.substring(1);
