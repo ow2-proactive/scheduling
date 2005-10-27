@@ -203,16 +203,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             return this.barrierBlockingRemove(); // the oospmd way ...
         }
 
-        long timeStartWaiting = 0;
-        if (timeout > 0) {
-            timeStartWaiting = System.currentTimeMillis();
-        }
         Request r = oldest
             ? ((requestFilter == null) ? removeOldest()
                                        : removeOldest(requestFilter))
             : ((requestFilter == null) ? removeYoungest()
                                        : removeYoungest(requestFilter));
-        while ((r == null) && shouldWait) {
+        if ((r == null) && shouldWait) {
             if (hasListeners()) {
                 notifyAllListeners(new RequestQueueEvent(ownerID,
                         RequestQueueEvent.WAIT_FOR_REQUEST));
@@ -221,14 +217,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
                 this.wait(timeout);
             } catch (InterruptedException e) {
             }
-            if ((timeout == 0) ||
-                    ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
-                r = oldest
-                    ? ((requestFilter == null) ? removeOldest()
-                                               : removeOldest(requestFilter))
-                    : ((requestFilter == null) ? removeYoungest()
-                                               : removeYoungest(requestFilter));
-            }
+            r = oldest
+                ? ((requestFilter == null) ? removeOldest()
+                                           : removeOldest(requestFilter))
+                : ((requestFilter == null) ? removeYoungest()
+                                           : removeYoungest(requestFilter));
         }
         return r;
     }
