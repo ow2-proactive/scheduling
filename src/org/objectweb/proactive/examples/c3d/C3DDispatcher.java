@@ -401,14 +401,12 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
             /* Waits on any method call */
             Request r = requestQueue.blockingRemoveOldest();
             String methodName = r.getMethodName();
+            // If we see rotate, then call the processRotate method
             if (methodName.equals("rotateScene")) {
                 processRotate(body, r);
-            } else if (!Election.isRunning()) {
-                // No election and the method isn't a rotation
-                body.serve(r);
-            } else if (methodName.equals("addSphere")) {
-                // There is an election and addsphere comes..
-                // nothing happens...
+            // Else, if election running say it's impossible to add a sphere
+            } else if (Election.isRunning() && methodName.equals("addSphere")) {
+                // There is an election and addsphere comes ==> nothing happens...
                 allLog("Cannot add spheres while an election is running");
             } else {
                 // There is a running election, the method is not rotate nor addshpere
@@ -430,19 +428,55 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
         Vec rotateVec = null;
         i_user = ((Integer) r.getParameter(0)).intValue();
         rotateVec = (Vec) r.getParameter(1);
-        if (Election.isRunning()) {
+
+        // FIXME : follows a hack to correct a bug discovered by ic2d & several users.
+        // election code should be put in Election class, PLEASE ! 
+        
+        // If there's only one user, rotate
+        if (this.userBag.size() == 1) {
+            userLog(i_user, "Scene is being spun along " +
+                rotateVec.direction());
+            body.serve(r);
+        }
+
+        // We have several users, so
+
+        // If this call follows the end of an Election, just serve request
+        else if (Election.justFinished()) {
+            body.serve(r);
+        }
+
+        // If there is no current election, start one
+        else if (! Election.isRunning()) {
+            Election.newElection(i_user, rotateVec, (C3DDispatcher) me);
+
+        // there is a current election, so just add a vote
+        } else {
             int nb_votes = Election.vote(i_user, rotateVec);
             if (nb_votes == this.userBag.size()) {
                 Election.finish();
             }
-        } else if (this.userBag.size() == 1) {
-            userLog(i_user, "Scene is being spun along " +
-                rotateVec.direction());
-            body.serve(r);
-        } else {
-            Election.newElection(i_user, rotateVec, this);
         }
     }
+
+//    public void processRotate(Body body, Request r) {
+//        int i_user = 0;
+//        Vec rotateVec = null;
+//        i_user = ((Integer) r.getParameter(0)).intValue();
+//        rotateVec = (Vec) r.getParameter(1);
+//        if (Election.isRunning()) {
+//            int nb_votes = Election.vote(i_user, rotateVec);
+//            if (nb_votes == this.userBag.size()) {
+//                Election.finish();
+//            }
+//        } else if (this.userBag.size() == 1) {
+//            userLog(i_user, "Scene is being spun along " +
+//                rotateVec.direction());
+//            body.serve(r);
+//        } else {
+//            Election.newElection(i_user, rotateVec, this);
+//        }
+//    }
 
     /** Sends a [log] message to given user */
     public void userLog(int i_user, String s_message) {

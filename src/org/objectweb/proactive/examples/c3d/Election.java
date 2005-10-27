@@ -136,6 +136,7 @@ final class Election extends Thread {
         } else {
             this.c3ddispatcher.allLog("   The scene will be rotated by " +
                 winner.direction());
+            Election.justFinished=true;
             this.c3ddispatcher.rotateScene(0, winner);
         }
         this.running = false;
@@ -187,5 +188,18 @@ final class Election extends Thread {
         C3DDispatcher c3ddispatcher) {
         Election.election = new Election(i_user, wish, c3ddispatcher);
         Election.vote(i_user, wish);
+    }
+
+    private static boolean justFinished = false;  // TODO : this field should be removed (hack)!
+
+    // FIXME : this justFinished business is a hack. This is due to having an Election
+    // and a C3DDispatcher Active Object. IC2D & several users discovered this flaw.
+    
+    public static boolean justFinished() {
+        if (Election.justFinished) {
+            Election.justFinished = false; 
+            return true; 
+        }
+        return false;
     }
 }
