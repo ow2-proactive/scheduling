@@ -196,7 +196,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
 
     protected Request blockingRemove(RequestFilter requestFilter,
         boolean oldest, long timeout) {
-        if (oldest && (requestFilter == null)) {
+        if (oldest && (requestFilter == null) && (timeout == 0)) {
             if (this.spmdManager == null) {
                 this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
             }
