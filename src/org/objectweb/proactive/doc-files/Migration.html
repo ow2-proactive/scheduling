@@ -30,7 +30,7 @@
 
 <h1>Active Object Migration</h1>
 
-<h2>Migration Primitive</h2>
+<h2><a name="prim"></a>Migration Primitive</h2>
 <p class="textNormal">
 The migration of an active object can be triggered by the active object itself, or by an external agent. In both cases 
 a single primitive will eventually get called to perform the migration. It is the method 
@@ -55,7 +55,7 @@ Body of the active object it wants to migrate.
 </ul>
 </p>
 
-<h2>Using migration</h2>
+<h2><a name="use"></a>Using migration</h2>
 <p class="textNormal">
 Any active object has the ability to migrate. If it references some passive objects, they will also migrate to the new location.
 Since we rely on the serialization to send the object on the network, <b>the active object must implement the serializable interface</b>.
@@ -76,7 +76,7 @@ We don't provide any test to check if the call to migrateTo is the last one in t
 Now to make this object move, you just have to call its <code>moveTo()</code> method.
 </p>
 
-<h2>Complete example</h2>
+<h2><a name="example"></a>Complete example</h2>
 
 <blockquote><pre>
   import org.objectweb.proactive.ProActive;
@@ -132,7 +132,7 @@ methods on it as on any object. We call its <code>moveTo</code> method which
 will make it migrate to the node specified as parameter and then we ask it what is its current
 location.
 
-<h2>Dealing with non-serializable attributes</h2>
+<h2><a name="non-seri"></a>Dealing with non-serializable attributes</h2>
 <p class="textNormal">
 The migration of an active object uses the serialization.
 Unfortunately, not all the objects in the Java language are

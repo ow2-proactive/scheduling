@@ -38,7 +38,7 @@ index</a>&nbsp;&nbsp;</td>
 <hr>
 <!-- Link to index : end -->
 <h1>XML Deployment Descriptors</h1>
-<h2>Objectives</h2>
+<h2><a name="objectives"></a>Objectives</h2>
 <p>
 Parameters tied to the deployment of an application should be totally
 described in a xml deployment descriptor. Hence within the source code,
@@ -83,7 +83,7 @@ and Communications Protocols</b></li>
 <p>A ProActive application can be
 deployed on different hosts, with different protocols <b>without</b>
 changing the source code</p>
-<h2>Principles</h2>
+<h2><a name="principles"></a>Principles</h2>
 <ul class="listWithSpace">
   <li class="textNormal"><b>Within a ProActive program, active objects are still created on Nodes</b></li>
   
@@ -187,7 +187,7 @@ VirtualNodes, to activate several VirtualNodes at the same time ....
 and in org.objectweb.proactive.core.descriptors.VirtualNode to
 manipulate and get nodes associated to VirtualNodes. </p><br>
 
-<h2>Different types of VirtualNodes</h2>
+<h2><a name="virtualNodes"></a>Different types of VirtualNodes</h2>
 <ul class="listWithSpace">
   <li class="textNormal"><b>VirtualNodes Definition</b></li><br>
     <ul class="listWithSpace" type="square">
@@ -454,7 +454,7 @@ url, String protocol);</code><br>
      <code class="alignleftsnippet">ProActive.unregisterVirtualNode(VirtualNode
 virtualNode);</code><br>
 </ul>
-<h2>Different types of JVMs</h2>
+<h2><a name="jvms"></a>Different types of JVMs</h2>
 <ul class="listWithSpace">
   <li class="textNormal"><b>Creation</b> </li>
     <br>
@@ -545,7 +545,7 @@ is totally abstract, with the condition that a service with the id <b>lookup</b>
 is defined in the infrastructure part</p>
 </ul>
 <br>
-<h2>Validation against XML Schema</h2>
+<h2><a name="validation"></a>Validation against XML Schema</h2>
 <p>To avoid mistake when building XML descriptors, ProActive provides an
 XML Schema called <b>DescriptorSchema.xsd</b>.
 Then to validate your file against this schema, the following line must
@@ -565,7 +565,7 @@ problem occurs during the validation, an error message is displayed
 otherwise if the validation is successful no message appear.
 An XML validation tool such as XMLSPY5.0(windows) can also be used to
 validate XML descriptors.</p>
-<h2>Complete description and
+<h2><a name="completeDesc"></a>Complete description and
 examples</h2>
 <p>Following XML files examples are used for the C3D application. The
 first file is read when launching the C3DDispatcher. The second one is
@@ -1661,7 +1661,7 @@ represents one jvm that will be acquired using an RMI Lookup, <b>Jvm2</b>
 represents two jvms that will be found in the P2P infrastructure, so at
 the end 3 acquired jvms are expected. </p>
 </ul>
-<h2>Killing the application</h2>
+<h2><a name="killing"></a>Killing the application</h2>
 <p>
 ProActive gives the ability to kill all JVMs and Nodes deployed with an
 XML descriptor with the method: killall(boolean softly) in class <a
@@ -1683,7 +1683,7 @@ killed abruptely. If true a jvm that originates the creation of a rmi
 registry waits until registry is empty before dying. To be more precise
 a thread is created to ask periodically the registry if objects are
 still registered.</p>
-<h2>Processes</h2>
+<h2><a name="processes"></a>Processes</h2>
 <p>There is the possiblity to use only the infrastructure part in order to
 create processes. A Schema called ProcessSchema located in the examples
 directory allows to validate XML files for processes.

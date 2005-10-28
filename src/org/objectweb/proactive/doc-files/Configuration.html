@@ -38,7 +38,7 @@ index</a>&nbsp;&nbsp;</td>
 <hr>
 <!-- Link to index : end -->
 <h1>ProActive Basic Configuration</h1>
-<h2>Overview</h2>
+<h2><a name="overview"></a>Overview</h2>
 <p class="textNormal"> In
 order to get easier and more flexible configuration in ProActive, we
 introduced an xml file where all ProActive related configuration is
@@ -49,7 +49,7 @@ services inside a global application. That file can also contain <b>user-defined
 properties to be used in their application.
 </p>
 <br>
-<h2>How does it work ?</h2>
+<h2><a name="howItWorks"></a>How does it work ?</h2>
 <p class="textNormal">
 Using this file is very straightforward, since all lines must follow
 the model: &lt;prop <b>key</b>="somekey"
@@ -80,7 +80,7 @@ all their properties in the ProActive configuration file with:<br>
 &lt;prop <b>key</b>="propn"
 <b>value</b>="valuen"/&gt;<br>
 </p>
-<h2>Where to access this file ?</h2>
+<h2><a name="whereIsIt"></a>Where to access this file ?</h2>
 <p class="textNormal">
 There is a default file with default ProActive options located under
 ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml.
@@ -108,7 +108,7 @@ Descriptor</a> to notify remote jvms
 which configuration file to load once created:
 </p>
 <pre>&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;<br>...<br> &lt;ProActiveUserPropertiesFile&gt;<br> &lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;<br> &lt;/ProActiveUserPropertiesFile&gt;<br>...<br>&lt;/jvmProcess&gt;<br> </pre>
-<h2>ProActive properties</h2>
+<h2><a name="properties"></a>ProActive properties</h2>
 <p>
 </p>
 <ul class="listWithSpace">
@@ -363,7 +363,7 @@ Note that as mentionned above, user-defined properties can be added.
     </ul>
   </li>
 </ul>
-<h2>Example</h2>
+<h2><a name="Example"></a>Example</h2>
 <p class="textNormal">Configuration
 file must have following structure: </p>
 <pre>&lt;ProActiveUserProperties&gt;<br> &lt;properties&gt;<br> &lt;prop <b>key</b>="schema.validation"<b>value</b>="disable"/&gt;<br> &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="enable"/&gt;<br> &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;<br> &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;<br> ....<br> &lt;prop <b>key</b>="myprop" <b>value</b>="myvalue"/&gt;<br> ....<br> &lt;/properties&gt;<br>&lt;/ProActiveUserProperties&gt;<br></pre>

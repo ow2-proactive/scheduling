@@ -30,7 +30,7 @@
 
 <h1>Active Objects : creation and advanced concepts</h1>
 
-<h2>Active Object: creation and advanced concepts</h2>
+<h2><a name="creation"></a>Active Object: creation and advanced concepts</h2>
 <p class="textNormal">
 Active objects are created on a per-object basis: an application can contain active as well as passive instances of a given class. In the remaining part of this section, we will consider that we want to create an active instance of class <code>example.A</code>. Although almost any object can be turned in an Active Object, there are some restrictions that we will detail below.
 </p>
@@ -47,7 +47,7 @@ could be :
 <p class="textNormal">
 In <b>ProActive</b> there are two ways to create active objects. One way is to use <code>ProActive.newActive</code> and is based on the instantiation of a new object, the other is to use <code>ProActive.turnActive</code> and is based on the use of an existing object.
 </p>
-<h2>Instantiation-Based Creation</h2>
+<h2><a name="instantiationCreation"></a>Instantiation-Based Creation</h2>
 <p class="textNormal">
 When using instantiation based creation, any argument passed to the constructor of the reified object through <code>ProActive.newActive</code> is serialized and passed by copy to the object. This is because the model behind <b>ProActive</b> is uniform whether the active object is instantiated locally or remotely. The parameters are therefore guaranteed to be passed by copy to the constructor. When using <code>ProActive.newActive</code> you must make sure that the arguments of the constructor are <code>Serializable</code>. On the other hand, the class used to create the active object <b>does not need to be</b> <code>Serializable</code> even in the case of remotely created  active objects. Remind also that to be created properly, the reified object must have a declared empty no-args constructor.
 </p>
@@ -114,7 +114,7 @@ A node is identified by a node URL which is formed using the protocol, the hostn
       a = (A) ProActive.newActive("example.A", params, node);
 </pre>
 
-<h2>Object-Based Creation</h2>
+<h2><a name="objectCreation"></a>Object-Based Creation</h2>
 <p class="textNormal">
 Object-based creation is used for turning an existing passive object instance into an active one. It has been introduced in ProActive as an answer to the following problem. Consider, for example, that an instance of class A is created inside a library and returned as the result of a method call. As a consequence, we do not have access to the source code where the object is created, which prevents us for modifying it for creating an active instance of A. Even if it were possible, it may not be likely since we do not want to get an active instance of A for every call on this method.
 </p>
@@ -144,7 +144,7 @@ could no more be guaranteed.
 </p>
 
 
-<h2>Specifying the activity of an active object</h2>
+<h2><a name="activity"></a>Specifying the activity of an active object</h2>
 <p class="textNormal">
 Customizing the activity of the active object is at the core of ProActive because it allows to specify fully the behavior of an active object. By default, an object turned into an active object serves its incoming requests in a FIFO manner. In order to specify another policy for serving the requests or to specify any other behaviors one can implement interfaces defining methods that will be automatically called by ProActive.
 </p>
@@ -363,7 +363,7 @@ Comparing to the solution above where interfaces are directly implemented in the
 
 
 
-<h2>Restrictions on reifiable objects</h2>
+<h2><a name="restrictions"></a>Restrictions on reifiable objects</h2>
 <p class="textNormal">
 Not all classes can give birth to active objects. There
 exist some restrictions, most of them caused by the 100%
@@ -384,7 +384,7 @@ Some other happen at the level of a method in a specific class:
     <li class="textNormal">Calling a non-public method on an active object raises an exception. This restriction disappeared with JDK 1.2.</li>
 </ul>
 </p>
-<h2>Using the Factory Method Design Pattern</h2>
+<h2><a name="factory"></a>Using the Factory Method Design Pattern</h2>
 <p class="textNormal">
 Creating an active object using ProActive might be a little bit cumbersome and requires more lines of code that for creating a regular object. A nice solution to this problem is through the use of the <b>factory</b> pattern. This mainly applies to class-based creation. It consists in adding a static method to class <code>pA</code> that takes care of instantiating the active object and returns it. The code is :
 </p>
@@ -406,7 +406,7 @@ It is up to the programmer to decide whether this method has to throw exceptions
 </p>
 
 
-<h2>Advanced : Customizing the Body of an Active Object</h2>
+<h2><a name="customize"></a>Advanced : Customizing the Body of an Active Object</h2>
 <h3>Motivations</h3>
 <p class="textNormal">There are many cases where you may want to customize the body used when creating an active object. For instance, one may want to add some debug messages or some timing behavior when sending or receiving requests. The body is a non changeable object that delegates most of its tasks to helper objects called MetaObjects. Standard MetaObjects are already used by default in ProActive but one can easily replace any of those MetaObjects by a custom one.
 </p>
@@ -469,7 +469,7 @@ In the case of a <code>turnActive</code> we would have :
 </pre>
 </p>
 
-<h2>Advanced : Role of the elements of an active object</h2>
+<h2><a name="elementRole"></a>Advanced : Role of the elements of an active object</h2>
 <p class="textNormal">
 In this section, we'll have a very close look at what happens when an active object is created. This section aims at
 providing a better understanding of how the library works and where the restrictions of Proactive come from.

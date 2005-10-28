@@ -32,7 +32,7 @@
 <h1>Typed Group Communication</h1>
 
 
-<h2>Overview</h2>
+<h2><a name="overview"></a>Overview</h2>
 <p class="textNormal">
 Group communication is a crucial feature for high-performance and Grid 
       computing. While previous works and libraries proposed such a
@@ -75,7 +75,7 @@ vg.f1();
 </pre></blockquote>
 
 
-<h2>Creation of a Group</h2>
+<h2><a name="Creation"></a>Creation of a Group</h2>
 <p class="textNormal">
 Any object that is reifiable has the ability to be included in a
       group. Groups are created using the static method
@@ -136,7 +136,7 @@ in the class A can be invoked on the group.
 </p>
 
 
-<h2>Group representation and manipulation</h2>
+<h2><a name="repr"></a>Group representation and manipulation</h2>
 <p class="textNormal">
 The <b>typed group representation</b> we have presented corresponds to the functional
 view of groups of objects.
@@ -193,7 +193,7 @@ A ag1new = (A) gA.getGroupByType();
 </pre></blockquote>
 
 
-<h2>Group as result of group communications</h2>
+<h2><a name="result"></a>Group as result of group communications</h2>
 
 <p class="textNormal">
 The particularity of our group communication mechanism is that
@@ -252,7 +252,7 @@ ProActiveGroup.waitAll(vg);
 
 
 
-<h2>Broadcast vs Dispatching</h2>
+<h2><a name="comms"></a>Broadcast vs Dispatching</h2>
 <p class="textNormal">
 Regarding the parameters of a method call towards a group of
 objects, the default behaviour is to broadcast them to
