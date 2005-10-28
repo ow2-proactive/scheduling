@@ -34,7 +34,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.objectweb.proactive.examples.c3d.User;
 import org.objectweb.proactive.examples.c3d.UserLogic;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 

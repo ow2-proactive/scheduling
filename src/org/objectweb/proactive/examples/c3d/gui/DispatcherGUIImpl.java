@@ -34,7 +34,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 
 
@@ -47,7 +46,9 @@ public class DispatcherGUIImpl extends DispatcherGUI {
     /** The real logic-centric dispatcher Active Object */
     private DispatcherLogic c3dDispatcher;
 
-    /** Creates a working GUI for C3D Dispatchers */
+    /** Creates a working GUI for C3D Dispatchers. See how we use a DispatcherLogic class? 
+     * This is made to avoid using the rendering capabilities of a C3DDispatcher, which 
+     * the GUI classes are not allowed to use! */
     public DispatcherGUIImpl(String title, final DispatcherLogic c3dDispatcher) {
         super(title);
         this.c3dDispatcher = c3dDispatcher;
