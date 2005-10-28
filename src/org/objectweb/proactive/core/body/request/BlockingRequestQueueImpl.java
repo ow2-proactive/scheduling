@@ -203,12 +203,16 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             return this.barrierBlockingRemove(); // the oospmd way ...
         }
 
+        long timeStartWaiting = 0;
+        if (timeout > 0) {
+            timeStartWaiting = System.currentTimeMillis();
+        }
         Request r = oldest
             ? ((requestFilter == null) ? removeOldest()
                                        : removeOldest(requestFilter))
             : ((requestFilter == null) ? removeYoungest()
                                        : removeYoungest(requestFilter));
-        if ((r == null) && shouldWait) {
+        while ((r == null) && shouldWait) {
             if (hasListeners()) {
                 notifyAllListeners(new RequestQueueEvent(ownerID,
                         RequestQueueEvent.WAIT_FOR_REQUEST));
@@ -222,6 +226,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
                                            : removeOldest(requestFilter))
                 : ((requestFilter == null) ? removeYoungest()
                                            : removeYoungest(requestFilter));
+            if ((timeout != 0) &&
+                    ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
+                // force return when timeout exceeded
+                return r;
+            }
         }
         return r;
     }
@@ -304,7 +313,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         }
         return r;
     }
-    
+
     /**
      * Blocks the calling thread until there is a request available
      * Returns immediately if there is already one. The request returned is non
