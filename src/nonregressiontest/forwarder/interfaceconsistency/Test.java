@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package nonregressiontest.forwarder.interfaceConsistency;
+package nonregressiontest.forwarder.interfaceconsistency;
 
 import java.lang.reflect.Method;
 
