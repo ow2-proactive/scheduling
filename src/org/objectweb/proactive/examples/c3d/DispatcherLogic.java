@@ -35,7 +35,11 @@ import org.objectweb.proactive.Body;
 
 /**
  * This interface describes methods which are accessible by classes
- * internal to the Dispatcher functionality, for example DispatcherGUI
+ * internal to the Dispatcher functionality, for example DispatcherGUI.
+ * These methods have to be exposed as public to be accessible, but not by 
+ * classes which use the Dispatcher for its rendering and chatting capabilities. 
+ * So this interface is created, to avoid errors in using the class C3DDispatcher
+ * directly, which is way too permissive.  
  */
 public interface DispatcherLogic {
 
@@ -60,10 +64,4 @@ public interface DispatcherLogic {
     /** Stops the engine from participating in the computation of images*/
     public void turnOffEngine(String engineName);
 
-    /** Tells what are the operations to perform before starting the activity of the AO.
-     * Here, we state that if migration asked, procedure  is : leaveHost, migrate */
-    public void initActivity(Body body);
-
-    /** ProActive queue handling */
-    public void runActivity(Body body);
 }
