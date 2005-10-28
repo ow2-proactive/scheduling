@@ -92,6 +92,7 @@ The FileTransfer could happen:
 	<li>scp</li>
 	<li>rcp</li>
 	<li>unicore (Unicore processDefault)</li>
+	<li>nordugrid (Nordugrid processDefault)</li>
 </ul>
 
 <h2>FileTransfer Design</h2>
@@ -146,19 +147,15 @@ Each CopyProtocol will be tried before the deployment takes place, until one suc
 <pre class="xml">
 ....
 &lt;/deployment&gt;
-&lt;FileTransferDefinitions&gt;
-   &lt;FileTransfer id="123"&gt;
-      &lt;file src="hello.dat" dest="world.dat" /&gt;
-      &lt;file src="hello.jar" dest="world.jar" /&gt;
-      &lt;file source="hello.class" dest="world.class" /&gt;
-      &lt;dir src="exampledir"
-          dest="exampledir"
-          includes="**/*.java"
-          excludes="**/Test.java"
-        /&gt;
-  &lt;/FileTransfer&gt;
+&lt;<b>FileTransferDefinitions</b>&gt;
+   &lt;<b>FileTransfer</b> id="<b>example</b>"&gt;
+      &lt;<b>file</b> src="hello.dat" dest="world.dat"/&gt;
+      &lt;<b>file</b> src="hello.jar" dest="world.jar"/&gt;
+      &lt;<b>file</b> src="hello.class" dest="world.class"/&gt;
+      &lt;<b>dir</b> src="exampledir" dest="exampledir"/&gt;
+  &lt;/<b>FileTransfer</b>&gt;
   ...
-&lt;/FileTransferDefinitions&gt;
+&lt;/<b>FileTransferDefinitions</b>&gt;
 &lt;infrastructure&gt;
 ....   
 </pre>
@@ -169,28 +166,28 @@ Each CopyProtocol will be tried before the deployment takes place, until one suc
 This tags can be referenced at the the VirtualNode level and the Process level.
 <ul class="listWithSpace">
 	<li class="textNormal">
-		<b>VirutalNode:</b>
-		<pre class="xml">
-	&lt;VirtualNode name="example" FileTransferDeploy="123"/&gt;
-		</pre>
+		<b>VirutalNode</b>
+<pre class="xml">
+&lt;VirtualNode name="exampleVNode" <b>FileTransferDeploy</b>="<b>example</b>"/&gt;
+</pre>
 	</li>
 	<li class="textNormal">
-		<b>Process:</b>
-		<pre class="xml">
-	&lt;processDefinition id="xyz"&gt;
-	&lt;sshProcess&gt;...
-		&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of an attribute.
-			This happens because FileTransfer information is process specific.
-			Note that hostname source and destination are defined implicitly from the process. --&gt;
-		&lt;FileTransferDeploy="implicit"&gt; &lt;!-- referenceID or keyword "implicit" (inherit)--&gt;
-			&lt;copyProtocol&gt;processDefault, scp, rcp &lt;/copyProtocol&gt;
-			&lt;sourceInfo prefix="/home/user" otherFutureAttributes="..." /&gt;
-			&lt;destinationInfo prefix="/tmp" otherFutureAtributes="..." /&gt;
-		&lt;/FileTransferDeploy&gt;
-		&lt;FileTransferRetrieve="implicit"&gt; &lt;!-- simmetric case--&gt;
-	&lt;/sshProcess&gt;
-	&lt;/processDefinition&gt;
-	</pre>
+		<b>Process</b>
+<pre class="xml">
+&lt;processDefinition id="xyz"&gt;
+  &lt;sshProcess&gt;...
+    <FONT ID="FormalComment">&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of an attribute.
+            This happens because FileTransfer information is process specific.
+            Note that the destination hostname and username can be ommited, and implicitly inferred 
+	    from the process information. --&gt;</FONT>
+    &lt;<b>FileTransferDeploy</b>="<b>implicit</b>"&gt; <FONT ID="FormalComment">&lt;!-- referenceID or keyword "implicit" (inherit)--&gt;</FONT>
+      &lt;<b>copyProtocol</b>&gt;processDefault, scp, rcp&lt;/<b>copyProtocol</b>&gt;
+      &lt;<b>sourceInfo</b> prefix="/home/user"/&gt;
+      &lt;<b>destinationInfo</b> prefix="/tmp" hostname="foo.org" username="smith" /&gt;
+    &lt;/<b>FileTransferDeploy</b>&gt;
+  &lt;/sshProcess&gt;
+&lt;/processDefinition&gt;
+</pre>
 	</li>
 </ul>
 </p>
