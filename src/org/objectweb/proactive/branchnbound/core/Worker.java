@@ -41,7 +41,7 @@ import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
@@ -177,7 +177,7 @@ public class Worker implements Serializable {
         this.taskProvider.addAll(subTaskList);
     }
 
-    public BooleanMutableWrapper isHungry() {
+    public BooleanWrapper isHungry() {
         return this.taskProvider.isHungry();
     }
 

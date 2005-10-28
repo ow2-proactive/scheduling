@@ -43,6 +43,7 @@ import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
@@ -60,7 +61,7 @@ public abstract class TaskQueue implements Serializable {
 
     public abstract void flushAll();
 
-    public abstract BooleanMutableWrapper isHungry();
+    public abstract BooleanWrapper isHungry();
 
     public abstract void setHungryLevel(int level);
 

@@ -43,6 +43,7 @@ import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
@@ -103,12 +104,12 @@ public class BasicQueueImpl extends TaskQueue {
         this.queue.removeAllElements();
     }
 
-    public BooleanMutableWrapper isHungry() {
+    public BooleanWrapper isHungry() {
         if (logger.isDebugEnabled()) {
             logger.debug("Queue size is " + this.queue.size() +
                 " - Hungry level is " + this.hungryLevel);
         }
-        return new BooleanMutableWrapper(this.queue.size() <= this.hungryLevel);
+        return new BooleanWrapper(this.queue.size() <= this.hungryLevel);
     }
 
     public void setHungryLevel(int level) {
