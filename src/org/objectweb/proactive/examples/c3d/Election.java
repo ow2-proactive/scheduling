@@ -30,176 +30,155 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.Vector;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
 /**
  * An election, as a poll under democracy. A certain number of people can vote,
- * and then results are drawn. Implements the singleton pattern.
+ * and then results are drawn. 
  */
+public class Election implements RunActive, Serializable{
+    private static final int WAITMSECS = 4000;  // Duration of one election round in milliseconds
+    private C3DDispatcher c3ddispatcher;        // to give back results
+    private int nbUsers = 0;                    // To know when the election is over
+    private long startTime = 0;                 // To enable the countdown
+    private Ballots ballots = new Ballots();    // registers the votes
+    private Vector voters = new Vector();       // remembers who has voted
 
-// final avoids creation of subclasses of Election ==> don't break singleton pattern
-final class Election extends Thread {
-    //static fields
-    private static final int WAITSECS = 4; // Duration of one election round in seconds
-    private static Election election;
-
-    //private fields, accessible through Election.election
-    private boolean running = false;
-    private HashMap wishes; // hashes of (user_ident, rotation Vec voted)
-
-    // implementation note : I would have prefered an array, but how can I know 
-    // how many Users there are? Maybe in the constructor? 
-    private C3DDispatcher c3ddispatcher; // to give back results
-
-    /**
-     * Private constructor, which is only called by Election, needed by singleton pattern.
-     */
-    private Election(int i_user, Vec wish, C3DDispatcher c3ddispatcher) {
-        this.c3ddispatcher = c3ddispatcher;
-        this.running = true;
-        this.wishes = new HashMap();
-        this.c3ddispatcher.userLog(i_user,
-            "Request 'rotate " + wish.direction() + "' submitted, \nnew " +
-            WAITSECS + " second election started ...");
-        this.c3ddispatcher.allLogExcept(i_user,
-            "New " + WAITSECS + " second election started:\n   User " +
-            this.c3ddispatcher.nameOfUser(i_user) + " wants to rotate " +
-            wish.direction());
-        // Launches the Election thread
-        this.start();
+    /** Required ProActive empty no-arg constructor */ 
+    public Election() {
     }
 
-    /**
-     * Handles the voting thread : waits for k seconds, counts votes, decides of the winner.
-     * This method runs while others calls can be made, like a new vote submission.
-     */
-    public synchronized void run() {
-        try {
-            wait(WAITSECS * 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    /** Real Constructor */ 
+    public Election(C3DDispatcher c3ddispatcher) {
+        this.c3ddispatcher = c3ddispatcher;
+        nbUsers = 1;
+    }
 
-        this.c3ddispatcher.allLog("Election finished");
-        // count scores
-        // TODO : this is horrible code ! counting votes should be more elegant!
-        HashMap scores = new HashMap();
-        for (Iterator iterator = wishes.values().iterator();
-                iterator.hasNext();) {
-            // for every vote expressed(let's call it 'vote')
-            Vec vote = (Vec) iterator.next();
-            boolean found = false;
-            for (Iterator keyiterator = scores.keySet().iterator();
-                    keyiterator.hasNext();) {
-                // for every vote already counted  (let's call it 'counted') 
-                Vec counted = (Vec) keyiterator.next();
-
-                // if 'vote' is 'counted', increment  
-                if (counted.equals(vote)) {
-                    found = true;
-                    Integer oldVal = (Integer) scores.remove(counted);
-                    scores.put(vote, new Integer(oldVal.intValue() + 1));
+    /** ProActive queue handling. Serve methods with time-out once election is started. */
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+        
+        // Loops over lifetime
+        while (body.isActive()) {
+            if (this.startTime == 0 ) { // election not yet started
+                service.blockingServeOldest(); // just wait for first vote to trigger timer.
+            }
+            else {      // An election was started, let's use a timer.   
+                long time =       // time is in milliseconds 
+                    this.startTime - System.currentTimeMillis() + WAITMSECS;
+                if (time < 0) { 
+                    voteOver("time's up");
+                }
+                else {
+                    // serve one request, or return if time given is up 
+                    service.blockingServeOldest(time);
                 }
             }
-
-            //  'vote' is not yet 'counted', so count it
-            if (!found) {
-                scores.put(vote, new Integer(1));
-            }
-        }
-
-        // display results 
-        Vec winner = null;
-        this.c3ddispatcher.allLog("   Result:");
-        for (Iterator iterator = scores.keySet().iterator();
-                iterator.hasNext();) {
-            Vec key = (Vec) iterator.next();
-            int votes = ((Integer) scores.get(key)).intValue();
-            c3ddispatcher.allLog("       " + votes + " votes for " +
-                key.direction());
-            if (winner == null) {
-                winner = key;
-            } else {
-                // at least 2 different votes, ie no consensus
-                winner = null;
-                break;
-            }
-        }
-
-        if (winner == null) {
-            this.c3ddispatcher.allLog(
-                "   No consensus found, vote again please!");
-        } else {
-            this.c3ddispatcher.allLog("   The scene will be rotated by " +
-                winner.direction());
-            Election.justFinished=true;
-            this.c3ddispatcher.rotateScene(0, winner);
-        }
-        this.running = false;
-        this.wishes.clear();
+        }                
     }
 
-    /**
-     * Submit a vote in this election.
+    /** Submit a vote in this election.
      * @param i_user id of the voter
      * @param wish Vec that is voted
-     * @return the numbers of voters up to now
-     */
-    public synchronized static int vote(int i_user, Vec wish) {
-        assert Election.election != null : "Trying to vote in an Election not started!";
-        if (Election.election.wishes.containsKey(new Integer(i_user))) {
-            Election.election.c3ddispatcher.userLog(i_user,
-                "You have already voted in this round");
-        } else {
-            Election.election.wishes.put(new Integer(i_user), wish);
+     * @return the numbers of voters up to now */
+    public void vote(int i_user, String name, Vec wish) {
+        // check no bad dude is voting twice
+        if (voters.contains (new Integer (i_user) ) ) { 
+            this.c3ddispatcher.userLog(i_user, "You have already voted in this round");
+            return;
         }
-        return Election.election.wishes.size();
-    }
-
-    public synchronized static boolean isRunning() {
-        if (Election.election == null) {
-            return false;
+        
+        // register this vote
+        this.voters.add(new Integer(i_user));
+        this.ballots.add(wish);
+        
+        //  We should be starting a new election, if startime=0 <==> ballots.size=0 <==> voters.size=0 
+        if (this.startTime == 0) {      
+            this.startTime = System.currentTimeMillis() ; 
+            this.c3ddispatcher.userLog(i_user,
+                    "Request 'rotate " + wish.direction() + "' submitted, \nnew " +
+                    WAITMSECS/1000 + " second election started.");
+            this.c3ddispatcher.allLogExcept(i_user,
+                    "New " + WAITMSECS/1000 + " second election started:");
         }
-        return Election.election.running;
+        this.c3ddispatcher.allLogExcept(i_user,
+                "   User " + name + " wants to rotate " + wish.direction());
+        // Has everybody voted ? 
+        if (this.voters.size() == this.nbUsers) {
+            voteOver("everybody voted");  
+        }
     }
 
-    /**
-     * Static method to declare the vote over.
-     */
-    public static synchronized void finish() {
-        assert Election.election != null : "Trying to finish an Election not started!";
-        Election.election.voteOver();
+    /** Declare the vote over, find out the winner, and notify Dispatcher. */
+    private void voteOver(String reason) {
+        this.c3ddispatcher.allLog("Election finished : " + reason);
+        Vec winner = ballots.winner();
+        if (winner == null) {
+            this.c3ddispatcher.allLog("   No consensus found, vote again please!");
+        }
+        else {
+            this.c3ddispatcher.allLog("   The scene will be rotated by " +
+                    winner.direction());
+            this.c3ddispatcher.rotateScene(-1, winner); // i_user = -1 means this is called from Election!
+        }
+            
+        this.startTime = 0;  
+        voters.clear();
+        ballots.clear();
     }
 
-    /**
-     * Declare the vote over.
-     * This is not static, so it has to be called as Election.election.voteOver()
-     */
-    private synchronized void voteOver() {
-        this.c3ddispatcher.allLog("Everybody voted");
-        this.notify();
+    /** Declares how many voters may vote in this election.
+     * @param nbUsers The nbUsers to set. */
+    public void setNbUsers(int nbUsers) {
+        this.nbUsers = nbUsers;
     }
 
-    public static void newElection(int i_user, Vec wish,
-        C3DDispatcher c3ddispatcher) {
-        Election.election = new Election(i_user, wish, c3ddispatcher);
-        Election.vote(i_user, wish);
-    }
-
-    private static boolean justFinished = false;  // TODO : this field should be removed (hack)!
-
-    // FIXME : this justFinished business is a hack. This is due to having an Election
-    // and a C3DDispatcher Active Object. IC2D & several users discovered this flaw.
+    public boolean isRunning () {
+        return this.startTime != 0;
+    } 
     
-    public static boolean justFinished() {
-        if (Election.justFinished) {
-            Election.justFinished = false; 
-            return true; 
+    /** Destroy the Active Object */
+    public void terminate() {
+        try {
+            org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return false;
     }
+
+
+    /** Class to register votes, and then determine a winner.
+     * In this implementation, a vote is saved if it is not already in this Vector.
+     * This allows us to have ballots.size == 1 <==> all votes are equal 
+     * To make a democracy, ie winner has most votes, you need to change winner and add methods. */
+    private class Ballots extends Vector implements Serializable{
+        
+        public Vec winner() {
+            if (size() == 1)
+                return (Vec) get(0);
+            return null;
+            }
+        
+        /** Only add elements which have not been put in yet. This is not DEMOCRACY! 
+         * To mimic a democracy, you need to count all votes, and then determine the majority*/
+        public void add(Vec v) {
+            int size = size();
+            for (int i=0 ; i < size ; i++) {
+                Vec tmp = (Vec) get(i);
+                if (tmp.equals(v)) 
+                    return;
+            }
+            super.add(v);
+        }
+        
+     }
+    
 }

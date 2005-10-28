@@ -43,8 +43,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
@@ -71,8 +71,9 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  * It handles the logic of asking renderers to draw partial images. It then forwards them to the users.
  * It also allows users to hold conversations, in a chat-like way.
  */
-public class C3DDispatcher implements RunActive, InitActive, Serializable,
+public class C3DDispatcher implements InitActive, RunActive, Serializable,
     Dispatcher, DispatcherLogic {
+        
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static int IMAGE_HEIGHT = 500;
     private static int IMAGE_WIDTH = 500;
@@ -106,6 +107,7 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
     /** The unique GUI reference. All GUI actions use this pointer. */
     private transient DispatcherGUI gui;
     private transient Dispatcher me;
+    private Election election; 
 
     // needed for benchmark to check no stopping order is issued. 
     private BlockingRequestQueue requestQueue;
@@ -368,17 +370,26 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
     /**
      * Rotate every object by the given angle
      */
-    public void rotateScene(int i_user, Vec angles) {
+    public void rotateScene(int i_user, Vec angle) {
+        // If there are more than one users, proceed with a vote. 
+        // i_user < 0 means the election trigerred the rotation  
+        if (i_user >= 0 & this.userBag.size() > 1) {
+            this.election.vote(i_user, this.userBag.getName(i_user), angle);  
+                // election cannot be null, it should be created by registerUser & by migration rebuild 
+            return; 
+        }
+        
+        allLog("Scene is being spun along " + angle.direction());   // FIXME : is this needed ?
+        
+        /* rotate every object ... */
         int objects = this.scene.getNbPrimitives();
-
-        /* on every object ... */
         for (int i = 0; i < objects; i++) {
             Primitive p = this.scene.getPrimitive(i);
-            p.rotate(angles);
+            p.rotate(angle);
             this.scene.setPrimitive(p, i);
         }
-
-        /* re-renders the image to reflect the rotation */
+        
+        /* render the image to reflect the rotation */
         render();
     }
 
@@ -393,27 +404,10 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
     public void runActivity(Body body) {
         // Creates the rendering engines 
         go();
-        requestQueue = body.getRequestQueue();
-
-        // Loops over lifetime
-        while (body.isActive()) {
-
-            /* Waits on any method call */
-            Request r = requestQueue.blockingRemoveOldest();
-            String methodName = r.getMethodName();
-            // If we see rotate, then call the processRotate method
-            if (methodName.equals("rotateScene")) {
-                processRotate(body, r);
-            // Else, if election running say it's impossible to add a sphere
-            } else if (Election.isRunning() && methodName.equals("addSphere")) {
-                // There is an election and addsphere comes ==> nothing happens...
-                allLog("Cannot add spheres while an election is running");
-            } else {
-                // There is a running election, the method is not rotate nor addshpere
-                body.serve(r);
-            }
-        }
+        Service service = new Service (body);
+        service.fifoServing();
     }
+
 
     /** Method called when leaving the current host, for example when migrating. 
      * Made public because put in the request queue */
@@ -422,61 +416,6 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
         // should we call a ProActive.unregister("//localhost/Dispatcher"); ? 
     }
 
-    /** check a demand for rotation is valid, and then possibly starts election */
-    public void processRotate(Body body, Request r) {
-        int i_user = 0;
-        Vec rotateVec = null;
-        i_user = ((Integer) r.getParameter(0)).intValue();
-        rotateVec = (Vec) r.getParameter(1);
-
-        // FIXME : follows a hack to correct a bug discovered by ic2d & several users.
-        // election code should be put in Election class, PLEASE ! 
-        
-        // If there's only one user, rotate
-        if (this.userBag.size() == 1) {
-            userLog(i_user, "Scene is being spun along " +
-                rotateVec.direction());
-            body.serve(r);
-        }
-
-        // We have several users, so
-
-        // If this call follows the end of an Election, just serve request
-        else if (Election.justFinished()) {
-            body.serve(r);
-        }
-
-        // If there is no current election, start one
-        else if (! Election.isRunning()) {
-            Election.newElection(i_user, rotateVec, (C3DDispatcher) me);
-
-        // there is a current election, so just add a vote
-        } else {
-            int nb_votes = Election.vote(i_user, rotateVec);
-            if (nb_votes == this.userBag.size()) {
-                Election.finish();
-            }
-        }
-    }
-
-//    public void processRotate(Body body, Request r) {
-//        int i_user = 0;
-//        Vec rotateVec = null;
-//        i_user = ((Integer) r.getParameter(0)).intValue();
-//        rotateVec = (Vec) r.getParameter(1);
-//        if (Election.isRunning()) {
-//            int nb_votes = Election.vote(i_user, rotateVec);
-//            if (nb_votes == this.userBag.size()) {
-//                Election.finish();
-//            }
-//        } else if (this.userBag.size() == 1) {
-//            userLog(i_user, "Scene is being spun along " +
-//                rotateVec.direction());
-//            body.serve(r);
-//        } else {
-//            Election.newElection(i_user, rotateVec, this);
-//        }
-//    }
 
     /** Sends a [log] message to given user */
     public void userLog(int i_user, String s_message) {
@@ -589,6 +528,21 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
             c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
         }
 
+        // CREATE the election mechanism when more than one user registered
+        int nbUsers = this.userBag.size();
+        if (nbUsers >= 2 && this.election==null) {
+            try {
+                this.election = (Election) ProActive.newActive( 
+                        Election.class.getName(), 
+                        new Object [] {(C3DDispatcher)me}
+                        );
+            } catch (Exception e) {
+                e.printStackTrace();        
+            }
+            election.setNbUsers(nbUsers);
+        }
+
+        
         // return user_id, image_width & image_height;
         int[] result = new int[] { this.lastUserID++, IMAGE_WIDTH, IMAGE_HEIGHT };
         return result;
@@ -631,10 +585,16 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
         // remove from internal list of users.
         this.userBag.remove(number);
 
+        int nbUsers = this.userBag.size() ;
+
         // if no more users, reset all numbers to zero
-        if (this.userBag.size() == 0) {
+        if (nbUsers == 1) { 
             this.lastUserID = 0;
+            this.election.terminate();
+            this.election = null;       // so as not to be reused.
         }
+        else
+            this.election.setNbUsers(nbUsers); 
     }
 
     public void resetScene() {
@@ -717,7 +677,10 @@ public class C3DDispatcher implements RunActive, InitActive, Serializable,
     }
 
     public void addSphere(Sphere s) {
-        // Can only add sphere if there is no rendering going on
+        if (this.election.isRunning()) {
+            allLog("A Sphere Cannot be added while election is running!");
+            return; 
+        }        
         this.scene.addPrimitive(s);
         allLog("A Sphere has been added\n" + s);
         render();
