@@ -2,9 +2,9 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../descriptors/DescriptorSchema.xsd">
 
 	<variables>
-		<propertiesFile location="${testfile}"/>
 		<property name="testfile" value="" type="setInProgram"/>
 		<property name="proac_home" value="" type="setInProgram"/>
+		<propertiesFile location="${testfile}"/>
 	</variables>
 	
 	<componentDefinition>
