@@ -109,9 +109,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     private transient Dispatcher me;
     private Election election; 
 
-    // needed for benchmark to check no stopping order is issued. 
-    private BlockingRequestQueue requestQueue;
-
+	/** The object serving requests   */
+    private Service service ; 
+    
     /** The no-argument Constructor as commanded by ProActive; otherwise unused */
     public C3DDispatcher() {
     }
@@ -404,7 +404,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     public void runActivity(Body body) {
         // Creates the rendering engines 
         go();
-        Service service = new Service (body);
+        service = new Service (body);
         service.fifoServing();
     }
 
@@ -727,7 +727,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                     turnOnEngine(enginesNowUsed[k]);
 
                 for (int j = 0; j < 16; j++) {
-                    if (requestQueue.hasRequest("doBenchmarks")) {
+                    if (service.hasRequestToServe("doBenchmarks")) {
                         break;
                     }
                     rotateScene(0, rotation);
@@ -735,10 +735,11 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                     render();
                     timer.stop();
                 }
-                if (requestQueue.hasRequest("doBenchmarks")) {
+                if (service.hasRequestToServe("doBenchmarks")) {
+                    // this is non blocking as we have just checked there was such a method
+                    service.blockingRemoveOldest("doBenchmarks");
                     log("Test aborted!");
                     plot.writeChars("Test aborted!\n");
-                    requestQueue.removeOldest("doBenchmarks");
                     break;
                 }
 
