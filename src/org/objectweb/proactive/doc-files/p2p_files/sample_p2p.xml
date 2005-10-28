@@ -36,7 +36,7 @@
 			</processes>
 		<services>
 			<serviceDefinition id="p2plookup">
-				<P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10" TTU="60000" TTL="10" booking_nodes="ture" xml_path="/user/alex/home/descriptor.xml">
+				<P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10" TTU="60000" TTL="10">
 					<peerSet>
 						<peer>rmi://localhost:3000</peer>
 					</peerSet>
