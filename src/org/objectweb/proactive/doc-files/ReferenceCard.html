@@ -812,9 +812,16 @@ mapped on this virtual node<br>
 &nbsp;&nbsp;&lt;/services&gt;<br>
 &nbsp;&nbsp;...<br>
 &lt;/ProActiveDescriptor&gt;<br>
-</code>
-
-
+</code><br>
+<b>Starting the fault-tolerance server</b><BR><BR>
+The global fault-tolerance server can be launched using the ProActive/scripts/[unix|windows]/FT/startGlobalFTServer.[sh|bat] script, with 5 optional parameters:
+<ul>
+<li> the protocol: <code>-proto [cic|pml]</code>. Default value is cic.
+<li> the server name: <code>-name [serverName]</code>. Default name is FTServer.
+<li> the port number: <code>-port [portNumber]</code>. Default port number is 1100.
+<li> the fault detection period: <code>-fdperiod [periodInSec]</code>, the time between two consecutive fault detection scanning. Default value is 10 sec.
+<li> the URL of a p2p service that can be used by the resource server: <code>-p2p [serviceURL]</code>. No default value. 
+</ul>
 
 </td>
 </tbody>
