@@ -38,7 +38,8 @@ index</a>&nbsp;&nbsp;</td>
 <hr>
 <!-- Link to index : end -->
 <h1>XML Deployment Descriptors</h1>
-<h2><a name="objectives"></a>Objectives</h2>
+<a name="objectives"/>
+<h2>Objectives</h2>
 <p>
 Parameters tied to the deployment of an application should be totally
 described in a xml deployment descriptor. Hence within the source code,
@@ -53,17 +54,9 @@ names</b></li></ul>
 Protocols</b></li>
     <ul class="listWithSpace">
       <li class="textNormal">local</li>
-      <li class="textNormal">rlogin</li>
-      <li class="textNormal">rsh</li>
-      <li class="textNormal">ssh</li>
-      <li class="textNormal">lsf</li>
-      <li class="textNormal">pbs</li>
-      <li class="textNormal">sun
-grid engine</li>
-      <li class="textNormal">gsissh</li>
-      <li class="textNormal">globus</li>
-      <li class="textNormal">oar</li>
-      <li class="textNormal">prun</li>
+      <li class="textNormal">ssh, gsissh, rsh, rlogin</li>
+      <li class="textNormal">lsf, pbs, sun grid engine, oar, prun</li>
+      <li class="textNormal">globus(GT2, GT3 and GT4), unicore, glite, arc (nordugrid)</li>
     </ul>
     
   </ul>
@@ -78,12 +71,18 @@ and Communications Protocols</b></li>
     <li class="textNormal">soap</li>
   </ul>
   </ul>
-  
-
+  <ul class="listWithSpace">
+  <li class="textNormal"><b>Files Transfers</b></li>
+    <ul class="listWithSpace">
+      <li class="textNormal">scp, rcp</li>
+      <li class="textNormal">unicore, arc (nordugrid)</li>
+      <li class="textNormal">other protocols like globus, glite will be supported soon</li>
+    </ul>
+</ul>
 <p>A ProActive application can be
 deployed on different hosts, with different protocols <b>without</b>
 changing the source code</p>
-<h2><a name="principles"></a>Principles</h2>
+<h2>Principles</h2>
 <ul class="listWithSpace">
   <li class="textNormal"><b>Within a ProActive program, active objects are still created on Nodes</b></li>
   
@@ -120,6 +119,8 @@ or a set of Nodes after activation</p>
       <li class="textNormal">the mapping of VN to JVMs</li>
       <li class="textNormal">the way to create, acquire JVMs using processes defined in the lower infrastructure part</li>
       <li class="textNormal">local, remote processes or combination of both to create remote jvms. <br>For instance defining an <b>sshProcess</b> that itself references a local <b>jvmProcess</b>. At execution, the ssh process will launch a jvm on the remote machine specified in hostname attribute of <b>sshProcess</b> definition.</li>
+        <li class="textNormal">files transfers</li>
+          <li class="textNormal">fault tolerance, P2P, security</li>
     </ul></ul>
     <ul class="listWithSpace">  
      <li class="textNormal"><b>Example:</b><br></br>
@@ -186,8 +187,8 @@ org.objectweb.proactive.descriptor.ProActiveDescriptor to manipulate
 VirtualNodes, to activate several VirtualNodes at the same time ....
 and in org.objectweb.proactive.core.descriptors.VirtualNode to
 manipulate and get nodes associated to VirtualNodes. </p><br>
-
-<h2><a name="virtualNodes"></a>Different types of VirtualNodes</h2>
+<a name="vn"/>
+<h2>Different types of VirtualNodes</h2>
 <ul class="listWithSpace">
   <li class="textNormal"><b>VirtualNodes Definition</b></li><br>
     <ul class="listWithSpace" type="square">
@@ -454,7 +455,8 @@ url, String protocol);</code><br>
      <code class="alignleftsnippet">ProActive.unregisterVirtualNode(VirtualNode
 virtualNode);</code><br>
 </ul>
-<h2><a name="jvms"></a>Different types of JVMs</h2>
+<a name="jvms"/>
+<h2>Different types of JVMs</h2>
 <ul class="listWithSpace">
   <li class="textNormal"><b>Creation</b> </li>
     <br>
@@ -545,7 +547,8 @@ is totally abstract, with the condition that a service with the id <b>lookup</b>
 is defined in the infrastructure part</p>
 </ul>
 <br>
-<h2><a name="validation"></a>Validation against XML Schema</h2>
+<a name="validation"/>
+<h2>Validation against XML Schema</h2>
 <p>To avoid mistake when building XML descriptors, ProActive provides an
 XML Schema called <b>DescriptorSchema.xsd</b>.
 Then to validate your file against this schema, the following line must
@@ -565,7 +568,8 @@ problem occurs during the validation, an error message is displayed
 otherwise if the validation is successful no message appear.
 An XML validation tool such as XMLSPY5.0(windows) can also be used to
 validate XML descriptors.</p>
-<h2><a name="completeDesc"></a>Complete description and
+<a name="example"/>
+<h2>Complete description and
 examples</h2>
 <p>Following XML files examples are used for the C3D application. The
 first file is read when launching the C3DDispatcher. The second one is
@@ -704,20 +708,19 @@ in the <b>virtualNodesAcquisition</b>
 part which will be the result of a lookup in the RMIRegistry of a host
 to be specified at runtime.</p>
     <br>
-  
-  <li class="textNormal"><b>Infrastructure
-and processes</b><br>
-    <br>
-In the previous example, all defined JVMs will be created using <b>jvmProcess</b>
+  </li>
+</ul>
+<a name="infrastructure"/>
+  <h2>Infrastructure and processes</h2>
+<p>In the previous example, all defined JVMs will be created using <b>jvmProcess</b>
 process. This name is abstract like the other ones, it means that it
 can be changed. This process is totally defined in the <b>infrastructure</b>
 part. Of course the process name in the creation part must point at an
 existing defined process in the <b>infrastructure</b>
 part. For instance if the name in the creation tag is <b>localJVM</b>,
 there must be a process defined in the <b>infrastructure</b>
-with the id <b>localJVM</b><br>
-    <br>
-    <ul class="listWithSpace" type="square">
+with the id <b>localJVM</b><p>
+    <ul class="listWithSpace">
       <li class="textNormal">Local
 JVMs </li>
 <p>As said before, all processes are defined in the <b>infrastructure</b>
@@ -738,7 +741,7 @@ local JVMs:
 &lt;infrastructure&gt;<br>
 &nbsp;&lt;processes&gt;<br>
 &nbsp;&nbsp;&lt;processDefinition id="<b>jvmProcess</b>"&gt;<br>
-&nbsp;&nbsp;&nbsp;&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;<b>jvmProcess</b> class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;classpath&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;absolutePath value="/home/ProActive/classes"/&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;absolutePath value="/home/ProActive/lib/bcel.jar"/&gt;<br>
@@ -764,7 +767,7 @@ local JVMs:
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;parameter value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib"/&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;parameter value=-Xms512 -Xmx512"/&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmParameters&gt;<br>
-&nbsp;&nbsp;&nbsp;&lt;/jvmProcess&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/<b>jvmProcess</b>&gt;<br>
 &nbsp;&nbsp;&lt;/processDefinition&gt;<br>
 &nbsp;&lt;/processes&gt;<br>
 &lt;/infrastructure&gt;<br>	
@@ -840,28 +843,18 @@ JVMs </li>
         
 <p>With XML Deployment Descriptor, <b>ProActive</b>
 provides the ability to create remote Nodes (remote JVMs). You can
-specify in the descriptor if you want to access the remote host with <b>rsh</b>,
-          <b>rlogin</b>,
-          <b>ssh</b>,
-          <b>lsf</b>,
-          <b>pbs</b>,
-          <b>globus</b>,
-          <b>oar</b>,
-          <b>prun</b>,
+specify in the descriptor if you want to access the remote host with <b>rsh</b>, <b>ssh</b>, <b>rlogin</b>, <b>lsf</b>, <b>pbs</b>, <b>oar</b>,  <b>prun</b>, <b>globus</b>, <b>unicore</b>, <b>arc (nordugrid)</b>, <b>glite</b>.
 How to use these protocols is explained in the following examples. Just
-remind that you can combine these protocols, and you will notice that
-there is at least one combination for each remote protocol, indeed each
-remote protocol <b>must </b>have
-a pointer on a process that will create a local JVM(discussed
-previoulsy). The principe is fairly simple, you can imagine that once
-logged on the remote host with the chosen protocol, you have to create
-a local JVM.<br>
+remind that you can also combine these protocols.The principle of combination is fairly simple, you can imagine for instance that you 
+will log on a remote cluster frontend with <b>ssh</b>, then use  <b>pbs</b> to book nodes and to create <b>jvms</b> on each. You will also notice that
+there is at least one combination for each remote protocol. Indeed each remote protocol <b>must </b>have a pointer either on another remote protocol or on a <b>jvmProcess</b> to create a jvm(discussed previoulsy). <br>
           <br>
+          You can find <a href="xml_examples/" target="examples">here</a> several examples of supported protocols and useful combinations. <br></br>
           <b><font color="#ff0000">Note that it is mandatory for using
 all these features, that ProActive is installed on each host, of course
 on the local host as well as on each host where you want to create Nodes</font>
           </b></p>
-          <ul class="listWithSpace" type="circle">
+          <ul class="listWithSpace" type="square">
           <li class="textNormal">RSH </li><br>
              <table width="100%">
  <tr>
@@ -882,7 +875,7 @@ on the local host as well as on each host where you want to create Nodes</font>
 &nbsp;&nbsp;&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;<br>
 &nbsp;&lt;/processDefinition&gt;<br>
 &nbsp;&lt;processDefinition id="<b>rshProcess</b>"&gt;<br>
-&nbsp;&nbsp;&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="sea.inria.fr"&gt;<br>
+&nbsp;&nbsp;&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sea.inria.fr"&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;processReference refid="<b>jvmProcess</b>"/&gt;<br>
 &nbsp;&nbsp;&lt;/rshProcess&gt;<br>
 &nbsp;&lt;/processDefinition&gt;<br>
@@ -900,7 +893,7 @@ an abstract name), which is defined in the <b>infrastructure</b>
 section. To define this process you have to give the class to
 instantiate to create the <b>rsh</b>
 process. <b>ProActive</b>
-provides <code><a href="../core/process/rsh/RSHJVMProcess.html">org.objectweb.proactive.core.process.rsh.RSHJVMProcess</a></code>
+provides <code><a href="../core/process/rsh/RSHProcess.html">org.objectweb.proactive.core.process.rsh.RSHProcess</a></code>
 to create <b>rsh</b>
 process. You must give the remote host name to log on with rsh. You can
 define as well <code>username="toto"</code>
@@ -911,7 +904,9 @@ reference a local process, and in the example, it references the
 process defined with the id <b>jvmProcess</b>.
 It means that once logged on sea.inria.fr with rsh, a local JVM will be
 launched, ie a ProActive node will be created on sea.inria.fr thanks to
-the process defined by <b>jvmProcess</b>.</p> <br>
+the process defined by <b>jvmProcess</b>.</p>
+<p>Check <a href="xml_examples/RSH_Example.xml">here</a> for a complete rsh deployment example. </p>
+ <br>
          
           <li class="textNormal">RLOGIN</li><br>
             <table width="100%">
@@ -1006,7 +1001,8 @@ These steps must be performed <b>before
             </b>running any
 ProActive application using <b>ssh
             </b>protocol. If you are
-not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a></p> <br>
+not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a></p> 
+<p>Check <a href="xml_examples/SSH_Example.xml">here</a> for a complete ssh deployment example. </p><br>
           
           <li class="textNormal"><a name="processlist">Process list</a></li>
           <p>ProActive provides a way to define a list of processes for <b>RSH, SSH, RLOGIN</b> protocols. Using <b>processList</b> or <b>processListbyHost</b> elements avoids having a long deployment file when many machines with similar names are going to be connected with protocols mentionned before. The first example below shows how to use <b>processList</b> tag, the second how to use <b>processListbyHost</b>.</p>
@@ -1070,7 +1066,8 @@ not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a></p> <br>
 </td></tr>
 </table>     
 <p>Using <b>processListbyHost</b> element allows to give a hostlist separated with a whitespace. The class attribute is defined as described in the processList tag. The <b>domain</b> attribute is optional since the complete hostname can also be provided in the hostlist attribute. In the example, a jvm is going to be created using ssh on crusoe.inria.fr, waha.inria.fr, nahuel.inria.fr.</p>
-          <br>
+<p>Check <a href="xml_examples/SSHList_example.xml">SSHList_example.xml</a> or <a href="xml_examples/SSHListbyHost_Example.xml">SSHListbyHost_Example.xml</a> for list examples. </p><br>
+        
           <li class="textNormal">LSF </li>
            
             
@@ -1080,7 +1077,7 @@ to create <b>bsub</b>
 process. <br>
 
 In this part we assume that you want to submit a job from a machine
-which is outside the cluster. As described before, you can combine
+which is not the cluster frontend. As described before, you can combine
 protocols. In this case , you will have to define a process to log on
 the front-end of the cluster(<b>rlogin</b>
 if your machine is on the same LAN than the cluster front-end, else <b>ssh</b>
@@ -1199,20 +1196,19 @@ appear. They are optional, and have a default value: respectively <b>false</b>
 and <b>normal</b>.
 They represent option in the bsub command: interactive mode, and the
 name of the queue.</p>
-            <br>
+<p>Check also <a href="xml_examples/SSH_LSF_Example.xml">SSH_LSF_Example.xml</a>.</p><br>
          
           <li class="textNormal">PBS</li>
            
-<p>This protocol is used to create jobs on cluster managed by PBS or
-PBSPro. ProActive provides <code><a
+<p>This protocol is used to create jobs on cluster managed by PBS, PBSPro or Torque. ProActive provides <code><a
  href="../core/process/pbs/PBSSubProcess.html">org.objectweb.proactive.core.process.pbs.PBSBSubProcess</a></code>
 to create <b>pbs</b>
 processes. As explained for LSF you can combine protocols in order for
 instance to log on the cluster's frontal with ssh, then to create nodes
 using PBS, or you can also use only PBS without ssh if you are already
 logged on the frontend. Example below shows how to combine an ssh
-process to log on the cluster, then a PBS process that reference a
-local process in order to create nodes on processors requested by PBS.</p>
+process to log on the cluster, then a PBS process that references a
+<b>jvmProcess</b> in order to create nodes on processors requested by PBS.</p>
 <table width="100%">
  <tr>
 	<td>
@@ -1266,7 +1262,8 @@ represents the file where to put the ouput of the job(default is
 specified by pbs), <b>scriptPath</b>
 represents the location on the frontend_host of the script
 pbsStartRuntime.sh(default is
-/user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</p> <br>
+/user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</p>
+<p>Check also <a href="xml_examples/SSH_PBS_Example.xml">SSH_PBS_Example.xml</a>.</p> <br>
           
           <li class="textNormal">Sun
 Grid Engine</li>
@@ -1279,8 +1276,8 @@ processes. As explained above you can combine protocols in order for
 instance to log on the cluster's frontal with ssh, then to create nodes
 using SGE, or you can also use only SGE without ssh if you are already
 logged on the frontend. Example below shows how to combine an ssh
-process to log on the cluster, then a SGE process that reference a
-local process in order to create nodes on processors requested by SGE.</p>
+process to log on the cluster, then a SGE process that references a
+<b>jvmProcess</b> in order to create nodes on processors requested by SGE.</p>
 
 <table width="100%">
  <tr>
@@ -1327,10 +1324,80 @@ local process in order to create nodes on processors requested by SGE.</p>
 main options specified in an SGE system. <b>ScriptPath</b>
 represents the location on the frontend_host of the script
 gridEngineStartRuntime.sh (default is
-/user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</p><br>
+/user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</p>
+<p>Check also <a href="xml_examples/SSH_SGE_Example.xml">SSH_SGE_Example.xml</a>.</p> <br>
             
           
-          <li class="textNormal">GLOBUS</li>
+         
+          
+          <li class="textNormal">OAR:</li>
+<p>OAR is a cluster protocol developed at INRIA Alpes and used on <a
+ href="http://www.grid5000.fr">Grid5000</a>.
+ProActive provides <code><a
+ href="../core/process/oar/OARSubProcess.html">org.objectweb.proactive.core.process.oar.OARSubProcess</a></code>
+to use such protocol.As explained above you can combine protocols in order for
+instance to log on the cluster's frontal with ssh, then to create nodes
+using OAR, or you can also use only OAR without ssh if you are already
+logged on the frontend. Example below shows how to combine an ssh
+process to log on the cluster, then an OAR process that references a
+<b>jvmProcess</b> in order to create nodes on processors requested by OAR.</p>
+
+<table width="100%">
+ <tr>
+	<td>
+<table class="xml" align="left">
+	<tr>
+	<td>
+    <p class="xml">
+&lt;jvm name="<b>Jvm2</b>"&gt;<br>
+&nbsp;&lt;creation&gt;<br>
+&nbsp;&lt;processReference refid="<b>sshProcess</b>"/&gt;<br>
+&nbsp;&lt;/creation&gt;<br>
+&lt;/jvm&gt;<br>
+...................................................<br>
+&lt;processes&gt;<br>
+&nbsp;&lt;processDefinition id="<b>jvmProcess</b>"&gt;<br>
+&nbsp;&nbsp;&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;<br>
+&nbsp;&lt;/processDefinition&gt;<br>
+&nbsp;&lt;processDefinition id="<b>oarCluster</b>"&gt;<br>
+&nbsp;&nbsp;&lt;oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;processReference refid="<b>jvmProcess</b>"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;oarOption&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;resources&gt;node=2,weight=2&lt;/resources&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;scriptPath&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;absolutePath value="/home/ProActive/scripts/unix/cluster/oarStartRuntime.sh"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/scriptPath&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/oarOption&gt;<br>
+&nbsp;&nbsp;&lt;/oarProcess&gt;<br>
+&nbsp;&lt;/processDefinition&gt;<br>
+&nbsp;&lt;processDefinition id="<b>sshProcess</b>"&gt;<br>
+&nbsp;&nbsp;&lt;sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="frontend"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;processReference refid="<b>oarCluster</b>"/&gt;<br>
+&nbsp;&nbsp;&lt;/sshProcess&gt;<br>
+&nbsp;&lt;/processDefinition&gt; <br>
+&lt;/processes&gt;<br>	
+            </td>
+	</tr>
+</table>
+</td></tr>
+</table>
+          
+<p>As mentionned previously, many options exist, and correspond to the
+main options specified in an OAR system. <b>ScriptPath</b>
+represents the location on the frontend_host of the script
+oarStartRuntime.sh (default is
+/user.home/ProActive/scripts/unix/cluster/oarStartRuntime.sh).</p>
+<p>Check also <a href="xml_examples/SSH_OAR_Example.xml">SSH_OAR_Example.xml</a> and <a href="xml_examples/SSH_OARGRID_Example.xml">SSH_OARGRID_Example.xml</a></p> <br>
+          
+          <li class="textNormal">PRUN:</li>
+<p>PRUN is a cluster protocol develloped at Amsterdam to manage their <a
+ href="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</a>.
+ProActive provides <code><a
+ href="../core/process/prun/PrunSubProcess.html">org.objectweb.proactive.core.process.prun.PrunSubProcess</a></code>
+to use such protocol.</p>
+<p>Check also <a href="xml_examples/SSH_PRUN_Example.xml">SSH_PRUN_Example.xml</a>.</p>
+            <br>
+             <li class="textNormal">GLOBUS</li>
             
 <p>Like <b>ssh</b>,
 using <b>globus</b>
@@ -1396,28 +1463,33 @@ For instance, the &lt;environment&gt; tag is not mandatory, but
 for the globus host to export the DISPLAY on your machine, you can
 define the value in the descriptor as well as other environment
 variable, except the classpath(or java path,...) which must be defined
-in the local process referenced by <b>globusProcess</b>
+in the <b>jvmProcess</b> referenced by <b>globusProcess</b>
 as explained before. &lt;globusOption&gt; is neither manatory.
 Default value for &lt;count&gt; element is 1. It represents the
 number of processor requested.</p>
+<p>Check also <a href="xml_examples/Globus_Example.xml">Globus_Example.xml</a>.</p>
             <br>
-          
-          <li class="textNormal">OAR:</li>
-<p>OAR is a cluster protocol develloped at INRIA Alpes to manage their <a
- href="http://www.inrialpes.fr/sed/i-cluster2/start.html">cluster</a>.
+          <li class="textNormal">UNICORE:</li>
+<p>
 ProActive provides <code><a
- href="../core/process/oar/OARSubProcess.html">org.objectweb.proactive.core.process.oar.OARSubProcess</a></code>
+ href="../core/process/unicore/UnicoreProcess.html">org.objectweb.proactive.core.process.unicore.UnicoreProcess</a></code>
 to use such protocol.</p>
+<p>Check also <a href="xml_examples/Unicore_Example.xml">Unicore_Example.xml</a>.</p>
             <br>
-          
-          <li class="textNormal">PRUN:</li>
-<p>PRUN is a cluster protocol develloped at Amsterdam to manage their <a
- href="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</a>.
+            <li class="textNormal">ARC (NorduGrid):</li>
+<p>
 ProActive provides <code><a
- href="../core/process/prun/PrunSubProcess.html">org.objectweb.proactive.core.process.prun.PrunSubProcess</a></code>
+ href="../core/process/nordugrid/NGProcess.html">org.objectweb.proactive.core.process.nordugrid.NGProcess</a></code>
 to use such protocol.</p>
+<p>Check also <a href="xml_examples/NorduGrid_Example.xml">NorduGrid_Example.xml</a>.</p>
             <br>
-          
+            <li class="textNormal">GLITE</li>
+<p>
+ProActive provides <code><a
+ href="../core/process/glite/GLiteProcess.html">org.objectweb.proactive.core.process.glite.GLiteProcess</a></code>
+to use such protocol.</p>
+<p>Check also <a href="xml_examples/SSH_GLite_Example.xml">SSH_GLite_Example.xml</a>.</p>
+            <br>
           <li class="textNormal">Complete
 example of XML Deployment Descriptor</li>
    <br>         
@@ -1543,8 +1615,8 @@ These JVMs will be created locally since they reference directly the
 process defined by <b>jvmProcess</b>.
         <b>Jvm3</b>
 will be created on the cluster using <b>ssh</b>
-to log on sea.inria.fr (cluster entry point). Two nodes will then be created
-on a machine that belongs to <b>cluster_group1 or cluster_group2</b> since processor tag is set to 2, and the hoslist
+to log on sea.inria.fr (cluster entry point)and then bsub to request processors and to create jvms on each. Here, two nodes will be created
+on machines that belong to <b>cluster_group1 or cluster_group2</b> since processor tag is set to 2, and the hoslist
 tag gives cluster_group1 cluster_group2 as candidates. At Last <b>Jvm4</b>
 will be created using globus It will access cluster.inria.fr and
 request 10 processors. We can notice that two local processes were
@@ -1569,11 +1641,9 @@ variable. If you are not familiar with ssh, see <a
  href="http://www.openssh.org">openSSH</a></p>
      
     </ul>
-   
-    <br>
-  </li>
-  <li class="textNormal"><b>Infrastructure
-and services</b></li>
+    <a name="services"/>
+  <h2>Infrastructure
+and services</h2>
    
 <p>As mentionned previously, instead of creating jvms, ProActive gives the
 possibility to acquire existing jvms. To do so, as shown in the example
@@ -1660,8 +1730,11 @@ and Jvm2</b>. <b>Jvm1</b>
 represents one jvm that will be acquired using an RMI Lookup, <b>Jvm2</b>
 represents two jvms that will be found in the P2P infrastructure, so at
 the end 3 acquired jvms are expected. </p>
-</ul>
-<h2><a name="killing"></a>Killing the application</h2>
+<p>Fault Tolerance can also be defined at the service level. See <a href="faultTolerance.html">Fault Tolerance
+documentation</a> for more
+information.</p>
+<a name="killing"/>
+<h2>Killing the application</h2>
 <p>
 ProActive gives the ability to kill all JVMs and Nodes deployed with an
 XML descriptor with the method: killall(boolean softly) in class <a
@@ -1683,7 +1756,8 @@ killed abruptely. If true a jvm that originates the creation of a rmi
 registry waits until registry is empty before dying. To be more precise
 a thread is created to ask periodically the registry if objects are
 still registered.</p>
-<h2><a name="processes"></a>Processes</h2>
+<a name="processes"/>
+<h2>Processes</h2>
 <p>There is the possiblity to use only the infrastructure part in order to
 create processes. A Schema called ProcessSchema located in the examples
 directory allows to validate XML files for processes.
