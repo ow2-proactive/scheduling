@@ -46,14 +46,21 @@ Under Windows
 	build.bat examples 
 
 
-If you want to compile all sources:
+If you want to compile all sources and to generate the documentation (might be useful with CVS version):
 Under Linux
 	cd compile
-	./build all  (check that the build script has executable permission)
+	./build all  (check that the build script has executable permission) 
 Under Windows
 	cd compile
 	build.bat all 
 
+If you want only to compile all sources (and not generate the documentation):
+Under Linux
+	cd compile
+	./build compile  (check that the build script has executable permission) 
+Under Windows
+	cd compile
+	build.bat compile 
 
 If you have any problems or questions when using ProActive feel free to contact us at proactive@objectweb.org
 Enjoy ProActive !

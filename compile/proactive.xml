@@ -460,7 +460,7 @@
       ==
       ================================================================
 	-->
-	<target name="dist" depends="all, docs">
+	<target name="dist" depends="compile, docs">
 		<!-- Create the distribution directory -->
 		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
