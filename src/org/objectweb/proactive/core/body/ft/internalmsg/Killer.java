@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.ft.internalmsg;
 
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
+
 /**
  * The vm is killed on reception of this message.
  * For benchmarking use !
@@ -39,8 +40,8 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
  * @since 2.2
  */
 public class Killer implements FTMessage {
-
-    public Killer() {}
+    public Killer() {
+    }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.internalmsg.FTMessage#handleFTMessage(org.objectweb.proactive.core.body.ft.protocols.FTManager)
@@ -49,5 +50,4 @@ public class Killer implements FTMessage {
         System.exit(111);
         return null;
     }
-
 }

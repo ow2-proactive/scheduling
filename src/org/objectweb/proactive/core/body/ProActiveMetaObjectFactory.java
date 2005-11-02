@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -235,7 +235,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     public ProActiveComponentFactory newComponentFactory() {
         return componentFactoryInstance;
     }
-    
+
     public FTManagerFactory newFTManagerFactory() {
         return ftmanagerFactoryInstance;
     }
@@ -283,7 +283,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected FTManagerFactory newFTManagerFactorySingleton() {
         return new FTManagerFactoryImpl();
     }
-    
+
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
@@ -363,25 +363,29 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                 if ("ibis".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Using ibis factory for creating remote body");
+                        logger.debug(
+                            "Using ibis factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
                 } else if ("http".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Using http factory for creating remote body");
+                        logger.debug(
+                            "Using http factory for creating remote body");
                     }
 
                     return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
                 } else if ("rmissh".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Using rmissh factory for creating remote body");
+                        logger.debug(
+                            "Using rmissh factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Using rmi factory for creating remote body");
+                        logger.debug(
+                            "Using rmi factory for creating remote body");
                     }
                     return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
                 }
@@ -423,11 +427,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             return new ProActiveComponentImpl(componentParameters, myBody);
         }
     }
-    
-    
+
     // FAULT-TOLERANCE
-    protected class FTManagerFactoryImpl implements FTManagerFactory, Serializable {
-        
+    protected class FTManagerFactoryImpl implements FTManagerFactory,
+        Serializable {
         public FTManager newFTManager(int protocolSelector) {
             switch (protocolSelector) {
             case FTManagerFactory.PROTO_CIC:
@@ -436,11 +439,12 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                 return new FTManagerPMLRB();
             default:
                 logger.error("Error while creating fault-tolerance manager : " +
-                		"no protocol is associated to selector value " + protocolSelector);
-            	return null;
+                    "no protocol is associated to selector value " +
+                    protocolSelector);
+                return null;
             }
         }
-        
+
         public FTManager newHalfFTManager(int protocolSelector) {
             switch (protocolSelector) {
             case FTManagerFactory.PROTO_CIC:
@@ -449,12 +453,12 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                 return new HalfFTManagerPMLRB();
             default:
                 logger.error("Error while creating fault-tolerance manager : " +
-                		"no protocol is associated to selector value " + protocolSelector);
-            	return null;
+                    "no protocol is associated to selector value " +
+                    protocolSelector);
+                return null;
             }
         }
     }
-    
 
     // SECURITY
     public void setProActiveSecurityManager(ProActiveSecurityManager psm) {

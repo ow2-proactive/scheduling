@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FTServer extends UnicastRemoteObject implements FaultDetector,
     LocationServer, RecoveryProcess, ResourceServer, CheckpointServer {
-    
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -240,20 +239,17 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-  
+
     // Commented code is used to benchmark recovery time. A failure is triggered
     // artifially by sending a kill message to one active object.
-    
     //public static final int numCkpt = 4; // totalWorker * failureFrequency
     //public static final int numberOfWorker = 4;
     //public static final long timeToWait = 45000; // TTC/2
     //public static final int totalFailure = 1;
-    
     //private int ckptCounter = 1;
     //private int failureCounter = 1;
     //private int firstCkptCounter = numberOfWorker;
     //private ActiveQueue killingQueue = new ActiveQueue("Killing thread");
-    
     public int storeCheckpoint(Checkpoint c, int incarnation)
         throws RemoteException {
         //this.firstCkptCounter--;

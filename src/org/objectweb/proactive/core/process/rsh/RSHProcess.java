@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -71,8 +71,8 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
      */
     public RSHProcess() {
         super();
-        
-        FILE_TRANSFER_DEFAULT_PROTOCOL=DEFAULT_RSH_COPYPROTOCOL;
+
+        FILE_TRANSFER_DEFAULT_PROTOCOL = DEFAULT_RSH_COPYPROTOCOL;
         this.command_path = DEFAULT_RSHPATH;
     }
 
@@ -83,8 +83,8 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
      */
     public RSHProcess(ExternalProcess targetProcess) {
         super(targetProcess);
-        
-        FILE_TRANSFER_DEFAULT_PROTOCOL=DEFAULT_RSH_COPYPROTOCOL;
+
+        FILE_TRANSFER_DEFAULT_PROTOCOL = DEFAULT_RSH_COPYPROTOCOL;
         this.command_path = DEFAULT_RSHPATH;
     }
 

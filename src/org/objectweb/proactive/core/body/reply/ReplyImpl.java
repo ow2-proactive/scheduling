@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -65,10 +65,9 @@ public class ReplyImpl extends MessageImpl implements Reply,
     protected byte[][] encryptedResult;
     protected boolean ciphered;
 
-    
     // true if this reply is sent by automatic continuation
     private boolean isAC;
-    
+
     /*
      * the session ID used to find the key and decrypt the reply
      */
@@ -82,9 +81,10 @@ public class ReplyImpl extends MessageImpl implements Reply,
         this.psm = psm;
         this.isAC = false;
     }
-    
+
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-            FutureResult result, ProActiveSecurityManager psm, boolean isAutomaticContinuation) {
+        FutureResult result, ProActiveSecurityManager psm,
+        boolean isAutomaticContinuation) {
         this(senderID, sequenceNumber, methodName, result, psm);
         this.isAC = isAutomaticContinuation;
     }
@@ -183,7 +183,4 @@ public class ReplyImpl extends MessageImpl implements Reply,
     public boolean isAutomaticContinuation() {
         return this.isAC;
     }
-
-
-
 }

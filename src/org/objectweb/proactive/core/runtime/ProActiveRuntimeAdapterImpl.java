@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -501,13 +501,13 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
             throw new ProActiveException(e);
         }
     }
-    
+
     public ExternalProcess getProcessToDeploy(
-            ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-            String padURL)
-        throws ProActiveException {
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException {
         try {
-            return proActiveRuntime.getProcessToDeploy(proActiveRuntimeDist, creatorID, vmName, padURL);
+            return proActiveRuntime.getProcessToDeploy(proActiveRuntimeDist,
+                creatorID, vmName, padURL);
         } catch (IOException e) {
             throw new ProActiveException(e);
         }

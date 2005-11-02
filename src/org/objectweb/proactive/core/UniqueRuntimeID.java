@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,6 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.core;
 
 import java.rmi.dgc.VMID;
@@ -42,8 +41,8 @@ import java.rmi.dgc.VMID;
  * @author  ProActive Team
  */
 public class UniqueRuntimeID implements java.io.Serializable {
-	private java.rmi.dgc.VMID vmID;
-	private String vmName;
+    private java.rmi.dgc.VMID vmID;
+    private String vmName;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -52,19 +51,18 @@ public class UniqueRuntimeID implements java.io.Serializable {
     /**
      * Creates a new UniqueRuntimeID
      */
-    public UniqueRuntimeID(){	
+    public UniqueRuntimeID() {
     }
-    
+
     public UniqueRuntimeID(String vmName) {
         this.vmID = new java.rmi.dgc.VMID();
         this.vmName = vmName;
     }
-    
+
     public UniqueRuntimeID(String vmName, VMID vmID) {
         this.vmID = vmID;
         this.vmName = vmName;
     }
-    
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
@@ -93,7 +91,7 @@ public class UniqueRuntimeID implements java.io.Serializable {
      * @return a string representation of this UniqueID
      */
     public String toString() {
-    	return "" + vmName + " " + vmID;
+        return "" + vmName + " " + vmID;
     }
 
     /**
@@ -112,8 +110,8 @@ public class UniqueRuntimeID implements java.io.Serializable {
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof UniqueRuntimeID) {
-        	UniqueRuntimeID uri = (UniqueRuntimeID) o;
-        	return vmName.equals(uri.vmName) && vmID.equals(uri.vmID);
+            UniqueRuntimeID uri = (UniqueRuntimeID) o;
+            return vmName.equals(uri.vmName) && vmID.equals(uri.vmID);
         } else {
             return false;
         }

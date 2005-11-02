@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -100,7 +100,7 @@ public interface P2PConstants {
 
     /** Boolean for using or not p2p load balanced. */
     public static final String PROPERTY_LOAD_BAL = "proactive.p2p.loadbalancing";
-    
+
     /** Boolean value for disable node sharing. */
     public static final String PROPERTY_NO_SHARING = "proactive.p2p.nosharing";
 

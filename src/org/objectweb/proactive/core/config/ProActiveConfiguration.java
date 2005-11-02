@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -198,10 +198,10 @@ public class ProActiveConfiguration {
         return System.getProperty("proactive.ft.server.resource");
     }
 
-    public static String getFTProtocol(){
+    public static String getFTProtocol() {
         return System.getProperty("proactive.ft.protocol");
     }
-    
+
     //To be used for the launcher 
     //    /**
     //     * Sets the value of proactive.home if not already set

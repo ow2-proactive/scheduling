@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -288,7 +288,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         if (!new Boolean(System.getProperty(PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
             nodes = 1;
         }
-        
+
         // No sharing enable
         if (new Boolean(System.getProperty(PROPERTY_NO_SHARING)).booleanValue()) {
             nodes = 0;

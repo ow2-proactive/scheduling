@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,20 +37,19 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.Killer;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 
+
 /**
  * A job that kill a given active object
  * @author cdelbe
  * @since 2.2
  */
 public class KillerJob implements ActiveQueueJob {
-
-    
     private FTServer server;
     private UniversalBody toKill;
     private long toWait;
-    
+
     /**
-     * 
+     *
      */
     public KillerJob(FTServer server, UniversalBody toKill, long toWait) {
         this.server = server;
@@ -79,5 +78,3 @@ public class KillerJob implements ActiveQueueJob {
         }
     }
 }
-
-

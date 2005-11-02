@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,15 +44,16 @@ public class Displayer implements Serializable {
     public Displayer() {
     }
 
-    public Displayer(
-        Integer nbBodies, Boolean displayft,
+    public Displayer(Integer nbBodies, Boolean displayft,
         org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.nbBodies = nbBodies.intValue();
         this.displayft = displayft.booleanValue();
-        this.nbf = new NBodyFrame("ProActive N-Body", this.nbBodies, this.displayft, killsupport);
+        this.nbf = new NBodyFrame("ProActive N-Body", this.nbBodies,
+                this.displayft, killsupport);
     }
 
-    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id, String name) {
+    public void drawBody(int x, int y, int vx, int vy, int weight, int d,
+        int id, String name) {
         this.nbf.drawBody(x, y, vx, vy, weight, d, id, name);
     }
 }

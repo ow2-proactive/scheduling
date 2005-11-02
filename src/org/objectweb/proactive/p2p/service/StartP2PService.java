@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,7 +76,7 @@ public class StartP2PService implements P2PConstants {
         " -node_acq Timeout for node acquisition\n" +
         " -lookup Lookup frequency for nodes\n" +
         " -no_multi_proc_nodes to share only a node. Otherwise, 1 node by CPU\n" +
-        " -xml_path Deployment descriptor path\n"+
+        " -xml_path Deployment descriptor path\n" +
         " -no_sharing Start the service with none shared nodes";
 
     private static class Args {
@@ -253,7 +253,7 @@ public class StartP2PService implements P2PConstants {
             System.setProperty(PROPERPY_XML_PATH, parsed.xml_path);
         }
         System.setProperty(PROPERTY_NO_SHARING,
-                (parsed.no_sharing == null)?"flase":parsed.no_sharing);
+            (parsed.no_sharing == null) ? "flase" : parsed.no_sharing);
     }
 
     // -------------------------------------------------------------------------

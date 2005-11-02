@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -118,10 +118,10 @@ public class StartHierarchical {
     }
 
     private void run() {
-    	// It's hard to know if we are on a forwarder or not in some spots 
-    	// (serialization for example), so we set property to help us.
+        // It's hard to know if we are on a forwarder or not in some spots 
+        // (serialization for example), so we set property to help us.
         System.setProperty("proactive.hierarchicalRuntime", "true");
-        
+
         padURL = System.getProperty("proactive.pad");
 
         ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
@@ -133,7 +133,6 @@ public class StartHierarchical {
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
             LocalProActiveRuntime localPart = (LocalProActiveRuntime) ProActiveRuntimeImpl.getProActiveRuntime();
-            
 
             ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
                     UrlBuilder.getProtocol(defaultRuntimeURL));

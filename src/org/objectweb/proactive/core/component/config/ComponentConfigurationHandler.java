@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -87,9 +87,11 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         try {
             InitialHandler initial_handler = new InitialHandler();
             String url = null;
-            if (ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation) != null) {
+            if (ComponentConfigurationHandler.class.getResource(
+                        componentsConfigurationLocation) != null) {
                 // it's in the classpath
-                url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation).toString();
+                url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation)
+                                                         .toString();
             } else {
                 // user-specified
                 url = new File(componentsConfigurationLocation).getAbsolutePath();

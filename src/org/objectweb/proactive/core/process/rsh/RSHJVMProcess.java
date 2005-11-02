@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -221,13 +221,13 @@ public class RSHJVMProcess extends RSHProcess implements JVMProcess {
     }
 
     /**
-     * Reset to empty value parameters associated to the class that this process 
+     * Reset to empty value parameters associated to the class that this process
      * is going to start
      */
     public void resetParameters() {
-    	jvmProcess.resetParameters();
+        jvmProcess.resetParameters();
     }
-    
+
     /**
      * Sets the parameters of the jvm to start with the given parameters for the target JVMProcess
      * @param parameters Paramaters to be given in order to start the jvm

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -36,10 +36,10 @@ import org.objectweb.proactive.Body;
 /**
  * This interface describes methods which are accessible by classes
  * internal to the Dispatcher functionality, for example DispatcherGUI.
- * These methods have to be exposed as public to be accessible, but not by 
- * classes which use the Dispatcher for its rendering and chatting capabilities. 
+ * These methods have to be exposed as public to be accessible, but not by
+ * classes which use the Dispatcher for its rendering and chatting capabilities.
  * So this interface is created, to avoid errors in using the class C3DDispatcher
- * directly, which is way too permissive.  
+ * directly, which is way too permissive.
  */
 public interface DispatcherLogic {
 
@@ -63,5 +63,4 @@ public interface DispatcherLogic {
 
     /** Stops the engine from participating in the computation of images*/
     public void turnOffEngine(String engineName);
-
 }

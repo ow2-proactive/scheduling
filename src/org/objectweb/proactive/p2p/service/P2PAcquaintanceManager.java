@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -241,7 +241,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      *         element.
      */
     public BooleanMutableWrapper contains(P2PService service) {
-        return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(service));
+        return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(
+                service));
     }
 
     /**
@@ -262,10 +263,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         int candidate = (int) (Math.random() * size);
 
         for (int i = 0; i < n; i++) {
-        	((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).balanceWithMe(sender,
-                    ranking);
+            ((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).balanceWithMe(sender,
+                ranking);
         }
-
     }
 
     /**
@@ -273,7 +273,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @param ranking who sends the request
      * @param myNodeAddress the ranking of the caller
      */
-	public void chooseNneighborsAndStealTheirWork(int n, double ranking, String myNodeAddress) {
+    public void chooseNneighborsAndStealTheirWork(int n, double ranking,
+        String myNodeAddress) {
         int size = this.groupOfAcquaintances.size();
         if (size <= 0) {
             return;
@@ -285,7 +286,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         int candidate = (int) (Math.random() * size);
 
         for (int i = 0; i < n; i++) {
-        	((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).ImStealingYou(ranking,myNodeAddress);
+            ((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).ImStealingYou(ranking,
+                myNodeAddress);
         }
-	}
+    }
 }

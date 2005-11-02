@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,6 +57,7 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+
 /**
  * An adapter for a RemoteProActiveRuntimeForwarder. The Adpater is the generic entry point for remote calls
  * to a RemoteProActiveRuntimeForwarder using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
@@ -64,8 +65,8 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  *
  * All calls done on a ProActiveRuntimeAdapterForwarderImpl, method1(foo, bar) for example, are
  * translated into remotePA.method1(urid, foo, bar) where urid is an unique identifiant for runtimes.
- * The forwarder forwards the call to the right runtime by using this ID. 
- * 
+ * The forwarder forwards the call to the right runtime by using this ID.
+ *
  * @author ProActiveTeam
  *
  */
@@ -115,14 +116,12 @@ public class ProActiveRuntimeAdapterForwarderImpl
 
         String prop = System.getProperty("proactive.hierarchicalRuntime");
         if ((prop != null) && prop.equals("true")) {
-
-        	// on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
+            // on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-
 
             if (!partf.registeredRuntimes.containsKey(urid)) {
                 try {
-                	// Add this unknown runtime to the table of forwarded runtimes
+                    // Add this unknown runtime to the table of forwarded runtimes
                     partf.registeredRuntimes.put(urid, this.clone());
                 } catch (CloneNotSupportedException e) {
                     runtimeLogger.warn(e);
@@ -130,7 +129,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
             }
 
             try {
-            	// Change the RMI reference to point on this forwarder. That's all, it's automagic !
+                // Change the RMI reference to point on this forwarder. That's all, it's automagic !
                 proActiveRuntime = ((ProActiveRuntimeAdapterForwarderImpl) RuntimeFactory.getDefaultRuntime()).proActiveRuntime;
             } catch (ProActiveException e) {
                 runtimeLogger.warn(e);

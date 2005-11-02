@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -138,28 +138,30 @@ public abstract class AbstractListProcessDecorator
             ((ExternalProcessDecorator) processes.get(i)).setCompositionType(compositionType);
         }
     }
-    
-    public FileTransferWorkShop getFileTransferWorkShopRetrieve(){
-    	/* TODO Check if this is the correct place
-    	 * implement this. Then implement it
-    	 */
 
-    	return null;
+    public FileTransferWorkShop getFileTransferWorkShopRetrieve() {
+
+        /* TODO Check if this is the correct place
+             * implement this. Then implement it
+             */
+        return null;
     }
 
-    public FileTransferWorkShop getFileTransferWorkShopDeploy(){
-    	/* TODO Check if this is the correct place
-    	 * implement this. Then implement it
-    	 */
+    public FileTransferWorkShop getFileTransferWorkShopDeploy() {
 
-    	return null;
+        /* TODO Check if this is the correct place
+             * implement this. Then implement it
+             */
+        return null;
     }
-    
-    public void startFileTransfer(){
-    	/* TODO Check if this is the correct place
-    	 * implement this. Then implement it
-    	 */
+
+    public void startFileTransfer() {
+
+        /* TODO Check if this is the correct place
+             * implement this. Then implement it
+             */
     }
+
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
      */
@@ -193,7 +195,8 @@ public abstract class AbstractListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#setInputMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(
+        RemoteProcessMessageLogger inputMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcessDecorator) processes.get(i)).setInputMessageLogger(inputMessageLogger);
         }
@@ -202,7 +205,8 @@ public abstract class AbstractListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#setErrorMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(
+        RemoteProcessMessageLogger errorMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcessDecorator) processes.get(i)).setErrorMessageLogger(errorMessageLogger);
         }

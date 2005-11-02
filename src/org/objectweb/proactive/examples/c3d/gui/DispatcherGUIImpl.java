@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -46,8 +46,8 @@ public class DispatcherGUIImpl extends DispatcherGUI {
     /** The real logic-centric dispatcher Active Object */
     private DispatcherLogic c3dDispatcher;
 
-    /** Creates a working GUI for C3D Dispatchers. See how we use a DispatcherLogic class? 
-     * This is made to avoid using the rendering capabilities of a C3DDispatcher, which 
+    /** Creates a working GUI for C3D Dispatchers. See how we use a DispatcherLogic class?
+     * This is made to avoid using the rendering capabilities of a C3DDispatcher, which
      * the GUI classes are not allowed to use! */
     public DispatcherGUIImpl(String title, final DispatcherLogic c3dDispatcher) {
         super(title);

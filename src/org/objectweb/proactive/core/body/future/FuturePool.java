@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -95,7 +95,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
     static private java.util.Hashtable bodyDestination;
-    
+
     // map of threads that are running a body forwarder 
     static private Map forwarderThreads;
 
@@ -252,6 +252,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     } catch (SecurityNotAvailableException e) {
                         psm = null;
                     }
+
                     //the added reply is a deep copy with the isAC tag set to true
                     queueAC.addACRequest(new ACService(bodiesToContinue,
                             new ReplyImpl(creatorID, id, null, result, psm, true)));

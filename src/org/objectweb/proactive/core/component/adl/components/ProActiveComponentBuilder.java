@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -50,7 +50,7 @@ public class ProActiveComponentBuilder implements ComponentBuilder {
     public void addComponent(final Object superComponent,
         final Object subComponent, final String name, final Object context)
         throws Exception {
-    	Fractal.getContentController((Component) superComponent)
+        Fractal.getContentController((Component) superComponent)
                .addFcSubComponent((Component) subComponent);
         // as opposed  to the standard fractal implementation, we do not set
         // the name of the component here because :

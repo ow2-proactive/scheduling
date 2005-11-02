@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -248,8 +248,7 @@ public class LocalBodyStore {
 
     public void registerForwarder(AbstractBody body) {
         if (localForwarderMap.getBody(body.bodyID) != null) {
-            logger.debug(
-                "Forwarder already registered in the body map");
+            logger.debug("Forwarder already registered in the body map");
             localForwarderMap.removeBody(body.bodyID);
         }
         localForwarderMap.putBody(body.bodyID, body);

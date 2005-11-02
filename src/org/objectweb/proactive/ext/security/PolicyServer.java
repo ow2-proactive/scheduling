@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -135,7 +135,8 @@ public class PolicyServer implements Serializable, Cloneable {
         matchingFrom = matchingTo = matchingFromDefault = matchingToDefault = false;
         int length = policyRules.size();
 
-        if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).isDebugEnabled()) {
+        if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
+                               .isDebugEnabled()) {
             String s = "================================\nFrom :";
             for (int i = 0; i < entitiesFrom.size(); i++)
                 s += (((Entity) entitiesFrom.get(i)) + " ");

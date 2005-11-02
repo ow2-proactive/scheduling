@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -166,12 +166,13 @@ public abstract class AbstractExternalProcessDecorator
     /**
      * Implementation of a RemoteProcessMessageLogger that feeds two MessageLoggers
      */
-    public static class CompositeMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
+    public static class CompositeMessageLogger
+        implements RemoteProcessMessageLogger, java.io.Serializable {
         private RemoteProcessMessageLogger messageLogger1;
         private RemoteProcessMessageLogger messageLogger2;
 
-        public CompositeMessageLogger(RemoteProcessMessageLogger messageLogger1,
+        public CompositeMessageLogger(
+            RemoteProcessMessageLogger messageLogger1,
             RemoteProcessMessageLogger messageLogger2) {
             this.messageLogger1 = messageLogger1;
             this.messageLogger2 = messageLogger2;

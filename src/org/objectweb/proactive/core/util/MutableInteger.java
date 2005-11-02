@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,44 +32,43 @@ package org.objectweb.proactive.core.util;
 
 import java.io.Serializable;
 
+
 /**
  * Defines a mutable, serializable and not final Integer.
  * @author cdelbe
  */
 public class MutableInteger implements Serializable {
-
     private int value;
-    
-    public MutableInteger(){}
-    
+
+    public MutableInteger() {
+    }
+
     public MutableInteger(int value) {
         this.value = value;
     }
 
-    public int getValue(){
+    public int getValue() {
         return this.value;
     }
-    
-    public void setValue(int value){
+
+    public void setValue(int value) {
         this.value = value;
     }
-    
-    
-    public int add(int toAdd){
-        this.value+=toAdd;
+
+    public int add(int toAdd) {
+        this.value += toAdd;
         return this.value;
     }
- 
-    public int hashCode(){
+
+    public int hashCode() {
         return this.value;
     }
-    
-    public boolean equals(Object mi){
+
+    public boolean equals(Object mi) {
         if (mi instanceof MutableInteger) {
-            return this.value==((MutableInteger)mi).getValue();
+            return this.value == ((MutableInteger) mi).getValue();
         } else {
             return false;
         }
     }
-    
 }

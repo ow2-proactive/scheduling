@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -62,7 +62,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
         addHandler(INFRASTRUCTURE_TAG,
             new InfrastructureHandler(proActiveDescriptor));
-        addHandler(FILE_TRANSFER_DEFINITIONS_TAG, new FileTransferDefinitionsHandler(proActiveDescriptor));
+        addHandler(FILE_TRANSFER_DEFINITIONS_TAG,
+            new FileTransferDefinitionsHandler(proActiveDescriptor));
         addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
         {
             PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
@@ -78,7 +79,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 vNodesAcqHandler);
             this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
         }
-		this.addHandler(VARIABLES_TAG, new VariablesHandler());
+        this.addHandler(VARIABLES_TAG, new VariablesHandler());
     }
 
     //
@@ -165,8 +166,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
-			// clean properties definitions for current descriptor
-			org.objectweb.proactive.core.xml.XMLProperties.clean();
+            // clean properties definitions for current descriptor
+            org.objectweb.proactive.core.xml.XMLProperties.clean();
         }
     }
 

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -58,8 +58,8 @@ public class Hello implements java.io.Serializable {
     /** The Active Object creates and returns information on its location
      * @return a StringWrapper which is a Serialized version, for asynchrony */
     public StringMutableWrapper sayHello() {
-        return new StringMutableWrapper(this.message + "\n from " + getHostName() +
-            "\n at " + dateFormat.format(new java.util.Date()));
+        return new StringMutableWrapper(this.message + "\n from " +
+            getHostName() + "\n at " + dateFormat.format(new java.util.Date()));
     }
 
     /** finds the name of the local machine */

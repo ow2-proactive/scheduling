@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,10 +57,10 @@ public class FaultToleranceService implements UniversalService {
 
     // logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
-    
+
     // protocol Type
     private String protocolType;
-    
+
     // fault tolerance servers
     private String recoveryProcessURL;
     private String checkpointServerURL;
@@ -118,16 +118,15 @@ public class FaultToleranceService implements UniversalService {
 
         if (this.getTtcValue() != null) {
             line.append(" -Dproactive.ft.ttc=" + this.getTtcValue());
-        }         
-        if (this.getAttachedResourceServer()!=null){
-            line.append(" -Dproactive.ft.server.resource=" + 
-            	this.getAttachedResourceServer());
         }
-        if (this.getProtocolType()!=null){
-            line.append(" -Dproactive.ft.protocol=" + 
-            	this.getProtocolType());
+        if (this.getAttachedResourceServer() != null) {
+            line.append(" -Dproactive.ft.server.resource=" +
+                this.getAttachedResourceServer());
         }
-        if (logger.isDebugEnabled()){
+        if (this.getProtocolType() != null) {
+            line.append(" -Dproactive.ft.protocol=" + this.getProtocolType());
+        }
+        if (logger.isDebugEnabled()) {
             logger.debug("FT config is : " + line);
         }
         return line.toString();
@@ -213,9 +212,11 @@ public class FaultToleranceService implements UniversalService {
     public void setTtcValue(String ttcValue) {
         this.ttcValue = ttcValue;
     }
+
     public String getProtocolType() {
         return protocolType;
     }
+
     public void setProtocolType(String protocolType) {
         this.protocolType = protocolType;
     }

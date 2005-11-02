@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,7 +75,7 @@ public class ActiveQueue extends Thread {
     }
 
     /**
-     * Add a job in the active queue. A barrier is created for this job; waiting on this 
+     * Add a job in the active queue. A barrier is created for this job; waiting on this
      * barrier is blocking until the job j ends.
      * @param j the job to add.
      * @return a barrier on the job j;
@@ -98,7 +98,6 @@ public class ActiveQueue extends Thread {
         return (ActiveQueueJob) (queue.remove(0));
     }
 
-    
     /**
      * Stop the thread.
      */

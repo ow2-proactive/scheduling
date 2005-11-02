@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -69,13 +69,16 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         this(messageLogger, messageLogger, null);
     }
 
-    public AbstractExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
+    public AbstractExternalProcess(
+        RemoteProcessMessageLogger inputMessageLogger,
         RemoteProcessMessageLogger errorMessageLogger) {
         this(inputMessageLogger, errorMessageLogger, null);
     }
 
-    public AbstractExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger, MessageSink outputMessageSink) {
+    public AbstractExternalProcess(
+        RemoteProcessMessageLogger inputMessageLogger,
+        RemoteProcessMessageLogger errorMessageLogger,
+        MessageSink outputMessageSink) {
         this.inputMessageLogger = inputMessageLogger;
         this.errorMessageLogger = errorMessageLogger;
         this.outputMessageSink = outputMessageSink;
@@ -103,12 +106,14 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return outputMessageSink;
     }
 
-    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(
+        RemoteProcessMessageLogger inputMessageLogger) {
         checkStarted();
         this.inputMessageLogger = inputMessageLogger;
     }
 
-    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(
+        RemoteProcessMessageLogger errorMessageLogger) {
         checkStarted();
         this.errorMessageLogger = errorMessageLogger;
     }
@@ -137,7 +142,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     public String getFileTransferDefaultCopyProtocol() {
         return FILE_TRANSFER_DEFAULT_PROTOCOL;
     }
-    
+
     public int getCompositionType() {
         return NO_COMPOSITION;
     }
@@ -383,8 +388,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     /**
      * Implementation of a RemoteProcessMessageLogger that output all messages to the standard output
      */
-    public static class StandardOutputMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
+    public static class StandardOutputMessageLogger
+        implements RemoteProcessMessageLogger, java.io.Serializable {
         public StandardOutputMessageLogger() {
             //messageLogger.addAppender(new ConsoleAppender(new PatternLayout("%-5p %m %n")));
         }
@@ -487,7 +492,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         private ThreadActivityMonitor threadMonitor;
 
         public ProcessInputHandler(java.io.BufferedReader in,
-            RemoteProcessMessageLogger logger, ThreadActivityMonitor threadMonitor) {
+            RemoteProcessMessageLogger logger,
+            ThreadActivityMonitor threadMonitor) {
             this.in = in;
             this.logger = logger;
             this.threadMonitor = threadMonitor;

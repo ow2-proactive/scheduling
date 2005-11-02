@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -219,7 +219,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      */
     public ExternalProcess createProcess(String processID,
         String processClassName) throws ProActiveException;
-    
+
     /**
      * Gets an instance of the FileTransfer description. If
      * an instance for this ID was already exists inside the pad
@@ -228,7 +228,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * @return New or existing instance for the ID
      */
     public FileTransfer getFileTransfer(String fileTransferID);
-    
+
     /**
      * Updates with the effective service, all objects that are mapped with the serviceID.
      * It updates the table where is stored the mapping serviceID/service and link the

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,13 +30,15 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import org.apache.log4j.Logger;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.body.ComponentBody;
@@ -49,17 +51,14 @@ import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 import org.objectweb.proactive.examples.c3d.RenderingEngine;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 
 /**
  * The Component wrapper class for our Dispatcher.
  * Most interesting bit of this code is the runComponentActivity redefinition.
  */
-public class DispatcherImpl extends C3DDispatcher implements Dispatcher, DispatcherLogic,
-    DispatcherAttributes, BindingController, ComponentRunActive {
+public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
+    DispatcherLogic, DispatcherAttributes, BindingController,
+    ComponentRunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     // component bindings
@@ -99,8 +98,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
         if (cItf.startsWith("dispatcher2engine")) {
             System.out.println("added engine  " + cItf);
             this.engines.put(cItf, sItf);
-            addEngine(
-                (RenderingEngine) sItf,
+            addEngine((RenderingEngine) sItf,
                 cItf.substring("dispatcher2".length()) + "@" +
                 Integer.toHexString(sItf.hashCode()));
         }
@@ -135,9 +133,9 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
                 ComponentBody componentBody = (ComponentBody) body;
 
                 // treat non functional requests before component is started
-                while (
-                    LifeCycleController.STOPPED.equals(
-                            Fractal.getLifeCycleController(componentBody.getProActiveComponent())
+                while (LifeCycleController.STOPPED.equals(
+                            Fractal.getLifeCycleController(
+                                componentBody.getProActiveComponent())
                                        .getFcState())) {
                     componentService.blockingServeOldest(nfRequestFilter);
                 }

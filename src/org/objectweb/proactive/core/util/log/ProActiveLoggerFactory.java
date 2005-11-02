@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,13 +53,13 @@ public class ProActiveLoggerFactory implements LoggerFactory {
         if (MDC.get("hostname") == null) {
             MDC.put("hostname", getHostName());
         }
-        if (MDC.get("runtime") == null) { 
+        if (MDC.get("runtime") == null) {
             MDC.put("runtime", "unknown runtime");
         }
 
         return new ProActiveLogger(name);
     }
-    
+
     private static String getHostName() {
         try {
             return InetAddress.getLocalHost().getHostName();

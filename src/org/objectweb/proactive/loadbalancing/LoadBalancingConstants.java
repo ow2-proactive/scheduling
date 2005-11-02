@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,8 +28,8 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.loadbalancing;
+
 
 /**
  * @author Javier.Bustos@sophia.inria.fr
@@ -46,7 +46,7 @@ public interface LoadBalancingConstants {
      * <code>MIGRATION_TIME</code>: constant estimation of MIGRATION time.
      */
     public static final long MIGRATION_TIME = 5000;
-    
+
     /**
      * <code>OVERLOADED_THREASHOLD</code>: begin of overloaded state.
      */
@@ -71,9 +71,6 @@ public interface LoadBalancingConstants {
      * <code>SUBSET_SIZE</code>: Number of acquaintances requested for balancing.
      */
     public static final int SUBSET_SIZE = 3;
-
-	public static final int NEIGHBORS_TO_STEAL = 2;
-
-	public static final double STEAL_PONDERATION = 1.5;
-
+    public static final int NEIGHBORS_TO_STEAL = 2;
+    public static final double STEAL_PONDERATION = 1.5;
 }

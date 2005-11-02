@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ public interface ProActiveDescriptorConstants {
     public static final String PROPERTY_TAG = "property";
     public static final String VARIABLES_TAG = "variables";
     public static final String PROPERTY_INFILE_TAG = "file";
-	public static final String PROPERTIES_FILE_TAG = "propertiesFile";
+    public static final String PROPERTIES_FILE_TAG = "propertiesFile";
     public static final String DEPLOYMENT_TAG = "deployment";
     public static final String INFRASTRUCTURE_TAG = "infrastructure";
     public static final String COMPONENT_DEFINITION_TAG = "componentDefinition";
@@ -85,7 +85,7 @@ public interface ProActiveDescriptorConstants {
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String HIERARCHICAL_PROCESS_TAG = "hierarchicalProcess";
     public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
-    public static final String GLITE_PROCESS_OPTIONS_TAG="gLiteOptions";
+    public static final String GLITE_PROCESS_OPTIONS_TAG = "gLiteOptions";
     public static final String GRID_ENGINE_OPTIONS_TAG = "gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
     public static final String SERVICES_TAG = "services";

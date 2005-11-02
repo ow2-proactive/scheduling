@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,8 +56,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-public class NBodyFrame extends JFrame implements Serializable, ActionListener, MouseListener,
-    WindowListener {
+public class NBodyFrame extends JFrame implements Serializable, ActionListener,
+    MouseListener, WindowListener {
     public final static int SIZE = 500;
     public final static int MAX_HISTO_SIZE = 100;
 
@@ -134,7 +134,8 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
             killingPanel.add(listVMs);
             killingPanel.add(cmd);
             killingPanel.add(kill);
-            killingPanel.setBorder(BorderFactory.createTitledBorder("Execution control"));
+            killingPanel.setBorder(BorderFactory.createTitledBorder(
+                    "Execution control"));
 
             controlPanel.add(killingPanel);
         }
@@ -153,7 +154,8 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         setVisible(true);
     }
 
-    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id, String name) {
+    public void drawBody(int x, int y, int vx, int vy, int weight, int d,
+        int id, String name) {
         this.bodies[id][0] = x;
         this.bodies[id][1] = y;
         this.bodies[id][2] = weight;
@@ -200,7 +202,10 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
     private class PlanetDisplayPanel extends JPanel {
         private final Image bkground;
         private int iter = 0;
-        private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
+        private Color[] colors = {
+                Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY,
+                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK
+            };
 
         private PlanetDisplayPanel(Image bkground) {
             super();
@@ -217,12 +222,10 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
                     for (int j = 0; j < histoSize; j++) {
                         int diameter = (bodies[i][3] > 10) ? (bodies[i][3]) : (6);
                         g.setColor(getColor(i));
-                        g.fillOval(
-                            historics[i].getX(j) + (diameter / 2),
+                        g.fillOval(historics[i].getX(j) + (diameter / 2),
                             historics[i].getY(j) + (diameter / 2), 6, 6);
                         g.setColor(Color.DARK_GRAY);
-                        g.drawOval(
-                            historics[i].getX(j) + (diameter / 2),
+                        g.drawOval(historics[i].getX(j) + (diameter / 2),
                             historics[i].getY(j) + (diameter / 2), 6, 6);
                     }
                 }
@@ -306,8 +309,8 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
             this.showTrace = !showTrace;
         } else if (e.getSource() == this.kill) {
             try {
-                Runtime.getRuntime().exec(
-                    "" + this.protocol.getSelectedItem() + " " + this.listVMs.getSelectedItem() +
+                Runtime.getRuntime().exec("" + this.protocol.getSelectedItem() +
+                    " " + this.listVMs.getSelectedItem() +
                     " killall -KILL java");
             } catch (IOException e1) {
                 e1.printStackTrace();

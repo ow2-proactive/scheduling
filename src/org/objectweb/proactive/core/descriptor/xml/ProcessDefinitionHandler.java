@@ -1,37 +1,40 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
- * computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis Contact:
- * proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by the Free
- * Software Foundation; either version 2.1 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
- * details.
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
  *
- * Initial developer(s): The ProActive Team
- * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s):
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
  *
  * ################################################################
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-
 import java.util.StringTokenizer;
 
 import javax.naming.directory.InvalidAttributeValueException;
 
+import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
@@ -39,8 +42,8 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
-import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
+import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
@@ -61,16 +64,11 @@ import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.SAXException;
-import org.glite.wms.jdlj.*;//glite-wms-jdlj.jar
 
 
 //import org.xml.sax.SAXException;
-
-
 public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
-
-implements ProActiveDescriptorConstants {
-		
+    implements ProActiveDescriptorConstants {
     protected String id;
     protected ProActiveDescriptor proActiveDescriptor;
     protected ExternalProcess targetProcess;
@@ -101,7 +99,7 @@ implements ProActiveDescriptorConstants {
         this.addHandler(OAR_PROCESS_TAG,
             new OARProcessHandler(proActiveDescriptor));
         this.addHandler(GLITE_PROCESS_TAG,
-				new GLiteProcessHandler(proActiveDescriptor));
+            new GLiteProcessHandler(proActiveDescriptor));
         this.addHandler(OARGRID_PROCESS_TAG,
             new OARGRIDProcessHandler(proActiveDescriptor));
         this.addHandler(HIERARCHICAL_PROCESS_TAG,
@@ -122,13 +120,14 @@ implements ProActiveDescriptorConstants {
      */
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
-    	/*if (name.equals(GLITE_PROCESS_TAG)) {
-    		String []chaine = ((GLiteProcess)targetProcess).getTargetProcess().getEnvironment();
-    		System.out.println("#######$$$$COMMAND PATH$$$$$$$########");
-    		System.out.println(chaine);
-    		
-			((GLiteProcess)activeHandler.getResultObject()).buildJdlFile();
-		}*/
+
+        /*if (name.equals(GLITE_PROCESS_TAG)) {
+                    String []chaine = ((GLiteProcess)targetProcess).getTargetProcess().getEnvironment();
+                    System.out.println("#######$$$$COMMAND PATH$$$$$$$########");
+                    System.out.println(chaine);
+
+                        ((GLiteProcess)activeHandler.getResultObject()).buildJdlFile();
+                }*/
     }
 
     /**
@@ -1140,255 +1139,270 @@ implements ProActiveDescriptorConstants {
     }
 
     //end of inner class GlobusProcessHandler
-    
     protected class GLiteProcessHandler extends ProcessHandler {
-				
-    	protected Object resultObject = null;
-		
-		public GLiteProcessHandler (ProActiveDescriptor proActiveDescriptor){
-			super(proActiveDescriptor);
-			UnmarshallerHandler pathHandler = new PathHandler();
-			BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
-			bch.addHandler(ABS_PATH_TAG, pathHandler);
-			bch.addHandler(REL_PATH_TAG, pathHandler);
-			this.addHandler(GLITE_CONFIG_TAG, bch);
-			this.addHandler(GLITE_ENVIRONMENT_TAG, new SingleValueUnmarshaller());
-			this.addHandler(GLITE_REQUIREMENTS_TAG, new SingleValueUnmarshaller());
-			this.addHandler(GLITE_INPUTDATA_TAG, new GLiteInputDataHandler());
-			this.addHandler(GLITE_RANK_TAG, new SingleValueUnmarshaller());
-			this.addHandler(GLITE_PROCESS_OPTIONS_TAG, new GLiteOptionHandler());
-		}
-		
-		public void setResultObject(Object obj) {
-			try { 
-				resultObject = obj;
-			}catch (Exception e){
-				e.printStackTrace();
-			}
-		}
-		public Object getResultObject() throws org.xml.sax.SAXException { 			
-			setResultObject(targetProcess);
+        protected Object resultObject = null;
+
+        public GLiteProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            UnmarshallerHandler pathHandler = new PathHandler();
+            BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+            bch.addHandler(ABS_PATH_TAG, pathHandler);
+            bch.addHandler(REL_PATH_TAG, pathHandler);
+            this.addHandler(GLITE_CONFIG_TAG, bch);
+            this.addHandler(GLITE_ENVIRONMENT_TAG, new SingleValueUnmarshaller());
+            this.addHandler(GLITE_REQUIREMENTS_TAG,
+                new SingleValueUnmarshaller());
+            this.addHandler(GLITE_INPUTDATA_TAG, new GLiteInputDataHandler());
+            this.addHandler(GLITE_RANK_TAG, new SingleValueUnmarshaller());
+            this.addHandler(GLITE_PROCESS_OPTIONS_TAG, new GLiteOptionHandler());
+        }
+
+        public void setResultObject(Object obj) {
+            try {
+                resultObject = obj;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            setResultObject(targetProcess);
             return resultObject;
         }
-		
-		public void startContextElement(String name, Attributes attributes)
-		throws org.xml.sax.SAXException {
-			
-			super.startContextElement(name, attributes);
-			
-			try {
-				String type = (attributes.getValue("Type"));
-				if(checkNonEmpty (type)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.TYPE, type);
-				}
-				String jdlFile = (attributes.getValue("JDLFileName"));
-				if (checkNonEmpty(jdlFile)) {
-					((GLiteProcess) targetProcess).setFileName(jdlFile);
-				}
-				String hostname = (attributes.getValue("hostname"));
-				if (checkNonEmpty(hostname)) {
-					((GLiteProcess) targetProcess).setNetServer(hostname);
-				}
-				String executable = (attributes.getValue("executable"));
-				if (checkNonEmpty(executable)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.EXECUTABLE, executable);
-					((GLiteProcess)targetProcess).setCommand_path(executable);
-				}
-				String stdOutput = (attributes.getValue("stdOutput"));
-				if (checkNonEmpty(stdOutput)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.STDOUTPUT, stdOutput);
-				}
-				String stdInput = (attributes.getValue("stdInput"));
-				if (checkNonEmpty(stdInput)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.STDINPUT, stdInput);
-				}	
-				String stdError = (attributes.getValue("stdError"));
-				if (checkNonEmpty(stdError)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.STDERROR, stdError);
-				}
-				
-				String outputse = (attributes.getValue("outputse"));
-				if (checkNonEmpty(outputse)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.OUTPUT_SE, outputse);
-				}
-				String virtualOrganisation = (attributes.getValue("virtualOrganisation"));
-				if (checkNonEmpty(virtualOrganisation)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.VIRTUAL_ORGANISATION, virtualOrganisation);
-				}
-				String retryCount = (attributes.getValue("retryCount"));
-				if (checkNonEmpty(retryCount)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.RETRYCOUNT, new Integer(retryCount).intValue());
-				}
-				String myProxyServer = (attributes.getValue("myProxyServer"));
-				if (checkNonEmpty(myProxyServer)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.MYPROXY, myProxyServer);
-				}
-				
-				//((GLiteProcess) targetProcess).setJad(jad);
-				
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvalidAttributeValueException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		protected void notifyEndActiveHandler(String name,
-				UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
-			//GLiteProcess gLiteProcess = (GLiteProcess) targetProcess;
-			try {
-				
-				if (name.equals(GLITE_CONFIG_TAG)) {
-					((GLiteProcess) targetProcess).setConfigFile((String)activeHandler.getResultObject());
-				}
-				if (name.equals(GLITE_ENVIRONMENT_TAG)) {
-					((GLiteProcess) targetProcess).jad.addAttribute(Jdl.ENVIRONMENT, (String)activeHandler.getResultObject());
-				} else if (name.equals(GLITE_REQUIREMENTS_TAG)) {
-					String value = (String)activeHandler.getResultObject();
-					((GLiteProcess) targetProcess).jad.setAttributeExpr(Jdl.REQUIREMENTS, value);
-				}else if (name.equals(GLITE_RANK_TAG)) {
-					String rank = (String)activeHandler.getResultObject();
-					((GLiteProcess) targetProcess).jad.setAttributeExpr(Jdl.RANK, Jdl.RANK_DEFAULT);
-				}else {
-					super.notifyEndActiveHandler(name, activeHandler);	
-				}
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvalidAttributeValueException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			
-		}
-		
-		protected class GLiteInputDataHandler extends PassiveCompositeUnmarshaller {
-			public GLiteInputDataHandler() {
-				super();
-			}
-			public void startContextElement(String name, Attributes attributes)
-			throws org.xml.sax.SAXException {
-				super.startContextElement(name, attributes);
-				
-				
-				try {
-					String dataAccessProtocol = (attributes.getValue("dataAccessProtocol"));
-					if (checkNonEmpty(dataAccessProtocol)) {
-						((GLiteProcess) targetProcess).jad.addAttribute(Jdl.DATA_ACCESS, dataAccessProtocol);
-					}
-					String storageIndex = (attributes.getValue("storageIndex"));
-					if (checkNonEmpty(storageIndex)) {
-						((GLiteProcess) targetProcess).jad.addAttribute(Jdl.OD_STORAGE_ELEMENT, storageIndex);
-					}
-					/*String dataCatalog = (attributes.getValue("dataCatalog"));
-					 if (checkNonEmpty(dataCatalog)) {
-					 gLiteProcess.jad.addAttribute(Jdl.CdataCatalog);
-					 }*/
-					
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvalidAttributeValueException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			protected void notifyEndActiveHandler(String name,
-					UnmarshallerHandler activeHandler)
-			throws org.xml.sax.SAXException {
-				
-			}
-			
-		}
-		
-		protected class GLiteRankHandler extends PassiveCompositeUnmarshaller {
-			public GLiteRankHandler() {
-				super();
-			}
-			public void startContextElement(String name, Attributes attributes)
-			throws org.xml.sax.SAXException {
-				super.startContextElement(name, attributes);
-							
-				try {
-					String fuzzyrank = (attributes.getValue("fuzzyrank"));
-					if (checkNonEmpty(fuzzyrank)) {
-						((GLiteProcess) targetProcess).jad.addAttribute(Jdl.FUZZY_RANK, fuzzyrank);
-					}						
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvalidAttributeValueException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			protected void notifyEndActiveHandler(String name,
-					UnmarshallerHandler activeHandler)
-			throws org.xml.sax.SAXException {			
-			}	
-		}
-		
-		protected class GLiteOptionHandler extends PassiveCompositeUnmarshaller{
-			public GLiteOptionHandler() {
-				UnmarshallerHandler pathHandler = new PathHandler();
-				BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
-				bch.addHandler(ABS_PATH_TAG, pathHandler);
-				bch.addHandler(REL_PATH_TAG, pathHandler);
-				this.addHandler(GLITE_PATH_TAG, bch);
-				this.addHandler(GLITE_CONFIG_TAG, bch);
-				this.addHandler(GLITE_REMOTE_PATH_TAG, bch);
-				this.addHandler(GLITE_OUTPUTSANDBOX_TAG, new SingleValueUnmarshaller());
-				this.addHandler(GLITE_ARGUMENTS_TAG, new SingleValueUnmarshaller());
-			}
-			
-			public void startContextElement(String name, Attributes attributes)
-			throws org.xml.sax.SAXException {
-			}
-			
-			
-			protected void notifyEndActiveHandler(String name,
-					UnmarshallerHandler activeHandler)
-			throws org.xml.sax.SAXException {
-				
-				try {
-					if (name.equals(GLITE_PATH_TAG)) {
-						((GLiteProcess) targetProcess).setFilePath((String)activeHandler.getResultObject());
-					}else if (name.equals(GLITE_REMOTE_PATH_TAG)){
-						((GLiteProcess) targetProcess).setRemoteFilePath((String)activeHandler.getResultObject());
-						((GLiteProcess) targetProcess).setJdlRemote(true);
-					}else if (name.equals(GLITE_CONFIG_TAG)){
-						((GLiteProcess) targetProcess).setConfigFile((String)activeHandler.getResultObject());
-						((GLiteProcess) targetProcess).setConfigFileOption(true);
-					} else if (name.equals(GLITE_INPUTSANDBOX_TAG)) {
-						((GLiteProcess) targetProcess).jad.addAttribute(Jdl.INPUTSB, (String)activeHandler.getResultObject());
-					} else if (name.equals(GLITE_OUTPUTSANDBOX_TAG)) {
-						String sandbox = (String)activeHandler.getResultObject();
-						StringTokenizer st = new StringTokenizer(sandbox);
-						while(st.hasMoreTokens()) {
-						((GLiteProcess) targetProcess).jad.addAttribute(Jdl.OUTPUTSB, st.nextToken());
-						}
-					} else if (name.equals(GLITE_ARGUMENTS_TAG)) {
-						((GLiteProcess) targetProcess).jad.addAttribute(Jdl.ARGUMENTS, (String)activeHandler.getResultObject());
-					}else {
-						super.notifyEndActiveHandler(name, activeHandler);
-					}
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (InvalidAttributeValueException e) {
-					e.printStackTrace();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}	   	
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            super.startContextElement(name, attributes);
+
+            try {
+                String type = (attributes.getValue("Type"));
+                if (checkNonEmpty(type)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.TYPE,
+                        type);
+                }
+                String jdlFile = (attributes.getValue("JDLFileName"));
+                if (checkNonEmpty(jdlFile)) {
+                    ((GLiteProcess) targetProcess).setFileName(jdlFile);
+                }
+                String hostname = (attributes.getValue("hostname"));
+                if (checkNonEmpty(hostname)) {
+                    ((GLiteProcess) targetProcess).setNetServer(hostname);
+                }
+                String executable = (attributes.getValue("executable"));
+                if (checkNonEmpty(executable)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.EXECUTABLE,
+                        executable);
+                    ((GLiteProcess) targetProcess).setCommand_path(executable);
+                }
+                String stdOutput = (attributes.getValue("stdOutput"));
+                if (checkNonEmpty(stdOutput)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.STDOUTPUT,
+                        stdOutput);
+                }
+                String stdInput = (attributes.getValue("stdInput"));
+                if (checkNonEmpty(stdInput)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.STDINPUT,
+                        stdInput);
+                }
+                String stdError = (attributes.getValue("stdError"));
+                if (checkNonEmpty(stdError)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.STDERROR,
+                        stdError);
+                }
+
+                String outputse = (attributes.getValue("outputse"));
+                if (checkNonEmpty(outputse)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.OUTPUT_SE,
+                        outputse);
+                }
+                String virtualOrganisation = (attributes.getValue(
+                        "virtualOrganisation"));
+                if (checkNonEmpty(virtualOrganisation)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.VIRTUAL_ORGANISATION,
+                        virtualOrganisation);
+                }
+                String retryCount = (attributes.getValue("retryCount"));
+                if (checkNonEmpty(retryCount)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.RETRYCOUNT,
+                        new Integer(retryCount).intValue());
+                }
+                String myProxyServer = (attributes.getValue("myProxyServer"));
+                if (checkNonEmpty(myProxyServer)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.MYPROXY,
+                        myProxyServer);
+                }
+
+                //((GLiteProcess) targetProcess).setJad(jad);
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (InvalidAttributeValueException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            //GLiteProcess gLiteProcess = (GLiteProcess) targetProcess;
+            try {
+                if (name.equals(GLITE_CONFIG_TAG)) {
+                    ((GLiteProcess) targetProcess).setConfigFile((String) activeHandler.getResultObject());
+                }
+                if (name.equals(GLITE_ENVIRONMENT_TAG)) {
+                    ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.ENVIRONMENT,
+                        (String) activeHandler.getResultObject());
+                } else if (name.equals(GLITE_REQUIREMENTS_TAG)) {
+                    String value = (String) activeHandler.getResultObject();
+                    ((GLiteProcess) targetProcess).jad.setAttributeExpr(Jdl.REQUIREMENTS,
+                        value);
+                } else if (name.equals(GLITE_RANK_TAG)) {
+                    String rank = (String) activeHandler.getResultObject();
+                    ((GLiteProcess) targetProcess).jad.setAttributeExpr(Jdl.RANK,
+                        Jdl.RANK_DEFAULT);
+                } else {
+                    super.notifyEndActiveHandler(name, activeHandler);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (InvalidAttributeValueException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        protected class GLiteInputDataHandler
+            extends PassiveCompositeUnmarshaller {
+            public GLiteInputDataHandler() {
+                super();
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                super.startContextElement(name, attributes);
+
+                try {
+                    String dataAccessProtocol = (attributes.getValue(
+                            "dataAccessProtocol"));
+                    if (checkNonEmpty(dataAccessProtocol)) {
+                        ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.DATA_ACCESS,
+                            dataAccessProtocol);
+                    }
+                    String storageIndex = (attributes.getValue("storageIndex"));
+                    if (checkNonEmpty(storageIndex)) {
+                        ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.OD_STORAGE_ELEMENT,
+                            storageIndex);
+                    }
+
+                    /*String dataCatalog = (attributes.getValue("dataCatalog"));
+                     if (checkNonEmpty(dataCatalog)) {
+                     gLiteProcess.jad.addAttribute(Jdl.CdataCatalog);
+                     }*/
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (InvalidAttributeValueException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+            }
+        }
+
+        protected class GLiteRankHandler extends PassiveCompositeUnmarshaller {
+            public GLiteRankHandler() {
+                super();
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                super.startContextElement(name, attributes);
+
+                try {
+                    String fuzzyrank = (attributes.getValue("fuzzyrank"));
+                    if (checkNonEmpty(fuzzyrank)) {
+                        ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.FUZZY_RANK,
+                            fuzzyrank);
+                    }
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (InvalidAttributeValueException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+            }
+        }
+
+        protected class GLiteOptionHandler extends PassiveCompositeUnmarshaller {
+            public GLiteOptionHandler() {
+                UnmarshallerHandler pathHandler = new PathHandler();
+                BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+                bch.addHandler(ABS_PATH_TAG, pathHandler);
+                bch.addHandler(REL_PATH_TAG, pathHandler);
+                this.addHandler(GLITE_PATH_TAG, bch);
+                this.addHandler(GLITE_CONFIG_TAG, bch);
+                this.addHandler(GLITE_REMOTE_PATH_TAG, bch);
+                this.addHandler(GLITE_OUTPUTSANDBOX_TAG,
+                    new SingleValueUnmarshaller());
+                this.addHandler(GLITE_ARGUMENTS_TAG,
+                    new SingleValueUnmarshaller());
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                try {
+                    if (name.equals(GLITE_PATH_TAG)) {
+                        ((GLiteProcess) targetProcess).setFilePath((String) activeHandler.getResultObject());
+                    } else if (name.equals(GLITE_REMOTE_PATH_TAG)) {
+                        ((GLiteProcess) targetProcess).setRemoteFilePath((String) activeHandler.getResultObject());
+                        ((GLiteProcess) targetProcess).setJdlRemote(true);
+                    } else if (name.equals(GLITE_CONFIG_TAG)) {
+                        ((GLiteProcess) targetProcess).setConfigFile((String) activeHandler.getResultObject());
+                        ((GLiteProcess) targetProcess).setConfigFileOption(true);
+                    } else if (name.equals(GLITE_INPUTSANDBOX_TAG)) {
+                        ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.INPUTSB,
+                            (String) activeHandler.getResultObject());
+                    } else if (name.equals(GLITE_OUTPUTSANDBOX_TAG)) {
+                        String sandbox = (String) activeHandler.getResultObject();
+                        StringTokenizer st = new StringTokenizer(sandbox);
+                        while (st.hasMoreTokens()) {
+                            ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.OUTPUTSB,
+                                st.nextToken());
+                        }
+                    } else if (name.equals(GLITE_ARGUMENTS_TAG)) {
+                        ((GLiteProcess) targetProcess).jad.addAttribute(Jdl.ARGUMENTS,
+                            (String) activeHandler.getResultObject());
+                    } else {
+                        super.notifyEndActiveHandler(name, activeHandler);
+                    }
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (InvalidAttributeValueException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
+
     //  END OF GLITE PROCESS HANDLER
-    
-    
     protected class UnicoreProcessHandler extends ProcessHandler {
         public UnicoreProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);

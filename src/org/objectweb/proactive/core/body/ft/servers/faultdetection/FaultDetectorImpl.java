@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -49,7 +49,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author cdelbe
  */
 public class FaultDetectorImpl implements FaultDetector {
-    
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -127,10 +126,9 @@ public class FaultDetectorImpl implements FaultDetector {
      * @author cdelbe
      */
     private class FaultDetectorThread extends Thread {
-        
         private boolean kill;
         private boolean wakeUpCalled;
-        
+
         public FaultDetectorThread() {
             this.kill = false;
             this.wakeUpCalled = false;
@@ -141,7 +139,7 @@ public class FaultDetectorImpl implements FaultDetector {
             notifyAll();
             this.wakeUpCalled = true;
         }
-        
+
         public synchronized void killMe() {
             this.kill = true;
             notifyAll();
@@ -149,7 +147,7 @@ public class FaultDetectorImpl implements FaultDetector {
 
         public synchronized void pause() {
             try {
-                this.wakeUpCalled=false;
+                this.wakeUpCalled = false;
                 this.wait(FaultDetectorImpl.this.faultDetectionPeriod);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -159,17 +157,22 @@ public class FaultDetectorImpl implements FaultDetector {
         public void run() {
             while (true) {
                 try {
-                    if (kill) break;
+                    if (kill) {
+                        break;
+                    }
+
                     //synchronized (FaultDetectorImpl.this.server){
                     ArrayList al = FaultDetectorImpl.this.server.getAllLocations();
                     Iterator it = al.iterator();
                     logger.info("[FAULT DETECTOR] Scanning " + al.size() +
                         " objects ...");
                     while (it.hasNext()) {
-                        if (kill) break;
+                        if (kill) {
+                            break;
+                        }
                         if (wakeUpCalled) {
                             // a detection is forced, restart...
-                            it=al.iterator();
+                            it = al.iterator();
                             this.wakeUpCalled = false;
                         }
                         UniversalBody current = (UniversalBody) (it.next());
@@ -180,7 +183,9 @@ public class FaultDetectorImpl implements FaultDetector {
                         }
                     }
                     logger.info("[FAULT DETECTOR] End scanning.");
-                    if (kill) break;
+                    if (kill) {
+                        break;
+                    }
                     this.pause();
                 } catch (RemoteException e) {
                     e.printStackTrace();
@@ -196,5 +201,4 @@ public class FaultDetectorImpl implements FaultDetector {
         this.fdt.killMe();
         this.fdt = new FaultDetectorThread();
     }
-
 }

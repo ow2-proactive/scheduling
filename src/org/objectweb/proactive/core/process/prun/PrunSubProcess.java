@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -84,7 +84,6 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
     private static final String FILE_TRANSFER_DEFAULT_PROTOCOL = null;
-    
     protected int jobID;
     protected String queueName;
     protected String hostList;
@@ -129,7 +128,8 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     //        super.setInputMessageLogger(new CompositeMessageLogger(
     //                new ParserMessageLogger(), inputMessageLogger));
     //    }
-    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(
+        RemoteProcessMessageLogger errorMessageLogger) {
         super.setErrorMessageLogger(new CompositeMessageLogger(
                 new ParserMessageLogger(), errorMessageLogger));
     }
@@ -374,9 +374,10 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         //        System.out.println(
         //            "---------------Internal start process of PBSSubProcess " +
         //            command);
-    	if(logger.isDebugEnabled())
-    		logger.debug(command);
-    	
+        if (logger.isDebugEnabled()) {
+            logger.debug(command);
+        }
+
         super.internalStartProcess(command);
     }
 
@@ -393,9 +394,9 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
         if (queueName != null) {
             //prunCommand.append("-native '-q " + queueName + "' ");
-        	prunCommand.append("-q " + queueName + " ");
+            prunCommand.append("-q " + queueName + " ");
         }
-        
+
         if (hostList != null) {
             prunCommand.append("-m " + hostList + " ");
         }
@@ -465,9 +466,9 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         }
     }
 
-	public String getFileTransferDefaultCopyProtocol() {
-		return FILE_TRANSFER_DEFAULT_PROTOCOL;
-	}
+    public String getFileTransferDefaultCopyProtocol() {
+        return FILE_TRANSFER_DEFAULT_PROTOCOL;
+    }
 
     // end inner class CompositeMessageLogger
 }

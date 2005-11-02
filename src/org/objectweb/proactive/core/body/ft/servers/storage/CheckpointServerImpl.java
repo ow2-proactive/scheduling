@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -49,13 +49,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since 2.2
  */
 public abstract class CheckpointServerImpl implements CheckpointServer {
-    
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // used memory
     private final static Runtime runtime = Runtime.getRuntime();
-    
+
     // global server
     protected FTServer server;
 
@@ -116,10 +115,9 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
      */
     protected long getUsedMem() {
         return (CheckpointServerImpl.runtime.totalMemory() -
-                CheckpointServerImpl.runtime.freeMemory()) / 1024;
+        CheckpointServerImpl.runtime.freeMemory()) / 1024;
     }
-    
-    
+
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#initialize()
      */

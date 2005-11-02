@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -120,7 +120,6 @@ public class ProActiveProvider extends WSConstants implements Provider {
         boolean isInterfaceComponent = ((String) props.get(ProActiveDeployer.COMPONENT_INTERFACE)).equals(
                 "true");
 
-        
         try {
             if (!isInterfaceComponent) {
                 targetObject = HttpMarshaller.unmarshallObject(serObj);
@@ -135,7 +134,6 @@ public class ProActiveProvider extends WSConstants implements Provider {
             System.out.println("Exception : " + e.getMessage());
             e.printStackTrace(System.out);
         }
-   
     }
 
     /**
@@ -154,10 +152,9 @@ public class ProActiveProvider extends WSConstants implements Provider {
         //dd.setProviderClass(targetObject.getClass().getName());
         // Add logic to invoke the service and get back the result here
         try {
-            
             Response resp = RPCRouter.invoke(dd, call, targetObject,
                     reqContext, resContext);
-            
+
             //build the enveloppe that contains the response 	
             Envelope env = resp.buildEnvelope();
             System.out.println(env);

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,7 +53,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
 
     /** Maximum number of active queues */
     public static final int MAX_ACTIVE_QUEUES = 50;
-  
+
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -132,7 +132,6 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
         logger.info("[RECOVERY]  " + id + " is updating its state : " + state);
         this.bodies.put(id, new Integer(state));
     }
-    
 
     /**
      * Submit an ActiveQueueJob to the active queue of the recovery process.
@@ -173,13 +172,10 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
         this.bodies = new Hashtable();
         // killing activeQueues
         Iterator itAQ = this.activeQueuePool.iterator();
-        while (itAQ.hasNext()){
-            ((ActiveQueue)(itAQ.next())).killMe();
-        }        
+        while (itAQ.hasNext()) {
+            ((ActiveQueue) (itAQ.next())).killMe();
+        }
         this.activeQueuePool = new Vector();
         this.activeQueuesCounter = 0;
     }
-    
-    
-    
 }

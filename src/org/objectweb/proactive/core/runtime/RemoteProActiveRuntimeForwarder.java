@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,6 +57,7 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+
 /**
  * An adapter for a ProActiveRuntimeForwarder to be able to receive remote calls. This helps isolate
  * protocol-specific code into a small set of specific classes, thus enabling reuse when
@@ -64,7 +65,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * Implemented protocols are RMI, RMISSH, IBIS, JINI, HTTP
  *
  * Note that contrary to BodyForwarder a RuntimeForwarder <b>IS</b> a Runtime.
- * 
+ *
  * @author ProActiveTeam
  */
 public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime {
@@ -155,9 +156,9 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
         throws IOException, ProActiveException;
 
     public ExternalProcess getProcessToDeploy(UniqueRuntimeID urid,
-            ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-            String padURL) throws ProActiveException, IOException;
-    
+        ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
+        String padURL) throws ProActiveException, IOException;
+
     /**
      * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
      */

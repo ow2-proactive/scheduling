@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -78,10 +78,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
     /** Period of the checkpoints garbage collection (ms) */
     public static final int DEFAULT_GC_PERIOD = 40000;
-    
+
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_CIC);
-    
+
     //monitoring latest global state
     private Hashtable stateMonitor; //ckpt index -> number of stored checkpoint
     private int lastGlobalState;
@@ -100,11 +100,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
     // garbage collection
     private ActiveQueue gc;
-    
+
     // profiling
     private boolean displayCkptSize;
 
- 
     public CheckpointServerCIC(FTServer server) {
         super(server);
 
@@ -159,7 +158,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
 
         // updating monitoring
-        int index = ((CheckpointInfoCIC)(c.getCheckpointInfo())).checkpointIndex;
+        int index = ((CheckpointInfoCIC) (c.getCheckpointInfo())).checkpointIndex;
         if (index > this.lastRegisteredCkpt) {
             this.lastRegisteredCkpt = index;
         }
@@ -174,10 +173,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         }
 
         //this.checkLastGlobalState();
-        
         logger.info("[CKPT] Receive checkpoint indexed " + index +
-                " from body " + c.getBodyID() + " (used memory = " + this.getUsedMem() + " Kb)"); // + "[" + System.currentTimeMillis() + "]");
-        
+            " from body " + c.getBodyID() + " (used memory = " +
+            this.getUsedMem() + " Kb)"); // + "[" + System.currentTimeMillis() + "]");
+
         if (displayCkptSize) {
             logger.info("[CKPT] Size of ckpt " + index + " before addInfo : " +
                 this.getSize(c) + " bytes");
@@ -318,6 +317,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             int systemSize = this.server.getSystemSize();
             MutableInteger nextPossible = (MutableInteger) (this.recoveryLineMonitor.get(new MutableInteger(this.recoveryLine +
                         1)));
+
             // THIS PART MUST BE ATOMIC
             if ((nextPossible != null) &&
                     (nextPossible.getValue() == systemSize)) {
@@ -409,6 +409,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                 if (current.equals(failed)) {
                     //look for a new Runtime for this oa
                     Node node = this.server.getFreeNode();
+
                     //if (node==null)return;
                     barriers.add(this.server.submitJobWithBarrier(
                             new RecoveryJob(toSend, this.globalIncarnation, node)));
@@ -423,6 +424,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                     }
                     if (isDead) {
                         Node node = this.server.getFreeNode();
+
                         //if (node==null)return;
                         barriers.add(this.server.submitJobWithBarrier(
                                 new RecoveryJob(toSend, this.globalIncarnation,
@@ -502,7 +504,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             element.confirmLastUpdate();
         }
     }
-    
+
     /**
      * Reintialize the server.
      */
@@ -522,7 +524,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         gc.start();
         gc.addJob(new GarbageCollectionJob(this, DEFAULT_GC_PERIOD));
     }
-    
 
     //////////////////////////////////////////
     ////// JOBS FOR ACTIVE QUEUE /////////////
@@ -562,7 +563,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
 
         // Delete unsable checkpoints, i.e. index < currentRecoveryLine
         protected void garbageCollection() {
-            boolean hasGarbaged =  false;
+            boolean hasGarbaged = false;
             synchronized (server) {
                 int recLine = server.recoveryLine;
                 Iterator it = server.checkpointStorage.values().iterator();
@@ -577,7 +578,9 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                     }
                 }
             }
-            if (hasGarbaged){System.gc();}
+            if (hasGarbaged) {
+                System.gc();
+            }
         }
     }
 
@@ -598,8 +601,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         public void doTheJob() {
             try {
                 UniversalBody destination = server.getLocation(callee);
+
                 // THIS CALL MUST BE FT !!!!
                 HistoryUpdater histo = (HistoryUpdater) (destination.receiveFTMessage(toSend));
+
                 // histo could be null : nothing to commit
                 if (histo != null) {
                     server.commitHistory(histo);

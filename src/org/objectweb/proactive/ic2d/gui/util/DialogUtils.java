@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.util;
 
+import java.net.InetAddress;
+
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
@@ -38,8 +40,6 @@ import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.MonitorThread;
-
-import java.net.InetAddress;
 
 
 public class DialogUtils {
@@ -69,10 +69,10 @@ public class DialogUtils {
         rmihostdialog.setButtonOK(false);
         String host = rmihostdialog.getJTextFieldHostIp();
         try {
-        	int port = UrlBuilder.getPortFromUrl(host);
+            int port = UrlBuilder.getPortFromUrl(host);
             String host1 = UrlBuilder.removePortFromHost(host);
             host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
-            host = host+":"+port;
+            host = host + ":" + port;
         } catch (java.net.UnknownHostException e) {
             logger.log(e, false);
             return;
@@ -110,6 +110,7 @@ public class DialogUtils {
             // ********************* Fix bug : In Http we need the port number !****************************
             int port = UrlBuilder.getPortFromUrl(host);
             String host1 = UrlBuilder.removePortFromHost(host);
+
             //Get the host IP           
             host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
             //Put the port
@@ -164,8 +165,9 @@ public class DialogUtils {
         ibishostdialog.setButtonOK(false);
         String host = ibishostdialog.getJTextFieldHostIp();
         try {
-        	int port = UrlBuilder.getPortFromUrl(host);
+            int port = UrlBuilder.getPortFromUrl(host);
             String host1 = UrlBuilder.removePortFromHost(host);
+
             //Get the host IP           
             host = UrlBuilder.getHostNameorIP(InetAddress.getByName(host1));
             //Put the port

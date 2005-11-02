@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -97,8 +97,8 @@ public class MetaObjectInterfaceClassGenerator
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
-            if (ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION)
-                                   .isDebugEnabled()) {
+            if (ProActiveLogger.getLogger(
+                        Loggers.COMPONENTS_BYTECODE_GENERATION).isDebugEnabled()) {
                 ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION)
                                .debug("generating metaobject interface reference");
             }
@@ -261,7 +261,7 @@ public class MetaObjectInterfaceClassGenerator
             body += (IMPL_FIELD_NAME + ")." + reifiedMethods[i].getName() +
             "(");
             for (int j = 0; j < paramTypes.length; j++) {
-                body += ("(" + paramTypes[j].getName() + ")" + ("$" + (j +1)));
+                body += ("(" + paramTypes[j].getName() + ")" + ("$" + (j + 1)));
                 if (j < (paramTypes.length - 1)) {
                     body += ",";
                 }

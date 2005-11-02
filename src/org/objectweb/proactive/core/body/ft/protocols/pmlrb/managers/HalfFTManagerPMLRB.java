@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,10 +60,9 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  * @since 3.0
  */
 public class HalfFTManagerPMLRB extends FTManager {
-    
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
-    
+
     //sequence number of sending for any messages
     private char sendNumber;
     private MessageInfoPMLRB requestInfos;

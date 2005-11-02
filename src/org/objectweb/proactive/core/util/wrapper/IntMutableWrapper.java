@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -70,13 +70,13 @@ public class IntMutableWrapper implements Serializable {
     public int intValue() {
         return this.value;
     }
-    
+
     /**
      * Set the value with a new one.
      * @param value the new value.
      */
     public void setIntValue(int value) {
-    	this.value = value;
+        this.value = value;
     }
 
     /**
@@ -85,21 +85,21 @@ public class IntMutableWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
-    
-	/**
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object arg0) {
-		if (arg0 instanceof IntMutableWrapper) {
-			return ((IntMutableWrapper)arg0).intValue() == this.value;
-		}
-		return false;
-	}
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		return new Integer(this.value).hashCode();
-	}
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object arg0) {
+        if (arg0 instanceof IntMutableWrapper) {
+            return ((IntMutableWrapper) arg0).intValue() == this.value;
+        }
+        return false;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return new Integer(this.value).hashCode();
+    }
 }

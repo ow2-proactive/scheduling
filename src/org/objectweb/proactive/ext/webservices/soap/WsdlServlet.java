@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -57,7 +57,7 @@ public class WsdlServlet extends HttpServlet {
 
         try {
             String id = req.getParameter("id");
-            
+
             if (id == null) {
                 error(out);
 
@@ -66,12 +66,12 @@ public class WsdlServlet extends HttpServlet {
 
             Hashtable options = new Hashtable();
             String catalinaBase = System.getProperty("catalina.base");
-            options.put("filename", catalinaBase + "/webapps/soap/DeployedServices.ds");
+            options.put("filename",
+                catalinaBase + "/webapps/soap/DeployedServices.ds");
             cm.setOptions(options);
             cm.loadRegistry();
 
             String[] liste = cm.list();
-
 
             DeploymentDescriptor dd = cm.query(id);
             if (dd == null) {

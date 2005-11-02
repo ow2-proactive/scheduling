@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -76,34 +76,32 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
             return buildCommand();
         }
     }
-    
-    public void startFileTransfer(){
-    	if (ProActiveLogger.getLogger(Loggers.FILETRANSFER).isDebugEnabled()) {
-            ProActiveLogger.getLogger(Loggers.FILETRANSFER).debug("FileTransfer initializations ");
-    	}
-    	
-    	FileTransferWorkShop ftwDeploy = getFileTransferWorkShopDeploy();
-    	FileTransferWorkShop ftwRetrieve = getFileTransferWorkShopRetrieve();
-    	
-    	//Set process envirorment information into the FileTransferWorkshop
-    	pushProcessAttributes(ftwDeploy.dstInfoParams);
-    	pushProcessAttributes(ftwRetrieve.srcInfoParams);
-    	
-    	internalStartFileTransfer(ftwDeploy);
-    }
-    
-    
-    /**
-	 * @return A FileTransferWorkShop instance for the deploy queue
-	 */
-	abstract FileTransferWorkShop getFileTransferWorkShopDeploy();
-	
-	/**
-	 * @return A FileTransferWorkShop instance for the retrieve queue
-	 */
-	abstract FileTransferWorkShop getFileTransferWorkShopRetrieve();
 
-    
+    public void startFileTransfer() {
+        if (ProActiveLogger.getLogger(Loggers.FILETRANSFER).isDebugEnabled()) {
+            ProActiveLogger.getLogger(Loggers.FILETRANSFER).debug("FileTransfer initializations ");
+        }
+
+        FileTransferWorkShop ftwDeploy = getFileTransferWorkShopDeploy();
+        FileTransferWorkShop ftwRetrieve = getFileTransferWorkShopRetrieve();
+
+        //Set process envirorment information into the FileTransferWorkshop
+        pushProcessAttributes(ftwDeploy.dstInfoParams);
+        pushProcessAttributes(ftwRetrieve.srcInfoParams);
+
+        internalStartFileTransfer(ftwDeploy);
+    }
+
+    /**
+         * @return A FileTransferWorkShop instance for the deploy queue
+         */
+    abstract FileTransferWorkShop getFileTransferWorkShopDeploy();
+
+    /**
+     * @return A FileTransferWorkShop instance for the retrieve queue
+     */
+    abstract FileTransferWorkShop getFileTransferWorkShopRetrieve();
+
     public void setEnvironment(String[] environment) {
         checkStarted();
         this.environment = environment;
@@ -140,10 +138,10 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         if (username != null) {
             HostsInfos.setUserName(hostname, username);
         }
-        
+
         //before starting the process we execute the filetransfer
         startFileTransfer();
-        
+
         if (logger.isDebugEnabled()) {
             logger.debug(getCommand());
         }
@@ -241,25 +239,28 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     /**
      * This method sets attributes into the FileTransferWorkshop.StructureInformation
      * For now:  : hostname, username
-     * 
+     *
      * If the attributes already exists then it remains unchanged.
-     * 
+     *
      * This method should be overriden if the process want's to set
      * specific parameters to the FileTransferWorkshop before starting
      * the FileTransfer.
      * @param ftw
      */
-    protected void pushProcessAttributes(FileTransferWorkShop.StructureInformation infoParams){
-    	
-    	if(infoParams.getUsername().length()<=0 && 
-    			username!=null && username.length()>0 )
-    		infoParams.setUsername(username);
-    	
-    	if(infoParams.getHostname().length()<=0 && 
-    			hostname!=null && hostname.length()>0 && !hostname.equalsIgnoreCase(DEFAULT_HOSTNAME))
-    		infoParams.setHostname(hostname);
+    protected void pushProcessAttributes(
+        FileTransferWorkShop.StructureInformation infoParams) {
+        if ((infoParams.getUsername().length() <= 0) && (username != null) &&
+                (username.length() > 0)) {
+            infoParams.setUsername(username);
+        }
+
+        if ((infoParams.getHostname().length() <= 0) && (hostname != null) &&
+                (hostname.length() > 0) &&
+                !hostname.equalsIgnoreCase(DEFAULT_HOSTNAME)) {
+            infoParams.setHostname(hostname);
+        }
     }
-    
+
     // -- PRIVATE METHODS -----------------------------------------------
     //
     private static String getLocalHost() {

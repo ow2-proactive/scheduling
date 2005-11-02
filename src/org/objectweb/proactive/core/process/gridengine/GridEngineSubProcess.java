@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -98,7 +98,8 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     //----------------------------------------------------------------------------------------
     //-----------------------Extends AbstractExternalProcessDecorator-------------------------
     //  ----------------------------------------------------------------------------------------
-    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(
+        RemoteProcessMessageLogger errorMessageLogger) {
         super.setErrorMessageLogger(new CompositeMessageLogger(
                 new ParserMessageLogger(), errorMessageLogger));
     }

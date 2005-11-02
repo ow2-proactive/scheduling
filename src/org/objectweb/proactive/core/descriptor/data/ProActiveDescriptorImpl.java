@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -100,7 +100,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     /** map filetransfer-id and filetransfer */
     private java.util.HashMap fileTransferMapping;
-    
+
     /** Location of the xml file */
     private String url;
     private String jobID;
@@ -316,26 +316,27 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public UniversalService getService(String serviceID) {
         return (UniversalService) serviceMapping.get(serviceID);
     }
-    
+
     /**
      * Creates a new FileTransfer definition, and maps this definition
-     * in the PAD internal mapping. Direct usage of this function is 
-     * discouraged, since no pre-existance checking of the definition 
-     * is made. Instead use the public method getFileTransfer(String) 
+     * in the PAD internal mapping. Direct usage of this function is
+     * discouraged, since no pre-existance checking of the definition
+     * is made. Instead use the public method getFileTransfer(String)
      * factory.
      * @param fileTransferID
      * @return a new FileTransfer definition
      */
-    protected FileTransfer createFileTransferDefinition(String fileTransferID){
-    	FileTransfer ft = new FileTransfer(fileTransferID);
-		fileTransferMapping.put(fileTransferID,ft);
-		
+    protected FileTransfer createFileTransferDefinition(String fileTransferID) {
+        FileTransfer ft = new FileTransfer(fileTransferID);
+        fileTransferMapping.put(fileTransferID, ft);
+
         if (logger.isDebugEnabled()) {
             logger.debug("created FileTransfer id=" + fileTransferID);
         }
-        
+
         return ft;
     }
+
     public VirtualNode createVirtualNode(String vnName, boolean lookup) {
         return createVirtualNode(vnName, lookup, false);
     }
@@ -433,24 +434,23 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-    public synchronized FileTransfer getFileTransfer(String fileTransferID){ 
-    	//TODO throw new ProActiveException 
-    	//if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
-    	
-    	FileTransfer ft = (FileTransfer) fileTransferMapping.get(fileTransferID);
-    
-    	if(ft == null){
-    		ft = createFileTransferDefinition(fileTransferID);
-    		fileTransferMapping.put(fileTransferID,ft);
-    		
+    public synchronized FileTransfer getFileTransfer(String fileTransferID) {
+        //TODO throw new ProActiveException 
+        //if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
+        FileTransfer ft = (FileTransfer) fileTransferMapping.get(fileTransferID);
+
+        if (ft == null) {
+            ft = createFileTransferDefinition(fileTransferID);
+            fileTransferMapping.put(fileTransferID, ft);
+
             if (logger.isDebugEnabled()) {
                 logger.debug("created FileTransfer id=" + fileTransferID);
             }
-    	}
+        }
 
-    	return ft;
-    } 
-    
+        return ft;
+    }
+
     public void registerProcess(ExternalProcessDecorator compositeProcess,
         String processID) {
         ExternalProcess process = getProcess(processID);

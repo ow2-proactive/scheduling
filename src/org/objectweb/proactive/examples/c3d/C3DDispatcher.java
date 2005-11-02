@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -73,7 +73,6 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  */
 public class C3DDispatcher implements InitActive, RunActive, Serializable,
     Dispatcher, DispatcherLogic {
-        
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static int IMAGE_HEIGHT = 500;
     private static int IMAGE_WIDTH = 500;
@@ -107,11 +106,11 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     /** The unique GUI reference. All GUI actions use this pointer. */
     private transient DispatcherGUI gui;
     private transient Dispatcher me;
-    private Election election; 
+    private Election election;
 
-	/** The object serving requests   */
-    private Service service ; 
-    
+    /** The object serving requests   */
+    private Service service;
+
     /** The no-argument Constructor as commanded by ProActive; otherwise unused */
     public C3DDispatcher() {
     }
@@ -373,14 +372,14 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     public void rotateScene(int i_user, Vec angle) {
         // If there are more than one users, proceed with a vote. 
         // i_user < 0 means the election trigerred the rotation  
-        if (i_user >= 0 & this.userBag.size() > 1) {
-            this.election.vote(i_user, this.userBag.getName(i_user), angle);  
-                // election cannot be null, it should be created by registerUser & by migration rebuild 
-            return; 
+        if ((i_user >= 0) & (this.userBag.size() > 1)) {
+            this.election.vote(i_user, this.userBag.getName(i_user), angle);
+            // election cannot be null, it should be created by registerUser & by migration rebuild 
+            return;
         }
-        
-        allLog("Scene is being spun along " + angle.direction());   // FIXME : is this needed ?
-        
+
+        allLog("Scene is being spun along " + angle.direction()); // FIXME : is this needed ?
+
         /* rotate every object ... */
         int objects = this.scene.getNbPrimitives();
         for (int i = 0; i < objects; i++) {
@@ -388,7 +387,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             p.rotate(angle);
             this.scene.setPrimitive(p, i);
         }
-        
+
         /* render the image to reflect the rotation */
         render();
     }
@@ -404,18 +403,16 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     public void runActivity(Body body) {
         // Creates the rendering engines 
         go();
-        service = new Service (body);
+        service = new Service(body);
         service.fifoServing();
     }
 
-
-    /** Method called when leaving the current host, for example when migrating. 
+    /** Method called when leaving the current host, for example when migrating.
      * Made public because put in the request queue */
     public void leaveHost() {
         this.gui.trash();
         // should we call a ProActive.unregister("//localhost/Dispatcher"); ? 
     }
-
 
     /** Sends a [log] message to given user */
     public void userLog(int i_user, String s_message) {
@@ -530,19 +527,16 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         // CREATE the election mechanism when more than one user registered
         int nbUsers = this.userBag.size();
-        if (nbUsers >= 2 && this.election==null) {
+        if ((nbUsers >= 2) && (this.election == null)) {
             try {
-                this.election = (Election) ProActive.newActive( 
-                        Election.class.getName(), 
-                        new Object [] {(C3DDispatcher)me}
-                        );
+                this.election = (Election) ProActive.newActive(Election.class.getName(),
+                        new Object[] { (C3DDispatcher) me });
             } catch (Exception e) {
-                e.printStackTrace();        
+                e.printStackTrace();
             }
             election.setNbUsers(nbUsers);
         }
 
-        
         // return user_id, image_width & image_height;
         int[] result = new int[] { this.lastUserID++, IMAGE_WIDTH, IMAGE_HEIGHT };
         return result;
@@ -585,16 +579,16 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         // remove from internal list of users.
         this.userBag.remove(number);
 
-        int nbUsers = this.userBag.size() ;
+        int nbUsers = this.userBag.size();
 
         // if no more users, reset all numbers to zero
-        if (nbUsers == 1) { 
+        if (nbUsers == 1) {
             this.lastUserID = 0;
             this.election.terminate();
-            this.election = null;       // so as not to be reused.
+            this.election = null; // so as not to be reused.
+        } else {
+            this.election.setNbUsers(nbUsers);
         }
-        else
-            this.election.setNbUsers(nbUsers); 
     }
 
     public void resetScene() {
@@ -679,8 +673,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     public void addSphere(Sphere s) {
         if (this.election.isRunning()) {
             allLog("A Sphere Cannot be added while election is running!");
-            return; 
-        }        
+            return;
+        }
         this.scene.addPrimitive(s);
         allLog("A Sphere has been added\n" + s);
         render();

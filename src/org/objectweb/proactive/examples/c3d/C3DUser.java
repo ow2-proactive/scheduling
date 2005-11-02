@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive-support@inria.fr
+ * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -180,7 +180,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
      * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild
      */
     public void initActivity(Body body) {
-		// FIXME : this test should be stripped, only put here to circumvent component bug
+        // FIXME : this test should be stripped, only put here to circumvent component bug
         if (body == null) {
             System.err.println("in C3DUser.initActivity, Body is " + body);
         } else {
