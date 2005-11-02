@@ -11,11 +11,12 @@
 <table width="100%">
   <tr>
     <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
 <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
     <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../index.html">back to index</a>&nbsp;&nbsp;</td>
           <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back
 to guided tour index</a>&nbsp;&nbsp;</td>
-          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="mobile_agents.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="hands_on_programming/migratablehelloframe.html">prev</a>&nbsp;&nbsp;</td>
           <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="nbody.html">next</a>&nbsp;&nbsp;</td>
         </tr>
       </table></td>
@@ -24,13 +25,13 @@ to guided tour index</a>&nbsp;&nbsp;</td>
   </tr>
 </table>
 <hr> <!-- Link to index : end -->
-<h1>3.0. SPMD Programming</h1>
+<h1>4. SPMD Programming</h1>
 <h2>OO SPMD on a Jacobi example</h2>
 
 <p class="textNormal">&nbsp;</p>
 
 
-<h3 class="textNormal">1.  Execution and first glance at the Jacobi code</h3>
+<h3 class="textNormal"><a name="firstglance"></a>1.  Execution and first glance at the Jacobi code</h3>
 <h3 class="textNormal">1.1 Source files: ProActive/src/org/objectweb/proactive/examples/jacobi</h3>
 <p class="textNormal">The Jacobi example is made of two Java classes:</p>
 <p class="textNormal">- Jacobi.java: the main class</p>
@@ -67,7 +68,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <p class="textNormal">	To stop the Jacobi computation and all the associated AOs, and JVMs, just ^C in the window where you started the Jacobi script.<br>
 </p>
 
-<h3 class="textNormal">2. Modification and compilation</h3>
+<h3 class="textNormal"><a name="modifs"></a>2. Modification and compilation</h3>
 <h3 class="textNormal">2.1 Source modification</h3>
 <p class="textNormal">Do a simple source modification, for instance changing the values of the constants MINDIFF (0.00000001 for ex) and ITERATIONS in class Jacobi.java.</p>
 <p class="textNormal">Caveat: Be careful, due to a shortcoming of the Java make system (ant), make sure to also touch the class SubMatrix.java that uses the constants.</p>
@@ -84,7 +85,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <p class="textNormal">	Following the recompilation, rerun the examples as explained in section 1.2 above, and observe the differences.</p>
 
 
-<h3 class="textNormal">3. Detailed understanding of the OO SPMD Jacobi</h3>
+<h3 class="textNormal"><a name="detail"></a>3. Detailed understanding of the OO SPMD Jacobi</h3>
 <h3 class="textNormal">3.1 Structure of the code</h3>
 <p class="textNormal">	Within the class SubMatrix.java the following methods correspond to a standard Jacobi implementation, and are not specific to ProActive:</p>
 		<p class="textNormal"><code>- internalCompute ()</code></p>
@@ -211,7 +212,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <p class="textNormal">	<code>				OOSPMD.html</code></p>
 
 
-<h3 class="textNormal">4. Virtual Nodes and Deployment descriptors</h3>
+<h3 class="textNormal"><a name="deploy"></a>4. Virtual Nodes and Deployment descriptors</h3>
 
 
 <h3 class="textNormal">4.1 Virtual Nodes</h3>
@@ -238,7 +239,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <p class="textNormal">	You do not need to recompile, just restart the execution. Use IC2D
 	to visualize the differences in the configuration.</p>
 
-<h3 class="textNormal">5. Execution on several machines and Clusters</h3>
+<h3 class="textNormal"><a name="execute"></a>5. Execution on several machines and Clusters</h3>
 
 <h3 class="textNormal">5.1 Execution on several machines in the room</h3>
 <ul>

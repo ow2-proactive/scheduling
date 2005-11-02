@@ -1,192 +1,173 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
 <html>
-  <head>
-    <title>ProActive guided tour</title>
+<head>
+<title>ProActive guided tour</title>
 <link rel="stylesheet" href="../ProActive.css">
-  </head>
-  <body bgcolor="#ffffff">
-   <!--
+</head>
+<body bgcolor="#ffffff">
+<!--
  Header : start 
 ~~~ -->
-  <table width="100%">
-  <tr>
-    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
-<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
-    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../index.html">back to index</a>&nbsp;&nbsp;</td>
-          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to guided tour index</a>&nbsp;&nbsp;</td>
-          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="../WSDoc.html">prev</a>&nbsp;&nbsp;</td>
-          <td class="smallLink2" nowrap>&nbsp;&nbsp;<a class="smallLink2" href="setup.html">next</a>&nbsp;&nbsp;</td>
-        </tr>
-      </table></td>
-    <td  align="right" valign="top"> <a href="http://www-sop.inria.fr/oasis/ProActive/"><img src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"/></a>
-    </td>
-  </tr>
+<table width="100%">
+	<tr>
+		<td align="left" valign="middle">
+		<table cellpadding="2" cellspacing="0" border="1">
+			<tr>
+				<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+					href="../../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+				<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+					href="../index.html">back to index</a>&nbsp;&nbsp;</td>
+				<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+					href="index.html">back to guided tour index</a>&nbsp;&nbsp;</td>
+				<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+					href="../WSDoc.html">prev</a>&nbsp;&nbsp;</td>
+				<td class="smallLink2" nowrap>&nbsp;&nbsp;<a class="smallLink2"
+					href="setup.html">next</a>&nbsp;&nbsp;</td>
+			</tr>
+		</table>
+		</td>
+		<td align="right" valign="top"><a
+			href="http://www-sop.inria.fr/oasis/ProActive/"><img
+			src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"
+			alt="" /></a></td>
+	</tr>
 </table>
-<hr> <!-- Link to index : end -->
+<hr>
+<!-- Link to index : end -->
 <h1>ProActive guided tour</h1>
+<p>This tour is a practical introduction to ProActive, giving an
+illustrated introduction to some of the functionnalities and facilities
+offered by the library.</p>
+<p>First off, we give an explaination on how to install and configure
+ProActive. Next are introduced the different functionalities of the
+library through some runnning examples. Then are given om details on how
+this is put down in code, and you will be challenged to write your bits
+of code. This should give you practical experience on how to program
+using ProActive. A section on OO-SPMD (Object-Oriented Single Program
+Multiple Data) will show how to use this programming paradigm.</p>
+<p>The guided tour is finished off by the complete N-Body example. This
+application is first written trivially, then some speed-ups are plugged
+in, to show how ProActive can help you. We hope this will help your
+understanding of the library, and of the concepts driving it.</p>
+<p>If you need further details on how the examples work, check the
+ProActive <a
+	href="http://www-sop.inria.fr/oasis/ProActive/apps/index.html"
+	target="_blank">applications </a>page.</p>
 <p>&nbsp;</p>
-<p>This tour is a practical introduction to ProActive.</p>
-<p> First you will get some practical experience on how to program using ProActive. 
-  This will help your understanding of the library, and of the concepts driving
-  it.<br>
-Second, you will be guided through some examples to run on your computer; this
-  way, you will get an illustrated introduction to some of the functionnalities
-  and facilities offered by the library. </p>
-  <p>Alternatively, you can just have a look at the second part, where you just have to run the applications. In that case, do not worry about answering the questions
-  involving code modifications.
-</p>
-<p>If you need further details on how the examples work, check the ProActive <a href="http://www-sop.inria.fr/oasis/ProActive/apps/index.html" target="_blank">applications 
-  </a>page.</p>
-<p>&nbsp; </p>
 
-                
+
 <table border="0" align="center" cellpadding="4" cellspacing="0">
-  <tbody> 
-  <tr> 
-    <th class="navyCell" colspan="4">Content</th>
-  </tr>
-  <tr> 
-    <td width="21" class="navyCell"> 
-      <div align="center">&nbsp;0.&nbsp;</div>
-    </td>
-    <td colspan="3" class="whiteCell"><a href="setup.html">Setup</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center">1.</div>
-    </td>
-    <td class="whiteCell" colspan="3"><a href="hands_on_programming.html">Hands-on 
-      Programming with ProActive</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">1.1. <a href="hands_on_programming/clientserver.html">Client-Server</a></div>
-    </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">1.2.<a href="hands_on_programming/initializedhello.html"> 
-        Control of the Activity</a></div>
-    </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">1.3. <a href="hands_on_programming/migratablehello.html">Migration</a></div>
-      </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">1.4. <a href="hands_on_programming/migratablehelloframe.html">Migration 
-        of Graphical Frames</a></div>
-    </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center">2.</div>
-    </td>
-    <td class="whiteCell" colspan="3"><a href="capabilities-intro.html">Introduction 
-      to the Functionalities of the Library</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">2.1.<a href="synchronization.html"> Synchronization</a></div>
-    </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell">&nbsp;</td>
-    <td class="whiteCell"> <a href="readers_writers.html">Readers / Writers</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell">&nbsp;</td>
-    <td class="whiteCell"> <a href="dining_philosophers.html">Dining Philosophers</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">2.2. <a href="parallel_processing.html">Collaborative and Parallel Processing 
-        </a></div>
-      </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell">&nbsp;</td>
-    <td class="whiteCell"> <a href="c3d.html">C3D</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell" colspan="3"> 
-      <div align="left">2.3. <a href="migration.html">Migration</a></div>
-    </td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center"></div>
-    </td>
-    <td class="whiteCell"> 
-      <div align="center" class="whiteCell"></div>
-    </td>
-    <td class="whiteCell">&nbsp;</td>
-    <td class="whiteCell"> <a href="mobile_agents.html">Mobile Agents</a></td>
-  </tr>
-  <tr> 
-    <td class="navyCell"> 
-      <div align="center">3.</div>
-    </td>
-    <td class="whiteCell" colspan="3"><a href="OOSPMDJacobiexample.html">OO SPMD</a></td>
-  </tr>
-    <td class="navyCell"> 
-      <div align="center">4.</div>
-    </td>
-    <td class="whiteCell" colspan="3"><a href="nbody.html">A complete example : the nbody example</a></td>
-  </tr>
-    <td class="navyCell"> 
-      <div align="center">5.</div>
-    </td>
-    <td class="whiteCell" colspan="3"><a href="conclusion.html">Conclusion</a></td>
-  </tr>
-  </tbody> 
+	<tbody>
+		<tr>
+			<th class="navyCell" colspan="4">Content</th>
+		</tr>
+		<tr>
+			<td width="21" class="navyCell">
+			<div align="center">1.</div>
+			</td>
+			<td colspan="3" class="whiteCell"><a href="setup.html">Setup</a></td>
+		</tr>
+		<tr>
+			<td class="navyCell">
+			<div align="center">2.</div>
+			</td>
+			<td class="whiteCell" colspan="3"><a href="capabilities-intro.html">Introduction
+			to the Functionalities of the Library</a></td>
+		</tr>
+		<tr>
+			<td class="navyCell"></td>
+			<td class="whiteCell" colspan="3">2.1.<a href="synchronization.html">Synchronization</a><br>
+			<div style="margin-left: 40px;"><a href="readers_writers.html">Readers
+			/ Writers</a> <br>
+			<a href="dining_philosophers.html">Dining Philosophers</a></div>
+			2.2. <a href="parallel_processing.html">Collaborative and Parallel
+			Processing </a>
+			<div style="margin-left: 40px;"><a href="c3d.html">C3D</a></div>
+			2.3. <a href="migration.html">Migration</a>
+			<div style="margin-left: 40px;"><a href="mobile_agents.html">Mobile
+			Agents</a></div>
+			</td>
+		</tr>
+		<tr>
+			<td class="navyCell">
+			<div align="center">3.</div>
+			</td>
+			<td class="whiteCell" colspan="3"><a href="hands_on_programming.html">Hands-on
+			Programming with ProActive</a></td>
+		</tr>
+		<tr>
+			<td class="navyCell">
+			<div align="center"></div>
+			</td>
+			<td class="whiteCell" colspan="3">3.1. <a
+				href="hands_on_programming/clientserver.html">Client-Server</a> <br>
+			3.2.<a href="hands_on_programming/initializedhello.html"> Control of
+			the Activity</a><br>
+			3.3. <a href="hands_on_programming/migratablehello.html">Migration</a><br>
+			3.4. <a href="hands_on_programming/migratablehelloframe.html">Migration
+			of Graphical Frames</a><br>
+			</td>
+		</tr>
+		<tr>
+			<td class="navyCell">
+			<div align="center">4.</div>
+			</td>
+			<td class="whiteCell" colspan="3"><a href="OOSPMDJacobiexample.html">OO
+			SPMD</a></td>
+		</tr>
+		<tr>
+			<td class="navyCell">
+			<div align="center"></div>
+			</td>
+			<td class="whiteCell" colspan="3">4.1.<a
+				href="OOSPMDJacobiexample.html#firstglance"> Execution and first
+			glance at the Jacobi code</a><br>
+			4.2.<a href="OOSPMDJacobiexample.html#modifs"> Modification and
+			compilation</a><br>
+			4.3.<a href="OOSPMDJacobiexample.html#detail"> Detailed understanding
+			of the OO SPMD Jacobi</a><br>
+			4.4.<a href="OOSPMDJacobiexample.html#deploy"> Virtual Nodes and
+			Deployment descriptors</a><br>
+			4.5.<a href="OOSPMDJacobiexample.html#execute"> Execution on several
+			machines and Clusters</a><br>
+			</td>
+		</tr>
+		<tr>
+			<td class="navyCell">
+			<div align="center">5.</div>
+			</td>
+			<td class="whiteCell" colspan="3"><a href="nbody.html">A complete
+			example : the nbody example</a></td>
+		</tr>
+		<tr>
+			<td class="navyCell"></td>
+			<td class="whiteCell" colspan="3">5.1.<a href="nbody.html#rationale">Rationale
+			and overview </a><br>
+			5.2.<a href="nbody.html#sources">Source files</a><br>
+			5.3.<a href="nbody.html#common">Common files</a><br>
+			5.4.<a href="nbody.html#simple">Simple Active Objects</a><br>
+			5.5.<a href="nbody.html#groups">Groups of Active objects</a><br>
+			5.6.<a href="nbody.html#distrib">groupdistrib</a><br>
+			5.7.<a href="nbody.html#oospmd">Object Oriented SPMD Groups</a><br>
+			5.8.<a href="nbody.html#barnes">Barnes-Hut</a><br>
+			5.9.<a href="nbody.html#concl">NBody Conclusion</a><br>
+			</td>
+		</tr>
+
+		<tr>
+			<td class="navyCell">
+			<div align="center">6.</div>
+			</td>
+			<td class="whiteCell" colspan="3"><a href="conclusion.html">Conclusion</a></td>
+		</tr>
+	</tbody>
 </table>
 <p>&nbsp;</p>
 <p><i><font size="-1">History :</font></i></p>
-<p><font size="-1"><i>26/04/2003 : first version</i></font></p>
-<p><font size="-1"><i>26/10/2004 : second version</i></font></p>
-<p><font size="-1"><i>15/04/2005 : third version</i></font></p>
-<p align="right">&nbsp;</p>
+<p><font size="-1"><i> 26/04/2003 : first version<br>
+26/10/2004 : second version<br>
+15/04/2005 : third version<br>
+02/11/2005 : Table of contents detailled and order changed -
+functionalities first, code later </i></font></p>
 </body>
 </html>

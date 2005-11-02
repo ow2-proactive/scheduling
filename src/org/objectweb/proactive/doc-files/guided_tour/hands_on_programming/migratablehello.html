@@ -37,11 +37,11 @@ to guided tour index</a>&nbsp;&nbsp;</td>
   </tbody>
 </table>
 <hr><!-- Link to index : end -->
-<h1>1.3. A simple migration example</h1>
+<h1>3.3. A simple migration example</h1>
 <p>This program is a very simple one : it creates an active object
 that migrates between virtual machines. It is a extension of the
 previous client-server example, the server now being mobile.</p>
-<h2>1.3.1. Required conditions</h2>
+<h2>Required conditions</h2>
 <p>The conditions for MigratableHello to be a migratable active object are : </p>
 <p>- it must have a constructor without parameters : this is a result of a 
 ProActive 
@@ -57,7 +57,7 @@ p>
 check 
   the <a 
 href="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Migration.html">manual</a>.</p><p></p>
-<h2>1.3.2. design</h2>
+<h2>Design</h2>
 <p>We want to further enhance InitializedHello it by making migratable : we'd like to be able to move it 
 across virtual machines. </p>
 <p>Thus, we create a MigratableHello class, that derives from InitializedHello. This class will implement 
@@ -72,7 +72,7 @@ across virtual machines. </p>
   active object : <code>static MigratableHello createMigratableHello(String : name)</code></p>
 <p>The class diagram for the application is the following :</p>
 <p><img src="../pics/hello/migratablehello.gif"></p>
-<h2>1.3.3. Programming</h2>
+<h2>Programming</h2>
 <h3>a) the MigratableHello class</h3>
 <p>The code of the MigratableHello class is <a href="code/MigratableHello.java.html">here</a>.</p>
 <p>MigratableHello derives from the Hello class from the previous example</p>
@@ -109,7 +109,7 @@ public void moveTo(String destination_node) {
 <p>The program calls the factory method of MigratableHello to create an instance of
   an active object. It then moves it from node to node, pausing for a while between
   the transfers.</p>
-  <h2>1.3.4. Execution</h2>
+  <h2>Execution</h2>
 <p>- start several nodes using the <code>startnode</code> script.</p>
 <pre>windows>cd scripts/windows
 				startNode.bat //localhost/n1

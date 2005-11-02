@@ -41,7 +41,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 </table>
 <hr>
 <!-- Link to index : end -->
-<h1>4.0. The nbody example<br>
+<h1>5. The nbody example<br>
 </h1>
 
 
@@ -49,7 +49,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 
 <h2>Using facilities provided by
 ProActive on a complete example</h2>
-<h3 class="textNormal">1 Rationale and overview<br> </h3>
+<h3><a name="rationale"></a>1 Rationale and overview<br> </h3>
 <p>This section of the guided tour goes through the different steps that could
 take you to writing an application with ProActive, from a simple design, to a
 more complicated structure. This is meant to help you get familiar with the
@@ -65,7 +65,6 @@ nbody example running on 3 hosts with 8 bodies:<br><br>
       <img src="./pics/nbody/gui.jpg">
 </div>
 
-</p>
 <p> n-body is a classic problem. It
 consists in working out the position of
 bodies in space, which depend only on the gravitational forces that
@@ -144,7 +143,7 @@ the time):<br>
   </tbody>
 </table>
 </div>
-<h3 class="textNormal">2 Source files: ProActive/src/org/objectweb/proactive/examples/nbody</h3>
+<h3><a name="sources"></a>2 Source files: ProActive/src/org/objectweb/proactive/examples/nbody</h3>
 <p>
 This guided tour is based on the files you may find in the directory
 ProActive/src/org/objectweb/proactive/examples/nbody. You'll find the
@@ -160,7 +159,7 @@ are two enhancement based on different synchronization schemes.
 'barneshut' is a bit special, in that it contains a different algorithm
 to solve the nbody problem. <br>
 </p>
-<h3 class="textNormal">3 Common files</h3>
+<h3><a name="common"></a>3 Common files</h3>
 <p>The
 files contained in 'common'
 are those that are reused throughout
@@ -179,7 +178,6 @@ void drawBody(int x, int y, int vx, int vy, int weight, int d,
 int id) ;</code></p>
 Taking position, velocity, diameter and unique identifier of a body, it
 updates the display window. </li>
-  <br>
   <li>Then, we have the files
 Force.java and Planet.java. They are used to compute the interaction
 between two distant bodies in the universe. Since they are in the
@@ -300,7 +298,7 @@ final implementation, featuring the Barnes-Hut algorithm. But let's not
 go too fast. Let's have a look at the insides of the simplest
 implementation of the n-body problem. <br>
 </p>
-<h3 class="textNormal">4 Simple Active Objects</h3>
+<h3><a name="simple"></a>4 Simple Active Objects</h3>
 <p>This is the implementation of
 the simplest example of nbody. We defined
 the <code>Planet</code>
@@ -520,7 +518,7 @@ are stored as an array, which is called <code>neighbours</code>.
 You may find another view of this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web
 page</a>.</p>
-<h3 class="textNormal">5 Groups of Active objects</h3>
+<h3><a name="groups"></a>5 Groups of Active objects</h3>
 <p>This
 is a simple improvement,
 which allows to have faster
@@ -592,7 +590,7 @@ method sets the local
 field as a copy of the passed parameter, and as such is unique, and we
 can
 play around with it without affecting the others. So let's remove the
-local <code>Domain<code>
+local <code>Domain</code>
 from the Group, to avoid having calls on self:
 </p>
 <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -637,7 +635,7 @@ You may find another view of this example on this <a
 page</a>.</p>
 
 
-<h3 class="textNormal">6 groupdistrib</h3>
+<h3><a name="distrib"></a>6 groupdistrib</h3>
 <p>Now,
 do like the idea that the synchronization is centralized on one
 entity, the <code>Maestro</code>? I don't and it's the bottleneck of the application anyway :
@@ -728,7 +726,7 @@ You
 may find another view of this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">web
 page</a>.</p>
-<h3 class="textNormal">7 Object Oriented SPMD Groups</h3>
+<h3><a name="oospmd"></a>7 Object Oriented SPMD Groups</h3>
 <p>This is another way to improve
 the groupcom example. It also removes
 the master, but this time by inserting oospmd barriers, that can be
@@ -794,7 +792,7 @@ the barrier execution, which is exactly what we don't want! <br>
 You may find another view of this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">web
 page</a>.</p>
-<h3 class="textNormal">8 Barnes-Hut</h3>
+<h3><a name="barnes"></a>8 Barnes-Hut</h3>
 <p class="textNormal">This
 way to construct the nbody simulation is based on a very different
 algorithm. This is inserted to show how one can express this algorithm
@@ -871,7 +869,7 @@ send them when needed.</p>
 this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web
 page</a>.</p>
-<h3 class="textNormal">9 Conclusion</h3>
+<h3><a name="concl"></a>9 Conclusion</h3>
 <p>In
 this guided tour, we tried
 to show different facilities provided by

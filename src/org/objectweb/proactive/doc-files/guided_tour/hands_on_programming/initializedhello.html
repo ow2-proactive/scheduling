@@ -33,7 +33,7 @@ border="0"/></a> </td>
 	<!-- Link to index : end -->
 	
 
-<h1>1.2. Initialization of the activity</h1>
+<h1>3.2. Initialization of the activity</h1>
 
 <p>Active objects, as indicates their name, have an activity of their own (an internal thread).<br>
 It is possible to add pre and post processing to this activity, just by implementing the interfaces
@@ -60,7 +60,7 @@ for the InitializedHelloClient class.</p><p>The main method is overriden so that
 <p>initActivity and endActivity here just log messages onto the console, so you can see when they are called.</p>
 <p>initActivity is called at the creation of the active object, while endActive is called after the activity has terminated 
 (thanks to the method terminate).</p>
-</p>
+ 
 <p>Here is the initActivity method :</p>
 <pre class="snippet">
 public void initActivity(Body body) {
