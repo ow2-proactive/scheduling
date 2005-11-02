@@ -791,7 +791,7 @@
       ==
       ================================================================
 	-->
-	<target name="nonregressiontest" depends="testsuite, all">
+	<target name="nonregressiontest" depends="testsuite, compile">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
@@ -951,7 +951,7 @@
   </target>
   
   
-  <target name="testsCoverage" depends="coverage-init, all, proActiveJar, testsuite, nonregressiontest">
+  <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
  	 <delete file="${base}/compile/tests.log"/>
 	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
 	 <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
