@@ -33,7 +33,7 @@
 <h1>Exporting Active Objects and components as web services</h1>
 
 
-<h2>Overview</h2>
+<h2><a name="overview"></a>Overview</h2>
  <p class="textNormal">
 
 This feature allows the call and monitoring of active objects and ProActive components  from any client written in any foreign language. <br>
@@ -44,7 +44,7 @@ because they are based on XML and HTTP.  Thus, any active object or
 component can be accessible from any enabled web service language.
 
 
-<h2>Principles </h2> 
+<h2><a name="principle"></a>Principles </h2> 
  <p class="textNormal">
 
 A <b>web service</b> is a software entity, providing one or several
@@ -95,7 +95,7 @@ is implemented.
 </center>
 
 
-<h2>Pre-requisite : Installing the Web Server and the SOAP engine</h2>
+<h2><a name="pre"></a>Pre-requisite : Installing the Web Server and the SOAP engine</h2>
  <p class="textNormal">
 First of all, you need to install the Jakarta Tomcat web server here
 and install it. You can find some documentation about it <a
@@ -123,7 +123,7 @@ href="web.xml" > this one </a> </li>
 
 
  <p class="textNormal">
-<h2>Steps to expose an active object or a component as a web services</h2> 
+<h2><a name="expose"></a>Steps to expose an active object or a component as a web services</h2> 
  <p class="textNormal">
 The steps for exporting and using  an active object as a web service are the
 following :
@@ -186,7 +186,7 @@ ProActive.exposeAsWebService(Object o,
 </ul>
 
 
-<h2> Undeploy the services </h2>
+<h2><a name="undeploy"></a> Undeploy the services </h2>
 <p class="textNormal">
 To undeploy an active object as a service, use the ProActive static
 method :
@@ -207,7 +207,7 @@ component( needed to know the interfaces to undeploy) :
 <b>ProActive.unExposeAsWebService ( String componentName , String url,  Component component); </b>
 </pre>
 
-<h2> Accessing the services </h2>
+<h2><a name="access"></a> Accessing the services </h2>
 <p class="textNormal">
 
 Once the active object or the interfaces component  are  deployed, you can access it via any web service
@@ -223,7 +223,7 @@ Now that this client knows what and where to call the service, it will send a SO
 the web server, the web server looks into the message and perform the
 right call then returns the reply into another SOAP message to the client.
 
-<h2> Limitations </h2>
+<h2><a name="limits"></a> Limitations </h2>
 <p class="textNormal">
 
 Apache Soap supports all defined types in the SOAP 1.1
@@ -236,7 +236,7 @@ type mapping.
 However, if the methods attributes types or return types are Java Beans, you
 have to copy the beans classes you wrote into the <code>$APACHE_SOAP_HOME/WEB_INF/classes</code>.
 
-<h2> A simple example : Hello World </h2>
+<h2><a name="example"></a> A simple example : Hello World </h2>
 <h3>Hello World web service code </h3>
 <p class="textNormal">
 Let's start with a simple example, an Hello world active object
@@ -296,7 +296,7 @@ string s = hw.helloWorld ();
 </li>
 </ul> 
 
-<h2> C# interoperability : an example with C3D </h2>
+<h2><a name="interop"></a> C# interoperability : an example with C3D </h2>
 
 <h3> Overview </h3>
  <p class="textNormal">

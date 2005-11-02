@@ -49,7 +49,7 @@ Policy Files</b></span> available at <a href="http://www.java.sun.com">Sun's
 website</a>.&nbsp; Extract the file and copy jar files to your
 &lt;jre_home&gt;/lib/security.<br>
 <br>
-<h2>Overview</h2>
+<h2><a name="Overview"></a>Overview</h2>
 <p class="textNormal">Usually,
 applications and security are developed
 for a specific use. We propose here a security framework that allows
@@ -72,7 +72,7 @@ expressed inside an <a href="#descriptors">XML
 descriptor</a>. <br>
 </p>
 <br>
-<h2>Security Architecture</h2>
+<h2><a name="architecture"></a>Security Architecture</h2>
 <h3>Base model</h3>
 <p>A distributed or concurrent
 application built using <i>ProActive</i>&nbsp;is
@@ -145,7 +145,7 @@ interaction.</p>
 <h3>
 </h3>
 <br>
-<h2>Detailed Security Architecture</h2>
+<h2><a name="detail"></a>Detailed Security Architecture</h2>
 <h3>Virtual Nodes and Nodes
 </h3>
 <p>
@@ -558,9 +558,7 @@ place, the security system retrieves not only the object's application
 policy but also policies rules attached to the node on which the
 object is to compute the policy. </li>
 </ul>
-<h2><a name="descriptors"></a>Activating
-security mechanism
-</h2>
+<h2><a name="descriptors"></a>Activating security mechanism </h2>
 <p class="textNormal">Within
 descriptor, the tag &lt;security&gt; is
 used to specify the policy for the deployed application. It will be the
@@ -697,9 +695,7 @@ security file descriptor.</p>
 <p>Here an example : java -Dproactive.runtime.security=jvmlocal.xml
 TestSecureDeployment secureDeployment.xml</p>
 <br>
-<h2><span style="text-decoration: underline;">How to
-quickly generate certificate ?</span><br>
-</h2>
+<h2><a name="certificate"></a>How to quickly generate certificate ?<br> </h2>
 <p>
 A GUI has been created to facilitate certificate generation.<br>
 The first screenshot presents a root certificate. Notice that the
@@ -732,9 +728,9 @@ Certificates are saved under a PKCS12 format (extension .p12). This
 format is natively supported by the ProActive Security mechanism.</p>
 </div>
 </div>
-<p><!--
-<h2><a name="SECTION00060000000000000000">Bibliography</a>
-</h2>
+<p>
+<!--
+<h2><a name="SECTION00060000000000000000">Bibliography</a></h2>
 <dl compact="compact">
 <dt><a name="CPE">1</a> </dt>
 <dd>Caromel, D., Klauser, W., Vayssi&egrave;re, J.: <br>

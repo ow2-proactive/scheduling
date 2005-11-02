@@ -31,7 +31,7 @@
 
 <h1>MOP : Metaobject Protocol</h1>
 
-<h2>Implementation: a Meta-Object Protocol</h2>
+<h2><a name="impl"></a>Implementation: a Meta-Object Protocol</h2>
 <p class="textNormal">
 ProActive is built on top of a metaobject protocol (MOP) that permits
 reification of method invocation and constructor call. As this MOP is not limited to
@@ -46,7 +46,7 @@ order to suppress default Java language access control checks when executing rei
 non-public method or constructor calls.
 </p>
 
-<h2>Principles</h2>
+<h2><a name="principles"></a>Principles</h2>
 <p class="textNormal">
 If the programmer wants to implement a new metabehavior using our metaobject protocol,
 he or she has to write both a concrete (as opposed to abstract) class and an interface.
@@ -80,7 +80,7 @@ object; the <code>turnActive</code> function of ProActive, for example, is imple
 through this feature.
 </p>
 
-<h2>Example of a different metabehavior: EchoProxy</h2>
+<h2><a name="echoproxy"></a>Example of a different metabehavior: EchoProxy</h2>
 <p class="textNormal">
 Here's the implementation of a very simple yet useful metabehavior : for each reified
 call, the name of the invoked method is printed out on the standard output stream and
@@ -146,7 +146,7 @@ class <code>Vector</code> is not reified.
 </ul>
 
 
-<h2>The Reflect interface</h2>
+<h2><a name="reflect"></a>The Reflect interface</h2>
 
 <p class="textNormal">
 All the interfaces used for declaring <i>metabehaviors</i> inherit directly or
@@ -167,7 +167,7 @@ Interfaces inheriting from <code>Reflect</code> can thus be logically grouped an
 using multiple inheritance in order to build new metabehaviors out of existing ones.
 </p>
 
-<h2>Limitations</h2>
+<h2><a name="limitations"></a>Limitations</h2>
 <p class="textNormal">
 Due to its commitment to be a 100% Java library, the MOP has a few limitations:
 <ul class="listWithSpace">
