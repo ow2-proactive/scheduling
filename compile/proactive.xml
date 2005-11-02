@@ -65,7 +65,8 @@
 		<echo message="  ext      : ProActive ext"/>
 		<echo message="  ic2d     : All IC2D"/>
 		<echo message="  examples : All examples"/>
-		<echo message="  all      : means all of the above"/>
+		<echo message="  compile    : means all of the above"/>
+		<echo message="  all    : means all of the above + generates the documentation"/>
 		<echo message=""/>
 		<echo message="  ------------------------------"/>
 		<echo message="         Utility builds"/>
@@ -110,11 +111,19 @@
 	<!--
 	   ================================================================
 	   ==
+      ==  Compile All and build the docs
+      ==
+      ================================================================
+	-->
+	<target name="all" depends="compile,docs" />
+	<!--
+	   ================================================================
+	   ==
       ==  Compile All
       ==
       ================================================================
 	-->
-	<target name="all" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper" />
+	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper" />
 	<!--
 	   ================================================================
 	   ==
