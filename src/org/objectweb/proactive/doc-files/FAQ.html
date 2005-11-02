@@ -41,7 +41,7 @@
 
 <p class="textNormal"><b>Note:</b> This FAQ is under construction. If
 one of your question is not answered here, just send it at <a
-	href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>
+	href="mailto:proactive@objectweb.org">proactive@objectweb.org</a>
 and we'll update the FAQ.</p>
 
 <h2><a name="list"></a>Questions</h2>
@@ -124,7 +124,13 @@ and we'll update the FAQ.</p>
 		<li>on Unix systems : <code>build all</code></li>
 
 	</ul>
-	<code>all</code> represents the target of the build.
+	<code>"all"</code> represents the target of the build. It will compile all sources files and generate the documentation.
+	<p class="textNormal">If you want only to compile sources and not generate the documentation use</p>
+	<ul>
+		<li>on Windows : <code>build.bat compile</code></li>
+		<li>on Unix systems : <code>build compile</code></li>
+
+	</ul>
 
 	<p class="textNormal">Other targets are available if needed :</p>
 
@@ -134,7 +140,8 @@ and we'll update the FAQ.</p>
 		<li><code>ext</code> : ProActive ext</li>
 		<li><code>ic2d</code> : All IC2D</li>
 		<li><code>examples</code> : All examples</li>
-		<li><code>all</code> : means all of the above</li>
+		<li><code>compile</code> : means all of the above</li>
+		<li><code>all</code> : means all of the above + generates the documentation</li>
 
 	</ul>
 
