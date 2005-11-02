@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!-- saved from url=(0022)http://internet.e-mail -->
+  <title>ProActive File Transfer Model</title>
+  <link rel="stylesheet" href="ProActive.css">
+</head>
+<body style="background-color: white;">
+<!--
+Header : start
+~~~ -->
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="left" valign="middle">
+      <table border="1" cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="../../../../overview-summary.html">back
+to API</a>&nbsp;&nbsp;</td>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="index.html">back to
+index</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="faultTolerance.html">prev</a>&nbsp;&nbsp;</td>
+ <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="development/DescriptorProcess.html">next</a>&nbsp;&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td align="right" valign="top">
+      <img src="ProActiveLogo200x34.gif"/></td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<!-- Link to index : end -->
+<h1>ProActive File Transfer Model</h1>
+<p>The following document describes our current proposal model for supporting file transfer in ProActive.</p>
+
+<h2><a name="intro">Introduction and Concepts</a></h2>
+
+<p>We believe it is interesting for us, and the ProActive users, to provide suppor for FileTransfer</p>
+
+<p>Currently we recognize the following type of files:
+<ul class="listWithSpace">
+	<li class="textNormal">1. ProActive Deployment Required Files (jars, policy, log4, etc)</li>
+	<li class="textNormal">2. User Application Data Files (User application input)</li>
+	<li class="textNormal">3. User Applictacion Code Files (jar, classes or native code)</li>
+	<li class="textNormal">4. JDK files (the jvm runtime and libraries)</li>
+</ul>
+</p>
+<p>
+Also,  this files can be transfered:
+<ul class="listWithSpace">
+	<li class="textNormal">1. To a remote location (Deploy)</li>
+	<li class="textNormal">2. From a remote location (Retrieve)</li>
+</ul>
+</p>
+
+<p>
+The FileTransfer could happen:
+<ul class="listWithSpace">
+	<li class="textNormal">1. Before deployment.</li>
+	<li class="textNormal">2. After deployment but before the user launches his/her applicaction.</li>
+	<li class="textNormal">3. During user application.</li>
+	<li class="textNormal">4. After the user applicaction has finished.</li>
+</ul>
+</p>
+
+<p>
+</p>
+
+<h2><a name="objectives">Objectives</a></h2>
+
+<h3>Main objective</h3>
+
+<ul class="listWithSpace"><li>Support File Transfer in ProActive</li></ul>
+
+<h3>Specific Objectives</h3>
+<ul class="listWithSpace">
+	<li class="textNormal">Specify file transfer in descriptor files.</li>
+	<li class="textNormal">If the process supports FileTransfer use the protocol support (processDefault), or some other protocol.</li>
+	<li class="textNormal">Else, use FileTransfer as file streaming in ProActive Runtime (jvm2jvm)</li>
+</ul>
+
+
+<h2><a name="protocols">Supported Protocols</a></h2>
+<ul class="listWithSpace">
+	<li>scp</li>
+	<li>rcp</li>
+	<li>unicore (Unicore processDefault)</li>
+	<li>nordugrid (Nordugrid processDefault)</li>
+</ul>
+
+<h2><a name="design">FileTransfer Design</a></h2>
+
+<p>FileTransfer definitinos are devided in two:</p>
+
+
+<h3>Abstract Definition</h3>
+
+<p>
+This definitions can be referenced from a VirtualNode. They contain the most basic information of a FileTransfer:</p>
+
+<ul class="listWithSpace">
+	<li>A unique definition identification name.</li>
+	<li>Files: source and optionally the destination name.</li>
+	<li>Directories: source and optionally the destination name. Also the exclude and include patterns (not yet available feature).</li>
+</ul>
+
+<p>References from the VirualNode are made using the unique definition name.</p>
+
+<h3> Concrete Definition</h3>
+
+<p>These definitions contain more arquitecture specific information, and are therefore contained within the Process:</p>
+
+<ul class="listWithSpace">
+	<li>A reference to an abstract definition, or the "implicit" indicating the reference will be inherited from the VirtualNode.</li>
+	<li>A sequence of Copy Protocols that will be used.</li>
+	<li>Source and Destination information: prefix, username, hostname, file separator, etc...</li>
+</ul>
+
+<p>
+If some of this information (like username or hostname) can be infered from the process, it is not necesary to declare it in the definition. Optionally, the information contained in the protocol can be overriden if specified.
+</p>
+
+<h3>How it works</h3>
+
+<center><img src="development/imgs/fileTransferDesign.gif"/></center>
+
+<p>When a FileTransfer starts, both abstract and concrete information are merged using the FileTransfer Workshop. 
+The result of this process correspons to a sequence of CopyProtocols, as specified in the Concrete Definition.</p>
+
+<p>
+Each CopyProtocol will be tried before the deployment takes place, until one succeeds. After one succeed are all fail, the process deployment will take place.
+</p>
+
+
+
+<h2><a name="xmlTags">Descriptor FileTransfer XML Tags</a></h2>
+
+<p>The abstract concept: "FileTransfer" is introduced. This concept is independent off the actual process used, but also flexible and configurable at the process level. To define this abstract representation of the FileTransfer:</p>
+
+<pre class="xml">
+....
+&lt;/deployment&gt;
+&lt;<b>FileTransferDefinitions</b>&gt;
+   &lt;<b>FileTransfer</b> id="<b>example</b>"&gt;
+      &lt;<b>file</b> src="hello.dat" dest="world.dat"/&gt;
+      &lt;<b>file</b> src="hello.jar" dest="world.jar"/&gt;
+      &lt;<b>file</b> src="hello.class" dest="world.class"/&gt;
+      &lt;<b>dir</b> src="exampledir" dest="exampledir"/&gt;
+  &lt;/<b>FileTransfer</b>&gt;
+  ...
+&lt;/<b>FileTransferDefinitions</b>&gt;
+&lt;infrastructure&gt;
+....   
+</pre>
+
+<p><b>Note</b>: exclude and include are not yet supported features</p>
+
+
+This tags can be referenced at the the VirtualNode level and the Process level.
+<ul class="listWithSpace">
+	<li class="textNormal">
+		<b>VirutalNode</b>
+<pre class="xml">
+&lt;VirtualNode name="exampleVNode" <b>FileTransferDeploy</b>="<b>example</b>"/&gt;
+</pre>
+	</li>
+	<li class="textNormal">
+		<b>Process</b>
+<pre class="xml">
+&lt;processDefinition id="xyz"&gt;
+  &lt;sshProcess&gt;...
+    <FONT ID="FormalComment">&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of an attribute.
+            This happens because FileTransfer information is process specific.
+            Note that the destination hostname and username can be ommited, and implicitly inferred 
+	    from the process information. --&gt;</FONT>
+    &lt;<b>FileTransferDeploy</b>="<b>implicit</b>"&gt; <FONT ID="FormalComment">&lt;!-- referenceID or keyword "implicit" (inherit)--&gt;</FONT>
+      &lt;<b>copyProtocol</b>&gt;processDefault, scp, rcp&lt;/<b>copyProtocol</b>&gt;
+      &lt;<b>sourceInfo</b> prefix="/home/user"/&gt;
+      &lt;<b>destinationInfo</b> prefix="/tmp" hostname="foo.org" username="smith" /&gt;
+    &lt;/<b>FileTransferDeploy</b>&gt;
+  &lt;/sshProcess&gt;
+&lt;/processDefinition&gt;
+</pre>
+	</li>
+</ul>
+</p>
+
+<p>
+The <b>implicit</b> keyword means the <b>FileTransferDeploy</b> identifier is inherited from the VN definition.
+If hostname and username are implicitly defined in the process tag, then this information will be used. But, if the user desires to override this information he can specify it as an attribute in the <b>destinationInfo</b> tag.
+When coallocating more than one VN on a JVM, and therefore on the same process, all files inherited from the multiple VN definitions will be transfered.
+
+</ul>
+</p>
+
+<p><b>Note</b>: FileTransferRetrieve is not yet supported.</p>
+
+
+<!--
+Footer : start ~~~ --><br>
+<hr>
+<div class="textSmall" align="right">Copyright
+&copy; August 2005 INRIA All Rights Reserved.
+<!-- Footer : end --></div>
+</body>
+</html>
