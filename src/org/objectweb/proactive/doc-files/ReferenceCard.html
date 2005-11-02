@@ -1057,43 +1057,21 @@ Result ri = splitted.execute();
     <tr>
 
       <td>
-      <h3>A simple Example:</h3>
-
-<ul class="listWithSpace">
-
-	<li class="textNormal">
-		<b>File Transfer Definition</b>
 <pre class="xml">
+&lt;VirtualNode name="exampleVNode" <b>FileTransferDeploy</b>="<b>example</b>"/&gt;
 ....
 &lt;/deployment&gt;
 &lt;<b>FileTransferDefinitions</b>&gt;
    &lt;<b>FileTransfer</b> id="<b>example</b>"&gt;
       &lt;<b>file</b> src="hello.dat" dest="world.dat"/&gt;
-      &lt;<b>file</b> src="hello.jar" dest="world.jar"/&gt;
-      &lt;<b>file</b> src="hello.class" dest="world.class"/&gt;
       &lt;<b>dir</b> src="exampledir" dest="exampledir"/&gt;
   &lt;/<b>FileTransfer</b>&gt;
   ...
 &lt;/<b>FileTransferDefinitions</b>&gt;
 &lt;infrastructure&gt;
-....   
-</pre>
-	</li>
-	<li class="textNormal">
-		<b>VirutalNode</b>
-<pre class="xml">
-&lt;VirtualNode name="exampleVNode" <b>FileTransferDeploy</b>="<b>example</b>"/&gt;
-</pre>
-	</li>
-	<li class="textNormal">
-		<b>Process</b>
-<pre class="xml">
+....
 &lt;processDefinition id="xyz"&gt;
   &lt;sshProcess&gt;...
-    <FONT ID="FormalComment">&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of an attribute.
-            This happens because FileTransfer information is process specific.
-            Note that the destination hostname and username can be ommited, and implicitly inferred 
-	    from the process information. --&gt;</FONT>
     &lt;<b>FileTransferDeploy</b>="<b>implicit</b>"&gt; <FONT ID="FormalComment">&lt;!-- referenceID or keyword "implicit" (inherit)--&gt;</FONT>
       &lt;<b>copyProtocol</b>&gt;processDefault, scp, rcp&lt;/<b>copyProtocol</b>&gt;
       &lt;<b>sourceInfo</b> prefix="/home/user"/&gt;
@@ -1101,9 +1079,8 @@ Result ri = splitted.execute();
     &lt;/<b>FileTransferDeploy</b>&gt;
   &lt;/sshProcess&gt;
 &lt;/processDefinition&gt;
+...
 </pre>
-	</li>
-</ul>
       </td>
     </tr>
 
