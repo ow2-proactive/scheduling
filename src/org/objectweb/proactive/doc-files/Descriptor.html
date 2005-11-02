@@ -1401,16 +1401,12 @@ to use such protocol.</p>
             
 <p>Like <b>ssh</b>,
 using <b>globus</b>
-requires some steps to be performed. Of course <b>globus</b>
-must be installed(at least globus client) on the machine that will
+requires some steps to be performed. In particular the <b>java COG Kit</b> (no need for the whole GT) must be installed on the machine that will
 originates the <b>RSL</b>
-request. See <a href="http://www.globus.org/gt2/install/">Globus
+request. See <a href="http://www.cogkit.org/">COG Kit
 Installation</a> for how to install
-globus. Then you have to initialize some variables by running the
-command <b>$GLOBUS_INSTALLATION/etc/globus-user-env.sh</b>,
-then <b>$GLOBUS_INSTALLATION/bin
-/grid-proxy-init</b> will initialize
-the proxy, you will be asked for a passphrase, it is the one you
+the client kit. Then you have to initialize your proxy by running <b>COG_INSTALLATION/bin
+/grid-proxy-init</b>, you will be asked for a passphrase, it is the one you
 provided when requesting a user certificate at globus.org. Once these
 steps are performed you can run <b>ProActive</b>
 application using <b>GRAM</b>
@@ -1481,6 +1477,7 @@ to use such protocol.</p>
 ProActive provides <code><a
  href="../core/process/nordugrid/NGProcess.html">org.objectweb.proactive.core.process.nordugrid.NGProcess</a></code>
 to use such protocol.</p>
+To use ARC you will need to download the <a href="http://ftp.nordugrid.org/download/index.php" target="ng">ARC Client</a>
 <p>Check also <a href="xml_examples/NorduGrid_Example.xml">NorduGrid_Example.xml</a>.</p>
             <br>
             <li class="textNormal">GLITE</li>
