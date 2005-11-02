@@ -1,0 +1,179 @@
+<html>
+<head>
+<title>Component programming with ProActive</title>
+<link rel="stylesheet" href="../ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start
+~~~ -->
+<table width="100%">
+	<tr>
+		<td align="left" valign="middle">
+		<table cellpadding="2" cellspacing="0" border="1">
+			<tr>
+				<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+					href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+				<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+					href="../index.html">back to index</a>&nbsp;&nbsp;</td>
+				<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+					href="../exceptions.html">prev</a>&nbsp;&nbsp;</td>
+				<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+					href="../Security.html">next</a>&nbsp;&nbsp;</td>
+			</tr>
+		</table>
+		</td>
+		<td align="right" valign="top"><img src="../ProActiveLogo200x34.gif"
+			alt=""></td>
+	</tr>
+
+</table>
+<hr>
+<!-- Link to index : end -->
+
+
+<h1>C3D - from Active Objects to Components</h1>
+
+<h2>Reason for this example</h2>
+
+<p class="textNormal">This is an example of an application that is
+refactored to fit the components dogma. The standard C3D example has
+been taken as a basis, and component wrappers have been created. This
+way, one can see what is needed to transform an application into
+component-oriented code.</p>
+
+<p>You may find the code in the <a
+	href="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.index.html">
+examples/components/c3d</a> directory of the proactive source.</p>
+
+<h2>Using working C3D code with components</h2>
+
+<img src="pics/C3D-Components-UML.png"
+	alt="C3D Components simplified UML" align=right>
+
+<p>We consider the working C3D application. It's nice, and has a sleak
+GUI, but we now want to add component power to it! What we do is shown
+on the image to the right: add wrappers around the original object
+classes (C3D*) and instead of linking the classes together by setting
+fields through the initial methods, do that in the binding methods. In
+other words, we have to spot exactly where C3DRenderingEngine, C3DUser
+and C3DDispatcher are used by a class other than itself, and make theses
+references component bounds. Of course, we also have to expose the
+interfaces that we are goining to use, hence the Dispatcher, Engine and
+User interface that have to be implemented.</p>
+
+<br clear> <!-- Means stop indenting while including the image on the right...  -->
+
+<h2>How the application is written</h2>
+
+<p>First of all, have a look at the doc on <a href="c3d.html">C3D</a> to
+remember how this application is written. Most important is
+the class diagram, showing C3DUser, C3DDispatcher and C3DRederingEngine.
+We decided that the only objects worth wrapping in components were those
+three. The rest is too small to be worth the hassle.</p>
+
+<h3>Creating the interfaces</h3>
+
+<p>What we need to do is to extract the interfaces of the Objects, ie
+the which methods are going to be called on the components. This means
+find out what methods are called from outside the Active Object. You can
+do that by searching in the classes where the calls are made on active
+objects. For this, <b>you have to know in detail which classes are going
+to be turned into component</b>. We have done that, and those exposed
+methods are put in the interfaces User, Engine and Dispatcher.</p>
+
+<p><b>Tricky part:</b> whatever way you look at components, you'll have
+to modify the initial code if these interfaces where not created at
+first go. This was the case for C3D. You have to replace all the classes
+by their interface, when you use them in other files. Compare, for
+example, the C3DUser classes in the 
+<a href="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.C3DUser.html">component</a> 
+and the 
+<a href="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.C3DUser.html">Active Object</a> 
+code: we have replaced all occurrences of C3DDispatcher by occurrences 
+of Dispatcher.</p>
+
+<p>Why do we have to do that, replacing classes by interfaces? That's
+due to the way components work. When the comopnents are going to be
+bound, you're not binding the class themselves, but proxies to these
+classes. And these proxies implement the interfaces, and do not extend
+the classes.</p>
+
+<h3>Creating the Component Wrappers</h3>
+
+<p>You now have to create a class that englobes the previous Active
+Objects, and which is a composent representing the same functionality.
+How do you do that? Pretty simple. All you need to do is extend the
+Active Object class, and add to it the non-functional interfaces which
+go with the component. You have the binding interfaces to create, which
+basically say how to put together two Objects, tell who is already
+attached, and how to separate them. These are the <code>lookupFc</code>,
+<code>bindFc</code>, <code>unbindFc</code>, and <code>listFc</code>
+methods.</p>
+
+<p>This has been done in the *Impl files. Have a peek, for example, at <a
+	href="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.UserImpl.html">
+UserImpl.java</a>. What you have here are those component methods. Be
+even more careful with this <code>bindFc</code> method. In fact, it
+really binds the protected Dispatcher variable <code>c3ddispatcher</code>.
+This way, the C3DUser code can now use this varaible as if it was
+addressing the real Active Object. Just to be precise, we have to point
+out that you're going through proxies before reaching the Component,
+then the Active Object. But this is hidden by the ProActive layer, al
+you should know is you're addressing a Dispatcher, and you're fine!</p>
+
+<h3>Discarding direct reference acknowledgment</h3>
+
+<p>If you're out of luck, the code contains instructions to retain
+references to objects that call methods on the current Object. These
+methods have a signature ressembling <code>method(..., ActiveObject ao,
+...)</code>. This is called, in ProActive, with a <code>ProActive.getStubOnThis()</code>
+(if you don't, the code won't work corretcly on remote hosts!). If the
+local object uses this reference, you're going to have trouble with
+components. You have to remove these from the code, and make it
+component-oriented. <b>You should be using bind methods to reference
+other components</b>.</p>
+
+<p>OK, we have left a <code>Fractive.getComponentRepresentativeOnThis()</code>
+in the user code. Can you guess why? Because we have a very special
+relationship between users and dispatchers. This link is two-way, ie
+users call methods on their dispatcher, and the dispatcher calls methods
+on its users. But even worse, the dispatcher points its users by id.
+This id is generated on the fly, when a user registers. Now, how is this
+compatible with external binding and unbinding of components? Well,
+that's tough. In fact the way we devised was to do it at binding-time :
+inside the <code>bindFc</code> and <code>unbindFc</code> methods, the
+components engage a conversation in which they share their references
+and set the correct id.</p>
+
+<h2>ADL</h2>
+
+<h2>Source Code</h2>
+
+<p class="textNormal">You may find the source code of this application
+at the following locations : </p>
+<ul>
+	<li><a
+		href="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.index.html">Active
+	Object version</a></li>
+	<li><a
+		href="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.index.html">Component
+	version</a></li>
+</ul>
+
+<hr>
+<p class="textSmall"><i> History :<br>
+November 2005: first version </i></p>
+
+<!--
+ Footer : start
+~~~ -->
+<br>
+<hr>
+<div align="right" class="textSmall">Copyright &#169; April 2005 INRIA
+All Rights Reserved.
+<p class="textNormal"></p>
+<!-- Footer : end --></div>
+</body>
+</html>
