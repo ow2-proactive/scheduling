@@ -30,20 +30,21 @@
  */
 package util;
 
+
 /**
  * @author  ProActive Team
- * @version 1.0 
+ * @version 1.0
  * @since   ProActive 2.2
  */
 public class ReplaceStringInHTML {
-
     String name;
     static String replace;
     static String replace_with;
 
     public static void main(String[] args) throws java.io.IOException {
         if (args.length < 3) {
-            System.out.println("there should be 3 args: directory, string_to_replace, string_to_replace_with");
+            System.out.println(
+                "there should be 3 args: directory, string_to_replace, string_to_replace_with");
             System.exit(-1);
         }
         replace = args[1];
@@ -61,25 +62,24 @@ public class ReplaceStringInHTML {
         System.out.println("Processing " + file);
         byte[] b = getBytesFromInputStream(new java.io.FileInputStream(file));
         String html = new String(b);
-        html=html.replaceAll(replace, replace_with);
+        if (html.indexOf(replace) >= 0) {
+        	System.out.println("Replacing "+replace+" by "+replace_with);
+            html = html.replaceAll(replace, replace_with);
 
-        
-        b = html.getBytes();
-        java.io.File newFile = new java.io.File(file.getParentFile(), name);
-        newFile.delete();
-        java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
-                    newFile));
-        out.write(b, 0, b.length);
-        out.flush();
-        out.close();
+            b = html.getBytes();
+            java.io.File newFile = new java.io.File(file.getParentFile(), name);
+            newFile.delete();
+            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
+                        newFile));
+            out.write(b, 0, b.length);
+            out.flush();
+            out.close();
+        }
     }
-
 
     /**
      * change img src="... .gif" to img src="..._pdf.gif"
      */
-    
-
     private static void filter(java.io.File file) throws java.io.IOException {
         java.io.File[] listFiles = file.listFiles();
         if (listFiles == null) {
@@ -113,5 +113,4 @@ public class ReplaceStringInHTML {
         }
         return bytecodes;
     }
-
 }
