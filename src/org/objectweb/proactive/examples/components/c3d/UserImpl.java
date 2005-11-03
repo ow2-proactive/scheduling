@@ -74,8 +74,15 @@ public class UserImpl extends C3DUser implements Runnable, BindingController,
         }
     }
 
-    /** The component's activity . In fact, this starts the component's GUI activity */
-    public void run() {
-        go();
+    /** The initialization and linkage is made in this method, instead of using the constructor */
+    public void findDispatcher() {
+        // active Object related fields
+        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
+        setUserName("Bob");
+        // We suppose bind to dispatcher has been done before
+        if (this.c3ddispatcher == null) {
+            logger.error("Could not find a dispatcher. Closing.");
+            System.exit(-1);
+        }
     }
 }

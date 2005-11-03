@@ -30,15 +30,13 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.body.ComponentBody;
@@ -51,26 +49,29 @@ import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 import org.objectweb.proactive.examples.c3d.RenderingEngine;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
+
 
 /**
  * The Component wrapper class for our Dispatcher.
  * Most interesting bit of this code is the runComponentActivity redefinition.
  */
-public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
-    DispatcherLogic, DispatcherAttributes, BindingController,
-    ComponentRunActive {
+public class DispatcherImpl extends C3DDispatcher implements Dispatcher, DispatcherLogic,
+    DispatcherAttributes, BindingController, ComponentRunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     // component bindings
     private Hashtable engines = new Hashtable();
 
+    /** The no-argument Constructor as commanded by ProActive; otherwise unused */
     public DispatcherImpl() {
     }
 
     // binding control
 
-    /** Returns the name of all the interfaces that can be bound.
-     * FIXME: check above behavior is the one expected in Fractal. */
+    /** Returns the name of all the interfaces that can be bound.*/
     public String[] listFc() {
         Vector v = new Vector();
 
@@ -89,24 +90,22 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
         if (cItf.startsWith("dispatcher2engine")) {
             return engines.get(cItf);
         }
-
         return null;
     }
 
     /** Attach a component to this dispatcher, expecting "dispatcher2engine" */
     public void bindFc(final String cItf, final Object sItf) {
         if (cItf.startsWith("dispatcher2engine")) {
-            System.out.println("added engine  " + cItf);
             this.engines.put(cItf, sItf);
-            addEngine((RenderingEngine) sItf,
-                cItf.substring("dispatcher2".length()) + "@" +
-                Integer.toHexString(sItf.hashCode()));
+            String name = cItf.substring("dispatcher2".length()) + "@" +
+                Integer.toHexString(sItf.hashCode());
+            addEngine((RenderingEngine) sItf, name);
+            turnOnEngine(name);
         }
     }
 
-    /** Deattach a component from this dispatcher, expecting "dispatcher2engine" */
+    /** Dettach a component from this dispatcher, expecting "dispatcher2engine" */
     public void unbindFc(final String cItf) {
-        System.out.println("UNBINDING " + cItf);
         if (cItf.startsWith("dispatcher2engine")) {
             Object engine = this.engines.remove(cItf);
             removeEngine((RenderingEngine) engine);
@@ -133,10 +132,10 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
                 ComponentBody componentBody = (ComponentBody) body;
 
                 // treat non functional requests before component is started
-                while (LifeCycleController.STOPPED.equals(
+                while (
+                    LifeCycleController.STOPPED.equals(
                             Fractal.getLifeCycleController(
-                                componentBody.getProActiveComponentImpl())
-                                       .getFcState())) {
+                                componentBody.getProActiveComponentImpl()).getFcState())) {
                     componentService.blockingServeOldest(nfRequestFilter);
                 }
 
