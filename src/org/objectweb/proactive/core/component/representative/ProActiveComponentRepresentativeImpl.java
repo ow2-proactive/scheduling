@@ -199,7 +199,6 @@ public class ProActiveComponentRepresentativeImpl
                 i++;
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException("cannot create interface references : " +
                 e.getMessage());
         }
@@ -219,7 +218,6 @@ public class ProActiveComponentRepresentativeImpl
         } catch (ClassNotFoundException e) {
             throw new ProActiveRuntimeException(e.toString());
         } catch (Throwable e) {
-            e.printStackTrace();
             throw new ProActiveRuntimeException(e.toString());
         }
     }
@@ -327,7 +325,8 @@ public class ProActiveComponentRepresentativeImpl
                 try {
                     ((StubObject) interface_references[i]).setProxy(proxy);
                 } catch (RuntimeException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                    throw new ProActiveRuntimeException(e);
                 }
             }
         }

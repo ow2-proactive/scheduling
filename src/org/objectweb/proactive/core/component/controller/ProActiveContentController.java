@@ -70,18 +70,23 @@ public class ProActiveContentController extends AbstractProActiveController
      */
     public ProActiveContentController(Component owner) {
         super(owner);
-        try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
-                    ContentController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
-        } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
-        }
         fcSubComponents = new ArrayList();
     }
+    
+        protected void setControllerItfType() {
+            try {
+                setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+                        ContentController.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            } catch (InstantiationException e) {
+                throw new ProActiveRuntimeException("cannot create controller " +
+                    this.getClass().getName());
+            }
+	}
 
-    /*
+
+
+	/*
      * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()
      *
      * in this implementation, the external interfaces are also internal interfaces

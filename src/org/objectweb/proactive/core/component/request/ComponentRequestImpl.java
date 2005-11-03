@@ -139,9 +139,11 @@ public class ComponentRequestImpl extends RequestImpl
                                       .getFcInterface(methodCall.getComponentInterfaceName()))
                                       .getFcItfImpl()).getProxy().reify(methodCall);
                         } catch (IllegalArgumentException e) {
-                            e.printStackTrace();
+                        	throw new ServeException(
+                            "could not reify method call : ", e);
                         } catch (Throwable e) {
-                            e.printStackTrace();
+                        	throw new ServeException(
+                                    "could not reify method call : ", e);
                         }
                     } else {
                         // the component is a primitive
@@ -166,11 +168,9 @@ public class ComponentRequestImpl extends RequestImpl
                 }
             }
         } catch (NoSuchInterfaceException nsie) {
-            nsie.printStackTrace();
             throw new ServeException("cannot serve request : problem accessing a component controller",
                 nsie);
         } catch (MethodCallExecutionFailedException e) {
-            e.printStackTrace();
             throw new ServeException("serve method " +
                 methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -196,9 +196,8 @@ public class ComponentRequestImpl extends RequestImpl
                 try {
                     InputInterceptor interceptor = (InputInterceptor) it.next();
                     interceptor.beforeInputMethodInvocation(methodCall);
-                    //((InputInterceptor) it.next()).beforeInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
                 } catch (NullPointerException e) {
-                    e.printStackTrace();
+                    logger.error("could not intercept invocation : " + e.getMessage());
                 }
             }
         }

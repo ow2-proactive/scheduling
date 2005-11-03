@@ -49,7 +49,10 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController
     implements Serializable, ProActiveSuperController {
     public ProActiveSuperControllerImpl(Component owner) {
         super(owner);
-        try {
+    }
+
+	protected void setControllerItfType() {
+		try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.SUPER_CONTROLLER,
                     ProActiveSuperController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -57,10 +60,10 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
-        }
-    }
+        }		
+	}
 
-    // the following is borrowed from the Julia implementation
+	// the following is borrowed from the Julia implementation
     public Component[] fcParents;
 
     public Component[] getFcSuperComponents() {
@@ -96,4 +99,5 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController
             fcParents = parents;
         }
     }
+
 }

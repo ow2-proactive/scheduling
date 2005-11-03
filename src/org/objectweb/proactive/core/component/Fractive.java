@@ -73,6 +73,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <li> a GenericFactory for instantiating new components</li>
  * <li> a utility class providing static methods to create collective interfaces and retreive references to ComponentParametersController</li>
  * </ol>
+ * @author Matthieu Morel
  */
 public class Fractive implements GenericFactory, Component, Factory {
     private static Fractive instance = null;
@@ -87,6 +88,10 @@ public class Fractive implements GenericFactory, Component, Factory {
     public Fractive() {
     }
 
+    /**
+     * Method instance.
+     * @return Fractive
+     */
     private static Fractive instance() {
         if (instance == null) {
             instance = new Fractive();
@@ -109,6 +114,11 @@ public class Fractive implements GenericFactory, Component, Factory {
     /**
      * Returns a generated interface reference, whose impl field is a group
      * It is able to handle multiple bindings
+     * @param itfName String
+     * @param itfSignature String
+     * @param owner Component
+     * @return ProActiveInterface
+     * @throws ProActiveRuntimeException
      */
     public static ProActiveInterface createCollectiveClientInterface(
         String itfName, String itfSignature, Component owner)
@@ -127,12 +137,26 @@ public class Fractive implements GenericFactory, Component, Factory {
         }
     }
 
+    /**
+     * Method createCollectiveClientInterface.
+     * @param itfName String
+     * @param itfSignature String
+     * @return ProActiveInterface
+     * @throws ProActiveRuntimeException
+     */
     public static ProActiveInterface createCollectiveClientInterface(
         String itfName, String itfSignature) throws ProActiveRuntimeException {
         return Fractive.createCollectiveClientInterface(itfName, itfSignature,
             null);
     }
 
+    /**
+     * Method newFcInstance.
+     * @param contentDesc ContentDescription
+     * @param componentParameters ComponentParameters
+     * @return Component
+     * @throws InstantiationException
+     */
     private static Component newFcInstance(ContentDescription contentDesc,
         ComponentParameters componentParameters) throws InstantiationException {
         //MetaObjectFactory factory = null;
@@ -242,6 +266,14 @@ public class Fractive implements GenericFactory, Component, Factory {
         }
     }
 
+    /**
+     * Method newFcInstance.
+     * @param type Type
+     * @param controllerDesc ControllerDescription
+     * @param contentDesc ContentDescription
+     * @return Component
+     * @throws InstantiationException
+     */
     private Component newFcInstance(Type type,
         ControllerDescription controllerDesc, ContentDescription contentDesc)
         throws InstantiationException {
@@ -264,6 +296,12 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)}
+     * @param arg0 Type
+     * @param arg1 Object
+     * @param arg2 Object
+     * @return Component
+     * @throws InstantiationException
+     * @see org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(Type, Object, Object)
      */
     public Component newFcInstance(Type arg0, Object arg1, Object arg2)
         throws InstantiationException {
@@ -309,6 +347,10 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.Component#getFcInterface(java.lang.String)}
+     * @param itfName String
+     * @return Object
+     * @throws NoSuchInterfaceException
+     * @see org.objectweb.fractal.api.Component#getFcInterface(String)
      */
     public Object getFcInterface(String itfName)
         throws NoSuchInterfaceException {
@@ -323,6 +365,8 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
+     * @return Object[]
+     * @see org.objectweb.fractal.api.Component#getFcInterfaces()
      */
     public Object[] getFcInterfaces() {
         return null;
@@ -330,6 +374,8 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.Component#getFcType()}
+     * @return Type
+     * @see org.objectweb.fractal.api.Component#getFcType()
      */
     public Type getFcType() {
         if (type == null) {
@@ -352,6 +398,8 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.factory.Factory#getFcContentDesc()}
+     * @return Object
+     * @see org.objectweb.fractal.api.factory.Factory#getFcContentDesc()
      */
     public Object getFcContentDesc() {
         return null;
@@ -359,6 +407,8 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.factory.Factory#getFcControllerDesc()}
+     * @return Object
+     * @see org.objectweb.fractal.api.factory.Factory#getFcControllerDesc()
      */
     public Object getFcControllerDesc() {
         return null;
@@ -366,6 +416,8 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.factory.Factory#getFcInstanceType()}
+     * @return Type
+     * @see org.objectweb.fractal.api.factory.Factory#getFcInstanceType()
      */
     public Type getFcInstanceType() {
         return null;
@@ -373,6 +425,9 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * see {@link org.objectweb.fractal.api.factory.Factory#newFcInstance()}
+     * @return Component
+     * @throws InstantiationException
+     * @see org.objectweb.fractal.api.factory.Factory#newFcInstance()
      */
     public Component newFcInstance() throws InstantiationException {
         return this;
@@ -380,6 +435,7 @@ public class Fractive implements GenericFactory, Component, Factory {
 
     /**
      * Helper method for extracting the types of client interfaces from the type of a component
+     * @param componentType ComponentType
      * @return the types of client interfacess
      */
     public static InterfaceType[] getClientInterfaceTypes(

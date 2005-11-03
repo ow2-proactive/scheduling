@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component;
 
-import java.io.File;
 import java.io.Serializable;
 
 
@@ -76,22 +75,48 @@ public class ControllerDescription implements Serializable {
         this(name, hierarchicalType, null, false);
     }
 
+    /**
+     * Constructor for ControllerDescription.
+     * @param name String
+     * @param hierarchicalType String
+     * @param synchronous boolean
+     */
     public ControllerDescription(String name, String hierarchicalType,
         boolean synchronous) {
         this(name, hierarchicalType, null, synchronous);
     }
 
+    /**
+     * Constructor for ControllerDescription.
+     * @param name String
+     * @param hierarchicalType String
+     * @param controllersConfigFileLocation String
+     */
     public ControllerDescription(String name, String hierarchicalType,
         String controllersConfigFileLocation) {
         this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
+    /**
+     * Constructor for ControllerDescription.
+     * @param name String
+     * @param hierarchicalType String
+     * @param controllersConfigFileLocation String
+     * @param interceptorsConfigFileLocation String
+     */
     public ControllerDescription(String name, String hierarchicalType,
         String controllersConfigFileLocation,
         String interceptorsConfigFileLocation) {
         this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
+    /**
+     * Constructor for ControllerDescription.
+     * @param name String
+     * @param hierarchicalType String
+     * @param controllersConfigFileLocation String
+     * @param synchronous boolean
+     */
     public ControllerDescription(String name, String hierarchicalType,
         String controllersConfigFileLocation, boolean synchronous) {
         this.hierarchicalType = hierarchicalType;
@@ -143,10 +168,18 @@ public class ControllerDescription implements Serializable {
         this.name = name;
     }
 
+    /**
+     * Method isSynchronous.
+     * @return boolean
+     */
     public boolean isSynchronous() {
         return synchronous;
     }
 
+    /**
+     * Method getControllersConfigFileLocation.
+     * @return String
+     */
     public String getControllersConfigFileLocation() {
         if (controllersConfigFileLocation == null) {
             return controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;

@@ -105,6 +105,8 @@ public class Bindings implements Serializable {
 
     /**
      * removes the binding on the given client interface
+     * @param clientItfName String name of the binding
+     * @return Object binding that was removed
      */
     public Object remove(String clientItfName) {
         if (normalBindings.containsKey(clientItfName)) {
@@ -116,6 +118,11 @@ public class Bindings implements Serializable {
         return null;
     }
 
+    /**
+     * Method get.
+     * @param clientItfName String
+     * @return Object
+     */
     public Object get(String clientItfName) {
         if (normalBindings.containsKey(clientItfName)) {
             return normalBindings.get(clientItfName);
@@ -142,7 +149,7 @@ public class Bindings implements Serializable {
     //	* with the same client interface)
     //	* 
     //	* @return all the bindings 
-    //	*/
+   
     //	public Binding[] getBindings() {
     //		Vector list_of_bindings = new Vector();
     //		Enumeration enum = clientInterfaceBindings.elements();
@@ -170,6 +177,10 @@ public class Bindings implements Serializable {
                                                                                    .size()]);
     }
 
+    /**
+     * @param bindingsTable Map map that stores the bindings
+     * @param binding Binding the binding to add
+     */
     private static void addCollectiveBinding(Map bindingsTable, Binding binding) {
         String client_itf_name = binding.getClientInterfaceName();
         if (binding.getClientInterface().getFcItfName().equals(client_itf_name)) {
@@ -186,10 +197,17 @@ public class Bindings implements Serializable {
         }
     }
 
+    /**
+     * 
+     * @param binding Binding the binding to add
+     */
     private void addCollectiveBindingOnExternalClientItf(Binding binding) {
         addCollectiveBinding(normalBindings, binding);
     }
 
+    /**
+      * @param binding Binding
+     */
     private void addCollectiveBindingOnInternalClientItf(Binding binding) {
         if (exportBindings == null) {
             exportBindings = new HashMap();

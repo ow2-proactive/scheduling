@@ -55,7 +55,12 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 
-
+/**
+ * This class generates output interceptors for intercepting outgoing functional invocations.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class OutputInterceptorClassGenerator
     extends AbstractInterfaceClassGenerator {
     List outputInterceptors;
@@ -237,7 +242,6 @@ public class OutputInterceptorClassGenerator
 
             return reference;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
                 e);
         }

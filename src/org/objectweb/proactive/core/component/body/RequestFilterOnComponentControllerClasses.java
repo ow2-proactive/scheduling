@@ -34,7 +34,12 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 
-
+/**
+ * This class is a request filter for invocations on component controllers.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class RequestFilterOnComponentControllerClasses implements RequestFilter,
     java.io.Serializable {
     public RequestFilterOnComponentControllerClasses() {

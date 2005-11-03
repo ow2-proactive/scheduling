@@ -82,17 +82,20 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
     public ProActiveBindingControllerImpl(Component owner) {
         super(owner);
+        bindings = new Bindings();
+    }
+
+    protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.BINDING_CONTROLLER,
                     ProActiveBindingController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
+            throw new ProActiveRuntimeException(
+                "cannot create controller type for controller " +
                 this.getClass().getName());
         }
-
-        bindings = new Bindings();
     }
 
     public void addBinding(Binding binding) {
@@ -417,17 +420,32 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.objectweb.fractal.api.control.BindingController#listFc()
+    /**
+     * @see org.objectweb.fractal.api.control.BindingController#listFc() In case
+     *      of a client collection interface, only the interfaces generated at
+     *      runtime and members of the collection are returned (a reference on
+     *      the collection interface itself is not returned, because it is just
+     *      a typing artifact and does not exist at runtime).
      */
     public String[] listFc() {
+        if (isPrimitive()) {
+            return ((BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject()).listFc();
+        }
         InterfaceType[] itfs_types = ((ComponentType) getFcItfOwner().getFcType()).getFcInterfaceTypes();
         List client_itfs_names = new ArrayList();
         for (int i = 0; i < itfs_types.length; i++) {
             if (itfs_types[i].isFcClientItf()) {
-                client_itfs_names.add(itfs_types[i].getFcItfName());
+                if (itfs_types[i].isFcCollectionItf()) {
+                    List collection_itfs = (List) bindings.get(itfs_types[i].getFcItfName());
+                    if (collection_itfs != null) {
+                        Iterator it = collection_itfs.iterator();
+                        while (it.hasNext()) {
+                            client_itfs_names.add(((Interface) it.next()).getFcItfName());
+                        }
+                    }
+                } else {
+                    client_itfs_names.add(itfs_types[i].getFcItfName());
+                }
             }
         }
         return (String[]) client_itfs_names.toArray(new String[client_itfs_names.size()]);

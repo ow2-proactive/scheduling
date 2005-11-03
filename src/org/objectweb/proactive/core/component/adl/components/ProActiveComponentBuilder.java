@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.component.adl.components;
 import org.objectweb.fractal.adl.components.ComponentBuilder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
 
 
 /**

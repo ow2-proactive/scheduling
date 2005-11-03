@@ -35,18 +35,39 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 
 
+/**
+ * This class is a filter for non functional component requests : it can separate
+ * component controller requests from component functional requests.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable {
     public NFRequestFilterImpl() {
     }
 
-    // TODO requestPriority
+    // TODO_M requestPriority
+    /**
+     * This methods verifies whether a request is a component controller request.
+     * @param request the request to filter
+     * @return true if the request is a component controller request, false otherwise  
+     */
     public boolean acceptRequest(Request request) {
         if (request instanceof ComponentRequest) {
-            // request is accepted only if it matches the rule : 
-            return ((ComponentRequest) request).isControllerRequest();
+            return acceptRequest((ComponentRequest)request);
         } else {
             // standard requests cannot be component controller requests
             return false;
         }
     }
+
+    /**
+     * This methods verifies whether a component request is a component controller request.
+     * @param request the component request to filter
+     * @return true if the request is a component controller request, false otherwise
+     */
+    public boolean acceptRequest(ComponentRequest request) {
+        return ((ComponentRequest) request).isControllerRequest();
+    }
+
 }

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.group;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
 
 import org.apache.log4j.Logger;
@@ -94,9 +93,6 @@ public class ProActiveComponentGroup {
                     owner, interfaceType);
             ((StubObject) generated).setProxy(proxy);
             return generated;
-            //            return (ProActiveInterface) (ProActiveComponentRepresentativeFactory.instance()
-            //                                                                                .createComponentRepresentative(component_type, null,
-            //                proxy)).getFcInterface(interfaceType.getFcItfName());
         } catch (InvalidProxyClassException e) {
             logger.error("**** InvalidProxyClassException ****");
         } catch (ConstructionOfProxyObjectFailedException e) {
@@ -114,7 +110,7 @@ public class ProActiveComponentGroup {
      * Creates an empty  component stub+a group proxy.
      * The stub in front of the group proxy is a component stub (instance of ComponentRepresentativeImpl),
      * that offers references to the functional interfaces defined in the type of the component.
-     * @param componentType the type of the component (i.e. the functional interfaces it offers and requires)
+     * @param componentParameters parameters of this component
      * @return a stub/proxy
      * @throws ClassNotFoundException
      * @throws java.lang.InstantiationException

@@ -48,6 +48,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
+ * This class defines the activity of active objects that are components. It allows
+ * the definition of a non functional activity (for managing a component in a stopped state), 
+ * and the encapsulation of a (possibly user-defined) functional activity that runs when the lifecycle of
+ * the component is started.
+ * 
  * @author Matthieu Morel
  *
  */
@@ -127,6 +132,16 @@ public class ComponentActivity implements RunActive, InitActive, EndActive {
         }
     }
 
+    /**
+     * <p>
+     * Runs the activity as defined in @see ComponentRunActive. The default behaviour is to
+     * serve non-functional requests in FIFO order, until the component is started. Then the functional
+     * activity (as defined in @see InitActive, @see RunActive and @see EndActive) begins.</p><p>
+     * When redefining the @see RunActive#runActivity(Body) method, the @see Body#isActive() returns true
+     * as long as the lifecycle of the component is @see LifeCycleController#STARTED. When the lifecycle of
+     * the component is @see LifeCycleController#STOPPED, @see Body#isActive() returns false.</p>
+     *
+     */
     public void runActivity(Body body) {
         if ((componentRunActive != null) && (componentRunActive != this)) {
             componentRunActive.runActivity(body);

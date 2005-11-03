@@ -73,7 +73,7 @@ public class ProActiveInterfaceType implements InterfaceType, Serializable {
      * @param itfType
      */
     public ProActiveInterfaceType(final InterfaceType itfType) {
-        this.name = new String(itfType.getFcItfName());
+        this.name = itfType.getFcItfName();
         this.signature = new String(itfType.getFcItfSignature());
         this.isClient = itfType.isFcClientItf();
         this.isOptional = itfType.isFcOptionalItf();

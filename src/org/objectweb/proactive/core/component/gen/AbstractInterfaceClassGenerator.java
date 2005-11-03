@@ -51,9 +51,14 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-
+/**
+ * This class is the parent of classes for generating component interfaces. It provides utility methods that are used in subclasses.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public abstract class AbstractInterfaceClassGenerator {
-    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION);
     protected static ClassPool pool = ClassPool.getDefault();
     protected static Hashtable generatedClassesCache = new Hashtable();
 
@@ -61,7 +66,7 @@ public abstract class AbstractInterfaceClassGenerator {
      * Returns the generatedClassesCache.
      * @return a Map acting as a cache for generated classes
      */
-    public static Map getGeneratedClassesCache() {
+    static Map getGeneratedClassesCache() {
         return generatedClassesCache;
     }
 
@@ -143,8 +148,6 @@ public abstract class AbstractInterfaceClassGenerator {
                                                .getContextClassLoader(),
                 effectiveArguments);
         } catch (ClassNotFoundException cnfe) {
-            cnfe.printStackTrace();
-
             //cat.error(cnfe.toString());
             throw new ProActiveRuntimeException(cnfe.toString());
         } catch (NoSuchMethodException nsme) {
@@ -153,10 +156,8 @@ public abstract class AbstractInterfaceClassGenerator {
             //cat.error(nsme.toString());
             throw new ProActiveRuntimeException(nsme.toString());
         } catch (IllegalAccessException iae) {
-            iae.printStackTrace();
             throw new ProActiveRuntimeException(iae.toString());
         } catch (InvocationTargetException ite) {
-            ite.printStackTrace();
             throw new ProActiveRuntimeException(ite.toString());
         }
     }

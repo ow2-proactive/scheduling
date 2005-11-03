@@ -33,8 +33,10 @@ package org.objectweb.proactive.core.component.body;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 
 
-/** Defines the actions specific to a component body.
- * @author mmorel
+/** 
+ * Defines the actions specific to a component body.
+ * 
+ * @author Matthieu Morel
  */
 public interface ComponentBody {
 
@@ -45,7 +47,15 @@ public interface ComponentBody {
 
     public boolean isComponent();
 
+    /**
+     * Flag setter
+     *
+     */
     public void startingFunctionalActivity();
 
+    /**
+     * Flag setter
+     *
+     */
     public void finishedFunctionalActivity();
 }

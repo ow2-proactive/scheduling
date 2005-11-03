@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.identity;
 
-import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -116,7 +115,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         interface_references_list.add(this);
 
         // 2. control interfaces
-        Properties controllers = new Properties();
         boolean current_component_is_primitive = !(componentParameters.getHierarchicalType()
                                                                       .equals(Constants.COMPOSITE) ||
             (componentParameters.getHierarchicalType().equals(Constants.PARALLEL)));
@@ -198,7 +196,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                 logger.debug("cannot create interface references : " +
                     e.getMessage());
             }
-            e.printStackTrace();
             throw new RuntimeException("cannot create interface references : " +
                 e.getMessage());
         }
@@ -296,8 +293,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * @param componentParameters
-     * @return
+     * @param controllerConfigFileLocation the location of the configuration file
+     * @return a xml parsing handler
      */
     public static ComponentConfigurationHandler loadComponentConfiguration(
         String controllerConfigFileLocation) {
@@ -404,7 +401,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
             return ((ComponentParametersController) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
                     .getComponentType();
         } catch (NoSuchInterfaceException nsie) {
-            nsie.printStackTrace();
             throw new ProActiveRuntimeException("cannot retreive the type of the component",
                 nsie);
         }

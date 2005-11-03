@@ -33,7 +33,12 @@ package org.objectweb.proactive.core.component.controller;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 
-
+/**
+ * This interface defines some basic services offered by a component controller in the ProActive implementation of the Fractal model.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public interface ProActiveController {
 
     /*

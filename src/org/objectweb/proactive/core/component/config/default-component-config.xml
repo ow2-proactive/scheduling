@@ -2,6 +2,7 @@
 <componentConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="component-config.xsd"
  name="defaultConfiguration">
+ <!--  This is the default configuration file for the controllers and interceptors of a component in the proactive implementation.-->
     <controllers>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>

@@ -32,7 +32,14 @@ package org.objectweb.proactive.core.component.gen;
 
 import java.util.List;
 
-
+/**
+ * This interface specifies a helper method for setting the list of output interceptors.
+ * (it is implemented by the generated output interceptors)
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public interface OutputInterceptorHelper {
+    
     public void setOutputInterceptors(List outputInterceptors);
 }

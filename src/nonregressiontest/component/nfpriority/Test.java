@@ -1,4 +1,4 @@
-package nonregressiontest.component.shortcuts;
+package nonregressiontest.component.nfpriority;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -8,7 +8,9 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
 
-import nonregressiontest.component.*;
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.Setup;
 
 
 /**
@@ -16,11 +18,6 @@ import nonregressiontest.component.*;
  */
 public class Test extends ComponentTest {
     private static final int NB_WRAPPERS = 5;
-    private static final int NB_ITERATIONS = 1;
-    private static final String P1_NAME = "primitive-component-1";
-    private static final String P2_NAME = "primitive-component-2";
-    private static final String C1_NAME = "composite-component1";
-    private static final String C2_NAME = "composite-component2";
     private Message result1;
     private Message result2;
     private Message result3;
@@ -33,58 +30,18 @@ public class Test extends ComponentTest {
     private Component systemWithoutWrapping;
 
     public Test() {
-        super("Shortcut communications through composite components",
-            "Shortcut communications through composite components");
+        super("Components : Prioritized non functional requests on components",
+            "Components : Prioritized non functional requests on components");
     }
 
     public void action() throws Exception {
-        initializeComponentSystems();
-
-        //System.out.println("testing unwrapped system");
-        Fractal.getLifeCycleController(systemWithoutWrapping).stopFc();
-        Fractal.getLifeCycleController(systemWithoutWrapping).startFc();
-        result1 = ((I1) systemWithoutWrapping.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
-        // waiting for the future is only for having an ordered logging output
-        ProActive.waitFor(result1);
-        Thread.sleep(2000);
-
-        //System.out.println("testing wrapped system without shortcuts");
-        Fractal.getLifeCycleController(systemWithWrappingWithoutShortcuts)
-               .stopFc();
-        Fractal.getLifeCycleController(systemWithWrappingWithoutShortcuts)
-               .startFc();
-
-        result2 = ((I1) systemWithWrappingWithoutShortcuts.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
-        ProActive.waitFor(result2);
-        Thread.sleep(2000);
-
-        //System.out.println("testing wrapped system with shortcuts -- fist invocation");
-        // first call, which performs tensioning
-        result3 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
-        ProActive.waitFor(result3);
-        Thread.sleep(2000);
-
-        Fractal.getLifeCycleController(systemWithWrappingWithShortcuts).stopFc();
-        Fractal.getLifeCycleController(systemWithWrappingWithShortcuts).startFc();
-
-        // second call, which goes directly through the shortcut
-        //System.out.println("testing wrapped system with shortcuts -- second invocation");
-        result4 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
-        ProActive.waitFor(result4);
-        Thread.sleep(2000);
-
-        // TODO_M manage shortcuts with reconfigurations
-        // reset while shortcut exists
-        //        resetComponentSystem();
-        //        initializeComponentSystems();
-        //      first call, which performs tensioning
-        //        result5 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message("foo"));
-        // a shortcut is now realized. Compare with previous result
-        //        result6 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message("foo"));
+        Component a = Setup.createSlowPrimitiveA();
+        Component c1 = Setup.createCompositeA();
+        Component b = Setup.createRemoteSlowPrimitiveB();
+        Component c2 = Setup.createCompositeB1();
+        Fractal.getContentController(c2).addFcSubComponent(a);
+        Fractal.getContentController(c2).addFcSubComponent(b);
+        // try a
     }
 
     private void initializeComponentSystems() throws Exception {
@@ -199,12 +156,6 @@ public class Test extends ComponentTest {
             Test test = new Test();
             test.initTest();
             test.action();
-            boolean success = test.postConditions();
-            if (success) {
-                System.out.println("Test succeeded");
-            } else {
-                System.out.println("Test failed");
-            }
             System.exit(0);
         } catch (Exception e) {
             e.printStackTrace();

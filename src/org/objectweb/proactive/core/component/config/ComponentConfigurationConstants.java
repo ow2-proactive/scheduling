@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive.core.component.config;
 
+/**
+ * This interface defines String constants used in the xml component configuration file.
+ *  
+ * @author Matthieu Morel
+ *
+ */
 public interface ComponentConfigurationConstants {
     public static final String COMPONENT_CONFIGURATION_ELEMENT = "componentConfiguration";
     public static final String CONTROLLERS_ELEMENT = "controllers";

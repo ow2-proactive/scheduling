@@ -81,7 +81,7 @@ public interface ComponentRequest extends Request {
     public int getShortcutLength();
 
     /*
-     * TODO : more comments on priorities of requests
+     * TODO_M : more comments on priorities of requests
      * @return the priority of the request
      */
     public short getPriority();

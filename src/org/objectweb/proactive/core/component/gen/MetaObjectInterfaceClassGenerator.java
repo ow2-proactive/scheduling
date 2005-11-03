@@ -244,7 +244,6 @@ public class MetaObjectInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
                 e);
         }

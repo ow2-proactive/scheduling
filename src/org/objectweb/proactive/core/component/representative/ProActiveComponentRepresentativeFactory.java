@@ -68,7 +68,7 @@ public class ProActiveComponentRepresentativeFactory {
      * the implementations of the controllers of this component.
      * @param componentType the type of the component
      * @param proxy the proxy to the active object
-     * @param controllerConfigFile a file that contains the description of the controllers for this component. null will load the default configuration
+     * @param controllerConfigFileLocation location of a file that contains the description of the controllers for this component. null will load the default configuration
      * @return a corresponding component representative
      */
     public ProActiveComponentRepresentative createComponentRepresentative(

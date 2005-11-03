@@ -42,8 +42,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
- * a controller for accessing configuration parameters of the component.
- *
+ * This class defines a controller for accessing configuration parameters of the component.
  *
  * @author Matthieu Morel
  *
@@ -59,18 +58,22 @@ public class ProActiveComponentParametersController
      */
     public ProActiveComponentParametersController(Component owner) {
         super(owner);
-        try {
+    }
+
+	protected void setControllerItfType() {
+		try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.COMPONENT_PARAMETERS_CONTROLLER,
                     ComponentParametersController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
+            throw new ProActiveRuntimeException("cannot create controller type : " +
                 this.getClass().getName());
         }
-    }
-
-    /*
+		
+	}
+	
+	/*
      * see {@link ComponentParametersController#getComponentParameters()}
      */
     public ComponentParameters getComponentParameters() {
@@ -97,4 +100,8 @@ public class ProActiveComponentParametersController
     public String getFcName() {
         return componentParameters.getName();
     }
+
+
+    
+    
 }

@@ -55,7 +55,13 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 
-
+/**
+ * This class generates representative interfaces objects, which are created on the client side along with the component representative
+ * object (@see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl).
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class RepresentativeInterfaceClassGenerator
     extends AbstractInterfaceClassGenerator {
     private static RepresentativeInterfaceClassGenerator instance;
@@ -224,7 +230,6 @@ public class RepresentativeInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
                 e);
         }

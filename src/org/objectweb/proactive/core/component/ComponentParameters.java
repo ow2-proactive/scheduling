@@ -38,16 +38,18 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveComponentType;
 
 
-/** Contains the configuration of a component. <ul>
+/** 
+ * Contains the configuration of a component. <ul>
  * <li> type</li>
  * <li> interfaces (server and client) --> in contained ControllerDescription object</li>
  * <li> name --> in contained ControllerDescription object</li>
  * <li> hierarchical type (primitive or composite) --> in contained ControllerDescription object</li>
  * <li> a ref on the stub on the base object</li>
  * </ul>
+ * 
+ * @author Matthieu Morel
  */
 public class ComponentParameters implements Serializable {
-    private Object stubOnReifiedObject;
     private ComponentType componentType;
     private ControllerDescription controllerDesc;
 
@@ -61,6 +63,13 @@ public class ComponentParameters implements Serializable {
         this(componentType, new ControllerDescription(name, hierarchicalType));
     }
 
+    /**
+     * Constructor for ComponentParameters.
+     * @param name String
+     * @param hierarchicalType String
+     * @param componentType ComponentType
+     * @param controllerConfigFileLocation String
+     */
     public ComponentParameters(String name, String hierarchicalType,
         ComponentType componentType, String controllerConfigFileLocation) {
         this(componentType, new ControllerDescription(name, hierarchicalType));

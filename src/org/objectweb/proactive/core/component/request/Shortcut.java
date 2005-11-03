@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class represents a shortcut. A shortcut represents the link between a
+ * This class represents a shortcut. A shortcut is a link between a
  * client interface of a primitive component and the server interface of another
  * primitive component. The shortcuting mechanism is based on tensioning, which
  * is also used for migration of active objects with forwarders. When performing
@@ -94,7 +94,7 @@ public class Shortcut implements Serializable {
      * This method returns length of the shortcut, in other words the number
      * of bindings it represents.
      * A shortcut of length 1 indicates a normal binding.
-     * @return
+     * @return the length of the shortcut
      */
     public int length() {
         return steps.size();

@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 /**
- * This class is able to handle requests, check if the current request can be
+ * This class is able to handle requests, and checks if the current request can be
  * handled by the current handler in the chain of handlers (here, it is actually
  * a list of controllers). If this is the case, then the request is executed by
  * this handler. Otherwise, the request is transferred to the next handler in
@@ -66,7 +66,7 @@ public abstract class AbstractRequestHandler implements RequestHandler,
 
     public Object handleRequest(ComponentRequest request)
         throws MethodCallExecutionFailedException, InvocationTargetException {
-        if (request.getTargetClass().isAssignableFrom(this.getClass())) {
+        if (request.getMethodCall().getComponentInterfaceName().equals(getFcItfName()) && request.getTargetClass().isAssignableFrom(this.getClass())) {
             return request.getMethodCall().execute(this);
         }
         if (nextHandler() != null) {
@@ -75,4 +75,6 @@ public abstract class AbstractRequestHandler implements RequestHandler,
         throw new MethodCallExecutionFailedException(
             "cannot find a suitable handler for this request");
     }
+    
+    abstract public String getFcItfName();
 }

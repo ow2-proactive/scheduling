@@ -34,10 +34,16 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 
 
 /**
+ * This interface defines an extension of the @see org.objectweb.fractal.api.control.LifeCycleController, which
+ * is able to handle prioritized requests.
+ *<p>
+ * (Under development)
+ * </p>
  * @author Matthieu Morel
  *
  */
 public interface ProActiveLifeCycleController extends LifeCycleController {
+    
     public String getFcState(short priority);
 
     public void startFc(short priority);

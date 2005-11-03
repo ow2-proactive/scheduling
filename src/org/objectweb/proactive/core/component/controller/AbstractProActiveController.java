@@ -63,6 +63,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
      */
     public AbstractProActiveController(Component owner) {
         this.owner = owner;
+        setControllerItfType();
     }
 
     /*
@@ -147,4 +148,6 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     protected void setItfType(InterfaceType itfType) {
         this.interfaceType = itfType;
     }
+    
+    protected abstract void setControllerItfType();
 }

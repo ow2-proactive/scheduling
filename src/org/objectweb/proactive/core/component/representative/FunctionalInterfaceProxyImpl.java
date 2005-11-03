@@ -85,7 +85,7 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
                                                   .getDeclaredField("bodyID");
             bodyIDField.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -108,10 +108,8 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
             bodyIDField.set(proxy, body.getID());
             bodyProxyDelegatee = proxy;
         } catch (InstantiationException e) {
-            e.printStackTrace();
             throw new ProActiveRuntimeException(e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
             throw new ProActiveRuntimeException(e);
         }
     }

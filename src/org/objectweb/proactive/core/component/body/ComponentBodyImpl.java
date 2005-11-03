@@ -49,7 +49,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-/** This class has been inserted into the bodies hierarchy in order to instantiate the
+/** 
+ * This class has been inserted into the bodies hierarchy in order to instantiate the
  * component metaobject (ProActiveComponent).
  */
 public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
@@ -60,14 +61,12 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     //    private RequestFilter filterOnNFRequests;
     private boolean insideFunctionalActivity = false;
 
-    /**
-     * Constructor for ComponentBodyImpl.
-     */
     public ComponentBodyImpl() {
         super();
     }
 
-    /** Constructor for ComponentBodyImpl.
+    /** 
+     * Constructor for ComponentBodyImpl.
      *
      * It creates the component metaobject only if the MetaObjectFactory is parameterized
      * with ComponentParameters (thus implicitely constructing components).
@@ -168,32 +167,4 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }
 
-    //    public void serve(ComponentRequest request) {
-    //            // handle FT
-    //        if (request.isControllerRequest()) {
-    //            super.serve(request);
-    //            return;
-    //        }
-    //        
-    //        ComponentRequest nextNFRequest = (ComponentRequest)getRequestQueue().getOldest(filterOnNFRequests);
-    //        if (nextNFRequest != null) {
-    //           }
-    //                
-    //            //TODO handle prioritized NF requests
-    //        }
-    //        
-    //    }
-    //    public void createShortcut(UniqueID id, UniversalBody body, String functionalInterfaceName) {
-    //          // TODO get or create a new proxy
-    //          location.putBody(id, body);
-    //        try {
-    //            FunctionalInterfaceProxy proxy = (FunctionalInterfaceProxy)((StubObject)getProActiveComponent().getFcInterface(functionalInterfaceName)).getProxy();
-    ////            /proxy.setRefOnBody(body, id);
-    //            System.out.println();
-    //        } catch (NoSuchInterfaceException e) {
-    //            e.printStackTrace();
-    //        }
-    //
-    //          throw new ProActiveRuntimeException("create shortcut method not implemented yet");
-    //      }
 }

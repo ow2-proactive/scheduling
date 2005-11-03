@@ -68,13 +68,13 @@ import org.objectweb.proactive.core.mop.MethodCall;
 public interface InputInterceptor {
 
     /**
-     * This method is when an input invocation is intercepted, before executing the input invocation.
+     * This method is executed when an input invocation is intercepted, before executing the input invocation.
      * @param methodCall the method to be executed (MethodCall objects include method parameters and other ProActive-specific infos)
      */
     public void beforeInputMethodInvocation(MethodCall methodCall);
 
     /**
-     * This method is when an input invocation has been intercepted, after the execution of the input invocation.
+     * This method is executed when an input invocation has been intercepted, after the execution of the input invocation.
      * @param methodCall the method that has been executed (MethodCall objects include method parameters and other ProActive-specific infos)
      */
     public void afterInputMethodInvocation(MethodCall methodCall);

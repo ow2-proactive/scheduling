@@ -34,9 +34,15 @@ import org.objectweb.proactive.Body;
 
 
 /**
+ * This interface defines the end of the activity of an active object which is a Fractal component.
+ * It replaces the {@link org.objectweb.proactive.EndActive} when using Fractal components.
+ * 
  * @author Matthieu Morel
  *
  */
 public interface ComponentEndActive extends ComponentActive {
+    /**
+     * @see org.objectweb.proactive.EndActive#endActivity(Body)
+     */
     public void endComponentActivity(Body body);
 }

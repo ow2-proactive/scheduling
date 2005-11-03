@@ -35,6 +35,7 @@ import org.objectweb.fractal.api.control.SuperController;
 
 
 /**
+ * Implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface
  * @author Matthieu Morel
  */
 public interface ProActiveSuperController extends SuperController {

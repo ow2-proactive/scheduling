@@ -52,8 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of the LifeCycleController ({@link org.objectweb.fractal.api.control.LifeCycleController}).<br>
- * It uses the request queue of the active objects.
+ * Implementation of the {@link org.objectweb.fractal.api.control.LifeCycleController} interface.<br>
  *
  * @author Matthieu Morel
  *
@@ -66,18 +65,23 @@ public class ProActiveLifeCycleControllerImpl
 
     public ProActiveLifeCycleControllerImpl(Component owner) {
         super(owner);
-        try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
-                    ProActiveLifeCycleController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
-        } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
-        }
     }
+    
+        protected void setControllerItfType() {
+            try {
+                setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+                        ProActiveLifeCycleController.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY,
+                        TypeFactory.SINGLE));
+            } catch (InstantiationException e) {
+                throw new ProActiveRuntimeException("cannot create controller " +
+                    this.getClass().getName());
+            }
+}
 
-    /*
+
+
+	/*
      * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
      */
     public String getFcState() {
@@ -170,10 +174,8 @@ public class ProActiveLifeCycleControllerImpl
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());
-            nsie.printStackTrace();
         } catch (IllegalLifeCycleException ilce) {
             logger.error("illegal life cycle operation : " + ilce.getMessage());
-            ilce.printStackTrace();
         }
     }
 

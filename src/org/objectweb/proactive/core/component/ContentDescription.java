@@ -37,9 +37,9 @@ import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * Fractal implementation-specific description of  the content of components.
- * With ProActive, features such as activity, factory, virtual node or constructor parameters
- * can be specified.
+ * <p>Fractal implementation-specific description of  the content of components.</p>
+ * <p>With ProActive, features such as activity, factory, virtual node or constructor parameters
+ * can be specified.</p>
  *
  * @author Matthieu Morel
  */
@@ -216,17 +216,26 @@ public class ContentDescription {
         uniqueInstance = true;
     }
 
+    /**
+     * Method uniqueInstance.
+     * @return boolean
+     */
     public boolean uniqueInstance() {
         return uniqueInstance;
     }
 
     /**
      * setter (visibility is reduced)
+     * @param factory MetaObjectFactory
      */
     public void setFactory(MetaObjectFactory factory) {
         this.factory = factory;
     }
 
+    /**
+     * Method setActivity.
+     * @param activity Active
+     */
     void setActivity(Active activity) {
         this.activity = activity;
     }

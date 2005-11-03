@@ -52,6 +52,7 @@ public class Binding implements Serializable {
 
     /**
      * @param clientInterface a reference on a client interface
+     * @param clientItfName String name of the binding
      * @param serverInterface a reference on a server interface
      */
     public Binding(final Interface clientInterface, String clientItfName,
