@@ -47,7 +47,7 @@ FileTransfer protocols can be of two types: <b>external</b> or <b>internal</b>. 
 Usually external FileTransfer happens before the deployment of the process. On the other hand, internal FileTransfer happens at the same time of the process deployment, because the specific tools provided by the process are used. This implies that internal FileTransfer protocols can not be used with other process (ex: unicore file transfer can not be used when deploying with ssh), but the other way around is valid (ex: scp can be used when deploying with unicore).
 </p>
 
-<h3>Adding external FileTransfer CopyProtocol</h3>
+<h2><a name="external"></a>Adding external FileTransfer CopyProtocol</h2>
 
 <ul class="listWithSpace">
 <li class="textNormal"><b>Implement the protocol class.</b> This is done inside the package: <b>org.objectweb.proactive.core.process.filetransfer;</b> by extending the abstract class <b>AbstractCopyProtocol</b>.</li>
@@ -57,7 +57,8 @@ Usually external FileTransfer happens before the deployment of the process. On t
 
 <p><b>Note</b>: Choosing the correct name for the protocol is simple, but must be done carefully. All names already in the array ALLOWED_COPY_PROTOCOLS are forbidden. This includes the name <b>"processDefault"</b>, which is also forbidden. In some cases <b>"processDefault"</b> will corresponde to an external FileTransfer protocol (ex: ssh with scp), and in some cases to an internal protocol (ex: unicore with unicore)</p> 
 
-<h3>Adding internal FileTransfer CopyProtocol</h3>
+<h2><a name="internal"></a>Adding internal FileTransfer CopyProtocol</h2>
+
 <ul class="listWithSpace">
 <li class="textNormal">Implement the method <b>protected boolean internalFileTransferDefaultProtocol()</b> inside the process class. Note that this method will be called if the <b>processDefault</b> keyword is specified in the <b>XML Descriptor Process Section</b>. Therefore, this method usually must return true, so no other FileTransfer protocols will be tried.</li>
 <li class="textNormal"><b>FileTransferWorkshop:</b> Add the name of the protocol to array <b>ALLOWED_COPY_PROTOCOLS[]</b></li>
