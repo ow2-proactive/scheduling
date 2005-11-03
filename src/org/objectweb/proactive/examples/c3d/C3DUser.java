@@ -68,13 +68,13 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     UserLogic {
 
     /** useful for showing information, if no GUI is available, or for error messages*/
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** reference to the dispatcher logic, for image generation and message forwarding */
     protected Dispatcher c3ddispatcher;
 
     /** AsyncRefto self, needed to add method on own queue */
-    private transient User me;
+    protected transient User me;
 
     /** The chosen name of the user*/
     private String userName;
@@ -100,19 +100,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     }
 
     /** The initialization and linkage is made in this method, instead of using the constructor */
-    public void go() {
-        // active Object related fields
-        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
-
-        // ask user through Dialog for userName & host 
-        String localHost = getLocalHostString();
-        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog(localHost);
-        this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
-        this.userName = userAndHostNameDialog.getValidatedUserName();
-        if (this.c3ddispatcher == null) {
-            logger.error("Could not find a dispatcher. Closing.");
-            System.exit(-1);
-        }
+    public void run() {
+        findDispatcher();
 
         // register user to dispatcher, while asking user to be patient
         WaitFrame wait = new WaitFrame("C3D : please wait!", "Please wait...",
@@ -131,6 +120,21 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
                 Integer.toString(pictureHeight)
             };
         this.gui.setValues(getMachineRelatedValues(), values);
+    }
+
+    public void findDispatcher() {
+        // active Object related fields
+        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
+
+        // ask user through Dialog for userName & host 
+        String localHost = getLocalHostString();
+        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog(localHost);
+        this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
+        setUserName(userAndHostNameDialog.getValidatedUserName());
+        if (this.c3ddispatcher == null) {
+            logger.error("Could not find a dispatcher. Closing.");
+            System.exit(-1);
+        }
     }
 
     /** Gets the name of the machine this is running on. */
@@ -180,9 +184,9 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
      * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild
      */
     public void initActivity(Body body) {
-        // FIXME : this test should be stripped, only put here to circumvent component bug
+		// FIXME : this test should be stripped, only put here to circumvent component bug
         if (body == null) {
-            System.err.println("in C3DUser.initActivity, Body is " + body);
+            logger.error("in C3DUser.initActivity, Body is " + body);
         } else {
             MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
             myStrategyManager.onArrival("rebuild");
@@ -290,7 +294,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         } catch (NodeException e) {
             e.printStackTrace();
         }
-        c3duser.go();
+        c3duser.run();
     }
 
     /** Ask the dispatcher to revert to original scene*/
@@ -353,5 +357,9 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
             this.userName, hostName, this.c3ddispatcher.getMachineName(),
             this.c3ddispatcher.getOSString(),
         };
+    }
+    
+    public void setUserName(String newName) {
+        this.userName = newName;
     }
 }

@@ -37,7 +37,7 @@ import org.objectweb.proactive.examples.c3d.geom.Vec;
 public interface UserLogic {
 
     /** The initialization and linkage is made in this method, instead of using the constructor */
-    public abstract void go();
+    public abstract void run();
 
     /** called after migration, to reconstruct the logic.
      * In the initActivity :  myStrategyManager.onArrival("rebuild"); */
