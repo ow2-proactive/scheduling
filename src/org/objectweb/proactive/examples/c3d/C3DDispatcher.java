@@ -378,7 +378,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             return;
         }
 
-        allLog("Scene is being spun along " + angle.direction()); // FIXME : is this needed ?
+        allLog("Scene is being spun along " + angle.direction()); 
 
         /* rotate every object ... */
         int objects = this.scene.getNbPrimitives();
@@ -671,7 +671,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     }
 
     public void addSphere(Sphere s) {
-        if (this.election.isRunning()) {
+        if (this.election != null && this.election.isRunning()) {
             allLog("A Sphere Cannot be added while election is running!");
             return;
         }
