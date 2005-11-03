@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
+import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -231,7 +233,10 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
         /* Throws the exceptionList if one or more exceptions occur in the oneWayCall */
         if ((exceptionList != null) && (exceptionList.size() != 0)) {
-            throw exceptionList;
+            FailedGroupRendezVousException fgrve = new FailedGroupRendezVousException(
+                    "RendezVous failed in group method: " + mc.getName(),
+                    exceptionList, this);
+            NFEManager.fireNFE(fgrve, this);
         }
 
         return result;

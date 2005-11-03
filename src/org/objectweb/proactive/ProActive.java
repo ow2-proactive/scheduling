@@ -71,6 +71,7 @@ import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
@@ -1820,5 +1821,41 @@ public class ProActive {
             throw new IllegalArgumentException(
                 "The object must be a proxy to an active object");
         }
+    }
+
+    private static ProxyForGroup getGroupProxy(Object g) {
+        ProxyForGroup pfg;
+
+        try {
+            pfg = (ProxyForGroup) ProActiveGroup.getGroup(g);
+        } catch (ClassCastException cce) {
+            pfg = null;
+        }
+
+        if (pfg == null) {
+            throw new IllegalArgumentException("The object must be a group");
+        }
+
+        return pfg;
+    }
+
+    /**
+     * Add a listener for NFE regarding a group.
+     *
+     * @param ao The active object receiving the NFE
+     * @param listener The listener to add
+     */
+    public static void addNFEListenerOnGroup(Object g, NFEListener listener) {
+        getGroupProxy(g).addNFEListener(listener);
+    }
+
+    /**
+     * Remove a listener for NFE regarding a group.
+     *
+     * @param ao The active object receiving the NFE
+     * @param listener The listener to remove
+     */
+    public static void removeNFEListenerOnGroup(Object g, NFEListener listener) {
+        getGroupProxy(g).removeNFEListener(listener);
     }
 }

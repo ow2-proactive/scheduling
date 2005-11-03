@@ -31,7 +31,6 @@
 package org.objectweb.proactive.p2p.service;
 
 import java.io.Serializable;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -42,8 +41,7 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
+import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -99,6 +97,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         // Create exportAcquaintances group
         try {
             this.acquaintances = (P2PService) ProActiveGroup.newGroup(P2PService.class.getName());
+            ProActive.addNFEListenerOnGroup(this.acquaintances,
+                FailedGroupRendezVousException.AUTO_GROUP_PURGE);
             this.groupOfAcquaintances = ProActiveGroup.getGroup(acquaintances);
             this.acquaintancesActived = (P2PService) ProActiveGroup.turnActiveGroup(acquaintances,
                     nodeUrl);
@@ -122,28 +122,23 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         Service service = new Service(body);
 
         while (body.isActive()) {
-            try {
-                if (this.groupOfAcquaintances.size() > 0) {
-                    // Register the local P2P service in all exportAcquaintances
-                    logger.debug("Sending heart-beat");
-                    this.acquaintances.heartBeat();
-                    logger.debug("Heart-beat sent");
+            if (this.groupOfAcquaintances.size() > 0) {
+                // Register the local P2P service in all exportAcquaintances
+                logger.debug("Sending heart-beat");
+                this.acquaintances.heartBeat();
+                logger.debug("Heart-beat sent");
 
-                    // How many peers ?
-                    if (this.groupOfAcquaintances.size() < NOA) {
-                        // Looking for new peers
-                        logger.debug("NOA is " + NOA +
-                            " - Size of P2PAcquaintanceManager is " +
-                            this.groupOfAcquaintances.size());
+                // How many peers ?
+                if (this.groupOfAcquaintances.size() < NOA) {
+                    // Looking for new peers
+                    logger.debug("NOA is " + NOA +
+                        " - Size of P2PAcquaintanceManager is " +
+                        this.groupOfAcquaintances.size());
 
-                        // Sending exploring message
-                        this.acquaintances.exploring(TTL, null,
-                            this.localService);
-                        logger.debug("Explorating message sent");
-                    }
+                    // Sending exploring message
+                    this.acquaintances.exploring(TTL, null, this.localService);
+                    logger.debug("Explorating message sent");
                 }
-            } catch (ExceptionListException e) {
-                removingAllExcpetedPeers(e);
             }
 
             // Waiting TTU & serving requests
@@ -159,29 +154,6 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 }
             }
             logger.debug("End waiting");
-        }
-    }
-
-    /**
-     * @param theExcpetionList
-     */
-    public void removingAllExcpetedPeers(
-        ExceptionListException theExcpetionList) {
-        // Removing bad peers
-        logger.debug("Some peers to remove from group");
-        Iterator it = theExcpetionList.iterator();
-        while (it.hasNext()) {
-            try {
-                // Remove bad peers
-                ExceptionInGroup ex = (ExceptionInGroup) it.next();
-                Object peer = ex.getObject();
-                this.groupOfAcquaintances.remove(peer);
-                logger.debug("Peer removed");
-            } catch (Exception concEx) {
-                // NullPointer or ConcurrentModification
-                // No peer localized for the excpetion => nothing to do
-                logger.debug(concEx);
-            }
         }
     }
 

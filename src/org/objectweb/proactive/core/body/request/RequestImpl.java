@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
-import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -185,13 +184,9 @@ public class RequestImpl extends MessageImpl implements Request,
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
             if (isOneWay) {
-
-                /* ExceptionListException are handled by group users */
-                if (!(exception instanceof ExceptionListException)) {
-                    throw new ServeException("serve method " +
-                        methodCall.getReifiedMethod().toString() + " failed",
-                        exception);
-                }
+                throw new ServeException("serve method " +
+                    methodCall.getReifiedMethod().toString() + " failed",
+                    exception);
             }
         }
 

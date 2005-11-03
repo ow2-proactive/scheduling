@@ -54,6 +54,7 @@ public class ExceptionInGroup extends RuntimeException {
      * @param throwable - the throwable thrown
      */
     public ExceptionInGroup(Object object, int index, Throwable throwable) {
+        super(throwable);
         this.object = object;
         this.index = index;
         this.throwable = throwable;

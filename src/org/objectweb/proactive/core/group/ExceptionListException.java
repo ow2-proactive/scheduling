@@ -48,6 +48,7 @@ public class ExceptionListException extends RuntimeException {
      * Builds a new empty list of exception
      */
     public ExceptionListException() {
+        super("Exception list, only one cause in the stacktrace");
         this.list = new Vector();
     }
 
@@ -56,6 +57,9 @@ public class ExceptionListException extends RuntimeException {
      * @param exception - the exception to add
      */
     public void add(ExceptionInGroup exception) {
+        if (getCause() == null) {
+            initCause(exception);
+        }
         this.list.add(exception);
     }
 

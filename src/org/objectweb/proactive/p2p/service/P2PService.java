@@ -32,7 +32,6 @@ package org.objectweb.proactive.p2p.service;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
@@ -46,8 +45,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -242,20 +239,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.debug("Generating uuid for exploring message");
                 uuid = generateUuid();
             }
-            try {
-                this.acquaintances.exploring(ttl, uuid, remoteService);
-                logger.debug("Broadcast exploring message with #" + uuid);
-                uuid = null;
-            } catch (ExceptionListException e) {
-                logger.debug("Some peers to remove from exploring");
-                Iterator it = e.iterator();
-                while (it.hasNext()) {
-                    // Remove bad peers
-                    ExceptionInGroup ex = (ExceptionInGroup) it.next();
-                    Object peer = ex.getObject();
-                    this.acquaintanceManager.remove((P2PService) peer);
-                }
-            }
+            this.acquaintances.exploring(ttl, uuid, remoteService);
+            logger.debug("Broadcast exploring message with #" + uuid);
+            uuid = null;
         }
     }
 
@@ -369,14 +355,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.debug("Generating uuid for askingNode message");
                 uuid = generateUuid();
             }
-            try {
-                this.acquaintances.askingNode(ttl, uuid, remoteService,
-                    numberOfNodes, lookup, vnName, jobId);
-                logger.debug("Broadcast askingNode message with #" + uuid);
-            } catch (ExceptionListException e) {
-                logger.debug("Some peers to remove from askingNode");
-                this.acquaintanceManager.removingAllExcpetedPeers(e);
-            }
+            this.acquaintances.askingNode(ttl, uuid, remoteService,
+                numberOfNodes, lookup, vnName, jobId);
+            logger.debug("Broadcast askingNode message with #" + uuid);
         }
     }
 

@@ -34,7 +34,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -45,8 +44,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionListException;
+import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -201,6 +199,8 @@ public class Manager implements Serializable, InitActive {
                 long singleStartTime = System.currentTimeMillis();
                 this.workerGroup = (Worker) ProActiveGroup.newGroupBuiltWithMultithreading(Worker.class.getName(),
                         args, this.nodes);
+                ProActive.addNFEListenerOnGroup(this.workerGroup,
+                    FailedGroupRendezVousException.AUTO_GROUP_PURGE);
                 this.freeWorkerList.addAll(ProActiveGroup.getGroup(
                         this.workerGroup));
                 long singleEndTime = System.currentTimeMillis();
@@ -250,15 +250,7 @@ public class Manager implements Serializable, InitActive {
         }
 
         Group groupOfWorkers = ProActiveGroup.getGroup(this.workerGroup);
-        try {
-            this.workerGroup.setWorkerGroup(this.workerGroup);
-        } catch (ExceptionListException e) {
-            logger.debug("Some workers are down", e);
-            Iterator it = e.iterator();
-            while (it.hasNext()) {
-                groupOfWorkers.remove(((ExceptionInGroup) it.next()).getObject());
-            }
-        }
+        this.workerGroup.setWorkerGroup(this.workerGroup);
 
         if (logger.isInfoEnabled()) {
             logger.info("Manager successfuly activate with " +
