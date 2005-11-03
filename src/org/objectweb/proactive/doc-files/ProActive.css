@@ -30,6 +30,11 @@ table.xml{ background-color: #C0C0C0; border: double #FFFFFF}
 .alignleftsnippet{ color: #00257e; font-size:0.75em; padding-top: 0;padding-right: 0; /*font-family:monospace;*/  background-color:white; font-family: "Lucida Console", Courier; font-size: 10pt; }
 .print {  page-break-after: always}
 
+/* Make a "red" class, to avoid purple on blue for <h2> <a ...  */
+a.red:link {color: #ee7b3e; background: #00257E; }
+a.red:active {color: #ee7b3e; background: #00257E;}
+a.red:visited {color: #e06712; background: #00257E;}
+a.red:hover {color: #ff0000; background: #00257E;}
 
 /* Token Colours */
 #CharacerLiteral	{ color: #FF00FF; }
