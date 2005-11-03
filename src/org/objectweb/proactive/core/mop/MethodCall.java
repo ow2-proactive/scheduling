@@ -248,10 +248,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * possible name of the functional interface invoked).
      * @param reifiedMethod
      * @param effectiveArguments
-     * @param interfaceName fractal interface name, whose value is :
-     *  - null if the call is non-functional
-     *  - the name of the functional interface otherwise
-     * @param priority TODO
+     * @param interfaceName fractal interface name
+     * @param priority default is to 3 (strict FIFO)
      * @return MethodCall
      */
     public synchronized static MethodCall getComponentMethodCall(
@@ -474,8 +472,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     /**
-     * accessor for the functional name ot the invoked Fractal interface
-     * @return the functional name of the invoked Fractal interface
+     * accessor for the name ot the invoked Fractal interface
+     * @return the name of the invoked Fractal interface
      */
     public String getComponentInterfaceName() {
         return componentInterfaceName;
