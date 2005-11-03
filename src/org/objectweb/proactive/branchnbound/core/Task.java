@@ -127,6 +127,11 @@ public abstract class Task implements Serializable, Comparable {
         }
     }
 
+    /**
+     * <p><b>***FOR INTERNAL USE ONLY***</b></p>
+     * <p>Push the best current solution which is broadcasted in this task.</p>
+     * @param newBestKnownResult the best current solution.
+     */
     public void setBestKnownSolution(Object newBestKnownResult) {
         if (this.bestKnownSolution != null) {
             synchronized (this.bestKnownSolution) {
@@ -138,6 +143,9 @@ public abstract class Task implements Serializable, Comparable {
         }
     }
 
+    /**
+     * Terminate this task.
+     */
     public void immediateTerminate() {
         try {
             ProActive.getBodyOnThis().terminate();

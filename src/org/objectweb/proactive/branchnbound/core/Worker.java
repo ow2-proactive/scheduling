@@ -38,6 +38,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
 import org.objectweb.proactive.branchnbound.core.queue.TaskQueue;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -45,6 +47,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
+ * <p><b>***FOR INTERNAL USE ONLY</b></p>
+ *
  * @author Alexandre di Costanzo
  *
  * Created on Apr 25, 2005
@@ -64,12 +68,17 @@ public class Worker implements Serializable {
         // The emplty constructor
     }
 
+    /**
+     * Construct a new worker with a reference on a task queue.
+     * @param taskProvider this task queue.
+     */
     public Worker(TaskQueue taskProvider) {
         this.taskProvider = taskProvider;
     }
 
     /**
-     * @param task
+     * Start the computation of the given task.
+     * @param task the task to compute.
      * @return the result or a result with the exception.
      */
     public Result execute(Task task) {
@@ -117,10 +126,13 @@ public class Worker implements Serializable {
         return new Result(exception);
     }
 
-    //    public void setWorkerGroup(Worker workerGroup) {
-    //        this.selfWorkerGroup = workerGroup;
-    //    }
+    /**
+     * Set the group of this worker.
+     * @param workerGroup the group of workers.
+     */
     public void setWorkerGroup(Worker workerGroup) {
+        Group group = ProActiveGroup.getGroup(workerGroup);
+        group.remove(ProActive.getStubOnThis());
         this.selfWorkerGroup = workerGroup;
     }
 
@@ -147,7 +159,7 @@ public class Worker implements Serializable {
     }
 
     /**
-     * @return the local best result.
+     * @return the best local result.
      */
     public Result getBestCurrentResult() {
         if (this.bestCurrentResult == null) {
@@ -156,6 +168,11 @@ public class Worker implements Serializable {
         return this.bestCurrentResult;
     }
 
+    /**
+     * Broadcast the best new localy found solution to all task and to the task
+     * queue.
+     * @param newBest the best new solution.
+     */
     public void informNewBestResult(Result newBest) {
         if ((this.bestCurrentResult == null) ||
                 newBest.isBetterThan(this.bestCurrentResult)) {
@@ -170,6 +187,10 @@ public class Worker implements Serializable {
         }
     }
 
+    /**
+     * Add a set of sub-task to the task queue.
+     * @param subTaskList the set of sub-tasks.
+     */
     public void sendSubTasksToTheManager(Vector subTaskList) {
         if (logger.isDebugEnabled()) {
             logger.debug("The task sends " + subTaskList.size() + " sub tasks");
@@ -177,23 +198,38 @@ public class Worker implements Serializable {
         this.taskProvider.addAll(subTaskList);
     }
 
+    /**
+     * @return <code>true</code> if the task queue needs more tasks.
+     */
     public BooleanWrapper isHungry() {
         return this.taskProvider.isHungry();
     }
 
+    /**
+     * Stop the current task computation.
+     */
     public void immediateStopComputation() {
         this.currentTask.immediateTerminate();
         this.currentTask = null;
     }
 
+    /**
+     * @return the current task.
+     */
     public Task getCurrentTask() {
         return this.currentTask;
     }
 
+    /**
+     * Pinging the current worker.
+     */
     public void alive() {
         // nothing to do here
     }
 
+    /**
+     * Reset the worker for a new computation.
+     */
     public void reset() {
         this.bestCurrentResult = null;
         this.currentTask = null;

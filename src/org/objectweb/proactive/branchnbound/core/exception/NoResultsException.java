@@ -33,11 +33,28 @@ package org.objectweb.proactive.branchnbound.core.exception;
 import java.io.Serializable;
 
 
+/**
+ * This exception is used for signaling that a <code>Result</code> containts no
+ * solutions.
+ *
+ * @author Alexandre di Costanzo
+ *
+ * Created on Nov 2, 2005
+ */
 public class NoResultsException extends Exception implements Serializable {
+
+    /**
+     * Create a new Excpeiton.
+     */
     public NoResultsException() {
         super();
     }
 
+    /**
+     * Create a new Excpetion with a given message.
+     *
+     * @param arg0 the message.
+     */
     public NoResultsException(String arg0) {
         super(arg0);
     }

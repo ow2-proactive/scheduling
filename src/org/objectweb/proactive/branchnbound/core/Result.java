@@ -39,6 +39,8 @@ import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
 
 
 /**
+ * A wrapper for a solution.
+ *
  * @author Alexandre di Costanzo
  *
  * Created on May 2, 2005
@@ -62,6 +64,11 @@ public class Result implements Serializable {
         this.theSolution = theSolution;
     }
 
+    /**
+     *
+     * Construct a new result with an excpetion.
+     * @param e the exception.
+     */
     public Result(Exception e) {
         this.exception = e;
     }
@@ -74,6 +81,9 @@ public class Result implements Serializable {
         return this.theSolution;
     }
 
+    /**
+     * @return the attached exception or <code>null</code> else.
+     */
     public Exception getException() {
         return this.exception;
     }

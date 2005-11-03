@@ -59,6 +59,8 @@ import ibis.impl.messagePassing.InputStream;
 
 
 /**
+ *
+ * <p><Manage and control the Branch and Bound computation.</p>
  * @author Alexandre di Costanzo
  *
  * Created on May 31, 2005
@@ -98,6 +100,12 @@ public class Manager implements Serializable, InitActive {
         // nothing to do
     }
 
+    /**
+     * The main constructor.
+     * @param root the root task.
+     * @param myNode the node where <code>this</code> is running.
+     * @param queueType the class name of the task queue.
+     */
     private Manager(Task root, Node myNode, String queueType) {
         // Activate the root task
         try {
@@ -126,22 +134,51 @@ public class Manager implements Serializable, InitActive {
         }
     }
 
+    /**
+     * Contruct a new Manager.
+     * @param root the root task.
+     * @param myNode the node where <code>this</code> is running.
+     * @param nodes the array of nodes for the computation.
+     * @param queueType the class name of the task queue.
+     */
     public Manager(Task root, Node myNode, Node[] nodes, String queueType) {
         this(root, myNode, queueType);
         this.nodes = nodes;
     }
 
+    /**
+     * Contruct a new Manager. Hierarchic communication are used between the
+     * given array of nodes.
+     * @param root the root task.
+     * @param myNode the node where <code>this</code> is running.
+     * @param nodes the array of array of nodes for the computation.
+     * @param queueType the class name of the task queue.
+     */
     public Manager(Task root, Node myNode, Node[][] nodes, String queueType) {
         this(root, myNode, queueType);
         this.arrayOfNodes = nodes;
     }
 
+    /**
+     * Contruct a new Manager. Hierarchic communication are used between the
+     * given virtual nodes. For a faster deployment, it is suggested to do not
+     * activate virtual nodes before.
+     * @param root the root task.
+     * @param myNode the node where <code>this</code> is running.
+     * @param virtualNodes the array of vitrual nodes for the computation.
+     * @param queueType the class name of the task queue.
+     */
     public Manager(Task root, Node myNode, VirtualNode[] virtualNodes,
         String queueType) {
         this(root, myNode, queueType);
         this.arrayOfVns = virtualNodes;
     }
 
+    /**
+     * Prepare everything for the computation. Activate the task queue, create
+     * Workers, etc.
+     * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
+     */
     public void initActivity(Body body) {
         // All asynchronous call on the root Task
         logger.info("Compute the lower bound for the root task");
@@ -232,6 +269,10 @@ public class Manager implements Serializable, InitActive {
         this.arrayOfNodes = null;
     }
 
+    /**
+     * Start the computation.
+     * @return the best found solution.
+     */
     public Result start() {
         logger.info("Starting computation");
         // Nothing to do if the manager is not actived
@@ -363,8 +404,13 @@ public class Manager implements Serializable, InitActive {
         return this.rootTask.gather(results);
     }
 
+    /**
+     * Start the computation with a new root task.
+     * @param rootTask the new root task.
+     * @return the best found solution.
+     */
     public Result start(Task rootTask) {
-        this.taskProviderQueue.reset();
+        this.taskProviderQueue.flushAll();
 
         this.workerGroup.reset();
 
@@ -392,12 +438,23 @@ public class Manager implements Serializable, InitActive {
         return ((Manager) ProActive.getStubOnThis()).start();
     }
 
+    /**
+     * Start a computation from a previous backup.
+     * @param task the stream with task backup.
+     * @param result the stream with result backup.
+     * @return the best found solution.
+     */
     public Result start(InputStream task, InputStream result) {
         this.loadTasks(task);
         this.loadResults(result);
         return ((Manager) ProActive.getStubOnThis()).start();
     }
 
+    /**
+     * Set the hungry level of the task queue.
+     * @param level the hungry level.
+     * @see TaskQueue#setHungryLevel(int)
+     */
     public void setHungryLevel(int level) {
         assert this.taskProviderQueue != null : "Manager is not active";
         this.taskProviderQueue.setHungryLevel(level);
@@ -422,6 +479,10 @@ public class Manager implements Serializable, InitActive {
         this.workingWorkerList.add(worker);
     }
 
+    /**
+     * Backup everythings.
+     * @param rootTask the root task.
+     */
     private void backupAll(Task rootTask) {
         logger.info("Backuping");
         try {
@@ -435,6 +496,10 @@ public class Manager implements Serializable, InitActive {
         }
     }
 
+    /**
+     * Restoring tasks from a previous backup.
+     * @param taskFile the stream for restoring.
+     */
     private void loadTasks(InputStream taskFile) {
         if (!ProActive.getBodyOnThis().isActive()) {
             logger.fatal("The manager is not active");
@@ -442,7 +507,6 @@ public class Manager implements Serializable, InitActive {
         }
         this.taskProviderQueue.loadTasks(taskFile);
         this.taskProviderQueue.getRootTaskFromBackup();
-        this.pendingTaskList = (Vector) this.taskProviderQueue.getPendingTasksFromBackup();
         try {
             this.rootTask = (Task) ProActive.turnActive(this.taskProviderQueue.getRootTaskFromBackup(),
                     ProActive.getBodyOnThis().getNodeURL());
@@ -455,6 +519,10 @@ public class Manager implements Serializable, InitActive {
         }
     }
 
+    /**
+     * Retsoring results from a previous backup.
+     * @param resultFile the strem for restoring.
+     */
     private void loadResults(InputStream resultFile) {
         this.taskProviderQueue.loadResults(resultFile);
     }
@@ -462,6 +530,14 @@ public class Manager implements Serializable, InitActive {
     // -------------------------------------------------------------------------
     // Inner Threads for groups creation and activing deploying
     // -------------------------------------------------------------------------
+
+    /**
+     * Inner class for faster deploying.
+     *
+     * @author Alexandre di Costanzo
+     *
+     * Created on Nov 3, 2005
+     */
     private class GroupThread implements Runnable {
         private Node[] nodes;
         private Object[] args;
@@ -506,6 +582,12 @@ public class Manager implements Serializable, InitActive {
         }
     }
 
+    /**
+     * Inner class for faster deployment.
+     * @author Alexandre di Costanzo
+     *
+     * Created on Nov 3, 2005
+     */
     private class VnThread implements Runnable {
         private VirtualNode vn;
         private Object[] args;

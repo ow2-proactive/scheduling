@@ -47,50 +47,126 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
+/**
+ * <p>This class must be extended by all task queues.</p>
+ * <p>It contains and describes all methods needed by the API for handling task
+ * allocation, managing results, and backuping / restoring computation.</p>
+ *
+ * @author Alexandre di Costanzo
+ *
+ * Created on Nov 3, 2005
+ */
 public abstract class TaskQueue implements Serializable {
+
+    /** The logger. */
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
+
+    /** Keeping a copy of the best current solution. */
     private Result bestCurrentResult;
 
+    /**
+     * Adding a set of tasks in the queue.
+     * Usually a set of sub-tasks from a task which is computing.
+     * @param tasks a <code>Collection</code> of <code>Task</code> classes.
+     */
     public abstract void addAll(Collection tasks);
 
+    /**
+     * @return the number of tasks not yet computed.
+     */
     public abstract IntMutableWrapper size();
 
+    /**
+     * @return <code>true</code> if the queue has more tasks not computed.
+     */
     public abstract BooleanMutableWrapper hasNext();
 
+    /**
+     * Return the next task to be computed, and remove it from the queue.
+     * @return the next task to be computed.
+     */
     public abstract Task next();
 
+    /**
+     * Empty the queue for a new computation.
+     */
     public abstract void flushAll();
 
+    /**
+     * @return <code>true</code> if the queue has reached the hungry level.
+     * @see TaskQueue#setHungryLevel(int)
+     */
     public abstract BooleanWrapper isHungry();
 
+    /**
+     * Set the hungry level for this queue.
+     * @param level the starving task level.
+     * @see TaskQueue#isHungry()
+     */
     public abstract void setHungryLevel(int level);
 
+    /**
+     * Write all tasks for backuping.
+     * @param rootTask the root task.
+     * @param pendingTasks the pending tasks.
+     * @param backupOutputStream the stream for backuping.
+     */
     public abstract void backupTasks(Task rootTask, Vector pendingTasks,
         OutputStream backupOutputStream);
 
+    /**
+     * Restoring all tasks from a previous backup.
+     * @param taskFile the stream for restoring.
+     */
     public abstract void loadTasks(InputStream taskFile);
 
+    /**
+     * Restore the root task. The <code>loadTasks(InputStream)</code> must be
+     * called before.
+     * @return the root task from a restore.
+     * @see #loadTasks(InputStream)
+     */
     public abstract Task getRootTaskFromBackup();
 
-    public abstract Collection getPendingTasksFromBackup();
-
-    public abstract void reset();
-
-    // --------------------------------------------------------------------------
-    // Managing results
-    // --------------------------------------------------------------------------
+    /**
+     * Add a found result for the final gather.
+     * @param result the found result.
+     */
     public abstract void addResult(Result result);
 
+    /**
+     * @return the current total of result found.
+     */
     public abstract IntMutableWrapper howManyResults();
 
+    /**
+     * @return a <code>Collection</code> with all current found results.
+     */
     public abstract Collection getAllResults();
 
+    /**
+     * Backuping in a stream all current found results.
+     * @param backupResultFile the stream for backuping.
+     */
     public abstract void backupResults(OutputStream backupResultFile);
 
+    /**
+     * Restoring results from a backup.
+     * @param backupResultFile the stream for restoring.
+     */
     public abstract void loadResults(InputStream backupResultFile);
 
+    /**
+     * Add a task for computing in the queue.
+     * @param t the task to be computed.
+     */
     public abstract void addTask(Task t);
 
+    /**
+     * <p><b>***FOR INTERNAL USE ONLY***</b></p>
+     * Inform the queue of the best current solution.
+     * @param newBest the best current solution.
+     */
     public void informNewBestResult(Result newBest) {
         if ((this.bestCurrentResult == null) ||
                 newBest.isBetterThan(this.bestCurrentResult)) {
@@ -102,6 +178,9 @@ public abstract class TaskQueue implements Serializable {
         }
     }
 
+    /**
+     * @return the best current solution.
+     */
     public Result getBestCurrentResult() {
         if (this.bestCurrentResult != null) {
             return this.bestCurrentResult;

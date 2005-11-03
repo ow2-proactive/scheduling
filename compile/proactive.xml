@@ -633,7 +633,7 @@
     	  </fileset>
    		 </copy>
 		<mkdir dir="${docs.dir}/ic2d-api"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.p2p.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" doctitle="ProActive 3.0&lt;br>&lt;a href='org/objectweb/proactive/doc-files/index.html'>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; November 2005 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.p2p.*,org.objectweb.proactive.ext.*,org.objectweb.proactive.branchnbound.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" doctitle="ProActive 3.0&lt;br>&lt;a href='org/objectweb/proactive/doc-files/index.html'>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; November 2005 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
 			<classpath refid="project.classpath"/>
 			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
@@ -642,7 +642,8 @@
 			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*"/>
 			<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*"/>
 			<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*"/>
-			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>		
+			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>	
+			<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*"/>	
 		</javadoc>
 		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 3.0 - IC2D" bottom="&lt;i>Copyright &#169; November 2005 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
 			<classpath refid="project.classpath"/>

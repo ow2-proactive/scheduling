@@ -47,6 +47,13 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
+/**
+ * This queue provides tasks in a Breath First Search order.
+ * 
+ * @author Alexandre di Costanzo
+ *
+ * Created on Nov 3, 2005
+ */
 public class LargerQueueImpl extends TaskQueue {
     private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
     private Vector queue = new Vector();
@@ -57,6 +64,9 @@ public class LargerQueueImpl extends TaskQueue {
     private Task rootTaskFromBackup = null;
     private Vector allResults = new Vector();
 
+    /**
+     * The no args constructor for ProActive activate.
+     */
     public LargerQueueImpl() {
     }
 
@@ -73,16 +83,6 @@ public class LargerQueueImpl extends TaskQueue {
                     tasks.size());
             }
         }
-    }
-
-    public void reset() {
-        queue = new Vector();
-        size = 0;
-        hungryLevel = 0;
-        current = 0;
-        pendingTasksFromBackup = new Vector();
-        rootTaskFromBackup = null;
-        allResults = new Vector();
     }
 
     /**
@@ -119,12 +119,22 @@ public class LargerQueueImpl extends TaskQueue {
         return (Task) subTasks.remove(0);
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#flushAll()
+     */
     public void flushAll() {
-        this.queue.removeAllElements();
-        this.current = 0;
-        this.size = 0;
+        queue = new Vector();
+        size = 0;
+        hungryLevel = 0;
+        current = 0;
+        pendingTasksFromBackup = new Vector();
+        rootTaskFromBackup = null;
+        allResults = new Vector();
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#isHungry()
+     */
     public BooleanWrapper isHungry() {
         if (logger.isDebugEnabled()) {
             logger.debug("Queue size is " + this.size + " - Hungry level is " +
@@ -133,10 +143,16 @@ public class LargerQueueImpl extends TaskQueue {
         return new BooleanWrapper(this.size <= hungryLevel);
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#setHungryLevel(int)
+     */
     public void setHungryLevel(int level) {
         this.hungryLevel = level;
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#backupTasks(org.objectweb.proactive.branchnbound.core.Task, java.util.Vector, java.io.OutputStream)
+     */
     public void backupTasks(Task rootTask, Vector pendingTasks,
         java.io.OutputStream backupOutputStream) {
         try {
@@ -156,6 +172,9 @@ public class LargerQueueImpl extends TaskQueue {
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#loadTasks(java.io.InputStream)
+     */
     public void loadTasks(InputStream taskInputStream) {
         try {
             ObjectInputStream ois = new ObjectInputStream(taskInputStream);
@@ -180,29 +199,37 @@ public class LargerQueueImpl extends TaskQueue {
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getRootTaskFromBackup()
+     */
     public Task getRootTaskFromBackup() {
         return this.rootTaskFromBackup;
     }
 
-    public Collection getPendingTasksFromBackup() {
-        return this.pendingTasksFromBackup;
-    }
-
-    // --------------------------------------------------------------
-    // Mananging results
-    // --------------------------------------------------------------
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addResult(org.objectweb.proactive.branchnbound.core.Result)
+     */
     public void addResult(Result result) {
         this.allResults.add(result);
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#howManyResults()
+     */
     public IntMutableWrapper howManyResults() {
         return new IntMutableWrapper(this.allResults.size());
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getAllResults()
+     */
     public Collection getAllResults() {
         return this.allResults;
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#backupResults(java.io.OutputStream)
+     */
     public void backupResults(java.io.OutputStream backupOutputStream) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(backupOutputStream);
@@ -218,6 +245,9 @@ public class LargerQueueImpl extends TaskQueue {
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#loadResults(java.io.InputStream)
+     */
     public void loadResults(InputStream backupResultInputStream) {
         try {
             ObjectInputStream ois = new ObjectInputStream(backupResultInputStream);
@@ -232,6 +262,9 @@ public class LargerQueueImpl extends TaskQueue {
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addTask(org.objectweb.proactive.branchnbound.core.Task)
+     */
     public void addTask(Task t) {
         Vector v = new Vector();
         v.add(t);
