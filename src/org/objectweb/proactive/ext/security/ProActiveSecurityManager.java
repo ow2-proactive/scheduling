@@ -161,7 +161,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     /**
      * @param keyStore
-     * @param policyServer2
+     * @param policyServer
      */
     public ProActiveSecurityManager(KeyStore keyStore, PolicyServer policyServer) {
         this();
@@ -378,7 +378,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
     /**
      * @param communicationPolicy
-     * @return
+     * @return an identifier for the session
      */
     public synchronized long startNewSession(Communication communicationPolicy) {
         long id = 0;

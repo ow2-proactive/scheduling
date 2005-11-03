@@ -245,7 +245,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
      * This method should be overriden if the process want's to set
      * specific parameters to the FileTransferWorkshop before starting
      * the FileTransfer.
-     * @param ftw
+     * @param infoParams
      */
     protected void pushProcessAttributes(
         FileTransferWorkShop.StructureInformation infoParams) {
