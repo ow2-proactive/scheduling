@@ -135,7 +135,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
                 // treat non functional requests before component is started
                 while (LifeCycleController.STOPPED.equals(
                             Fractal.getLifeCycleController(
-                                componentBody.getProActiveComponent())
+                                componentBody.getProActiveComponentImpl())
                                        .getFcState())) {
                     componentService.blockingServeOldest(nfRequestFilter);
                 }

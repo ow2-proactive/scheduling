@@ -108,7 +108,7 @@ public class Service {
             nfRequestsFilter = new org.objectweb.proactive.core.component.body.RequestFilterOnComponentControllerClasses();
             prioritizedNfRequestFilter = new PrioritizedComponentRequestFilter();
             try {
-                lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponent());
+                lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
             } catch (NoSuchInterfaceException e) {
                 //logger.error("could not find the life cycle controller for this component");
             }
