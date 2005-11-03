@@ -100,7 +100,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
 
         // when building a component, encapsulate the functional activity
         // TODO_M read some flag before doing this?
-        if (getProActiveComponent() != null) {
+        if (getProActiveComponentImpl() != null) {
             activity = new ComponentActivity(activity, reifiedObject);
         }
 
