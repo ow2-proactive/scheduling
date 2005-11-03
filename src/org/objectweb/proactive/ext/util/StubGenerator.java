@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
-import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
