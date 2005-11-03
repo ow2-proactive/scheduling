@@ -24,6 +24,9 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
      */
     public InputOutputInterceptorImpl(Component owner) {
         super(owner);
+    }
+
+    protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(InputOutputInterceptor.INPUT_OUTPUT_INTERCEPTOR_NAME,
                     InputOutputInterceptor.class.getName(), TypeFactory.SERVER,
@@ -32,9 +35,9 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
         }
-    }
+ 	}
 
-    public void setDummyValue(String value) {
+	public void setDummyValue(String value) {
         try {
             ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
         } catch (NoSuchInterfaceException e) {

@@ -4,7 +4,10 @@
  */
 package nonregressiontest.component;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -45,6 +48,9 @@ public class PrimitiveComponentD implements I1, BindingController {
     public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.equals(I2_ITF_NAME)) {
             i2Group.add(serverItf);
+        } else if (clientItfName.startsWith(I2_ITF_NAME)) {
+            // conformance to the Fractal API
+            i2Group.addNamedElement(clientItfName, serverItf);
         } else {
             logger.error("Binding impossible : wrong client interface name");
         }
@@ -72,15 +78,18 @@ public class PrimitiveComponentD implements I1, BindingController {
      * @see org.objectweb.fractal.api.control.BindingController#listFc()
      */
     public String[] listFc() {
-        return new String[] { I2_ITF_NAME };
+        Set itf_names = i2Group.keySet();
+        return (String[]) itf_names.toArray(new String[itf_names.size()]);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
-    public Object lookupFc(String clientItf) throws NoSuchInterfaceException {
-        if (clientItf.equals(I2_ITF_NAME)) {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
+        if (clientItfName.equals(I2_ITF_NAME)) {
             return i2;
+        } else if (i2Group.containsKey(clientItfName)){
+            return i2Group.getNamedElement(clientItfName);
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("cannot find " + I2_ITF_NAME + " interface");
@@ -92,13 +101,18 @@ public class PrimitiveComponentD implements I1, BindingController {
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
-    public void unbindFc(String clientItf)
+    public void unbindFc(String clientItfName)
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
-        if (clientItf.equals(I2_ITF_NAME)) {
+        if (clientItfName.equals(I2_ITF_NAME)) {
             i2Group.clear();
             if (logger.isDebugEnabled()) {
                 logger.debug(I2_ITF_NAME + " interface unbound");
+            }
+        } else if (clientItfName.startsWith(I2_ITF_NAME)) {
+            i2Group.removeNamedElement(clientItfName);
+            if (logger.isDebugEnabled()) {
+                logger.debug(clientItfName + " interface unbound");
             }
         } else {
             logger.error("client interface not found");

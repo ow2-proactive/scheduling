@@ -21,17 +21,22 @@ public class DummyControllerImpl extends AbstractProActiveController
      */
     public DummyControllerImpl(Component owner) {
         super(owner);
-        try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(DummyController.DUMMY_CONTROLLER_NAME,
-                    DummyController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
-        } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
-        }
-    }
+  }
+    
+        protected void setControllerItfType() {
+            try {
+                setItfType(ProActiveTypeFactory.instance().createFcItfType(DummyController.DUMMY_CONTROLLER_NAME,
+                        DummyController.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            } catch (InstantiationException e) {
+                throw new ProActiveRuntimeException("cannot create controller " +
+                    this.getClass().getName());
+            }
+       }
 
-    public void setDummyValue(String value) {
+
+
+	public void setDummyValue(String value) {
         dummyValue = value;
     }
 

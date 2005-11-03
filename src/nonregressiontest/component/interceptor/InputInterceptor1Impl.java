@@ -18,7 +18,7 @@ import nonregressiontest.component.controller.DummyController;
  *
  */
 public class InputInterceptor1Impl extends AbstractProActiveController
-    implements InputInterceptor {
+    implements InputInterceptor1 {
     private int beforeInvocationCounter = 0;
     private int afterInvocationCounter = 0;
 
@@ -27,6 +27,10 @@ public class InputInterceptor1Impl extends AbstractProActiveController
      */
     public InputInterceptor1Impl(Component owner) {
         super(owner);
+    }
+
+    
+    protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(InputInterceptor1.INPUT_INTERCEPTOR1_NAME,
                     InputInterceptor1.class.getName(), TypeFactory.SERVER,
@@ -35,9 +39,10 @@ public class InputInterceptor1Impl extends AbstractProActiveController
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
         }
-    }
+	}
 
-    public void setDummyValue(String value) {
+
+	public void setDummyValue(String value) {
         try {
             ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
         } catch (NoSuchInterfaceException e) {

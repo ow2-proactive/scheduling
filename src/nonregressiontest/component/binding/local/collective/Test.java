@@ -30,6 +30,8 @@
  */
 package nonregressiontest.component.binding.local.collective;
 
+import java.util.Arrays;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -40,6 +42,8 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+
+import testsuite.test.Assertions;
 
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
@@ -100,10 +104,17 @@ public class Test extends ComponentTest {
                 new ControllerDescription("pB2", Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(),
                     new Object[] {  }));
+        
+        // check that listFc() does not return the name of the collective interface :
+        // it should return no client interface
+        Assertions.assertTrue(Fractal.getBindingController(pD1).listFc().length == 0);
 
         // bind the components
-        Fractal.getBindingController(pD1).bindFc("i2", pB1.getFcInterface("i2"));
-        Fractal.getBindingController(pD1).bindFc("i2", pB2.getFcInterface("i2"));
+        Fractal.getBindingController(pD1).bindFc("i2_01", pB1.getFcInterface("i2"));
+        Fractal.getBindingController(pD1).bindFc("i2_02", pB2.getFcInterface("i2"));
+
+        // check that listFc() does not return the name of the collective interface
+        Assertions.assertTrue(Arrays.equals(Fractal.getBindingController(pD1).listFc(), new String[] {"i2_01", "i2_02"}));
 
         // start them
         Fractal.getLifeCycleController(pD1).startFc();
