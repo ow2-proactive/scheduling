@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.OutputInterceptorClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
@@ -233,7 +234,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         // TODO_M check with groups : interception is here done at the beginning
         // of the group invocation,
         // not for each element of the group
-        List outputInterceptors = ((ProActiveComponent) getFcItfOwner()).getOutputInterceptors();
+        List outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner()).getOutputInterceptors();
         if (!outputInterceptors.isEmpty()) {
             try {
                 // serverItf =

@@ -158,7 +158,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive {
                     ComponentBody componentBody = (ComponentBody) body;
                     while (LifeCycleController.STOPPED.equals(
                                 Fractal.getLifeCycleController(
-                                    componentBody.getProActiveComponent())
+                                    componentBody.getProActiveComponentImpl())
                                            .getFcState())) {
                         componentService.blockingServeOldest(nfRequestFilter);
                     }

@@ -108,13 +108,13 @@ public class ComponentRequestImpl extends RequestImpl
         try {
             if (isControllerRequest()) {
                 result = ((ProActiveComponentImpl) ((ComponentBodyImpl) targetBody)
-                          .getProActiveComponent()).getControllerRequestHandler()
+                          .getProActiveComponentImpl()).getControllerRequestHandler()
                           .handleRequest(this);
             } else {
-                if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
+                if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);
 
-                    String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponent())
+                    String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
                                                        .getComponentParameters()
                                                        .getHierarchicalType();
 
@@ -127,7 +127,7 @@ public class ComponentRequestImpl extends RequestImpl
                                 methodCall.getComponentInterfaceName() +
                                 "] to : " +
                                 ((ComponentParametersController) ((ComponentBodyImpl) targetBody)
-                                 .getProActiveComponent().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
+                                 .getProActiveComponentImpl().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
                                  .getName());
                         }
                         try {
@@ -135,7 +135,7 @@ public class ComponentRequestImpl extends RequestImpl
                                 // TODO_M allow stopping shortcut here
                             }
                             result = ((StubObject) ((ProActiveInterface) (((ComponentBodyImpl) targetBody)
-                                      .getProActiveComponent())
+                                      .getProActiveComponentImpl())
                                       .getFcInterface(methodCall.getComponentInterfaceName()))
                                       .getFcItfImpl()).getProxy().reify(methodCall);
                         } catch (IllegalArgumentException e) {
@@ -189,7 +189,7 @@ public class ComponentRequestImpl extends RequestImpl
     // intercept and delegate for preprocessing from the inputInterceptors 
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            List inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
+            List inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
                                       .getInputInterceptors();
             Iterator it = inputInterceptors.iterator();
             while (it.hasNext()) {
@@ -206,8 +206,8 @@ public class ComponentRequestImpl extends RequestImpl
     // intercept and delegate for postprocessing from the inputInterceptors 
     private void interceptAfterInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
-                List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
+            if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
+                List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
                                      .getInputInterceptors();
 
                 // use inputInterceptors in reverse order after invocation

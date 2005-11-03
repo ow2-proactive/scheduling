@@ -464,7 +464,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                 "Cannot get a component representative from the current object, because this object is not a component");
             return null;
         }
-        ProActiveComponent currentComponent = componentBody.getProActiveComponent();
+        ProActiveComponent currentComponent = componentBody.getProActiveComponentImpl();
         return currentComponent.getRepresentativeOnThis();
     }
 }

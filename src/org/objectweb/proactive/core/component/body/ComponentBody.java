@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.component.body;
 
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 
 /** 
@@ -43,7 +43,7 @@ public interface ComponentBody {
     /**
      * @return a reference on the component meta-object ProActiveComponentImpl
      */
-    public ProActiveComponent getProActiveComponent();
+    public ProActiveComponentImpl getProActiveComponentImpl();
 
     public boolean isComponent();
 

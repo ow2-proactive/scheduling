@@ -67,9 +67,9 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
             if (!((ComponentRequest) r).isControllerRequest()) {
                 if ("true".equals(System.getProperty(
                                 "proactive.components.use_shortcuts"))) {
-                    if (!((ComponentBody) bodyReceiver).getProActiveComponent()
+                    if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl()
                               .getInputInterceptors().isEmpty() ||
-                            !((ComponentBody) bodyReceiver).getProActiveComponent()
+                            !((ComponentBody) bodyReceiver).getProActiveComponentImpl()
                                   .getOutputInterceptors().isEmpty()) {
                         if (logger.isDebugEnabled()) {
                             logger.debug(

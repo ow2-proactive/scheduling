@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -111,8 +112,8 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * Returns the a reference on the Component meta object
      * @return the ProActiveComponent meta-object
      */
-    public ProActiveComponent getProActiveComponent() {
-        return componentIdentity;
+    public ProActiveComponentImpl getProActiveComponentImpl() {
+        return (ProActiveComponentImpl)componentIdentity;
     }
 
     /**
@@ -128,7 +129,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         if (insideFunctionalActivity) {
             try {
                 return LifeCycleController.STARTED.equals(Fractal.getLifeCycleController(
-                        getProActiveComponent()).getFcState());
+                        getProActiveComponentImpl()).getFcState());
             } catch (NoSuchInterfaceException e) {
                 logger.error(
                     "could not find the life cycle controller of this component");
@@ -143,7 +144,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * @see org.objectweb.proactive.core.component.body.ComponentBody#isComponent()
      */
     public boolean isComponent() {
-        return (getProActiveComponent() != null);
+        return (getProActiveComponentImpl() != null);
     }
 
     /*

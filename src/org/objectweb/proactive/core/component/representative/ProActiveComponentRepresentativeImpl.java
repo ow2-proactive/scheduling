@@ -35,6 +35,7 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -390,7 +391,7 @@ public class ProActiveComponentRepresentativeImpl
     public void setStubOnBaseObject(StubObject stub) {
         stubOnBaseObject = stub;
     }
-
+    
     protected boolean isControllerInterface(String interfaceName)
         throws NoSuchInterfaceException {
         if (nfInterfaceReferences.keySet().contains(interfaceName)) {

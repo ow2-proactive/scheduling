@@ -31,15 +31,14 @@
 package org.objectweb.proactive.core.component.identity;
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.UniqueID;
 
 
 /**
- * This class extends Component, in order to provide access to some ProActive
- * functionalities (the parameters of the component, the request queue, the reified object)
+ * This class extends Component, in order to provide access to some ProActive-specific
+ * features (reference on this component, reference on the base object, IDs)
  *
  * @author Matthieu Morel
  */
@@ -75,15 +74,4 @@ public interface ProActiveComponent extends Component, Serializable {
      */
     public UniqueID getID();
 
-    /**
-     * getter
-     * @return the list of interceptors on input invocations for this component
-     */
-    public List getInputInterceptors();
-
-    /**
-     * getter
-     * @return the list of interceptors on output invocations for this component
-     */
-    public List getOutputInterceptors();
 }
