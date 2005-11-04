@@ -285,26 +285,13 @@ Sequence Diagram
  name="commonerror"></a>
  there are few things to remember with asynchronous method call and futures, in order to avoid annoying debugs:<br></br>
  <ul>
-		<li><b>Constructor with no-args:</b> this constructor will be used either for  the Active Objects creation(if not present, an exception might be thrown) or Future creation for a method call (if not present, the method call is synchronous). Avoid to put initialization stuff in this constructor, as it might lead to unexpected behavior. Indeed this constructor is called for the stub creation.</li><br></br>
+		<li><b>Constructor with no-args:</b> this constructor will be used either for  the Active Objects creation(if not present, an exception might be thrown) or Future creation for a method call (if not present, the method call is synchronous). Avoid to put initialization stuff in this constructor, as it might lead to unexpected behavior. Indeed this constructor is called for the stub creation.</li>
 		<li>Make your classes implement <b>Serializable </b>interface since ProActive deals with objects that cross the network<br></br></li>
-		<li>Think to use <b>wrappers </b>instead of primitive types or final classes for methods result type otherwise you will loose the asynchronism capabilities. For instance if one of your object has a method<pre><b> int</b> giveSolution(parameter)</pre> calling this method with ProActive is sychronous. So to keep the asynchronism it is advised  to use<pre><b>MyInteger </b>giveSolution(parameter)</pre>In that case call to this method is asynchronous. 
-<pre>public class MyInteger{
+		<li>Think to use <b>wrappers</b> instead of primitive types or final classes for methods result type otherwise you will loose the asynchronism capabilities. For instance if one of your object has a method<pre><b> int</b> giveSolution(parameter)</pre> calling this method with ProActive is sychronous. So to keep the asynchronism it is advised  to use<pre><b>InWrapper </b>giveSolution(parameter)</pre>In that case call to this method is asynchronous.<br>
+		 All wrappers are in the package: <b>org.objectweb.proactive.core.util.wrapper</b><br>
+		 ProActive provides more used primitive type wrappers, there are 2 versions of each,
+		 one <b>mutable</b>, and the other which is <b>immutable</b>.
 
-protected int i;
-
- public MyInteger(){
- //empty constructor with no-args
- }
- 
- public MyInteger(int i){
- this.i = i;
- }
- 
- public int get{
-  return i;
- }
- 
-}</pre>
 <p class="textNormal">Only the methods  return type are concerned not the parameters.</p>
 
 <br></li>
@@ -321,7 +308,7 @@ protected int i;
  return new Object();
  }
  else {
-   return null; --> to avoid in ProActive
+   return null; --&gt; to avoid in ProActive
   }
  }
  
@@ -335,12 +322,15 @@ if(result_from_method == null){
 ......
 }
 </pre>
- This test is never true, indeed, result_from_method is <b>Stub-->Proxy-->null</b> if the future is not yet available or the method returns null or <b>Stub-->Proxy-->Object</b> if the future is available, but result_from_method is <b>never null</b>
+ This test is never true, indeed, result_from_method is <b>Stub--&gt;Proxy--&gt;null</b> if the future is not yet available or the method returns null or <b>Stub--&gt;Proxy--&gt;Object</b> if the future is available, but result_from_method is <b>never null</b>
 </li>
+</ul>
 <!--
  Footer : start 
 ~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169;  2001-2005 INRIA All Rights Reserved.</p>
+<br>
+<hr>
+<div align="right" class="textSmall">Copyright &#169;  2001-2005 INRIA All Rights Reserved.</div>
 <!-- Footer : end -->
 </body>
 </html>
