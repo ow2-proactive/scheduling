@@ -355,8 +355,8 @@ public Result execute() {
   // Test all permutation
     while((FlowShopTask.nextPerm(currentPerm)) != null) {
         int currentMakespan;
-        fsr.makespan = ((FlowShopResult) this.bestKnownSolution).makespan;
-        fsr.permutation = ((FlowShopResult) this.bestKnownSolution).permutation;
+        fsr.makespan = ((FlowShopResult)this.bestKnownSolution).makespan;
+        fsr.permutation = ((FlowShopResult)this.bestKnownSolution).permutation;
         if ((currentMakespan = FlowShopTask.computeConditionalMakespan(
             fs, currentPerm,
             ((FlowShopResult) this.bestKnownSolution).makespan,
