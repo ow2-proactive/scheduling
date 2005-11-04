@@ -1823,17 +1823,17 @@ public class ProActive {
         }
     }
 
-    private static ProxyForGroup getGroupProxy(Object g) {
+    private static ProxyForGroup getGroupProxy(Object group) {
         ProxyForGroup pfg;
 
         try {
-            pfg = (ProxyForGroup) ProActiveGroup.getGroup(g);
+            pfg = (ProxyForGroup) ProActiveGroup.getGroup(group);
         } catch (ClassCastException cce) {
             pfg = null;
         }
 
         if (pfg == null) {
-            throw new IllegalArgumentException("The object must be a group");
+            throw new IllegalArgumentException("The argument must be a group");
         }
 
         return pfg;
@@ -1842,20 +1842,20 @@ public class ProActive {
     /**
      * Add a listener for NFE regarding a group.
      *
-     * @param ao The active object receiving the NFE
+     * @param group The group receiving the NFE
      * @param listener The listener to add
      */
-    public static void addNFEListenerOnGroup(Object g, NFEListener listener) {
-        getGroupProxy(g).addNFEListener(listener);
+    public static void addNFEListenerOnGroup(Object group, NFEListener listener) {
+        getGroupProxy(group).addNFEListener(listener);
     }
 
     /**
      * Remove a listener for NFE regarding a group.
      *
-     * @param ao The active object receiving the NFE
+     * @param group The group receiving the NFE
      * @param listener The listener to remove
      */
-    public static void removeNFEListenerOnGroup(Object g, NFEListener listener) {
-        getGroupProxy(g).removeNFEListener(listener);
+    public static void removeNFEListenerOnGroup(Object group, NFEListener listener) {
+        getGroupProxy(group).removeNFEListener(listener);
     }
 }
