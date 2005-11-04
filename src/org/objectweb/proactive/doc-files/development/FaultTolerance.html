@@ -4,7 +4,7 @@
 
 
 <!-- saved from url=(0022)http://internet.e-mail -->
-  <title>Adding a Deployment Protocol</title>
+  <title>Adding a Fault-Tolerance Protocol</title>
   <link rel="stylesheet" href="../ProActive.css">
 </head>
 <body style="background-color: white;">
@@ -40,9 +40,170 @@ index</a>&nbsp;&nbsp;</td>
 <hr>
 <!-- Link to index : end -->
 <h1>Adding a Fault-Tolerance Protocol</h1>
-<h2><a name="objectives">Objectives</a></h2>
 
 
+<p>
+This documentation is a quick overview of how to add a new fault-tolerance
+protocol within ProActive. A more complete version should be released with the
+version 3.1. If you wish to get more informations, please feel free to
+send a mail to <A href="mailto:proactive@objectweb.org">proactive@objectweb.org</a>.
+</p>
+
+
+<h2><a name="objectives">Overview</a></h2>
+<h3>Active Object side</h3>
+<p>
+Fault-tolerance mechanism in ProActive is mainly based on the
+<code>org.objectweb.proactive.core.body.ft.protocols.FTManager</code> class.  This class
+contains several hooks that are called before and after the main actions of an
+active object, e.g. sending or receiving a message, serving a request, etc.
+<br>
+For example, with the Pessimistic Message Logging protocol (PML), messages are
+      logged just before the delivery of the message to the active
+      object. Main methods for the FTManager of the PML protocol are then:
+
+<pre>
+   /**
+     * Message must be synchronously logged before being delivered.
+     * The LatestRcvdIndex table is updated
+     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onDeliverReply(org.objectweb.proactive.core.body.reply.Reply)
+     */
+    public int onDeliverReply(Reply reply) {
+        // if the ao is recovering, message are not logged
+        if (!this.isRecovering) {
+            try {
+                // log the message
+                this.storage.storeReply(this.ownerID, reply);
+                // update latestIndex table
+                this.updateLatestRvdIndexTable(reply);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Message must be synchronously logged before being delivered.
+     * The LatestRcvdIndex table is updated
+     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onReceiveRequest(org.objectweb.proactive.core.body.request.Request)
+     */
+    public int onDeliverRequest(Request request) {
+        // if the ao is recovering, message are not logged
+        if (!this.isRecovering) {
+            try {
+                // log the message
+                this.storage.storeRequest(this.ownerID, request);
+                // update latestIndex table
+                this.updateLatestRvdIndexTable(request);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+</pre>
+<p>
+The local variable <code>this.storage</code> is remote reference to the
+checkpoint server. The FTManager class contains a reference to each
+fault-tolerance server: fault-detector, checkpoint storage and localization
+server. Those reference are initialized during the creation of the active
+object.
+</p>
+
+
+<p>
+A FTManager must define also a <code>beforeRestartAfterRecovery()</code>
+method, which is called when an active object is recovered. This method usually
+restore the state of the active object so as to be consistent with the others
+active objects of the application.
+<br>
+For example, with the PML protocol, all the messages logged before the failure
+must be delivered to the active object. The method
+<code>beforeRestartAfterRecovery()</code> thus looks like:
+
+<pre>
+  /**
+     * Message logs are contained in the checkpoint info structure.
+     */
+    public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
+        // recovery mode: received message no longer logged
+        this.isRecovering = true;
+
+         //get messages
+        List replies = ci.getReplyLog();
+        List request = ci.getRequestLog();
+
+         // add messages in the body context
+        Iterator itRequest = request.iterator();
+        BlockingRequestQueue queue = owner.getRequestQueue();
+
+        // requests
+        while (itRequest.hasNext()) {
+            queue.add((Request) (itRequest.next()));
+        }
+
+        // replies
+        Iterator itReplies = replies.iterator();
+        FuturePool fp = owner.getFuturePool();
+        try {
+            while (itReplies.hasNext()) {
+                Reply current = (Reply) (itReplies.next());
+                fp.receiveFutureValue(current.getSequenceNumber(),
+                    current.getSourceBodyID(), current.getResult(), current);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // normal mode
+        this.isRecovering = false;
+
+        // enable communication
+        this.owner.acceptCommunication();
+
+        try {
+            // update servers
+            this.location.updateLocation(ownerID, owner.getRemoteAdapter());
+            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
+        } catch (RemoteException e) {
+            logger.error("Unable to connect with location server");
+            e.printStackTrace();
+        }
+        return 0;
+    }
+</pre>
+
+<p>
+The parameter <code>ci</code> is a
+<code>org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo</code>.
+This object contains all the informations linked to the checkpoint used for
+recovering the active object, and is used to restore its state. The programmer
+might defines his own class implementing <code>CheckpointInfo</code>, to add
+needed informations, depending on the protocol.
+</p>
+
+
+<h3>Server side</h3>
+
+<p>
+ProActive include a global server that provide fault detection, active object
+localization, resource service and checkpoint storage. For developing a new
+fault-tolerance protocol, the programmer might specify the behavior of the
+checkpoint storage by extending the class
+<code>org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServerImpl</code>.
+For example, only for the PML protocol and not for the CIC protocol, the
+checkpoint server must be able to log synchronously messages. The other parts
+of the server can be used directly. 
+<br>
+To specify the recovery algorithm, the programmer must extends the
+<code>org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl</code>.
+In the case of the CIC protocol, all the active object of the application must
+recover after one failure, while only the faulty process must restart with the
+PML protocol; this specific behavior is coded in the recovery process.
+</p>
+
+<br><br>
 <!--
 Footer : start ~~~ --><br>
 <hr>
