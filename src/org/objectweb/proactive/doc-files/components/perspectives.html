@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Component programming with ProActive - perspectives</title>
+<link rel="stylesheet" href="../ProActive.css">
+</head>
+<body style="background-color: white;">
+<!--
+Header : start
+~~~ -->
+<table width="100%">
+	<tbody>
+		<tr>
+			<td align="left" valign="middle">
+			<table border="1" cellpadding="2" cellspacing="0">
+				<tbody>
+					<tr>
+						<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+							href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+						<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../index.html">back to index</a>&nbsp;&nbsp;</td>
+						<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="examples.html">prev</a>&nbsp;&nbsp;</td>
+						<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="../p2p.html">next</a>&nbsp;&nbsp;</td>
+					</tr>
+				</tbody>
+			</table>
+			</td>
+			<td align="right" valign="top"><img src="../ProActiveLogo200x34.gif" alt=""></td>
+		</tr>
+	</tbody>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1><a name="perspectives"></a>Component perspectives : a support for our research work</h1>
+<p class="textNormal">Currently, we have a functional implementation of the Fractal API and model.
+One can configure and deploy a distributed system made of components.</p>
+<h2><a name="Optimizations"></a>Optimizations</h2>
+<p class="textNormal">However, there are currently no optimizations apart from those already offered
+by ProActive, such as direct communications when communicating entities are in the same virtual
+machine.</p>
+<p class="textNormal">We are studying strategies for optimizations that would allow us to reduce the
+interceptions and the network latency times (when the components are distributed). We have already
+implemented a first mechanism for shortcuts, which does not allow reconfiguration. We are currently
+working on a more sophisticated version that will allow dynamic reconfigurations.</p>
+<h2><a name="Packaging"></a>Packaging</h2>
+<p>Reusability and Components should be accessible through predefined / preconfigured packages. A
+bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition
+of deployment that should be addressed.</p>
+<h2><a name="GUI">Graphical user interface </a></h2>
+<p class="textNormal">Another area of investigation is the tools for configuring, deploying and
+monitoring distributed component systems.</p>
+<p class="textNormal">Because component based programming is somewhat analogous to the assembly of
+building blocks into a functional product, graphical tools are well suited for the design and
+monitoring of component based systems. The Fractal community actually proposes such a tool : the
+Fractal GUI. We have extended this tool to evaluate the feasibility of a full-fledge graphical
+interface for the design and monitoring of distributed components. The result is available within
+the IC2D GUI, you can try it out, but consider it as a product in alpha state. Development is indeed
+currently discontinued as we are waiting for a new release of the Fractal GUI, and some features are
+only partially implemented (runtime monitoring, composition of virtual nodes).</p>
+<p>The GUI allows the creation of ADL files representing component systems, and - the other way
+around - also allows to load ADL files and get a visual representation of systems described in the
+ADL files. We have worked on the manipulation of virtual nodes - a deployment abstraction - :
+components display the virtual nodes where they are deployed, and it is also possible to <a
+	href="#composition%20of%20virtual%20nodes">compose virtual nodes</a></p>
+<p>Ultimately, we would like to couple the visualization of components at runtime (currently
+unavailable here) with the standard monitoring capabilities of IC2D : we would get a structural view
+of the application in the Fractal GUI, and a topological view in the standard IC2D frame</p>
+<h3>Usage</h3>
+<p>If you want to try out the extended Fractal GUI for ProActive :</p>
+<ul>
+	<li>start IC2D</li>
+	<li>Components --&gt; start components GUI</li>
+	<li>to load an ADL file :
+	<ol>
+		<li>File --&gt; Storage --&gt; select the storage repository which is the root repository of your
+		ADL files. <i>For example you can select the "src" directory of the ProActive distribution</i></li>
+		<li>File --&gt; Open --&gt; select an ADL file in the storage repository. <i>For example you can
+		select the "helloworld-distributed-wrappers.fractal" file in the
+		src/org/objectweb/proactive/examples/components/helloworld directory of the ProActive
+		distribution.</i></li>
+	</ol>
+	</li>
+	<li>to modify an ADL file, you can use the Graph tab for a structural view, while the Dialog tab
+	gives you access to the properties of the components, including the composition of the virtual
+	ndoes.</li>
+	<li>to save an ADL file : File --&gt; Save</li>
+</ul>
+<h2><a name="Other"></a>Other</h2>
+<p class="textNormal">Other areas of research that we are opening around this work include :</p>
+<ul>
+	<li class="textNormal">wrapping legacy codes (MPI for instance) for interoperability with existing
+	software</li>
+	<li class="textNormal">behavioral studies with asynchronous distributed components</li>
+	<li class="textNormal">formalism (ProActive is based on a formal deterministic model for
+	asynchronous distributed objects)</li>
+	<li class="textNormal">patterns for automatic and parameterizable configurations of component
+	systems</li>
+	<li class="textNormal">MxN data redistribution : automatic redistribution of data from M components
+	to N components</li>
+</ul>
+<p></p>
+<h2><a name="limitations"></a>Limitations</h2>
+<p class="textNormal">Some features of the Fractal model are not implemented :</p>
+<ul>
+	<li class="textNormal">Shared components</li>
+	<li class="textNormal">Templates (generic factories)</li>
+</ul>
+
+<p class="textSmall"><i> </i></p>
+<!--
+Footer : start
+~~~ -->
+<br>
+<hr>
+<div class="textSmall" align="right">Copyright &Acirc;&copy; April 2005 INRIA All Rights Reserved.
+<p class="textNormal"></p>
+<!-- Footer : end --></div>
+</body>
+</html>
