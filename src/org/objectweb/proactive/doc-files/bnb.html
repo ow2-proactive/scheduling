@@ -1,0 +1,408 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+
+
+<meta name="Keywords"
+	content="infrastructure, p2p, peer-to-peer, proactive, daemon, xml">
+
+
+
+
+<title>ProActive Branch and Bound API</title>
+<link rel="stylesheet" href="ProActive.css">
+
+
+<meta name="Author" content="Alexandre di Costanzo">
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+
+<body>
+
+
+<!-- Header : start ~~~ -->
+<table width="100%">
+
+
+	<tbody>
+
+
+		<tr>
+
+
+			<td align="left" valign="middle">
+
+			<table border="1" cellpadding="2" cellspacing="0">
+
+
+				<tbody>
+
+
+					<tr>
+
+
+						<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+							href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+
+
+						<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+							href="index.html">back to index</a>&nbsp;&nbsp;</td>
+
+
+						<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+							href="exceptions.html">prev</a>&nbsp;&nbsp;</td>
+
+
+						<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+							href="Configuration.html">next</a>&nbsp;&nbsp;</td>
+
+
+					</tr>
+
+
+
+				</tbody>
+
+			</table>
+
+
+			</td>
+
+
+			<td align="right" valign="top"><img src="ProActiveLogo200x34.gif"
+				alt="ProActive Logo"></td>
+
+
+		</tr>
+
+
+
+	</tbody>
+</table>
+
+
+<hr>
+<!-- Link to index : end -->
+<h1>Branch and Bound API</h1>
+
+
+<p>The outline of this short handbook:</p>
+<ol id="mozToc">
+	<!--mozToc h2 1 h3 2 h4 3 h5 4 h6 5-->
+	<li><a href="#mozTocId894456">Overview</a></li>
+	<li><a href="#mozTocId664917">The API Architecture</a></li>
+	<li><a href="#mozTocId204520">The API Description</a></li>
+	<li><a href="#mozTocId733244">An Example: FlowShop</a></li>
+	<li><a href="#mozTocId331057">Future Work</a></li>
+</ol>
+
+
+
+
+<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h2><a class="mozTocH2" name="mozTocId894456"></a>Overview</h2>
+
+<p>The Branch and Bound (BnB) consists to an algorithmic technique for
+exploring a solution tree from which returns the optimal solution.</p>
+
+<p>The main goal of this BnB API is to provide a set of tools for
+helping the developpers to parallelize his BnB problem implementation.</p>
+
+<p>The main features are:</p>
+<ul>
+	<li>Hidding computation distribution.</li>
+	<li>Dynamic task splitting.</li>
+	<li>Automatic solution gathering.</li>
+	<li>Task communications for broadcasting best current solution.</li>
+	<li>Different behaviors for task allocation, provided by the API or
+	yourself.</li>
+	<li>Open API for extensions.</li>
+</ul>
+
+<p>Further research information is available <a
+	href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</a>.</p>
+
+<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h2><a class="mozTocH2" name="mozTocId664917"></a>The Model Architecture</h2>
+
+<p>The next figure show the architecture of the API:</p>
+<div align="center"><img src="bnb_files/api_archi.jpg"
+	alt="Architecture">
+<p><b class="legend">The API architecture.</b></p>
+
+</div>
+
+<p>The API active objects are:</p>
+
+<ul>
+	<li><b>Manager</b>: the main point of the API. It is the master for deploying
+	and managing Workers. Also, it attributes Tasks to free workers. The Tasks
+	are provided the Task Queue.</li>
+	<li><b>Task Queue</b>: provides Task in a specific order to the Manager.</li>
+	<li><b>Worker</b>: broadcasts solution to all Task, and provides the API
+	environment to the Tasks.</li>
+	<li><b>Task</b>: the user code to compute.</li>
+</ul>
+
+<p>All Workers have a group reference on all the others. The next figure show 
+step by step how a Task can share a new better solution with all:</p>
+
+<div align="center"><img src="bnb_files/api_com.jpg"
+	alt="Broadcasting solution">
+<p><b class="legend">Broadcasting a new solution.</b></p>
+</div>
+<p>Finally, the methods order execution:</p>
+<ol>
+	<li>rootTask.initLowerBound(); // compute a first lower bound</li>
+	<li>rootTask.initUpperBound(); // compute a first upper bound</li>
+	<li>Vector splitted = rootTask.split(); // generate a set of tasks</li>
+	<li>for i in splitted do in parallel<br>
+	 splitted[i].initLowerBound();<br>
+	 splitted[i].initUpperBound();<br>
+	 Result ri = splitted.execute()</li>
+	<li>Result final = rootTask.gather(Result[] ri); // gathering all result
+</ol>
+
+<p>Keep in mind that is only "initLower/UpperBound" and "split" methods
+are called on the root task. The "execute" method is called on the root
+task's splitted task.</p>
+
+
+<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h2><a class="mozTocH2" name="mozTocId204520"></a>The API Details</h2>
+
+<h3>The Task Description</h3>
+
+<p>The <b>Task</b> object is located in this followed package:</p>
+<pre class="snippet">
+org.objectweb.proactive.branchnbound.core
+</pre>
+
+<p>All abstract methods are described bellow:</p>
+
+<h4>public Result execute()</h4>
+<p>It is the place where the user has to put his code for solving a part
+and/or the totality of his BnB problem. There are 2 main usages of it.
+The first one consists to divide the task and returning no result. The
+second is to try to improve the best solution.</p>
+
+<h4>public Vector split()</h4>
+<p>This is for helping the user when he wants to divide a task. In a
+future work we have planned to use this method in an automatic way.</p>
+
+<h4>public void initLowerBound()</h4>
+<p>Initialize a lower bound local to the task.</p>
+
+<h4>public void initUpperBound()</h4>
+<p>Initialize a upper bound local to the task.</p>
+
+<h4>public Result gather(Result[] results)</h4>
+<p>This one is <b>not abstract</b> but it is strongly recommended to
+override it. The default behavior is to return the smallest Result gave
+by the compareTo method. That's why it is also recommended to override
+the <b>compareTo(Object) </b> method.</p>
+
+<p>Some class variables are provided by the API to help the user for
+keeping a code clear. See next their descriptions:</p>
+
+<pre class="snippet">
+protected Result initLowerBound; // to store the lower bound
+protected Result initUpperBound; // to store the upper bound
+protected Object bestKnownSolution; // setted automaticaly by the API 
+				// with the best current solution
+protected Worker worker; // to interact with the API (see after)
+</pre>
+
+<p>From the Task, specialy within the execute() method, the user has to
+interact with the API for sending sub-tasks, which result from a split
+call, to the task queue, or broadcasting to other tasks a new better
+solution, etc.</p>
+<p>The way to do that is to use the class variable: <b>worker</b>.</p>
+
+<ul>
+	<li>Broadcasting a new better solution to all the other class:<br>
+	<pre class="snippet">
+this.worker.setBestCurrentResult(newBetterSolution);
+</pre></li>
+	<li>Sending a set of sub-tasks for computing:<br>
+	<pre class="snippet">
+this.worker.sendSubTasksToTheManager(subTaskList);
+</pre></li>
+	<li>For a smarter split, checking that the task queue needs more tasks:<br>
+	<pre class="snippet">
+BooleanWrapper workersAvailable = this.worker.isHungry();
+</pre></li>
+</ul>
+
+<h3>The Task Queue Description</h3>
+
+<p>This manages the task allocation. The main functions are: providing
+tasks in a sepcial order, and keeping results back.</p>
+
+<p>For the moment, there are 2 different queue types provided by the
+API:</p>
+
+<ul>
+	<li><b>BasicQueueImpl</b>: provides tasks in FIFO order.</li>
+	<li><b>LargerQueueImpl</b>: provides tasks in a larger order, as
+	Breadth First Search algorithm.</li>
+</ul>
+
+<p>By extending the <b>TaskQueue</b> you can use a specialized task
+allocator for your need.</p>
+
+<h3>The ProActiveBranchNBound Description</h3>
+
+<p>Finally, it is the main entry point for starting, and controlling
+your computation.</p>
+
+<pre class="snippet">
+Task task = new YourTask(someArguments);
+
+Manager manager =  ProActiveBranchNBound.newBnB(task,
+                        nodes,
+                        LargerQueueImpl.class.getName());
+
+Result futureResult = manager.start(); // this call is asynchronous
+</pre>
+
+<p><b>Tip:</b> use the constructor <b>ProActiveBranchNBound.newBnB(Task, VirtualNode[],
+        String)</b> and <b>do not activate</b> virtual nodes. This method provides
+        a faster deployment and active objects creation way. Communications
+        between workers are also optimized by a hierarchic group based on the
+        array of virtual nodes. That means when it is possible define a virtual node
+        by clusters.</p>
+
+<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h2><a class="mozTocH2" name="mozTocId733244"></a>An Example: FlowShop</h2>
+
+<p>This example solves the permutation flowshop scheduling problem, with
+the monoobjective case. The main objective is to minimized the overall
+completion time for all the jobs, i.e. makespan. A flowshop problem can
+be represented as a set of n jobs; this jobs have to scheduled on a set
+of m machines. Each jobs is defined by a set of m distinct operations.
+The goal consists to determine the sequence used for all machines to
+execute operations.</p>
+<p>The algorithm used to find the best solution, tests all permutations
+and try to cut bad branches.</p>
+
+<p>Firstly, the <b>Flowshop Task</b>:</p>
+
+<pre class="snippet">
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.branchnbound.core.Result;
+import org.objectweb.proactive.branchnbound.core.Task;
+import org.objectweb.proactive.branchnbound.core.exception.NoResultsException;
+
+public class FlowShopTask extends Task {
+
+ public FlowShopTask() {
+   // the empty no args constructor for ProActive
+ }
+
+ /**
+  * Contruct a Task which search solution for all permutations to the
+  * Flowshop problem. Use it to create the root Task.
+  */
+ public FlowShopTask(FlowShop fs) {
+   this.flowshopProblem = fs;
+ }
+
+}
+</pre>
+
+<p>Now, implement all Task abstract methods.</p>
+
+<p>Computation <b>bound</b> methods:</p>
+
+<pre class="snippet">
+// Compute the lower bound
+public void initLowerBound() {
+  this.lowerBound = this.computeLowerBound(this.fs);
+}
+
+// Compute the upper bound
+public void initUpperBound() {
+  this.upperBound = this.computeUpperBound(this.fs);
+}
+</pre>
+
+<p>The <b>split</b> method:</p>
+
+<pre class="snippet">
+public Vector split() {
+  // Divide the set of permutations in 10 sub-tasks
+  int nbTasks = 10;
+
+  Vector tasks = new Vector(nbTasks);
+
+  for (int i = 0 ; i &lt; nbTasks ; i++){
+    tasks.add(new FlowShopTask(this, i, nbTasks));
+  }
+        
+  return tasks;
+}
+</pre>
+    
+<p>Then, the <b>execute</b> method:</p>
+<pre class="snippet">
+public Result execute() {
+       
+  if (! this.iHaveToSplit()) {
+  // Test all permutation
+    while((FlowShopTask.nextPerm(currentPerm)) != null) {
+        int currentMakespan;
+        fsr.makespan = ((FlowShopResult) this.bestKnownSolution).makespan;
+        fsr.permutation = ((FlowShopResult) this.bestKnownSolution).permutation;
+        if ((currentMakespan = FlowShopTask.computeConditionalMakespan(
+            fs, currentPerm,
+            ((FlowShopResult) this.bestKnownSolution).makespan,
+            timeMachine)) &lt; 0) {
+        //bad branch
+          int n = currentPerm.length + currentMakespan;
+          FlowShopTask.jumpPerm(currentPerm, n, tmpPerm[n]);
+          // ...
+       } else {
+         // better branch than previous best
+         fsr.makespan = currentMakespan;
+         System.arraycopy(currentPerm, 0, fsr.permutation, 0,
+                            currentPerm.length);
+         r.setSolution(fsr);
+         this.worker.setBestCurrentResult(r);
+       } 
+    }
+  } else {
+  // Using the Stub for an asynchronous call
+    this.worker.sendSubTasksToTheManager(
+      ((FlowShopTask) ProActive.getStubOnThis()).split());
+  }
+        
+        // ...
+        
+  r.setSolution(bestKnownSolution);
+  return r;
+}
+</pre>
+
+<p>This example is available in a complete version <a
+	href="http://www-sop.inria.fr/oasis/ProActive/apps/flowshop.html">here</a>.</p>
+
+<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
+<h2><a class="mozTocH2" name="mozTocId331057"></a>Future Work</h2>
+<ul>
+	<li>An auto-dynamic task splitting mechanism.</li>
+	<li>Providing more queues for task allocation.</li>
+	<li>A new task interface for wrapping native code.</li>
+</ul>
+
+<!-- Footer : start -->
+<hr>
+<div class="textSmall" align="right">Copyright &copy; November 2005
+INRIA All Rights Reserved.</div>
+
+<!-- Footer : end -->
+</body>
+</html>
