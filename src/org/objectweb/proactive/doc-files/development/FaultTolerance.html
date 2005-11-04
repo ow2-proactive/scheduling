@@ -62,7 +62,7 @@ For example, with the Pessimistic Message Logging protocol (PML), messages are
       logged just before the delivery of the message to the active
       object. Main methods for the FTManager of the PML protocol are then:
 
-<pre>
+<pre class="snippet">
    /**
      * Message must be synchronously logged before being delivered.
      * The LatestRcvdIndex table is updated
@@ -122,8 +122,8 @@ For example, with the PML protocol, all the messages logged before the failure
 must be delivered to the active object. The method
 <code>beforeRestartAfterRecovery()</code> thus looks like:
 
-<pre>
-  /**
+<pre class="snippet">
+    /**
      * Message logs are contained in the checkpoint info structure.
      */
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
