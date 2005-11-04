@@ -23,7 +23,7 @@ PROJECT_NAME           = ProActiveUml
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = 2.2
+PROJECT_NUMBER         = 3.0
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -370,7 +370,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = Z:\ProactiveSrc\src\org\objectweb\proactive\ext Z:\ProactiveSrc\src\org\objectweb\proactive\examples Z:\ProactiveSrc\src\org\objectweb\proactive\ic2d
+EXCLUDE                = Z:\ProactiveSrc\src\org\objectweb\proactive\ext Z:\ProactiveSrc\src\org\objectweb\proactive\examples Z:\ProactiveSrc\src\org\objectweb\proactive\ic2d Z:\ProactiveSrc\src\org\objectweb\proactive\p2p Z:\ProactiveSrc\src\org\objectweb\proactive\branchnbound  
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or directories 
 # that are symbolic links (a Unix filesystem feature) are excluded from the input.
