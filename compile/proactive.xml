@@ -152,8 +152,6 @@
 			<include name="${proactive.dir}/jini/*.java"/>
 			<include name="${proactive.dir}/osgi/**/*.java"/>
 			<include name="${proactive.dir}/osgi/**/**/*.java"/>
-			<include name="${proactive.dir}/jmx/*.java"/>
-			<include name="${proactive.dir}/jmx/**/**/*.java"/>
 			<include name="${proactive.dir}/rmi/*.java"/>
 			<include name="${proactive.core.dir}/**/*.java"/>
 
