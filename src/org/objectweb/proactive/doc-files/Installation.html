@@ -299,6 +299,36 @@ log4j.appender.A1.layout.ConversionPattern=%m %n
 ########### usage is log4j.logger.className=Level, Appender
 </blockquote></pre>
      
+     
+<h2><a name="eclipse"></a>ProActive and the Eclipse IDE</h2>
+<p class="textNormal">
+We highly recommend you to use the Eclispe IDE to develop your ProActive applications.
+You can get this tool on the <a href="http://www.eclipse.org">Eclipse website </a>
+Just unzip and launch the eclipse executable. 
+In order to develop your own ProActive application, you have to create an eclipse project :
+<br>
+<p class="textNormal">
+<b> File -> New ... -> Project </b> <br>
+Then choose <b> Java Project </b>.
+A wizard should appear and ask you to enter the project name :
+<center><img src="eclipse_files/wizard_new_project.jpg" /></center>
+<p class="textNormal">
+In order to separate class files from source files, you can check the 
+<b>Create separate source and ouput folders</b> in the <b>Project Layout</b> Frame, and click on <b> configure default ... </b> to choose the folders names. 
+Once you have choosen all informations about <b>Project Name </b>, <b>Project localtion</b> , you can click on <b> Next </b>. 
+<br>You have to specify some java settings in order to set the application classpath. Select the <b>Librairies</b> tab and click on the 
+<b>Add External Jar...</b> button. Add the ProActive.jar and the librairies contained in the lib/ directory of the ProActive distribution.
+<br> The <b> Librairies </b> tab should look like this :
+<center> <img src="eclipse_files/wizard_java_settings.jpg" /> </center>
+<br>
+<p class="textNormal">
+All is now configured to create your ProActive application. Click on the <b>Finish</b> button. <br>
+You can see now on the navigator tab on the left side, that there is a new Project with the source and output folders you've just created : 
+<center><img src="eclipse_files/navigator.jpg" /> </center>
+<p class="textNormal">
+You are now able to create classes and packages that use the ProActive library. <br>
+We are currently developping an eclipse plugin that will help developpers to create easily ProActive applications.
+ Take a look at <a href="development/plugin.html" >the plugin documentation page </a>.     
 <h2><a name="support"></a>Troubleshooting and support</h2>
   If you encounter any problem with installing ProActive and running the
 examples, please make sure you correctly followed all the steps described
