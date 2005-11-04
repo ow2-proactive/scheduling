@@ -849,7 +849,7 @@ remind that you can also combine these protocols.The principle of combination is
 will log on a remote cluster frontend with <b>ssh</b>, then use  <b>pbs</b> to book nodes and to create <b>jvms</b> on each. You will also notice that
 there is at least one combination for each remote protocol. Indeed each remote protocol <b>must </b>have a pointer either on another remote protocol or on a <b>jvmProcess</b> to create a jvm(discussed previoulsy). <br>
           <br>
-          You can find <a href="xml_examples/" target="examples">here</a> several examples of supported protocols and useful combinations. <br></br>
+          You can find <a href="../../../../../xml_examples/" target="examples">here</a> several examples of supported protocols and useful combinations. <br></br>
           <b><font color="#ff0000">Note that it is mandatory for using
 all these features, that ProActive is installed on each host, of course
 on the local host as well as on each host where you want to create Nodes</font>
@@ -905,7 +905,7 @@ process defined with the id <b>jvmProcess</b>.
 It means that once logged on sea.inria.fr with rsh, a local JVM will be
 launched, ie a ProActive node will be created on sea.inria.fr thanks to
 the process defined by <b>jvmProcess</b>.</p>
-<p>Check <a href="xml_examples/RSH_Example.xml">here</a> for a complete rsh deployment example. </p>
+<p>Check <a href="../../../../../xml_examples/RSH_Example.xml" target="rsh">here</a> for a complete rsh deployment example. </p>
  <br>
          
           <li class="textNormal">RLOGIN</li><br>
@@ -1002,7 +1002,7 @@ These steps must be performed <b>before
 ProActive application using <b>ssh
             </b>protocol. If you are
 not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a></p> 
-<p>Check <a href="xml_examples/SSH_Example.xml">here</a> for a complete ssh deployment example. </p><br>
+<p>Check <a href="../../../../../xml_examples/SSH_Example.xml" target="ssh">here</a> for a complete ssh deployment example. </p><br>
           
           <li class="textNormal"><a name="processlist">Process list</a></li>
           <p>ProActive provides a way to define a list of processes for <b>RSH, SSH, RLOGIN</b> protocols. Using <b>processList</b> or <b>processListbyHost</b> elements avoids having a long deployment file when many machines with similar names are going to be connected with protocols mentionned before. The first example below shows how to use <b>processList</b> tag, the second how to use <b>processListbyHost</b>.</p>
@@ -1066,7 +1066,7 @@ not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a></p>
 </td></tr>
 </table>     
 <p>Using <b>processListbyHost</b> element allows to give a hostlist separated with a whitespace. The class attribute is defined as described in the processList tag. The <b>domain</b> attribute is optional since the complete hostname can also be provided in the hostlist attribute. In the example, a jvm is going to be created using ssh on crusoe.inria.fr, waha.inria.fr, nahuel.inria.fr.</p>
-<p>Check <a href="xml_examples/SSHList_example.xml">SSHList_example.xml</a> or <a href="xml_examples/SSHListbyHost_Example.xml">SSHListbyHost_Example.xml</a> for list examples. </p><br>
+<p>Check <a href="../../../../../xml_examples/SSHList_example.xml" target="sshlist">SSHList_example.xml</a> or <a href="../../../../../xml_examples/SSHListbyHost_Example.xml" target="sshhost">SSHListbyHost_Example.xml</a> for list examples. </p><br>
         
           <li class="textNormal">LSF </li>
            
@@ -1196,7 +1196,7 @@ appear. They are optional, and have a default value: respectively <b>false</b>
 and <b>normal</b>.
 They represent option in the bsub command: interactive mode, and the
 name of the queue.</p>
-<p>Check also <a href="xml_examples/SSH_LSF_Example.xml">SSH_LSF_Example.xml</a>.</p><br>
+<p>Check also <a href="../../../../../xml_examples/SSH_LSF_Example.xml" target="lsf">SSH_LSF_Example.xml</a>.</p><br>
          
           <li class="textNormal">PBS</li>
            
@@ -1263,7 +1263,7 @@ specified by pbs), <b>scriptPath</b>
 represents the location on the frontend_host of the script
 pbsStartRuntime.sh(default is
 /user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</p>
-<p>Check also <a href="xml_examples/SSH_PBS_Example.xml">SSH_PBS_Example.xml</a>.</p> <br>
+<p>Check also <a href="../../../../../xml_examples/SSH_PBS_Example.xml" target="pbs">SSH_PBS_Example.xml</a>.</p> <br>
           
           <li class="textNormal">Sun
 Grid Engine</li>
@@ -1325,7 +1325,7 @@ main options specified in an SGE system. <b>ScriptPath</b>
 represents the location on the frontend_host of the script
 gridEngineStartRuntime.sh (default is
 /user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</p>
-<p>Check also <a href="xml_examples/SSH_SGE_Example.xml">SSH_SGE_Example.xml</a>.</p> <br>
+<p>Check also <a href="../../../../../xml_examples/SSH_SGE_Example.xml" target="sge">SSH_SGE_Example.xml</a>.</p> <br>
             
           
          
@@ -1387,7 +1387,7 @@ main options specified in an OAR system. <b>ScriptPath</b>
 represents the location on the frontend_host of the script
 oarStartRuntime.sh (default is
 /user.home/ProActive/scripts/unix/cluster/oarStartRuntime.sh).</p>
-<p>Check also <a href="xml_examples/SSH_OAR_Example.xml">SSH_OAR_Example.xml</a> and <a href="xml_examples/SSH_OARGRID_Example.xml">SSH_OARGRID_Example.xml</a></p> <br>
+<p>Check also <a href="../../../../../xml_examples/SSH_OAR_Example.xml" target="oar">SSH_OAR_Example.xml</a> and <a href="../../../../../xml_examples/SSH_OARGRID_Example.xml" target="oargrid">SSH_OARGRID_Example.xml</a></p> <br>
           
           <li class="textNormal">PRUN:</li>
 <p>PRUN is a cluster protocol develloped at Amsterdam to manage their <a
@@ -1395,7 +1395,7 @@ oarStartRuntime.sh (default is
 ProActive provides <code><a
  href="../core/process/prun/PrunSubProcess.html">org.objectweb.proactive.core.process.prun.PrunSubProcess</a></code>
 to use such protocol.</p>
-<p>Check also <a href="xml_examples/SSH_PRUN_Example.xml">SSH_PRUN_Example.xml</a>.</p>
+<p>Check also <a href="../../../../../xml_examples/SSH_PRUN_Example.xml" target="prun">SSH_PRUN_Example.xml</a>.</p>
             <br>
              <li class="textNormal">GLOBUS</li>
             
@@ -1463,14 +1463,14 @@ in the <b>jvmProcess</b> referenced by <b>globusProcess</b>
 as explained before. &lt;globusOption&gt; is neither manatory.
 Default value for &lt;count&gt; element is 1. It represents the
 number of processor requested.</p>
-<p>Check also <a href="xml_examples/Globus_Example.xml">Globus_Example.xml</a>.</p>
+<p>Check also <a href="../../../../../xml_examples/Globus_Example.xml" target="globus">Globus_Example.xml</a>.</p>
             <br>
           <li class="textNormal">UNICORE:</li>
 <p>
 ProActive provides <code><a
  href="../core/process/unicore/UnicoreProcess.html">org.objectweb.proactive.core.process.unicore.UnicoreProcess</a></code>
 to use such protocol.</p>
-<p>Check also <a href="xml_examples/Unicore_Example.xml">Unicore_Example.xml</a>.</p>
+<p>Check also <a href="../../../../../xml_examples/Unicore_Example.xml" target="unicore">Unicore_Example.xml</a>.</p>
             <br>
             <li class="textNormal">ARC (NorduGrid):</li>
 <p>
@@ -1478,14 +1478,14 @@ ProActive provides <code><a
  href="../core/process/nordugrid/NGProcess.html">org.objectweb.proactive.core.process.nordugrid.NGProcess</a></code>
 to use such protocol.</p>
 To use ARC you will need to download the <a href="http://ftp.nordugrid.org/download/index.php" target="ng">ARC Client</a>
-<p>Check also <a href="xml_examples/NorduGrid_Example.xml">NorduGrid_Example.xml</a>.</p>
+<p>Check also <a href="../../../../../xml_examples/NorduGrid_Example.xml" target="ng">NorduGrid_Example.xml</a>.</p>
             <br>
             <li class="textNormal">GLITE</li>
 <p>
 ProActive provides <code><a
  href="../core/process/glite/GLiteProcess.html">org.objectweb.proactive.core.process.glite.GLiteProcess</a></code>
 to use such protocol.</p>
-<p>Check also <a href="xml_examples/SSH_GLite_Example.xml">SSH_GLite_Example.xml</a>.</p>
+<p>Check also <a href="../../../../../xml_examples/SSH_GLite_Example.xml" target="glite">SSH_GLite_Example.xml</a>.</p>
             <br>
           <li class="textNormal">Complete
 example of XML Deployment Descriptor</li>
