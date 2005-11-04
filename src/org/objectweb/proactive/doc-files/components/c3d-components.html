@@ -59,7 +59,7 @@ classes (C3D*) and instead of linking the classes together by setting
 fields through the initial methods, do that in the binding methods. In
 other words, we have to spot exactly where C3DRenderingEngine, C3DUser
 and C3DDispatcher are used by a class other than itself, and make theses
-references component bounds. Of course, we also have to expose the
+references component bindings. Of course, we also have to expose the
 interfaces that we are goining to use, hence the Dispatcher, Engine and
 User interface that have to be implemented.</p>
 
@@ -84,18 +84,14 @@ to be turned into component</b>. We have done that, and those exposed
 methods are put in the interfaces User, Engine and Dispatcher.</p>
 
 <p><b>Tricky part:</b> whatever way you look at components, you'll have
-to modify the initial code if these interfaces where not created at
-first go. This was the case for C3D. You have to replace all the classes
-by their interface, when you use them in other files. Compare, for
-example, the C3DUser classes in the 
-<a href="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.C3DUser.html">component</a> 
-and the 
-<a href="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.C3DUser.html">Active Object</a> 
-code: we have replaced all occurrences of C3DDispatcher by occurrences 
-of Dispatcher.</p>
+to modify the initial code if these interfaces were not created at
+first go. You have to replace all the classes
+by their interface, when you use them in other files. If we had not already
+used interfaces in the C3D Objecct code, we would have had to replace all 
+occurrences of C3DDispatcher by occurrences of Dispatcher. </p>
 
 <p>Why do we have to do that, replacing classes by interfaces? That's
-due to the way components work. When the comopnents are going to be
+due to the way components work. When the components are going to be
 bound, you're not binding the class themselves, but proxies to these
 classes. And these proxies implement the interfaces, and do not extend
 the classes.</p>
@@ -107,7 +103,7 @@ Objects, and which is a composent representing the same functionality.
 How do you do that? Pretty simple. All you need to do is extend the
 Active Object class, and add to it the non-functional interfaces which
 go with the component. You have the binding interfaces to create, which
-basically say how to put together two Objects, tell who is already
+basically say how to put together two Components, tell who is already
 attached, and how to separate them. These are the <code>lookupFc</code>,
 <code>bindFc</code>, <code>unbindFc</code>, and <code>listFc</code>
 methods.</p>
@@ -120,7 +116,7 @@ really binds the protected Dispatcher variable <code>c3ddispatcher</code>.
 This way, the C3DUser code can now use this varaible as if it was
 addressing the real Active Object. Just to be precise, we have to point
 out that you're going through proxies before reaching the Component,
-then the Active Object. But this is hidden by the ProActive layer, al
+then the Active Object. But this is hidden by the ProActive layer, all
 you should know is you're addressing a Dispatcher, and you're fine!</p>
 
 <h3>Discarding direct reference acknowledgment</h3>
@@ -129,11 +125,12 @@ you should know is you're addressing a Dispatcher, and you're fine!</p>
 references to objects that call methods on the current Object. These
 methods have a signature ressembling <code>method(..., ActiveObject ao,
 ...)</code>. This is called, in ProActive, with a <code>ProActive.getStubOnThis()</code>
-(if you don't, the code won't work corretcly on remote hosts!). If the
-local object uses this reference, you're going to have trouble with
-components. You have to remove these from the code, and make it
-component-oriented. <b>You should be using bind methods to reference
-other components</b>.</p>
+(if you don't, and instead use 'this', the code won't work correctly on remote hosts!). If the
+local object uses this <code>ProActive.getStubOnThis()</code>, you're going to have trouble with
+components. The problem is that this design does not fit the component paradigm : you should be 
+using declared interfaces bound with the bind methods, not be passing along references to self.
+So you have to remove these from the code, and make it component-oriented. But remember, 
+<b>you should be using bind methods to attach other components</b>.</p>
 
 <p>OK, we have left a <code>Fractive.getComponentRepresentativeOnThis()</code>
 in the user code. Can you guess why? Because we have a very special
@@ -149,6 +146,46 @@ and set the correct id.</p>
 
 <h2>ADL</h2>
 
+<p>You may be wanting to see how we have bound the components together, now. Since the design is
+pretty simple, there is not much to it. We have used the fractal ADL, to avoid hard-coding bindings.
+So all of the information here is in the <code>components/c3d/fractal/</code> directory. There are
+the components (which interfaces they propose), and a "distributed.fractal" file, which is where the
+bindings are made. It includes the creation of a Composite component, just for the fun. You may want
+to explore it with the Fractal GUI provided with IC2D, it's easier to understand graphically. Here's
+the code, nevertheless, for you curiosity :</p>
+
+<pre>
+&lt;?xml version="1.0" encoding="ISO-8859-1" ?&gt;
+&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" 
+     "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd"&gt;
+
+&lt;definition name="org.objectweb.proactive.examples.components.c3d.fractal.distributed"&gt;
+  &lt;interface signature="java.lang.Runnable" role="server" name="r"/&gt;
+  &lt;component definition="org.objectweb.proactive.examples.components.c3d.fractal.UserImpl" name="user" /&gt;
+  &lt;component name="Composite"&gt;
+    &lt;interface signature="org.objectweb.proactive.examples.c3d.Dispatcher" role="server" name="dispatch"/&gt;
+    &lt;component definition="org.objectweb.proactive.examples.components.c3d.fractal.EngineImpl" name="engine2"/&gt;
+    &lt;component definition="org.objectweb.proactive.examples.components.c3d.fractal.EngineImpl" name="engine1"/&gt;
+    &lt;component definition="org.objectweb.proactive.examples.components.c3d.fractal.DispatcherImpl" name="disp"/&gt;
+    &lt;binding client="this.dispatch" server="disp.user2dispatcher"/&gt;
+    &lt;binding client="disp.dispatcher2engine00" server="engine1.dispatcher2engine"/&gt;
+    &lt;binding client="disp.dispatcher2engine01" server="engine2.dispatcher2engine"/&gt;
+  &lt;/component&gt;
+  &lt;binding client="this.r" server="user.r"/&gt;
+  &lt;binding client="user.user2dispatcher" server="Composite.dispatch"/&gt;
+  &lt;controller desc="composite"/&gt;
+  &lt;coordinates color="-73" y0="0.11" x1="0.30" y1="0.33" name="user" x0="0.03"/&gt;
+  &lt;coordinates color="-73" y0="0.18" x1="0.99" y1="0.98" name="Composite" x0="0.32"&gt;
+    &lt;coordinates color="-73" y0="0.60" x1="0.84" y1="0.89" name="engine2" x0="0.23"/&gt;
+    &lt;coordinates color="-73" y0="0.15" x1="0.99" y1="0.53" name="engine1" x0="0.72"/&gt;
+    &lt;coordinates color="-73" y0="0.12" x1="0.67" y1="0.42" name="disp" x0="0.09"/&gt;
+  &lt;/coordinates&gt;
+&lt;/definition&gt;
+</pre>
+
+
+
+
 <h2>Source Code</h2>
 
 <p class="textNormal">You may find the source code of this application
@@ -156,10 +193,10 @@ at the following locations : </p>
 <ul>
 	<li><a
 		href="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.index.html">Active
-	Object version</a></li>
+	Object version</a> ( examples/c3d )</li>
 	<li><a
 		href="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.index.html">Component
-	version</a></li>
+	version</a>  ( examples/components/c3d )</li>
 </ul>
 
 <hr>
