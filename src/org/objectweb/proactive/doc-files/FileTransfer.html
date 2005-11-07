@@ -42,13 +42,13 @@ index</a>&nbsp;&nbsp;</td>
 
 <h2><a name="intro">Introduction and Concepts</a></h2>
 
-<p>We believe it is interesting for us, and the ProActive users, to provide suppor for FileTransfer</p>
+<p>We believe it is interesting for us, and the ProActive users, to provide support for FileTransfer</p>
 
 <p>Currently we recognize the following type of files:
 <ul class="listWithSpace">
 	<li class="textNormal">1. ProActive Deployment Required Files (jars, policy, log4, etc)</li>
 	<li class="textNormal">2. User Application Data Files (User application input)</li>
-	<li class="textNormal">3. User Applictacion Code Files (jar, classes or native code)</li>
+	<li class="textNormal">3. User Application Code Files (jar, classes or native code)</li>
 	<li class="textNormal">4. JDK files (the jvm runtime and libraries)</li>
 </ul>
 </p>
@@ -64,9 +64,9 @@ Also,  this files can be transfered:
 The FileTransfer could happen:
 <ul class="listWithSpace">
 	<li class="textNormal">1. Before deployment.</li>
-	<li class="textNormal">2. After deployment but before the user launches his/her applicaction.</li>
+	<li class="textNormal">2. After deployment but before the user launches his/her application.</li>
 	<li class="textNormal">3. During user application.</li>
-	<li class="textNormal">4. After the user applicaction has finished.</li>
+	<li class="textNormal">4. After the user application has finished.</li>
 </ul>
 </p>
 
@@ -97,7 +97,7 @@ The FileTransfer could happen:
 
 <h2><a name="design">FileTransfer Design</a></h2>
 
-<p>FileTransfer definitinos are devided in two:</p>
+<p>FileTransfer definitions are divided in two:</p>
 
 
 <h3>Abstract Definition</h3>
@@ -111,11 +111,11 @@ This definitions can be referenced from a VirtualNode. They contain the most bas
 	<li>Directories: source and optionally the destination name. Also the exclude and include patterns (not yet available feature).</li>
 </ul>
 
-<p>References from the VirualNode are made using the unique definition name.</p>
+<p>References from the VirtualNode are made using the unique definition name.</p>
 
 <h3> Concrete Definition</h3>
 
-<p>These definitions contain more arquitecture specific information, and are therefore contained within the Process:</p>
+<p>These definitions contain more architecture specific information, and are therefore contained within the Process:</p>
 
 <ul class="listWithSpace">
 	<li>A reference to an abstract definition, or the "implicit" indicating the reference will be inherited from the VirtualNode.</li>
@@ -124,7 +124,7 @@ This definitions can be referenced from a VirtualNode. They contain the most bas
 </ul>
 
 <p>
-If some of this information (like username or hostname) can be infered from the process, it is not necesary to declare it in the definition. Optionally, the information contained in the protocol can be overriden if specified.
+If some of this information (like username or hostname) can be inferred from the process, it is not necessary to declare it in the definition. Optionally, the information contained in the protocol can be overridden if specified.
 </p>
 
 <h3>How it works</h3>
@@ -166,7 +166,7 @@ Each CopyProtocol will be tried before the deployment takes place, until one suc
 This tags can be referenced at the the VirtualNode level and the Process level.
 <ul class="listWithSpace">
 	<li class="textNormal">
-		<b>VirutalNode</b>
+		<b>VirtualNode</b>
 <pre class="xml">
 &lt;VirtualNode name="exampleVNode" <b>FileTransferDeploy</b>="<b>example</b>"/&gt;
 </pre>
@@ -178,7 +178,7 @@ This tags can be referenced at the the VirtualNode level and the Process level.
   &lt;sshProcess&gt;...
     <FONT ID="FormalComment">&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of an attribute.
             This happens because FileTransfer information is process specific.
-            Note that the destination hostname and username can be ommited, and implicitly inferred 
+            Note that the destination hostname and username can be omitted, and implicitly inferred 
 	    from the process information. --&gt;</FONT>
     &lt;<b>FileTransferDeploy</b>="<b>implicit</b>"&gt; <FONT ID="FormalComment">&lt;!-- referenceID or keyword "implicit" (inherit)--&gt;</FONT>
       &lt;<b>copyProtocol</b>&gt;processDefault, scp, rcp&lt;/<b>copyProtocol</b>&gt;
