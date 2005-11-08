@@ -179,11 +179,8 @@ public class NodeExploration implements JobMonitorConstants {
         try {
             foundRuntimes = runtimeFinder.findPARuntimes(hostname, port);
         } catch (IOException e) {
-            // if time out (probably due to a firewall) the host is skipped
-            if (e.getMessage().indexOf("Connection timed out") != -1) {
-                skippedObjects.addElement(hostObject);
-            }
-
+            //if an IOException is thrown when connecting the registry, the host is removed
+            skippedObjects.addElement(hostObject);
             log(e);
         }
         if (foundRuntimes != null) {
@@ -259,10 +256,9 @@ public class NodeExploration implements JobMonitorConstants {
                 }
             }
         } catch (ProActiveException e) {
-            // this test is usefull to avoid to log an exception at each refresh
-            if (e.getMessage().indexOf("Connection refused: connect") == -1) {
+            	skippedObjects.addElement(jvmObject);
                 log(e);
-            }
+            
             return;
         }
 
@@ -338,7 +334,11 @@ public class NodeExploration implements JobMonitorConstants {
             asso.addChild(jvmObject, nodeObject);
             asso.addChild(jobObject, nodeObject);
         } catch (ProActiveException e) {
-            log(e);
+        	if(! skippedObjects.contains(jvmObject)){
+        		log(e);
+        		skippedObjects.addElement(jvmObject);
+        	}
+            
             return;
         }
     }
@@ -435,13 +435,13 @@ public class NodeExploration implements JobMonitorConstants {
      */
     private HostRTFinder initiateFinder(String protocol) {
         if (protocol.equals("rmi:") || protocol.equals("rmissh:")) {
-            return new RMIHostRTFinder(controller);
+            return new RMIHostRTFinder(controller, skippedObjects);
         } else if (protocol.equals("http:")) {
-            return new HttpHostRTFinder(controller);
+            return new HttpHostRTFinder(controller, skippedObjects);
         } else if (protocol.equals("jini:")) {
-            return new JiniHostRTFinder(controller);
+            return new JiniHostRTFinder(controller, skippedObjects);
         } else if (protocol.equals("ibis:")) {
-            return new IbisHostRTFinder(controller);
+            return new IbisHostRTFinder(controller, skippedObjects);
         }
         return null;
     }

@@ -34,24 +34,29 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 
 
 public class RMIHostRTFinder implements HostRTFinder {
     static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
     private static final int DEFAULT_RMI_PORT = 1099;
     private IC2DMessageLogger logger;
+	private DefaultListModel skippedObjects;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public RMIHostRTFinder(IC2DMessageLogger logger) {
+    public RMIHostRTFinder(IC2DMessageLogger logger, DefaultListModel skippedObjects) {
         this.logger = logger;
+        this.skippedObjects= skippedObjects;
     }
 
     public RMIHostRTFinder() {
@@ -85,15 +90,21 @@ public class RMIHostRTFinder implements HostRTFinder {
         for (int idx = 0; idx < list.length; ++idx) {
             String id = list[idx];
             if (id.indexOf("PA_JVM") != -1) {
-                ProActiveRuntime part;
+                ProActiveRuntime part = null;
 
                 try {
                     RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
                     part = new ProActiveRuntimeAdapterImpl(r);
                     runtimeArray.add(part);
                 } catch (Exception e) {
-                    log(e.getMessage(), e);
-                    continue;
+                	//we build a jvmObject with depth of 0 since this jvm won't be monitored
+                	MonitoredJVM jvmObject = new MonitoredJVM(id, 0);
+                	if(! skippedObjects.contains(jvmObject)){
+                        log(e.getMessage(), e);
+                        skippedObjects.addElement(jvmObject);
+                	}
+                	continue;
+                    
                 }
             }
         }

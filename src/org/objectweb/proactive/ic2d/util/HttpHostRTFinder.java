@@ -33,17 +33,23 @@ package org.objectweb.proactive.ic2d.util;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.http.HttpProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 
 
 public class HttpHostRTFinder implements HostRTFinder {
     private IC2DMessageLogger logger;
+    private DefaultListModel skippedObjects;
 
-    public HttpHostRTFinder(IC2DMessageLogger logger) {
+    public HttpHostRTFinder(IC2DMessageLogger logger,
+        DefaultListModel skippedObjects) {
         this.logger = logger;
+        this.skippedObjects = skippedObjects;
     }
 
     /**
@@ -59,7 +65,13 @@ public class HttpHostRTFinder implements HostRTFinder {
                         UrlBuilder.buildUrl(host, "", "http:", port)));
             runtimeArray.add(adapter);
         } catch (ProActiveException e) {
-            logger.log(e.getMessage(), e);
+            //        	we build a jvmObject with depth of 0 since this jvm won't be monitored
+            MonitoredJVM jvmObject = new MonitoredJVM(UrlBuilder.buildUrl(
+                        host, "", "http:", port), 0);
+            if (!skippedObjects.contains(jvmObject)) {
+                logger.log(e.getMessage(), e);
+                skippedObjects.addElement(jvmObject);
+            }
         }
 
         return runtimeArray;

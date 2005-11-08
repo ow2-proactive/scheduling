@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.util;
 import java.rmi.ConnectException;
 import java.rmi.RMISecurityManager;
 
+import javax.swing.DefaultListModel;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -40,6 +42,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
@@ -55,10 +58,13 @@ public class JiniRTListener implements DiscoveryListener {
     protected java.util.ArrayList runtimes = new java.util.ArrayList();
     private String host;
     private IC2DMessageLogger logger;
+    private DefaultListModel skippedObjects;
 
-    public JiniRTListener(String _host, IC2DMessageLogger logger) {
+    public JiniRTListener(String _host, IC2DMessageLogger logger,
+        DefaultListModel skippedObjects) {
         host = _host;
         this.logger = logger;
+        this.skippedObjects = skippedObjects;
         if ((System.getSecurityManager() == null) &&
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new RMISecurityManager());
@@ -106,7 +112,13 @@ public class JiniRTListener implements DiscoveryListener {
                                     runtimes.add(part);
                                 }
                             } catch (ProActiveException e) {
-                                e.printStackTrace();
+                                //                            	we build a jvmObject with depth of 0 since this jvm won't be monitored
+                                MonitoredJVM jvmObject = new MonitoredJVM(name,
+                                        0);
+                                if (!skippedObjects.contains(jvmObject)) {
+                                    logger.log(e.getMessage(), e);
+                                    skippedObjects.addElement(jvmObject);
+                                }
                             }
                         }
                     }
@@ -142,10 +154,11 @@ public class JiniRTListener implements DiscoveryListener {
         RemoteProActiveRuntime runtime = null;
         ServiceMatches matches = null;
         ServiceTemplate template = new ServiceTemplate(null, classes, null);
-
+        String name = "";
         for (int n = 0; n < registrars.length; n++) {
             //System.out.println("JiniNodeListener:  Service found");
             ServiceRegistrar registrar = registrars[n];
+
             try {
                 //System.out.println("JiniNodeListener:  lookup registrar");
                 matches = registrar.lookup(template, Integer.MAX_VALUE);
@@ -159,7 +172,7 @@ public class JiniRTListener implements DiscoveryListener {
                         if ((jiniName.indexOf("PA_JVM") != -1)) {
                             // it is a runtime
                             int k = jiniName.indexOf("=");
-                            String name = jiniName.substring(k + 1,
+                            name = jiniName.substring(k + 1,
                                     jiniName.length() - 1);
 
                             //System.out.println("-----------------name "+name);
@@ -177,18 +190,27 @@ public class JiniRTListener implements DiscoveryListener {
                     log4jlogger.error("JiniRTListener: No Service");
                 }
             } catch (ConnectException e) {
-                //System.err.println("JiniNodeListener RemoteException ");
+                MonitoredJVM jvmObject = new MonitoredJVM(name, 0);
+                if (!skippedObjects.contains(jvmObject)) {
+                    logger.log(e.getMessage(), e);
+                    skippedObjects.addElement(jvmObject);
+                }
                 continue;
                 //e.printStackTrace();
             } catch (java.rmi.RemoteException e) {
-                //logger.log(e);
-                //System.err.println("JiniNodeListener RemoteException ");
-                //e.printStackTrace();
+                MonitoredJVM jvmObject = new MonitoredJVM(name, 0);
+                if (!skippedObjects.contains(jvmObject)) {
+                    logger.log(e.getMessage(), e);
+                    skippedObjects.addElement(jvmObject);
+                }
                 continue;
                 //e.printStackTrace();
             } catch (ProActiveException e) {
-                //logger.log(e);
-                //e.printStackTrace();
+                MonitoredJVM jvmObject = new MonitoredJVM(name, 0);
+                if (!skippedObjects.contains(jvmObject)) {
+                    logger.log(e.getMessage(), e);
+                    skippedObjects.addElement(jvmObject);
+                }
                 continue;
             }
         }

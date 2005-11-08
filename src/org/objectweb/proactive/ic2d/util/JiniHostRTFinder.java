@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.util;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+
 
 //import org.objectweb.proactive.core.node.jini.JiniNode;
 
@@ -41,12 +43,14 @@ import java.util.ArrayList;
  */
 public class JiniHostRTFinder implements HostRTFinder {
     private IC2DMessageLogger logger;
+	private DefaultListModel skippedObjects;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public JiniHostRTFinder(IC2DMessageLogger logger) {
+    public JiniHostRTFinder(IC2DMessageLogger logger, DefaultListModel skippedObjects) {
         this.logger = logger;
+        this.skippedObjects= skippedObjects;
     }
 
     //
@@ -59,7 +63,7 @@ public class JiniHostRTFinder implements HostRTFinder {
     public ArrayList findPARuntimes(String host, int port)
         throws IOException {
         //we guess here that the port is fixed in Jini implementation
-        JiniRTListener RTlist = new JiniRTListener(host, logger);
+        JiniRTListener RTlist = new JiniRTListener(host, logger, skippedObjects );
         try {
             //          stay around long enough to receice replies
             Thread.sleep(10000L);

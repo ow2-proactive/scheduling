@@ -191,17 +191,21 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         String jobId = proActiveRuntimeRegistered.getJobID();
         MonitoredJob monitoredJob = new MonitoredJob(jobId);
-
+        
+        String full_host = host;
+        if (port != 0) {
+        	full_host = host+":"+port;
+        }
         // monitor the host where is launched the runtime
         if (launcherFrame.isGraphicalMonitoring()) {
-            ic2dPanel.getWorldPanel().monitoredHostAdded(host, protocol);
+            ic2dPanel.getWorldPanel().monitoredHostAdded(full_host, protocol);
             ic2dPanel.getWorldPanel().getMonitorThread().updateHosts();
         } else {
             ic2dPanel.getWorldPanel().getMonitorThread().addObjectToSkip(monitoredJob);
         }
         if (launcherFrame.isJobMonitoring()) {
             jobMonitorFrame.getPanel().addMonitoredHost(UrlBuilder.removePortFromHost(
-                    host), UrlBuilder.getPortFromUrl(host));
+                    host), UrlBuilder.getPortFromUrl(url));
             jobMonitorFrame.getPanel().updateHosts();
         } else {
             jobMonitorFrame.getPanel().addObjectToSkip(monitoredJob);

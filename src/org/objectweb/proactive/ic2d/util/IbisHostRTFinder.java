@@ -32,6 +32,8 @@ package org.objectweb.proactive.ic2d.util;
 
 import java.util.ArrayList;
 
+import javax.swing.DefaultListModel;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapterImpl;
@@ -39,6 +41,7 @@ import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.IbisProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 
 import ibis.rmi.registry.LocateRegistry;
 import ibis.rmi.registry.Registry;
@@ -56,12 +59,14 @@ public class IbisHostRTFinder implements HostRTFinder {
 
     private static final int DEFAULT_RMI_PORT = 1099;
     private IC2DMessageLogger logger;
+	private DefaultListModel skippedObjects;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public IbisHostRTFinder(IC2DMessageLogger logger) {
+    public IbisHostRTFinder(IC2DMessageLogger logger, DefaultListModel skippedObjects) {
         this.logger = logger;
+        this.skippedObjects= skippedObjects;
     }
 
     public IbisHostRTFinder() {
@@ -101,8 +106,12 @@ public class IbisHostRTFinder implements HostRTFinder {
                     part = new ProActiveRuntimeAdapterImpl(r);
                     runtimeArray.add(part);
                 } catch (Exception e) {
-                    log(e.getMessage(), e);
-                    continue;
+//                	we build a jvmObject with depth of 0 since this jvm won't be monitored
+                	MonitoredJVM jvmObject = new MonitoredJVM(id, 0);
+                	if(! skippedObjects.contains(jvmObject)){
+                        log(e.getMessage(), e);
+                        skippedObjects.addElement(jvmObject);
+                	}
                 }
             }
         }
