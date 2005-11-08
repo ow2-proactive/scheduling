@@ -90,7 +90,7 @@ public class StartNode {
 
     static {
         ProActiveConfiguration.load();
-        Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
+        logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
         if (logger.isDebugEnabled()) {
             logger.debug("Loading ProActive class");
         }
