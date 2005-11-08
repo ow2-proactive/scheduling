@@ -32,6 +32,7 @@ package org.objectweb.proactive;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -66,12 +67,14 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
+import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
@@ -83,6 +86,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
+import org.objectweb.proactive.core.util.ProcessForAoCreation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -378,19 +383,77 @@ public class ProActive {
         }
     }
 
+    /** A pool of thread for newActiveINParallel */
+    transient private static ThreadPool threadpool;
+   
     /**
-     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter.
-     * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter.
-     * @param classname classname the name of the class to instanciate as active
-     * @param constructorParameters constructorParameters the parameters of the constructor.
-     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-     * on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws NodeException if the virtualnode was null
+     * Clean the threadpool used by the newActiveInParallel
+     * @see java.lang.Object#finalize()
      */
+    protected void finalize() throws Throwable {
+    if (threadpool != null) {
+        threadpool.clean();
+    }
+    }
+    
+    /**
+     * <p>Create a set of identical active objects on a given virtual node. The
+     * object activation is optimized by a thread pool.</p>
+     * <p>When the given virtual node is not previously activated, this method
+     * employ the node creation event producer/listerner mechanism joined to the
+     * thread pool. That aims to create an active object just after the node
+     * deploying.</p>
+     * 
+     * @param className the name of the class to instanciate as active.
+     * @param constructorParameters the array that contains the parameters used
+     * to build the active objects. All active objects have the same constructor
+     * parameters.
+     * @param virtualNode the virtual node where the active objects are created.
+     * @return an array of references (possibly remote) on Stubs of the newly 
+     * created active objects.
+     * @throws NodeException happens when the given virtualNode is already
+     * activated and throws an exception.
+     */
+    public static Object[] newActiveInParallel(String className,
+        Object[] constructorParameters, VirtualNode virtualNode)
+        throws NodeException {
+        // Creation of the thread pool
+        if (threadpool == null) {
+            threadpool = new ThreadPool();
+        }
+        Vector result = new Vector();
+        if (virtualNode.isActivated()) {
+            // The Virtual Node is already activate
+            Node[] nodes = virtualNode.getNodes();
+            for (int i = 0; i < nodes.length; i++) {
+                threadpool.addAJob(new ProcessForAoCreation(result, className,
+                        constructorParameters, nodes[i]));
+            }
+            threadpool.complete();
+        } else {
+            // Use the node creation event mechanism
+            ((NodeCreationEventProducerImpl) virtualNode).addNodeCreationEventListener(new NodeCreationListenerForAoCreation(
+                    result, className, constructorParameters, threadpool));
+            virtualNode.activate();
+            ((VirtualNodeImpl) virtualNode).waitForAllNodesCreation();
+            threadpool.complete();
+        }
+        return result.toArray(new Object[result.size()]);
+    }
+
+    /**
+    * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
+    * correspond to the classname parameter.
+    * This group will contain one active object per node mapped onto the virtual node
+    * given as a parameter.
+    * @param classname classname the name of the class to instanciate as active
+    * @param constructorParameters constructorParameters the parameters of the constructor.
+    * @param virtualnode The virtualnode where to create active objects. Active objects will be created
+    * on each node mapped to the given virtualnode in XML deployment descriptor.
+    * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
+    * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+    * @throws NodeException if the virtualnode was null
+    */
     public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {

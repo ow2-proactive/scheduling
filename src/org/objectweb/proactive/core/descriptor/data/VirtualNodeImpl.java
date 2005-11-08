@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.Serializable;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -64,7 +63,6 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -1002,7 +1000,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Waits until all Nodes mapped to this VirtualNode in the XML Descriptor are created
      */
-    private void waitForAllNodesCreation() throws NodeException {
+    public void waitForAllNodesCreation() throws NodeException {
         int tempNodeCount = nbMappedNodes;
 
         if (tempNodeCount != P2PConstants.MAX_NODE) {
