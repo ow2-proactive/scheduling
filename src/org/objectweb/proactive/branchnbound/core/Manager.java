@@ -197,7 +197,7 @@ public class Manager implements Serializable, InitActive {
                 logger.info("Manager is deploying a group of workers");
                 // Node[]
                 long singleStartTime = System.currentTimeMillis();
-                this.workerGroup = (Worker) ProActiveGroup.newGroupBuiltWithMultithreading(Worker.class.getName(),
+                this.workerGroup = (Worker) ProActiveGroup.newGroupInParallel(Worker.class.getName(),
                         args, this.nodes);
                 ProActive.addNFEListenerOnGroup(this.workerGroup,
                     FailedGroupRendezVousException.AUTO_GROUP_PURGE);
@@ -546,7 +546,7 @@ public class Manager implements Serializable, InitActive {
             if (this.nodes.length > 0) {
                 long startTime = System.currentTimeMillis();
                 try {
-                    tmpWorkers = (Worker) ProActiveGroup.newGroupBuiltWithMultithreading(Worker.class.getName(),
+                    tmpWorkers = (Worker) ProActiveGroup.newGroupInParallel(Worker.class.getName(),
                             args, this.nodes);
                     freeWorkerList.addAll(ProActiveGroup.getGroup(tmpWorkers));
                     Worker activedTmpWorkers = (Worker) ProActiveGroup.turnActiveGroup(tmpWorkers,
@@ -615,7 +615,7 @@ public class Manager implements Serializable, InitActive {
             if (nodes.length > 0) {
                 startTime = System.currentTimeMillis();
                 try {
-                    tmpWorkers = (Worker) ProActiveGroup.newGroupBuiltWithMultithreading(Worker.class.getName(),
+                    tmpWorkers = (Worker) ProActiveGroup.newGroupInParallel(Worker.class.getName(),
                             args, nodes);
                     freeWorkerList.addAll(ProActiveGroup.getGroup(tmpWorkers));
                     Worker activedTmpWorkers = (Worker) ProActiveGroup.turnActiveGroup(tmpWorkers,
