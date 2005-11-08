@@ -329,6 +329,7 @@ using declared interfaces bound with the bind methods, not be passing along refe
 So you have to remove these from the code, and make it component-oriented. But remember, 
 <b>you should be using bind methods to attach other components</b>.</p>
 
+<!-- 
 <p>OK, we have left a <code>Fractive.getComponentRepresentativeOnThis()</code>
 in the user code. Can you guess why? Because we have a very special
 relationship between users and dispatchers. This link is two-way, ie
@@ -340,7 +341,8 @@ that's tough. In fact the way we devised was to do it at binding-time :
 inside the <code>bindFc</code> and <code>unbindFc</code> methods, the
 components engage a conversation in which they share their references
 and set the correct id.</p>
-
+-->
+ 
 <h3>ADL</h3>
 
 <p>You may be wanting to see how we have bound the components together, now. Since the design is
