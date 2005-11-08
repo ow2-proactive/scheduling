@@ -139,6 +139,7 @@
 				<include name="**/*.xml"/>
 				<include name="**/*.fractal"/>
 				<include name="**/*.properties"/>
+				<include name="**/*.xsd"/>
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd"/>
 			</fileset>
 		</copy>
@@ -397,7 +398,7 @@
       ==
       ================================================================
 	-->
-	<target name="alljunk" depends="all, migration, modelisation, essai, nonregressiontest, benchmark"/>
+	<target name="alljunk" depends="compile, migration, modelisation, essai, nonregressiontest, benchmark"/>
 	<!--
 	   ================================================================
 	   ==
