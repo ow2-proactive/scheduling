@@ -155,9 +155,8 @@ import ibis.rmi.RemoteException;
  * removeNFEListenerOnJVM(NFEListener)
  * removeNFEListenerOnProxy(Object, NFEListener)
  * </pre>
-
  * </p>
-  * <p><a href="doc-files/exceptions.html">Functionnal Exceptions</a>
+ * <p><a href="doc-files/exceptions.html">Functionnal Exceptions</a>
  * <pre>
  * tryWithCatch(Class)
  * removeTryWithCatch()
@@ -758,13 +757,7 @@ public class ProActive {
     public static void register(Object obj, String url)
         throws java.io.IOException {
         BodyAdapter body = getRemoteBody(obj);
-        try {
-            body.register(url);
-        } catch (IOException e) {
-            throw new java.io.IOException(
-                "Cannot reconize the type of this UniversalBody: " +
-                body.getClass().getName());
-        }
+        body.register(url);
         if (logger.isInfoEnabled()) {
             logger.info("Success at binding url " + url);
         }
@@ -1855,7 +1848,8 @@ public class ProActive {
      * @param group The group receiving the NFE
      * @param listener The listener to remove
      */
-    public static void removeNFEListenerOnGroup(Object group, NFEListener listener) {
+    public static void removeNFEListenerOnGroup(Object group,
+        NFEListener listener) {
         getGroupProxy(group).removeNFEListener(listener);
     }
 }
