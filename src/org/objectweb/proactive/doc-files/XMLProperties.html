@@ -15,8 +15,8 @@
           <tr>
             <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
             <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
-            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Descriptor.html">prev</a>&nbsp;&nbsp;</td>            
- 			<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FileTransfer.html">next</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Descriptor.html">prev</a>&nbsp;&nbsp;</td> 
+ 	    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FileTransfer.html">next</a>&nbsp;&nbsp;</td>
           </tr>
         </tbody>
       </table>
@@ -28,192 +28,100 @@
 </table>
 <HR>
 <H1>Variables for Descriptors</H1>
-<H2>Principle:</H2>
-<P>The aim of this feature is to allow the definition of variables in
-XML descriptors: variables can be defined directly in the descriptor, or in other
-independents files. An API also allows to set some variables in the
-program using the descriptor.</P>
-<P>Adding variable tags in the descriptor can help you by factorizing
-at begin of the document the parameters being used often.</P>
-<P>A variable is the association of a <b>name</b> that is it be
-uniquely defined and a <b>text</b> setting its value. When the parser
-finds subject to change the name of a variable like ${ProActive_home} he
-swaps the variable with the value associate to.</P>
-<P>The mechanism takes into account the different persons and roles
-involved: the programmer, the deployer. The programmer knows what variable he midht used in is program, allowing or not overiding the values by the deployer, providing or not a default value. The deployer sees the variable the programmer has defined, and the conditions to use them.</P>
+<H2>Principle</H2>
+<P>The objective of this feature is to allow the use of variables inside
+XML descriptors. Variables can be defined: directly in the descriptor, using
+independent files, or inside the deploying application's code (with an API).</P>
 
-	<LI><B>There are five categories of variables</B></li>
+<P>The variable tags are usefull inside a descriptor because they can factorize frequent parameters. For example, a variable like ${PROACTIVE_HOME} can be defined, set and used in an XML Descriptor.</P>
 
-	<UL class="listWithSpace">
-		<LI><b>javaProperty</b>: defined by corresponding java property</LI> 
-		<LI><b>constant</b>: defined in XML, not modifiable in program (default)</LI> 
-		<LI><b>overridableInXML</b>: should be set in program, but XML value if given has priority</LI>
-		<LI><b>overridableInProgram</b>: should be set in XML, but program value, if set, has priority</LI> 
-		<LI><b>setInProgram</b>: should be set in program, cannot be given in XML</LI> 
-	</UL>
+<h2><a name="variableTypes">Variable Types</a></h2>
 
-<P>The deployer can only add the two first type of variables( javaProperty, constant). The three others ( overridableInXML, overridableInProgram, setInProgram) are defined by the programmer.</P>
+	   <ul><table>
+	  		<tr>
+				<th><p>Type</p></th>
+				<th><p>Variable Declaration</p></th>
+				<th><p>Value Setting</p></th>
+				<th><p>Priority</p></th>
+			</tr>
+			<tr>
+				<td><p><b>constant</b></p></td>
+				<td><p>Descriptor</p></td>
+				<td><p>Descriptor </p></td>
+				<td><p>Descriptor</p></td>
+			</tr>
+			<tr>
+				<td><p><b>overridableInProgram</b></p></td>
+				<td><p>Descriptor</p></td>
+				<td><p>Descriptor or Program</p></td>
+				<td><p>Program</p></td>
+			</tr>
+			<tr>
+				<td><p><b>overridableInXML</b></p></td>
+				<td><p>Descriptor</p></td>
+				<td><p>Descriptor or Program</p></td>
+				<td><p>Descriptor</p></td>
+			</tr>
+			<tr>
+				<td><p><b>setInProgram</b></p></td>
+				<td><p>Descriptor</p></td>
+				<td><p>Program</p></td>
+				<td><p>Program</p></td>
+			</tr>
+						<tr>
+				<td><p><b>javaProperty</b></p></td>
+				<td><p>Descriptor</p></td>
+				<td><p>JavaProperty</p></td>
+				<td><p>JavaProperty</p></td>
+			</tr>
+
+	   </table></ul>
+
+<p> Variables can be defined in more than one place. When the value is set on multiple places, then the definition specified in the priority column will take precedence.</p>
 	
-	
-<H2>Sample example:</H2>
+<H2>Variables Example</H2>
+<H3>Descriptor Variables</H3>
+<p>All variable declarations must be written in a variable section at the beginning of the descriptor file in the following way:</p>
 
-<p>Here is an example of descroptor featuring all types of variables:</p>
+<pre CLASS="xml">
+	&lt;variables&gt;
+	&nbsp;&lt;property name=&quot;<b>USER_HOME</b>" value=&quot;<b>/usr/home/team</b>"/&gt; <FONT ID="FormalComment">&lt;!-- constant is default--&gt;</FONT>
+	&nbsp;&lt;property name="<b>PROACTIVE_HOME</b>" value="<b>ProActive/dist/ProActive</b>" type="<b>constant</b>"/&gt;
 
-<DL>
-	<DD>
-	<TABLE WIDTH=100%>
-      <TR>
-        <TD > 
-          <TABLE CLASS="xml" ALIGN=LEFT WIDTH=935 CELLPADDING=2 CELLSPACING=0>
-					<TR>
-						
-              <TD WIDTH=931 height="286"> <P CLASS="xml">
-                  &lt;variables&gt;<BR>
-                  &nbsp;&lt;property name=&quot;<b>home</b>" value=&quot;<b>/usr/home/team</b>" 
-                  /&gt;<BR>
-                  &nbsp;&lt;property name="<b>ProActive</b>" value="<b>ProActive/dist/ProActive</b>" type="<b>constant</b>"/&gt;<BR>
-				  <br>
-                  &nbsp;&lt;property name="<b>OptionalNodes</b>" value="<b>2</b>" type="<b>overrridableInXML</b>"/&gt;<BR>
-                  &nbsp;&lt;property name="<b>UseP2P</b>" value="<b>yes</b>" type="<b>overrridableInProgram</b>"/&gt;<BR>
-                  &nbsp;&lt;property name="<b>NeededNodes</b>" value="" type="<b>setInProgram</b>" /&gt;<BR>
-				  <br>
-                  &nbsp;&lt;!-- example of using jvm properties --&gt;<BR>
-                  &nbsp;&lt;property name="<b>javaHome</b>" value="<b>user.home</b>" type="<b>javaProperty</b>"/&gt;<BR>
-				  <br>
-                  &nbsp;&lt;!-- loading external file to define variables --&gt;<BR>
-                  &nbsp;&lt;propertiesFile location="<b>context.properties</b>"/&gt;<BR>
-                  &nbsp;&lt;property file="<b>context.xml</b>"/&gt;<BR>
-                  &nbsp;&lt;!-- see sections External file below for detailed examples--&gt;<BR>
-				  <br>
-                  &lt;/variables&gt;<BR>
-                  <br>
-                  &lt;classpath&gt;<BR>
-                  &nbsp;&lt;absolutePath value="<b>${home}/${ProActive}/ProActive.jar</b>"/&gt;<BR>
-                  &nbsp;&lt;absolutePath value="<b>${javaHome}/lib/asm.jar</b>"/&gt;<BR>
-                  <BR>
-                  &lt;/classpath&gt;<BR>
-						</TD>
-					</TR>
-					<TR>
-						
-              <TD WIDTH=931> 
-                <P CLASS="xml"><BR>
-							</P>
-						</TD>
-					</TR>
-				</TABLE></TD>
-		</TR>
-	</TABLE>
-</DL>
+	&nbsp;&lt;property name="<b>OPTIONAL_NODES</b>" value="<b>2</b>" type="<b>overrridableInXML</b>"/&gt;
+	&nbsp;&lt;property name="<b>USE_P2P</b>" value="<b>yes</b>" type="<b>overrridableInProgram</b>"/&gt;
+	&nbsp;&lt;property name="<b>NEEDED_NODES</b>" value="" type="<b>setInProgram</b>" /&gt;
+		  
+	&nbsp;<FONT ID="FormalComment">&lt;!-- example using jvm properties --&gt;</FONT>
+	&nbsp;&lt;property name="<b>JAVA_HOME</b>" value="<b>java.home</b>" type="<b>javaProperty</b>"/&gt;
 
-<P>Inside you code application:</P>
+	&nbsp;<FONT ID="FormalComment">&lt;!-- loading external files with variables definitions --&gt;</FONT>
+	&nbsp;&lt;propertiesFile location="<b>context.properties</b>"/&gt;
+	&nbsp;&lt;property file="<b>context.xml</b>"/&gt;
+	&lt;/variables&gt;
+
+	<FONT ID="FormalComment">&lt;!-- example usage --&gt;</FONT>
+	...
+	&lt;classpath&gt;
+	&nbsp;&lt;absolutePath value="<b>${USER_HOME}/${PROACTIVE_HOME}/ProActive.jar</b>"/&gt;
+	&nbsp;&lt;absolutePath value="<b>${JAVA_HOME}/lib/asm.jar</b>"/&gt;
+	&lt;/classpath&gt;
+	...
+</pre>
+
+<h3>Program Variables</h3>
 <UL>
 	<PRE CLASS="snippet" STYLE="margin-bottom: 0.5cm; line-height: 150%">
-XMLProperties.setVariableValue( "<b>OptionalNodes</b>", "<b>4</b>", "<b>overridableInXML</b>");
-XMLProperties.setVariableValue( "<b>UseP2P</b>", "<b>no</b>", "<b>overridableInProgram</b>");
-XMLProperties.setVariableValue( "<b>NeededNodes</b>", "<b>50</b>", "<b>setInProgram</b>");
+XMLProperties.setVariableValue( "<b>OPTIONAL_NODES</b>", "<b>4</b>", "<b>overridableInXML</b>");
+XMLProperties.setVariableValue( "<b>USE_P2P</b>", "<b>no</b>", "<b>overridableInProgram</b>");
+XMLProperties.setVariableValue( "<b>NEEDED_NODES</b>", "<b>50</b>", "<b>setInProgram</b>");
 </PRE></UL>
 <br>
 
-<H2>For the Deployer </H2>
-  <P>We add facility in three ways, two by defined variables in external files, and one by write full variables definition inside descriptor file.</P>
-  <p>All variables declarations must be write in a variables bloc at the beginning of the descriptor file. </p>
-  <p>The variables section may have two blocs, first bloc is made of simples property tags and secondely a bloc for loading externals files.</P>
-  <p>After is definition the variable can be used any where in the document, it's valide to define a new variable text value with previously defined variables.</p>
+<H2>External Variable Definitions Files</H2>
 
-<li><b>Property tag</b></li>
-       <P>All variables used in the descriptor must be declared either by a tag in this section or inside a file defined in the extrenal file section.</p>
-	   <ul><table CLASS="xml">
-	  		<tr>
-				<th>Type</th>
-				<th>Behavior</th>
-				<th>When To use this type</th>
-			</tr>
-			<tr>
-				<td><b>constant</b></td>
-				<td><p>The value has to be set in descriptor, and cannot be specified in program.</p></td>
-				<td><p>If the deployer want to use a value, witout giving the possibility to the programmer to modify it.</p></td>
-			</tr>
-			<tr>
-				<td><b>overridableInXML</b></td>
-				<td><p>A value is guarantied to be given by the program.The XML has the possibility to leave the variable with no value.If a value is given in the XML, it has priority over the one in the program.</p></td>
-				<td><p>If the programmer of an application can provide a default value, but wants to leave the possibility to the deployer to change it.</p></td>
-			</tr>
-			<tr>
-				<td><b>overridableInProgram</b></td>
-				<td><p>A value is mandatory to be specified in the XML by the deployer. The program has the possibility not to change the value. If the program at execution decide to set a value for the variable, it will take priority over the one in the XML.</p></td>
-				<td><p>If the programmer of an application must have a value from the deployer, but in some case want to be able to overpasse the value at program execution.</p></td>
-			</tr>
-			<tr>
-				<td><b>setInProgram</b></td>
-				<td><p>The value has to be set in the program, and cannot be specified in the XML.</p></td>
-				<td><p>If the programmer of an application always want his program to set the value, without giving the possibility to the deployer to change it.</p></td>
-			</tr>
-			<tr>
-				<td><b>javaProperty</b></td>
-				<td><p>The value has to be set in the JVM properties.</p></td>
-				<td><p>This variable type enable using of properties defined at runtime.</p></td>
-			</tr>
-	   </table></ul>
-	   
-<li><b>External properties file</b></li>
-
-<TABLE WIDTH=100% CELLPADDING=2 CELLSPACING=0>
-      <COL WIDTH=256*>
-      <TR> <TD WIDTH=100%> <TABLE CLASS="xml" DIR="LTR" ALIGN=LEFT WIDTH=663 CELLPADDING=2 CELLSPACING=0>
-            <COL WIDTH=659>
-       		<TR> <TD  WIDTH=659 align="left"> <P CLASS="xml">&nbsp;&lt;!-- loading external file to defined variables --&gt;<BR>
-              &nbsp;&lt;propertiesFile location="<b>context.properties</b>"/&gt;<BR></P>
-       		</TD></TR>
-          	</TABLE>
-	 </TD></TR>
-    </TABLE>
-<P>The first file approach using Sun microsystems terminology. You have to defined variables in a full text syntax like following.</P>
-
-<UL>
-  <LI> 
-    <P STYLE="border: none; padding: 0cm; line-height: 150%"><FONT FACE="Verdana, Helvetica, Arial, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>File 
-      : context.properties</B></FONT></FONT></P>
-    <TABLE WIDTH=100% CELLPADDING=2 CELLSPACING=0>
-      <COL WIDTH=256*>
-      <TR> 
-        <TD WIDTH=100%> <TABLE CLASS="xml" DIR="LTR" ALIGN=LEFT WIDTH=663 CELLPADDING=2 CELLSPACING=0>
-            <COL WIDTH=659>
-            <TR> 
-              <TD  WIDTH=659 align="left"> <P CLASS="xml"># Definition of the specific context<BR>
-                  <BR>
-				  userhome = /usr/home/team<BR>
-                  proActive = ProActive/dist/ProActive<BR>
-                  minNodes : 45<BR>
-                  <BR>
-                </P></TD>
-            </TR>
-          </TABLE></TD>
-      </TR>
-    </TABLE>
-</UL>
-	
-<P>See Properties.load on <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">http://java.sun.com</a> 
-  for more information.</P>
-<li><b>External XML file</b></li>
-<TABLE WIDTH=100% CELLPADDING=2 CELLSPACING=0>
-      <COL WIDTH=256*>
-      <TR> 
-        <TD WIDTH=100%> <TABLE CLASS="xml" DIR="LTR" ALIGN=LEFT WIDTH=663 CELLPADDING=2 CELLSPACING=0>
-            <COL WIDTH=659>
-            <TR> 
-              
-          <TD  WIDTH=659 align="left"> <P CLASS="xml">&nbsp;&lt;!-- loading external file to defined variables --&gt;<BR>
-              &nbsp;&lt;property file="<b>context.xml</b>"/&gt;<BR>
-            </P></TD>
-            </TR>
-          </TABLE></TD>
-      </TR>
-    </TABLE>
-<P>The other external file is constituted of XML property tags.</P>
-
-<UL>
-  <LI> 
+<h3>XML Files</h3>
+<P>Is built using XML property tags.</P>
     <P STYLE="border: none; padding: 0cm; line-height: 150%"><FONT FACE="Verdana, Helvetica, Arial, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>File 
       : context.xml</B></FONT></FONT></P>
     <TABLE WIDTH=100% CELLPADDING=2 CELLSPACING=0>
@@ -222,30 +130,53 @@ XMLProperties.setVariableValue( "<b>NeededNodes</b>", "<b>50</b>", "<b>setInProg
         <TD WIDTH=100%> <TABLE CLASS="xml" DIR="LTR" ALIGN=LEFT WIDTH=663 CELLPADDING=2 CELLSPACING=0>
             <COL WIDTH=659>
             <TR> 
-              <TD  WIDTH=659 align="left"> <P CLASS="xml">&lt;!-- Definition of 
-                  the specific context --&gt;<BR>
-                  <BR>
-                  &lt;property name="<b>userhome</b>" value="<b>/usr/home/team</b>" /&gt;<BR>
-                  &lt;property name="<b>proActive</b>" value="<b>ProActive/dist/ProActive</b>" 
-                  /&gt;<BR>
-                  &lt;property name="<b>minNodes</b>" value="<b>45</b>" /&gt;<BR>
-                  <BR>
-                </P></TD>
+              <TD  WIDTH=659 align="left"> 
+	      <PRE CLASS="xml">
+
+	<FONT ID="FormalComment">&lt;!-- Definition of the specific context --&gt;</FONT>
+	&lt;property name="<b>USER_HOME</b>" value="<b>/usr/home/team</b>" /&gt;
+	&lt;property name="<b>PROACTIVE_HOME</b>" value="<b>ProActive/dist/ProActive</b>" /&gt;
+	&lt;property name="<b>MIN_NODES</b>" value="<b>45</b>" /&gt;
+	</PRE>
+	  	</TD>
             </TR>
           </TABLE></TD>
       </TR>
     </TABLE>
-</UL>
 
-<H2>For the Developer </H2>
-<P>We offer the possibility to define variables at design time, these values are 
-used during the descriptor parsing for deployment preparation.</P>
-<P>API for adding a single variable value is :</P>
-<code class="alignleftsnippet">..........XMLProperties.setVariableValue( String <b>name</b>, String <b>value</b>, String <b>type</b>);<br></code>
-<P>API for adding a table of variables is show below. The key of the map is the "name" and the value "the variable text".</P>
-<code class="alignleftsnippet">..........XMLProperties.setVariableValue( HashMap <b>map</b>, String <b>type</b>);<br></code>
-<P>Both methods are access by static way.</P>
 
+<h3>Properties Files</h3>
+
+<P>This approach uses <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">Sun microsystems properties file format</a>. The format is plain text with one definition per line in the format <b>variable = value</b>, as shown in the following example:</P>
+    
+    <P STYLE="border: none; padding: 0cm; line-height: 150%"><FONT FACE="Verdana, Helvetica, Arial, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt"><B>File 
+      : context.properties</B></FONT></FONT></P>
+    <TABLE WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <COL WIDTH=256*>
+      <TR> 
+        <TD WIDTH=100%> <TABLE CLASS="xml" DIR="LTR" ALIGN=LEFT WIDTH=663 CELLPADDING=2 CELLSPACING=0>
+            <COL WIDTH=659>
+            <TR> 
+              <TD  WIDTH=659 align="left">
+	      <PRE CLASS="xml">
+
+	<FONT ID="FormalComment"># Definition of the specific context</FONT>
+	USER_HOME = /usr/home/team
+	PROACTIVE_HOME = ProActive/dist/ProActive
+	MIN_NODES : 45
+	</PRE></TD>
+            </TR>
+          </TABLE></TD>
+      </TR>
+    </TABLE>
+<p> Note that colon (:) can be used instead of equal (=).
+    
+<H2>Program Variable API</H2>
+
+<P>The API for adding a single variable value is show below. The <b>name</b> corresponds to the variable name, and the <b>value</b> to the variable content. The <b>type</b> is the String corresponding to one of the <a href="#variableTypes">supported variable types</a>.</P>
+<code class="snippet">static public XMLProperties.setVariableValue( String <b>name</b>, String <b>value</b>, String <b>type</b>);<br></code>
+<P>The API for adding a multiple variables is shown below. The variable <b>name</b>/<b>value</b> pair is specified as the key/content of the HashMap. The <b>type</b> is the String corresponding to one of the <a href="#variableTypes">supported variable types</a>.</P>
+<code class="snippet">static public XMLProperties.setVariableValue( HashMap <b>map</b>, String <b>type</b>);<br></code>
 
 <br>
 <HR>
