@@ -33,14 +33,17 @@ package org.objectweb.proactive.ic2d.gui.util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -59,6 +62,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -106,6 +110,7 @@ public class LauncherWindow extends JFrame {
     JScrollPane jScrollPane1 = new JScrollPane();
     JScrollPane jScrollPane2 = new JScrollPane();
     JComboBox jComboBox1 = new JComboBox();
+    JTextArea jTextDescriptor = new JTextArea();
     private boolean doGraphicalMonitoring;
     private boolean doJobMonitoring;
 
@@ -203,6 +208,7 @@ public class LauncherWindow extends JFrame {
         launchedTable.setCellEditor(null);
         launchedTable.setRowSelectionAllowed(true);
         jScrollPane1.setViewportView(launchedTable);
+        
     }
 
     public static void main(String[] args) {
@@ -244,8 +250,9 @@ public class LauncherWindow extends JFrame {
     /**
      * popup actions when clicking on the descriptor list
      * @param e
+     * @throws IOException 
      */
-    public void doPopupCall(ActionEvent e) {
+    public void doPopupCall(ActionEvent e)  {
         String command = e.getActionCommand();
         Launcher launcher = (Launcher) (descriptorMap.get(descriptorList.getSelectedValue()));
         if (command == "Launch the application") {
@@ -288,6 +295,33 @@ public class LauncherWindow extends JFrame {
             descriptorMap.remove(cell);
             descriptorsToLaunch.remove(cell);
             descriptorList.setListData(descriptorsToLaunch);
+            
+        }else if (command == "View") {
+        	try {
+        		//gets the path and the name of the xml descripor
+        		String descripContent = new String(), buf;
+        		String path = ((ListCell) descriptorList.getSelectedValue()).getContent();
+        		String [] tab = path.split(System.getProperty("file.separator"));
+        		String name = tab[tab.length-1];
+        		
+        		//reads the xml descriptor
+				BufferedReader br = new BufferedReader(new FileReader(new File(path)));		
+				while ((buf = br.readLine()) != null){ 
+					descripContent += (buf + "\n");
+				}
+				
+				jTextDescriptor.setText(descripContent);
+				jTextDescriptor.setEditable(false);
+				JScrollPane scrollPane = new JScrollPane(jTextDescriptor);
+				JFrame frame = new JFrame (name);
+				frame.add(scrollPane);
+				frame.setBounds(200, 100, 900, 800);
+				frame.setVisible(true);
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}catch (IOException e2) {
+				e2.printStackTrace();
+			}
         } else if (command == "Kill") {
             try {
                 if (launcher.isActivated()) {
@@ -337,11 +371,12 @@ public class LauncherWindow extends JFrame {
                 menuItem.addActionListener(new GUI_PopupMenuItem_ActionListener(
                         this));
                 popup.add(menuItem);
-                menuItem = new JMenuItem("Edit");
+                
+                menuItem = new JMenuItem("View");
                 menuItem.addActionListener(new GUI_PopupMenuItem_ActionListener(
                         this));
                 popup.add(menuItem);
-                menuItem.setEnabled(false); // TODO not yet implemented
+                //menuItem.setEnabled(true); // TODO not yet implemented
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
