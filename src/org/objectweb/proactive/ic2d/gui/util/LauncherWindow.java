@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.gui.util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -99,6 +100,7 @@ public class LauncherWindow extends JFrame {
     JSplitPane jSplitPane2 = new JSplitPane();
     JPanel jPanel6 = new JPanel();
     BorderLayout borderLayout5 = new BorderLayout();
+    JPanel jPanel61 = new JPanel();
     JPanel jPanel7 = new JPanel();
     BorderLayout borderLayout6 = new BorderLayout();
     JScrollPane jScrollPane1 = new JScrollPane();
@@ -174,9 +176,9 @@ public class LauncherWindow extends JFrame {
         jPanel3.add(graphicalCheckBox);
         jPanel3.add(jobCheckBox);
         jPanel1.add(jPanel6, java.awt.BorderLayout.NORTH);
-        jPanel6.add(jButton1, java.awt.BorderLayout.SOUTH);
+        jPanel61.add(jButton1, java.awt.BorderLayout.CENTER);
+        jPanel6.add(jPanel61, java.awt.BorderLayout.CENTER);
         jSplitPane2.add(jPanel4, JSplitPane.BOTTOM);
-
         jPanel5.add(jLabel2);
         jSplitPane2.add(jPanel1, JSplitPane.TOP);
         jSplitPane2.setResizeWeight(0.5);
