@@ -255,7 +255,7 @@ public class NodeExploration implements JobMonitorConstants {
                     handleNode(pr, jvmObject, vmName, nodeName);
                 }
             }
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             	skippedObjects.addElement(jvmObject);
                 log(e);
             
@@ -333,7 +333,7 @@ public class NodeExploration implements JobMonitorConstants {
 
             asso.addChild(jvmObject, nodeObject);
             asso.addChild(jobObject, nodeObject);
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
         	if(! skippedObjects.contains(jvmObject)){
         		log(e);
         		skippedObjects.addElement(jvmObject);
