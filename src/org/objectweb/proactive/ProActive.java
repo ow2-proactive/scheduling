@@ -384,17 +384,57 @@ public class ProActive {
 
     /** A pool of thread for newActiveINParallel */
     transient private static ThreadPool threadpool;
-   
+
     /**
      * Clean the threadpool used by the newActiveInParallel
      * @see java.lang.Object#finalize()
      */
     protected void finalize() throws Throwable {
-    if (threadpool != null) {
-        threadpool.clean();
+        if (threadpool != null) {
+            threadpool.clean();
+        }
     }
+
+    /**
+     * <p>Create a set of active objects  with given construtor parameters.
+     * The object activation is optimized by a thread pool.</p>
+     * <p>The total of active objects created is equal to the number of nodes
+     * and to the total of constructor paramaters also.</p>
+     * <p>The condition to use this method is that:
+     * <b>constructorParameters.length == nodes.length</b></p>
+     *
+     * @param className the name of the class to instanciate as active.
+     * @param constructorParameters the array that contains the parameters used
+     * to build the active objects. All active objects have the same constructor
+     * parameters.
+     * @param nodes the array of nodes where the active objects are created.
+     * @return an array of references (possibly remote) on Stubs of the newly
+     * created active objects.
+     */
+    public static Object[] newActiveInParallel(String className,
+        Object[][] constructorParameters, Node[] nodes) {
+        if (constructorParameters.length != nodes.length) {
+            throw new ProActiveRuntimeException(
+                "The total of constructors must" +
+                " be equal to the total of nodes");
+        }
+
+        // Creation of the thread pool
+        if (threadpool == null) {
+            threadpool = new ThreadPool();
+        }
+        Vector result = new Vector();
+
+        // The Virtual Node is already activate
+        for (int i = 0; i < constructorParameters.length; i++) {
+            threadpool.addAJob(new ProcessForAoCreation(result, className,
+                    constructorParameters[i], nodes[i % nodes.length]));
+        }
+        threadpool.complete();
+
+        return result.toArray(new Object[result.size()]);
     }
-    
+
     /**
      * <p>Create a set of identical active objects on a given virtual node. The
      * object activation is optimized by a thread pool.</p>
@@ -402,13 +442,13 @@ public class ProActive {
      * employ the node creation event producer/listerner mechanism joined to the
      * thread pool. That aims to create an active object just after the node
      * deploying.</p>
-     * 
+     *
      * @param className the name of the class to instanciate as active.
      * @param constructorParameters the array that contains the parameters used
      * to build the active objects. All active objects have the same constructor
      * parameters.
      * @param virtualNode the virtual node where the active objects are created.
-     * @return an array of references (possibly remote) on Stubs of the newly 
+     * @return an array of references (possibly remote) on Stubs of the newly
      * created active objects.
      * @throws NodeException happens when the given virtualNode is already
      * activated and throws an exception.

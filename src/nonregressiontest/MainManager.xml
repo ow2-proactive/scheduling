@@ -54,8 +54,9 @@
 			<unitTest exclude="no" class="nonregressiontest.group.barrier.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.accessbyname.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.equality.Test" />
-			<unitTest class="nonregressiontest.activeobject.creation.parallel.TestVnActivated" />
-			<unitTest class="nonregressiontest.activeobject.creation.parallel.TestVnNotActivated" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnActivated" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnNotActivated" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestArrayOfArray" />
 			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>

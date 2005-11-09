@@ -81,16 +81,17 @@ public class TestVnNotActivated extends FunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        this.vn.killAll(false);
     }
 
     public boolean postConditions() throws Exception {
         if ((this.aos == null) || (this.aos.length != 4)) {
+            this.vn.killAll(false);
             return false;
         }
         for (int i = 0; i < this.aos.length; i++) {
             ((A) aos[i]).getNodeUrl();
         }
+        this.vn.killAll(false);
         return true;
     }
 }

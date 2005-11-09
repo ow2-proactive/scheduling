@@ -44,29 +44,42 @@ import testsuite.test.FunctionalTest;
  *
  * Created on Nov 8, 2005
  */
-public class TestVnActivated extends FunctionalTest {
-    private static final String XML_PATH = TestVnActivated.class.getResource(
+public class TestArrayOfArray extends FunctionalTest {
+    private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/nonregressiontest/activeobject/creation/parallel/4_local.xml")
-                                                                .getPath();
+                                                                   .getPath();
     private Object[] aos;
     private VirtualNode vn;
 
-    public TestVnActivated() {
-        super("newActiveInParallel (VN activated)",
+    public TestArrayOfArray() {
+        super("newActiveInParallel with an array of params",
             "Test newActiveInParallel method" +
-            " with the virtual node has been activated");
+            " with an array for constructor parameters");
     }
 
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        this.aos = ProActive.newActiveInParallel(A.class.getName(),
-                new Object[] { "toto" }, vn);
-    }
-
-    public boolean preConditions() throws Exception {
-        return this.vn.isActivated();
+        try {
+            this.aos = ProActive.newActiveInParallel(A.class.getName(),
+                    new Object[][] {
+                        { "toto" },
+                        { "tata" }
+                    }, vn.getNodes());
+        } catch (Exception e) {
+            this.aos = ProActive.newActiveInParallel(A.class.getName(),
+                    new Object[][] {
+                        { "toto" },
+                        { "tata" },
+                        { "titi" },
+                        { "tutu" }
+                    }, vn.getNodes());
+            return;
+        }
+        throw new Exception(
+            "The total of constructors must be equal to the total of nodes" +
+            " NOT VERIFIED");
     }
 
     /**
@@ -74,14 +87,8 @@ public class TestVnActivated extends FunctionalTest {
      */
     public void initTest() throws Exception {
         ProActiveDescriptor padForActiving = ProActive.getProactiveDescriptor(XML_PATH);
-        this.vn = padForActiving.getVirtualNode("Workers01");
+        this.vn = padForActiving.getVirtualNode("Workers03");
         this.vn.activate();
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    public void endTest() throws Exception {
     }
 
     public boolean postConditions() throws Exception {
@@ -89,10 +96,26 @@ public class TestVnActivated extends FunctionalTest {
             this.vn.killAll(false);
             return false;
         }
-        for (int i = 0; i < this.aos.length; i++) {
-            ((A) aos[i]).getNodeUrl();
+        if (((A) aos[0]).getName().compareTo("toto") != 0) {
+            this.vn.killAll(false);
+            return false;
+        }
+        if (((A) aos[1]).getName().compareTo("tata") != 0) {
+            this.vn.killAll(false);
+            return false;
+        }
+        if (((A) aos[2]).getName().compareTo("titi") != 0) {
+            this.vn.killAll(false);
+            return false;
+        }
+        if (((A) aos[3]).getName().compareTo("tutu") != 0) {
+            this.vn.killAll(false);
+            return false;
         }
         this.vn.killAll(false);
         return true;
+    }
+
+    public void endTest() throws Exception {
     }
 }

@@ -6,6 +6,7 @@
 		<virtualNodesDefinition>
 			<virtualNode name="Workers01" property="multiple" />
 			<virtualNode name="Workers02" property="multiple" />
+			<virtualNode name="Workers03" property="multiple" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -24,6 +25,14 @@
 					<vmName value="Jvm22" />
 					<vmName value="Jvm23" />
 					<vmName value="Jvm24" />
+				</jvmSet>
+			</map>
+			<map virtualNode="Workers03">
+				<jvmSet>
+					<vmName value="Jvm31" />
+					<vmName value="Jvm32" />
+					<vmName value="Jvm33" />
+					<vmName value="Jvm34" />
 				</jvmSet>
 			</map>
 		</mapping>
@@ -64,6 +73,26 @@
 				</creation>
 			</jvm>
 			<jvm name="Jvm24">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm31">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm32">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm33">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm34">
 				<creation>
 					<processReference refid="localJVM" />
 				</creation>
