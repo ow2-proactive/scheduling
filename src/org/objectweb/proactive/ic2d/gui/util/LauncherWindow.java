@@ -255,7 +255,7 @@ public class LauncherWindow extends JFrame {
     public void doPopupCall(ActionEvent e)  {
         String command = e.getActionCommand();
         Launcher launcher = (Launcher) (descriptorMap.get(descriptorList.getSelectedValue()));
-        if (command == "Launch the application") {
+        if (command.equals("Launch the application")) {
             if (!launcher.isActivated()) {
                 try {
                     // activate the launcher
@@ -290,17 +290,20 @@ public class LauncherWindow extends JFrame {
                     ex.printStackTrace();
                 }
             }
-        } else if (command == "Remove the descriptor") {
+        } else if (command.equals("Remove the descriptor")) {
             ListCell cell = ((ListCell) descriptorList.getSelectedValue());
             descriptorMap.remove(cell);
             descriptorsToLaunch.remove(cell);
             descriptorList.setListData(descriptorsToLaunch);
             
-        }else if (command == "View") {
+        }else if (command.equals("View")) {
         	try {
         		//gets the path and the name of the xml descripor
         		String descripContent = new String(), buf;
         		String path = ((ListCell) descriptorList.getSelectedValue()).getContent();
+        		if(path.endsWith("- activated")) {
+        			path = path.substring(0, path.indexOf(" - activated"));
+        		}
         		String [] tab = path.split(System.getProperty("file.separator"));
         		String name = tab[tab.length-1];
         		
@@ -314,7 +317,7 @@ public class LauncherWindow extends JFrame {
 				jTextDescriptor.setEditable(false);
 				JScrollPane scrollPane = new JScrollPane(jTextDescriptor);
 				JFrame frame = new JFrame (name);
-				frame.add(scrollPane);
+				frame.getContentPane().add(scrollPane);
 				frame.setBounds(200, 100, 900, 800);
 				frame.setVisible(true);
 			} catch (FileNotFoundException e1) {
@@ -322,7 +325,7 @@ public class LauncherWindow extends JFrame {
 			}catch (IOException e2) {
 				e2.printStackTrace();
 			}
-        } else if (command == "Kill") {
+        } else if (command.equals("Kill")) {
             try {
                 if (launcher.isActivated()) {
                     launcher.getProActiveDescriptor().killall(true);
@@ -376,7 +379,6 @@ public class LauncherWindow extends JFrame {
                 menuItem.addActionListener(new GUI_PopupMenuItem_ActionListener(
                         this));
                 popup.add(menuItem);
-                //menuItem.setEnabled(true); // TODO not yet implemented
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
