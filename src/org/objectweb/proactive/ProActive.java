@@ -237,7 +237,6 @@ public class ProActive {
      * created with the default constructor
      * @param classname
      * @param node
-     * @return new instance
      * @throws ClassNotFoundException
      * @throws ProActiveException
      */
