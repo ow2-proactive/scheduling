@@ -17,7 +17,7 @@
 				</jvmSet>
 			</map>
 		</mapping>
-		<lookup virtualNode="Dispatcher" host="*" protocol="rmi" port="1099"/>
+		<lookup virtualNode="Dispatcher" host="*" protocol="rmi" port="*"/>
 	</deployment>
 	<infrastructure>
 		<processes>
