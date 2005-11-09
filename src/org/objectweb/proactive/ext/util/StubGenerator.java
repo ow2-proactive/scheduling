@@ -48,20 +48,17 @@ public class StubGenerator {
     protected static String processClassName(String name) {
         int i = name.indexOf(".class");
         String tmp = name;
-        System.out.println(name);
         if (i < 0) {
             return name;
-        } else {
-            tmp = name.substring(0, i);
         }
+        tmp = name.substring(0, i);
 
         String tmp2 = tmp.replace(File.separatorChar, '.');
 
         if (tmp2.indexOf('.') == 0) {
             return tmp2.substring(1);
-        } else {
-            return tmp2;
         }
+        return tmp2;
     }
 
     public static void printUsageAndExit() {
@@ -112,7 +109,6 @@ public class StubGenerator {
     protected static void generateClass(String arg, String directoryName) {
         String className = processClassName(arg);
         String fileName = null;
-        System.out.println("Now processing " + className);
 
         String stubClassName;
 
@@ -151,7 +147,6 @@ public class StubGenerator {
             fos.write(data);
             fos.flush();
             fos.close();
-            System.out.println("Wrote file " + fileName);
         } catch (ClassNotFoundException e) {
             System.err.println("Cannot find class " + className);
         } catch (Exception e) {
