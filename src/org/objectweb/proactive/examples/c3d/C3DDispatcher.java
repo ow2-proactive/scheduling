@@ -582,7 +582,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             this.election.terminate();
             this.election = null; // so as not to be reused.
         } else {
+        	if(nbUsers != 0){
             this.election.setNbUsers(nbUsers);
+        	}
         }
     }
 
