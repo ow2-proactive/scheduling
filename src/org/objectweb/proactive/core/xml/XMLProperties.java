@@ -228,7 +228,7 @@ public class XMLProperties {
                     " already exist in the list of properties !");
             }
             try {
-                String jvmValue = System.getProperty(value);
+                String jvmValue = System.getProperty(name);
                 value = new String(jvmValue);
             } catch (Exception ex) {
                 throw new org.xml.sax.SAXException("Property XML " + name +
