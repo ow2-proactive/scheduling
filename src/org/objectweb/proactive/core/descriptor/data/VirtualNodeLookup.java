@@ -61,6 +61,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     private String name;
     private String urlForLookup;
     private String lookupProtocol;
+    private String lookupHost;
     private boolean isActivated = false;
 
     //we use 1099 as default port
@@ -68,6 +69,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     private String message = "########## Calling this method on a VirtualNodeLookup has no sense, since such VirtualNode object references a remote VirtualNode ##########";
     private String notActivatedMessage = "This VirtualNode lookup is not yet activated. Activate it first";
     protected String runtimeHostForLookup = "LOOKUP_HOST";
+    protected String runtimePortForLookup = "LOOKUP_PORT";
 
     public VirtualNodeLookup(String name) {
         this.name = name;
@@ -310,6 +312,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             checkProperty(information);
         } catch (ProActiveException e) {
             throw new ProActiveException("only " + runtimeHostForLookup +
+                " and" + runtimePortForLookup +
                 " property can be set at runtime", e);
         }
         performTask(information, value);
@@ -322,15 +325,19 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     //	public void  lookForProperty(DeploymentPropertiesEvent event){
     //		
     //	}
-    public void setLookupInformations(String url, String protocol, int port) {
-        this.urlForLookup = url;
-
-        if (urlForLookup.indexOf("*") > -1) {
-            runtimeProperties.add(runtimeHostForLookup);
-        }
-
+    public void setLookupInformations(String host, String protocol, String port) {
+        //this.urlForLookup = url;
         this.lookupProtocol = protocol;
-        this.portForLookup = port;
+        if (host.indexOf("*") > -1) {
+            runtimeProperties.add(runtimeHostForLookup);
+        } else {
+            this.lookupHost = host;
+        }
+        if (port.indexOf("*") > -1) {
+            runtimeProperties.add(runtimePortForLookup);
+        } else {
+            this.portForLookup = new Integer(port).intValue();
+        }
     }
 
     /**
@@ -362,9 +369,14 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
 
     private void performTask(String information, String value) {
         if (information.equals(runtimeHostForLookup)) {
-            urlForLookup = UrlBuilder.buildUrl(value, this.name,
+            this.lookupHost = value;
+        } else {
+            this.portForLookup = new Integer(value).intValue();
+        }
+        runtimeProperties.remove(information);
+        if (!isWaitingForProperties()) {
+            this.urlForLookup = UrlBuilder.buildUrl(this.lookupHost, this.name,
                     this.lookupProtocol, this.portForLookup);
-            runtimeProperties.remove(runtimeHostForLookup);
             activate();
         }
     }

@@ -137,7 +137,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                     "within a lookup tag attribute host must be defined for rmi protocol");
             }
             protocol = UrlBuilder.checkProtocol(protocol);
-            String url = UrlBuilder.buildUrl(host, vnLookup, protocol);
+            // String url = UrlBuilder.buildUrl(host, vnLookup, protocol);
             VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup,
                     true);
 
@@ -150,14 +150,11 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                     throw new org.xml.sax.SAXException(
                         "For a jini lookup, no port number should be specified");
                 }
-                url = UrlBuilder.buildUrl(host, vnLookup, protocol,
-                        new Integer(port).intValue());
-                vn.setLookupInformations(url, protocol,
-                    new Integer(port).intValue());
+                vn.setLookupInformations(host, protocol, port);
                 //if no port is specified we use 1099 since it is the default port. Even if it is jini
                 // the UrlBuilder will not use the port when building the url
             } else {
-                vn.setLookupInformations(url, protocol, 1099);
+                vn.setLookupInformations(host, protocol, "1099");
             }
         }
     }
