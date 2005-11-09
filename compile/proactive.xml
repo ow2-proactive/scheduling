@@ -950,7 +950,7 @@
     ==  Tests coverage : need clover license in user.home directory
     ==
     ================================================================-->
-    
+  <!-- Commented for the release
   <property name="coverage.dir" value="${base}/compile/coverage"/>
 
   	<path id="coverage.classpath">
@@ -981,8 +981,8 @@
   
   
   <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
- 	 <delete file="${base}/compile/tests.log"/>
-	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
+ 	 <delete file="${base}/compile/tests.log"/>-->
+	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file 
 	 <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
 	  <java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="coverage.classpath"/>
@@ -995,7 +995,7 @@
             <format type="html"/>
          </current>
       </clover-report>
- </target>
+ </target> -->
  
 	  <!-- ==================================================================== -->
 	  <!-- Formats the project sources                                          -->
