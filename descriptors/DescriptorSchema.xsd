@@ -435,7 +435,8 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:complexContent>
 			<xs:extension base="RegisterType">
 				<xs:attribute name="host" type="xs:string" use="required"/>
-				<xs:attribute name="port" type="xs:positiveInteger" use="optional"/>
+				<!-- should be integer for the port, but * would not be supported-->
+				<xs:attribute name="port" type="xs:string" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -887,24 +888,23 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	
 	<!--gLiteProcess element has six children: processReference element, gLiteOptions which contains JDLFilePath child and SdtOutput child 
 	environment, rank, inputData, requirements-->
 	<!--Environment : List of string representing environment settings that hava to be performed on the execution machine.-->
 	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
 	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
 	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
-	<xs:complexType name="gLiteProcessType" >
+	<xs:complexType name="gLiteProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
-			<xs:element name="environment" type="xs:string" minOccurs="0"/>			
-			<xs:element name="requirements" type="xs:string" minOccurs="0"/>			
-			<xs:element name="inputData" type="gLiteInputDataType"  minOccurs="0"/>
+			<xs:element name="environment" type="xs:string" minOccurs="0"/>
+			<xs:element name="requirements" type="xs:string" minOccurs="0"/>
+			<xs:element name="inputData" type="gLiteInputDataType" minOccurs="0"/>
 			<xs:element name="rank" minOccurs="0">
 				<xs:complexType>
 					<xs:simpleContent>
 						<xs:extension base="xs:string">
-							<xs:attribute name="fuzzyrank" type="xs:string" />
+							<xs:attribute name="fuzzyrank" type="xs:string"/>
 						</xs:extension>
 					</xs:simpleContent>
 				</xs:complexType>
@@ -916,12 +916,12 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="hostname" type="xs:string"/>
 		<xs:attribute name="virtualOrganisation" type="xs:string" use="required"/>
 		<xs:attribute name="JDLFileName" type="xs:string" use="required"/>
-		<xs:attribute name="Type"  type="xs:string" default="Job"/>
-		<xs:attribute name="executable" type="xs:string" default="/bin/sh" />
+		<xs:attribute name="Type" type="xs:string" default="Job"/>
+		<xs:attribute name="executable" type="xs:string" default="/bin/sh"/>
 		<xs:attribute name="stdOutput" type="xs:string" default="job.log"/>
 		<xs:attribute name="stdInput" type="xs:string"/>
 		<xs:attribute name="stdError" type="xs:string" default="error.log"/>
-		<xs:attribute name="outputse" type="xs:string" />
+		<xs:attribute name="outputse" type="xs:string"/>
 		<xs:attribute name="retryCount" type="xs:string"/>
 		<xs:attribute name="myProxyServer" type="xs:string"/>
 	</xs:complexType>
@@ -931,10 +931,9 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	</xs:complexType>
 	<!--gLiteInputDataType-->
 	<xs:complexType name="gLiteInputDataType">
-		<xs:attribute name="dataAccessProtocol" type="xs:string">
-		</xs:attribute>
-		<xs:attribute name="storageIndex" type="xs:string" />
-		<xs:attribute name="dataCatalog" type="xs:string" />		
+		<xs:attribute name="dataAccessProtocol" type="xs:string"/>
+		<xs:attribute name="storageIndex" type="xs:string"/>
+		<xs:attribute name="dataCatalog" type="xs:string"/>
 	</xs:complexType>
 	<!--gLiteJobType-->
 	<xs:complexType name="gLiteJobType">
@@ -977,7 +976,6 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		</xs:sequence>
 	</xs:complexType>
 	<!-- end of gLiteProcessType -->
-	
 	<!--prunProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, prunOption element that may not appear and represents different options of prun command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.prun.PrunSubProcess, interactive which is optinal to run prun command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run prun command-->
 	<xs:complexType name="prunProcessType">
 		<xs:sequence>
@@ -1084,7 +1082,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
-		<!--	<xs:element ref="commandPath" minOccurs="0"/>-->
+			<!--	<xs:element ref="commandPath" minOccurs="0"/>-->
 			<xs:element name="globusOption" type="GlobusOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.globus.GlobusProcess"/>
