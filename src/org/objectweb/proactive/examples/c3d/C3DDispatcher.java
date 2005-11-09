@@ -109,7 +109,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     private Election election;
 
     /** The object serving requests   */
-    private Service service;
+    private transient Service service;
 
     /** The no-argument Constructor as commanded by ProActive; otherwise unused */
     public C3DDispatcher() {
@@ -129,11 +129,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
      */
     public void go() {
         this.me = (Dispatcher) ProActive.getStubOnThis();
-        try {
-            ProActive.register(me, "//localhost/Dispatcher");
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
 
         this.gui = new DispatcherGUIImpl("C3D Dispatcher",
                 (DispatcherLogic) this.me);
@@ -723,6 +718,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                 for (int j = 0; j < 16; j++) {
                     if (service.hasRequestToServe("doBenchmarks")) {
                         break;
+                        
                     }
                     rotateScene(0, rotation);
                     timer.start();
@@ -767,9 +763,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                 name = (String) couple[1];
                 engineAndStringTable.remove(i);
                 if (engineVector.remove(engine)) {
-                    System.out.println("Found engine in vector, removed!");
+                    logger.debug("Found engine in vector, removed!");
                 } else {
-                    System.out.println("engine not found in vector!");
+                    logger.debug("Engine not found in vector!");
                 }
                 break;
             }
@@ -789,13 +785,11 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             this.gui.noEngines();
 
             int length = engineAndStringTable.size();
-            System.out.println("Adding " + length + " engines to GUI");
             for (int i = 0; i < length; i++) {
                 Object[] couple = (Object[]) engineAndStringTable.get(i);
                 gui.addUsedEngine((String) couple[1]);
                 turnOnEngine((String) couple[1]);
             }
-            System.out.println("Added engines to GUI");
         }
     }
 

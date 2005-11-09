@@ -30,25 +30,27 @@
  */
 package org.objectweb.proactive.examples.c3d.gui;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.examples.c3d.C3DDispatcher;
+import org.objectweb.proactive.examples.c3d.Dispatcher;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
+
 import java.rmi.UnknownHostException;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.examples.c3d.C3DDispatcher;
-import org.objectweb.proactive.examples.c3d.Dispatcher;
 
 
 /**
@@ -56,8 +58,7 @@ import org.objectweb.proactive.examples.c3d.Dispatcher;
  * Handles incorrect entries.
  * Inspired from the java Swing Dialog tutorial
  */
-public class NameAndHostDialog extends JDialog implements ActionListener,
-    PropertyChangeListener {
+public class NameAndHostDialog extends JDialog implements ActionListener, PropertyChangeListener {
     private String userName = null;
     private String hostName = null;
     private JTextField userTextField;
@@ -66,9 +67,15 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
     private String enterButtonString = "Enter";
     private String cancelButtonString = "Cancel";
     private Dispatcher c3dDispatcher;
+    private VirtualNode dispatcherVN;
+    private int portNumber;
 
-    public NameAndHostDialog(String localHost) {
+    public NameAndHostDialog(String localHost, VirtualNode dispatcherVN) {
         super();
+
+        this.hostName = localHost;
+        this.dispatcherVN = dispatcherVN;
+
         setTitle("Welcome to the Collaborative 3D Environment.");
 
         userTextField = new JTextField(10);
@@ -76,27 +83,26 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         userTextField.addActionListener(this);
 
         hostNameTextField = new JTextField(10);
-        hostNameTextField.setText(localHost);
+        hostNameTextField.setText(this.hostName);
         hostNameTextField.addActionListener(this);
 
         //Create an array of the text and components to be displayed.
-        Object[] array = {
-                "Please enter your name,", userTextField,
-                "and the C3DDispatcher host", hostNameTextField
-            };
+        Object[] array = { "Please enter your name,", userTextField, "and the C3DDispatcher host", hostNameTextField };
 
         //Create an array specifying the number of dialog buttons and their text.
         Object[] options = { enterButtonString, cancelButtonString };
 
         //Create the JOptionPane.
-        optionPane = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE,
-                JOptionPane.YES_NO_OPTION, null, options, options[0]);
+        optionPane = new JOptionPane(
+                array, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null, options,
+                options[0]);
 
         //Make this dialog display it.
         setContentPane(optionPane);
 
         //Handle window closing correctly.
-        addWindowListener(new WindowAdapter() {
+        addWindowListener(
+            new WindowAdapter() {
                 public void windowClosing(WindowEvent we) {
                     // handle closing behavior in propertyChange () 
                     optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
@@ -104,7 +110,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             });
 
         //Ensure the text field always gets the first focus.
-        addComponentListener(new ComponentAdapter() {
+        addComponentListener(
+            new ComponentAdapter() {
                 public void componentShown(ComponentEvent ce) {
                     userTextField.requestFocusInWindow();
                 }
@@ -126,7 +133,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
     public void propertyChange(PropertyChangeEvent event) {
         String prop = event.getPropertyName();
 
-        if (isVisible() && (event.getSource() == optionPane) &&
+        if (
+            isVisible() && (event.getSource() == optionPane) &&
                 (JOptionPane.VALUE_PROPERTY.equals(prop) ||
                 JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))) {
             Object value = optionPane.getValue();
@@ -145,26 +153,31 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
                 if (this.userName.equals("")) { //userName text was invalid
                     userName = "Bob";
                 }
-                this.hostName = hostNameTextField.getText();
+
+                this.portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
 
                 try {
-                    this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(),
-                            "//" + hostName + "/Dispatcher");
+                    this.hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
+
+                    this.dispatcherVN.setRuntimeInformations("LOOKUP_HOST", this.hostName);
+                    this.dispatcherVN.setRuntimeInformations("LOOKUP_PORT", this.portNumber + "");
+                    this.c3dDispatcher = (C3DDispatcher) dispatcherVN.getUniqueAO();
                     setVisible(false);
-                } catch (UnknownHostException exception) {
-                    treatException(exception,
-                        "Sorry, could not connect to host \"" + hostName +
-                        "\".\nMaybe you should check for typos?");
-                } catch (IOException exception) {
-                    treatException(exception,
-                        "Sorry, could not find a registered C3DDispatcher on host \"" +
-                        hostName +
-                        "\".\nMaybe you should create one, or try another host?");
+                    this.dispatcherVN = null ; // this reference is no longer needed!
                 } catch (ActiveObjectCreationException exception) {
-                    exception.printStackTrace(); // this exception is a problem, for sure!
-                    treatException(exception,
-                        "Sorry, could not create stub for C3DDispatcher on host \"" +
-                        hostName + "\".");
+                    System.err.println("TROUBLE AOC AHEAD");
+                    //exception.printStackTrace(); // this exception is a problem, for sure!
+                    treatException(
+                        exception,
+                        "Sorry, could not create stub for C3DDispatcher on host \"" + hostName +
+                        "\".");
+                    //} catch (ProActiveException exception) {
+                } catch (Exception exception) {
+                    //exception.printStackTrace(); // this exception is a problem, for sure!
+                    treatException(
+                        exception,
+                        "Sorry, could not find a registered C3DDispatcher on host \"" + hostName +
+                        "\".");
                 }
             } else { //user closed dialog or clicked cancel
                 userName = hostName = null;
@@ -173,13 +186,16 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         }
     }
 
+    /** Take action against failed connections to Dispatcher.
+     * In next versions, this will NOT use System.exit*/
     private void treatException(Exception exception, String message) {
         hostNameTextField.selectAll();
-        JOptionPane.showMessageDialog(NameAndHostDialog.this,
-            message + "\nError is \n " + exception.getMessage(), "Try again",
+        JOptionPane.showMessageDialog(
+            NameAndHostDialog.this, message + "\nError is \n " + exception.getMessage(), "Try again",
             JOptionPane.ERROR_MESSAGE);
         hostName = null;
-        hostNameTextField.requestFocusInWindow();
+        //hostNameTextField.requestFocusInWindow();
+        System.exit(-1);
     }
 
     /** Always contains some characters, default value is Bob. */
