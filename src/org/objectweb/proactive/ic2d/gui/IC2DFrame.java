@@ -46,11 +46,11 @@ import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorFrame;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.MonitoredObjectsList;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.gui.util.HostDialog;
-import org.objectweb.proactive.ic2d.gui.util.LauncherFrame;
 import org.objectweb.proactive.ic2d.gui.util.LauncherWindow;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
@@ -191,11 +191,12 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         String jobId = proActiveRuntimeRegistered.getJobID();
         MonitoredJob monitoredJob = new MonitoredJob(jobId);
-        
+
         String full_host = host;
         if (port != 0) {
-        	full_host = host+":"+port;
+            full_host = host + ":" + port;
         }
+
         // monitor the host where is launched the runtime
         if (launcherFrame.isGraphicalMonitoring()) {
             ic2dPanel.getWorldPanel().monitoredHostAdded(full_host, protocol);
@@ -427,6 +428,22 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         //
         //    monitoringMenu.addSeparator();
         // Edit the filter list
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Show skipped hosts");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        MonitorThread mon = IC2DFrame.this.getIc2dPanel()
+                                                          .getWorldPanel()
+                                                          .getMonitorThread();
+                        MonitoredObjectsList dialog = new MonitoredObjectsList(IC2DFrame.this,
+                                mon);
+                        dialog.setVisible(true);
+                    }
+                });
+            b.setToolTipText("Stop monitoring some hosts");
+            monitoringMenu.add(b);
+        }
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
                     "Show filtered classes");

@@ -39,7 +39,6 @@ import org.objectweb.proactive.ic2d.gui.data.WorldPanel;
 import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class DialogUtils {

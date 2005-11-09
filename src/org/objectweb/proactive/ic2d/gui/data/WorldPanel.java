@@ -43,7 +43,6 @@ import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.util.MonitorThread;

@@ -47,17 +47,43 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 
+import org.objectweb.proactive.ic2d.gui.IC2DFrame;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class MonitoredObjectsList extends JDialog {
     private DefaultListModel monitoredListModel;
     private DefaultListModel skippedListModel;
+
+    /* For IC2D */
+    private MonitorThread monitor;
+
+    /* Job Monitor */
     private JobMonitorPanel jobPanel;
 
+    /* For IC2D */
+    public MonitoredObjectsList(IC2DFrame owner, MonitorThread mon) {
+        super(owner, true);
+
+        this.monitor = mon;
+        this.jobPanel = null;
+        this.monitoredListModel = null;
+        this.skippedListModel = mon.getSkippedObjects(JobMonitorConstants.HOST);
+
+        JTabbedPane tabbedPane = init();
+
+        addPane(tabbedPane, "Skipped hosts", "Remove host", skippedListModel);
+
+        pack();
+    }
+
+    /* For the Job Monitor */
     public MonitoredObjectsList(JobMonitorFrame owner, JobMonitorPanel jobPanel) {
         super(owner, true);
 
+        this.monitor = null;
         this.jobPanel = jobPanel;
         monitoredListModel = copyList(null, jobPanel.getMonitoredHosts());
         skippedListModel = copyList(null, jobPanel.getSkippedObjects());
@@ -173,8 +199,22 @@ public class MonitoredObjectsList extends JDialog {
     }
 
     private void ok() {
-        copyList(jobPanel.getMonitoredHosts(), monitoredListModel);
-        copyList(jobPanel.getSkippedObjects(), skippedListModel);
+        if (monitoredListModel == null) {
+
+            /* IC2D */
+            DefaultListModel origSkippedHosts = monitor.getSkippedObjects(JobMonitorConstants.HOST);
+            for (int i = 0, size = origSkippedHosts.getSize(); i < size; i++) {
+                MonitoredHost h = (MonitoredHost) origSkippedHosts.get(i);
+                if (!skippedListModel.contains(h)) {
+                    monitor.removeObjectToSkip(h);
+                }
+            }
+        } else {
+
+            /* Job Monitor */
+            copyList(jobPanel.getMonitoredHosts(), monitoredListModel);
+            copyList(jobPanel.getSkippedObjects(), skippedListModel);
+        }
         setVisible(false);
     }
 }

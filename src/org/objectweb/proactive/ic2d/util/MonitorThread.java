@@ -42,7 +42,6 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.NodeExploration;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 
 
 /**
@@ -193,6 +192,7 @@ public class MonitorThread {
      * @param hostObject monitored host
      */
     public void addMonitoredHost(MonitoredHost hostObject) {
+        skippedObjects.removeElement(hostObject);
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);
             if (monitoredHosts.size() == 1) {
@@ -232,6 +232,18 @@ public class MonitorThread {
      */
     public void removeObjectToSkip(BasicMonitoredObject object) {
         skippedObjects.removeElement(object);
+    }
+
+    public DefaultListModel getSkippedObjects(int key) {
+        DefaultListModel list = new DefaultListModel();
+        for (int i = 0, size = skippedObjects.getSize(); i < size; i++) {
+            BasicMonitoredObject o = (BasicMonitoredObject) skippedObjects.get(i);
+            if (o.getKey() == key) {
+                list.addElement(o);
+            }
+        }
+
+        return list;
     }
 
     public void updateHosts() {

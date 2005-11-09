@@ -228,6 +228,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
     public void addMonitoredHost(String host, int port) {
         MonitoredHost hostObject = new MonitoredHost(host, port, "rmi:");
+        skippedObjects.removeElement(hostObject);
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);
             if (monitoredHosts.size() == 1) {
