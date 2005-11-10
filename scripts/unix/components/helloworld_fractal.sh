@@ -2,6 +2,9 @@
 
 echo
 echo --- Fractal Helloworld example ---------------------------------------------
+echo --- 
+echo --- The expected result is an exception
+echo --- 
 
 if [ -z "$PROACTIVE" ]
 then

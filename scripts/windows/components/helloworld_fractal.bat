@@ -1,6 +1,9 @@
 @echo off
 echo. 
 echo --- Fractal HelloWorld example ----------------------------------------
+echo --- 
+echo --- The expected result is an exception
+echo --- 
 rem if "%1" == "help" goto usage
 
 goto doit
