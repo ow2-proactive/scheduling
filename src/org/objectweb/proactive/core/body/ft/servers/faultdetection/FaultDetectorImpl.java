@@ -80,7 +80,7 @@ public class FaultDetectorImpl implements FaultDetector {
         Object res = null;
         try {
             res = body.receiveFTMessage(FaultDetectorImpl.hbe);
-        } catch (IOException e) {
+        } catch (Exception e) {
             // object is unreachable
             return true;
         }
