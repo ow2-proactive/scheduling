@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.group;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -43,11 +44,11 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     private ProxyForGroup proxyGroup;
     private String className;
     private Object[] param;
-    private String node;
+    private Node node;
     private int index;
 
     public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className,
-        Object[] param, String node, int index) {
+        Object[] param, Node node, int index) {
         this.proxyGroup = proxyGroup;
         this.className = className;
         this.param = param;

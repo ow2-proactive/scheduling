@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -177,6 +176,111 @@ public class ProSPMD {
         return ProSPMD.newSPMDGroup(className, params, virtualNode.getNodes());
     }
 
+    // -------------------------------------------------------------------------
+    // InParallel OOSPMD constructors
+    // -------------------------------------------------------------------------
+
+    /**
+     * Creates an object representing a spmd group (a typed group) and creates all members with params on the node.
+     * @param className - the name of the (upper) class of the group's member.
+     * @param params - the array that contain the parameters used to build the group's member.
+     * @param nodeName - the name (String) of the node where the members are created.
+     * @return a typed group with its members.
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newSPMDGroupInParallel(String className,
+        Object[][] params, String nodeName)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = NodeFactory.getNode(nodeName);
+        return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a spmd group (a typed group) and creates members with params cycling on nodeList.
+     * @param className - the name of the (upper) class of the group's member.
+     * @param params - the array that contain the parameters used to build the group's member.
+     * @param nodeListString - the names of the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newSPMDGroupInParallel(String className,
+        Object[][] params, String[] nodeListString)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            NodeException {
+        Node[] nodeList = new Node[nodeListString.length];
+        for (int i = 0; i < nodeListString.length; i++)
+            nodeList[i] = NodeFactory.getNode(nodeListString[i]);
+        return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a spmd group (a typed group) and creates all members with params on the node.
+     * @param className - the name of the (upper) class of the group's member.
+     * @param params - the array that contain the parameters used to build the group's member.
+     * @param node - the node where the members are created.
+     * @return a typed group with its members.
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     */
+    public static Object newSPMDGroupInParallel(String className,
+        Object[][] params, Node node)
+        throws ClassNotFoundException, ClassNotReifiableException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = node;
+        return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a spmd group (a typed group) and creates members with params cycling on the nodes of the virtual node.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params - the array that contain the parameters used to build the group's member.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param virtualNode - the virtual where the members are created.
+     * @return a typed group with its members.
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newSPMDGroupInParallel(String className,
+        Object[][] params, VirtualNode virtualNode)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            NodeException {
+        return ProSPMD.newSPMDGroupInParallel(className, params,
+            virtualNode.getNodes());
+    }
+
+    /**
+     * Creates an object representing a spmd group (a typed group) and creates members with params cycling on nodeList.
+     * @param className - the name of the (upper) class of the group's member.
+     * @param params the array that contain the parameters used to build the group's member.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param nodeList - the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     */
+    public static Object newSPMDGroupInParallel(String className,
+        Object[][] params, Node[] nodeList)
+        throws ClassNotFoundException, ClassNotReifiableException {
+        Object result = ProActiveGroup.newGroup(className);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, params, nodeList);
+
+        proxy.setSPMDGroup(result);
+
+        return result;
+    }
+
+    // -------------------------------------------------------------------------
+    // End InParallel
+    // -------------------------------------------------------------------------
     //    /**
     //     * Set the SPMD group for this
     //     * @param o - the new SPMD group
@@ -249,7 +353,7 @@ public class ProSPMD {
      */
     public static void barrier(String[] methodNames) {
         try {
-            ((StubObject) ProActive.getStubOnThis()).getProxy().reify(new MethodCallBarrierWithMethodName(
+            (ProActive.getStubOnThis()).getProxy().reify(new MethodCallBarrierWithMethodName(
                     methodNames));
         } catch (InvocationTargetException e) {
             System.err.println(

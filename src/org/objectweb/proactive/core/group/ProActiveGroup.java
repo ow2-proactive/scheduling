@@ -472,11 +472,12 @@ public class ProActiveGroup {
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        String[] nodeListString = new String[nodeList.length];
-        for (int i = 0; i < nodeList.length; i++)
-            nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
-            params, nodeListString);
+        Object result = ProActiveGroup.newGroup(className);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, params, nodeList);
+
+        return result;
     }
 
     /**
@@ -497,12 +498,11 @@ public class ProActiveGroup {
         Object[][] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
-
-        proxy.createMemberWithMultithread(className, params, nodeList);
-
-        return result;
+        Node[] nodeListString = new Node[nodeList.length];
+        for (int i = 0; i < nodeList.length; i++)
+            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
+            params, nodeListString);
     }
 
     /**
@@ -545,12 +545,11 @@ public class ProActiveGroup {
         Object[] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
-
-        proxy.createMemberWithMultithread(className, params, nodeList);
-
-        return result;
+        Node[] nodeListString = new Node[nodeList.length];
+        for (int i = 0; i < nodeList.length; i++)
+            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
+            params, nodeListString);
     }
 
     /**
@@ -570,11 +569,12 @@ public class ProActiveGroup {
         Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        String[] nodeListString = new String[nodeList.length];
-        for (int i = 0; i < nodeList.length; i++)
-            nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
-            params, nodeListString);
+        Object result = ProActiveGroup.newGroup(className);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, params, nodeList);
+
+        return result;
     }
 
     /**
@@ -639,11 +639,12 @@ public class ProActiveGroup {
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        String[] nodeListString = new String[nodeList.length];
-        for (int i = 0; i < nodeList.length; i++)
-            nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-        return ProActiveGroup.newGroupInParallel(className, params,
-            nodeListString);
+        Object result = ProActiveGroup.newGroup(className);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, params, nodeList);
+
+        return result;
     }
 
     /**
@@ -663,12 +664,11 @@ public class ProActiveGroup {
         Object[][] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
-
-        proxy.createMemberWithMultithread(className, params, nodeList);
-
-        return result;
+        Node[] nodeListString = new Node[nodeList.length];
+        for (int i = 0; i < nodeList.length; i++)
+            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
+        return ProActiveGroup.newGroupInParallel(className, params,
+            nodeListString);
     }
 
     /**
@@ -709,12 +709,11 @@ public class ProActiveGroup {
         String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
-
-        proxy.createMemberWithMultithread(className, params, nodeList);
-
-        return result;
+        Node[] nodeListString = new Node[nodeList.length];
+        for (int i = 0; i < nodeList.length; i++)
+            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
+        return ProActiveGroup.newGroupInParallel(className, params,
+            nodeListString);
     }
 
     /**
@@ -733,11 +732,12 @@ public class ProActiveGroup {
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        String[] nodeListString = new String[nodeList.length];
-        for (int i = 0; i < nodeList.length; i++)
-            nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-        return ProActiveGroup.newGroupInParallel(className, params,
-            nodeListString);
+        Object result = ProActiveGroup.newGroup(className);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, params, nodeList);
+
+        return result;
     }
 
     /**

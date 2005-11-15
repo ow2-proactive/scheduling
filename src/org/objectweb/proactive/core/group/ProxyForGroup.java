@@ -56,6 +56,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
@@ -1051,8 +1052,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param params - an array that contains the parameters for the constructor of member.
      * @param nodeList - the nodes where the member will be created.
      */
-    protected void createMemberWithMultithread(String className,
-        Object[][] params, String[] nodeList) {
+    public void createMemberWithMultithread(String className,
+        Object[][] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < params.length; i++) {
             this.memberList.add(null);
@@ -1071,7 +1072,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param nodeList - the nodes where the member will be created.
      */
     protected void createMemberWithMultithread(String className,
-        Object[] params, String[] nodeList) {
+        Object[] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < nodeList.length; i++) {
             this.memberList.add(null);
