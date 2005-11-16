@@ -578,29 +578,67 @@
 	<target name="manual" depends="util">
 		<java classname="util.buildManual" fork="true">
 			<classpath refid="project.classpath"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/index.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/Principles.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/Installation.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/HelloWorld.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/ProActiveBasis.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/ActiveObjectCreation.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/FutureObjectCreation.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/Migration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/AC.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/HelloWorld.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/TypedGroupCommunication.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/OOSPMD.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Migration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/exceptions.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/bnb.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/Configuration.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/Descriptor.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/XMLProperties.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/FileTransfer.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/SSHTunneling.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/AC.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/exceptions.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/intro.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/architecture.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/Security.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/faultTolerance.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/intro.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/implementation.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/conformance.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/configuration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/adl.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/examples.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/perspectives.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/p2p.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/MOP.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Security.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/WSDoc.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/OSGi.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/IC2D.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/development/plugin.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/index.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/capabilities-intro.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/parallel_processing.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/c3d.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/synchronization.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/readers_writers.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/dining_philosophers.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/migration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/mobile_agents.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/clientserver.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/initializedhello.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehello.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehelloframe.html"/>			
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/OOSPMDJacobiexample.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/nbody.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/conclusion.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/development/DescriptorProcess.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/development/FileTransfer.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/development/FaultTolerance.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/MOP.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/FAQ.html"/>
+			
+			
+				
+			
+			
+			
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/index.html"/>			
+			
 		</java>
 	</target>
 	<!--
@@ -615,23 +653,20 @@
 		<java classname="util.buildManual" fork="true">
 			<classpath refid="project.classpath"/>
 			<jvmarg value="-Dproactive.guidedtour=true"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/Title.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/index.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/setup.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/clientserver.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/HelloWorld.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/initializedhello.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehello.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehelloframe.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/capabilities-intro.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/parallel_processing.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/c3d.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/synchronization.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/readers_writers.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/dining_philosophers.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/parallel_processing.html"/>
-			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/c3d.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/migration.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/mobile_agents.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/clientserver.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/initializedhello.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehello.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehelloframe.html"/>			
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/OOSPMDJacobiexample.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/nbody.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/conclusion.html"/>
@@ -950,7 +985,6 @@
     ==  Tests coverage : need clover license in user.home directory
     ==
     ================================================================-->
-  <!-- Commented for the release
   <property name="coverage.dir" value="${base}/compile/coverage"/>
 
   	<path id="coverage.classpath">
@@ -981,8 +1015,8 @@
   
   
   <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
- 	 <delete file="${base}/compile/tests.log"/>-->
-	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file 
+ 	 <delete file="${base}/compile/tests.log"/>
+	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file--> 
 	 <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
 	  <java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="coverage.classpath"/>
@@ -995,7 +1029,7 @@
             <format type="html"/>
          </current>
       </clover-report>
- </target> -->
+ </target>
  
 	  <!-- ==================================================================== -->
 	  <!-- Formats the project sources                                          -->
