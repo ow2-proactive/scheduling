@@ -31,6 +31,7 @@
 package org.objectweb.proactive.p2p.service;
 
 import java.io.Serializable;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -261,5 +262,15 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             ((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).ImStealingYou(ranking,
                 myNodeAddress);
         }
+    }
+
+    private Random randomizer = new Random();
+
+    /**
+     * @return a random acquaintance reference.
+     */
+    public P2PService randomPeer() {
+        int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
+        return (P2PService) this.groupOfAcquaintances.get(random);
     }
 }

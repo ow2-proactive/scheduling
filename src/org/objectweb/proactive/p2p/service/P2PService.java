@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
 import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
@@ -223,7 +224,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             return;
         }
 
-        // Method code ---------------------------------------------------------
         // This should be register
         if (this.shouldBeAcquaintance(remoteService)) {
             this.register(remoteService);
@@ -467,6 +467,49 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     }
 
     /**
+     * For asking a single node to the p2p infrastructure.
+     * There no warranties that a node will be returned.
+     * @param vnName the virtual node name.
+     * @param jobId the job ID.
+     * @return a free node.
+     */
+    public Node getANode(String vnName, String jobId) {
+        return this.stubOnThis.getANode(vnName, jobId, this.stubOnThis);
+    }
+
+    /**
+     * <b>***For internal use only***
+     * @param vnName the virtual node name.
+     * @param jobId the job ID.
+     * @param service a stub on the requester
+     * @return a free node.
+     */
+    public Node getANode(String vnName, String jobId, P2PService service) {
+        if (service.equals(this.stubOnThis)) {
+            return this.acquaintanceManager.randomPeer().getANode(vnName, jobId, service);
+        }
+        P2PNode askedNode = this.nodeManager.askingNode();
+        Node nodeAvailable = askedNode.getNode();
+
+        if (nodeAvailable != null) {
+            if (vnName != null) {
+                try {
+                    nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName,
+                        true);
+                } catch (ProActiveException e) {
+                    logger.warn("Couldn't register " + vnName + " in the PAR", e);
+                }
+            }
+            if (jobId != null) {
+                nodeAvailable.getNodeInformation().setJobID(jobId);
+            }
+            return nodeAvailable;
+        }
+        return this.acquaintanceManager.randomPeer().getANode(vnName, jobId, service);
+    }
+
+
+	/**
      * Put in a <code>P2PNodeLookup</code> all available nodes during all the
      * time where it is actived.
      * @param vnName Virtual node name.
@@ -481,8 +524,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * For load balancing.
      * @return URL of the node where the P2P service is running.
      */
-    public String getAddress() {
-        return this.p2pServiceNode.getNodeInformation().getURL();
+    public StringWrapper getAddress() {
+        return new StringWrapper(this.p2pServiceNode.getNodeInformation()
+                                                    .getURL());
     }
 
     /**
