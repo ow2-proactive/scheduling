@@ -239,9 +239,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         // address space because being a local representative for something remote
         // is what the proxy is all about. This is why we know that the table that
         // can be accessed by using a static methode has this information.
+        ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
         sendRequest(methodCall, future,
             LocalBodyStore.getInstance().getCurrentThreadBody());
-        ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
     }
 
     protected void sendRequest(MethodCall methodCall, Future future,
