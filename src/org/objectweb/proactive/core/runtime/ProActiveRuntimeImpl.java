@@ -30,18 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Random;
-
 import org.apache.log4j.MDC;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -89,6 +79,21 @@ import org.objectweb.proactive.ext.security.securityentity.Entity;
 import org.objectweb.proactive.ext.security.securityentity.EntityCertificate;
 import org.objectweb.proactive.ext.security.securityentity.EntityVirtualNode;
 
+import java.io.File;
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+
 
 /**
  * <p>
@@ -118,7 +123,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    private static Random prng = null; // new Random();
+    private static SecureRandom prng = null; // new Random();
 
     // runtime security manager 
     private static ProActiveSecurityManager runtimeSecurityManager;
@@ -221,7 +226,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     protected static synchronized int getNextInt() {
         if (prng == null) {
-            prng = new Random();
+            prng = new SecureRandom();
         }
 
         return prng.nextInt();
@@ -278,6 +283,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } else if (!isHierarchicalSearch) {
             return null; // pad == null
         } else { // else search pad in parent runtime
+
             if (parentRuntime == null) {
                 throw new IOException(
                     "Descriptor cannot be found hierarchically since this runtime has no parent");
@@ -749,89 +755,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
     }
 
-    //
-    // -- INNER CLASSES  -----------------------------------------------
-    //
-    protected static class VMInformationImpl implements VMInformation,
-        java.io.Serializable {
-        private java.net.InetAddress hostInetAddress;
-
-        //the Unique ID of the JVM
-        private java.rmi.dgc.VMID uniqueVMID;
-        private String name;
-        private String processCreatorId;
-        private String jobId;
-        private String hostName;
-
-        public VMInformationImpl() throws java.net.UnknownHostException {
-            this.uniqueVMID = UniqueID.getCurrentVMID();
-            hostInetAddress = java.net.InetAddress.getLocalHost();
-            hostName = UrlBuilder.getHostNameorIP(hostInetAddress);
-            this.processCreatorId = "jvm";
-
-            //            this.name = "PA_JVM" +
-            //                Integer.toString(new java.security.SecureRandom().nextInt()) +
-            //                "_" + hostName;
-            String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
-            if (System.getProperty("proactive.runtime.name") != null) {
-                this.name = System.getProperty("proactive.runtime.name");
-                if (this.name.indexOf("PA_JVM") < 0) {
-                    runtimeLogger.warn(
-                        "WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n" +
-                        "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
-                }
-            } else {
-                this.name = "PA_JVM" + random + "_" + hostName;
-            }
-            if (System.getProperty("proactive.jobid") != null) {
-                this.jobId = System.getProperty("proactive.jobid");
-            } else {
-                //if the property is null, no need to generate another random, take the one in name
-                this.jobId = "JOB-" + random;
-            }
-        }
-
-        //
-        // -- PUBLIC METHODS  -----------------------------------------------
-        //
-        //
-        // -- implements VMInformation  -----------------------------------------------
-        //
-        public java.rmi.dgc.VMID getVMID() {
-            return uniqueVMID;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public java.net.InetAddress getInetAddress() {
-            return hostInetAddress;
-        }
-
-        public String getCreationProtocolID() {
-            return this.processCreatorId;
-        }
-
-        public void setCreationProtocolID(String protocolId) {
-            this.processCreatorId = protocolId;
-        }
-
-        /**
-         * @see org.objectweb.proactive.Job#getJobID()
-         */
-        public String getJobID() {
-            return this.jobId;
-        }
-
-        /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#getHostName()
-         */
-        public String getHostName() {
-            return this.hostName;
-        }
-    }
-
     //  SECURITY
 
     /**
@@ -1220,14 +1143,102 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             return null;
         }
+
         notifyListeners(this,
             RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED,
             proActiveRuntimeDist, creatorID, null, vmName);
+
         return pad.getHierarchicalProcess(vmName);
     }
 
     public String getVNName(String nodename) throws ProActiveException {
         return (String) virtualNodesMapNodes.get(nodename);
+    }
+
+    //
+    // -- INNER CLASSES  -----------------------------------------------
+    //
+    protected static class VMInformationImpl implements VMInformation,
+        java.io.Serializable {
+        private java.net.InetAddress hostInetAddress;
+
+        //the Unique ID of the JVM
+        private java.rmi.dgc.VMID uniqueVMID;
+        private String name;
+        private String processCreatorId;
+        private String jobId;
+        private String hostName;
+
+        public VMInformationImpl() throws java.net.UnknownHostException {
+            this.uniqueVMID = UniqueID.getCurrentVMID();
+            hostInetAddress = java.net.InetAddress.getLocalHost();
+            hostName = UrlBuilder.getHostNameorIP(hostInetAddress);
+            this.processCreatorId = "jvm";
+
+            //            this.name = "PA_JVM" +
+            //                Integer.toString(new java.security.SecureRandom().nextInt()) +
+            //                "_" + hostName;
+            String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
+
+            if (System.getProperty("proactive.runtime.name") != null) {
+                this.name = System.getProperty("proactive.runtime.name");
+
+                if (this.name.indexOf("PA_JVM") < 0) {
+                    runtimeLogger.warn(
+                        "WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n" +
+                        "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
+                }
+            } else {
+                this.name = "PA_JVM" + random + "_" + hostName;
+            }
+
+            if (System.getProperty("proactive.jobid") != null) {
+                this.jobId = System.getProperty("proactive.jobid");
+            } else {
+                //if the property is null, no need to generate another random, take the one in name
+                this.jobId = "JOB-" + random;
+            }
+        }
+
+        //
+        // -- PUBLIC METHODS  -----------------------------------------------
+        //
+        //
+        // -- implements VMInformation  -----------------------------------------------
+        //
+        public java.rmi.dgc.VMID getVMID() {
+            return uniqueVMID;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public java.net.InetAddress getInetAddress() {
+            return hostInetAddress;
+        }
+
+        public String getCreationProtocolID() {
+            return this.processCreatorId;
+        }
+
+        public void setCreationProtocolID(String protocolId) {
+            this.processCreatorId = protocolId;
+        }
+
+        /**
+         * @see org.objectweb.proactive.Job#getJobID()
+         */
+        public String getJobID() {
+            return this.jobId;
+        }
+
+        /**
+         * @see org.objectweb.proactive.core.runtime.VMInformation#getHostName()
+         */
+        public String getHostName() {
+            return this.hostName;
+        }
     }
 
     //
