@@ -346,6 +346,7 @@ static void change_to_daemon_dir(void)
     if (length < 0 || length >= sizeof(buffer))
         return;
 
+    buffer[length] = '\0';
     last_slash = strrchr(buffer, '/');
     if (last_slash != NULL)
         *last_slash = '\0';
