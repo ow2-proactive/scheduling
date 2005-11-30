@@ -48,7 +48,7 @@ public class TestVnNotActivated extends FunctionalTest {
     private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/nonregressiontest/activeobject/creation/parallel/4_local.xml")
                                                                    .getPath();
-    private Object[] aos;
+    private A[] aos;
     private VirtualNode vn;
 
     public TestVnNotActivated() {
@@ -61,7 +61,7 @@ public class TestVnNotActivated extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        this.aos = ProActive.newActiveInParallel(A.class.getName(),
+        this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                 new Object[] { "toto" }, vn);
     }
 
@@ -89,7 +89,7 @@ public class TestVnNotActivated extends FunctionalTest {
             return false;
         }
         for (int i = 0; i < this.aos.length; i++) {
-            ((A) aos[i]).getNodeUrl();
+            aos[i].getNodeUrl();
         }
         this.vn.killAll(false);
         return true;

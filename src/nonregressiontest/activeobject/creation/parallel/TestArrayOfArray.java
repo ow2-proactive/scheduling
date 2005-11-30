@@ -48,7 +48,7 @@ public class TestArrayOfArray extends FunctionalTest {
     private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/nonregressiontest/activeobject/creation/parallel/4_local.xml")
                                                                    .getPath();
-    private Object[] aos;
+    private A[] aos;
     private VirtualNode vn;
 
     public TestArrayOfArray() {
@@ -62,13 +62,13 @@ public class TestArrayOfArray extends FunctionalTest {
      */
     public void action() throws Exception {
         try {
-            this.aos = ProActive.newActiveInParallel(A.class.getName(),
+            this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                     new Object[][] {
                         { "toto" },
                         { "tata" }
                     }, vn.getNodes());
         } catch (Exception e) {
-            this.aos = ProActive.newActiveInParallel(A.class.getName(),
+            this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                     new Object[][] {
                         { "toto" },
                         { "tata" },
@@ -96,19 +96,19 @@ public class TestArrayOfArray extends FunctionalTest {
             this.vn.killAll(false);
             return false;
         }
-        if (((A) aos[0]).getName().compareTo("toto") != 0) {
+        if (aos[0].getName().compareTo("toto") != 0) {
             this.vn.killAll(false);
             return false;
         }
-        if (((A) aos[1]).getName().compareTo("tata") != 0) {
+        if (aos[1].getName().compareTo("tata") != 0) {
             this.vn.killAll(false);
             return false;
         }
-        if (((A) aos[2]).getName().compareTo("titi") != 0) {
+        if (aos[2].getName().compareTo("titi") != 0) {
             this.vn.killAll(false);
             return false;
         }
-        if (((A) aos[3]).getName().compareTo("tutu") != 0) {
+        if (aos[3].getName().compareTo("tutu") != 0) {
             this.vn.killAll(false);
             return false;
         }
