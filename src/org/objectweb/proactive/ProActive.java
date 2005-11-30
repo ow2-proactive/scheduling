@@ -31,6 +31,7 @@
 package org.objectweb.proactive;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.UnknownHostException;
 import java.util.Vector;
 
@@ -410,9 +411,11 @@ public class ProActive {
      * @param nodes the array of nodes where the active objects are created.
      * @return an array of references (possibly remote) on Stubs of the newly
      * created active objects.
+     * @throws ClassNotFoundException in the case of className is not a class.
      */
     public static Object[] newActiveInParallel(String className,
-        Object[][] constructorParameters, Node[] nodes) {
+        Object[][] constructorParameters, Node[] nodes)
+        throws ClassNotFoundException {
         if (constructorParameters.length != nodes.length) {
             throw new ProActiveRuntimeException(
                 "The total of constructors must" +
@@ -432,7 +435,9 @@ public class ProActive {
         }
         threadpool.complete();
 
-        return result.toArray(new Object[result.size()]);
+        Class classForResult = Class.forName(className);
+        return result.toArray((Object[]) Array.newInstance(classForResult,
+                result.size()));
     }
 
     /**
@@ -452,10 +457,11 @@ public class ProActive {
      * created active objects.
      * @throws NodeException happens when the given virtualNode is already
      * activated and throws an exception.
+     * @throws ClassNotFoundException in the case of className is not a class.
      */
     public static Object[] newActiveInParallel(String className,
         Object[] constructorParameters, VirtualNode virtualNode)
-        throws NodeException {
+        throws NodeException, ClassNotFoundException {
         // Creation of the thread pool
         if (threadpool == null) {
             threadpool = new ThreadPool();
@@ -477,7 +483,9 @@ public class ProActive {
             ((VirtualNodeImpl) virtualNode).waitForAllNodesCreation();
             threadpool.complete();
         }
-        return result.toArray(new Object[result.size()]);
+        Class classForResult = Class.forName(className);
+        return result.toArray((Object[]) Array.newInstance(classForResult,
+                result.size()));
     }
 
     /**
