@@ -52,7 +52,7 @@ public class SingleValueUnmarshaller extends BasicUnmarshaller {
      */
     public void readValue(String value) throws SAXException {
         if ((value != null) && (value.indexOf("${") >= 0)) {
-            value = org.objectweb.proactive.core.xml.XMLProperties.transform(value);
+            value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value);
         }
         if (resultObject == null) {
             setResultObject(value);
