@@ -242,31 +242,52 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="infrastructure" type="InfrastructureType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
-	<!--main definition must have at least one child, a mapToVirtualNode and a not-empty attribute, the main class name. It may also have, in first, a group of elements of type ArgType, which define the arguments of the main class.-->
+	
 	<xs:complexType name="VariablesType">
 		<xs:sequence>
-			<xs:group ref="propertyGroup" minOccurs="0"/>
-			<xs:group ref="propertiesFileGroup" minOccurs="0"/>
+			<xs:element name="DescriptorVariable" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="value" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DescriptorDefaultVariable" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="value" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ProgramDefaultVariable" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="value" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ProgramVariable" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="value" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="JavaPropertyVariable" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+					<xs:attribute name="value" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IncludeXMLFile" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="location" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="IncludePropertyFile" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="location" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:group name="propertyGroup">
-		<xs:sequence>
-			<xs:element name="property" type="PropertyType" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:group>
-	<xs:group name="propertiesFileGroup">
-		<xs:sequence>
-			<xs:element name="propertiesFile" type="PropertyFileType" minOccurs="0" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:group>
-	<xs:complexType name="PropertyType">
-		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="value" type="xs:string" use="required"/>
-		<xs:attribute name="type" type="xs:string" use="optional" default="constant"/>
-	</xs:complexType>
-	<xs:complexType name="PropertyFileType">
-		<xs:attribute name="location" type="xs:string" use="required"/>
-	</xs:complexType>
+	<!--main definition must have at least one child, a mapToVirtualNode and a not-empty attribute, the main class name. It may also have, in first, a group of elements of type ArgType, which define the arguments of the main class.-->
 	<xs:complexType name="MainDefinitionType">
 		<xs:sequence>
 			<xs:group ref="ArgGroup" minOccurs="0" maxOccurs="unbounded"/>
