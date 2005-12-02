@@ -42,10 +42,14 @@ package org.objectweb.proactive.core.descriptor.xml;
 public interface ProActiveDescriptorConstants {
     public static final String PROACTIVE_DESCRIPTOR_TAG = "ProActiveDescriptor";
     public static final String MAIN_DEFINITION_TAG = "mainDefinition";
-    public static final String PROPERTY_TAG = "property";
     public static final String VARIABLES_TAG = "variables";
-    public static final String PROPERTY_INFILE_TAG = "file";
-    public static final String PROPERTIES_FILE_TAG = "propertiesFile";
+    public static final String VARIABLES_DESCRIPTOR_TAG ="DescriptorVariable";
+    public static final String VARIABLES_PROGRAM_TAG ="ProgramVariable";
+    public static final String VARIABLES_DESCRIPTOR_DEFAULT_TAG ="DescriptorDefaultVariable";
+    public static final String VARIABLES_PROGRAM_DEFAULT_TAG ="ProgramDefaultVariable";
+    public static final String VARIABLES_JAVAPROPERTY_TAG ="JavaPropertyVariable";    
+    public static final String VARIABLES_INCLUDE_XML_FILE_TAG ="IncludeXMLFile";
+    public static final String VARIABLES_INCLUDE_PROPERTY_FILE_TAG ="IncludePropertyFile";
     public static final String DEPLOYMENT_TAG = "deployment";
     public static final String INFRASTRUCTURE_TAG = "infrastructure";
     public static final String COMPONENT_DEFINITION_TAG = "componentDefinition";

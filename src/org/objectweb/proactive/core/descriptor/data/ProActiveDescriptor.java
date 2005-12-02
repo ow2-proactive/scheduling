@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
 
@@ -339,4 +340,16 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public PolicyServer getPolicyServer();
 
     public String getSecurityFilePath();
+
+	/**
+	 * Keeps a reference to the Variable Contract passed as parameter
+	 * @param  The Variable Contract (ex XMLProperties)
+	 */
+	public void setVariableContract(VariableContract properties);
+	
+	/**
+	 *
+	 * @return The current variable contract, or null.
+	 */
+	public VariableContract getVariableContract();
 }

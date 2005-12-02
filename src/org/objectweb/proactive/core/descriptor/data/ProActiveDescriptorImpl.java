@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -101,6 +102,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     /** map filetransfer-id and filetransfer */
     private java.util.HashMap fileTransferMapping;
 
+    /** map of the variable contract (ex XMLProperties) */
+    private VariableContract variableContract;
+    
     /** Location of the xml file */
     private String url;
     private String jobID;
@@ -129,6 +133,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         serviceMapping = new java.util.HashMap();
         pendingServiceMapping = new java.util.HashMap();
         fileTransferMapping = new java.util.HashMap();
+        variableContract = new VariableContract();
         this.url = url;
         mainDefined = false;
     }
@@ -860,4 +865,18 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             }
         }
     }
+
+	/**
+	 * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#setVariableContract(org.objectweb.proactive.core.xml.XMLProperties)
+	 */
+	public void setVariableContract(VariableContract variableContract) {
+		this.variableContract=variableContract;
+	}
+
+	/**
+	 * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getVariableContract()
+	 */
+	public VariableContract getVariableContract() {
+		return this.variableContract;
+	}
 }

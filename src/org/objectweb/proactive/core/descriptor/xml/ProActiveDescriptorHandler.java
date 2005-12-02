@@ -33,12 +33,12 @@ package org.objectweb.proactive.core.descriptor.xml;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 
 /**
  * This class receives deployment events
@@ -49,14 +49,17 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  */
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     implements ProActiveDescriptorConstants {
-    private ProActiveDescriptor proActiveDescriptor;
+    protected ProActiveDescriptor proActiveDescriptor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public ProActiveDescriptorHandler(String xmlDescriptorUrl) {
+    public ProActiveDescriptorHandler(String xmlDescriptorUrl, VariableContract variableContract) {
         super(false);
         proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
+    	//keep a reference of the variable contract for future use
+        proActiveDescriptor.setVariableContract(variableContract);
+    	
         addHandler(MAIN_DEFINITION_TAG,
             new MainDefinitionHandler(proActiveDescriptor));
         addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
@@ -79,7 +82,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 vNodesAcqHandler);
             this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
         }
-        this.addHandler(VARIABLES_TAG, new VariablesHandler());
+
+        this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
     }
 
     //
@@ -87,7 +91,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     //
     public static void main(String[] args) throws java.io.IOException {
         String uri = "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
-        InitialHandler h = new InitialHandler(uri);
+        InitialHandler h = new InitialHandler(uri, new VariableContract());
 
         //String uri = "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
         org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
@@ -100,11 +104,11 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
      * @param xmlDescriptorUrl the URL of XML Descriptor
      */
     public static ProActiveDescriptorHandler createProActiveDescriptor(
-        String xmlDescriptorUrl)
+        String xmlDescriptorUrl, VariableContract variableContract)
         throws java.io.IOException, org.xml.sax.SAXException {
         //static method added to replace main method
         try {
-            InitialHandler h = new InitialHandler(xmlDescriptorUrl);
+            InitialHandler h = new InitialHandler(xmlDescriptorUrl, variableContract);
             String uri = xmlDescriptorUrl;
             org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
                         uri), h);
@@ -112,6 +116,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             return (ProActiveDescriptorHandler) h.getResultObject();
         } catch (org.xml.sax.SAXException e) {
             //e.printStackTrace();
+        	
             logger.fatal(
                 "a problem occurs when getting the ProActiveDescriptorHandler");
             throw e;
@@ -122,6 +127,13 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     // -- implements XMLUnmarshaller ------------------------------------------------------
     //
     public Object getResultObject() throws org.xml.sax.SAXException {
+        //copy xmlproperties into the pad
+    	//proActiveDescriptor.setVariableContract(XMLProperties.xmlproperties.duplicate());
+    	
+        //Release lock on static global variable XMLProperties
+    	//XMLProperties.xmlproperties.clear();
+    	//XMLProperties.xmlproperties.releaseLock();
+    	
         return proActiveDescriptor;
     }
 
@@ -134,6 +146,13 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     //
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    	/*
+    	if(name.equals(VARIABLES_TAG)){
+	    	//Check XMLProperties Runtime
+	    	if(!org.objectweb.proactive.core.xml.XMLProperties.xmlproperties.checkContract())
+	    		throw new SAXException("Variable contract breached");
+    	}
+    	*/
     }
 
     //
@@ -150,9 +169,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         // line added to return a ProactiveDescriptorHandler object
         private ProActiveDescriptorHandler proActiveDescriptorHandler;
 
-        private InitialHandler(String xmlDescriptorUrl) {
+        private InitialHandler(String xmlDescriptorUrl, VariableContract variableContract) {
             super();
-            proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl);
+            proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl, variableContract);
             this.addHandler(PROACTIVE_DESCRIPTOR_TAG, proActiveDescriptorHandler);
         }
 
@@ -166,8 +185,6 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
-            // clean properties definitions for current descriptor
-            org.objectweb.proactive.core.xml.XMLProperties.clean();
         }
     }
 

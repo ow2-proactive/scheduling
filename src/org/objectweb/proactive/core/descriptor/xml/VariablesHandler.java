@@ -30,77 +30,126 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-
-//import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.xml.XMLProperties;
+import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.io.Attributes;
+import org.xml.sax.InputSource;
 
 
+/**
+ * This class handles all the parsing of Variable Contract XML tags.
+ * @author The ProActive Team
+ *
+ */
 public class VariablesHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
-    public VariablesHandler() {
+    protected VariableContract variableContract;
+
+    public VariablesHandler(VariableContract variableContract) {
         super(false);
-        this.addHandler(PROPERTY_TAG, new PropertiesHandler());
-        this.addHandler(PROPERTIES_FILE_TAG, new PropertiesFileHandler());
+        this.variableContract = variableContract;
+
+        this.addHandler(VARIABLES_DESCRIPTOR_TAG, new VariableHandler(VARIABLES_DESCRIPTOR_TAG));
+        this.addHandler(VARIABLES_PROGRAM_TAG, new VariableHandler(VARIABLES_PROGRAM_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_TAG));
+        this.addHandler(VARIABLES_PROGRAM_DEFAULT_TAG, new VariableHandler(VARIABLES_PROGRAM_DEFAULT_TAG));
+        this.addHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG, new VariableHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG));
+        
+        this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG, new IncludeXMLFileHandler());
+        this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG, new IncludePropertiesFileHandler());
+        
     }
 
-    public class PropertiesHandler extends BasicUnmarshaller {
-        PropertiesHandler() {
+    /**
+     * Creates a SAX parser on the specified file for variables. This is used
+     * when including a variable contract defined on a different file.
+     * @param filename the full path to the file
+     */
+    public static void createVariablesHandler(String filename,
+        VariableContract variableContract) {
+    	VariablesFileHandler vfh = new VariablesFileHandler(variableContract);
+
+        org.objectweb.proactive.core.xml.io.StreamReader sr;
+        //String file = VariablesHandler.class.getResource(filename).getPath();
+        InputSource source = new org.xml.sax.InputSource(filename);
+        try {
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(source, vfh);
+            sr.read();
+            //return (cast) vh.getResultObject();
+        } catch (Exception e) {
+            logger.error("Unable to load Variable Contract from:" + filename);
+            e.printStackTrace();
+        }
+    }
+    
+    public static class VariablesFileHandler extends PassiveCompositeUnmarshaller{
+    	
+    	VariablesFileHandler(VariableContract variableContract){
+    		super(false);
+            this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
+    	}
+    }
+    
+    private class VariableHandler extends BasicUnmarshaller {
+    	
+    	VariableContractType varType;
+    	String varStringType;
+    	
+    	VariableHandler(String varStringType) {
+        	this.varType=VariableContractType.getType(varStringType);
+        	this.varStringType=varStringType;
+       
         }
 
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
-            // First control if it's a file tag
-            String file = attributes.getValue("file");
-            if (checkNonEmpty(file)) {
-                // Specific processing for loading file
-                XMLProperties.loadXML(file);
-                return;
-            }
-
-            // get datas
+        	
+         	if(this.varType==null)
+                throw new org.xml.sax.SAXException("Ilegal Descriptor Variable Type: "+varStringType);
+         	
+            // Variable Name
             String name = attributes.getValue("name");
             if (!checkNonEmpty(name)) {
                 throw new org.xml.sax.SAXException(
                     "Tag property have no name !");
             }
-            String type = attributes.getValue("type");
-            if (!checkNonEmpty(type)) {
-                throw new org.xml.sax.SAXException("Tag property " + name +
-                    " have no type !");
-            }
+
             String value = attributes.getValue("value");
 
-            //	        if ((!checkNonEmpty(value)) && (!type.equalsIgnoreCase("setInProgram"))) {
-            //	            throw new org.xml.sax.SAXException("Tag property " + name +
-            //	                " have no value !");
-            //	        }
-            if (value == null) {
-                value = "";
-            }
-
-            // add property informations to list
-            try {
-                XMLProperties.setDescriptorVariable(name, value, type);
-            } catch (org.xml.sax.SAXException ex) {
-                throw ex;
-            }
+            // Define and set variables into the contract
+            variableContract.setDescriptorVariable(name, value,varType);
         }
     }
 
-    private class PropertiesFileHandler extends BasicUnmarshaller {
-        PropertiesFileHandler() {
+    private class IncludeXMLFileHandler extends BasicUnmarshaller {
+    	IncludeXMLFileHandler() {
         }
 
         public void startContextElement(String tag, Attributes attributes)
             throws org.xml.sax.SAXException {
-            // First control if it's a file tag
+
             String file = attributes.getValue("location");
             if (checkNonEmpty(file)) {
-                // Specific processing for loading file
-                XMLProperties.load(file);
+                // Specific processing for loading an xml file
+            	variableContract.loadXML(file);
+                return;
+            }
+        }
+    }
+    
+    private class IncludePropertiesFileHandler extends BasicUnmarshaller {
+    	IncludePropertiesFileHandler() {
+        }
+
+        public void startContextElement(String tag, Attributes attributes)
+            throws org.xml.sax.SAXException {
+
+            String file = attributes.getValue("location");
+            if (checkNonEmpty(file)) {
+                // Specific processing for loading a file
+                variableContract.load(file);
                 return;
             }
         }
