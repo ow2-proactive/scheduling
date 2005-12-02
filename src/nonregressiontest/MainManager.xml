@@ -35,9 +35,12 @@
 			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
-			<unitTest exclude="no" class="nonregressiontest.descriptor.property.Test" />
-			<unitTest exclude="no" class="nonregressiontest.descriptor.property.TestFile" />
-			<unitTest exclude="no" class="nonregressiontest.descriptor.property.TestError" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.descriptordefaultvariable.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.descriptorvariable.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.externalfiles.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.javaproperties.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.programdefaultvariable.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.programvariable.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.extendedjvm.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.rmilookup.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.p2p.Test" />
