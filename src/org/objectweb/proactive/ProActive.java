@@ -95,6 +95,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
+import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
 
@@ -1045,7 +1046,7 @@ public class ProActive {
             //System.out.println("pad null");
             return null;
         } else {
-            return getProactiveDescriptor(padURL, true);
+            return getProActiveDescriptor(padURL, new VariableContract(), true);
         }
     }
 
@@ -1061,9 +1062,52 @@ public class ProActive {
      */
     public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
-        return getProactiveDescriptor(xmlDescriptorUrl, false);
+        return getProActiveDescriptor(xmlDescriptorUrl, new VariableContract(), false);
+    }
+    
+    /**
+     * Returns a <code>ProActiveDescriptor</code> that gives an object representation
+     * of the XML document located at the given url, and uses the given Variable Contract.
+     * @param xmlDescriptorUrl The url of the XML document
+     * @return ProActiveDescriptor. The object representation of the XML document
+     * @throws ProActiveException if a problem occurs during the creation of the object
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
+     */
+    public static ProActiveDescriptor getProactiveDescriptor(
+        String xmlDescriptorUrl, VariableContract variableContract) throws ProActiveException {
+    	
+    	if(variableContract == null) throw new NullPointerException("Argument variableContract can not be null");
+    
+		return getProActiveDescriptor(xmlDescriptorUrl, variableContract, false);
     }
 
+    private static ProActiveDescriptor getProActiveDescriptor(String xmlDescriptorUrl, 
+    		VariableContract variableContract,  boolean hierarchicalSearch ) throws ProActiveException{
+    	
+    	//Get lock on XMLProperties global static variable
+    	org.objectweb.proactive.core.xml.VariableContract.lock.aquire();
+    	org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
+    	
+    	//Get the pad
+    	ProActiveDescriptor pad = internalGetProActiveDescriptor(xmlDescriptorUrl, variableContract, hierarchicalSearch);
+		
+    	//No further modifications can be donde on the xmlproperties, thus we close the contract
+    	variableContract.close();
+    	
+    	//Check the contract (proposed optimization: Do this when parsing </variable> tag instead of here!)
+    	if(!variableContract.checkContract())
+    		throw new ProActiveException("Variable Contract has not been met!");
+    	
+		//Release lock on static global variable XMLProperties
+    	VariableContract.xmlproperties=new VariableContract();
+    	org.objectweb.proactive.core.xml.VariableContract.lock.release();
+		
+		return pad;
+		//return getProactiveDescriptor(xmlDescriptorUrl, false);
+    }
+    
     /**
      * return the pad matching with the given url or parse it from the file system
      * @param xmlDescriptorUrl url of the pad
@@ -1072,8 +1116,8 @@ public class ProActive {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    private static ProActiveDescriptor getProactiveDescriptor(
-        String xmlDescriptorUrl, boolean hierarchicalSearch)
+    private static ProActiveDescriptor internalGetProActiveDescriptor(
+        String xmlDescriptorUrl, VariableContract variableContract, boolean hierarchicalSearch)
         throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
         if (!xmlDescriptorUrl.startsWith("file:")) {
@@ -1105,7 +1149,8 @@ public class ProActive {
                 logger.info("************* Reading deployment descriptor: " +
                     xmlDescriptorUrl + " ********************");
             }
-            ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl);
+            ProActiveDescriptorHandler proActiveDescriptorHandler = 
+            	ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl, variableContract);
             pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
             part.registerDescriptor(pad.getUrl(), pad);
             return pad;
