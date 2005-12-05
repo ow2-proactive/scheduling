@@ -78,6 +78,49 @@ independent files, or inside the deploying application's code (with an API).</P>
 	   </table></ul>
 
 <p> Variables can be set in more than one place. When the value is set on multiple places, then the definition specified in the priority column will take precedence.</p>
+
+<h2><a name="variableTypesDesc">Variable Types User Guide</a></h2>
+<p> To help identify the user cases where the variable types might be useful, we have defined the concept of programmer and deployer. The programmer is the person writing the application code. The deployer corresponds to the responsible of writing the deployment descriptor. The variables represent rights and responsabilities between the two parties (contract) as specified in the following table:</p>
+
+	   <ul><table>
+	  		<tr>
+				<th><p>Type</p></th>
+				<th><p>Behavior</p></th>
+				<th><p>When to use this type</p></th>
+			</tr>
+			<tr>
+				<td><p><b>DescriptorVariable</b></p></td>
+				<!--td><p>Garanties that the value must be set in the descriptor, and cannot be specified in the program.</p></td-->
+				<td><p>The value has to be set in the descriptor, and cannot be specified in the program.</p></td>
+				<!--td><p>The program can define this variable to empty, to force the descriptor to set a value. The descriptor can use this type when it doesn't want the program to have the ability to change the value.</p></td-->
+				<td><p>If the deployer wants to use a value, without giving the possibility to the programmer to modify it. The programmer can define this variable to empty, to force the descriptor to set a value.</p></td>
+			</tr>
+			<tr>
+				<td><p><b>ProgramVariable</b></p></td>
+				<!--td><p>Garanties that the value must be set in the program, and cannot be specified in the descriptor.</p></td-->
+				<td><p>The value must be set in the program, and cannot be specified in the descriptor.</p></td>
+				<!--td><p>The descriptor can define this variable to empty, to force the program to set a value. The program can use this type when it doesn't want the descriptor to have the ability to change the value.</p></td-->
+				<td><p>If the programmer wants to use a value, without giving the possibility to the descriptor to modify it. The descriptor can define this variable to empty, to force the programmer to set a value.</p></td>
+			</tr>
+			<tr>
+				<td><p><b>DescriptorDefaultVariable</b></p></td>
+				<!--td><p>Garanties that the descriptor will always provide a default value. The program may also set a value for this variable, overriding the default.</p></td-->
+				<td><p>A default value must be specified in the descriptor. The programmer has the ability not to change the value in the program. Nevertheless, if the value is changed in the program, then this new value will have precedence over the one defined in the descriptor.</p></td>
+				<td><p>If the programmer may override the default value, but the responsability of setting a default belongs to the deployer.</p></td>
+			</tr>
+			<tr>
+				<td><p><b>ProgramDefaultVariable</b></p></td>
+				<!--td><p>Garanties that the program will always provide a default value. The descriptor may also set a value for this variable, overriding the default.</p></td-->
+				<td><p>A default value must be specified in the program. The descriptor has the ability not to change the value. Nevertheless, if the value is changed in the descriptor, then this new value will have precedence over the one defined in the program.</p></td>
+				<td><p>If the deployer may override the default value, but the responsability of setting a default belongs to the programmer.</p></td>
+			</tr>
+			<tr>
+				<td><p><b>JavaPropertyVariable</b></p></td>
+				<td><p>Takes the value from the corresponding Java property.</p></td>
+				<td><p>When a variable will only be known at runtime through the Java properties.</p></td>
+			</tr>
+
+	   </table></ul>
 	
 <H2>Variables Example</H2>
 <H3>Descriptor Variables</H3>
@@ -198,6 +241,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 public void VariableContract.setVariableFromProgram( String <b>name</b>, String <b>value</b>, VariableContractType <b>type</b>);
 public void VariableContract.setVariableFromProgram( HashMap <b>map</b>, VariableContractType <b>type</b>);</pre>
 <P>The API for adding a multiple variables is shown above. The variable <b>name</b>/<b>value</b> pair is specified as the key/content of the HashMap.</P>
+
 
 <br>
 <HR>
