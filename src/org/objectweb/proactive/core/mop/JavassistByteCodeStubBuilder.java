@@ -54,6 +54,9 @@ import javassist.NotFoundException;
  *
  */
 public class JavassistByteCodeStubBuilder {
+    private static CtMethod proxyGetter;
+    private static CtMethod proxySetter;
+
     public static byte[] create(String className) throws NoClassDefFoundError {
         CtClass generatedClass = null;
         CtMethod[] reifiedMethods;
@@ -128,7 +131,6 @@ public class JavassistByteCodeStubBuilder {
                         for (int k = 0; k < params.length; k++) {
                             key = key + params[k].getName();
                         }
-
                         // Tests if we already have met this method in a subclass
                         exists = temp.get(key);
                         if (exists == null) {
@@ -154,7 +156,13 @@ public class JavassistByteCodeStubBuilder {
             }
 
             // now get the methods from implemented interfaces
-            CtClass[] implementedInterfacesTable = superClass.getInterfaces();
+            List superInterfaces = new Vector();
+            addSuperInterfaces(superClass, superInterfaces);
+            
+            CtClass[] implementedInterfacesTable = (CtClass[])(superInterfaces.toArray(new CtClass[superInterfaces.size()]));
+            for (int i=0; i< implementedInterfacesTable.length; i++) {
+                
+            }
             for (int itfsIndex = 0;
                     itfsIndex < implementedInterfacesTable.length;
                     itfsIndex++) {
@@ -370,9 +378,9 @@ public class JavassistByteCodeStubBuilder {
         CtField proxyField = new CtField(ClassPool.getDefault().get(Proxy.class.getName()),
                 "myProxy", generatedClass);
         generatedClass.addField(proxyField);
-        CtMethod proxyGetter = CtNewMethod.getter("getProxy", proxyField);
+        proxyGetter = CtNewMethod.getter("getProxy", proxyField);
         generatedClass.addMethod(proxyGetter);
-        CtMethod proxySetter = CtNewMethod.setter("setProxy", proxyField);
+        proxySetter = CtNewMethod.setter("setProxy", proxyField);
         generatedClass.addMethod(proxySetter);
     }
 
@@ -458,6 +466,22 @@ public class JavassistByteCodeStubBuilder {
                 (met.getParameterTypes().length == 0)) {
             return false;
         }
+        
+        if ((met.getSignature().equals(proxyGetter.getSignature()) || met.getSignature().equals(proxySetter.getSignature()))) {
+            return false;
+        }
+
         return true;
+    }
+    
+    private static void addSuperInterfaces(CtClass cl, List superItfs) throws NotFoundException {
+        if (!cl.isInterface()) {
+            return;
+        }
+        CtClass[] super_interfaces = cl.getInterfaces();
+        for (int i = 0; i < super_interfaces.length; i++) {
+            superItfs.add(super_interfaces[i]);
+            addSuperInterfaces(super_interfaces[i], superItfs);
+        }
     }
 }
