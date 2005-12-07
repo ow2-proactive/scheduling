@@ -30,12 +30,10 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
-import java.io.File;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -50,11 +48,13 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
+import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
@@ -104,13 +104,62 @@ public class ProActiveComponentRepresentativeImpl
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
         String hierarchicalType, String controllersConfigFileLocation) {
         this.componentType = componentType;
-        this.hierarchicalType = hierarchicalType;
-        ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadComponentConfiguration(controllersConfigFileLocation);
-        Map controllersConfiguration = componentConfiguration.getControllers();
-
         useShortcuts = ("true".equals(System.getProperty(
                     "proactive.components.use_shortcuts")));
+        this.hierarchicalType = hierarchicalType;
+        addControllers(componentType, controllersConfigFileLocation);
 
+        // add functional interfaces
+        // functional interfaces are proxies on the corresponding meta-objects
+        addFunctionalInterfaces(componentType);
+    }
+
+    /**
+     * @param componentType
+     */
+    private void addFunctionalInterfaces(ComponentType componentType) {
+        fcInterfaceReferences = new HashMap(componentType.getFcInterfaceTypes().length);
+        InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
+        try {
+            for (int j = 0; j < interface_types.length; j++) {
+                Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
+                                                                                     .generateFunctionalInterface(interface_types[j].getFcItfName(),
+                        this, interface_types[j]);
+
+                // all calls are to be reified
+                fcInterfaceReferences.put(interface_reference.getFcItfName(),
+                    interface_reference);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("cannot create interface references : " +
+                e.getMessage());
+        }
+    }
+
+    /**
+     * @param componentType
+     * @param hierarchicalType
+     * @param controllersConfigFileLocation
+     * @return
+     */
+    private void addControllers(ComponentType componentType,
+        String controllersConfigFileLocation) {
+        if (controllersConfigFileLocation == null) {
+            return;
+        }
+        ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadControllerConfiguration(controllersConfigFileLocation);
+        Map controllersConfiguration = componentConfiguration.getControllers();
+
+        addControllers(componentType, controllersConfiguration);
+    }
+
+    /**
+     * @param componentType
+     * @param hierarchicalType
+     * @param controllersConfiguration
+     */
+    private void addControllers(ComponentType componentType,
+        Map controllersConfiguration) {
         // create the interface references tables
         // the size is the addition of :  
         // - 1 for the current ItfRef (that is at the same time a binding controller, lifecycle controller,
@@ -121,8 +170,6 @@ public class ProActiveComponentRepresentativeImpl
         nfInterfaceReferences = new HashMap(1 +
                 controllersConfiguration.size());
 
-        //        interfaceReferences = new Interface[1 +
-        //            componentType.getFcInterfaceTypes().length+controllersConfiguration.size()];
         int i = 0;
 
         // add controllers
@@ -145,9 +192,6 @@ public class ProActiveComponentRepresentativeImpl
                 currentController = (AbstractProActiveController) controllerClassConstructor.newInstance(new Object[] {
                             this
                         });
-                //                currentInterface = RepresentativeInterfaceClassGenerator.instance()
-                //                                                                        .generateControllerInterface(currentController.getFcItfName(),
-                //                this, (InterfaceType) currentController.getFcItfType());
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
                                                                         .generateControllerInterface(currentController.getFcItfName(),
                         this, (InterfaceType) currentController.getFcItfType());
@@ -170,7 +214,7 @@ public class ProActiveComponentRepresentativeImpl
                 }
             }
             if (ContentController.class.isAssignableFrom(controllerClass)) {
-                if (hierarchicalType.equals(Constants.PRIMITIVE)) {
+                if (Constants.PRIMITIVE.equals(hierarchicalType)) {
                     // no content controller here
                     continue;
                 }
@@ -181,27 +225,6 @@ public class ProActiveComponentRepresentativeImpl
 
                 i++;
             }
-        }
-
-        // add functional interfaces
-        // functional interfaces are proxies on the corresponding meta-objects
-        // 3. external functional interfaces
-        fcInterfaceReferences = new HashMap(componentType.getFcInterfaceTypes().length);
-        InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
-        try {
-            for (int j = 0; j < interface_types.length; j++) {
-                Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
-                                                                                     .generateFunctionalInterface(interface_types[j].getFcItfName(),
-                        this, interface_types[j]);
-
-                // all calls are to be reified
-                fcInterfaceReferences.put(interface_reference.getFcItfName(),
-                    interface_reference);
-                i++;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("cannot create interface references : " +
-                e.getMessage());
         }
     }
 
@@ -228,21 +251,29 @@ public class ProActiveComponentRepresentativeImpl
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (isControllerInterface(interfaceName)) {
-            if (Constants.CONTENT_CONTROLLER.equals(interfaceName) &&
-                    isPrimitive()) {
-                throw new NoSuchInterfaceException(
-                    "there is no content controller in this component");
+        if (interfaceName.endsWith("-controller") &&
+                !("attribute-controller".equals(interfaceName))) {
+            if (nfInterfaceReferences == null) {
+                // retreive the configuration by calling directly the mandatory component parameters controller itf
+                ComponentParameters params = (ComponentParameters) reifyCall(ComponentParametersController.class.getName(),
+                        "getComponentParameters", new Class[] {  },
+                        new Object[] {  }, ComponentRequest.STRICT_FIFO_PRIORITY);
+                hierarchicalType = params.getHierarchicalType();
+                addControllers(componentType,
+                    params.getControllerDescription().getControllersSignatures());
             }
-            return nfInterfaceReferences.get(interfaceName);
+            if (nfInterfaceReferences.containsKey(interfaceName)) {
+                return nfInterfaceReferences.get(interfaceName);
+            } else {
+                throw new NoSuchInterfaceException(interfaceName);
+            }
         }
 
         Iterator iterator = fcInterfaceReferences.keySet().iterator();
         while (iterator.hasNext()) {
             String itfName = (String) iterator.next();
             ProActiveInterface itf = (ProActiveInterface) fcInterfaceReferences.get(itfName);
-            if (interfaceName.startsWith(itfName) ||
-                    interfaceName.startsWith(itfName)) {
+            if (interfaceName.startsWith(itfName)) {
                 if (getProxy() instanceof ProxyForGroup) {
                     //create a new group of called functional interfaces 
                     try {
@@ -264,7 +295,8 @@ public class ProActiveComponentRepresentativeImpl
                         return result;
                     } catch (Exception e) {
                         throw new NoSuchInterfaceException(
-                            "could not generate a group of interfaces");
+                            "could not generate a group of interfaces on " +
+                            interfaceName);
                     }
                 } else {
                     return itf;
@@ -391,23 +423,22 @@ public class ProActiveComponentRepresentativeImpl
     public void setStubOnBaseObject(StubObject stub) {
         stubOnBaseObject = stub;
     }
-    
-    protected boolean isControllerInterface(String interfaceName)
-        throws NoSuchInterfaceException {
-        if (nfInterfaceReferences.keySet().contains(interfaceName)) {
-            if (interfaceName.equals(Constants.CONTENT_CONTROLLER)) {
-                if (Constants.PRIMITIVE.equals(hierarchicalType)) {
-                    throw new NoSuchInterfaceException(interfaceName);
-                } else {
-                    return true;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
 
+    //    protected boolean isControllerInterface(String interfaceName)
+    //        throws NoSuchInterfaceException {
+    //        if (nfInterfaceReferences.keySet().contains(interfaceName)) {
+    //            if (interfaceName.equals(Constants.CONTENT_CONTROLLER)) {
+    //                if (Constants.PRIMITIVE.equals(hierarchicalType)) {
+    //                    throw new NoSuchInterfaceException(interfaceName);
+    //                } else {
+    //                    return true;
+    //                }
+    //            }
+    //            return true;
+    //        } else {
+    //            return false;
+    //        }
+    //    }
     private boolean isPrimitive() {
         return Constants.PRIMITIVE.equals(hierarchicalType);
     }

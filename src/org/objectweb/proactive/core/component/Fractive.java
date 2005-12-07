@@ -30,9 +30,13 @@
  */
 package org.objectweb.proactive.core.component;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -48,20 +52,30 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
+import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
+import org.objectweb.proactive.core.body.rmi.RmiBodyAdapter;
+import org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.mop.MOPException;
+import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -466,5 +480,51 @@ public class Fractive implements GenericFactory, Component, Factory {
         }
         ProActiveComponent currentComponent = componentBody.getProActiveComponentImpl();
         return currentComponent.getRepresentativeOnThis();
+    }
+
+    public static void register(Component ref, String url)
+        throws IOException {
+        if (!(ref instanceof ProActiveComponentRepresentative)) {
+            throw new IllegalArgumentException(
+                "This method can only register ProActive components");
+        }
+        ProActive.register(ref, url);
+    }
+
+    public static ProActiveComponentRepresentative lookup(String url)
+        throws IOException, NamingException {
+        UniversalBody b = null;
+
+        String protocol = UrlBuilder.getProtocol(url);
+
+        // First step towards Body factory, will be introduced after the release
+        if (protocol.equals("rmi:")) {
+            b = new RmiBodyAdapter().lookup(url);
+        } else if (protocol.equals("rmissh:")) {
+            b = new SshRmiBodyAdapter().lookup(url);
+        } else if (protocol.equals("http:")) {
+            b = new HttpBodyAdapter().lookup(url);
+        } else if (protocol.equals("ibis:")) {
+            b = new IbisBodyAdapter().lookup(url);
+        } else {
+            throw new IOException("Protocol " + protocol + " not defined");
+        }
+
+        try {
+            StubObject stub = (StubObject) ProActive.createStubObject(ProActiveComponentRepresentative.class.getName(),
+                    b);
+            return ProActiveComponentRepresentativeFactory.instance()
+                                                          .createComponentRepresentative(stub.getProxy());
+        } catch (Throwable t) {
+            t.printStackTrace();
+            logger.error("Could not perform lookup for component at URL: " +
+                url.toString() +
+                ", because construction of component representative failed." +
+                t.toString());
+            throw new NamingException(
+                "Could not perform lookup for component at URL: " +
+                url.toString() +
+                ", because construction of component representative failed.");
+        }
     }
 }

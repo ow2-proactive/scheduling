@@ -72,7 +72,7 @@ public class ComponentParameters implements Serializable {
      */
     public ComponentParameters(String name, String hierarchicalType,
         ComponentType componentType, String controllerConfigFileLocation) {
-        this(componentType, new ControllerDescription(name, hierarchicalType));
+        this(componentType, new ControllerDescription(name, hierarchicalType, controllerConfigFileLocation));
     }
 
     /**

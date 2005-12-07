@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
-import java.io.File;
-
 import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
+import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 
 
@@ -78,5 +81,31 @@ public class ProActiveComponentRepresentativeFactory {
                 hierarchicalType, controllerConfigFileLocation);
         representative.setProxy(proxy);
         return representative;
+    }
+
+    /**
+     * The creation of a component representative from a proxy object implies a remote invocation (immediate service) for
+     * getting the parameters of the component, necessary for the construction of the representative
+     * @param proxy a reference on a proxy pointing to a component
+     * @return a component representative for the pointed component
+     * @throws Throwable an exception
+     */
+    public ProActiveComponentRepresentative createComponentRepresentative(
+        Proxy proxy) throws Throwable {
+        ((BodyProxy) proxy).getBody().getRemoteAdapter().setImmediateService("getComponentParameters",
+            new Class[] {  });
+        ComponentParameters componentParameters = (ComponentParameters) proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+                    ComponentParametersController.class.getDeclaredMethod(
+                        "getComponentParameters", new Class[] {  }),
+                    new Object[] {  },
+                    Constants.COMPONENT_PARAMETERS_CONTROLLER, false,
+                    ComponentRequest.STRICT_FIFO_PRIORITY));
+        ((BodyProxy) proxy).getBody().getRemoteAdapter().removeImmediateService("getComponentParameters",
+            new Class[] {  });
+        return ProActiveComponentRepresentativeFactory.instance()
+                                                      .createComponentRepresentative(componentParameters.getComponentType(),
+            componentParameters.getHierarchicalType(), proxy,
+            componentParameters.getControllerDescription()
+                               .getControllersConfigFileLocation());
     }
 }

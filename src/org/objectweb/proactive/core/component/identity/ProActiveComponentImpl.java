@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -115,15 +114,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         interface_references_list.add(this);
 
         // 2. control interfaces
-        boolean current_component_is_primitive = !(componentParameters.getHierarchicalType()
-                                                                      .equals(Constants.COMPOSITE) ||
-            (componentParameters.getHierarchicalType().equals(Constants.PARALLEL)));
         addControllers(interface_references_list, componentParameters,
-            current_component_is_primitive);
+            component_is_primitive);
 
         // 3. external functional interfaces
         addFunctionalInterfaces(componentParameters, component_is_primitive,
-            interface_references_list, current_component_is_primitive);
+            interface_references_list);
         // put all in a table
         interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
@@ -140,8 +136,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      */
     private void addFunctionalInterfaces(
         ComponentParameters componentParameters,
-        boolean component_is_primitive, ArrayList interface_references_list,
-        boolean current_component_is_primitive) {
+        boolean component_is_primitive, ArrayList interface_references_list) {
         InterfaceType[] interface_types = componentParameters.getComponentType()
                                                              .getFcInterfaceTypes();
         try {
@@ -149,7 +144,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                 // no interface generated for client itfs of primitive
                 // components
                 if (!(interface_types[i].isFcClientItf() &&
-                        current_component_is_primitive)) {
+                        component_is_primitive)) {
                     ProActiveInterface itf_ref = null;
 
                     // if we have a COLLECTION CLIENT interface, we should see
@@ -203,8 +198,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
 
     private void addControllers(ArrayList interface_references_list,
         ComponentParameters componentParameters, boolean isPrimitive) {
-        ComponentConfigurationHandler componentConfiguration = loadComponentConfiguration(componentParameters.getControllerDescription()
-                                                                                                             .getControllersConfigFileLocation());
+        ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadControllerConfiguration(componentParameters.getControllerDescription()
+                                                                                                                                     .getControllersConfigFileLocation());
         Map controllers = componentConfiguration.getControllers();
         List inputInterceptorsSignatures = componentConfiguration.getInputInterceptors();
         inputInterceptors.setSize(inputInterceptorsSignatures.size());
@@ -296,7 +291,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * @param controllerConfigFileLocation the location of the configuration file
      * @return a xml parsing handler
      */
-    public static ComponentConfigurationHandler loadComponentConfiguration(
+    public static ComponentConfigurationHandler loadControllerConfiguration(
         String controllerConfigFileLocation) {
         try {
             return ComponentConfigurationHandler.createComponentConfigurationHandler(controllerConfigFileLocation);

@@ -31,6 +31,9 @@
 package org.objectweb.proactive.core.component;
 
 import java.io.Serializable;
+import java.util.Map;
+
+import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 
 /**
@@ -57,6 +60,7 @@ public class ControllerDescription implements Serializable {
     private boolean synchronous = false;
     public static final String DEFAULT_COMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-component-config.xml";
     private String controllersConfigFileLocation;
+    private Map controllersSignatures;
 
     /**
      * a no-arg constructor (used in the ProActive parser)
@@ -124,7 +128,12 @@ public class ControllerDescription implements Serializable {
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
             this.synchronous = synchronous;
         }
-        this.controllersConfigFileLocation = controllersConfigFileLocation;
+        if (controllersConfigFileLocation == null) {
+            this.controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
+        } else {
+            this.controllersConfigFileLocation = controllersConfigFileLocation;
+        }
+        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(controllersConfigFileLocation).getControllers();
     }
 
     /**
@@ -132,8 +141,7 @@ public class ControllerDescription implements Serializable {
      * @param controllerDesc the ControllerDescription to copy.
      */
     public ControllerDescription(ControllerDescription controllerDesc) {
-        hierarchicalType = new String(controllerDesc.getHierarchicalType());
-        name = new String(controllerDesc.getName());
+        this(controllerDesc.name, controllerDesc.hierarchicalType, controllerDesc.controllersConfigFileLocation, controllerDesc.synchronous);
     }
 
     /**
@@ -181,10 +189,10 @@ public class ControllerDescription implements Serializable {
      * @return String
      */
     public String getControllersConfigFileLocation() {
-        if (controllersConfigFileLocation == null) {
-            return controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
-        } else {
-            return controllersConfigFileLocation;
-        }
+        return controllersConfigFileLocation;
+    }
+    
+    public Map getControllersSignatures() {
+        return controllersSignatures;
     }
 }

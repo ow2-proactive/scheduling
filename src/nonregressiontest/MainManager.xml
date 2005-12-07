@@ -73,6 +73,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.controller.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.shortcuts.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.lookup.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.cic.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
