@@ -58,6 +58,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
     protected UniqueID bodyID;
+    protected Integer cachedHashCode = null;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -99,19 +100,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
      * </UL>
      */
     public Object reify(MethodCall methodCall) throws Throwable {
-        if (methodCall.getName().equals("equals") &&
-                (methodCall.getNumberOfParameter() == 1)) {
-            Object arg = methodCall.getParameter(0);
-            if (MOP.isReifiedObject(arg)) {
-                Proxy proxy = ((StubObject) arg).getProxy();
-                if (proxy instanceof AbstractBodyProxy) {
-                    return new Boolean(bodyID.equals(
-                            ((AbstractBodyProxy) proxy).bodyID));
-                }
-            }
-            return new Boolean(false);
+        
+        Object cachedMethodResult = checkOptimizedMethod(methodCall);
+        if (cachedMethodResult != null) {
+            return cachedMethodResult;
         }
+        return invokeOnBody(methodCall);
+    }
 
+  
+    private Object invokeOnBody(MethodCall methodCall) throws Exception, RenegotiateSessionException, Throwable {
         // Now gives the MethodCall object to the body
         try {
             if (isOneWayCall(methodCall)) {
@@ -126,6 +124,34 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             throw new ProActiveRuntimeException(e.getMessage(),
                 e.getTargetException());
         }
+    }
+    
+    // optimization may be a local execution or a caching mechanism
+    // returns null if not applicable
+    private Object checkOptimizedMethod(MethodCall methodCall) throws Exception, RenegotiateSessionException, Throwable {
+        if (methodCall.getName().equals("equals") &&
+                (methodCall.getNumberOfParameter() == 1)) {
+            Object arg = methodCall.getParameter(0);
+            if (MOP.isReifiedObject(arg)) {
+                Proxy proxy = ((StubObject) arg).getProxy();
+                if (proxy instanceof AbstractBodyProxy) {
+                    return new Boolean(bodyID.equals(
+                            ((AbstractBodyProxy) proxy).bodyID));
+                }
+            }
+            return new Boolean(false);
+        }
+        
+        if (methodCall.getName().equals("hashCode") &&
+                (methodCall.getNumberOfParameter() == 0)) {
+            if (cachedHashCode == null) {
+                return cachedHashCode = (Integer)invokeOnBody(methodCall);
+            } else {
+                return cachedHashCode;
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -71,6 +71,8 @@ public class Test extends FunctionalTest {
 
     public boolean postConditions() throws Exception {
         Assertions.assertEquals(group1, group2);
+        Assertions.assertEquals(new Integer(group1.hashCode()),
+            new Integer(group2.hashCode()));
         Assertions.assertNonEquals(group1, group3);
         Assertions.assertNonEquals(a1, "x");
         Assertions.assertNonEquals(a1, null);
@@ -79,7 +81,8 @@ public class Test extends FunctionalTest {
         Assertions.assertNonEquals(a1, group3);
         Assertions.assertNonEquals(group3, a1);
         Assertions.assertEquals(registeredA1, registeredA2);
-
+        Assertions.assertEquals(new Integer(registeredA1.hashCode()),
+            new Integer(registeredA2.hashCode()));
         return true;
     }
 }
