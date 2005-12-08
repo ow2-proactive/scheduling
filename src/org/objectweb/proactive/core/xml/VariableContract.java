@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import java.io.FileInputStream;
+import java.io.Serializable;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,7 +49,7 @@ import java.util.Properties;
  * Variables can be defined of different types, thus inforcing different requirements to the contract.
  * @author The ProActive Team
  */
-public class VariableContract {
+public class VariableContract implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     public static VariableContract xmlproperties = null;
     public static final Lock lock = new Lock();
