@@ -32,6 +32,7 @@ package org.objectweb.proactive.branchnbound.core;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Vector;
@@ -53,7 +54,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-import ibis.impl.messagePassing.InputStream;
 
 
 /**
