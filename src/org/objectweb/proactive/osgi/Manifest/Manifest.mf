@@ -3,7 +3,7 @@ Bundle-Description: Bundle containing proactive library
 Bundle-Vendor: OASIS - INRIA Sophia Antipolis
 Bundle-version: 1.0.0
 Bundle-ClassPath: .,components/fractal.jar,asm.jar,log4j.jar,xercesImpl.jar,bouncycastle.jar 
-Export-Package: org.objectweb.proactive.core.group,org.objectweb.proactive.core.descriptor.data,org.objectweb.proactive.core.mop, org.objectweb.proactive.core.runtime,org.objectweb.proactive.core,org.objectweb.proactive.core.rmi, org.objectweb.proactive.osgi, org.objectweb.proactive, org.objectweb.proactive.core.node,org.objectweb.proactive.core.rmi
+Export-Package: org.objectweb.proactive.core.group,org.objectweb.proactive.core.descriptor.data,org.objectweb.proactive.core.mop, org.objectweb.proactive.core.runtime,org.objectweb.proactive.core,org.objectweb.proactive.core.rmi, org.objectweb.proactive.osgi, org.objectweb.proactive, org.objectweb.proactive.core.node,org.objectweb.proactive.core.rmi,org.objectweb.proactive.jmx, org.objectweb.proactive.jmx.provider,org.objectweb.proactive.jmx.provider.proactive, org.objectweb.proactive.osgi.entities, org.objectweb.proactive.osgi.mbean
 DynamicImport-Package: * 
-Bundle-Location: file:///home/vlegrand/workspace/ProActiveNEW_SAVE/dist/bundle/proactiveBundle.jar
+Bundle-Location: file:///user/vlegrand/home/workspace/ProActiveNEW_SAVE/dist/bundle/proactiveBundle.jar
 Bundle-Activator: org.objectweb.proactive.osgi.Activator
