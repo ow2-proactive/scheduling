@@ -215,7 +215,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
                 if ((nodes.length > 1) && !contentDesc.uniqueInstance()) { // cyclic node + 1 instance per node
                     //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
-                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters);
+                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType(), componentParameters.getControllerDescription());
                     Group group_of_components = ProActiveGroup.getGroup(components);
 
                     if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
@@ -273,9 +273,6 @@ public class Fractive implements GenericFactory, Component, Factory {
         } catch (NodeException e) {
             throw new InstantiationException(e.getMessage());
         } catch (ClassNotFoundException e) {
-            throw new InstantiationException(e.getMessage());
-        } catch (java.lang.InstantiationException e) {
-            e.printStackTrace();
             throw new InstantiationException(e.getMessage());
         }
     }

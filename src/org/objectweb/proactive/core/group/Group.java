@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.group;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ import java.util.Set;
  * @author Laurent Baduel
  *
  */
-public interface Group extends Collection {
+public interface Group extends List {
 
     /**
      * Returns the (upper) class of member.

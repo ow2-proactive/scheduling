@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
@@ -109,14 +110,6 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.className = nameOfClass;
     }
 
-    //    public ProxyForGroup(String nameOfClass, Integer size)
-    //        throws ConstructionOfReifiedObjectFailedException {
-    //        this.className = nameOfClass;
-    //        this.memberList = new Vector(size.intValue());
-    //        this.proxyForGroupID = new UniqueID();
-    //        this.threadpool = new ThreadPool();
-    //		this.elementNames = new HashMap();
-    //    }
     public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
         this.memberList = new Vector();
         this.proxyForGroupID = new UniqueID();
@@ -1084,13 +1077,48 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.threadpool.complete();
     }
 
-    /**
-     * Sets an object to the specified position in the Group
-     * @param index - the position
-     * @param o - the object to add
+    /*
+     * @see java.util.List#set(int, java.lang.Object)
      */
-    public void set(int index, Object o) {
-        this.memberList.set(index, o);
+     public Object set(int index, Object o) {
+        return this.memberList.set(index, o);
+    }
+     
+     
+
+    /*
+     * @see java.util.List#add(int, java.lang.Object)
+     */
+    public void add(int index, Object element) {
+        memberList.add(index, element);
+    }
+
+    /*
+     * @see java.util.List#addAll(int, java.util.Collection)
+     */
+    public boolean addAll(int index, Collection c) {
+        return memberList.addAll(index, c);
+    }
+
+    /*
+     * @see java.util.List#lastIndexOf(java.lang.Object)
+     */
+    public int lastIndexOf(Object o) {
+        return memberList.lastIndexOf(o);
+    }
+
+    /*
+     * @see java.util.List#listIterator(int)
+     */
+    public ListIterator listIterator(int index) {
+        return memberList.listIterator(index);
+    }
+
+    /*
+     * @see java.util.List#subList(int, int)
+     */
+    public List subList(int fromIndex, int toIndex) {
+        return memberList.subList(fromIndex, toIndex);
     }
 
     /* ------------------------ PRIVATE METHODS FOR SERIALIZATION --------------------- */
@@ -1202,4 +1230,5 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         elementNames.remove(key);
         return removed;
     }
+
 }

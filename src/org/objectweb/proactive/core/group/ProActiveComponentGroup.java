@@ -34,9 +34,10 @@ import java.lang.reflect.Constructor;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
@@ -68,7 +69,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveComponentGroup {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-
+    
     /**
      * creates an empty group able to contain ProActiveInterfaceImpl objects of the given type..
      * The stub in front of the group proxy is of type ProActiveInterfaceImpl.
@@ -110,14 +111,15 @@ public class ProActiveComponentGroup {
      * Creates an empty  component stub+a group proxy.
      * The stub in front of the group proxy is a component stub (instance of ComponentRepresentativeImpl),
      * that offers references to the functional interfaces defined in the type of the component.
-     * @param componentParameters parameters of this component
+     * @param componentType type of this component
+     * @param controllerDesc configuration of the controllers
      * @return a stub/proxy
      * @throws ClassNotFoundException
      * @throws java.lang.InstantiationException
      */
     public static ProActiveComponentRepresentative newComponentRepresentativeGroup(
-        ComponentParameters componentParameters)
-        throws ClassNotFoundException, java.lang.InstantiationException {
+        ComponentType componentType, ControllerDescription controllerDesc)
+        throws ClassNotFoundException, InstantiationException {
         try {
             ProActiveComponentRepresentative result = null;
 
@@ -126,19 +128,17 @@ public class ProActiveComponentGroup {
                         ComponentType.class, String.class, String.class
                     });
             result = (ProActiveComponentRepresentative) constructor.newInstance(new Object[] {
-                        componentParameters.getComponentType(),
-                        componentParameters.getHierarchicalType(),
-                        componentParameters.getControllerDescription()
-                                           .getControllersConfigFileLocation()
+                        componentType,
+                        controllerDesc.getHierarchicalType(),
+                        controllerDesc.getControllersConfigFileLocation()
                     });
 
             // build the constructor call for the proxy object to create
             ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(ProActiveComponentRepresentativeImpl.class,
                     new Object[] {
-                        componentParameters.getComponentType(),
-                        componentParameters.getHierarchicalType(),
-                        componentParameters.getControllerDescription()
-                                           .getControllersConfigFileLocation()
+                        componentType,
+                        controllerDesc.getHierarchicalType(),
+                        controllerDesc.getControllersConfigFileLocation()
                     });
 
             // Instanciates the proxy object
@@ -152,7 +152,7 @@ public class ProActiveComponentGroup {
 
             return result;
         } catch (Exception e) {
-            throw new java.lang.InstantiationException(
+            throw new InstantiationException(
                 "cannot create group of component representatives : " +
                 e.getMessage());
         }
