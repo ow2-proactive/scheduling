@@ -83,7 +83,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //table used to handle virtualnode's registration when discovery event is received after the virtualnode's registration
     //this table contains a mapping virtualNode's name and an arrayList that contains all associated ServiceRegistrations
     protected java.util.Hashtable jiniVirtualNodeMap;
-    private boolean isRuntimeRegistered = false;
+    private volatile boolean isRuntimeRegistered = false;
 
     // this object is not serializable
     protected transient net.jini.lease.LeaseRenewalManager leaseManager = new net.jini.lease.LeaseRenewalManager();
