@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.runtime.jini;
 
 import java.io.IOException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.security.SecureRandom;
 import java.util.Hashtable;
@@ -128,7 +129,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String vnname, String jobId)
-        throws RemoteException, NodeException {
+        throws RemoteException, NodeException, AlreadyBoundException {
         //counter used to check that the node has been registered at 
         //least once as jini service
         //int counter = 0;
