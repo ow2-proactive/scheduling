@@ -45,10 +45,10 @@ public class MOPClassLoader extends URLClassLoader {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     // retreives the optionnal byteCodeManipulator JVM arg
-    // ASM is used by default
+    // javassist is used by default
     public static String BYTE_CODE_MANIPULATOR = (System.getProperty(
             "byteCodeManipulator") != null)
-        ? System.getProperty("byteCodeManipulator") : "ASM";
+        ? System.getProperty("byteCodeManipulator") : "javassist";
     protected static Hashtable classDataCache = new Hashtable();
     protected static MOPClassLoader mopCl = null;
 
@@ -203,9 +203,9 @@ public class MOPClassLoader extends URLClassLoader {
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                     logger.error(
-                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist.");
+                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
                     logger.error(
-                        "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
+                        "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
                 }
 
                 // We use introspection to invoke the defineClass method to avoid the normal 

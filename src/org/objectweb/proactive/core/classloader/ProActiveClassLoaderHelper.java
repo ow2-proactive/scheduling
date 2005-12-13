@@ -110,9 +110,9 @@ public class ProActiveClassLoaderHelper {
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist.");
+                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
                 System.err.println(
-                    "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
+                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
             }
             if (class_data != null) {
                 classCache.addClassData(className, class_data);
