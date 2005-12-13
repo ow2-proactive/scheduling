@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
+import java.rmi.AlreadyBoundException;
+import java.util.Random;
+
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
 import org.objectweb.fractal.gui.FractalGUI;
 import org.objectweb.proactive.ProActive;
@@ -63,6 +66,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     RuntimeRegistrationEventListener {
     private static final int DEFAULT_WIDTH = 850;
     private static final int DEFAULT_HEIGHT = 600;
+    private static Random randomizer = new Random();
     private int options;
     private IC2DPanel ic2dPanel;
     private IC2DObject ic2dObject;
@@ -172,8 +176,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
 
-        nodeName = "IC2DNode-" +
-            Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt());
+        nodeName = "IC2DNode-" + Integer.toString(randomizer.nextInt());
         if (port != 0) {
             url = UrlBuilder.buildUrl(host, nodeName, protocol, port);
         } else {
@@ -186,7 +189,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                     this.getName(), ProActive.getJobId());
             } catch (NodeException e1) {
                 logger.log(e1, false);
-            }
+            } catch (AlreadyBoundException e) {
+				e.printStackTrace();
+			}
         }
 
         String jobId = proActiveRuntimeRegistered.getJobID();

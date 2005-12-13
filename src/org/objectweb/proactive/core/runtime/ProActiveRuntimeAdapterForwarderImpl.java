@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.UnmarshalException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -115,6 +116,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
         in.defaultReadObject();
 
         String prop = System.getProperty("proactive.hierarchicalRuntime");
+
         if ((prop != null) && prop.equals("true")) {
             // on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
@@ -388,7 +390,8 @@ public class ProActiveRuntimeAdapterForwarderImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#registerVirtualNode(java.lang.String, boolean)
      */
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws ProActiveException {
+        boolean replacePreviousBinding)
+        throws ProActiveException, AlreadyBoundException {
         try {
             proActiveRuntime.registerVirtualNode(urid, virtualNodeName,
                 replacePreviousBinding);

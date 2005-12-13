@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.UnmarshalException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -153,7 +154,8 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
      */
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, ProActiveSecurityManager policyServer,
-        String vnName, String jobId) throws NodeException {
+        String vnName, String jobId)
+        throws NodeException, AlreadyBoundException {
         try {
             return proActiveRuntime.createLocalNode(nodeName,
                 replacePreviousBinding, policyServer, vnName, jobId);
@@ -376,7 +378,8 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#registerVirtualNode(java.lang.String, boolean)
      */
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws ProActiveException {
+        boolean replacePreviousBinding)
+        throws ProActiveException, AlreadyBoundException {
         try {
             proActiveRuntime.registerVirtualNode(virtualNodeName,
                 replacePreviousBinding);

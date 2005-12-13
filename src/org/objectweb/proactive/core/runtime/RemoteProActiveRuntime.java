@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public interface RemoteProActiveRuntime extends Serializable {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String VNname, String jobId)
-        throws IOException, NodeException;
+        throws IOException, NodeException, AlreadyBoundException;
 
     public void killAllNodes() throws IOException, ProActiveException;
 
@@ -124,7 +125,8 @@ public interface RemoteProActiveRuntime extends Serializable {
         throws IOException, ProActiveException;
 
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws IOException, ProActiveException;
+        boolean replacePreviousBinding)
+        throws IOException, AlreadyBoundException, ProActiveException;
 
     public void unregisterVirtualNode(String virtualNodeName)
         throws IOException, ProActiveException;

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
+import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -73,7 +74,8 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
 
     public String createLocalNode(UniqueRuntimeID ruid, String nodeName,
         boolean replacePreviousBinding, ProActiveSecurityManager psm,
-        String VNname, String jobId) throws IOException, NodeException;
+        String VNname, String jobId)
+        throws IOException, NodeException, AlreadyBoundException;
 
     public void killAllNodes(UniqueRuntimeID ruid)
         throws IOException, ProActiveException;
@@ -132,7 +134,7 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
 
     public void registerVirtualNode(UniqueRuntimeID ruid,
         String virtualNodeName, boolean replacePreviousBinding)
-        throws IOException, ProActiveException;
+        throws IOException, ProActiveException, AlreadyBoundException;
 
     public void unregisterVirtualNode(UniqueRuntimeID ruid,
         String virtualNodeName) throws IOException, ProActiveException;

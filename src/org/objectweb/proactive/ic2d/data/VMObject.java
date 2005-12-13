@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.data;
 
+import java.rmi.AlreadyBoundException;
 import java.rmi.dgc.VMID;
 
 import org.apache.log4j.Logger;
@@ -61,12 +62,10 @@ public class VMObject extends AbstractDataObject {
     private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
     private static Node SPY_LISTENER_NODE;
     private static int NOT_RESPONDING_MAX_TRIES = 3; // actually not used
-    private int notRespondingCounter = 0;
-    private long firstNotRespondingTime = 0;
-    private long lastNotRespondingTime = -1;
 
     static {
         String currentHost;
+
         try {
             currentHost = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
@@ -79,9 +78,14 @@ public class VMObject extends AbstractDataObject {
                         currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
         } catch (NodeException e) {
             SPY_LISTENER_NODE = null;
+        } catch (AlreadyBoundException e) {
+            e.printStackTrace();
         }
     }
 
+    private int notRespondingCounter = 0;
+    private long firstNotRespondingTime = 0;
+    private long lastNotRespondingTime = -1;
     protected Spy spy;
     protected VMID vmid;
     protected String protocolId;
@@ -98,23 +102,30 @@ public class VMObject extends AbstractDataObject {
     public VMObject(HostObject host, VMID vmid, Node node, String protocolId)
         throws ActiveObjectCreationException, NodeException {
         super(host);
+
         //System.out.println("nodeURL : "+node.getNodeInformation().getURL());
         if (log4jlogger.isDebugEnabled()) {
             log4jlogger.debug("VMObject.<init>");
         }
+
         this.vmid = vmid;
         this.protocolId = protocolId;
         this.objectNodeMap = new java.util.HashMap();
         this.baseNode = node;
+
         SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());
+
         if (log4jlogger.isDebugEnabled()) {
             log4jlogger.debug("VMObject.<init> creating activeSpyListener");
         }
+
         this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,
                 SPY_LISTENER_NODE);
+
         if (log4jlogger.isDebugEnabled()) {
             log4jlogger.debug("VMObject.<init> creating spy");
         }
+
         this.spy = (Spy) ProActive.newActive(Spy.class.getName(),
                 new Object[] { activeSpyListener }, node);
         addNodeObject(node);
@@ -137,6 +148,7 @@ public class VMObject extends AbstractDataObject {
     public void registerListener(VMObjectListener listener) {
         this.messageMonitoringListener = listener;
         this.listener = listener;
+
         // notify existing childs
         notifyListenerOfExistingChilds();
         sendEventsForAllActiveObjects();
@@ -174,6 +186,7 @@ public class VMObject extends AbstractDataObject {
             return spy.getSystemProperty(key);
         } catch (Exception e) {
             recoverExceptionInSpy(e);
+
             return "! Error occured";
         }
     }
@@ -183,6 +196,7 @@ public class VMObject extends AbstractDataObject {
             return spy.getUpdateFrequence();
         } catch (Exception e) {
             recoverExceptionInSpy(e);
+
             return 0;
         }
     }
@@ -199,6 +213,7 @@ public class VMObject extends AbstractDataObject {
         if (log4jlogger.isDebugEnabled()) {
             log4jlogger.debug("VMObject.sendEventForAllActiveObjects()");
         }
+
         try {
             spy.sendEventsForAllActiveObjects();
         } catch (Exception e) {
@@ -213,16 +228,21 @@ public class VMObject extends AbstractDataObject {
         if (log4jlogger.isDebugEnabled()) {
             log4jlogger.debug("VMObject: addNodeObject()");
         }
+
         String nodeName = node.getNodeInformation().getName();
         NodeObject nodeObject = (NodeObject) getChild(nodeName);
+
         if (nodeObject == null) {
             nodeObject = new NodeObject(this, node);
             putChild(nodeName, nodeObject);
+
             if (listener != null) {
                 listener.nodeObjectAdded(nodeObject);
             }
+
             sendEventsForAllActiveObjects();
         }
+
         return nodeObject;
     }
 
@@ -237,6 +257,7 @@ public class VMObject extends AbstractDataObject {
     public void removeNodeObject(String nodeName) {
         // remove the node
         NodeObject nodeObject = (NodeObject) removeChild(nodeName);
+
         if (nodeObject == null) {
             controller.log("The node " + nodeName +
                 " does not exist. Cannot remove it");
@@ -257,6 +278,7 @@ public class VMObject extends AbstractDataObject {
 
     public void killVM() {
         ProActiveRuntime part = null;
+
         try {
             part = baseNode.getProActiveRuntime();
             part.killRT(false);
@@ -267,6 +289,7 @@ public class VMObject extends AbstractDataObject {
                                                .getInetAddress()) +
                 " terminated!!!");
         }
+
         getTypedParent().removeVMObject(vmid);
     }
 
@@ -295,11 +318,13 @@ public class VMObject extends AbstractDataObject {
                 spy.terminate();
             } catch (Exception e) {
             }
+
             activeSpyListener.terminate();
             objectNodeMap.clear();
             spy = null;
             activeSpyListener = null;
             listener = null;
+
             return true;
         } else {
             return false;
@@ -314,6 +339,7 @@ public class VMObject extends AbstractDataObject {
             } else {
                 spy.removeMessageEventListener(object.getID());
             }
+
             super.monitoringMessageEventChanged(object, value);
         } catch (Exception e) {
             recoverExceptionInSpy(e);
@@ -332,6 +358,7 @@ public class VMObject extends AbstractDataObject {
         //controller.log("Exception occured while contacting Spy for VM " + vmid +
         //    ". Now removing the VM from IC2D.", e);
         controller.log("VM " + vmid + " is not responding ...");
+
         if (listener != null) {
             listener.vmNotResponding();
         }
@@ -343,6 +370,7 @@ public class VMObject extends AbstractDataObject {
         if ((System.currentTimeMillis() - lastNotRespondingTime) > (MonitorThread.getTtr() * 1000)) {
             notRespondingCounter++;
             lastNotRespondingTime = System.currentTimeMillis();
+
             //System.out.println("Spy lost #" + notRespondingCounter) ;
         }
 
@@ -363,15 +391,20 @@ public class VMObject extends AbstractDataObject {
 
     private ActiveObject findActiveObject(UniqueID id) {
         NodeObject nodeObject = getNodeObject(id);
+
         if (nodeObject == null) {
             controller.log("!! Event received for an unknown node, id=" + id);
+
             return null; // unknown node
         }
+
         ActiveObject ao = nodeObject.getActiveObject(id);
+
         if (ao == null) {
             controller.log(
                 "!! Event received for an unknown active object, id=" + id);
         }
+
         return ao;
     }
 
@@ -379,7 +412,9 @@ public class VMObject extends AbstractDataObject {
         if (getChildObjectsCount() == 0) {
             return;
         }
+
         java.util.Iterator iterator = childsIterator();
+
         while (iterator.hasNext()) {
             NodeObject nodeObject = (NodeObject) iterator.next();
             listener.nodeObjectAdded(nodeObject);
@@ -411,6 +446,7 @@ public class VMObject extends AbstractDataObject {
 
             //System.out.println("NodeName "+nodeName+" AO id "+id);
             NodeObject nodeObject = getNodeObject(nodeName);
+
             if (nodeObject != null) {
                 nodeObject.addActiveObject(classname, id, isActive);
             }
@@ -424,6 +460,7 @@ public class VMObject extends AbstractDataObject {
             if (object == null) {
                 return;
             }
+
             if (!isAlive) {
                 object.destroyObject();
             }
@@ -433,10 +470,13 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             object.setServingStatus(ActiveObject.STATUS_WAITING_FOR_REQUEST);
             object.setRequestQueueLength(0);
             communicationEventListener.objectWaitingForRequest(object, spyEvent);
@@ -446,10 +486,13 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             object.setServingStatus((object.getServingStatus() == ActiveObject.STATUS_SERVING_REQUEST)
                 ? ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_SERVING
                 : ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_ACTIVE);
@@ -460,10 +503,13 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             switch (object.getServingStatus()) {
             case ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_SERVING:
                 object.setServingStatus(ActiveObject.STATUS_SERVING_REQUEST);
@@ -478,13 +524,17 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             if (!object.isMonitoringRequestSender()) {
                 return;
             }
+
             communicationEventListener.requestMessageSent(object, spyEvent);
         }
 
@@ -492,15 +542,20 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             object.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
             object.setServingStatus(ActiveObject.STATUS_ACTIVE);
+
             if (!object.isMonitoringReplySender()) {
                 return;
             }
+
             communicationEventListener.replyMessageSent(object, spyEvent);
         }
 
@@ -508,14 +563,19 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             object.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
+
             if (!object.isMonitoringRequestReceiver()) {
                 return;
             }
+
             communicationEventListener.requestMessageReceived(object, spyEvent);
         }
 
@@ -523,13 +583,17 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             if (!object.isMonitoringReplySender()) {
                 return;
             }
+
             communicationEventListener.replyMessageReceived(object, spyEvent);
         }
 
@@ -537,15 +601,20 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             object.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
             object.setServingStatus(ActiveObject.STATUS_ACTIVE);
+
             if (!object.isMonitoringReplySender()) {
                 return;
             }
+
             communicationEventListener.voidRequestServed(object, spyEvent);
         }
 
@@ -553,10 +622,13 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             ActiveObject object = findActiveObject(id);
+
             if (object == null) {
                 return;
             }
+
             object.setRequestQueueLength(((SpyMessageEvent) spyEvent).getRequestQueueLength());
             object.setServingStatus(ActiveObject.STATUS_SERVING_REQUEST);
         }
@@ -565,6 +637,7 @@ public class VMObject extends AbstractDataObject {
             if (!controller.isMonitoring()) {
                 return;
             }
+
             communicationEventListener.allEventsProcessed();
         }
     } // end inner class MySpyEventListener

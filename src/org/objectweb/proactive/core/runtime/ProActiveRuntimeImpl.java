@@ -30,8 +30,18 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.apache.log4j.MDC;
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
+import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -78,21 +88,6 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 import org.objectweb.proactive.ext.security.securityentity.Entity;
 import org.objectweb.proactive.ext.security.securityentity.EntityCertificate;
 import org.objectweb.proactive.ext.security.securityentity.EntityVirtualNode;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import java.security.PublicKey;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-
 
 
 /**
@@ -224,7 +219,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         MDC.put("runtime", getURL());
     }
 
-    protected static synchronized int getNextInt() {
+    public static synchronized int getNextInt() {
         if (prng == null) {
             prng = new SecureRandom();
         }
@@ -283,7 +278,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } else if (!isHierarchicalSearch) {
             return null; // pad == null
         } else { // else search pad in parent runtime
-
             if (parentRuntime == null) {
                 throw new IOException(
                     "Descriptor cannot be found hierarchically since this runtime has no parent");
@@ -1006,9 +1000,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                     System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
+                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
                     System.err.println(
-                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
+                        "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
                 }
             } catch (ClassNotFoundException ignored) {
             }

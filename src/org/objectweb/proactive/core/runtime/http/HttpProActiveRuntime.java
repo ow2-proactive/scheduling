@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime.http;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public HttpProActiveRuntime() {
         isLocal = true;
         this.localruntime = ProActiveRuntimeImpl.getProActiveRuntime();
+
         if (OsgiParameters.servletEnabled()) {
             this.url = ClassServerServlet.getUrl();
         } else {
@@ -104,6 +106,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
      */
     public HttpProActiveRuntime(String newurl) {
         runtimeLogger.debug("Adapter URL = " + newurl);
+
         try {
             this.url = UrlBuilder.checkUrl(newurl);
             isLocal = false;
@@ -125,19 +128,22 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         params.add(creatorID);
         params.add(vmName);
         params.add(padURL);
+
         try {
             new RuntimeRequest("getProcessToDeploy", params, this.url).send();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String vname, String jobId)
-        throws NodeException, HTTPRemoteException {
+        throws NodeException, HTTPRemoteException, AlreadyBoundException {
         String nodeURL = null;
+
         try {
             nodeURL = buildNodeURL(nodeName);
         } catch (UnknownHostException e1) {
@@ -157,29 +163,37 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             paramsList.add(securityManager);
             paramsList.add(vname);
             paramsList.add(jobId);
+
             RuntimeRequest req = new RuntimeRequest("createLocalNode",
                     paramsList, this.url);
             req.send();
         }
+
         runtimeLogger.info(nodeURL + " successfully registered ");
+
         return nodeURL;
     }
 
     public void killAllNodes() throws HTTPRemoteException, ProActiveException {
         if (isLocal) {
             localruntime.killAllNodes();
+
             return;
         }
+
         new RuntimeRequest("killAllNodes", this.url).send();
     }
 
     public void killNode(String nodeName)
         throws ProActiveException, HTTPRemoteException {
         String name = UrlBuilder.getNameFromUrl(nodeName);
+
         if (isLocal) {
             localruntime.killNode(name);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(name);
         new RuntimeRequest("killNode", params, this.url).send();
@@ -189,8 +203,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws IOException, ProActiveException {
         if (isLocal) {
             localruntime.createVM(remoteProcess);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(remoteProcess);
         new RuntimeRequest("createVM", params, this.url).send();
@@ -201,8 +217,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getLocalNodeNames();
         }
+
         RuntimeRequest req = new RuntimeRequest("getLocalNodeNames", this.url);
         req.send();
+
         try {
             return (String[]) req.getReturnedObject();
         } catch (Exception e) {
@@ -215,14 +233,17 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             if (isLocal) {
                 this.vmInformation = localruntime.getVMInformation();
             }
+
             RuntimeRequest req = new RuntimeRequest("getVMInformation", this.url);
             req.send();
+
             try {
                 this.vmInformation = (VMInformation) req.getReturnedObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
         return this.vmInformation;
     }
 
@@ -232,8 +253,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             localruntime.register(proActiveRuntimeDist, proActiveRuntimeName,
                 creatorID, creationProtocol, vmName);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         ArrayList paramsTypes = new ArrayList();
 
@@ -262,8 +285,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             localruntime.unregister(proActiveRuntimeDist, proActiveRuntimeUrl,
                 creatorID, creationProtocol, vmName);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         ArrayList paramsTypes = new ArrayList();
 
@@ -284,10 +309,13 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ProActiveRuntime[] getProActiveRuntimes()
         throws ProActiveException, HTTPRemoteException {
         RuntimeRequest req = new RuntimeRequest("getProActiveRuntimes", this.url);
+
         if (isLocal) {
             return localruntime.getProActiveRuntimes();
         }
+
         req.send();
+
         try {
             return (ProActiveRuntime[]) req.getReturnedObject();
         } catch (Exception e) {
@@ -300,12 +328,14 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getProActiveRuntime(proActiveRuntimeName);
         }
+
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
 
         RuntimeRequest req = new RuntimeRequest("getProActiveRuntime", params,
                 this.url);
         req.send();
+
         try {
             return (ProActiveRuntime) req.getReturnedObject();
         } catch (Exception e) {
@@ -337,12 +367,14 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getActiveObjects(nodeName);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodeName);
 
         RuntimeRequest req = new RuntimeRequest("getActiveObjects", params,
                 this.url);
         req.send();
+
         try {
             return (ArrayList) req.getReturnedObject();
         } catch (Exception e) {
@@ -355,6 +387,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getActiveObjects(nodeName, objectName);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodeName);
         params.add(objectName);
@@ -362,6 +395,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("getActiveObjects", params,
                 this.url);
         req.send();
+
         try {
             return (ArrayList) req.getReturnedObject();
         } catch (Exception e) {
@@ -374,11 +408,14 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getVirtualNode(virtualNodeName);
         }
+
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
+
         RuntimeRequest req = new RuntimeRequest("getVirtualNode", params,
                 this.url);
         req.send();
+
         try {
             return (VirtualNode) req.getReturnedObject();
         } catch (Exception e) {
@@ -393,6 +430,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         //indeed the local registration occured when the vn was created.
         // It is the same behavior(for this method) in all remote parts
         String vn_url;
+
         try {
             vn_url = buildNodeURL(virtualNodeName);
         } catch (UnknownHostException e) {
@@ -407,8 +445,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             localruntime.unregisterVirtualNode(virtualNodeName);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
 
@@ -418,8 +458,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public void unregisterAllVirtualNodes() throws ProActiveException {
         if (isLocal) {
             localruntime.unregisterAllVirtualNodes();
+
             return;
         }
+
         try {
             new RuntimeRequest("unregisterAllVirtualNodes", this.url).send();
         } catch (HTTPRemoteException e) {
@@ -436,6 +478,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.createBody(nodeName, bodyConstructorCall,
                 isNodeLocal);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodeName);
         params.add(bodyConstructorCall);
@@ -443,6 +486,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
 
         RuntimeRequest req = new RuntimeRequest("createBody", params, this.url);
         req.send();
+
         try {
             return (UniversalBody) req.getReturnedObject();
         } catch (ConstructorCallExecutionFailedException e) {
@@ -459,12 +503,14 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.receiveBody(nodeName, body);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodeName);
         params.add(body);
 
         RuntimeRequest req = new RuntimeRequest("receiveBody", params, this.url);
         req.send();
+
         try {
             return (UniversalBody) req.getReturnedObject();
         } catch (Exception e) {
@@ -481,11 +527,13 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getJobID(nodeUrl);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodeUrl);
 
         RuntimeRequest req = new RuntimeRequest("getJobID", params, this.url);
         req.send();
+
         try {
             return (String) req.getReturnedObject();
         } catch (Exception e) {
@@ -497,8 +545,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             localruntime.addAcquaintance(proActiveRuntimeName);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
 
@@ -510,8 +560,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getAcquaintances();
         }
+
         RuntimeRequest req = new RuntimeRequest("getAcquaintances", this.url);
         req.send();
+
         try {
             return (String[]) req.getReturnedObject();
         } catch (Exception e) {
@@ -528,8 +580,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             localruntime.rmAcquaintance(proActiveRuntimeName);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
 
@@ -541,12 +595,14 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getClassDataFromParentRuntime(className);
         }
+
         ArrayList params = new ArrayList();
         params.add(className);
 
         RuntimeRequest req = new RuntimeRequest("getClassDataFromParentRuntime",
                 params, this.url);
         req.send();
+
         try {
             return (byte[]) req.getReturnedObject();
         } catch (Exception e) {
@@ -559,16 +615,19 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getClassDataFromThisRuntime(className);
         }
+
         ArrayList params = new ArrayList();
         params.add(className);
 
         RuntimeRequest req = new RuntimeRequest("getClassDataFromThisRuntime",
                 params, this.url);
         req.send();
+
         try {
             return (byte[]) req.getReturnedObject();
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -581,6 +640,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.receiveCheckpoint(nodeURL, ckpt, inc);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodeURL);
         params.add(ckpt);
@@ -589,6 +649,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("receiveCheckpoint", params,
                 this.url);
         req.send();
+
         try {
             return (UniversalBody) req.getReturnedObject();
         } catch (Exception e) {
@@ -601,6 +662,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getDescriptor(url, isHierarchicalSearch);
         }
+
         ArrayList params = new ArrayList();
         params.add(url);
         params.add(new Boolean(isHierarchicalSearch));
@@ -608,6 +670,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("getDescriptor", params,
                 this.url);
         req.send();
+
         try {
             return (ProActiveDescriptor) req.getReturnedObject();
         } catch (Exception e) {
@@ -620,8 +683,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             ProActiveException {
         if (isLocal) {
             localruntime.launchMain(className, parameters);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(className);
         params.add(parameters);
@@ -634,8 +699,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws IOException, ClassNotFoundException, ProActiveException {
         if (isLocal) {
             localruntime.newRemote(className);
+
             return;
         }
+
         ArrayList params = new ArrayList();
         params.add(className);
 
@@ -651,6 +718,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (i == -1) {
             //it is an url given by a descriptor
             String host = null;
+
             try {
                 host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                       .getInetAddress());
@@ -661,10 +729,12 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             //        System.out.println("host = " + host);
             int n = host.indexOf(":");
             String u = "";
+
             if (n == -1) {
                 int port = Integer.parseInt(System.getProperty(
                             "proactive.http.port"));
                 u = UrlBuilder.buildUrl(host, url, "http:", port);
+
                 //            System.out.println("U = " + u + " -- " + port);
             } else {
                 u = UrlBuilder.buildUrl(host, url, "http:");
@@ -697,11 +767,13 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             return localruntime.getVNName(nodename);
         }
+
         ArrayList params = new ArrayList();
         params.add(nodename);
 
         RuntimeRequest req = new RuntimeRequest("getVNName", params, this.url);
         req.send();
+
         try {
             return (String) req.getReturnedObject();
         } catch (Exception e) {
@@ -720,6 +792,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("getCertificate", params,
                 this.url);
         req.send();
+
         try {
             return (X509Certificate) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -728,6 +801,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -746,6 +820,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 this.url);
 
         req.send();
+
         try {
             return ((Long) req.getReturnedObject()).longValue();
         } catch (SecurityException e) {
@@ -754,6 +829,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return 0;
         }
     }
@@ -769,6 +845,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("getPublicKey", params, this.url);
 
         req.send();
+
         try {
             return (PublicKey) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -777,6 +854,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -795,6 +873,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("randomValue", params, this.url);
 
         req.send();
+
         try {
             return (byte[]) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -803,6 +882,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -826,6 +906,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 this.url);
 
         req.send();
+
         try {
             return (byte[][]) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -834,6 +915,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -861,6 +943,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 this.url);
 
         req.send();
+
         try {
             return (byte[][]) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -871,6 +954,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -887,6 +971,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("getPolicy", params, this.url);
 
         req.send();
+
         try {
             return (SecurityContext) req.getReturnedObject();
         } catch (SecurityNotAvailableException e) {
@@ -895,6 +980,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -911,6 +997,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 params, this.url);
 
         req.send();
+
         try {
             return (byte[]) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -919,6 +1006,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -934,6 +1022,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         RuntimeRequest req = new RuntimeRequest("getEntities", params, this.url);
 
         req.send();
+
         try {
             return (ArrayList) req.getReturnedObject();
         } catch (SecurityException e) {
@@ -942,6 +1031,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -959,6 +1049,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 this.url);
 
         req.send();
+
         try {
             req.getReturnedObject();
         } catch (SecurityException e) {

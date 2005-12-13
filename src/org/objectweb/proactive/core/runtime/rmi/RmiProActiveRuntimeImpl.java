@@ -67,6 +67,8 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import ibis.rmi.AlreadyBoundException;
+
 
 /**
  *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
@@ -76,6 +78,9 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  */
 public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     implements RmiProActiveRuntime {
+    //attemps to register when having an AlreadyBoundException
+    private static final int NUMBER_OF_REGISTER_ATTEMPTS = 2;
+
     //  In few methods this field is cast into a ProActiveRuntimeImpl
     // First because we are sure that it is an instance of such object
     // and it avoids throwing an exception
@@ -88,28 +93,6 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     //store vn urls to be able to unregister vns
     private ArrayList vnNodesArray;
     private boolean hasCreatedRegistry;
-
-    //	
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
-    private void construct()
-        throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
-        //System.out.println("toto");
-        this.hasCreatedRegistry = RegistryHelper.getRegistryCreator();
-        try {
-            this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-        } catch (ExceptionInInitializerError e) {
-            e.printStackTrace();
-            throw e;
-        }
-        this.nodesArray = new java.util.ArrayList();
-        this.vnNodesArray = new java.util.ArrayList();
-        //this.urlBuilder = new UrlBuilder();
-        this.proActiveRuntimeURL = buildRuntimeURL();
-        //            java.rmi.Naming.bind(proActiveRuntimeURL, this);
-        register(proActiveRuntimeURL, false);
-        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
-    }
 
     public RmiProActiveRuntimeImpl()
         throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
@@ -127,6 +110,41 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         throws java.rmi.RemoteException {
     }
 
+    //	
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    private void construct() throws java.rmi.RemoteException {
+        //System.out.println("toto");
+        this.hasCreatedRegistry = RegistryHelper.getRegistryCreator();
+
+        int registerAttempts = NUMBER_OF_REGISTER_ATTEMPTS;
+
+        while (registerAttempts > 0) {
+            try {
+                this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+            } catch (ExceptionInInitializerError e) {
+                e.printStackTrace();
+                throw e;
+            }
+
+            this.nodesArray = new java.util.ArrayList();
+            this.vnNodesArray = new java.util.ArrayList();
+
+            //this.urlBuilder = new UrlBuilder();
+            this.proActiveRuntimeURL = buildRuntimeURL();
+
+            try {
+                //java.rmi.Naming.bind(proActiveRuntimeURL, this);
+                register(proActiveRuntimeURL, false);
+                registerAttempts = 0; //registration was ok
+            } catch (java.rmi.AlreadyBoundException e) {
+                registerAttempts--;
+            }
+        }
+
+        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
+    }
+
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -140,13 +158,14 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String VNname, String jobId)
-        throws NodeException, RemoteException {
+        throws NodeException, RemoteException, java.rmi.AlreadyBoundException {
         String nodeURL = null;
 
         //Node node;
         try {
             //first we build a well-formed url
             nodeURL = buildNodeURL(nodeName);
+
             //then take the name of the node
             String name = UrlBuilder.getNameFromUrl(nodeURL);
 
@@ -158,7 +177,9 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
+
         nodesArray.add(nodeURL);
+
         return nodeURL;
     }
 
@@ -167,6 +188,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
             String url = (String) nodesArray.get(i);
             killNode(url);
         }
+
         proActiveRuntime.killAllNodes();
     }
 
@@ -174,6 +196,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         throws RemoteException, ProActiveException {
         String nodeUrl = null;
         String name = null;
+
         try {
             nodeUrl = buildNodeURL(nodeName);
             name = UrlBuilder.getNameFromUrl(nodeUrl);
@@ -181,6 +204,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeUrl, e);
         }
+
         proActiveRuntime.killNode(name);
     }
 
@@ -247,14 +271,17 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         killAllNodes();
         unregisterAllVirtualNodes();
         unregister(proActiveRuntimeURL);
+
         if (hasCreatedRegistry) {
             if (softly) {
                 if (RegistryHelper.getRegistry().list().length > 0) {
                     new RMIKillerThread().start();
+
                     return;
                 }
             }
         }
+
         proActiveRuntime.killRT(softly);
     }
 
@@ -285,18 +312,21 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws RemoteException {
+        boolean replacePreviousBinding)
+        throws RemoteException, java.rmi.AlreadyBoundException {
         String virtualNodeURL = null;
 
         try {
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualNodeName);
+
             //register it with the url
             register(virtualNodeURL, replacePreviousBinding);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
+
         vnNodesArray.add(virtualNodeURL);
     }
 
@@ -305,6 +335,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         String virtualNodeURL = null;
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualnodeName));
+
         try {
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualnodeName);
@@ -313,6 +344,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
+
         vnNodesArray.remove(virtualNodeURL);
     }
 
@@ -385,7 +417,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     // ---PRIVATE METHODS--------------------------------------
     //
     private void register(String url, boolean replacePreviousBinding)
-        throws java.rmi.RemoteException {
+        throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         try {
             if (replacePreviousBinding) {
                 java.rmi.Naming.rebind(UrlBuilder.removeProtocol(url,
@@ -394,13 +426,14 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
                 java.rmi.Naming.bind(UrlBuilder.removeProtocol(url,
                         getProtocol()), this);
             }
+
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " successfully bound in registry at " +
                     url);
             }
         } catch (java.rmi.AlreadyBoundException e) {
-            runtimeLogger.warn("WARNING " + url + " already bound in registry",
-                e);
+            runtimeLogger.warn(url + " already bound in registry", e);
+            throw e;
         } catch (java.net.MalformedURLException e) {
             throw new java.rmi.RemoteException("cannot bind in registry at " +
                 url, e);
@@ -410,6 +443,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     private void unregister(String url) throws java.rmi.RemoteException {
         try {
             java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url, getProtocol()));
+
             if (url.indexOf("PA_JVM") < 0) {
                 runtimeLogger.info(url + " unbound in registry");
             }
@@ -444,12 +478,14 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                      .getInetAddress());
         String name = getVMInformation().getName();
+
         return UrlBuilder.buildUrl(host, name, getProtocol(), port);
     }
 
     private String buildNodeURL(String url)
         throws java.net.UnknownHostException {
         int i = url.indexOf('/');
+
         if (i == -1) {
             //it is an url given by a descriptor
             String host = UrlBuilder.getHostNameorIP(getVMInformation()
@@ -457,37 +493,10 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
 
             int port = RmiRuntimeFactory.getRegistryHelper()
                                         .getRegistryPortNumber();
+
             return UrlBuilder.buildUrl(host, url, getProtocol(), port);
         } else {
             return UrlBuilder.checkUrl(url);
-        }
-    }
-
-    //
-    // ----------------- INNER CLASSES --------------------------------
-    //
-    private class RMIKillerThread extends Thread {
-        public RMIKillerThread() {
-        }
-
-        public void run() {
-            try {
-                while (RegistryHelper.getRegistry().list().length > 0) {
-                    // the thread sleeps for 10 minutes
-                    Thread.sleep(600000);
-                }
-
-                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
-            } catch (InterruptedException e) {
-                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
-                e.printStackTrace();
-            } catch (AccessException e) {
-                runtimeLogger.error(e.getMessage());
-                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
-            } catch (Exception e) {
-                runtimeLogger.error(e.getMessage());
-                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
-            }
         }
     }
 
@@ -555,5 +564,33 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     public void terminateSession(long sessionID)
         throws IOException, SecurityNotAvailableException {
         proActiveRuntime.terminateSession(sessionID);
+    }
+
+    //
+    // ----------------- INNER CLASSES --------------------------------
+    //
+    private class RMIKillerThread extends Thread {
+        public RMIKillerThread() {
+        }
+
+        public void run() {
+            try {
+                while (RegistryHelper.getRegistry().list().length > 0) {
+                    // the thread sleeps for 10 minutes
+                    Thread.sleep(600000);
+                }
+
+                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
+            } catch (InterruptedException e) {
+                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
+                e.printStackTrace();
+            } catch (AccessException e) {
+                runtimeLogger.error(e.getMessage());
+                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
+            } catch (Exception e) {
+                runtimeLogger.error(e.getMessage());
+                ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
+            }
+        }
     }
 }

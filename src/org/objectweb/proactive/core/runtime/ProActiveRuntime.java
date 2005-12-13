@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
+import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -89,7 +90,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager nodeSecurityManager, String vnName,
-        String jobId) throws NodeException;
+        String jobId) throws NodeException, AlreadyBoundException;
 
     /**
      * Kills all Nodes in this ProActiveRuntime
@@ -245,7 +246,8 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws ProActiveException;
+        boolean replacePreviousBinding)
+        throws ProActiveException, AlreadyBoundException;
 
     /**
      * Unregisters the VirtualNode of the given name from the local runtime.

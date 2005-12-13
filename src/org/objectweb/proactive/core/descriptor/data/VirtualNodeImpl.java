@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.Serializable;
+import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -173,6 +174,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private boolean mainVirtualNode;
     private String padURL;
     private Vector p2pNodeslookupList = new Vector();
+
+    //REGISTRATION ATTEMPTS
+    private final int REGISTRATION_ATTEMPTS = 2;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -657,6 +661,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         for (int i = 0; i < createdRuntimeF.size(); i++) {
             part = (ProActiveRuntime) createdRuntimeF.get(i);
+
             try {
                 part.killRT(true);
             } catch (Exception e) {
@@ -742,6 +747,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private synchronized void forwarderRuntimeRegisteredPerform(
         RuntimeRegistrationEvent event) {
         VirtualMachine virtualMachine = null;
+
         for (int i = 0; i < virtualMachines.size(); i++) {
             if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
@@ -756,6 +762,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     " registered on virtualnode " + this.name);
             }
         }
+
         createdRuntimeF.add(event.getRegisteredRuntime());
     }
 
@@ -765,8 +772,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         ProActiveRuntime proActiveRuntimeRegistered;
         String nodeHost;
         String protocol;
-        String url;
+        String url = null;
         int port = 0;
+        int registerAttempts = 1; //number of register attempts before throwing an AlreadyBoundException
         VirtualMachine virtualMachine = null;
 
         for (int i = 0; i < virtualMachines.size(); i++) {
@@ -795,26 +803,43 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
 
             try {
-                //get the node on the registered runtime
+                // get the node on the registered runtime
                 // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
                 int nodeNumber = (new Integer((String) virtualMachine.getNodeNumber())).intValue();
 
                 for (int i = 1; i <= nodeNumber; i++) {
-                    nodeName = this.name +
-                        Integer.toString(new java.util.Random(
-                                System.currentTimeMillis()).nextInt());
-                    url = buildURL(nodeHost, nodeName, protocol, port);
-
-                    // nodes are created from the registered runtime, since this virtualNode is
-                    // waiting for runtime registration to perform co-allocation in the jvm.
                     ProActiveSecurityManager siblingPSM = null;
 
                     if (proactiveSecurityManager != null) {
                         siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
                     }
 
-                    proActiveRuntimeRegistered.createLocalNode(url, false,
-                        siblingPSM, this.getName(), this.jobID);
+                    registerAttempts = REGISTRATION_ATTEMPTS;
+
+                    while (registerAttempts > 0) { // If there is an
+                        // AlreadyBoundException, we
+                        // will gerate an other
+                        // random node's name and
+                        // try to register it again
+                        nodeName = this.name +
+                            Integer.toString(ProActiveRuntimeImpl.getNextInt());
+                        url = buildURL(nodeHost, nodeName, protocol, port);
+
+                        // nodes are created from the registered runtime, since
+                        // this
+                        // virtualNode is
+                        // waiting for runtime registration to perform
+                        // co-allocation
+                        // in the jvm.
+                        try {
+                            proActiveRuntimeRegistered.createLocalNode(url,
+                                false, siblingPSM, this.getName(), this.jobID);
+                            registerAttempts = 0; //the registration has succeded, we don't have to try again
+                        } catch (AlreadyBoundException e) {
+                            registerAttempts--;
+                        }
+                    }
+
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 }
             } catch (ProActiveException e) {
@@ -822,9 +847,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
 
-        //Check if the virtualNode that originates the process is among awaited VirtualNodes
+        // Check if the virtualNode that originates the process is among awaited
+        // VirtualNodes
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
-            //gets the registered runtime
+            // gets the registered runtime
             proActiveRuntimeRegistered = event.getRegisteredRuntime();
 
             // get the host for the node to be created
@@ -840,11 +866,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             for (int i = 1; i <= nodeNumber; i++) {
                 try {
-                    nodeName = this.name +
-                        Integer.toString(new java.util.Random(
-                                System.currentTimeMillis()).nextInt());
-                    url = buildURL(nodeHost, nodeName, protocol, port);
-
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
                     ProActiveSecurityManager siblingPSM = null;
@@ -853,8 +874,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
                     }
 
-                    proActiveRuntimeRegistered.createLocalNode(url, false,
-                        siblingPSM, this.getName(), this.jobID);
+                    registerAttempts = REGISTRATION_ATTEMPTS;
+
+                    while (registerAttempts > 0) {
+                        nodeName = this.name +
+                            Integer.toString(ProActiveRuntimeImpl.getNextInt());
+                        url = buildURL(nodeHost, nodeName, protocol, port);
+
+                        try {
+                            proActiveRuntimeRegistered.createLocalNode(url,
+                                false, siblingPSM, this.getName(), this.jobID);
+                            registerAttempts = 0; //the registration has succeded, we don't have to try again
+                        } catch (AlreadyBoundException e) {
+                            registerAttempts--;
+                        }
+                    }
+
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 } catch (ProActiveException e) {
                     e.printStackTrace();
@@ -865,7 +900,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
-     * At the moment no property can be set at runtime on a VirtualNodeImpl.
+     *      At the moment no property can be set at runtime on a
+     *      VirtualNodeImpl.
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException {
@@ -943,12 +979,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
             // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
             // we must increase the node count
-            String url;
+            String url = null;
             increaseNumberOfNodes(1);
-
-            String nodeName = this.name +
-                Integer.toString(new java.util.Random(
-                        System.currentTimeMillis()).nextInt());
 
             // get the Runtime for the given protocol
             ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
@@ -961,8 +993,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 siblingPSM = proactiveSecurityManager.generateSiblingCertificate(this.name);
             }
 
-            url = defaultRuntime.createLocalNode(nodeName, false, siblingPSM,
-                    this.getName(), ProActive.getJobId());
+            int registrationAttempts = REGISTRATION_ATTEMPTS;
+
+            while (registrationAttempts > 0) { //If there is an AlreadyBoundException, we generate an other random node name
+                String nodeName = this.name +
+                    Integer.toString(ProActiveRuntimeImpl.getNextInt());
+
+                try {
+                    url = defaultRuntime.createLocalNode(nodeName, false,
+                            siblingPSM, this.getName(), ProActive.getJobId());
+                    registrationAttempts = 0;
+                } catch (AlreadyBoundException e) {
+                    registrationAttempts--;
+                }
+            }
 
             //add this node to this virtualNode
             performOperations(defaultRuntime, url, protocol);
@@ -1118,6 +1162,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         protocolId = process.getProcessId();
 
         int cnt = process.getNodeNumber();
+
         if (cnt == UniversalProcess.UNKNOWN_NODE_NUMBER) {
             waitForTimeout = true;
         } else {
@@ -1273,6 +1318,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.error(e.getMessage());
         } catch (ProActiveException e) {
             e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            logger.warn("The Virtual Node name " + this.getName() +
+                " is already bound in the registry", e);
         }
     }
 

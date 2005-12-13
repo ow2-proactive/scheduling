@@ -33,6 +33,7 @@ package org.objectweb.proactive;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -203,8 +204,12 @@ public class ProActive {
     //
     static {
         ProActiveConfiguration.load();
+
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
     }
+
+    /** A pool of thread for newActiveINParallel */
+    transient private static ThreadPool threadpool;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -261,6 +266,7 @@ public class ProActive {
         throws ActiveObjectCreationException, NodeException {
         // avoid ambiguity for method parameters types
         Node nullNode = null;
+
         return newActive(classname, constructorParameters, nullNode, null, null);
     }
 
@@ -280,6 +286,7 @@ public class ProActive {
         if (nodeURL == null) {
             // avoid ambiguity for method parameters types
             Node nullNode = null;
+
             return newActive(classname, constructorParameters, nullNode, null,
                 null);
         } else {
@@ -345,6 +352,7 @@ public class ProActive {
                 timer = new CompositeAverageMicroTimer("newActiveSecurityTimer");
                 PAProfilerEngine.registerTimer(timer);
             }
+
             timer.setTimer("constructing certificate");
             timer.start();
         }
@@ -352,6 +360,7 @@ public class ProActive {
         MetaObjectFactory clonedFactory = factory;
 
         ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
+
         if (factorySM != null) {
             try {
                 clonedFactory = (MetaObjectFactory) factory.clone();
@@ -363,6 +372,7 @@ public class ProActive {
             psm = psm.generateSiblingCertificate(classname);
             clonedFactory.setProActiveSecurityManager(psm);
         }
+
         if (Profiling.SECURITY) {
             timer.stop();
         }
@@ -383,9 +393,6 @@ public class ProActive {
             throw new ActiveObjectCreationException(t);
         }
     }
-
-    /** A pool of thread for newActiveINParallel */
-    transient private static ThreadPool threadpool;
 
     /**
      * Clean the threadpool used by the newActiveInParallel
@@ -427,6 +434,7 @@ public class ProActive {
         if (threadpool == null) {
             threadpool = new ThreadPool();
         }
+
         Vector result = new Vector();
 
         // The Virtual Node is already activate
@@ -434,9 +442,11 @@ public class ProActive {
             threadpool.addAJob(new ProcessForAoCreation(result, className,
                     constructorParameters[i], nodes[i % nodes.length]));
         }
+
         threadpool.complete();
 
         Class classForResult = Class.forName(className);
+
         return result.toArray((Object[]) Array.newInstance(classForResult,
                 result.size()));
     }
@@ -467,14 +477,18 @@ public class ProActive {
         if (threadpool == null) {
             threadpool = new ThreadPool();
         }
+
         Vector result = new Vector();
+
         if (virtualNode.isActivated()) {
             // The Virtual Node is already activate
             Node[] nodes = virtualNode.getNodes();
+
             for (int i = 0; i < nodes.length; i++) {
                 threadpool.addAJob(new ProcessForAoCreation(result, className,
                         constructorParameters, nodes[i]));
             }
+
             threadpool.complete();
         } else {
             // Use the node creation event mechanism
@@ -484,7 +498,9 @@ public class ProActive {
             ((VirtualNodeImpl) virtualNode).waitForAllNodesCreation();
             threadpool.complete();
         }
+
         Class classForResult = Class.forName(className);
+
         return result.toArray((Object[]) Array.newInstance(classForResult,
                 result.size()));
     }
@@ -535,8 +551,10 @@ public class ProActive {
             if (!virtualnode.isActivated()) {
                 virtualnode.activate();
             }
+
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
+
             try {
                 aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
                             classname));
@@ -547,6 +565,7 @@ public class ProActive {
                 throw new ActiveObjectCreationException(
                     "Cannot create group of active objects" + e);
             }
+
             for (int i = 0; i < nodeTab.length; i++) {
                 Object tmp = newActive(classname, constructorParameters,
                         (Node) nodeTab[i], activity, factory);
@@ -590,6 +609,7 @@ public class ProActive {
         try {
             Component boot = Fractal.getBootstrapComponent();
             GenericFactory cf = Fractal.getGenericFactory(boot);
+
             return cf.newFcInstance(componentParameters.getComponentType(),
                 new ControllerDescription(componentParameters.getName(),
                     componentParameters.getHierarchicalType()),
@@ -639,6 +659,7 @@ public class ProActive {
         try {
             Component boot = Fractal.getBootstrapComponent();
             GenericFactory cf = Fractal.getGenericFactory(boot);
+
             return cf.newFcInstance(componentParameters.getComponentType(),
                 new ControllerDescription(componentParameters.getName(),
                     componentParameters.getHierarchicalType()),
@@ -828,6 +849,7 @@ public class ProActive {
         if (virtualnode != null) {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
+
             try {
                 aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
                             target.getClass().getName()));
@@ -869,6 +891,7 @@ public class ProActive {
         throws java.io.IOException {
         BodyAdapter body = getRemoteBody(obj);
         body.register(url);
+
         if (logger.isInfoEnabled()) {
             logger.info("Success at binding url " + url);
         }
@@ -894,6 +917,7 @@ public class ProActive {
         } else {
             throw new IOException("Protocol " + protocol + " not defined");
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("Success at unbinding url " + url);
         }
@@ -955,6 +979,7 @@ public class ProActive {
      */
     public static String getActiveObjectNodeUrl(Object activeObject) {
         UniversalBody body = getRemoteBody(activeObject);
+
         return body.getNodeURL();
     }
 
@@ -1062,9 +1087,10 @@ public class ProActive {
      */
     public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
-        return getProActiveDescriptor(xmlDescriptorUrl, new VariableContract(), false);
+        return getProActiveDescriptor(xmlDescriptorUrl, new VariableContract(),
+            false);
     }
-    
+
     /**
      * Returns a <code>ProActiveDescriptor</code> that gives an object representation
      * of the XML document located at the given url, and uses the given Variable Contract.
@@ -1076,38 +1102,44 @@ public class ProActive {
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
     public static ProActiveDescriptor getProactiveDescriptor(
-        String xmlDescriptorUrl, VariableContract variableContract) throws ProActiveException {
-    	
-    	if(variableContract == null) throw new NullPointerException("Argument variableContract can not be null");
-    
-		return getProActiveDescriptor(xmlDescriptorUrl, variableContract, false);
+        String xmlDescriptorUrl, VariableContract variableContract)
+        throws ProActiveException {
+        if (variableContract == null) {
+            throw new NullPointerException(
+                "Argument variableContract can not be null");
+        }
+
+        return getProActiveDescriptor(xmlDescriptorUrl, variableContract, false);
     }
 
-    private static ProActiveDescriptor getProActiveDescriptor(String xmlDescriptorUrl, 
-    		VariableContract variableContract,  boolean hierarchicalSearch ) throws ProActiveException{
-    	
-    	//Get lock on XMLProperties global static variable
-    	org.objectweb.proactive.core.xml.VariableContract.lock.aquire();
-    	org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
-    	
-    	//Get the pad
-    	ProActiveDescriptor pad = internalGetProActiveDescriptor(xmlDescriptorUrl, variableContract, hierarchicalSearch);
-		
-    	//No further modifications can be donde on the xmlproperties, thus we close the contract
-    	variableContract.close();
-    	
-    	//Check the contract (proposed optimization: Do this when parsing </variable> tag instead of here!)
-    	if(!variableContract.checkContract())
-    		throw new ProActiveException("Variable Contract has not been met!");
-    	
-		//Release lock on static global variable XMLProperties
-    	VariableContract.xmlproperties=new VariableContract();
-    	org.objectweb.proactive.core.xml.VariableContract.lock.release();
-		
-		return pad;
-		//return getProactiveDescriptor(xmlDescriptorUrl, false);
+    private static ProActiveDescriptor getProActiveDescriptor(
+        String xmlDescriptorUrl, VariableContract variableContract,
+        boolean hierarchicalSearch) throws ProActiveException {
+        //Get lock on XMLProperties global static variable
+        org.objectweb.proactive.core.xml.VariableContract.lock.aquire();
+        org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
+
+        //Get the pad
+        ProActiveDescriptor pad = internalGetProActiveDescriptor(xmlDescriptorUrl,
+                variableContract, hierarchicalSearch);
+
+        //No further modifications can be donde on the xmlproperties, thus we close the contract
+        variableContract.close();
+
+        //Check the contract (proposed optimization: Do this when parsing </variable> tag instead of here!)
+        if (!variableContract.checkContract()) {
+            throw new ProActiveException("Variable Contract has not been met!");
+        }
+
+        //Release lock on static global variable XMLProperties
+        VariableContract.xmlproperties = new VariableContract();
+        org.objectweb.proactive.core.xml.VariableContract.lock.release();
+
+        return pad;
+
+        //return getProactiveDescriptor(xmlDescriptorUrl, false);
     }
-    
+
     /**
      * return the pad matching with the given url or parse it from the file system
      * @param xmlDescriptorUrl url of the pad
@@ -1117,14 +1149,17 @@ public class ProActive {
      * @throws RemoteException
      */
     private static ProActiveDescriptor internalGetProActiveDescriptor(
-        String xmlDescriptorUrl, VariableContract variableContract, boolean hierarchicalSearch)
-        throws ProActiveException {
+        String xmlDescriptorUrl, VariableContract variableContract,
+        boolean hierarchicalSearch) throws ProActiveException {
         RuntimeFactory.getDefaultRuntime();
+
         if (!xmlDescriptorUrl.startsWith("file:")) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
+
         ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveDescriptor pad;
+
         try {
             if (!hierarchicalSearch) {
                 //if not hierarchical search, we assume that the descriptor might has been
@@ -1149,10 +1184,12 @@ public class ProActive {
                 logger.info("************* Reading deployment descriptor: " +
                     xmlDescriptorUrl + " ********************");
             }
-            ProActiveDescriptorHandler proActiveDescriptorHandler = 
-            	ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl, variableContract);
+
+            ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl,
+                    variableContract);
             pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
             part.registerDescriptor(pad.getUrl(), pad);
+
             return pad;
         } catch (org.xml.sax.SAXException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
@@ -1179,22 +1216,26 @@ public class ProActive {
      */
     public static void registerVirtualNode(VirtualNode virtualNode,
         String registrationProtocol, boolean replacePreviousBinding)
-        throws ProActiveException {
+        throws ProActiveException, AlreadyBoundException {
         if (!(virtualNode instanceof VirtualNodeImpl)) {
             throw new ProActiveException(
                 "Cannot register such virtualNode since it results from a lookup!");
         }
+
         if (registrationProtocol == null) {
             registrationProtocol = System.getProperty(
                     "proactive.communication.protocol");
         }
+
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
         VirtualNode vn = part.getVirtualNode(virtualnodeName);
+
         if (vn == null) {
             throw new ProActiveException("VirtualNode " + virtualnodeName +
                 " has not been yet activated or does not exist! Try to activate it first !");
         }
+
         part.registerVirtualNode(UrlBuilder.appendVnSuffix(virtualnodeName),
             replacePreviousBinding);
     }
@@ -1211,12 +1252,14 @@ public class ProActive {
     public static VirtualNode lookupVirtualNode(String url)
         throws ProActiveException {
         ProActiveRuntime remoteProActiveRuntime = null;
+
         try {
             remoteProActiveRuntime = RuntimeFactory.getRuntime(UrlBuilder.buildVirtualNodeUrl(
                         url), UrlBuilder.getProtocol(url));
         } catch (UnknownHostException ex) {
             throw new ProActiveException(ex);
         }
+
         return remoteProActiveRuntime.getVirtualNode(UrlBuilder.getNameFromUrl(
                 url));
     }
@@ -1234,10 +1277,12 @@ public class ProActive {
             throw new ProActiveException(
                 "Cannot unregister such virtualNode since it results from a lookup!");
         }
+
         String virtualNodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(((VirtualNodeImpl) virtualNode).getRegistrationProtocol());
         part.unregisterVirtualNode(UrlBuilder.appendVnSuffix(
                 virtualNode.getName()));
+
         if (logger.isInfoEnabled()) {
             logger.info("Success at unbinding " + virtualNodeName);
         }
@@ -1273,6 +1318,7 @@ public class ProActive {
         if (logger.isDebugEnabled()) {
             //logger.debug("ProActive: getStubOnThis() returns " + body);
         }
+
         if (body == null) {
             return null;
         }
@@ -1308,6 +1354,7 @@ public class ProActive {
         if (logger.isDebugEnabled()) {
             logger.debug("migrateTo " + nodeURL);
         }
+
         ProActive.migrateTo(getNodeFromURL(nodeURL));
     }
 
@@ -1324,7 +1371,9 @@ public class ProActive {
         if (logger.isDebugEnabled()) {
             logger.debug("migrateTo " + node);
         }
+
         Body bodyToMigrate = getBodyOnThis();
+
         if (!(bodyToMigrate instanceof Migratable)) {
             throw new MigrationException(
                 "This body cannot migrate. It doesn't implement Migratable interface");
@@ -1422,6 +1471,7 @@ public class ProActive {
         } catch (ProActiveException e) {
             //Exception above should never be thrown since timeout=0 means no timeout
             e.printStackTrace();
+
             return -1;
         }
     }
@@ -1453,6 +1503,7 @@ public class ProActive {
 
                     index++;
                 }
+
                 fp.waitForReply(timeout);
             }
         }
@@ -1565,6 +1616,7 @@ public class ProActive {
                     return false;
                 }
             }
+
             return true;
         }
     }
@@ -1708,6 +1760,7 @@ public class ProActive {
 
         BodyProxy myBodyProxy = (BodyProxy) myProxy;
         BodyAdapter body = myBodyProxy.getBody().getRemoteAdapter();
+
         return body;
     }
 

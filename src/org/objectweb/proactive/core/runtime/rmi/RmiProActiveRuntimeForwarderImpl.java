@@ -107,7 +107,8 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
 
     public String createLocalNode(UniqueRuntimeID urid, String nodeName,
         boolean replacePreviousBinding, ProActiveSecurityManager ps,
-        String VNname, String jobId) throws IOException, NodeException {
+        String VNname, String jobId)
+        throws IOException, NodeException, AlreadyBoundException {
         return proActiveRuntimeF.createLocalNode(urid, nodeName,
             replacePreviousBinding, ps, VNname, jobId);
     }
@@ -235,7 +236,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
 
     public void registerVirtualNode(UniqueRuntimeID urid,
         String virtualNodeName, boolean replacePreviousBinding)
-        throws IOException, ProActiveException {
+        throws IOException, ProActiveException, java.rmi.AlreadyBoundException {
         proActiveRuntimeF.registerVirtualNode(urid, virtualNodeName,
             replacePreviousBinding);
     }

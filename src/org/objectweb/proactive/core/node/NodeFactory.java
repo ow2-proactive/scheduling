@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.node;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.rmi.AlreadyBoundException;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -86,6 +88,7 @@ public class NodeFactory {
         String protocol = UrlBuilder.checkProtocol(System.getProperty(
                     "proactive.communication.protocol"));
         String port = System.getProperty("proactive.rmi.port");
+
         if (port != null) {
             DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node",
                     protocol, new Integer(port).intValue());
@@ -109,6 +112,7 @@ public class NodeFactory {
      */
     public static synchronized Node getDefaultNode() throws NodeException {
         String nodeURL = null;
+
         ProActiveRuntime defaultRuntime = null;
         String jobID = ProActive.getJobId();
         ProActiveSecurityManager securityManager = null;
@@ -117,16 +121,19 @@ public class NodeFactory {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
-                        Integer.toString(
-                            new java.util.Random(System.currentTimeMillis()).nextInt()),
+                        Integer.toString(ProActiveRuntimeImpl.getNextInt()),
                         false, securityManager, "DefaultVN", jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
+            } catch (AlreadyBoundException e) { //if this exception is risen, we generate an othe random name for the node
+                getDefaultNode();
             }
+
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
                     UrlBuilder.checkProtocol(System.getProperty(
                             "proactive.communication.protocol")), jobID);
         }
+
         return defaultNode;
     }
 
@@ -152,7 +159,8 @@ public class NodeFactory {
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String nodeURL) throws NodeException {
+    public static Node createNode(String nodeURL)
+        throws NodeException, AlreadyBoundException {
         return createNode(nodeURL, false, null, null);
     }
 
@@ -172,7 +180,8 @@ public class NodeFactory {
      * @exception NodeException if the node cannot be created
      */
     public static Node createNode(String url, boolean replacePreviousBinding,
-        ProActiveSecurityManager psm, String vnname) throws NodeException {
+        ProActiveSecurityManager psm, String vnname)
+        throws NodeException, AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
         String jobID = ProActive.getJobId();
@@ -193,7 +202,9 @@ public class NodeFactory {
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }
+
         Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol, jobID);
+
         return node;
     }
 
@@ -227,7 +238,9 @@ public class NodeFactory {
         } catch (UnknownHostException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
         }
+
         Node node = new NodeImpl(proActiveRuntime, url, protocol, jobID);
+
         return node;
     }
 
@@ -241,6 +254,7 @@ public class NodeFactory {
         String url;
 
         String protocol = UrlBuilder.getProtocol(nodeURL);
+
         try {
             url = UrlBuilder.checkUrl(nodeURL);
             proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);

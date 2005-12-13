@@ -102,7 +102,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager securityManager, String vnname, String jobId)
-        throws RemoteException, NodeException {
+        throws RemoteException, NodeException, java.rmi.AlreadyBoundException {
         String nodeURL = null;
 
         //Node node;

@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -250,6 +251,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 isNodeLocal);
 
         bodyForwarder.addcreatedBody(rBody.getID());
+
         return rBody;
     }
 
@@ -258,7 +260,8 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     //
     public String createLocalNode(UniqueRuntimeID urid, String nodeName,
         boolean replacePreviousBinding, ProActiveSecurityManager psm,
-        String vnName, String jobId) throws NodeException {
+        String vnName, String jobId)
+        throws NodeException, AlreadyBoundException {
         if (urid == null) {
             return this.createLocalNode(nodeName, replacePreviousBinding, psm,
                 vnName, jobId);
@@ -574,7 +577,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public void registerVirtualNode(UniqueRuntimeID urid,
         String virtualNodeName, boolean replacePreviousBinding)
-        throws ProActiveException {
+        throws ProActiveException, AlreadyBoundException {
         if (urid == null) {
             this.registerVirtualNode(virtualNodeName, replacePreviousBinding);
         } else {

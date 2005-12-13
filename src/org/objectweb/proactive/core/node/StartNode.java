@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.node;
 
+import java.rmi.AlreadyBoundException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
@@ -80,6 +82,27 @@ public class StartNode {
     protected static final String NO_CLASS_SERVER_OPTION_NAME = "-noClassServer";
     protected static final String NO_REGISTRY_OPTION_NAME = "-noRegistry";
     protected static final String MULTICAST_LOCATOR_NAME = "-multicastLocator";
+
+    static {
+        ProActiveConfiguration.load();
+        logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Loading ProActive class");
+        }
+
+        try {
+            Class.forName("org.objectweb.proactive.ProActive");
+        } catch (ClassNotFoundException e) {
+            if (logger.isDebugEnabled()) {
+                logger.fatal("Loading of ProActive class FAILED");
+            }
+
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
     protected boolean noClassServer = false;
     protected boolean noRebind = false;
     protected boolean noRegistry = false;
@@ -87,23 +110,6 @@ public class StartNode {
     protected int registryPortNumber = DEFAULT_PORT;
     protected String classpath;
     protected String nodeURL;
-
-    static {
-        ProActiveConfiguration.load();
-        logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Loading ProActive class");
-        }
-        try {
-            Class.forName("org.objectweb.proactive.ProActive");
-        } catch (ClassNotFoundException e) {
-            if (logger.isDebugEnabled()) {
-                logger.fatal("Loading of ProActive class FAILED");
-            }
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -186,8 +192,10 @@ public class StartNode {
         // look for classpath
         for (int i = start; i < args.length; i++) {
             String s = args[i];
+
             if (s.charAt(0) != '-') {
                 classpath = s;
+
                 break;
             }
         }
@@ -209,26 +217,32 @@ public class StartNode {
      * Creates the node at the given URL with the rebind option
      */
     protected void createNode(String nodeURL, boolean noRebind)
-        throws NodeException {
+        throws NodeException, AlreadyBoundException {
         int exceptionCount = 0;
+
         while (true) {
             try {
                 Node node = null;
+
                 if (nodeURL == null) {
                     node = NodeFactory.getDefaultNode();
                 } else {
                     //TODO allow start alone node with security parameters 
                     node = NodeFactory.createNode(nodeURL, !noRebind, null, null);
                 }
+
                 logger.info("OK. Node " + node.getNodeInformation().getName() +
                     " is created in VM id=" + UniqueID.getCurrentVMID());
+
                 break;
             } catch (NodeException e) {
                 exceptionCount++;
+
                 if (exceptionCount == MAX_RETRY) {
                     throw e;
                 } else {
                     logger.error("Error, retrying (" + exceptionCount + ")");
+
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e2) {
@@ -249,17 +263,20 @@ public class StartNode {
      * Run the complete creation of the node step by step by invoking the other
      * helper methods
      */
-    protected void run() throws java.io.IOException, NodeException {
+    protected void run()
+        throws java.io.IOException, NodeException, AlreadyBoundException {
         //setProperties();
         // set options on node factory
         RmiRuntimeFactory.setShouldCreateClassServer(!noClassServer);
         RmiRuntimeFactory.setShouldCreateRegistry(!noRegistry);
         RmiRuntimeFactory.setRegistryPortNumber(registryPortNumber);
+
         if (multicastLocator) {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
         }
 
         AverageMicroTimer mt = null;
+
         if (Profiling.STARTNODE) {
             mt = new AverageMicroTimer("StartNode");
             PAProfilerEngine.registerTimer(mt);
@@ -268,8 +285,10 @@ public class StartNode {
 
         // create node
         createNode(nodeURL, noRebind);
+
         if (Profiling.STARTNODE) {
             mt.stop();
+
             //	mt.dump();
         }
     }
@@ -296,6 +315,7 @@ public class StartNode {
      */
     protected static int getPort(String nodeURL, int defaultValue) {
         int deb = nodeURL.lastIndexOf(":");
+
         if (deb > -1) {
             //there is a port number specified
             try {
@@ -306,6 +326,7 @@ public class StartNode {
                 return defaultValue;
             }
         }
+
         return defaultValue;
     }
 
@@ -314,6 +335,7 @@ public class StartNode {
     //
     private void printUsage() {
         String localhost = "localhost";
+
         try {
             localhost = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {

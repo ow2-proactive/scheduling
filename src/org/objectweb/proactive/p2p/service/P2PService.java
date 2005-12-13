@@ -32,6 +32,7 @@ package org.objectweb.proactive.p2p.service;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.rmi.AlreadyBoundException;
 import java.util.Random;
 import java.util.Vector;
 
@@ -74,19 +75,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /** Logger. */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SERVICE);
-
-    /** ProActive Group of acquaintances. **/
-    private P2PService acquaintances;
-
-    /**
-     * ProActive Group representing <code>acquaintances</code>.
-     */
-    private P2PAcquaintanceManager acquaintanceManager;
-
-    /**
-     * Reference to the current Node.
-     */
-    private Node p2pServiceNode = null;
     private static final int MSG_MEMORY = Integer.parseInt(System.getProperty(
                 P2PConstants.PROPERTY_MSG_MEMORY));
     private static final int NOA = Integer.parseInt(System.getProperty(
@@ -101,6 +89,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
      */
     private static final Random randomizer = new Random();
+
+    /** ProActive Group of acquaintances. **/
+    private P2PService acquaintances;
+
+    /**
+     * ProActive Group representing <code>acquaintances</code>.
+     */
+    private P2PAcquaintanceManager acquaintanceManager;
+
+    /**
+     * Reference to the current Node.
+     */
+    private Node p2pServiceNode = null;
 
     /**
      * Sequence number list of received messages.
@@ -129,9 +130,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
              */
             public boolean acceptRequest(Request request) {
                 String requestName = request.getMethodName();
+
                 if (requestName.compareToIgnoreCase("askingNode") == 0) {
                     return false;
                 }
+
                 return true;
             }
         };
@@ -163,6 +166,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         params[0] = peers;
         params[1] = this.acquaintanceManager;
         params[2] = this.stubOnThis;
+
         try {
             ProActive.newActive(P2PFirstContact.class.getName(), params,
                 this.p2pServiceNode);
@@ -182,6 +186,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         try {
             if (!this.stubOnThis.equals(service)) {
                 this.acquaintanceManager.add(service);
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("Remote peer localy registered: " +
                         ProActive.getActiveObjectNodeUrl(service));
@@ -218,6 +223,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         }
 
         boolean broadcast;
+
         try {
             broadcast = broadcaster(ttl, uuid, remoteService);
         } catch (P2POldMessageException e) {
@@ -227,6 +233,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         // This should be register
         if (this.shouldBeAcquaintance(remoteService)) {
             this.register(remoteService);
+
             try {
                 remoteService.register(this.stubOnThis);
             } catch (Exception e) {
@@ -239,6 +246,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.debug("Generating uuid for exploring message");
                 uuid = generateUuid();
             }
+
             this.acquaintances.exploring(ttl, uuid, remoteService);
             logger.debug("Broadcast exploring message with #" + uuid);
             uuid = null;
@@ -260,9 +268,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
         String vnName, String jobId) {
         boolean broadcast;
+
         if (uuid != null) {
             logger.debug("AskingNode message received with #" + uuid);
             ttl--;
+
             try {
                 broadcast = broadcaster(ttl, uuid, remoteService);
             } catch (P2POldMessageException e) {
@@ -279,8 +289,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
             // Asking node available?
             Node nodeAvailable = askedNode.getNode();
+
             if (nodeAvailable != null) {
                 P2PNodeAck nodeAck = null;
+
                 try {
                     nodeAck = lookup.giveNode(nodeAvailable,
                             askedNode.getNodeManager());
@@ -288,11 +300,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     logger.info("Cannot contact the remote lookup",
                         lookupExcption);
                     this.nodeManager.noMoreNodeNeeded(nodeAvailable);
+
                     return;
                 }
 
                 // Waitng the ACK
                 long endTime = System.currentTimeMillis() + ACQ_TO;
+
                 while ((System.currentTimeMillis() < endTime) &&
                         ProActive.isAwaited(nodeAck)) {
                     if (this.service.hasRequestToServe()) {
@@ -311,6 +325,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     // Do not forward the message
                     // Prevent from deadlock
                     this.nodeManager.noMoreNodeNeeded(nodeAvailable);
+
                     return;
                 }
 
@@ -324,17 +339,23 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         } catch (ProActiveException e) {
                             logger.warn("Couldn't register " + vnName +
                                 " in the PAR", e);
+                        } catch (AlreadyBoundException e) {
+                            logger.warn("This name " + vnName +
+                                " is already bound in the registry", e);
                         }
                     }
+
                     if (jobId != null) {
                         nodeAvailable.getNodeInformation().setJobID(jobId);
                     }
+
                     numberOfNodes--;
                     logger.info("Giving 1 node to vn: " + vnName);
                 } else {
                     // It's a NACK node
                     this.nodeManager.noMoreNodeNeeded(nodeAvailable);
                     logger.debug("NACK node received");
+
                     // No more nodes needed
                     return;
                 }
@@ -342,6 +363,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 // Do we need more nodes?
                 if (numberOfNodes <= 0) {
                     logger.debug("No more nodes are needed");
+
                     return;
                 }
             }
@@ -355,6 +377,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.debug("Generating uuid for askingNode message");
                 uuid = generateUuid();
             }
+
             this.acquaintances.askingNode(ttl, uuid, remoteService,
                 numberOfNodes, lookup, vnName, jobId);
             logger.debug("Broadcast askingNode message with #" + uuid);
@@ -398,10 +421,12 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         params[3] = jobId;
 
         P2PNodeLookup lookup = null;
+
         try {
             lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
                     params, this.p2pServiceNode);
             ProActive.enableAC(lookup);
+
             if (numberOfNodes == MAX_NODE) {
                 this.waitingMaximunNodesLookup.add(lookup);
             } else {
@@ -409,9 +434,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             }
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't create an active lookup", e);
+
             return null;
         } catch (NodeException e) {
             logger.fatal("Couldn't connect node to creat", e);
+
             return null;
         } catch (IOException e) {
             if (logger.isDebugEnabled()) {
@@ -426,6 +453,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.info("Asking for maxinum nodes");
             }
         }
+
         return lookup;
     }
 
@@ -439,6 +467,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         params[4] = String.valueOf(onlyUnderloaded);
 
         P2PNodeLookup lookup = null;
+
         try {
             lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
                     params, this.p2pServiceNode);
@@ -446,9 +475,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             this.waitingNodesLookup.add(lookup);
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't create an active lookup", e);
+
             return null;
         } catch (NodeException e) {
             logger.fatal("Couldn't connect node to creat", e);
+
             return null;
         } catch (IOException e) {
             if (logger.isDebugEnabled()) {
@@ -463,6 +494,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.info("Asking for maxinum nodes");
             }
         }
+
         return lookup;
     }
 
@@ -486,8 +518,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public Node getANode(String vnName, String jobId, P2PService service) {
         if (service.equals(this.stubOnThis)) {
-            return this.acquaintanceManager.randomPeer().getANode(vnName, jobId, service);
+            return this.acquaintanceManager.randomPeer().getANode(vnName,
+                jobId, service);
         }
+
         P2PNode askedNode = this.nodeManager.askingNode();
         Node nodeAvailable = askedNode.getNode();
 
@@ -498,24 +532,30 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         true);
                 } catch (ProActiveException e) {
                     logger.warn("Couldn't register " + vnName + " in the PAR", e);
+                } catch (AlreadyBoundException e) {
+                    logger.warn("This name " + vnName +
+                        " is already bound in the registry", e);
                 }
             }
+
             if (jobId != null) {
                 nodeAvailable.getNodeInformation().setJobID(jobId);
             }
+
             return nodeAvailable;
         }
-        return this.acquaintanceManager.randomPeer().getANode(vnName, jobId, service);
+
+        return this.acquaintanceManager.randomPeer().getANode(vnName, jobId,
+            service);
     }
 
-
-	/**
-     * Put in a <code>P2PNodeLookup</code> all available nodes during all the
-     * time where it is actived.
-     * @param vnName Virtual node name.
-     * @param jobId
-     * @return an active object where nodes are received.
-     */
+    /**
+    * Put in a <code>P2PNodeLookup</code> all available nodes during all the
+    * time where it is actived.
+    * @param vnName Virtual node name.
+    * @param jobId
+    * @return an active object where nodes are received.
+    */
     public P2PNodeLookup getMaximunNodes(String vnName, String jobId) {
         return this.getNodes(P2PConstants.MAX_NODE, vnName, jobId);
     }
@@ -558,6 +598,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         UniversalUniqueID uuid = UniversalUniqueID.randomUUID();
         oldMessageList.add(uuid);
         logger.debug(" UUID generated with #" + uuid);
+
         return uuid;
     }
 
@@ -574,6 +615,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         boolean isAnOldMessage = this.isAnOldMessage(uuid);
 
         String remoteNodeUrl = null;
+
         try {
             remoteNodeUrl = ProActive.getActiveObjectNodeUrl(remoteService);
         } catch (Exception e) {
@@ -585,8 +627,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (!isAnOldMessage && !remoteNodeUrl.equals(thisNodeUrl)) {
             if (ttl > 0) {
                 logger.debug("Forwarding message request");
+
                 return true;
             }
+
             return false;
         }
 
@@ -613,18 +657,26 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     private boolean shouldBeAcquaintance(P2PService remoteService) {
         if (this.acquaintanceManager.contains(remoteService).booleanValue()) {
             logger.debug("The remote peer is already known");
+
             return false;
         }
+
         if (this.acquaintanceManager.size().intValue() < NOA) {
             logger.debug("NOA not reached: I should be an acquaintance");
+
             return true;
         }
+
         int random = randomizer.nextInt(100);
+
         if (random < EXPL_MSG) {
             logger.debug("Random said: I should be an acquaintance");
+
             return true;
         }
+
         logger.debug("Random said: I should not be an acquaintance");
+
         return false;
     }
 
@@ -637,13 +689,17 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (uuid == null) {
             return false;
         }
+
         if (oldMessageList.contains(uuid)) {
             return true;
         }
+
         if (oldMessageList.size() == MSG_MEMORY) {
             oldMessageList.remove(0);
         }
+
         oldMessageList.add(uuid);
+
         return false;
     }
 
@@ -686,6 +742,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
+
         try {
             // Active acquaintances
             this.acquaintanceManager = (P2PAcquaintanceManager) ProActive.newActive(P2PAcquaintanceManager.class.getName(),
@@ -729,6 +786,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (ranking >= 0) {
             return p2pLoadBalancer.AreYouUnderloaded(ranking);
         }
+
         return p2pLoadBalancer.AreYouUnderloaded();
     }
 

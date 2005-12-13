@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.osgi;
 
+import java.rmi.AlreadyBoundException;
+import java.util.Properties;
+
+import javax.servlet.Servlet;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -39,18 +44,12 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceEvent;
 import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
-
 import org.osgi.service.http.HttpService;
-
-import java.util.Properties;
-
-import javax.servlet.Servlet;
 
 
 /**
@@ -58,25 +57,28 @@ import javax.servlet.Servlet;
  * This is the entry point of the proActiveBundle
  */
 public class Activator implements BundleActivator, ServiceListener {
-    private org.osgi.framework.ServiceRegistration reg = null;
-    private ProActiveService service = null;
-    private Servlet servlet;
-    private BundleContext bc;
     private static final String aliasRes = "/";
     private static final String aliasServlet = ClassServerServlet.SERVLET_NAME;
     private static final String OSGI_NODE_NAME = "OSGiNode";
-    private OsgiParameters parameters = new OsgiParameters();
-    private HttpService http;
-    private Node node;
 
     static {
         ProActiveConfiguration.load();
     }
 
+    private org.osgi.framework.ServiceRegistration reg = null;
+    private ProActiveService service = null;
+    private Servlet servlet;
+    private BundleContext bc;
+    private OsgiParameters parameters = new OsgiParameters();
+    private HttpService http;
+    private Node node;
+
     public void start(BundleContext ctx) throws Exception {
         this.bc = ctx;
+
         ServiceReference ref = bc.getServiceReference(
                 "org.osgi.service.http.HttpService");
+
         if (ref != null) {
             this.http = (HttpService) bc.getService(ref);
             createProActiveService();
@@ -98,6 +100,7 @@ public class Activator implements BundleActivator, ServiceListener {
         int port = Integer.parseInt(this.bc.getProperty(
                     "org.osgi.service.http.port"));
         this.servlet = new ClassServerServlet(port);
+
         boolean b = registerServlet();
         Properties props = new Properties();
         props.put("name", "proactive");
@@ -107,6 +110,9 @@ public class Activator implements BundleActivator, ServiceListener {
                     OSGI_NODE_NAME);
         } catch (NodeException e) {
             System.out.println("Unable to create OsgiNode");
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            System.out.println("The OsgiNode is already bound in the registry");
             e.printStackTrace();
         }
 
@@ -120,9 +126,11 @@ public class Activator implements BundleActivator, ServiceListener {
     private boolean registerServlet() {
         try {
             this.http.registerServlet(aliasServlet, this.servlet, null, null);
+
             return true;
         } catch (Throwable t) {
             t.printStackTrace();
+
             return false;
         }
     }

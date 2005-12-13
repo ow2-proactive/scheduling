@@ -52,7 +52,6 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     protected static int MAX_RETRY = 3;
 
     //private final static long WAITFOR = 100000L;
-    protected java.util.Random random;
     protected static ServiceLocatorHelper serviceLocatorHelper = new ServiceLocatorHelper();
     private static ProActiveRuntime defaultJiniRuntime = null;
 
@@ -75,7 +74,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
-        random = new java.util.Random(System.currentTimeMillis());
+
         //serviceLocatorHelper.initializeServiceLocator();
     }
 
@@ -97,11 +96,13 @@ public class JiniRuntimeFactory extends RuntimeFactory {
         throws ProActiveException {
         runtimeLogger.info("> JiniRuntimeFactory.getJiniRuntimeImpl(" + s +
             ")");
+
         String host = null;
         Entry[] entries;
         RemoteProActiveRuntime jiniRuntime = null;
         LookupLocator lookup = null;
         ServiceRegistrar registrar = null;
+
         try {
             host = UrlBuilder.getHostNameFromUrl(s);
             runtimeLogger.info("Try to find the service lookup on host: " +
@@ -124,6 +125,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
             } catch (java.io.IOException e) {
                 runtimeLogger.error("Registrar search failed: " +
                     e.getMessage());
+
                 if (MAX_RETRY-- > 0) {
                     runtimeLogger.info(
                         "failed to contact the service lookup, retrying ...");
@@ -136,21 +138,26 @@ public class JiniRuntimeFactory extends RuntimeFactory {
                 throw new ProActiveException("Registrar search failed: " +
                     e.toString());
             }
+
             Class[] classes = new Class[] { RemoteProActiveRuntime.class };
 
             entries = new Entry[] { new Name(s) };
 
             ServiceTemplate template = new ServiceTemplate(null, classes,
                     entries);
+
             try {
                 jiniRuntime = (RemoteProActiveRuntime) registrar.lookup(template);
+
                 if (jiniRuntime == null) {
                     throw new ProActiveException("No service found for url: " +
                         s);
                 }
+
                 return createRuntimeAdapter(jiniRuntime);
             } catch (java.rmi.RemoteException e) {
                 throw new ProActiveException(e);
+
                 //e.printStackTrace();
             }
         } else {
@@ -193,11 +200,13 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     protected ProActiveRuntimeAdapterImpl createRuntimeAdapter()
         throws ProActiveException {
         JiniRuntimeImpl impl;
+
         try {
             impl = new JiniRuntimeImpl();
         } catch (RemoteException e) {
             throw new ProActiveException("Cannot create the JiniRuntimeImpl", e);
         }
+
         return new ProActiveRuntimeAdapterImpl(impl);
     }
 
