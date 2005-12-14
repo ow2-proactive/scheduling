@@ -51,7 +51,8 @@ public interface ComponentRequest extends Request {
     public static final short IMMEDIATE_PRIORITY = 1;
 
     /**
-     * tells whether the request is a call to a control interface
+     * Tells whether the request is a call to a control interface.
+     * @return true if it is an invocation on a control interface
      */
     public boolean isControllerRequest();
 

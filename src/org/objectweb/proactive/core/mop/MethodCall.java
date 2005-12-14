@@ -770,11 +770,6 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         return isComponentMethodCall;
     }
 
-    public boolean isComponentControllerMethodCall() {
-        return (isComponentMethodCall() && (!isFunctionalComponentMethodCall) &&
-        (componentInterfaceName != null));
-    }
-
     public boolean isComponentMethodCallOnComponent() {
         return (isComponentMethodCall && (componentInterfaceName == null));
     }

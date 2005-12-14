@@ -228,7 +228,8 @@ public class ComponentRequestImpl extends RequestImpl
      * @see org.objectweb.proactive.core.component.request.ComponentRequest#isControllerRequest()
      */
     public boolean isControllerRequest() {
-        return methodCall.isComponentControllerMethodCall();
+        // according to the Fractal spec v2.0 , section 4.1
+        return ((methodCall.getComponentInterfaceName()!=null) && (methodCall.getComponentInterfaceName().endsWith("-controller") || methodCall.getComponentInterfaceName().equals("component"))); 
     }
 
     /*
