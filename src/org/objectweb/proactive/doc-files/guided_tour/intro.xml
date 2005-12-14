@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <chapter><title>Guided tour</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/intro.html  -->
+  
+
+    <para>This is an introduction to the functionalities offered by ProActive : you
+ will be performing distributed computations, moving objects between virtual machines and verify
+ the transparency of the</para>
+    <sect1 remap="h2">
+      <title>1. Installation</title>
+      <para>Follow the <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Installation.xml">
+ instructions</ulink> for downloading and installing ProActive.</para>
+      <para>The examples used in this tour are provided in the /scripts directory of
+ the distribution.</para>
+      <para>The scripts are platform dependant : .sh files on linux are equivalent to
+ the .bat files on windows</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title>2. The Reader-Writer example</title>
+      <para>Illustrates several <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/readers.xml">synchronization policies</ulink>.</para>
+      <sect2 remap="h3">
+        <title>2.1 start the Reader-Writer application</title>
+        <para>Use the readers script</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>2.2 look and check the effects of the different policies : even, writer priority, reader
+ priority</title>
+        <para>What happens when priority is set to &quot;reader priority&quot; ?</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>2.3 look at the code for programming such policies</title>
+        <para>in org.objectweb.proactive.examples.readers.ReaderWriter.java</para>
+        <para>More specifically, look at the routines in :</para>
+        <para><literal>public void evenPolicy(org.objectweb.proactive.Service service)</literal></para>
+        <para><literal>public void readerPolicy(org.objectweb.proactive.Service service)</literal></para>
+        <para><literal>public void writerPolicy(org.objectweb.proactive.Service service)</literal></para>
+        <para>Look at the inner class MyRequestFilterm that implements<literal>org.objectweb.proactive.core.body.request.RequestFilter</literal></para>
+        <para>How does it work?</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>2.4 Introduce a bug in the Writer Priority policy</title>
+        <para>For instance, let several writers go through at the same time.</para>
+        <para>- observe the Writer Policy policy before recompiling</para>
+        <para>- recompile (using compile.sh readers or compile.bat readers)</para>
+        <para>- observe that stub classes are regenerated and recompiled</para>
+        <para>- observe the difference due to the new synchronization policy : what
+ happens now?</para>
+        <para>- correct the bug and recompile again ; check that everything is back to
+ normal</para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>3. The dining philosophers</title>
+      <para>The &quot;dining philosophers&quot; problem is a classical exercise in the
+ teaching of concurrent programming. The goal is to avoid deadlocks.</para>
+      <para>We have provided <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/phil.xml">an illustration of the solution</ulink>
+ using ProActive, where all the philosophers are active objects, as well as the table and the
+ dinner frame (user interface).</para>
+      <sect2 remap="h3">
+        <title>3.1 start the philosophers application</title>
+        <para>with philosophers.sh or philosophers.bat</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>3.2 understand the color codes</title>
+        <informaltable frame="none">
+          <tgroup cols="3">
+            <colspec colname="c1" colwidth="33*"/>
+            <colspec colname="c2" colwidth="33*"/>
+            <colspec colname="c3" colwidth="33*"/>
+            <tbody>
+              <row>
+                <entry align="center" morerows="2" valign="middle"><para><emphasis role="bold">Philosophers</emphasis></para></entry>
+                <entry><para><emphasis role="bold"></emphasis></para></entry>
+                <entry><para><emphasis role="bold">philosophing</emphasis></para></entry>
+              </row>
+              <row>
+                <entry><para><emphasis role="bold"></emphasis></para></entry>
+                <entry><para><emphasis role="bold">hungry, wants the fork !</emphasis></para></entry>
+              </row>
+              <row>
+                <entry><para><emphasis role="bold"></emphasis></para></entry>
+                <entry><para><emphasis role="bold">eating</emphasis></para></entry>
+              </row>
+              <row>
+                <entry align="center" morerows="1" valign="middle"><para><emphasis role="bold">Forks</emphasis></para></entry>
+                <entry><para><emphasis role="bold"></emphasis></para></entry>
+                <entry><para><emphasis role="bold">taken</emphasis></para></entry>
+              </row>
+              <row>
+                <entry><para><emphasis role="bold"></emphasis></para></entry>
+                <entry><para><emphasis role="bold">free</emphasis></para></entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        <para>&#160;</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>&#160;</title>
+        <para>This paragraph was inserted, to avoid an empty section element.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>3.3 test the autopilot mode</title>
+        <para>The application runs by itself without encountering a deadlock.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>3.4 test the manual mode</title>
+        <para>Click on the philosophers&#39; heads to switch their modes</para>
+        <para>Test that there are no deadlocks!</para>
+        <para>Test that you can starve one of the philosophers (ie the others alternate
+ eating and thinking while one never eats!)</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>3.5 start the IC2D application</title>
+        <para><ulink url="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.xml">IC2D</ulink>
+ is a graphical environment for monitoring and steering of distributed and metacomputing
+ applications.</para>
+        <para>- being in the autopilot mode, start the IC2D visualization application
+ (using ic2d.sh or ic2d.bat)</para>
+        <para>- acquire you current machine</para>
+        <blockquote>
+          <para>
+            <blockquote>
+              <para> <emphasis>menu monitoring - monitor new RMI host</emphasis></para>
+            </blockquote>
+ look at the active objects, and at the topology</para>
+        </blockquote>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>4. C3D : a parallel, distributed and collaborative 3D renderer</title>
+      <para><ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.xml">C3D</ulink> is
+ a Java benchmark application that measures the performance of a 3D raytracer renderer distributed
+ over several Java virtual machines using Java RMI.</para>
+      <sect2 remap="h3">
+        <title>4.1 start C3D</title>
+        <para>using the script c3d_no_user</para>
+        <para>A &quot;Dispatcher&quot; object is launched (ie a centralized server) as
+ well as 4 &quot;Renderer&quot; objects, that are active objects to be used for parallel
+ rendering.</para>
+        <para>The bottom part of the window allows the addition and removal of
+ renderers.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>4.2 start a user</title>
+        <para>using c3d_add_user</para>
+        <para>- connect on the current host (proposed by default) by just giving your
+ name</para>
+        <para>- spin the scene, add a random sphere, and observe how the action takes
+ place immediately</para>
+        <para>- add and remove renderers, and observe the effect on the &quot;speed
+ up&quot; indication from the user window.</para>
+        <para>Which configuration is the fastest for the rendering?</para>
+        <para>Are you on a multi-processor machine?</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>4.3 start a user from another machine</title>
+        <para>using the c3d_add_user script, and <emphasis role="underline">specifying the host</emphasis> (NOT set by
+ default)</para>
+        <para>If you use rlogin, make sure the DISPLAY is properly set.</para>
+        <para>You must use the same version of ProActive on both machines!</para>
+        <para>- test the collaborative behavior of the application when several users are
+ connected.</para>
+        <para>Notice that a collaborative consensus must be reached before starting some
+ actions (or that a timeout occured).</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>4.4 start IC2D to visualize the topology</title>
+        <para>- to visualize all Active objects, you need to acquire
+ (&quot;monitoring&quot; menu) :</para>
+        <blockquote>
+          <para>
+            <blockquote>
+              <para> - the machine on which you started the &quot;Dispatcher&quot;</para>
+              <para>- the machine on which you started the second user</para>
+            </blockquote>
+</para>
+        </blockquote>
+        <para>- add random spheres for instance, and observe messages (Requests) between
+ Active Objects.</para>
+        <para>- add and remove renderers, and check graphically whether the corresponding
+ Active Objects are contacted or not, in order to achieve the rendering.</para>
+        <para>- you can textually visualize this information activating &quot;add event
+ timeline for this WorldObject&quot; on the World panelm with the right button, and then
+ &quot;show the event list window&quot; on the top menu window</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>4.5 drag-and-drop migration</title>
+        <para>- from IC2D, you can drag-and-drop active objects from one JVM to another.
+ Click the right button on a C3DRenderingEngine, and drag and drop it in another JVM. Observe the
+ migration taking place.</para>
+        <para>- add a new sphere, using all rendering engines, and check that the
+ messages are still sent to the active object that was asked to migrate.</para>
+        <para>- as migration and communications are implemented in a fully compatible
+ manner, you can even migrate with IC2D an active object while it is communicating (for instance
+ when a rendering action is in progress). Give it a try!</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>4.6 start a new JVM in a computation</title>
+        <para>manually you can start a new JVM - a &quot;Node&quot; in the ProActive
+ terminology - that will be used in a running system.</para>
+        <para>- on a different machine, or by remote login on another host, start another
+ Node, named for instance NodeZ :</para>
+        <blockquote>
+          <para>
+            <blockquote>
+              <para> under linux :<literal>startNode.sh rmi://mymachine/NodeZ
+ &amp; (or startNode.bat rmi://mymachine/NodeZ)</literal></para>
+            </blockquote>
+</para>
+        </blockquote>
+        <para>The node should appear in IC2D when you request the monitoring of the new
+ machine involved (Monitoring menu, then &quot;monitor new RMI host&quot;.</para>
+        <para>- the node just started has no active object running in it. Drag and drop
+ on of the renderers, and check that the node is now taking place in the computation :</para>
+        <blockquote>
+          <para>
+            <blockquote>
+              <para> - spin the scene to trigger a new rendering</para>
+              <para>- see the topology</para>
+            </blockquote>
+</para>
+        </blockquote>
+        <para><emphasis>* if you feel uncomfortable with the automatic layout, switch to manual
+ using the &quot;manual layout&quot; option (right click on the World panel). You can then
+ reorganize the layout of the machines.</emphasis></para>
+        <para>- to fully distribute the computation, start several nodes (you need 2
+ more) and drag-and drop renderers in them.</para>
+        <para>Depending on the machines you have, the complexity of the image, look for
+ the most efficient configuration.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>4.7 have a look at the source code for the main classes of this
+ application :</title>
+        <para><literal>org.objectweb.proactive.examples.c3d.C3DUser.java</literal></para>
+        <para><literal>org.objectweb.proactive.examples.c3d.C3DRenderingEngine.java</literal></para>
+        <para><literal>org.objectweb.proactive.examples.c3d.C3DDispatcher.java</literal></para>
+        <blockquote>
+          <para> look at the method public void processRotate(org.objectweb.proactive.Body
+ body, String methodName, Request r) that handles election of the next action to undertake.</para>
+        </blockquote>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>5. Mobile agents</title>
+      <para>This example shows a set of <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.xml">mobile agents</ulink> moving around while
+ still communicating with their base and with each other. It also features the capability to move
+ a swing window between screens while moving an agent from one JVM to the other.</para>
+      <sect2 remap="h3">
+        <title>5.1 start the penguin application</title>
+        <para>using the penguin script.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>5.2 start IC2D to see what is going on</title>
+        <para>using the ic2d script</para>
+        <para>acquire the machines you have started nodes on</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>5.3 add an agent</title>
+        <para>- on the Advanced Penguin Controller window : button &quot;add
+ agent&quot;</para>
+        <para>- select it, and press button &quot;start&quot;</para>
+        <para>- observe that the active object is moving between the machines, and that
+ the penguin window disappears and reappears on the screen associated with the new JVM.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>5.4 add several agents</title>
+        <para>after selecting them, use the buttons to :</para>
+        <blockquote>
+          <para> - communicate with them (&quot;call agent&quot;)</para>
+          <para>- start, stop, resume them</para>
+          <para>- trigger a communication between them (&quot;call another
+ agent&quot;)</para>
+        </blockquote>
+      </sect2>
+      <sect2 remap="h3">
+        <title>5.5 move the control window to another user</title>
+        <para>- start a node on a different computer, using another screen and
+ keyboard</para>
+        <para>- monitor the corresponding JVM with IC2D</para>
+        <para>- drag-and-drop the active object &quot;AdvancedPenguinController&quot;
+ with IC2D into the newly created JVM : the control window will appear on the other computer and
+ its user can now control the penguins application.</para>
+        <para>- still with IC2D, doing a drag-and-drop back to the original JVM, you will
+ be able to get back the window, and control yourself the application.</para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>6. develop you own application</title>
+      <para>pick up your favorite topic, and develop your own distributed application
+ using the ProActive library. Don&#39;t forget to use IC2D to visualize the topology, and to
+ debug.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title>7. other applications</title>
+      <para>you can also try <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/index.xml">other applications</ulink></para>
+      <para>&#160;</para>
+      <para>&#160;</para>
+    </sect1>
+  
+</chapter>

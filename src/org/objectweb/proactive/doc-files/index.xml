@@ -1,0 +1,991 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/index.html  -->
+  
+
+    <sect1 remap="h3">
+      <title>version 3.0 (November 2005)</title>
+      <para><emphasis role="bold">ProActive</emphasis> is a <emphasis role="bold">GRID</emphasis> Java library for <emphasis role="bold">parallel</emphasis>, <emphasis role="bold">distributed</emphasis>, and <emphasis role="bold">concurrent</emphasis> computing, also featuring <emphasis role="bold">mobility</emphasis> and <emphasis role="bold">security</emphasis> in a uniform framework. With a reduced set of simple primitives, <emphasis role="bold">ProActive</emphasis>
+ provides a comprehensive API allowing to simplify the programming of applications that are
+ distributed on <emphasis role="bold">Local Area Network (LAN)</emphasis>, on <emphasis role="bold">cluster of workstations</emphasis>, or on <emphasis role="bold">Internet Grids</emphasis>. The library is based on an Active Object pattern that is a uniform way to
+ encapsulate:</para>
+      <itemizedlist>
+        <listitem>
+          <para> a <emphasis role="bold">remotely</emphasis> accessible object,</para>
+        </listitem>
+        <listitem>
+          <para> a <emphasis role="bold">thread</emphasis> as an asynchronous activity,</para>
+        </listitem>
+        <listitem>
+          <para> an <emphasis role="bold">actor</emphasis> with its own script,</para>
+        </listitem>
+        <listitem>
+          <para> a <emphasis role="bold">server</emphasis> of incoming requests,</para>
+        </listitem>
+        <listitem>
+          <para> a <emphasis role="bold">mobile</emphasis> and potentially secure entity.</para>
+        </listitem>
+</itemizedlist>
+      <para>On top of those basic features, ProActive also includes <emphasis role="bold">advanced</emphasis>
+ aspects, such as:</para>
+      <itemizedlist>
+        <listitem>
+          <para> Typed <emphasis role="bold">Group</emphasis> Communications</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">OO SPMD</emphasis></para>
+        </listitem>
+        <listitem>
+          <para> Distributed and Hierarchical <emphasis role="bold">Components</emphasis></para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Security</emphasis> .</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Fault Tolerance</emphasis>  with checkpointing</para>
+        </listitem>
+        <listitem>
+          <para> a <emphasis role="bold">P2P</emphasis> infrastructure.</para>
+        </listitem>
+        <listitem>
+          <para> a Graphical User Interface <emphasis role="bold">IC2D</emphasis></para>
+        </listitem>
+        <listitem>
+          <para> a powerful <emphasis role="bold">deployment</emphasis> model based on XML descriptors.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">File transfer</emphasis>  capabilities over the <emphasis role="bold">Grid</emphasis>.</para>
+        </listitem>
+</itemizedlist>
+      <para><emphasis role="bold">ProActive</emphasis> is only made of standard Java classes, and requires <emphasis role="bold">no
+ changes to the Java Virtual Machine</emphasis>, no preprocessing or compiler modification; programmers
+ write standard Java code. Based on a simple Meta-Object Protocol, the library is itself
+ extensible, making the system open for adaptations and optimizations. <emphasis role="bold">ProActive</emphasis> currently
+ uses the <emphasis role="bold">RMI</emphasis> Java standard library as default portable transport layer.</para>
+      <para><emphasis role="bold">ProActive</emphasis> features several optimizations improving performance. For
+ instance, whenever two active objects are located within the same virtual machine, a direct
+ communication is always achieved, without going through the network stack. This optimization is
+ ensured even when the co-location occurs after a migration of one or both of the active
+ objects.</para>
+      <para>ProActive and the (de facto) <emphasis role="bold">Standards</emphasis>: ProActive has an
+ architecture that allows the library to <emphasis role="bold">interoperate</emphasis> with various official or de facto <emphasis role="bold">standards</emphasis>:</para>
+      <itemizedlist>
+        <listitem>
+          <para> Web Service Exportation</para>
+        </listitem>
+        <listitem>
+          <para> HTTP Transport, RMI/SSH tunneling Transport</para>
+        </listitem>
+        <listitem>
+          <para> ssh, scp, rsh, rcp</para>
+        </listitem>
+        <listitem>
+          <para> Globus GT2, GT3 and GT4, Unicore, GLite, ARC (NorduGrid), GSI-SSH</para>
+        </listitem>
+        <listitem>
+          <para> LSF, PBS, Sun Grid Engine, OAR</para>
+        </listitem>
+</itemizedlist>
+      <para>Please send us comments, suggestions, bug reports at <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> Your input will be greatly
+ appreciated.</para>
+      <para><anchor id="dbdoclet.id.index_html_guided_tour"/></para>
+      <informaltable frame="none">
+        <tgroup cols="2">
+          <colspec colname="c1" colwidth="50*"/>
+          <colspec colname="c2" colwidth="50*"/>
+          <tbody>
+            <row>
+              <entry align="center" nameend="c2" namest="c1" valign="middle"><para><emphasis role="bold">Content</emphasis></para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry>
+                <para></para>
+</entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART I</para></entry>
+              <entry><para>INTRODUCTION</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="Principles.xml">Principles and Overview</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="Principles.xml#intro">Seamless sequential, multithreaded and
+ distributed</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Principles.xml#active">Active objects: Unifying threads and remote
+ objects</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Principles.xml#model">Model of Computation Based on previous works
+ and studies....</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Principles.xml#reuse">Reuse and Seamless Why and how do we achieve
+ better reuse ?</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="TinyHelloWorld.xml">HelloWorld, tiny version</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="Installation.xml">Installation</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="Installation.xml#quickStart">Quick Start</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#downloadExpand">Download and expand the
+ archive</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#runExamples">Run a few examples for testing</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#setClassPath">CLASSPATH to set when writing
+ application using ProActive</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#javaPolicy">Create a java.policy file to set
+ permissions</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#log4j">Create a log4j configuration file</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#eclipse">ProActive and the Eclipse IDE</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Installation.xml#support">Troubleshooting and support</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART II</para></entry>
+              <entry><para>PROGRAMMING</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="ProActiveBasis.xml">Active Objects</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="ProActiveBasis.xml">Active Object basis</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ProActiveBasis.xml#def">What is an Active Object</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#creation">Active Object: creation and
+ advanced concepts</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#instantiationCreation">Instantiation-Based
+ Creation</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#objectCreation">Object-Based
+ Creation</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#activity">Specifying the activity of an
+ active object</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#restrictions">Restrictions on reifiable
+ objects</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#factory">Using the Factory Method Design
+ Pattern</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#customize">Advanced : Customizing the Body
+ of an Active Object</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="ActiveObjectCreation.xml#elementRole">Advanced : Role of the elements
+ of an active object</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="FutureObjectCreation.xml">Asynchrony</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="AC.xml">Automatic continuations</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="HelloWorld.xml">A Working Example : Hello World</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="TypedGroupCommunication.xml">Typed Groups</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="TypedGroupCommunication.xml#overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="TypedGroupCommunication.xml#Creation">Creation of a Group</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="TypedGroupCommunication.xml#repr">Group representation and
+ manipulation</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="TypedGroupCommunication.xml#result">Group as result of group
+ communications</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="TypedGroupCommunication.xml#comms">Broadcast vs Dispatching</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="OOSPMD.xml">OO SPMD</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="OOSPMD.xml#intro">OOSPMD : Introduction</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OOSPMD.xml#spmdGroups">SPMD Groups</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OOSPMD.xml#introBarrier">Barrier : Introduction</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OOSPMD.xml#totalBarrier">Total Barrier</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OOSPMD.xml#neighbourBarrier">Neighbor barrier</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OOSPMD.xml#methodBarrier">Method Barrier</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="Migration.xml">Migration : Computational Mobility</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="Migration.xml#prim">Migration Primitive</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Migration.xml#use">Using migration</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Migration.xml#example">Complete example</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Migration.xml#non-seri">Dealing with non-serializable
+ attributes</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="exceptions.xml">Exceptions</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="exceptions.xml#presentation">Exceptions and Asynchrony</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="exceptions.xml#nfe">Non-Functional Exceptions</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="bnb.xml">Branch n bound</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="bnb.xml#mozTocId894456">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="bnb.xml#mozTocId664917">The API Architecture</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="bnb.xml#mozTocId204520">The API Description</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="bnb.xml#mozTocId733244">An Example: FlowShop</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="bnb.xml#mozTocId331057">Future Work</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART III</para></entry>
+              <entry><para>DEPLOYING</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="Configuration.xml">JAVA Properties and Configuration -
+ ProActiveConfig.xml</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="Configuration.xml#overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Configuration.xml#howItWorks">How does it work ?</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Configuration.xml#whereIsIt">Where to access this file ?</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Configuration.xml#properties">ProActive properties</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Configuration.xml#Example">Example</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="Descriptor.xml">Deployment Descriptors</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#objectives">Objectives and Principles</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#vn">Different types of VirtualNodes</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#jvms">Different types of JVMs</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#validation">Validation against XML Schema</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#example">Complete example</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#infrastructure">Infrastructure and processes</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#services">Infrastructure and services</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#killing">Killing the application</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Descriptor.xml#processes">Processes</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="VariableContract.xml">Variable Contracts for Descriptors</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="FileTransfer.xml">File Transfer</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="FileTransfer.xml#intro">Introduction and Concepts</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="FileTransfer.xml#objectives">Objectives</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="FileTransfer.xml#protocols">Supported Protocols</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="FileTransfer.xml#design">FileTransfer Design</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="FileTransfer.xml#xmlTags">Descriptor FileTransfer XML Tags</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="SSHTunneling.xml">SSH Tunneling</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="SSHTunneling.xml#overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="SSHTunneling.xml#configuration">Configuration of the network</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="SSHTunneling.xml#runtimecom">ProActive runtime communication
+ patterns</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="SSHTunneling.xml#applicom">ProActive application communication
+ patterns.</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="SSHTunneling.xml#protocols">ProActive communication
+ protocols</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="SSHTunneling.xml#rmissh">The rmissh communication protocol.</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="faultTolerance.xml">Fault Tolerance</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="faultTolerance.xml#overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="faultTolerance.xml#making">Making a ProActive application
+ fault-tolerant</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="faultTolerance.xml#rules">Programming rules</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="faultTolerance.xml#nbody">A complete example</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART IV</para></entry>
+              <entry><para>COMPOSING</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="components/intro.xml">Components introduction</ulink></para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="components/implementation.xml">An implementation of the Fractal component
+ model with ProActive</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="components/implementation.xml#Specific_features_of_this_implementation">Specific
+ features of this implementation</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="components/conformance.xml">Conformance to the Fractal model and
+ extensions</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="components/conformance.xml#Model">Model</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/conformance.xml#Implementation_specific_API">Implementation specific
+ API</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="components/configuration.xml">Configuration</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="components/configuration.xml#Controllers_and_interceptors">Controllers and
+ interceptors</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/configuration.xml#Lifecycle_:_encapsulation_of_functional_activity_in_component_lifecycle">
+ Lifecycle : encapsulation of functional activity in component lifecycle</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/configuration.xml#Shortcuts">Shortcuts</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="components/adl.xml">Architecture Description Language</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="components/adl.xml#Overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/adl.xml#Example">Example</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/adl.xml#Exportation_and_composition_of_virtual_nodes">Exportation and
+ composition of virtual nodes</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/adl.xml#usage">Usage</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="components/examples.xml">Examples</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="components/examples.xml#From_objects_to_active_objects_to_distributed_components">
+ From objects to active objects to distributed components</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/examples.xml#The_HelloWorld_example">The HelloWorld
+ example</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/examples.xml#The_Comanche_example">The Comanche
+ example</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/examples.xml#The_C3D_example_:_turning_Active_Objects_into_Components">
+ The C3D example : turning Active Objects into Components</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="components/perspectives.xml">Component perspectives : a support for our
+ research work</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="components/perspectives.xml#Optimizations">Optimizations</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/perspectives.xml#Packaging">Packaging</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/perspectives.xml#GUI">Graphical user interface</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/perspectives.xml#Other">Other</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="components/perspectives.xml#limitations">Limitations</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART V</para></entry>
+              <entry><para>ADVANCED FEATURES</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="p2p.xml">Peer-to-Peer Infrastructure</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="p2p.xml#mozTocId121981">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="p2p.xml#infrastructure_model">The P2P Infrastructure Model</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="p2p.xml#implementation">The P2P Infrastructure
+ Implementation</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="p2p.xml#mozTocId325247">Installing and Using the P2P
+ Infrastructure</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="p2p.xml#limitations">Future Work</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="Security.xml">Security</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="Security.xml#Overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Security.xml#architecture">Security Architecture</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Security.xml#detail">Detailed Security Architecture</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Security.xml#descriptors">Activating security mechanism</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="Security.xml#certificate">How to quickly generate certificate
+ ?</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="WSDoc.xml">Web Services</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#principle">Principles</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#pre">Pre-requisite : Installing the Web Server and the SOAP
+ engine</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#expose">Steps to expose an active object or a component as
+ a web services</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#undeploy">Undeploy the services</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#access">Accessing the services</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#limits">Limitations</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#example">A simple example : Hello World</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="WSDoc.xml#interop">C# interoperability : an example with C3D</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="OSGi.xml">OSGI Open Service Gateway initiative</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="OSGi.xml#overview">Overview of OSGi</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OSGi.xml#proactiveBundle">ProActive on top of OSGi</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OSGi.xml#helloWorld">Yet another Hello World</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="OSGi.xml#futureWorks">Current and future works</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART VI</para></entry>
+              <entry><para>USER INTERFACE AND TOOLS</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="IC2D.xml">IC2D : Interactive Control and Debugging of Distribution</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="IC2D.xml#visualisation">Graphical Visualisation within IC2D</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="IC2D.xml#control">Control within IC2D</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="IC2D.xml#applications">Job monitoring and control</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="IC2D.xml#launcher">Launcher</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="IC2D.xml#gridcomp">Grid and cluster computing</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="development/plugin.xml">ProActive Eclipse Plugin</ulink></para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART VII</para></entry>
+              <entry><para>GUIDED TOUR</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="guided_tour/index.xml">Setup</ulink></para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="guided_tour/capabilities-intro.xml">Introduction to the Environment</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="guided_tour/parallel_processing.xml">Collaborative and Parallel
+ Processing</ulink>  : <ulink url="guided_tour/c3d.xml">C3D</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/synchronization.xml">Synchronization</ulink>  : <ulink url="guided_tour/readers_writers.xml">Readers / Writers</ulink> and <ulink url="guided_tour/dining_philosophers.xml">Dining Philosophers</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/migration.xml">Migration</ulink>  : <ulink url="guided_tour/mobile_agents.xml">Mobile Agents</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="guided_tour/hands_on_programming.xml">Hands-on Programming with
+ ProActive</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="guided_tour/hands_on_programming/clientserver.xml">Client-Server</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/hands_on_programming/initializedhello.xml">Control of the
+ Activity</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/hands_on_programming/migratablehello.xml">Migration</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/hands_on_programming/migratablehelloframe.xml">Migration
+ of Graphical Frames</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="guided_tour/OOSPMDJacobiexample.xml">OO SPMD</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="guided_tour/OOSPMDJacobiexample.xml#firstglance">Execution and first
+ glance at the Jacobi code</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/OOSPMDJacobiexample.xml#modifs">Modification and
+ compilation</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/OOSPMDJacobiexample.xml#detail">Detailed understanding of
+ the OO SPMD Jacobi</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/OOSPMDJacobiexample.xml#deploy">Virtual Nodes and
+ Deployment descriptors</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/OOSPMDJacobiexample.xml#execute">Execution on several
+ machines and Clusters</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="guided_tour/nbody.xml">A complete example : the nbody example</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#rationale">Rationale and overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#sources">Source files</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#common">Common files</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#simple">Simple Active Objects</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#groups">Groups of Active objects</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#distrib">groupdistrib</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#oospmd">Object Oriented SPMD Groups</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#barnes">Barnes-Hut</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="guided_tour/nbody.xml#concl">NBody Conclusion</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="guided_tour/conclusion.xml">Guided Tour Conclusion</ulink></para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART VIII</para></entry>
+              <entry><para>EXTENDING PROACTIVE</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="development/DescriptorProcess.xml">Adding a deployment Protocol</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="development/DescriptorProcess.xml#objectives">Objectives</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="development/DescriptorProcess.xml#overview">Overview</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="development/DescriptorProcess.xml#javaProcess">Java Process
+ Class</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="development/DescriptorProcess.xml#xmlProcess">XML Descriptor
+ Process</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="development/FileTransfer.xml">How to add a new FileTransfer
+ CopyProtocol</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="development/FileTransfer.xml#external">Adding external FileTransfer
+ CopyProtocol</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="development/FileTransfer.xml#internal">Adding internal FileTransfer
+ CopyProtocol</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="development/FaultTolerance.xml">Adding a checkpointing Protocol</ulink></para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="MOP.xml">MOP : Metaobject protocol</ulink>                        <orderedlist>
+                          <listitem>
+                            <para><ulink url="MOP.xml#impl">Implementation: a Meta-Object Protocol</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="MOP.xml#principles">Principles</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="MOP.xml#echoproxy">Example of a different metabehavior:
+ EchoProxy</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="MOP.xml#reflect">The Reflect interface</ulink></para>
+                          </listitem>
+                          <listitem>
+                            <para><ulink url="MOP.xml#limitations">Limitations</ulink></para>
+                          </listitem>
+</orderedlist>
+</para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para>PART IX</para></entry>
+              <entry><para>APPENDIX</para></entry>
+            </row>
+            <row>
+              <entry align="center" valign="top"><para></para></entry>
+              <entry><para>
+                  <orderedlist>
+                    <listitem>
+                      <para><ulink url="ProActiveRefBook.pdf">Booklet</ulink></para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="FAQ.xml">Frequently Asked Questions</ulink></para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="http://www-sop.inria.fr/oasis/proactive/doc/index.xml#Papers">References</ulink></para>
+                    </listitem>
+                    <listitem>
+                      <para><ulink url="index.xml">Index</ulink></para>
+                    </listitem>
+</orderedlist>
+</para></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <para><emphasis role="bold">Credits :</emphasis></para>
+      <itemizedlist>
+        <listitem>
+          <para> ProActive is using <ulink url="http://www.objectweb.org/asm/">ASM</ulink> to
+ dynamically generate the java bytecode of the Stubs.</para>
+        </listitem>
+        <listitem>
+          <para> ProActive provides the ability to use <ulink url="http://www.csg.is.titech.ac.jp/~chiba/javassist/">Javassist</ulink> for this task
+ (-DbyteCodeManipulator=javassist option).</para>
+        </listitem>
+        <listitem>
+          <para> ProActive is using <ulink url="http://jakarta.apache.org/ant/">Apache
+ Ant</ulink> to compile.</para>
+        </listitem>
+        <listitem>
+          <para> ProActive is using <ulink url="http://xml.apache.org/xerces2-j/index.xml">Apache Xerces2</ulink> to parse XML.</para>
+        </listitem>
+</itemizedlist>
+      <para><emphasis role="bold">Design Patterns used in the library :</emphasis></para>
+      <itemizedlist>
+        <listitem>
+          <para> Adapter</para>
+        </listitem>
+        <listitem>
+          <para> Chain of responsibility</para>
+        </listitem>
+        <listitem>
+          <para> Composite</para>
+        </listitem>
+        <listitem>
+          <para> Decorator</para>
+        </listitem>
+        <listitem>
+          <para> Facade</para>
+        </listitem>
+        <listitem>
+          <para> Factory</para>
+        </listitem>
+        <listitem>
+          <para> Observer</para>
+        </listitem>
+        <listitem>
+          <para> Producer-Consumer</para>
+        </listitem>
+        <listitem>
+          <para> Proxy</para>
+        </listitem>
+        <listitem>
+          <para> Singleton</para>
+        </listitem>
+        <listitem>
+          <para> Strategy</para>
+        </listitem>
+</itemizedlist>
+      <para></para>
+      <para></para>
+      <para><emphasis role="bold">ProActive</emphasis> is part of the <emphasis role="bold"><ulink url="http://www.objectweb.org/">ObjectWeb consortium</ulink></emphasis> for <emphasis role="bold">OpenSource middleware</emphasis></para>
+      <para>
+        <informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.gif" format="GIF"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.svg" format="SVG"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
+          </mediaobject>
+<ulink url="http://www.objectweb.org/"></ulink>        </informalfigure>
+</para>
+      <para></para>
+      <para></para>
+      <para>
+  </para>
+    </sect1>
+  
+</chapter>

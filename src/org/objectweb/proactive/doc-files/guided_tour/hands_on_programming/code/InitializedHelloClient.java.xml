@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/InitializedHelloClient.java.html  -->
+  
+
+    <para>
+      <screen>
+<emphasis role="bold">package org.objectweb.proactive.examples.hello;</emphasis>
+
+
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">class</emphasis> 
+InitializedHelloClient
+ 
+<emphasis role="bold">{</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">static</emphasis> 
+<emphasis role="bold">void</emphasis> 
+main
+<emphasis role="bold">(</emphasis>String
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+args
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+InitializedHello
+ 
+myServer
+;
+
+        
+String
+ 
+message
+;
+
+        
+<emphasis role="bold">try</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+// checks for the server&#39;s URL
+
+            
+<emphasis role="bold">if</emphasis> 
+<emphasis role="bold">(</emphasis>args
+.
+length
+ 
+=
+=
+ 
+0
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+                
+// There is no url to the server, so create an active server within this VM
+
+                
+myServer
+ 
+=
+ 
+<emphasis role="bold">(</emphasis>InitializedHello
+<emphasis role="bold">)</emphasis> 
+org
+.
+objectweb
+.
+proactive
+.
+ProActive
+.
+newActive
+<emphasis role="bold">(</emphasis>InitializedHello
+.
+<emphasis role="bold">class</emphasis>.
+getName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>,
+                        
+<emphasis role="bold">new</emphasis> 
+Object
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+<emphasis role="bold">{</emphasis> 
+&quot;local&quot;
+ 
+<emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">else</emphasis> 
+<emphasis role="bold">{</emphasis>
+                
+// Lookups the server object
+
+                
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;Using server located on &quot;
+ 
++
+ 
+args
+<emphasis role="bold">[</emphasis>0
+<emphasis role="bold">]</emphasis><emphasis role="bold">)</emphasis>;
+
+                
+myServer
+ 
+=
+ 
+<emphasis role="bold">(</emphasis>InitializedHello
+<emphasis role="bold">)</emphasis> 
+org
+.
+objectweb
+.
+proactive
+.
+ProActive
+.
+lookupActive
+<emphasis role="bold">(</emphasis>InitializedHello
+.
+<emphasis role="bold">class</emphasis>.
+getName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>,
+                        
+args
+<emphasis role="bold">[</emphasis>0
+<emphasis role="bold">]</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+<emphasis role="bold">}</emphasis>
+
+            
+// Invokes a remote method on this object to get the message
+
+            
+message
+ 
+=
+ 
+myServer
+.
+sayHello
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+// Prints out the message
+
+            
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;The message is : &quot;
+ 
++
+ 
+message
+<emphasis role="bold">)</emphasis>;
+
+            
+myServer
+.
+terminate
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">catch</emphasis> 
+<emphasis role="bold">(</emphasis>Exception
+ 
+e
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+System
+.
+err
+.
+println
+<emphasis role="bold">(</emphasis>&quot;Could not reach/create server object&quot;
+<emphasis role="bold">)</emphasis>;
+
+            
+e
+.
+printStackTrace
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+System
+.
+exit
+<emphasis role="bold">(</emphasis>1
+<emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+<emphasis role="bold">}</emphasis>
+
+      </screen>
+</para>
+  
+</chapter>

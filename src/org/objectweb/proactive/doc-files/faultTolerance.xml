@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>Fault-Tolerance</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/faultTolerance.html  -->
+  
+
+    
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.faultTolerance_html_overview"/>Overview</title>
+      <para>ProActive can provide fault-tolerance capabilities through two differents
+ protocols: a Communication-Induced Checkpointing protocol (CIC) or a pessimistic message logging
+ protocol (PML). Making a ProActive application fault-tolerant is <emphasis role="bold">fully transparent</emphasis>; active
+ objects are turned fault-tolerant using Java properties that can be set in the <ulink url="Descriptor.xml">deployment descriptor</ulink> . The programmer can select <emphasis>at deployment time</emphasis>
+ the most adapted protocol regarding the application and the execution environment.</para>
+      <para>
+ Persistence of active objects is obtained through standard Java serialization; a checkpoint thus
+ consists in an object containing a serialized copy of an active object and few informations
+ related to the protocol. As a consequence, a fault-tolerant active object must be
+ serializable.</para>
+      <sect2 remap="h3">
+        <title>Communication Induced Checkpointing (CIC)</title>
+        <para>Each active object in a CIC fault-tolerant application have to checkpoint
+ at least every <emphasis role="bold">TTC</emphasis> (Time To Checkpoint) seconds. When all the active objects have taken a
+ checkpoint, a <emphasis role="bold">global state</emphasis> is formed. If a failure occurs, the <emphasis>entire</emphasis> application
+ must restarts from such a global state. The TTC value depends mainly on the assessed frequency of
+ failures. A little TTC value leads to very frequent global state creation and thus to a little
+ rollback in the execution in case of failure. But a little TTC value leads also to a bigger
+ overhead between a non-fault-tolerant and a fault-tolerant execution. The TTC value can be set by
+ the programmer in the deployment descriptor.</para>
+        <para>The failure-free overhead induced by the CIC protocol is usually low, and
+ this overhead is quasi-independent from the message communication rate. The counterpart is that
+ the recovery time could be long since all the application must restart after the failure of one
+ or more active object.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Pessimistic message logging (PML)</title>
+        <para>Each active object in a PML fault-tolerant application have to checkpoint
+ at least every TTC seconds and all the messages delivered to an active object are logged on a
+ stable storage. There is no need for global synchronization as with CIC protocol, each checkpoint
+ is independent: if a failure occurs, only the faulty process have to recover from its latest
+ checkpoint. As for CIC protocol, the TTC value impact the global failure-free overhead, but the
+ overhead is more linked to the communication rate of the application.</para>
+        <para>Regarding the CIC protocol, the PML protocol induces a higher overhead on
+ failure-free execution, but the recovery time is lower as a single failure does not involve all
+ the system.</para>
+        <para></para>
+        <para></para>
+        <para><emphasis role="bold">Warning:</emphasis> For the version 3.0, those two protocols are not compatible: a fault-tolerance
+ application can use <emphasis role="bold">only</emphasis> one of the two protocols. This compatibility will be provide in
+ the next version.</para>
+        <para></para>
+        <para></para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.faultTolerance_html_making"/>Making a ProActive application
+ fault-tolerant</title>
+      <sect2 remap="h3">
+        <title>Resource Server</title>
+        <para>To be able to recover a failed active object, the fault-tolerance system
+ must have access to a <emphasis>resource server</emphasis>. A resource server is able to return a free node
+ that can host the recovered active object.</para>
+        <para>
+ A resource server is implemented in ProActive in <literal>ft.servers.resource.ResourceServer</literal>.
+ This server can store free nodes by two differents way:</para>
+        <itemizedlist>
+          <listitem>
+            <para> at deployment time: the user can specify in the deployment descriptor a resource virtual
+ node. Each node mapped on this virtual node will automaticaly register itself as free node at
+ the specified resource server.</para>
+          </listitem>
+          <listitem>
+            <para> at execution time: the resource server can use an <ulink url="p2p.xml">underlying p2p
+ network</ulink> to reclaim free nodes when a hosting node is needed.</para>
+          </listitem>
+</itemizedlist>
+        <para>Note that those two mechanisms can be combined. In that case, the resource
+ server first provides node registered at deployment time, and when no more such nodes are
+ available, the p2p network is used.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Fault-Tolerance servers</title>
+        <para>Fault-tolerance mechanism needs servers for the checkpoints storage, the
+ localization of the active objects, and the failure detection. Those servers are implemented in
+ the current version as a unique server (<literal>ft.servers.FTServer</literal>), that implements the
+ interfaces of each server (<literal>ft.servers.*.*</literal>). This global server also includes a
+ resource server.</para>
+        <para>
+ This server is a classfile server for recovered active objects. It must thus have access to all
+ classes of the application, i.e. it must be started with <emphasis role="bold">all classes of the application in its
+ classpath</emphasis>.</para>
+        <para>The global fault-tolerance server can be launched using the <literal>ProActive/scripts/[unix|windows]/FT/startGlobalFTServer.[sh|bat]</literal> script, with 5
+ optional parameters:</para>
+        <itemizedlist>
+          <listitem>
+            <para> the protocol: <literal>-proto [cic|pml]</literal>. Default value is <literal>cic</literal>.</para>
+          </listitem>
+          <listitem>
+            <para> the server name: <literal>-name &lt;serverName&gt;</literal>. The default name is FTServer.</para>
+          </listitem>
+          <listitem>
+            <para> the port number: <literal>-port &lt;portNumber&gt;</literal>. The default port number is
+ 1100.</para>
+          </listitem>
+          <listitem>
+            <para> the fault detection period: <literal>-fdperiod &lt;periodInSec&gt;</literal>. This value defines
+ the time between two consecutive fault detection scanning. The default value is 10 sec. Note
+ that an active object is considered as faulty when it becomes unreachable, i.e. when it becomes
+ unable to receive a message from another active object.</para>
+          </listitem>
+          <listitem>
+            <para> the URL of a <ulink url="p2p.xml">p2p service</ulink> that can be used by the resource server: <literal>-p2p &lt;serviceURL&gt;</literal>. There is no default value for this option.</para>
+          </listitem>
+</itemizedlist>
+        <para>The server can also be directly launched in the java source code, using <literal>org.objectweb.proactive.core.process.JVMProcessImpl</literal> class:</para>
+        <blockquote>
+          <para>
+            <screen>
+GlobalFTServer server = new JVMProcessImpl(new org.objectweb.proactive.core\
+.process.AbstractExternalProcess.StandardOutputMessageLogger());
+this.server.setClassname(&quot;org.objectweb.proactive.core.body.ft.servers.Start\
+FTServer&quot;);
+this.server.startProcess();
+            </screen>
+</para>
+        </blockquote>
+        <para>Note that if one of the servers is unreachable when a fault-tolerant
+ application is deploying, fault-tolerance is automatically and transparently disabled for all the
+ application.</para>
+        <para></para>
+        <para></para>
+      </sect2>
+      <sect2 remap="h3">
+        <title><anchor id="dbdoclet.id.faultTolerance_html_configuration" xreflabel="Configure fault-tolerance for
+ a ProActive application"/>Configure fault-tolerance for
+ a ProActive application</title>
+        <para>Fault-tolerance capabilities of a ProActive application are set in the
+ deployment descriptor, using the <literal>faultTolerance</literal> service. This service is attached to <emphasis>a virtual node</emphasis>: active objects that are deployed on this virtual node are turned
+ fault-tolerant. This service must first defines the protocol that have to be used for this
+ application. The user can select the appropriate protocol with the entry <literal>&lt;protocol
+ type=&quot;[cic|pml]&quot;/&gt;</literal> in the definition of the service.</para>
+        <para>
+ The service also defines <emphasis role="bold">servers URLs</emphasis> :</para>
+        <itemizedlist>
+          <listitem>
+            <para><literal>&lt;globalServer url=&quot;...&quot;/&gt;</literal>  set the URL of a <emphasis>global</emphasis>
+ server, i.e. a server that implements all needed methods for fault-tolerance mechanism (stable
+ storage, fault detection, localization). If this value is set, all others URLs will be <emphasis>ignored</emphasis>.</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;checkpointServer url=&quot;...&quot;/&gt;</literal>  set the URL of the checkpoint
+ server, i.e. the server where checkpoints are stored.</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;locationServer url=&quot;...&quot;/&gt;</literal>  set the URL of the location
+ server, i.e. the server responsible for giving references on failed and recovered active
+ objects.</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;recoveryProcess url=&quot;...&quot;/&gt;</literal>  set the URL of the recovery
+ process, i.e. the process responsible for launching the recovery of the application after a
+ failure.</para>
+          </listitem>
+          <listitem>
+            <para><literal>&lt;resourceServer url=&quot;...&quot;/&gt;</literal>  set the URL of the resource
+ server, i.e. the server responsible for providing free nodes that can host a recovered active
+ object.</para>
+          </listitem>
+</itemizedlist>
+        <para>Finally, the <emphasis role="bold">TTC</emphasis> value is set in fault-tolerance service, using <literal>&lt;ttc value=&quot;x&quot;/&gt;</literal>, where x is expressed in <emphasis>seconds</emphasis>. If not,
+ the default value (30 sec) is used.</para>
+        <para></para>
+        <para></para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>A deployment descriptor example</title>
+        <para>Here is an example of deployment descriptor that deploys 3 virtual nodes :
+ one for deploying fault-tolerant active objects, one for deploying non-fault-tolerant active
+ object (if needed), and one as resource for recovery. The two fault-tolerance behaviors
+ correspond to two fault-tolerance services, <literal>appli</literal> and <literal>resource</literal>. Note
+ that non-fault-tolerant active objects can communicate with fault-tolerant active objects as
+ usual. Chosen protocol is CIC and TTC is set to 5 sec for all the application.</para>
+        <informaltable frame="none">
+          <tgroup cols="1">
+            <colspec colname="c1" colwidth="100*"/>
+            <tbody>
+              <row>
+                <entrytbl cols="1">
+                  <colspec colname="c1"/>
+                  <tbody>
+                    <row>
+                      <entry><para> &lt;ProActiveDescriptor&gt;</para>                        <para>
+ &#160;&lt;componentDefinition&gt;</para>
+                        <para>
+ &#160;&#160;&lt;virtualNodesDefinition&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;virtualNode name=&quot;NonFT-Workers&quot;
+ property=&quot;multiple&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;virtualNode name=&quot;FT-Workers&quot;
+ property=&quot;multiple&quot; <emphasis role="bold">ftServiceId=&quot;appli&quot;</emphasis>/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;virtualNode name=&quot;Failed&quot;
+ property=&quot;multiple&quot; <emphasis role="bold">ftServiceId=&quot;resource&quot;</emphasis>/&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/virtualNodesDefinition&gt;</para>
+                        <para>
+ &#160;&lt;/componentDefinition&gt;</para>
+                        <para>
+ &#160;&lt;deployment&gt;</para>
+                        <para>
+ &#160;&#160;&lt;mapping&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;map virtualNode=&quot;NonFT-Workers&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;Jvm1&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/map&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;map virtualNode=&quot;FT-Workers&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;Jvm2&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/map&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;map virtualNode=&quot;Failed&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;JvmS1&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;JvmS2&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/map&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/mapping&gt;</para>
+                        <para>
+ &#160;&#160;&lt;jvms&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;jvm name=&quot;Jvm1&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;processReference
+ refid=&quot;linuxJVM&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/jvm&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;jvm name=&quot;Jvm2&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;processReference
+ refid=&quot;linuxJVM&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/jvm&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;jvm name=&quot;JvmS1&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;processReference
+ refid=&quot;linuxJVM&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/jvm&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;jvm name=&quot;JvmS2&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;processReference
+ refid=&quot;linuxJVM&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/jvm&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/jvms&gt;</para>
+                        <para>
+ &#160;&lt;/deployment&gt;</para>
+                        <para>
+ &#160;&lt;infrastructure&gt;</para>
+                        <para>
+ &#160;&#160;&lt;processes&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;processDefinition id=&quot;linuxJVM&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;jvmProcess
+ class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/processDefinition&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/processes&gt;</para>
+                        <para>
+ &#160;&#160;&lt;services&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;<emphasis role="bold">serviceDefinition id=&quot;appli&quot;</emphasis>&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;globalServer
+ url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/serviceDefinition&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;<emphasis role="bold">serviceDefinition id=&quot;resource&quot;</emphasis>&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;globalServer
+ url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;resourceServer
+ url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/serviceDefinition&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/services&gt;</para>
+                        <para>
+ &#160;&lt;/infrastructure&gt;</para>
+                        <para>
+ &lt;/ProActiveDescriptor&gt;</para>
+                        <para></para>
+</entry>
+                    </row>
+                  </tbody>
+</entrytbl>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        <para></para>
+        <para></para>
+        <para></para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.faultTolerance_html_rules"/>Programming rules</title>
+      <sect2 remap="h3">
+        <title>Serializable</title>
+        <para>Persistence of active objects is obtained through standard Java
+ serialization; a checkpoint thus consists in an object containing a serialized copy of an active
+ object and a few informations related to the protocol. As a consequence, a fault-tolerant active
+ object <emphasis>must be serializable</emphasis>. If a non serializable object is activated on a fault-tolerant
+ virtual node, fault-tolerance is automatically and transparently disabled for this active
+ object.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Standard Java main method</title>
+        <para>Standard Java thread, typically main method, cannot be turned
+ fault-tolerant. As a consequence, if a standard main method interacts with active objects during
+ the execution, consistency after a failure can no more be ensured: after a failure, all the
+ active objects will roll back to the most recent global state <emphasis>but the main will not</emphasis>.</para>
+        <para></para>
+        <para>
+ So as to avoid such inconsistency on recovery, the programmer must minimizes the use of standard
+ main by, for example, delegating the initialization and launching procedure to an active
+ object.</para>
+        <blockquote>
+          <para>
+            <screen>
+...
+public static void main(String[] args){
+   Initializer init = (Initializer)(ProActive.newActive(&quot;Initializer.getClas\
+s.getName()&quot;, args);
+   init.launchApplication();
+   System.out.println(&quot;End of main thread&quot;);
+}
+...
+            </screen>
+</para>
+        </blockquote>
+        <para>The object <literal>init</literal> is an active object, and as such will be
+ rolled back if a failure occurs: the application is kept consistent.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Checkpointing occurrence</title>
+        <para>To keep fault-tolerance fully transparent (see <ulink url="http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf">the technical
+ report</ulink> for more details), active objects can take a checkpoint <emphasis>before the service of a
+ request</emphasis>. As a first consequence, if the service of a request is infinite, or at least much
+ greater than TTC, the active object that serves such a request can no more take checkpoints. If a
+ failure occurs during the execution, this object will force the entire application to rolls back
+ to the beginning of the execution. The programmer must thus avoid infinite method such as</para>
+        <blockquote>
+          <para>
+            <screen>
+...
+public void infiniteMethod(){
+   while (true){
+     this.doStuff();
+   }
+}
+...
+            </screen>
+</para>
+        </blockquote>
+        <para>The second consequence concerns the definition of the <literal>runActivity()</literal> method (see <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/RunActive.xml"><literal>runActive</literal></ulink>).
+ Let us consider the following example :</para>
+        <blockquote>
+          <para>
+            <screen>
+...
+public void runActivity(Body body) {
+   org.objectweb.proactive.Service service = new org.objectweb.proactive.Se\
+rvice(body);
+   while (body.isActive()) {
+      Request r = service.blockingRemoveOldest();
+      ...
+      /* CODE A */
+      ...
+      /* CHECKPOINT OCCURRENCE */
+      service.serve(r);
+   }
+}
+...
+            </screen>
+</para>
+        </blockquote>
+        <para>If a checkpoint is triggered before the service of <literal>r</literal>, it characterizes the state
+ of the active object at the point <literal>/* CHECKPOINT OCCURRENCE */</literal>. If a failure occurs,
+ this active object is restarted by calling the <literal>runActivity()</literal> method, <emphasis>from a state
+ in which the code <literal>/* CODE A */</literal> has been already executed</emphasis>. As a consequence, the
+ execution looks like if <literal>/* CODE A */</literal> was executed two times.</para>
+        <para>
+ The programmer should then avoid to alter the state of an active object in the code preceding the
+ call to <literal>service.serve(r)</literal> when he redefines the <literal>runActivity()</literal>
+ method.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Activity Determinism</title>
+        <para>All the activities of a fault-tolerant application must be deterministic
+ (see <ulink url="http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf">the
+ technical report</ulink> for more details). The programmer must then avoid the use of
+ non-deterministic methods such as <literal>Math.random()</literal>.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Limitations</title>
+        <para>Fault-tolerance in ProActive is still not compliant with the following
+ features :</para>
+        <itemizedlist>
+          <listitem>
+            <para> active objects exposed as <ulink url="WSDoc.xml">Web services</ulink>, or reachable using http
+ protocol,</para>
+          </listitem>
+          <listitem>
+            <para> and <ulink url="./Security.xml">security</ulink>, as fault-tolerance servers are implemented
+ using standard RMI.</para>
+          </listitem>
+</itemizedlist>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.faultTolerance_html_nbody" xreflabel="A complete example"/>A complete example</title>
+      <sect2 remap="h3">
+        <title>Description</title>
+        <para>You can find in <literal>ProActive/scripts/[unix|windows]/ft/nbodyft.[sh|bat]</literal> a script that starts a
+ fault-tolerant version of the <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/nbody.xml">ProActive NBody</ulink> example. This
+ script actually call the <literal>ProActive/scripts/[unix|windows]/nbody.[sh|bat]</literal> script with
+ the option <literal>-displayft</literal>. The java source code is the same as the standard version. The
+ only difference is the &quot;Execution Control&quot; panel added in the graphical interface,
+ which allows the user to remotely kill Java Virtual Machine so as to trigger a failure by sending
+ a <literal>killall java</literal> signal. Note that this panel will not work with Windows operating
+ system, since the <literal>killall</literal> does not exist. But a failure can be triggered for example
+ by killing the JVM process on one of the hosts.</para>
+        <para>
+          <informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="doc-files/./pics/nbodyft.jpg" format="JPG"/>              </imageobject>
+              <imageobject>
+                <imagedata fileref="doc-files/./pics/nbodyft.svg" format="SVG"/>              </imageobject>
+              <imageobject>
+                <imagedata fileref="doc-files/./pics/nbodyft.png" format="PNG"/>              </imageobject>
+            </mediaobject>
+          </informalfigure>
+</para>
+        <para>This snapshot shows a fault-tolerant execution with 8 bodies on 3 different
+ hosts. Clicking on the &quot;Execute&quot; button will trigger the failure of the host called
+ Nahuel and the recovery of the 8 bodies. The checkbox <emphasis>Show trace</emphasis> is checked: the 100
+ latest positions of each body are drawn with darker points. These traces allow to verify that,
+ after a failure, each body finally reach the position it had just before the failure.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Running NBody example</title>
+        <para>Before starting the fault-tolerant body example, you have to edit the <literal>ProActive/descriptors/FaultTolerantWorkers.xml</literal> deployment descriptor so as to deploy
+ on your own hosts (<emphasis role="bold">HOSTNAME</emphasis>), as follow:</para>
+        <informaltable frame="none">
+          <tgroup cols="1">
+            <colspec colname="c1" colwidth="100*"/>
+            <tbody>
+              <row>
+                <entrytbl cols="1">
+                  <colspec colname="c1"/>
+                  <tbody>
+                    <row>
+                      <entry><para> ...</para>                        <para>
+ &#160;&lt;processDefinition id=&quot;jvmAppli1&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&lt;rshProcess
+ class=&quot;org.objectweb.proactive.core.process.rsh.RSHJVMProcess&quot;
+ hostname=&quot;<emphasis role="bold">HOSTNAME</emphasis>&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;processReference refid=&quot;jvmProcess&quot;/&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/rshProcess&gt;</para>
+                        <para>
+ &#160;&lt;/processDefinition&gt;</para>
+                        <para>
+ ...</para>
+                        <para></para>
+</entry>
+                    </row>
+                  </tbody>
+</entrytbl>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        <para>Of course, more than one host is needed to run this example, as failure are
+ triggered by killing all Java processes on the selected host.</para>
+        <para>
+ The deployment descriptor must also specify the GlobalFTServer location as follow, assuming that
+ the script <literal>startGlobalFTServer.sh</literal> has been started on the host <emphasis role="bold">SERVER_HOSTAME</emphasis>:</para>
+        <informaltable frame="none">
+          <tgroup cols="1">
+            <colspec colname="c1" colwidth="100*"/>
+            <tbody>
+              <row>
+                <entrytbl cols="1">
+                  <colspec colname="c1"/>
+                  <tbody>
+                    <row>
+                      <entry><para> ...</para>                        <para>
+ &#160;&lt;services&gt;</para>
+                        <para>
+ &#160;&#160;&lt;serviceDefinition id=&quot;appli&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;globalServer
+ url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
+                        <para>
+
+ &#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/serviceDefinition&gt;</para>
+                        <para>
+ &#160;&#160;&lt;serviceDefinition id=&quot;ressource&quot;&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&#160;&lt;globalServer
+ url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
+                        <para>
+
+ &#160;&#160;&#160;&#160;&lt;resourceServer
+ url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;</para>
+                        <para>
+
+ &#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
+                        <para>
+ &#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
+                        <para>
+ &#160;&#160;&lt;/serviceDefinition&gt;</para>
+                        <para>
+ &#160;&lt;/services&gt;</para>
+                        <para>
+ ...</para>
+</entry>
+                    </row>
+                  </tbody>
+</entrytbl>
+              </row>
+            </tbody>
+          </tgroup>
+        </informaltable>
+        <para>Finally, you can start the fault-tolerant ProActive NBody and choose the
+ version you want to run :</para>
+        <screen>
+~/ProActive/scripts/unix/FT&gt; ./nbodyFT.sh
+Starting Fault-Tolerant version of ProActive NBody...
+
+--- N-body with ProActive ---------------------------------
+ **WARNING** : $PROACTIVE/descriptors/FaultTolerantWorkers.xml MUST BE SET \
+WITH EXISTING HOSTNAMES !
+        Running with options set to 4 bodies, 3000 iterations, display true
+ 1 : Simplest version, one-to-one communication and master
+ 2 : group communication and master
+ 3 : group communication, odd-even-synchronization
+ 4 : group communication, oospmd synchronization
+ 5 : Barnes-Hut, and oospmd
+Choose which version you want to run [12345] :
+4
+Thank you!
+ --&gt; This ClassFileServer is reading resources from classpath
+Jini enabled
+Ibis enabled
+Created a new registry on port 1099
+//tranquility.inria.fr/Node-157559959 successfully bound in registry at //t\
+ranquility.inria.fr/Node-157559959
+Generating class : pa.stub.org.objectweb.proactive.examples.nbody.common.St\
+ub_Displayer
+************* Reading deployment descriptor: file:./../../.././descriptors/\
+FaultTolerantWorkers.xml ********************
+        </screen>
+        <screen>
+
+
+
+
+
+        </screen>
+        <para>
+  </para>
+      </sect2>
+    </sect1>
+  
+</chapter>

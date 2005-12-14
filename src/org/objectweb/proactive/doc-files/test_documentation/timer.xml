@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>0.2 Timer for the Benchmarks</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/timer.html  -->
+  
+
+    <para> In this API, it is the benchmark programmer who make the measure, he can simply use : <emphasis>System.currentTimeMillis()</emphasis> of Java. This method is in the wrong !</para>
+    <para>If you want to change the method to make measure you must to modify the code of all your
+ Benchmarks.</para>
+    <sect1 remap="h2">
+      <title>The solution</title>
+      <para>To solve this problem, we have choose an interface : <emphasis>Timeable</emphasis></para>
+      <screen>
+<literal>
+package testsuite.timer;
+
+public interface Timeable {
+    // Start the timer
+    public void start();
+
+    // Stop the timer
+    public void stop();
+
+    // Get the total time, measured
+    public long getCumulatedTime();
+
+    // To print the time unit
+    public String getUnit();
+}
+    </literal>
+      </screen>
+      <para>By default the API provides two timer which of implement this interface :</para>
+      <para>To make measure in milliseconds : <emphasis>testsuite.timer.ms.MsTimer</emphasis></para>
+      <para>To make measure in microseconds : <emphasis>testsuite.timer.micro.MicroTimer</emphasis></para>
+      <para>By implementing the interface you can easily create new timer for more performents for you
+ needs.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title>How to use Timer in Benchmarck ?</title>
+      <para>Use <emphasis role="bold">this.timer</emphasis> like this :</para>
+      <screen>
+<literal>
+public long action() throws Exception {
+        String className = ReifiableObject.class.getName();
+        Node node = getNode();
+        this.timer.start();
+        object = (ReifiableObject) ProActive.newActive(className, null, node);
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
+    }
+    </literal>
+      </screen>
+    </sect1>
+    <sect1 remap="h2">
+      <title>How to configure the Manager with your Timer ?</title>
+      <para>By a prop file or a XML file :</para>
+      <screen>
+<literal>
+        &lt;prop key=&quot;Timer&quot; value=&quot;testsuite.timer.micro.MicroTimer&quot;/&gt;
+        
+        Timer=testsuite.timer.micro.MicroTimer
+    </literal>
+      </screen>
+      <para>Or by the code :</para>
+      <screen>
+<literal>
+        yourManager.setTimer(&quot;class.name.YourTimer&quot;);
+    </literal>
+      </screen>
+    </sect1>
+  
+</chapter>

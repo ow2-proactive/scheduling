@@ -1,0 +1,1255 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<chapter>
+  <title>SPMD PROGRAMMING</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/OOSPMDJacobiexample.html  -->
+  
+
+    <sect1 remap="h2">
+      <title>OO SPMD on a Jacobi example</title>
+      <para>&nbsp;</para>
+      <sect2 remap="h3">
+        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_firstglance"/>1.
+ Execution and first glance at the Jacobi code</title>
+        <sect3 remap="h4">
+          <title>1.1 Source files:
+ ProActive/src/org/objectweb/proactive/examples/jacobi</title>
+          <para>The Jacobi example is made of two Java classes:</para>
+          <para>- Jacobi.java: the main class</para>
+          <para>- SubMatrix.java: the class implementing the SPMD code</para>
+          <para>Have a first quick look at the code, especially the Jacobi class, looking
+ for the strings "ProActive", "Nodes", "newSPMDGroup".</para>
+          <para></para>
+          <para></para>
+          <para>The last instruction of the class:</para>
+          <para><literal>matrix.compute();</literal></para>
+          <para>is an asynchronous group call. It sends a request to all active objects in
+ the SPMD group, triggering computations in all the SubMatrix.</para>
+          <para>We will get to the class SubMatrix.java later on.</para>
+</sect3>
+        <sect3 remap="h4">
+          <title>1.2 Execution</title>
+          <para>ProActive examples come with scripts to easily launch the execution under
+ both Unix and Windows.</para>
+          <para>For Jacobi, launch:</para>
+          <para><literal>ProActive/scripts/unix/jacobi.sh</literal></para>
+          <para>or</para>
+          <para><literal>ProActive/scripts/windows/jacobi.bat</literal></para>
+          <para>The computation stops after minimal difference is reached between two
+ iterations (constant MINDIFF in class Jacobi.java), or after a fixed number of iteration
+ (constant ITERATIONS in class Jacobi.java).</para>
+          <para></para>
+          <para></para>
+          <para>The provided script, using an XML descriptor, creates 4 JVMs on the current
+ machine. The Jacobi class creates an SPMD group of 9 Active Objects; 2 or 3 AOs per JVM.</para>
+          <para></para>
+          <para></para>
+          <para>Look at the traces on the console upon starting the script; in the current
+ case, remember that all JVMs and AOs send output to the same console. More specifically,
+ understand the following:</para>
+          <para></para>
+          <para><literal>- "Created a new registry on port 1099"</literal></para>
+          <para><literal>- "Reading deployment descriptor ... Matrix.xml
+ "</literal></para>
+          <para><literal>- "created VirtualNode"</literal></para>
+          <para><literal>- "**** Starting jvm on"</literal></para>
+          <para><literal>- "ClassFileServer is reading resources from
+ classpath"</literal></para>
+          <para><literal>- "Detected an existing RMI Registry on port
+ 1099""</literal></para>
+          <para><literal>- "Generating class : ... jacobi.Stub_SubMatrix
+ "</literal></para>
+          <para><literal>- "ClassServer sent class ... jacobi.Stub_SubMatrix
+ successfully"</literal></para>
+          <para></para>
+          <para></para>
+          <para>You can start IC2D (script ic2d.sh or ic2d.bat) in order to visualize the
+ JVMs and the Active Objects. Just activate the "Monitoring a new host" in the
+ "Monitoring" menu at the top left.</para>
+          <para></para>
+          <para></para>
+          <para>To stop the Jacobi computation and all the associated AOs, and JVMs, just
+ ^C in the window where you started the Jacobi script.</para>
+          <para></para>
+</sect3>
+      </sect2>
+      <sect2 remap="h3">
+        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_modifs"/>2. Modification
+ and compilation</title>
+        <sect3 remap="h4">
+          <title>2.1 Source modification</title>
+          <para>Do a simple source modification, for instance changing the values of the
+ constants MINDIFF (0.00000001 for ex) and ITERATIONS in class Jacobi.java.</para>
+          <para>Caveat: Be careful, due to a shortcoming of the Java make system (ant),
+ make sure to also touch the class SubMatrix.java that uses the constants.</para>
+</sect3>
+        <sect3 remap="h4">
+          <title>2.2 Compilation</title>
+          <para>ProActive distribution comes with scripts to easily recompile the provided
+ examples:</para>
+          <para><literal>linux&gt;ProActive/compile/build</literal></para>
+          <para>or</para>
+          <para><literal>windows&gt;ProActive/compile/build.bat</literal></para>
+          <para>Several targets are provided (start build without arguments to obtain
+ them). In order to recompile the Jacobi, just start the target that recompile all the
+ examples:</para>
+          <para><literal>build examples</literal></para>
+          <para>2 source files must appear as being recompiled.</para>
+          <para>Following the recompilation, rerun the examples as explained in section 1.2
+ above, and observe the differences.</para>
+</sect3>
+      </sect2>
+      <sect2 remap="h3">
+        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_detail"/>3. Detailed
+ understanding of the OO SPMD Jacobi</title>
+        <sect3 remap="h4">
+          <title>3.1 Structure of the code</title>
+          <para>Within the class SubMatrix.java the following methods correspond to a
+ standard Jacobi implementation, and are not specific to ProActive:</para>
+          <para><literal>- internalCompute ()</literal></para>
+          <para><literal>- borderCompute ()</literal></para>
+          <para><literal>- exchange ()</literal></para>
+          <para><literal>- buildFakeBorder (int size)</literal></para>
+          <para><literal>- buildNorthBorder ()</literal></para>
+          <para><literal>- buildSouthBorder ()</literal></para>
+          <para><literal>- buildWestBorder ()</literal></para>
+          <para><literal>- buildEastBorder ()</literal></para>
+          <para><literal>- stop ()</literal></para>
+          <para>The methods on which asynchronous remote method invocations take place</para>
+          <para>are:</para>
+          <para><literal>- sendBordersToNeighbors ()</literal></para>
+          <para><literal>- setNorthBorder (double[] border)</literal></para>
+          <para><literal>- setSouthBorder (double[] border)</literal></para>
+          <para><literal>- setWestBorder (double[] border)</literal></para>
+          <para><literal>- setEastBorder (double[] border)</literal></para>
+          <para>The first one sends to the appropriate neighbors the appropriate values,
+ calling set*Border() methods asynchronously. Upon execution by the AO, the methods set*Border()
+ memorize locally the values being received.</para>
+          <para>Notice that all those communication methods are made of purely functional
+ Java code, without any code to the ProActive API.</para>
+          <para>On the contrary, the followings are ProActive related aspects:</para>
+          <para><literal>- buildNeighborhood ()</literal></para>
+          <para><literal>- compute ()</literal></para>
+          <para><literal>- loop ()</literal></para>
+          <para>We will detail them in the next section.</para>
+          <para>Note: the classes managing topologies are still under development. In the
+ next release, the repetitive and tedious topology related instructions (e.g. methods
+ buildNeighborhood) won't have to be written explicitly by the user, whatever the topology
+ (2D, 3D).</para>
+</sect3>
+        <sect3 remap="h4">
+          <title>3.2 OO SPMD behavior</title>
+          <para>Let us detail the OO SPMD techniques and ProActive related methods.</para>
+          <para>First of all, look for the definition and use of the attribute
+ "asyncRefToMe". Using the primitive "getStubOnThis()", it provides a
+ reference to the current active object **on which method calls are asynchronous**. It permits the
+ AO to send requests to itself.</para>
+          <para>For instance in</para>
+          <para><literal>this.asyncRefToMe.loop();</literal></para>
+          <para>Notice the absence of classical loop. The method "loop()" is
+ indeed asynchronously called from itself; it is not really recursivity since it does not have the
+ drawback of the stack growing. It features an important advantage: the AO will remain reactive to
+ other calls being sent to him. Moreover, it eases reuse since it is not necessary to explicitly
+ encode within the main SPMD loop all the messages that have to be taken into account. It also
+ facilitates composition since services can be called by activities outside the SPMD group, they
+ will be automatically executed by the FIFO service of the Active Object.</para>
+          <para>The method "buildNeighborhood ()" is called only once for
+ initialization. Using a 2D topology (Plan), it constructs references to north, south, west, east
+ neighbors -- attributes with respective names. It also construct dynamically the group of
+ neighbors. Starting from an empty group of type SubMatrix</para>
+          <para><literal>this.neighbors = (SubMatrix) ProActiveGroup.newGroup</literal></para>
+          <para><literal>(SubMatrix.class.getName());</literal></para>
+          <para>such typed view of the group is used to get the group view: Group
+ neighborsGroup = ProActiveGroup.getGroup(this.neighbors); Then, the appropriate neighbors are
+ added dynamically in the group, e.g.:</para>
+          <para><literal>neighborsGroup.add(this.north);</literal></para>
+          <para>Again, the classes managing topologies will permit to simplify this
+ code.</para>
+</sect3>
+        <sect3 remap="h4">
+          <title>3.3 Adding a Method barrier for a step by step execution</title>
+          <para>Let say we would like to control step by step the execution of the SPMD
+ code. We will add a barrier in the SubMatrix.java, and control the barrier from input in the
+ Jacobi.java class.</para>
+          <para>In class SubMatrix.java, add a Method <literal>barrier()</literal> of the
+ form:</para>
+          <para><literal>String[] st= new String[1];</literal></para>
+          <para><literal>st[0]="keepOnGoing";</literal></para>
+          <para><literal>ProSPMD.barrier(st);</literal></para>
+          <para>Do not forget to define the <literal>keepOnGoing()</literal> method that indeed
+ can return void, and just be empty. Find the appropriate place to call the <literal>barrier()</literal>
+ Method in the <literal>loop()</literal> Method.</para>
+          <para>In class Jacobi.java, just after the <literal>compute()</literal> Method, add an
+ infinite loop that, upon a user's return key pressed, calls the method <literal>keepOnGoing()</literal> on the SPMD group "matrix". Here are samples of the
+ code:</para>
+          <para><literal>while (true) {</literal></para>
+          <para><literal>printMessageAndWait();</literal></para>
+          <para><literal>matrix.keepOnGoing();</literal></para>
+          <para><literal>}</literal></para>
+          <para><literal>...</literal></para>
+          <para><literal>private static void printMessageAndWait() {</literal></para>
+          <para><literal>java.io.BufferedReader d = new java.io.BufferedReader(</literal></para>
+          <para><literal>new java.io.InputStreamReader(System.in));</literal></para>
+          <para><literal>System.out.println(" --&gt; Press return key to
+ continue");</literal></para>
+          <para><literal>System.out.println(" or Ctrl c to stop.");</literal></para>
+          <para><literal>try {</literal></para>
+          <para><literal>d.readLine();</literal></para>
+          <para><literal>} catch (Exception e) {</literal></para>
+          <para><literal>}</literal></para>
+          <para><literal>}</literal></para>
+          <para>Recompile, and execute the code. Each iteration needs to be activated by
+ hitting the return key in the shell window where Jacobi was launched. Start IC2D (./ic2d.sh or
+ ic2d.bat), and visualize the communications as you control them. Use the "Reset
+ Topology" button to clear communication arcs. The green and red dots indicate the pending
+ requests.</para>
+          <para>You can imagine and test other modifications to the Jacobi code.</para>
+          <para>&nbsp;</para>
+          <informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d.png" format="PNG"/>              </imageobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d.svg" format="SVG"/>              </imageobject>
+            </mediaobject>
+          </informalfigure>
+</sect3>
+        <sect3 remap="h4">
+          <title>3.4 Undestanding various different kind of barriers</title>
+          <para>The group of neighbors built above is important wrt synchronization. Below
+ in method "loop()", an efficient barrier is achieved only using the direct
+ neighbors:</para>
+          <para><literal>ProSPMD.barrier("SynchronizationWithNeighbors"+
+ this.iterationsToStop, this.neighbors);</literal></para>
+          <para>This barrier takes as a parameter the group to synchronize with: it will be
+ passed only when the 4 neighbors in the current 2D example have reached the same point. Adding
+ the rank of the current iteration allows to have a unique identifier for each instance of the
+ barrier.</para>
+          <para>Try to change the barrier instruction to a total barrier:</para>
+          <para><literal>ProSPMD.barrier("SynchronizationWithNeighbors"+
+ this.iterationsToStop);</literal></para>
+          <para>Then recompile and execute again. Using IC2D observe that many more
+ communications are necessary.</para>
+          <para>&nbsp;</para>
+          <informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG"/>              </imageobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobi9-allcoms.svg" format="SVG"/>              </imageobject>
+            </mediaobject>
+          </informalfigure>
+          <para>&nbsp;</para>
+          <informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG"/>              </imageobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobi9-ratio-ligne.svg" format="SVG"/>              </imageobject>
+            </mediaobject>
+          </informalfigure>
+          <para>In order to get details and documentation on Groups and OO SPMD, have a
+ look at:</para>
+          <para><literal>ProActive/src/org/objectweb/proactive/doc-files/</literal></para>
+          <para><literal>TypedGroupCommunication.html</literal></para>
+          <para><literal>OOSPMD.html</literal></para>
+</sect3>
+      </sect2>
+      <sect2 remap="h3">
+        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_deploy"/>4. Virtual Nodes
+ and Deployment descriptors</title>
+        <sect3 remap="h4">
+          <title>4.1 Virtual Nodes</title>
+          <para>Get back to the source code of Jacobi.java, and understand where and how
+ the Virtual Nodes and Nodes are being used.</para>
+</sect3>
+        <sect3 remap="h4">
+          <title>4.2 XML Descriptors</title>
+          <para>The XML descriptor being used is:</para>
+          <para><literal>ProActive/descriptors/Matrix.xml</literal></para>
+          <para>Look for and understand the following definitions:</para>
+          <para><literal>- Virtual Node Definition</literal></para>
+          <para><literal>- Mapping of Virtual Nodes to JVM</literal></para>
+          <para><literal>- JVM Definition</literal></para>
+          <para><literal>- Process Definition</literal></para>
+          <para>A detailed presentation of XML descriptors is available at:</para>
+          <para><literal>ProActive/docs/api/index.html</literal></para>
+          <para>entry 9. XML Deployment Descriptors</para>
+</sect3>
+        <sect3 remap="h4">
+          <title>4.3 Changing the descriptor</title>
+          <para>Edit the file Matrix.xml in order to change the number of JVMs being used.
+ For instance, if your machine is powerful enough, start 9 JVMs, in order to have a single
+ SubMatrix per JVM.</para>
+          <para>&nbsp;</para>
+          <informalfigure>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG"/>              </imageobject>
+              <imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d9vm.svg" format="SVG"/>              </imageobject>
+            </mediaobject>
+          </informalfigure>
+          <para>You do not need to recompile, just restart the execution. Use IC2D to
+ visualize the differences in the configuration.</para>
+</sect3>
+      </sect2>
+      <sect2 remap="h3">
+        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_execute"/>5. Execution
+ on several machines and Clusters</title>
+        <sect3 remap="h4">
+          <title>5.1 Execution on several machines in the room</title>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis role="bold">Explicit machine names</emphasis></para>
+            </listitem>
+</itemizedlist>
+          <para><literal>ProActive/examples/descriptors/Matrix.xml</literal> is the XML
+ deployment file used in this tutorial to start 4 jvms on the local machine. This behavior is
+ achieved by referencing in the creation tag of <emphasis role="bold">Jvm1, Jvm2, Jvm3, Jvm4</emphasis> a <emphasis role="bold">jvmProcess</emphasis>
+ named with the id <emphasis role="bold">localProcess</emphasis>. To summarize briefly at least one <emphasis role="bold">jvmProcess</emphasis> must
+ be defined in an xml deployment file. When this process is referenced directly in the creation
+ part of the jvm definition (like the example below), the jvm will be created locally. On the
+ other hand, if this process is referenced by another process(<emphasis role="bold">rshProcess</emphasis> for instance, this
+ is the case in the next example), the jvm will be created remotely using the related protocol
+ (rsh in the next example).</para>
+          <para>Note that several <emphasis role="bold">jvmProcess</emphasis> can be defined, for instance in order
+ to specify different jvm configurations (e.g classpath, java path,...).</para>
+          <informaltable frame="none">
+            <tgroup cols="1">
+              <colspec colname="c1" colwidth="100*"/>
+              <tbody>
+                <row>
+                  <entrytbl cols="1">
+                    <colspec colname="c1"/>
+                    <tbody>
+                      <row>
+                        <entry><para> &lt;ProActiveDescriptor
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;</para>                          <para>
+
+ &nbsp;&lt;componentDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+ property="<emphasis role="bold">multiple</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/componentDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&lt;deployment&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;mapping&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/mapping&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;jvms&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/jvms&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/deployment&gt;</para>
+                          <para>
+
+ &nbsp;&lt;infrastructure&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;processes&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+ class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/processes&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/infrastructure&gt;</para>
+                          <para>
+
+ &lt;/ProActiveDescriptor&gt;</para>
+                          <para></para>
+</entry>
+                      </row>
+                    </tbody>
+</entrytbl>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <para>Modify your XML deployment file to use the current jvm (i.e the jvm reading
+ the descriptor) and also to start 4 jvms on remote machines using <emphasis role="bold">rsh protocol</emphasis>.</para>
+          <para>Use IC2D to visualize the machines and the JVMs being launched on them.</para>
+          <informaltable frame="none">
+            <tgroup cols="1">
+              <colspec colname="c1" colwidth="100*"/>
+              <tbody>
+                <row>
+                  <entrytbl cols="1">
+                    <colspec colname="c1"/>
+                    <tbody>
+                      <row>
+                        <entry><para> &lt;ProActiveDescriptor
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;</para>                          <para>
+
+ &nbsp;&lt;componentDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+ property="<emphasis role="bold">multiple</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/componentDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&lt;deployment&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;mapping&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">currentJvm</emphasis> /&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/mapping&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;jvms&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">rsh_toto</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">rsh_tata</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">rsh_tutu</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/jvms&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/deployment&gt;</para>
+                          <para>
+
+ &nbsp;&lt;infrastructure&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;processes&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+ class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="titi"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_toto</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="toto"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_tata</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="tata"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_tutu</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="tutu"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/processes&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/infrastructure&gt;</para>
+                          <para>
+
+ &lt;/ProActiveDescriptor&gt;</para>
+                          <para></para>
+</entry>
+                      </row>
+                    </tbody>
+</entrytbl>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <para>Pay attention of what happened to your previous XML deployment file. First
+ of all to use the current jvm the following line was added just under the <emphasis role="bold">jvmSet</emphasis> tag</para>
+          <informaltable frame="none">
+            <tgroup cols="1">
+              <colspec colname="c1" colwidth="100*"/>
+              <tbody>
+                <row>
+                  <entrytbl cols="1">
+                    <colspec colname="c1"/>
+                    <tbody>
+                      <row>
+                        <entry><para> &lt;jvmSet&gt;</para>                          <para>
+
+ &nbsp;&lt;<emphasis role="bold">currentJvm</emphasis> /&gt;</para>
+                          <para>
+
+ &nbsp;...</para>
+                          <para>
+
+ &lt;jvmSet&gt;</para>
+</entry>
+                      </row>
+                    </tbody>
+</entrytbl>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <para>Then the jvms are not created directly using the localProcess, but instead
+ using other processes named <emphasis role="bold">rsh_titi, rsh_toto, rsh_tata, rsh_tutu</emphasis></para>
+          <informaltable frame="none">
+            <tgroup cols="1">
+              <colspec colname="c1" colwidth="100*"/>
+              <tbody>
+                <row>
+                  <entrytbl cols="1">
+                    <colspec colname="c1"/>
+                    <tbody>
+                      <row>
+                        <entry><para> &lt;jvms&gt;</para>                          <para>
+
+ &nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_toto</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_tata</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &nbsp;&lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;creation&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_tutu</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;/creation&gt;</para>
+                          <para>
+
+ &nbsp;&lt;/jvm&gt;</para>
+                          <para>
+
+ &lt;/jvms&gt;</para>
+                          <para></para>
+</entry>
+                      </row>
+                    </tbody>
+</entrytbl>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <para>Those processes as shown below are rsh processes. Note that it is <emphasis role="bold">mandatory</emphasis> for such processes to reference a <emphasis role="bold">jvmProcess</emphasis>, in this case named with the
+ id <emphasis role="bold">localProcess</emphasis>, to create, at deployment time, a jvm on machines titi, toto, tata, tutu,
+ once connected to those machines with rsh.</para>
+          <informaltable frame="none">
+            <tgroup cols="1">
+              <colspec colname="c1" colwidth="100*"/>
+              <tbody>
+                <row>
+                  <entrytbl cols="1">
+                    <colspec colname="c1"/>
+                    <tbody>
+                      <row>
+                        <entry><para> &lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;</para>                          <para>
+
+ &nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+ class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;</para>
+                          <para>
+
+ &lt;/processDefinition&gt;</para>
+                          <para>
+
+ &lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="titi"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &lt;/processDefinition&gt;</para>
+                          <para>
+
+ &lt;processDefinition id="<emphasis role="bold">rsh_toto</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="toto"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &lt;/processDefinition&gt;</para>
+                          <para>
+
+ &lt;processDefinition id="<emphasis role="bold">rsh_tata</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="tata"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &lt;/processDefinition&gt;</para>
+                          <para>
+
+ &lt;processDefinition id="<emphasis role="bold">rsh_tutu</emphasis>"&gt;</para>
+                          <para>
+
+ &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcess"
+ hostname="tutu"&gt;</para>
+                          <para>
+
+ &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                          <para>
+
+ &nbsp;/rshProcess&gt;</para>
+                          <para>
+
+ &lt;/processDefinition&gt;</para>
+                          <para></para>
+</entry>
+                      </row>
+                    </tbody>
+</entrytbl>
+                </row>
+              </tbody>
+            </tgroup>
+          </informaltable>
+          <itemizedlist>
+            <listitem>
+              <para><emphasis role="bold">Using Lists of Processes</emphasis></para>
+            </listitem>
+            <listitem>
+              <para> You can also use the notion of <emphasis role="bold">Process List</emphasis>, which leads to the
+ same result but often simplifies the xml. Two tags are provided:</para>
+              <itemizedlist>
+                <listitem>
+                  <para><emphasis role="bold">processListbyHost</emphasis></para>
+                </listitem>
+</itemizedlist>
+              <para>Used to list the machine's name in a single process</para>
+              <informaltable frame="none">
+                <tgroup cols="1">
+                  <colspec colname="c1" colwidth="100*"/>
+                  <tbody>
+                    <row>
+                      <entrytbl cols="1">
+                        <colspec colname="c1"/>
+                        <tbody>
+                          <row>
+                            <entry><para> &lt;ProActiveDescriptor
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;</para>                              <para>
+
+ &nbsp;&lt;componentDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+ property="<emphasis role="bold">multiple</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&lt;/componentDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&lt;deployment&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;mapping&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;currentJvm/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/mapping&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;jvms&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">rsh_list_titi_toto_tutu_tata</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/jvms&gt;</para>
+                              <para>
+
+ &nbsp;&lt;/deployment&gt;</para>
+                              <para>
+
+ &nbsp;&lt;infrastructure&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;processes&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition
+ id="<emphasis role="bold">localProcess</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+ class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition
+ id="<emphasis role="bold">rsh_list_titi_toto_tutu_tata</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">processListbyHost</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
+ hostlist="<emphasis role="bold">titi toto tata tutu</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/processListbyHost&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/processes&gt;</para>
+                              <para>
+
+ &nbsp;&lt;/infrastructure&gt;</para>
+                              <para>
+
+ &lt;/ProActiveDescriptor&gt;</para>
+                              <para></para>
+</entry>
+                          </row>
+                        </tbody>
+</entrytbl>
+                    </row>
+                  </tbody>
+                </tgroup>
+              </informaltable>
+
+              <itemizedlist>
+                <listitem>
+                  <para><emphasis role="bold">processList</emphasis></para>
+                </listitem>
+</itemizedlist>
+              <para>Used when machine's names follow a list format, for instance titi1
+ titi2 titi3 ... titi100</para>
+              <informaltable frame="none">
+                <tgroup cols="1">
+                  <colspec colname="c1" colwidth="100*"/>
+                  <tbody>
+                    <row>
+                      <entrytbl cols="1">
+                        <colspec colname="c1"/>
+                        <tbody>
+                          <row>
+                            <entry><para> &lt;ProActiveDescriptor
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;</para>                              <para>
+
+ &nbsp;&lt;componentDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+ property="<emphasis role="bold">multiple</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&lt;/componentDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&lt;deployment&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;mapping&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;currentJvm/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/map&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/mapping&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;jvms&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">rsh_list_titi1_to_100</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/jvms&gt;</para>
+                              <para>
+
+ &nbsp;&lt;/deployment&gt;</para>
+                              <para>
+
+ &nbsp;&lt;infrastructure&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;processes&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition
+ id="<emphasis role="bold">localProcess</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+ class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;processDefinition
+ id="<emphasis role="bold">rsh_list_titi1_to_100</emphasis>"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">processList</emphasis>
+ class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
+ fixedName="titi" list="[1-100]"
+ domain="titi_domain"&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+ refid="<emphasis role="bold">localProcess</emphasis>"/&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&lt;/processList&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;</para>
+                              <para>
+
+ &nbsp;&nbsp;&lt;/processes&gt;</para>
+                              <para>
+
+ &nbsp;&lt;/infrastructure&gt;</para>
+                              <para>
+
+ &lt;/ProActiveDescriptor&gt;</para>
+                              <para></para>
+</entry>
+                          </row>
+                        </tbody>
+</entrytbl>
+                    </row>
+                  </tbody>
+                </tgroup>
+              </informaltable>
+            </listitem>
+</itemizedlist>
+</sect3>
+        <sect3 remap="h4">
+          <title>5.2 Execution on Clusters</title>
+          <para>If you have access to your own clusters, configure the XML descriptor to
+ launch the Jacobi on them, using the appropriate protocol:</para>
+          <para>ssh, LSF, PBS, Globus, etc.</para>
+          <para>Have a look at <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Descriptor.xml">
+ XML Descriptors documentation</ulink> to get the format of the XML descriptor for each of the
+ supported protocols.</para>
+          <para>&nbsp;</para>
+</sect3>
+      </sect2>
+    </sect1>
+  
+  <index/>
+</chapter>

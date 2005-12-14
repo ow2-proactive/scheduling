@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/MigratableHello.java.html  -->
+  
+
+    <para>
+      <screen>
+<emphasis role="bold">package org.objectweb.proactive.examples.hello;</emphasis>
+
+
+<emphasis role="bold">import org.objectweb.proactive.ActiveObjectCreationException;</emphasis>
+<emphasis role="bold">import org.objectweb.proactive.ProActive;</emphasis>
+<emphasis role="bold">import org.objectweb.proactive.core.body.migration.MigrationException;</emphasis>
+<emphasis role="bold">import org.objectweb.proactive.core.node.NodeException;</emphasis>
+
+<emphasis role="bold">import java.io.Serializable;</emphasis>
+
+
+// the object that will be migrated active has to be Serializable
+
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">class</emphasis> 
+MigratableHello
+ 
+<emphasis role="bold">extends</emphasis> 
+InitializedHello
+ 
+<emphasis role="bold">implements</emphasis> 
+Serializable
+ 
+<emphasis role="bold">{</emphasis>
+
+    
+<emphasis>/**
+    * Creates a new MigratableHello object.
+    */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+MigratableHello
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/**
+    * Creates a new MigratableHello object.
+    *
+    * @param name the name of the agent
+    */</emphasis>
+
+    
+// ProActive requires the active object to explicitely define (or redefine)
+
+    
+// the constructors, so that they can be reified
+
+    
+<emphasis role="bold">public</emphasis> 
+MigratableHello
+<emphasis role="bold">(</emphasis>String
+ 
+name
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+<emphasis role="bold">super</emphasis><emphasis role="bold">(</emphasis>name
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/** factory for locally creating the active object
+    * @param name the name of the agent
+    * @return an instance of a ProActive active object of type MigratableHello
+    *
+    */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">static</emphasis> 
+MigratableHello
+ 
+createMigratableHello
+<emphasis role="bold">(</emphasis>String
+ 
+name
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+<emphasis role="bold">try</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+<emphasis role="bold">return</emphasis> 
+<emphasis role="bold">(</emphasis>MigratableHello
+<emphasis role="bold">)</emphasis> 
+ProActive
+.
+newActive
+<emphasis role="bold">(</emphasis>MigratableHello
+.
+<emphasis role="bold">class</emphasis>.
+getName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>,
+                
+<emphasis role="bold">new</emphasis> 
+Object
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+<emphasis role="bold">{</emphasis> 
+name
+ 
+<emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">catch</emphasis> 
+<emphasis role="bold">(</emphasis>ActiveObjectCreationException
+ 
+aoce
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;creation of the active object failed&quot;
+<emphasis role="bold">)</emphasis>;
+
+            
+aoce
+.
+printStackTrace
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+<emphasis role="bold">return</emphasis> 
+<emphasis role="bold">null</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">catch</emphasis> 
+<emphasis role="bold">(</emphasis>NodeException
+ 
+ne
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;creation of default node failed&quot;
+<emphasis role="bold">)</emphasis>;
+
+            
+ne
+.
+printStackTrace
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+<emphasis role="bold">return</emphasis> 
+<emphasis role="bold">null</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/** method for migrating
+    * @param destination_node destination node
+    */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">void</emphasis> 
+moveTo
+<emphasis role="bold">(</emphasis>String
+ 
+destination_node
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;
+\n
+-----------------------------&quot;
+<emphasis role="bold">)</emphasis>;
+
+        
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;starting migration to node : &quot;
+ 
++
+ 
+destination_node
+<emphasis role="bold">)</emphasis>;
+
+        
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;...&quot;
+<emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">try</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+// THIS MUST BE THE LAST CALL OF THE METHOD
+
+            
+ProActive
+.
+migrateTo
+<emphasis role="bold">(</emphasis>destination_node
+<emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">catch</emphasis> 
+<emphasis role="bold">(</emphasis>MigrationException
+ 
+me
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;migration failed : &quot;
+ 
++
+ 
+me
+.
+toString
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+<emphasis role="bold">}</emphasis>
+
+      </screen>
+</para>
+  
+</chapter>

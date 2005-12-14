@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>Component perspectives : a support for our research work</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/perspectives.html  -->
+  
+
+    <para> <anchor id="dbdoclet.id.perspectives_html_perspectives"/></para>
+    <para>Currently, we have a functional implementation of the Fractal API and
+ model. One can configure and deploy a distributed system made of components.</para>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.perspectives_html_Optimizations"/>Optimizations</title>
+      <para>However, there are currently no optimizations apart from those already
+ offered by ProActive, such as direct communications when communicating entities are in the same
+ virtual machine.</para>
+      <para>We are studying strategies for optimizations that would allow us to reduce
+ the interceptions and the network latency times (when the components are distributed). We have
+ already implemented a first mechanism for shortcuts, which does not allow reconfiguration. We are
+ currently working on a more sophisticated version that will allow dynamic reconfigurations.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.perspectives_html_Packaging"/>Packaging</title>
+      <para>Reusability and Components should be accessible through predefined / preconfigured packages. A
+ bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of
+ composition of deployment that should be addressed.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.perspectives_html_GUI" xreflabel="Graphical user interface"/>Graphical user interface</title>
+      <para>Another area of investigation is the tools for configuring, deploying and
+ monitoring distributed component systems.</para>
+      <para>Because component based programming is somewhat analogous to the assembly
+ of building blocks into a functional product, graphical tools are well suited for the design and
+ monitoring of component based systems. The Fractal community actually proposes such a tool : the
+ Fractal GUI. We have extended this tool to evaluate the feasibility of a full-fledge graphical
+ interface for the design and monitoring of distributed components. The result is available within
+ the IC2D GUI, you can try it out, but consider it as a product in alpha state. Development is
+ indeed currently discontinued as we are waiting for a new release of the Fractal GUI, and some
+ features are only partially implemented (runtime monitoring, composition of virtual nodes).</para>
+      <para>The GUI allows the creation of ADL files representing component systems, and - the other way
+ around - also allows to load ADL files and get a visual representation of systems described in
+ the ADL files. We have worked on the manipulation of virtual nodes - a deployment abstraction - :
+ components display the virtual nodes where they are deployed, and it is also possible to compose virtual nodes</para>
+      <para>Ultimately, we would like to couple the visualization of components at runtime (currently
+ unavailable here) with the standard monitoring capabilities of IC2D : we would get a structural
+ view of the application in the Fractal GUI, and a topological view in the standard IC2D frame</para>
+      <sect2 remap="h3">
+        <title>Usage</title>
+        <para>If you want to try out the extended Fractal GUI for ProActive :</para>
+        <itemizedlist>
+          <listitem>
+            <para> start IC2D</para>
+          </listitem>
+          <listitem>
+            <para> Components --&gt; start components GUI</para>
+          </listitem>
+          <listitem>
+            <para> to load an ADL file : </para>
+            <orderedlist>
+              <listitem>
+                <para> File --&gt; Storage --&gt; select the storage repository which is the root repository
+ of your ADL files. <emphasis>For example you can select the &quot;src&quot; directory of the
+ ProActive distribution</emphasis></para>
+              </listitem>
+              <listitem>
+                <para> File --&gt; Open --&gt; select an ADL file in the storage repository. <emphasis>For example
+ you can select the &quot;helloworld-distributed-wrappers.fractal&quot; file in the
+ src/org/objectweb/proactive/examples/components/helloworld directory of the ProActive
+ distribution.</emphasis></para>
+              </listitem>
+</orderedlist>
+          </listitem>
+          <listitem>
+            <para> to modify an ADL file, you can use the Graph tab for a structural view, while the Dialog
+ tab gives you access to the properties of the components, including the composition of the
+ virtual ndoes.</para>
+          </listitem>
+          <listitem>
+            <para> to save an ADL file : File --&gt; Save</para>
+          </listitem>
+</itemizedlist>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.perspectives_html_Other"/>Other</title>
+      <para>Other areas of research that we are opening around this work include :</para>
+      <itemizedlist>
+        <listitem>
+          <para> wrapping legacy codes (MPI for instance) for interoperability with
+ existing software</para>
+        </listitem>
+        <listitem>
+          <para> behavioral studies with asynchronous distributed components</para>
+        </listitem>
+        <listitem>
+          <para> formalism (ProActive is based on a formal deterministic model for
+ asynchronous distributed objects)</para>
+        </listitem>
+        <listitem>
+          <para> patterns for automatic and parameterizable configurations of component
+ systems</para>
+        </listitem>
+        <listitem>
+          <para> MxN data redistribution : automatic redistribution of data from M
+ components to N components</para>
+        </listitem>
+</itemizedlist>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.perspectives_html_limitations"/>Limitations</title>
+      <para>Some features of the Fractal model are not implemented :</para>
+      <itemizedlist>
+        <listitem>
+          <para> Shared components</para>
+        </listitem>
+        <listitem>
+          <para> Templates (generic factories)</para>
+        </listitem>
+</itemizedlist>
+      <para>Custom controllers cannot yet be specified in the ADL.</para>
+      <para>&#160;</para>
+      <para></para>
+      <para>
+ Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
+    </sect1>
+  
+</chapter>

@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/InitializedHello.java.html  -->
+  
+
+    <para>
+      <screen>
+<emphasis role="bold">package org.objectweb.proactive.examples.hello;</emphasis>
+
+
+<emphasis role="bold">import org.objectweb.proactive.Body;</emphasis>
+<emphasis role="bold">import org.objectweb.proactive.EndActive;</emphasis>
+<emphasis role="bold">import org.objectweb.proactive.InitActive;</emphasis>
+<emphasis role="bold">import org.objectweb.proactive.ProActive;</emphasis>
+
+
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">class</emphasis> 
+InitializedHello
+ 
+<emphasis role="bold">extends</emphasis> 
+Hello
+ 
+<emphasis role="bold">implements</emphasis> 
+InitActive
+, 
+EndActive
+ 
+<emphasis role="bold">{</emphasis>
+
+    
+<emphasis>/**
+     * Constructor for InitializedHello.
+     */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+InitializedHello
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/**
+     * Constructor for InitializedHello.
+     * @param name
+     */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+InitializedHello
+<emphasis role="bold">(</emphasis>String
+ 
+name
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+<emphasis role="bold">super</emphasis><emphasis role="bold">(</emphasis>name
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/**
+     * @see org.objectweb.proactive.InitActive#initActivity(Body)
+     * This is the place where to make initialization before the object
+     * starts its activity
+     */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">void</emphasis> 
+initActivity
+<emphasis role="bold">(</emphasis>Body
+ 
+body
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;I am about to start my activity&quot;
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/**
+     * @see org.objectweb.proactive.EndActive#endActivity(Body)
+     * This is the place where to clean up or terminate things after the
+     * object has finished its activity
+     */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">void</emphasis> 
+endActivity
+<emphasis role="bold">(</emphasis>Body
+ 
+body
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+System
+.
+out
+.
+println
+<emphasis role="bold">(</emphasis>&quot;I have finished my activity&quot;
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/**
+     * this method will end the activity of the active object
+     */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">void</emphasis> 
+terminate
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+// the termination of the activity is done through a call on the
+
+        
+// terminate method of the body associated to the current active object
+
+        
+ProActive
+.
+getBodyOnThis
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>.
+terminate
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">static</emphasis> 
+<emphasis role="bold">void</emphasis> 
+main
+<emphasis role="bold">(</emphasis>String
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+args
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+// Registers it with an URL
+
+        
+<emphasis role="bold">try</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+// Creates an active instance of class HelloServer on the local node
+
+            
+InitializedHello
+ 
+hello
+ 
+=
+ 
+<emphasis role="bold">(</emphasis>InitializedHello
+<emphasis role="bold">)</emphasis> 
+org
+.
+objectweb
+.
+proactive
+.
+ProActive
+.
+newActive
+<emphasis role="bold">(</emphasis>InitializedHello
+.
+<emphasis role="bold">class</emphasis>.
+getName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>,
+                    
+<emphasis role="bold">new</emphasis> 
+Object
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+<emphasis role="bold">{</emphasis> 
+&quot;remote&quot;
+ 
+<emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+java
+.
+net
+.
+InetAddress
+ 
+localhost
+ 
+=
+ 
+java
+.
+net
+.
+InetAddress
+.
+getLocalHost
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+org
+.
+objectweb
+.
+proactive
+.
+ProActive
+.
+register
+<emphasis role="bold">(</emphasis>hello
+,
+                
+&quot;//&quot;
+ 
++
+ 
+localhost
+.
+getHostName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
++
+ 
+&quot;/Hello&quot;
+<emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">catch</emphasis> 
+<emphasis role="bold">(</emphasis>Exception
+ 
+e
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+System
+.
+err
+.
+println
+<emphasis role="bold">(</emphasis>&quot;Error: &quot;
+ 
++
+ 
+e
+.
+getMessage
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+e
+.
+printStackTrace
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+<emphasis role="bold">}</emphasis>
+
+      </screen>
+</para>
+  
+</chapter>

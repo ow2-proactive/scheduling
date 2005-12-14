@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE book
+          PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+          "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+          [
+<!ENTITY Principles SYSTEM "Principles.xml">
+<!ENTITY Installation SYSTEM "Installation.xml">
+<!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
+<!ENTITY TypedGroupCommunication SYSTEM "TypedGroupCommunication.xml">
+<!ENTITY OOSPMD SYSTEM "OOSPMD.xml">
+<!ENTITY Migration SYSTEM "Migration.xml">
+<!ENTITY exceptions SYSTEM "exceptions.xml">
+<!ENTITY bnb SYSTEM "bnb.xml">
+<!ENTITY PAConfiguration SYSTEM "Configuration.xml">
+<!ENTITY VariableContract SYSTEM "VariableContract.xml">
+<!ENTITY FileTransfer SYSTEM "FileTransfer.xml">
+<!ENTITY SSHTunneling SYSTEM "SSHTunneling.xml">
+<!ENTITY faultTolerance SYSTEM "faultTolerance.xml">
+<!ENTITY intro SYSTEM "components/intro.xml">
+<!ENTITY implementation SYSTEM "components/implementation.xml">
+<!ENTITY conformance SYSTEM "components/conformance.xml">
+<!ENTITY Compconfiguration SYSTEM "components/configuration.xml">
+<!ENTITY adl SYSTEM "components/adl.xml">
+<!ENTITY examples SYSTEM "components/examples.xml">
+<!ENTITY perspectives SYSTEM "components/perspectives.xml">
+<!ENTITY p2p SYSTEM "p2p.xml">
+<!ENTITY Security SYSTEM "Security.xml">
+<!ENTITY WSDoc SYSTEM "WSDoc.xml">
+<!ENTITY OSGi SYSTEM "OSGi.xml">
+<!ENTITY IC2D SYSTEM "IC2D.xml">
+<!ENTITY plugin SYSTEM "development/plugin.xml">
+<!ENTITY guidedindex SYSTEM "guided_tour/index.xml">
+<!ENTITY capabilities-intro SYSTEM "guided_tour/capabilities-intro.xml">
+<!ENTITY hands_on_programming SYSTEM "guided_tour/hands_on_programming.xml">
+<!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
+<!ENTITY nbody SYSTEM "guided_tour/nbody.xml">
+<!ENTITY conclusion SYSTEM "guided_tour/conclusion.xml">
+<!ENTITY DescriptorProcess SYSTEM "development/DescriptorProcess.xml">
+<!ENTITY devFileTransfer SYSTEM "development/FileTransfer.xml">
+<!ENTITY devFaultTolerance SYSTEM "development/FaultTolerance.xml">
+<!ENTITY MOP SYSTEM "MOP.xml">
+<!-- <!ENTITY FAQ SYSTEM "FAQ.xml"> -->
+
+]>
+<book>
+  <title>ProActive v3.01 Documentation</title>
+  <part> <title> Introduction</title>
+  &Principles;
+  &Installation;
+ </part><part> <title> Programming</title>
+   &ProActiveBasis;
+  &TypedGroupCommunication;
+  &OOSPMD;
+  &Migration;
+  &exceptions;
+  &bnb;
+ </part><part> <title> Deploying</title>
+  &PAConfiguration;
+  &VariableContract;
+  &FileTransfer;
+  &SSHTunneling;
+  &faultTolerance;
+ </part><part> <title> Composing</title>
+  &intro;
+  &implementation;
+  &conformance;
+  &Compconfiguration;
+  &adl;
+  &examples;
+  &perspectives;
+ </part><part> <title> Advanced</title>
+  &p2p;
+  &Security;
+  &WSDoc;
+  &OSGi;
+ </part><part> <title> User Interface and tools</title>
+  &IC2D;
+  &plugin;
+ </part><part> <title> Guided Tour</title>
+  &guidedindex;
+  &capabilities-intro;
+  &hands_on_programming;
+  &OOSPMDJacobiexample;
+  &nbody;
+  &conclusion;
+ </part><part> <title> Extending ProActive</title>
+  &DescriptorProcess;
+  &devFileTransfer;
+  &devFaultTolerance;
+  &MOP;
+ </part>
+  <!-- &FAQ; -->
+</book>

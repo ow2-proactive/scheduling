@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/HelloFrame.java.html  -->
+  
+
+    <para>
+      <screen>
+
+<emphasis role="bold">package org.objectweb.proactive.examples.hello;</emphasis>
+
+
+<emphasis>/**
+ * This class allows the creation of a graphical window
+ * with a text field
+ *
+ */</emphasis>
+ 
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">class</emphasis> 
+HelloFrame
+ 
+<emphasis role="bold">extends</emphasis> 
+javax
+.
+swing
+.
+JFrame
+ 
+<emphasis role="bold">{</emphasis>
+    
+<emphasis role="bold">private</emphasis> 
+javax
+.
+swing
+.
+JLabel
+ 
+jLabel1
+;
+
+
+    
+<emphasis>/** Creates new form HelloFrame */</emphasis>
+    
+<emphasis role="bold">public</emphasis> 
+HelloFrame
+<emphasis role="bold">(</emphasis>String
+ 
+text
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+initComponents
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+setText
+<emphasis role="bold">(</emphasis>text
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/** This method is called from within the constructor to
+     * initialize the form.
+     *        It will perform the initialization of the frame
+     */</emphasis>
+    
+<emphasis role="bold">private</emphasis> 
+<emphasis role="bold">void</emphasis> 
+initComponents
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+jLabel1
+ 
+=
+ 
+<emphasis role="bold">new</emphasis> 
+javax
+.
+swing
+.
+JLabel
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+addWindowListener
+<emphasis role="bold">(</emphasis><emphasis role="bold">new</emphasis> 
+java
+.
+awt
+.
+event
+.
+WindowAdapter
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+                
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">void</emphasis> 
+windowClosing
+<emphasis role="bold">(</emphasis>java
+.
+awt
+.
+event
+.
+WindowEvent
+ 
+evt
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+                    
+exitForm
+<emphasis role="bold">(</emphasis>evt
+<emphasis role="bold">)</emphasis>;
+
+                
+<emphasis role="bold">}</emphasis>
+            
+<emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
+
+
+        
+jLabel1
+.
+setHorizontalAlignment
+<emphasis role="bold">(</emphasis>javax
+.
+swing
+.
+SwingConstants
+.
+CENTER
+<emphasis role="bold">)</emphasis>;
+
+        
+getContentPane
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>.
+add
+<emphasis role="bold">(</emphasis>jLabel1
+, 
+java
+.
+awt
+.
+BorderLayout
+.
+CENTER
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/** Kill the frame */</emphasis>
+    
+<emphasis role="bold">private</emphasis> 
+<emphasis role="bold">void</emphasis> 
+exitForm
+<emphasis role="bold">(</emphasis>java
+.
+awt
+.
+event
+.
+WindowEvent
+ 
+evt
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+//        System.exit(0); would kill the VM !
+
+        
+dispose
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+ 
+// this way, the active object agentFrameController stays alive
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis>/**
+     * sets the text of the label inside the frame
+     */</emphasis>
+    
+<emphasis role="bold">private</emphasis> 
+<emphasis role="bold">void</emphasis> 
+setText
+<emphasis role="bold">(</emphasis>String
+ 
+text
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+jLabel1
+.
+setText
+<emphasis role="bold">(</emphasis>text
+<emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+<emphasis role="bold">}</emphasis>
+
+      </screen>
+      <screen>
+
+      </screen>
+      <screen>
+
+
+      </screen>
+</para>
+  
+</chapter>

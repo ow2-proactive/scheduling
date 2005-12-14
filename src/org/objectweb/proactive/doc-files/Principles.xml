@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>Principles</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Principles.html  -->
+  
+
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.Principles_html_intro"/>Seamless sequential, multithreaded and
+ distributed</title>
+      <para>Most of the time, activities and distribution are not known at the
+ beginning, and change over time. <emphasis role="bold">Seamless implies reuse, smooth and incremental
+ transitions</emphasis>.</para>
+      <para>
+        <informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="doc-files/proActiveModelColor.gif" format="GIF"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/proActiveModelColor.svg" format="SVG"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/proActiveModelColor.png" format="PNG"/>            </imageobject>
+          </mediaobject>
+        </informalfigure>
+</para>
+      <para></para>
+      <para></para>
+      <para>A huge gap yet exists between multithreaded and distributed Java
+ applications which forbids code reuse in order to build distributed applications from
+ multithreaded applications. Both JavaRMI and JavaIDL, as examples of distributed object libraries
+ in Java, put a heavy burden on the programmer because they require deep modifications of existing
+ code in order to turn local objects into remote accessible ones. In these systems, remote objects
+ need to be accessed through some specific interfaces. As a consequence, these distributed objects
+ libraries do not allow polymorphism between local and remote objects. This feature is our first
+ requirement for a metacomputing framework. It is strongly required in order to let the programmer
+ concentrate first on modeling and algorithmic issues rather than lower-level tasks such as object
+ distribution, mapping and load balancing.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.Principles_html_active"/>Active objects: Unifying threads and remote
+ objects</title>
+      <para>Given a standard object, we provide the ability to give it:</para>
+      <itemizedlist>
+        <listitem>
+          <para> location transparency</para>
+        </listitem>
+        <listitem>
+          <para> activity transparency</para>
+        </listitem>
+        <listitem>
+          <para> synchronization</para>
+        </listitem>
+</itemizedlist>
+      <sect2 remap="h3">
+        <title>==&gt; only with modifications of the instanciation code !</title>
+        <para>Three ways to transform a standard object into an active one:</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Class-based</title>
+        <blockquote>
+          <para>
+            <screen>
+Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
+A a = (A) 
+ProActive.newActive(&quot;example.A&quot;, params, node)
+;
+            </screen>
+</para>
+        </blockquote>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Instantiation-based</title>
+        <blockquote>
+          <para>
+            <screen>
+public class AA extends A implements Active {}
+
+Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
+A a = (A) 
+ProActive.newActive(&quot;example.AA&quot;, params, node)
+;
+            </screen>
+</para>
+        </blockquote>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Object-based</title>
+        <para>Allows to turn active and remote objects for which you do not have the
+ source code; a necessary feature in the context of code mobility.</para>
+        <blockquote>
+          <para>
+            <screen>
+A a = new A (26, &quot;astring&quot;);
+a = (A) 
+ProActive.turnActive(a, node)
+;
+            </screen>
+</para>
+        </blockquote>
+        <para><emphasis role="bold">Notes:</emphasis><emphasis>Node allows to control the
+ mapping</emphasis></para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.Principles_html_model"/>Model of Computation: Based on previous works
+ and studies</title>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Heterogeneous model</emphasis>  both passive and active objects</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Systematic asynchronous communications towards active
+ objects</emphasis></para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">No shared passive object</emphasis> , Call-by-value between active
+ objects</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Automatic continuations</emphasis> , a transparent delegation mechanism</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">wait-by-necessity</emphasis> , automatic and transparent futures</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Centralized and explicit control</emphasis> , libraries of Abstractions</para>
+        </listitem>
+</itemizedlist>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.Principles_html_reuse" xreflabel="Reuse and Seamless: why and how do we achieve
+ better reuse ?"/>Reuse and Seamless: why and how do we achieve
+ better reuse ?</title>
+      <para>Two key features :</para>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Wait-by-necessity : inter-objects synchronization</emphasis></para>
+          <para></para>
+        </listitem>
+</itemizedlist>
+      <para>Systematic, implicit and transparent futures. Ease the programming of
+ synchronization and reuse of existing methods</para>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Polymorphism between standard and active objects</emphasis></para>
+        </listitem>
+</itemizedlist>
+      <itemizedlist>
+        <listitem>
+          <para> Type compatibility for classes and not just for interface</para>
+        </listitem>
+        <listitem>
+          <para> Needed and done for the future objects as well</para>
+        </listitem>
+        <listitem>
+          <para> Dynamic mechanism (dynamically achieve if needed)</para>
+        </listitem>
+</itemizedlist>
+      <para>
+        <informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="doc-files/polymorphism.gif" format="GIF"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/polymorphism.svg" format="SVG"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/polymorphism.png" format="PNG"/>            </imageobject>
+          </mediaobject>
+        </informalfigure>
+</para>
+      <para></para>
+      <para></para>
+      <para></para>
+      <para>
+ </para>
+    </sect1>
+  
+</chapter>

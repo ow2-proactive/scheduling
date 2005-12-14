@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>ProActive guided tour</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/index.html  -->
+  
+
+    <para> This tour is a practical introduction to ProActive, giving an illustrated introduction to some
+ of the functionnalities and facilities offered by the library.</para>
+    <para>First off, we give an explaination on how to install and configure ProActive. Next are
+ introduced the different functionalities of the library through some runnning examples. Then are
+ given om details on how this is put down in code, and you will be challenged to write your bits
+ of code. This should give you practical experience on how to program using ProActive. A section
+ on OO-SPMD (Object-Oriented Single Program Multiple Data) will show how to use this programming
+ paradigm.</para>
+    <para>The guided tour is finished off by the complete N-Body example. This application is first
+ written trivially, then some speed-ups are plugged in, to show how ProActive can help you. We
+ hope this will help your understanding of the library, and of the concepts driving it.</para>
+    <para>If you need further details on how the examples work, check the ProActive <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/index.xml">applications</ulink>
+ page.</para>
+    <para>&#160;</para>
+    <sect1 remap="h2">
+      <title>Installation and setup</title>
+      <para>Follow the <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Installation.xml">instructions</ulink> for downloading and installing ProActive.</para>
+      <para>&#160;</para>
+      <para>The programming exercises in the first part imply that you :</para>
+      <itemizedlist>
+        <listitem>
+          <para> Don&#39;t forget to add the required libraries to your classpath (i.e. the libraries
+ contained in the ProActive/lib directory, as well as either the proactive.jar archive, or the
+ compiled classes of proactive (better if you modify the source code)</para>
+        </listitem>
+        <listitem>
+          <para> use a policy file, such as ProActive/scripts/proactive.security.policy, with the JVM option
+ -Djava.security.policy=/filelocation/proactive.java.policy</para>
+        </listitem>
+</itemizedlist>
+      <para>Set the CLASSPATH as follow :</para>
+      <para>Under linux :</para>
+      <para>export
+ CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:./lib/components/fractal.jar:./lib/bouncycastle.jar</para>
+      <para>Under windows :</para>
+      <para>set
+ CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;.\lib\components\fractal.jar;.\lib\bouncycastle.jar</para>
+      <para>&#160;</para>
+      <para>Concerning <emphasis role="underline">the second part</emphasis> of the tutorial (examples of some functionalities):</para>
+      <itemizedlist>
+        <listitem>
+          <para> Note that the compilation is managed by <ulink url="http://jakarta.apache.org/ant">Ant</ulink> ;
+ we suggest you use this tool to make modifications to the source code, while doing this
+ tutorial. Nevertheless, you can just change the code and compile using compile.sh &lt;the example application&gt; (or compile.bat under windows)</para>
+        </listitem>
+        <listitem>
+          <para> The examples used in the second part of this tutorial are provided in the /scripts
+ directory of the distribution.</para>
+          <para>
+ The scripts are platform dependant : .sh files on linux are equivalent to the .bat files on
+ windows</para>
+        </listitem>
+</itemizedlist>
+      <para>
+        <informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="doc-files/guided_tour/pics/screenshots/proactive_directories.jpg" format="JPG"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/guided_tour/pics/screenshots/proactive_directories.svg" format="SVG"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/guided_tour/pics/screenshots/proactive_directories.png" format="PNG"/>            </imageobject>
+          </mediaobject>
+        </informalfigure>
+</para>
+    </sect1>
+  
+</chapter>

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/Hello.java.html  -->
+  
+
+    <para>
+      <screen>
+<emphasis role="bold">import org.objectweb.proactive.ProActive;</emphasis>
+
+
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">class</emphasis> 
+Hello
+ 
+<emphasis role="bold">{</emphasis>
+    
+<emphasis role="bold">private</emphasis> 
+String
+ 
+name
+;
+
+    
+<emphasis role="bold">private</emphasis> 
+String
+ 
+hi
+ 
+=
+ 
+&quot;Hello world&quot;
+;
+
+    
+<emphasis role="bold">private</emphasis> 
+java
+.
+text
+.
+DateFormat
+ 
+dateFormat
+ 
+=
+ 
+<emphasis role="bold">new</emphasis> 
+java
+.
+text
+.
+SimpleDateFormat
+<emphasis role="bold">(</emphasis>
+            
+&quot;dd/MM/yyyy HH:mm:ss&quot;
+<emphasis role="bold">)</emphasis>;
+
+
+    
+<emphasis role="bold">public</emphasis> 
+Hello
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis role="bold">public</emphasis> 
+Hello
+<emphasis role="bold">(</emphasis>String
+ 
+name
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+<emphasis role="bold">this</emphasis>.
+name
+ 
+=
+ 
+name
+;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis role="bold">public</emphasis> 
+String
+ 
+sayHello
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+<emphasis role="bold">return</emphasis> 
+hi
+ 
++
+ 
+&quot; at &quot;
+ 
++
+ 
+dateFormat
+.
+format
+<emphasis role="bold">(</emphasis><emphasis role="bold">new</emphasis> 
+java
+.
+util
+.
+Date
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis> 
++
+
+        
+&quot; from node : &quot;
+ 
++
+ 
+ProActive
+.
+getBodyOnThis
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>.
+getNodeURL
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+    
+<emphasis role="bold">}</emphasis>
+
+    
+<emphasis role="bold">public</emphasis> 
+<emphasis role="bold">static</emphasis> 
+<emphasis role="bold">void</emphasis> 
+main
+<emphasis role="bold">(</emphasis>String
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+args
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+        
+// Registers it with an URL
+
+        
+<emphasis role="bold">try</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+// Creates an active instance of class HelloServer on the local node
+
+            
+Hello
+ 
+hello
+ 
+=
+ 
+<emphasis role="bold">(</emphasis>Hello
+<emphasis role="bold">)</emphasis> 
+org
+.
+objectweb
+.
+proactive
+.
+ProActive
+.
+newActive
+<emphasis role="bold">(</emphasis>Hello
+.
+<emphasis role="bold">class</emphasis>.
+getName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>,
+                    
+<emphasis role="bold">new</emphasis> 
+Object
+<emphasis role="bold">[</emphasis><emphasis role="bold">]</emphasis> 
+<emphasis role="bold">{</emphasis> 
+&quot;remote&quot;
+ 
+<emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+java
+.
+net
+.
+InetAddress
+ 
+localhost
+ 
+=
+ 
+java
+.
+net
+.
+InetAddress
+.
+getLocalHost
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+org
+.
+objectweb
+.
+proactive
+.
+ProActive
+.
+register
+<emphasis role="bold">(</emphasis>hello
+,
+                
+&quot;//&quot;
+ 
++
+ 
+localhost
+.
+getHostName
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis> 
++
+ 
+&quot;/Hello&quot;
+<emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis> 
+<emphasis role="bold">catch</emphasis> 
+<emphasis role="bold">(</emphasis>Exception
+ 
+e
+<emphasis role="bold">)</emphasis> 
+<emphasis role="bold">{</emphasis>
+            
+System
+.
+err
+.
+println
+<emphasis role="bold">(</emphasis>&quot;Error: &quot;
+ 
++
+ 
+e
+.
+getMessage
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis>;
+
+            
+e
+.
+printStackTrace
+<emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
+
+        
+<emphasis role="bold">}</emphasis>
+    
+<emphasis role="bold">}</emphasis>
+<emphasis role="bold">}</emphasis>
+
+      </screen>
+</para>
+  
+</chapter>

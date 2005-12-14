@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>6. Guided Tour Conclusion </title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/conclusion.html  -->
+  
+
+    <para>This tour was intented to guide you through an overview of ProActive.</para>
+    <para>You should now be able to start programming with ProActive, and you should also have an idea
+ of the capabilities of the library.</para>
+    <para>We hope that you liked it and we thank you for your interest in ProActive.</para>
+    <para>Further information can be found on the website, and <ulink url="mailto:proactive-support@inria.fr">suggestion</ulink>s are welcome.</para>
+    <para>&#160;</para>
+    <para>&#160;</para>
+  
+</chapter>

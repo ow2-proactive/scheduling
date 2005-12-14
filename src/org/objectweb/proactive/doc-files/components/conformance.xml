@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter><title>Conformance to the Fractal model and extensions</title>
+
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/conformance.html  -->
+  
+
+    <para> <anchor id="dbdoclet.id.conformance_html_conformance_to_fractal"/></para>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.conformance_html_Model"/>Model</title>
+      <para>The conceptual model of Fractal is the base of our work, and as it is
+ extensible, we have added a few concepts to fulfill our needs. The Fractal specification defines
+ conformance levels for implementations of the API (section 7.1. of the Fractal 2 specification).
+ The implementation for ProActive is conformant up to level 3.2. . In other words, it is fully
+ compliant with the API, except it does not consider the creation of components through template
+ components.</para>
+      <para>The implementation for ProActive currently defines 2 extensions to the base
+ component model :</para>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">Distributed deployment</emphasis>  : components can be deployed onto
+ distributed virtual machines, using the deployment facilities of ProActive.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Parallel components</emphasis>  : this type of components is a specialization
+ of the composite components. They encapsulate other components of the same type, and all
+ incoming calls are forwarded to the corresponding internal interfaces of the enclosed
+ components. This allows parallel processing while just manipulating one entity, the enclosing
+ parallel component. As we use the typed groups API of ProActive, coupled with the concept of
+ internal collective interfaces of Fractal, the communications to the enclosed components are
+ either <emphasis>scattered</emphasis> or <emphasis>broadcasted</emphasis>. The following figure sums up the different kinds
+ of components available.</para>
+        </listitem>
+</itemizedlist>
+      <para>
+        <informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="doc-files/components/pics/kinds-of-components.gif" format="GIF"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/components/pics/kinds-of-components.svg" format="SVG"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="doc-files/components/pics/kinds-of-components.png" format="PNG"/>            </imageobject>
+          </mediaobject>
+        </informalfigure>
+</para>
+      <para><emphasis role="bold">The different kinds of components with the ProActive
+ implementation. Primitive components have customizable activities (primitive components are also
+ active objects).</emphasis></para>
+    </sect1>
+    <sect1 remap="h2">
+      <title><anchor id="dbdoclet.id.conformance_html_Implementation_specific_API"/>Implementation specific API</title>
+      <sect2 remap="h3">
+        <title>fractal.provider</title>
+        <para>The API is the same for any Fractal implementation, though some classes are
+ implementation-specific :</para>
+        <para>The fractal provider class, that corresponds to the <literal>fractal.provider</literal> parameters of the JVM, is <literal>org.objectweb.proactive.core.component.Fractive</literal>. The <literal>Fractive</literal> class
+ acts as :</para>
+        <itemizedlist>
+          <listitem>
+            <para> a bootstrap component</para>
+          </listitem>
+          <listitem>
+            <para> a GenericFactory for instantiating new components</para>
+          </listitem>
+          <listitem>
+            <para> a utility class providing static methods to create collective interfaces
+ and retreive references to ComponentParametersController</para>
+          </listitem>
+</itemizedlist>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Content and controller descriptions</title>
+        <para>The controller description and the content description of the components,
+ as specified in the method <literal>public Component newFcInstance(Type type, Object controllerDesc,
+ Object contentDesc) throws InstantiationException</literal> of the <literal>org.objectweb.fractal.api.factory.Factory</literal> class, correspond in this implementation
+ to the classes <literal>org.objectweb.proactive.core.component.ControllerDescription</literal> and <literal>org.proactive.core.component.ContentDescription</literal>.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Collective bindings</title>
+        <para>In composite or parallel components, collective bindings are performed
+ automatically. For primitive component, the developer has to implement the bindings explicitely
+ in the code. We provide a method in the <literal>org.objectweb.proactive.core.component.Fractal</literal> class for creating collective
+ bindings :</para>
+        <screen>
+public static ProActiveInterface createCollectiveClientInterface(String itf\
+Name, String itfSignature) throws ProActiveRuntimeException
+        </screen>
+        <para>where <literal>itfName</literal> is the name of the interface, and <literal>itfSignature</literal> is the signature of the interface.</para>
+        <para>Suppose you have an attribute of the base class of the primitive component
+ of type I, named i. The initialization of the binding would be :</para>
+        <screen>
+i= (I) Fractal.createCollectiveClientInterface(&quot;i&quot;,I.class.getName());
+        </screen>
+        <para>Then the binding method (implementation of the BindingController interface)
+ would be :</para>
+        <screen>
+public void bindFc(String clientItfName, Object serverItf) {
+
+
+ if (clientItfName.equals(&quot;i&quot;)) {
+
+
+ ProActiveGroup.getGroup(i).add(serverItf);
+
+
+ }
+
+
+}
+        </screen>
+        <para>You will be able to see the collective interface as an object of type I,
+ and therefore invoke methods defined by I. But you will also be able to see the collective
+ interface as a <ulink url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Collection.xml">collection</ulink>, as a group
+ can also be manipulated as a collection :</para>
+        <screen>
+Collection c = ProActiveGroup.getGroup(i);
+        </screen>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Requirements</title>
+        <para>As this implementation is based on ProActive, several <ulink url="../ActiveObjectCreation.xml">conditions</ulink> are required :</para>
+        <itemizedlist>
+          <listitem>
+            <para> the base class for the implementation of a primitive component has to
+ provide an empty, no-args constructor.</para>
+          </listitem>
+          <listitem>
+            <para> parameters types and return types of the methods provided by the
+ interfaces of the components have to be reifiable.</para>
+          </listitem>
+</itemizedlist>
+        <para>&#160;</para>
+        <para></para>
+        <para>
+ Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
+      </sect2>
+    </sect1>
+  
+</chapter>
