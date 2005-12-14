@@ -85,6 +85,12 @@ public interface ProActiveDescriptorConstants {
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
     public static final String GLITE_PROCESS_TAG = "gLiteProcess";
+    public static final String DEPENDENT_PROCESS_SEQUENCE_TAG = "dependentProcessSequence";
+    public static final String SEQUENTIAL_PROCESS_TAG = "independentProcessSequence";
+    public static final String MPI_PROCESS_TAG = "mpiProcess";
+    public static final String MPI_PROCESS_OPTIONS_TAG = "mpiOptions";
+    public static final String MPI_LOCAL_PATH_TAG = "localRelativePath";
+    public static final String MPI_REMOTE_PATH_TAG = "remoteAbsolutePath";    
     public static final String NG_PROCESS_TAG = "ngProcess";
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String HIERARCHICAL_PROCESS_TAG = "hierarchicalProcess";
