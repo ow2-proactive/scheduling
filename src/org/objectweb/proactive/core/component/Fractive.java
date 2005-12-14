@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.component;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
@@ -62,16 +61,12 @@ import org.objectweb.proactive.core.component.controller.ComponentParametersCont
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
-import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.MOPException;
-import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -126,13 +121,14 @@ public class Fractive implements GenericFactory, Component, Factory {
     }
 
     /**
-     * Returns a generated interface reference, whose impl field is a group
-     * It is able to handle multiple bindings
-     * @param itfName String
-     * @param itfSignature String
-     * @param owner Component
-     * @return ProActiveInterface
-     * @throws ProActiveRuntimeException
+     * Returns a generated interface reference, whose impl field is a group It
+     * is able to handle multiple bindings, and automatically adds it to an owner component
+     *
+     * @param itfName the name of the interface
+     * @param itfSignature the signature of the interface
+     * @param owner the component to which this interface belongs
+     * @return ProActiveInterface the resulting collective client interface
+     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
      */
     public static ProActiveInterface createCollectiveClientInterface(
         String itfName, String itfSignature, Component owner)
@@ -152,11 +148,13 @@ public class Fractive implements GenericFactory, Component, Factory {
     }
 
     /**
-     * Method createCollectiveClientInterface.
-     * @param itfName String
-     * @param itfSignature String
-     * @return ProActiveInterface
-     * @throws ProActiveRuntimeException
+     * Returns a generated interface reference, whose impl field is a group It
+     * is able to handle multiple bindings
+     *
+     * @param itfName the name of the interface
+     * @param itfSignature the signature of the interface
+     * @return ProActiveInterface the resulting collective client interface
+     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
      */
     public static ProActiveInterface createCollectiveClientInterface(
         String itfName, String itfSignature) throws ProActiveRuntimeException {
@@ -164,13 +162,6 @@ public class Fractive implements GenericFactory, Component, Factory {
             null);
     }
 
-    /**
-     * Method newFcInstance.
-     * @param contentDesc ContentDescription
-     * @param componentParameters ComponentParameters
-     * @return Component
-     * @throws InstantiationException
-     */
     private static Component newFcInstance(ContentDescription contentDesc,
         ComponentParameters componentParameters) throws InstantiationException {
         //MetaObjectFactory factory = null;
@@ -215,7 +206,8 @@ public class Fractive implements GenericFactory, Component, Factory {
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
                 if ((nodes.length > 1) && !contentDesc.uniqueInstance()) { // cyclic node + 1 instance per node
                     //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
-                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType(), componentParameters.getControllerDescription());
+                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType(),
+                            componentParameters.getControllerDescription());
                     Group group_of_components = ProActiveGroup.getGroup(components);
 
                     if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
@@ -306,44 +298,47 @@ public class Fractive implements GenericFactory, Component, Factory {
     }
 
     /**
-     * see {@link org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)}
-     * @param arg0 Type
-     * @param arg1 Object
-     * @param arg2 Object
-     * @return Component
-     * @throws InstantiationException
+     * @param componentType Type the type of the component
+     * @param controllerDesc Object a description of the controller. In this implementation, a {@link ControllerDescription} object
+     * @param contentDesc Object a description of the content. In this implementation, a {@link ContentDescription} object
+     * @return Component a reference on the instantiated component
+     * @throws InstantiationException if the instantiation of the component failed
      * @see org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(Type, Object, Object)
      */
-    public Component newFcInstance(Type arg0, Object arg1, Object arg2)
-        throws InstantiationException {
+    public Component newFcInstance(Type componentType, Object controllerDesc,
+        Object contentDesc) throws InstantiationException {
         try {
-            return newFcInstance(arg0, (ControllerDescription) arg1,
-                (ContentDescription) arg2);
+            return newFcInstance(componentType,
+                (ControllerDescription) controllerDesc,
+                (ContentDescription) contentDesc);
         } catch (ClassCastException e) {
-            if ((arg0 == null) && (arg1 == null) && (arg2 instanceof Map)) {
+            if ((componentType == null) && (controllerDesc == null) &&
+                    (contentDesc instanceof Map)) {
                 // for compatibility with the new org.objectweb.fractal.util.Fractal class
                 return this;
             }
-            if ((arg1 instanceof ControllerDescription) &&
-                    ((arg2 instanceof String) || (arg2 == null))) {
+            if ((controllerDesc instanceof ControllerDescription) &&
+                    ((contentDesc instanceof String) || (contentDesc == null))) {
                 // for the ADL, when only type and ControllerDescription are given
-                return newFcInstance(arg0, arg1,
-                    (arg2 == null) ? null : new ContentDescription(
-                        (String) arg2));
+                return newFcInstance(componentType, controllerDesc,
+                    (contentDesc == null) ? null
+                                          : new ContentDescription(
+                        (String) contentDesc));
             }
 
             // code compatibility with Julia
-            if ("composite".equals(arg1) && (arg2 == null)) {
-                return newFcInstance(arg0,
+            if ("composite".equals(controllerDesc) && (contentDesc == null)) {
+                return newFcInstance(componentType,
                     new ControllerDescription(null, Constants.COMPOSITE), null);
             }
-            if ("primitive".equals(arg1) && (arg2 instanceof String)) {
-                return newFcInstance(arg0,
+            if ("primitive".equals(controllerDesc) &&
+                    (contentDesc instanceof String)) {
+                return newFcInstance(componentType,
                     new ControllerDescription(null, Constants.PRIMITIVE),
-                    new ContentDescription((String) arg2));
+                    new ContentDescription((String) contentDesc));
             }
-            if ("parallel".equals(arg1) && (arg2 == null)) {
-                return newFcInstance(arg0,
+            if ("parallel".equals(controllerDesc) && (contentDesc == null)) {
+                return newFcInstance(componentType,
                     new ControllerDescription(null, Constants.PARALLEL), null);
             }
 
@@ -356,12 +351,9 @@ public class Fractive implements GenericFactory, Component, Factory {
         }
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.Component#getFcInterface(java.lang.String)}
-     * @param itfName String
-     * @return Object
-     * @throws NoSuchInterfaceException
-     * @see org.objectweb.fractal.api.Component#getFcInterface(String)
+    /*
+     *
+     * @see org.objectweb.fractal.api.Component#getFcInterface(java.lang.String)
      */
     public Object getFcInterface(String itfName)
         throws NoSuchInterfaceException {
@@ -374,18 +366,16 @@ public class Fractive implements GenericFactory, Component, Factory {
         }
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
-     * @return Object[]
+    /*
+     *
      * @see org.objectweb.fractal.api.Component#getFcInterfaces()
      */
     public Object[] getFcInterfaces() {
         return null;
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.Component#getFcType()}
-     * @return Type
+    /*
+     *
      * @see org.objectweb.fractal.api.Component#getFcType()
      */
     public Type getFcType() {
@@ -407,37 +397,32 @@ public class Fractive implements GenericFactory, Component, Factory {
         }
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.factory.Factory#getFcContentDesc()}
-     * @return Object
+    /*
+     *
      * @see org.objectweb.fractal.api.factory.Factory#getFcContentDesc()
      */
     public Object getFcContentDesc() {
         return null;
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.factory.Factory#getFcControllerDesc()}
-     * @return Object
+    /*
+     *
      * @see org.objectweb.fractal.api.factory.Factory#getFcControllerDesc()
      */
     public Object getFcControllerDesc() {
         return null;
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.factory.Factory#getFcInstanceType()}
-     * @return Type
+    /*
+     *
      * @see org.objectweb.fractal.api.factory.Factory#getFcInstanceType()
      */
     public Type getFcInstanceType() {
         return null;
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.factory.Factory#newFcInstance()}
-     * @return Component
-     * @throws InstantiationException
+    /*
+     *
      * @see org.objectweb.fractal.api.factory.Factory#newFcInstance()
      */
     public Component newFcInstance() throws InstantiationException {
@@ -479,6 +464,17 @@ public class Fractive implements GenericFactory, Component, Factory {
         return currentComponent.getRepresentativeOnThis();
     }
 
+    /**
+     * Registers a component into a registry(RMI or IBIS or HTTP, default is RMI).
+     * This method is similar to {@link ProActive#register(Object, String)}.
+     * @param ref the component to register.
+     * @param url the url under which the component is registered. The url must point to the localhost
+     * since registering is always a local action. The url can take the form:protocol://localhost:port/nam
+     * or //localhost:port/name if protocol is RMI or //localhost/name if port is 1099 or only the name.
+     * The registered component will be reachable with the following url: protocol://machine_name:port/name
+     * using lookupActive method. Protocol and port can be removed if default
+     * @exception java.io.IOException if the remote body cannot be registered
+     */
     public static void register(Component ref, String url)
         throws IOException {
         if (!(ref instanceof ProActiveComponentRepresentative)) {
@@ -488,6 +484,16 @@ public class Fractive implements GenericFactory, Component, Factory {
         ProActive.register(ref, url);
     }
 
+    /**
+     * Looks-up a component object previously registered in a registry(RMI, IBIS, HTTP).
+     * It is similar to the {@link ProActive#lookupActive(String, String)} method.
+     *
+     * @param url the url under which the remote component is registered. The url takes the following form:
+     * protocol://machine_name:port/name. Protocol and port can be ommited if respectively RMI and 1099:
+     * //machine_name/name
+     * @return a remote reference on a Component
+     * @exception java.io.IOException if the remote component cannot be found under the given url
+     */
     public static ProActiveComponentRepresentative lookup(String url)
         throws IOException, NamingException {
         UniversalBody b = null;
@@ -518,7 +524,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                 url.toString() +
                 ", because construction of component representative failed." +
                 t.toString());
-            throw new NamingException(
+            throw new IOException(
                 "Could not perform lookup for component at URL: " +
                 url.toString() +
                 ", because construction of component representative failed.");
