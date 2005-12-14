@@ -38,7 +38,7 @@ package org.objectweb.proactive.core.util.log;
  *
  */
 public interface Loggers {
-    static final public String CORE = "proactive";
+	static final public String CORE = "proactive";
     static final public String CLASSLOADING = "proactive.classloading";
     static final public String EVENTS = "proactive.events";
     static final public String RUNTIME = "proactive.runtime";
@@ -106,4 +106,9 @@ public interface Loggers {
     public static final String FAULT_TOLERANCE = "proactive.ft";
     public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
     public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
+    
+    // MPI loggers
+    static final public String MPI = "proactive.mpi";
+    static final public String MPI_DEPLOY = ".deploy";
+    
 }
