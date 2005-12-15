@@ -477,9 +477,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * start the MPI process attached with this virtual node
      * @return int, the termination status of the mpi process
      */
-
-    // start the MPI process attached with this virtual node
-    // returns the termination status of process
     public int startMPI() {
         int exitValue = -1;
         if (mpiProcess != null) {

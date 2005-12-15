@@ -73,7 +73,8 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
     //
     //--------------------------Implements DependentProcess---------------------
     public void setDependencyParameters(Object[] dependencyParameters) {
-        buildHostsFile((Node[]) dependencyParameters);
+    	if (remotePath != null)
+    		buildHostsFile((Node[]) dependencyParameters);
     }
 
     protected void buildHostsFile(Node[] nodes) {
