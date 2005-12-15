@@ -30,23 +30,23 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import java.util.StringTokenizer;
-
-import javax.naming.directory.InvalidAttributeValueException;
-
 import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
+import org.objectweb.proactive.core.process.DependentListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
+import org.objectweb.proactive.core.process.IndependentListProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.process.nordugrid.NGProcess;
 import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
 import org.objectweb.proactive.core.process.oar.OARSubProcess;
@@ -63,7 +63,12 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+
 import org.xml.sax.SAXException;
+
+import java.util.StringTokenizer;
+
+import javax.naming.directory.InvalidAttributeValueException;
 
 
 //import org.xml.sax.SAXException;
@@ -104,7 +109,12 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new OARGRIDProcessHandler(proActiveDescriptor));
         this.addHandler(HIERARCHICAL_PROCESS_TAG,
             new HierarchicalProcessHandler(proActiveDescriptor));
-
+        this.addHandler(MPI_PROCESS_TAG,
+            new MPIProcessHandler(proActiveDescriptor));
+        this.addHandler(DEPENDENT_PROCESS_SEQUENCE_TAG,
+            new DependentProcessSequenceHandler(proActiveDescriptor));
+        this.addHandler(SEQUENTIAL_PROCESS_TAG,
+            new SequentialProcessHandler(proActiveDescriptor));
         ProcessListHandler handler = new ProcessListHandler(proActiveDescriptor);
         this.addHandler(PROCESS_LIST_TAG, handler);
         this.addHandler(PROCESS_LIST_BYHOST_TAG, handler);
@@ -122,12 +132,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         UnmarshallerHandler activeHandler) throws SAXException {
 
         /*if (name.equals(GLITE_PROCESS_TAG)) {
-                    String []chaine = ((GLiteProcess)targetProcess).getTargetProcess().getEnvironment();
-                    System.out.println("#######$$$$COMMAND PATH$$$$$$$########");
-                    System.out.println(chaine);
-
-                        ((GLiteProcess)activeHandler.getResultObject()).buildJdlFile();
-                }*/
+           String []chaine = ((GLiteProcess)targetProcess).getTargetProcess().getEnvironment();
+           System.out.println("#######$$$$COMMAND PATH$$$$$$$########");
+           System.out.println(chaine);
+               ((GLiteProcess)activeHandler.getResultObject()).buildJdlFile();
+           }*/
     }
 
     /**
@@ -1296,9 +1305,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     }
 
                     /*String dataCatalog = (attributes.getValue("dataCatalog"));
-                     if (checkNonEmpty(dataCatalog)) {
-                     gLiteProcess.jad.addAttribute(Jdl.CdataCatalog);
-                     }*/
+                       if (checkNonEmpty(dataCatalog)) {
+                       gLiteProcess.jad.addAttribute(Jdl.CdataCatalog);
+                       }*/
                 } catch (IllegalArgumentException e) {
                     e.printStackTrace();
                 } catch (InvalidAttributeValueException e) {
@@ -1632,6 +1641,175 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         }
     }
 
+    // MPI Process Handler
+    protected class MPIProcessHandler extends ProcessHandler {
+        public MPIProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            this.addHandler(MPI_PROCESS_OPTIONS_TAG, new MPIOptionHandler());
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            super.startContextElement(name, attributes);
+
+            try {
+                String mpiFileName = (attributes.getValue("mpiFileName"));
+                if (checkNonEmpty(mpiFileName)) {
+                    ((MPIProcess) targetProcess).setMpiFileName(mpiFileName);
+                }
+                String hostsFileName = (attributes.getValue("hostsFileName"));
+                if (checkNonEmpty(hostsFileName)) {
+                    ((MPIProcess) targetProcess).setHostsFileName(hostsFileName);
+                }
+                String mpiCommandOptions = (attributes.getValue(
+                        "mpiCommandOptions"));
+                if (checkNonEmpty(mpiCommandOptions)) {
+                    ((MPIProcess) targetProcess).setMpiCommandOptions(mpiCommandOptions);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws SAXException {
+            super.notifyEndActiveHandler(name, activeHandler);
+        }
+
+        protected class MPIOptionHandler extends PassiveCompositeUnmarshaller {
+            public MPIOptionHandler() {
+                UnmarshallerHandler pathHandler = new PathHandler();
+                BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+                bch.addHandler(ABS_PATH_TAG, pathHandler);
+                bch.addHandler(REL_PATH_TAG, pathHandler);
+                this.addHandler(MPI_LOCAL_PATH_TAG, bch);
+                this.addHandler(MPI_REMOTE_PATH_TAG, bch);
+                this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                try {
+                    if (name.equals(MPI_LOCAL_PATH_TAG)) {
+                        ((MPIProcess) targetProcess).setLocalPath((String) activeHandler.getResultObject());
+                    } else if (name.equals(MPI_REMOTE_PATH_TAG)) {
+                        ((MPIProcess) targetProcess).setRemotePath((String) activeHandler.getResultObject());
+                    } else if (name.equals(HOSTS_NUMBER_TAG)) {
+                        ((MPIProcess) targetProcess).setHostsNumber((String) activeHandler.getResultObject());
+                    } else {
+                        super.notifyEndActiveHandler(name, activeHandler);
+                    }
+                } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    } //  END OF MPI PROCESS HANDLER
+
+    // DEPENDENTPROCESSSEQUENCE process Handler
+    public class DependentProcessSequenceHandler
+        extends AbstractUnmarshallerDecorator
+        implements ProActiveDescriptorConstants {
+        protected ProActiveDescriptor proActiveDescriptor;
+        protected boolean isRef;
+
+        public DependentProcessSequenceHandler(
+            ProActiveDescriptor proActiveDescriptor) {
+            super();
+            this.proActiveDescriptor = proActiveDescriptor;
+            this.addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            String className = attributes.getValue("class");
+
+            if (!checkNonEmpty(className)) {
+                throw new org.xml.sax.SAXException(
+                    "Process defined without specifying the class");
+            }
+
+            try {
+                targetProcess = proActiveDescriptor.createProcess(id, className);
+            } catch (ProActiveException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        // -- implements UnmarshallerHandler
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            return null;
+        }
+
+        // -- PROTECTED METHODS
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            if (name.equals(PROCESS_REFERENCE_TAG)) {
+                DependentListProcessDecorator dep = (DependentListProcessDecorator) targetProcess;
+                Object result = activeHandler.getResultObject();
+                proActiveDescriptor.addProcessToSequenceList(dep,
+                    (String) result);
+            }
+        } //  END OF DEPENDENTPROCESSSEQUENCE PROCESS HANDLER
+    }
+
+    // SEQUENTIALPROCESS process Handler
+    public class SequentialProcessHandler extends AbstractUnmarshallerDecorator
+        implements ProActiveDescriptorConstants {
+        protected ProActiveDescriptor proActiveDescriptor;
+        protected boolean isRef;
+
+        public SequentialProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super();
+            this.proActiveDescriptor = proActiveDescriptor;
+            this.addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            String className = attributes.getValue("class");
+
+            if (!checkNonEmpty(className)) {
+                throw new org.xml.sax.SAXException(
+                    "Process defined without specifying the class");
+            }
+
+            try {
+                targetProcess = proActiveDescriptor.createProcess(id, className);
+            } catch (ProActiveException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        // -- implements UnmarshallerHandler
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            return null;
+        }
+
+        // -- PROTECTED METHODS
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            if (name.equals(PROCESS_REFERENCE_TAG)) {
+                IndependentListProcessDecorator dep = (IndependentListProcessDecorator) targetProcess;
+                Object result = activeHandler.getResultObject();
+                proActiveDescriptor.addProcessToSequenceList(dep,
+                    (String) result);
+            }
+        }
+    } //  END OF SEQUENTIALPROCESS PROCESS HANDLER
+
+    //  Begin inner class SingleValueUnmarshaller
     private class SimpleValueHandler extends BasicUnmarshaller {
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
@@ -1641,6 +1819,6 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             setResultObject(value);
         }
     }
-
-    //end of inner class SingleValueUnmarshaller
 }
+
+//end of inner class SingleValueUnmarshaller
