@@ -2,7 +2,7 @@
 
 echo
 echo --- MPI deployment example ---------------------------------------------
-
+lamboot
 workingDir=`dirname $0`
 . $workingDir/env.sh
 PROACTIVE=$workingDir/../..
