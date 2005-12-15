@@ -30,12 +30,10 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
+import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
@@ -43,6 +41,9 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -341,15 +342,24 @@ public interface ProActiveDescriptor extends java.io.Serializable {
 
     public String getSecurityFilePath();
 
-	/**
-	 * Keeps a reference to the Variable Contract passed as parameter
-	 * @param  The Variable Contract (ex XMLProperties)
-	 */
-	public void setVariableContract(VariableContract properties);
-	
-	/**
-	 *
-	 * @return The current variable contract, or null.
-	 */
-	public VariableContract getVariableContract();
+    /**
+     * Keeps a reference to the Variable Contract passed as parameter
+     * @param  The Variable Contract (ex XMLProperties)
+     */
+    public void setVariableContract(VariableContract properties);
+
+    /**
+     *
+     * @return The current variable contract, or null.
+     */
+    public VariableContract getVariableContract();
+
+    /**
+     * Add the process given by the specified processID in the list of sequential processes.
+     * @param sequentialListProcess
+     * @param processID
+     */
+    public void addProcessToSequenceList(
+        AbstractSequentialListProcessDecorator sequentialListProcess,
+        String string);
 }

@@ -30,18 +30,15 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
+import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
+import org.objectweb.proactive.core.process.DependentProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
@@ -56,6 +53,12 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -104,7 +107,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     /** map of the variable contract (ex XMLProperties) */
     private VariableContract variableContract;
-    
+
     /** Location of the xml file */
     private String url;
     private String jobID;
@@ -467,6 +470,17 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
+    public void addProcessToSequenceList(
+        AbstractSequentialListProcessDecorator sequentialListProcess,
+        String processID) {
+        ExternalProcess process = (ExternalProcess) getProcess(processID);
+        if (process == null) {
+            addSequentialPendingProcess(processID, sequentialListProcess);
+        } else {
+            sequentialListProcess.addProcessToList(process);
+        }
+    }
+
     public void mapToExtendedJVM(JVMProcess jvmProcess, String processID)
         throws ProActiveException {
         try {
@@ -661,6 +675,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         addProcessUpdater(processID, updater);
     }
 
+    private void addSequentialPendingProcess(String processID,
+        AbstractSequentialListProcessDecorator sp) {
+        ProcessUpdater updater = new SequentialProcessUpdater(sp);
+        addProcessUpdater(processID, updater);
+    }
+
     //Commented in the fist version of jvm extension
     //    private void addPendingJVMProcess(String processID, JVMProcess jvmProcess) {
     //        ProcessUpdater updater = new ExtendedJVMProcessUpdater(jvmProcess);
@@ -807,6 +827,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
+    private class SequentialProcessUpdater implements ProcessUpdater {
+        private AbstractSequentialListProcessDecorator spd;
+
+        public SequentialProcessUpdater(
+            AbstractSequentialListProcessDecorator spd) {
+            this.spd = spd;
+        }
+
+        public void updateProcess(ExternalProcess p) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating Sequential Process");
+            }
+
+            // add the process in head of list
+            spd.addProcessToList(0, (ExternalProcessDecorator) p);
+        }
+    }
+
     //  Commented in the fist version of jvm extension
     //    private class ExtendedJVMProcessUpdater implements ProcessUpdater {
     //        private JVMProcess jvmProcess;
@@ -866,17 +904,17 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-	/**
-	 * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#setVariableContract(org.objectweb.proactive.core.xml.XMLProperties)
-	 */
-	public void setVariableContract(VariableContract variableContract) {
-		this.variableContract=variableContract;
-	}
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#setVariableContract(org.objectweb.proactive.core.xml.XMLProperties)
+     */
+    public void setVariableContract(VariableContract variableContract) {
+        this.variableContract = variableContract;
+    }
 
-	/**
-	 * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getVariableContract()
-	 */
-	public VariableContract getVariableContract() {
-		return this.variableContract;
-	}
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getVariableContract()
+     */
+    public VariableContract getVariableContract() {
+        return this.variableContract;
+    }
 }

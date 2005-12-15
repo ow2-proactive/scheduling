@@ -391,4 +391,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             throw new ProActiveException(exceptionMessage);
         }
     }
+
+    public int startMPI() {
+        throw new RuntimeException(
+            " ERROR: No MPI process attached with the virtual node !");
+    }
 }

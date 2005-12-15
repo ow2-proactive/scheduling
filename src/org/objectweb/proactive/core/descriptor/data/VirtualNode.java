@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -222,4 +223,10 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return true if the virtual node is mapped to several nodes, false otherwise
      */
     public boolean isMultiple();
+
+    /**
+     * start MPI process attached with the virtual node
+     * @return termination status of process i.e its exit value
+     */
+    public int startMPI();
 }

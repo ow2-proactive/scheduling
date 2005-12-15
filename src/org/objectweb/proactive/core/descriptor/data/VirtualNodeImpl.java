@@ -30,13 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.Serializable;
-import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -53,11 +48,15 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
+import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
+import org.objectweb.proactive.core.process.DependentProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
+import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -67,6 +66,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.rmi.AlreadyBoundException;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -85,6 +93,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
+    private final static Logger MPI_LOGGER = ProActiveLogger.getLogger(Loggers.MPI_DEPLOY);
     public static int counter = 0;
 
     //
@@ -177,6 +186,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     //REGISTRATION ATTEMPTS
     private final int REGISTRATION_ATTEMPTS = 2;
+
+    // MPI Process
+    ExternalProcess mpiProcess = null;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -340,21 +352,89 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
                     ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
 
-                    // Test if that is this virtual Node that originates the creation of the vm
-                    // else the vm was already created by another virtualNode, in that case, nothing is
-                    // done at this point, nodes creation will occur when the runtime associated with the jvm
-                    // will register.
-                    if (!vmAlreadyAssigned) {
-                        setParameters(process, vm);
+                    // get the rank of sequential process - return -1 if it does not exist
+                    int rankOfSequentialProcess = checkForSequentialProcess(process);
 
-                        // It is this virtual Node that originates the creation of the vm
+                    // there's a sequential process in the hierarchical process
+                    if (rankOfSequentialProcess > -1) {
+                        ExternalProcess deepCopy = (ExternalProcess) makeDeepCopy(process);
+
+                        // there's a process before the sequential one
+                        if (rankOfSequentialProcess > 0) {
+                            process = getSequentialProcessInHierarchie(process,
+                                    rankOfSequentialProcess);
+                        }
+                        ExternalProcess firstProcess = (ExternalProcess) ((AbstractSequentialListProcessDecorator) process).getFirstProcess();
+
+                        // build the process with the rest of hierarchie
+                        if (rankOfSequentialProcess > 0) {
+                            firstProcess = buildProcessWithHierarchie((ExternalProcess) makeDeepCopy(
+                                        deepCopy), firstProcess,
+                                    rankOfSequentialProcess);
+                        }
+                        setParameters(firstProcess, vm);
                         try {
-                            proActiveRuntimeImpl.createVM(process);
+                            proActiveRuntimeImpl.createVM(firstProcess);
+                            globalTimeOut = System.currentTimeMillis() +
+                                timeout;
+                            waitForAllNodesCreation();
+                            ExternalProcess nextProcess = null;
+
+                            // loop on each process in the sequence
+                            while ((nextProcess = (ExternalProcess) ((AbstractSequentialListProcessDecorator) process).getNextProcess()) != null) {
+                                boolean launchProcessManually = false;
+
+                                /* if process is a dependent process then each process
+                                 * in the sequence list except the first one have to receive
+                                 * an array of objects relative to their dependence.
+                                 * we assume that this dependence is the generation ov nodes
+                                 */
+                                if (process.isDependent()) {
+                                    ((DependentProcess) nextProcess).setDependencyParameters(getNodes());
+                                    if (nextProcess instanceof MPIProcess) {
+                                        launchProcessManually = true;
+                                    }
+                                }
+
+                                // rebuild the process with the rest of hierarchie
+                                if (rankOfSequentialProcess > 0) {
+                                    nextProcess = this.buildProcessWithHierarchie((ExternalProcess) makeDeepCopy(
+                                                deepCopy), nextProcess,
+                                            rankOfSequentialProcess);
+                                }
+                                if (!launchProcessManually) {
+                                    setParameters(nextProcess, vm);
+                                    proActiveRuntimeImpl.createVM(nextProcess);
+                                    // initialization of the global timeout
+                                    globalTimeOut = System.currentTimeMillis() +
+                                        timeout;
+                                    waitForAllNodesCreation();
+                                } else {
+                                    mpiProcess = nextProcess;
+                                }
+                            }
                         } catch (java.io.IOException e) {
                             e.printStackTrace();
-                            logger.error("cannot activate virtualNode " +
-                                this.name + " with the process " +
-                                process.getCommand());
+                        } catch (NodeException e1) {
+                            e1.printStackTrace();
+                        }
+                    } else {
+                        // Test if that is this virtual Node that originates the creation of the vm
+                        // else the vm was already created by another virtualNode, in that case, nothing is
+                        // done at this point, nodes creation will occur when the runtime associated with the jvm
+                        // will register.
+                        if (!vmAlreadyAssigned) {
+                            setParameters(process, vm);
+
+                            // It is this virtual Node that originates the creation of the vm
+                            try {
+                                proActiveRuntimeImpl.createVM(process);
+                            } catch (java.io.IOException e) {
+                                e.printStackTrace();
+                                logger.error("cannot activate virtualNode " +
+                                    this.name + " with the process " +
+                                    process.getCommand());
+                            }
                         }
                     }
                 } else {
@@ -365,7 +445,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 increaseIndex();
             }
 
-            // local nodes creation 
+            // local nodes creation
             for (int i = 0; i < localVirtualMachines.size(); i++) {
                 String protocol = (String) localVirtualMachines.get(i);
                 internalCreateNodeOnCurrentJvm(protocol);
@@ -391,6 +471,76 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             logger.info("VirtualNode " + this.name + " already activated !!!");
         }
+    }
+
+    /**
+     * start the MPI process attached with this virtual node
+     * @return int, the termination status of the mpi process
+     */
+
+    // start the MPI process attached with this virtual node
+    // returns the termination status of process
+    public int startMPI() {
+        int exitValue = -1;
+        if (mpiProcess != null) {
+            try {
+                MPI_LOGGER.debug(" Start MPI Process: " +
+                    mpiProcess.toString());
+                mpiProcess.startProcess();
+                MPI_LOGGER.debug(" Wait for MPI Process to finish...");
+                mpiProcess.waitFor();
+                exitValue = mpiProcess.exitValue();
+                mpiProcess.setStarted(false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (IllegalThreadStateException e) {
+                e.printStackTrace();
+            }
+            return exitValue;
+        } else {
+            throw new RuntimeException(
+                " ERROR: No MPI process attached with the virtual node !");
+        }
+    }
+
+    //returns the sequential process in the process hierarchie
+    private ExternalProcess getSequentialProcessInHierarchie(
+        ExternalProcess process, int rank) {
+        while (rank > 0) {
+            process = ((AbstractExternalProcessDecorator) process).getTargetProcess();
+            rank--;
+        }
+        return process;
+    }
+
+    // returns a process such that the target of p is finalProcess
+    private ExternalProcess buildProcessWithHierarchie(
+        ExternalProcess process, ExternalProcess finalProcess, int rank) {
+        if (rank == 0) {
+            return finalProcess;
+        } else {
+            ((AbstractExternalProcessDecorator) process).setTargetProcess(buildProcessWithHierarchie(
+                    ((AbstractExternalProcessDecorator) process).getTargetProcess(),
+                    finalProcess, rank - 1));
+            return process;
+        }
+    }
+
+    // returns the rank of sequential process in the processes hierarchie, -1 otherwise
+    private int checkForSequentialProcess(ExternalProcess process) {
+        int res = 0;
+        while (!(process instanceof JVMProcess)) {
+            // a sequential process was found return its rank
+            if (process.isSequential()) {
+                return res;
+            } else {
+                res++;
+                process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+            }
+        }
+        return -1;
     }
 
     /**
@@ -803,7 +953,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
 
             try {
-                // get the node on the registered runtime
+                //get the node on the registered runtime
                 // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
                 int nodeNumber = (new Integer((String) virtualMachine.getNodeNumber())).intValue();
 
@@ -850,7 +1000,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // Check if the virtualNode that originates the process is among awaited
         // VirtualNodes
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
-            // gets the registered runtime
+            //gets the registered runtime
             proActiveRuntimeRegistered = event.getRegisteredRuntime();
 
             // get the host for the node to be created
