@@ -141,10 +141,10 @@
         <title>How it works</title>
         <informalfigure>
           <mediaobject>
-            <imageobject>
+<!--            <imageobject>
               <imagedata fileref="doc-files/development/imgs/fileTransferDesign.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/development/imgs/fileTransferDesign.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="doc-files/development/imgs/fileTransferDesign.svg" format="SVG"/>            </imageobject>-->
             <imageobject>
               <imagedata fileref="doc-files/development/imgs/fileTransferDesign.png" format="PNG"/>            </imageobject>
           </mediaobject>
