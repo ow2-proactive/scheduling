@@ -65,6 +65,7 @@ public class Cpi {
         VirtualNode vnCpi;
         ProActiveDescriptor pad = null;
         int count;
+        int exitValue;
         try {
             pad = ProActive.getProactiveDescriptor("file:" + args[1]);
             count = new Integer(args[0]).intValue();
@@ -72,12 +73,19 @@ public class Cpi {
             vnCpi = pad.getVirtualNode("CPI");
             // activates VN
             vnCpi.activate();
-
+            
             while ((count--) > 0) {
                 logger.info(" -> Iteration [" + count + "]");
-                logger.info(" MPI code returned value  " + vnCpi.startMPI());
+                exitValue = vnCpi.startMPI();
+                if (exitValue != 0){
+                	logger.error("ERROR : try to run \"lamboot\" command");
+                	break;
+                }else{
+                	logger.info(" MPI code returned value  "+exitValue );
+                }
             }
             vnCpi.killAll(false);
+            System.exit(0);
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
