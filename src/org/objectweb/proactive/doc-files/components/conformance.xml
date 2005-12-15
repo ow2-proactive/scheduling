@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Conformance to the Fractal model and extensions</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/conformance.html  -->
   
-
     <para> <anchor id="dbdoclet.id.conformance_html_conformance_to_fractal"/></para>
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.conformance_html_Model"/>Model</title>
@@ -35,11 +33,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/components/pics/kinds-of-components.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/components/pics/kinds-of-components.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/components/pics/kinds-of-components.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/components/pics/kinds-of-components.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -95,17 +89,9 @@ i= (I) Fractal.createCollectiveClientInterface(&quot;i&quot;,I.class.getName());
  would be :</para>
         <screen>
 public void bindFc(String clientItfName, Object serverItf) {
-
-
  if (clientItfName.equals(&quot;i&quot;)) {
-
-
  ProActiveGroup.getGroup(i).add(serverItf);
-
-
  }
-
-
 }
         </screen>
         <para>You will be able to see the collective interface as an object of type I,
@@ -129,10 +115,6 @@ Collection c = ProActiveGroup.getGroup(i);
  interfaces of the components have to be reifiable.</para>
           </listitem>
 </itemizedlist>
-        <para>&#160;</para>
-        <para></para>
-        <para>
- Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
       </sect2>
     </sect1>
   

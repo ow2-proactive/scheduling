@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Frequently Asked Questions</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FAQ.html  -->
   
-
     <para> <emphasis role="bold">Note:</emphasis> This FAQ is under construction. If one of your question is not
  answered here, just send it at <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and we&#39;ll update the FAQ.</para>
     <sect1 remap="h2">
@@ -109,7 +107,6 @@
         <listitem>
           <para><link linkend="dbdoclet.id.valid_error">Why do I get the following message when parsing
  my xml deployment file:
-
  ERROR: file:~/ProActive/descriptor.xml Line:2 Message:cvc-elt.1: Cannot find the declaration of
  element &#39;ProActiveDescriptor&#39;</link></para>
         </listitem>
@@ -205,66 +202,28 @@
           <screen>
     Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/objectweb/\
 asm/Constants
-
-
         at java.lang.ClassLoader.defineClass0(Native Method)
-
-
         at java.lang.ClassLoader.defineClass(ClassLoader.java:509)
-
-
         at java.security.SecureClassLoader.defineClass(SecureClassLoader.ja\
 va:123)
-
-
         at java.net.URLClassLoader.defineClass(URLClassLoader.java:246)
-
-
         at java.net.URLClassLoader.access$100(URLClassLoader.java:54)
-
-
         at java.net.URLClassLoader$1.run(URLClassLoader.java:193)
-
-
         at java.security.AccessController.doPrivileged(Native Method)
-
-
         at java.net.URLClassLoader.findClass(URLClassLoader.java:186)
-
-
         at java.lang.ClassLoader.loadClass(ClassLoader.java:306)
-
-
         at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:265)
-
-
         at java.lang.ClassLoader.loadClass(ClassLoader.java:262)
-
-
         at java.lang.ClassLoader.loadClassInternal(ClassLoader.java:322)
-
-
         at org.objectweb.proactive.core.mop.MOP.&lt;clinit&gt;(MOP.java:88)
-
-
         at org.objectweb.proactive.ProActive.createStubObject(ProActive.jav\
 a:836)
-
-
         at org.objectweb.proactive.ProActive.createStubObject(ProActive.jav\
 a:830)
-
-
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:255)
-
-
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:180)
-
-
         at org.objectweb.proactive.examples.binarytree.TreeApplet.main(Tree\
 Applet.java:103)
-
-
           </screen>
           <para>The problem can simply be fixed by adding asm<literal>.jar</literal> in the <literal>CLASSPATH</literal>.</para>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
@@ -280,51 +239,25 @@ Applet.java:103)
           <screen>
     Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/apache/bce\
 l/generic/Type
-
-
         at org.objectweb.proactive.core.mop.MOPClassLoader.loadClass(MOPCla\
 ssLoader.java:129)
-
-
         at org.objectweb.proactive.core.mop.MOPClassLoader.loadClass(MOPCla\
 ssLoader.java:109)
-
-
         at org.objectweb.proactive.core.mop.MOP.createStubClass(MOP.java:34\
 1)
-
-
         at org.objectweb.proactive.core.mop.MOP.findStubConstructor(MOP.jav\
 a:376)
-
-
         at org.objectweb.proactive.core.mop.MOP.createStubObject(MOP.java:4\
 43)
-
-
         at org.objectweb.proactive.core.mop.MOP.newInstance(MOP.java:165)
-
-
         at org.objectweb.proactive.core.mop.MOP.newInstance(MOP.java:137)
-
-
         at org.objectweb.proactive.ProActive.createStubObject(ProActive.jav\
 a:590)
-
-
         at org.objectweb.proactive.ProActive.createStubObject(ProActive.jav\
 a:585)
-
-
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:170)
-
-
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:137)
-
-
         at DiscoveryManager.main(DiscoveryManager.java:226)
-
-
           </screen>
           <para>The problem can simply be fixed by adding <literal>bcel.jar</literal> in the <literal>CLASSPATH</literal>.</para>
         </listitem>
@@ -336,122 +269,58 @@ a:585)
           <screen>
     java.security.AccessControlException: access denied (java.net.SocketPer\
 mission 127.0.0.1:1099 connect,resolve)
-
-
         at java.security.AccessControlContext.checkPermission(AccessControl\
 Context.java:270)
-
-
         at java.security.AccessController.checkPermission(AccessController.\
 java:401)
-
-
         at java.lang.SecurityManager.checkPermission(SecurityManager.java:5\
 42)
-
-
         at java.lang.SecurityManager.checkConnect(SecurityManager.java:1044\
 )
-
-
         at java.net.Socket.connect(Socket.java:419)
-
-
         at java.net.Socket.connect(Socket.java:375)
-
-
         at java.net.Socket.&lt;init&gt;(Socket.java:290)
-
-
         at java.net.Socket.&lt;init&gt;(Socket.java:118)
-
-
         at sun.rmi.transport.proxy.RMIDirectSocketFactory.createSocket(RMID\
 irectSocketFactory.java:22)
-
-
         at sun.rmi.transport.proxy.RMIMasterSocketFactory.createSocket(RMIM\
 asterSocketFactory.java:122)
-
-
         at sun.rmi.transport.tcp.TCPEndpoint.newSocket(TCPEndpoint.java:562\
 )
-
-
         at sun.rmi.transport.tcp.TCPChannel.createConnection(TCPChannel.jav\
 a:185)
-
-
         at sun.rmi.transport.tcp.TCPChannel.newConnection(TCPChannel.java:1\
 71)
-
-
         at sun.rmi.server.UnicastRef.newCall(UnicastRef.java:313)
-
-
         at sun.rmi.registry.RegistryImpl_Stub.lookup(Unknown Source)
-
-
         at org.objectweb.proactive.core.rmi.RegistryHelper.detectRegistry(R\
 egistryHelper.java:101)
-
-
         at org.objectweb.proactive.core.rmi.RegistryHelper.getOrCreateRegis\
 try(RegistryHelper.java:114)
-
-
         at org.objectweb.proactive.core.rmi.RegistryHelper.initializeRegist\
 ry(RegistryHelper.java:77)
-
-
         at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory(RemoteNo\
 deFactory.java:56)
-
-
         at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Me\
 thod)
-
-
         at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeCons\
 tructorAccessorImpl.java:39)
-
-
         at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(Delega\
 tingConstructorAccessorImpl.java:27)
-
-
         at java.lang.reflect.Constructor.newInstance(Constructor.java:274)
-
-
         at java.lang.Class.newInstance0(Class.java:296)
-
-
         at java.lang.Class.newInstance(Class.java:249)
-
-
         at org.objectweb.proactive.core.node.NodeFactory.createNodeFactory(\
 NodeFactory.java:281)
-
-
         at org.objectweb.proactive.core.node.NodeFactory.createNodeFactory(\
 NodeFactory.java:298)
-
-
         at org.objectweb.proactive.core.node.NodeFactory.getFactory(NodeFac\
 tory.java:308)
-
-
         at org.objectweb.proactive.core.node.NodeFactory.createNode(NodeFac\
 tory.java:179)
-
-
         at org.objectweb.proactive.core.node.NodeFactory.createNode(NodeFac\
 tory.java:158)
-
-
         ...
-
-
           </screen>
           <para>ProActive uses <ulink url="http://java.sun.com/products/jdk/rmi/">RMI</ulink>
  as its underlying transport technology. Moreover it uses code downloading features to
@@ -468,20 +337,12 @@ tory.java:158)
  granting all permissions for all code :</para>
           <screen>
     grant {
-
-
         permission java.security.AllPermission;
-
-
     };
-
-
           </screen>
           <para>Then you need to start your Java program using the property <literal>-Djava.security.policy</literal>. For instance :</para>
           <screen>
     java -Djava.security.policy=my.policy.file MyMainClass
-
-
           </screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
@@ -519,18 +380,12 @@ tory.java:158)
  it is created. On host X you can use startNode to start a new node</para>
           <screen>
    startNode.sh ///node1
-
-
           </screen>
           <para>On host Y you can create an active object on host X</para>
           <screen>
   org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.n\
 ode.NodeFactory.getNode(&quot;//X/node1&quot;);
-
-
   ProActive.turnActive(myObject, n);
-
-
           </screen>
           <para>You do not need to start any rmiregistry manually as they are started
  automatically as needed.</para>
@@ -613,11 +468,7 @@ ode.NodeFactory.getNode(&quot;//X/node1&quot;);
  instance <literal>a</literal> into an active object is to use the method <literal>ProActive.turnActive</literal> :</para>
           <screen>
     A a = new A();
-
-
     A activeA = (A) ProActive.turnActive(a);
-
-
           </screen>
           <para>In the code above, the variable <literal>a</literal> is a direct reference
  onto the instance of <literal>A</literal> stored somewhere in memory. In contrast, the variable <literal>activeA</literal> is a direct reference onto an instance of the generated ProActive stub
@@ -637,38 +488,16 @@ ode.NodeFactory.getNode(&quot;//X/node1&quot;);
           <para>Suppose you have a class <literal>A</literal> with an attribute <literal>a1</literal> as the example below.</para>
           <screen>
     public class A {
-
-
-
-
       public int a1;
-
-
-
-
       public static void main(String[] args) {
-
-
         A a = new A();
-
-
         A activeA = (A) ProActive.turnActive(a);
-
-
         a.a1 = 2;       // set the attribute a1 of the instance pointed by \
 a to 2
-
-
         activeA.a1 = 2; // !!! set the attribute a1 of the stub instance to\
  2
-
-
       }
-
-
     }
-
-
           </screen>
           <para>When you reference an active object, you always reference it through
  its associated stub (<link linkend="dbdoclet.id.stub">see definition of Stub</link>). The stub class inheriting
@@ -689,17 +518,9 @@ a to 2
  In <literal>A</literal> you want to have a method that returns a reference on that instance of <literal>A</literal> as the example below.</para>
           <screen>
   public class A {
-
-
     public A getRef() {
-
-
       return this;  // !!!! THIS IS WRONG FOR AN ACTIVE OBJECT
-
-
     }
-
-
   }
           </screen>
           <para>There is indeed a problem in the code above. If an instance of <literal>A</literal> is created as, or turned into an active object, the method <literal>getRef</literal>
@@ -714,20 +535,10 @@ a to 2
  calling the method. The correct version of the previous class is :</para>
           <screen>
   public class A {
-
-
     public A getRef() {
-
-
       return ProActive.getStubOnThis(); // returns a reference on the stub
-
-
     }
-
-
   }
-
-
           </screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
@@ -743,93 +554,31 @@ a to 2
  the active object has been created and its active thread is started.</para>
           <screen>
   public class A {
-
-
-
-
     private int i;
-
-
     private String s;
-
-
-
-
     public A() {}
-
-
-
-
     public A(int i, String s) {
-
-
       this.i = i;
-
-
       this.s = s;
-
-
     }
-
-
   }
-
-
-
-
   // instance based creation 
-
-
   A a;
-
-
   Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
-
-
   try {
-
-
     a = (A) ProActive.newActive(A.class.getName(), params);
-
-
   } catch (ActiveObjectCreationException e) {
-
-
     // creation of ActiveObject failed
-
-
     e.printStackTrace();
-
-
   }
-
-
-
-
   // object based creation
-
-
   A a = new A(26, &quot;astring&quot;);
-
-
   try {
-
-
     a = (A) ProActive.turnActive(a);
-
-
   } catch (ActiveObjectCreationException e) {
-
-
     // creation of ActiveObject failed
-
-
     e.printStackTrace();
-
-
   }
-
-
           </screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
@@ -929,67 +678,31 @@ a to 2
             <emphasis role="bold">InitActive</emphasis>          </simpara>
           <screen>
 if activity is non null and implements InitActive
-
-
   we invoke the method initActivity defined in the object activity
-
-
 else if the class of the reified object implements InitActive
-
-
   we invoke the method initActivity of the reified object
-
-
 else
-
-
   we don&#39;t do any initialization
-
-
           </screen>
           <simpara>
             <emphasis role="bold">RunActive</emphasis>          </simpara>
           <screen>
 if activity is non null and implements RunActive
-
-
   we invoke the method runActivity defined in the object activity
-
-
 else if the class of the reified object implements RunActive
-
-
   we invoke the method runActivity of the reified object
-
-
 else
-
-
   we run the standard FIFO activity
-
-
           </screen>
           <simpara>
             <emphasis role="bold">EndActive</emphasis>          </simpara>
           <screen>
 if activity is non null and implements EndActive
-
-
   we invoke the method endActivity defined in the object activity
-
-
 else if the class of the reified object implements EndActive
-
-
   we invoke the method endActivity of the reified object
-
-
 else
-
-
   we don&#39;t do any cleanup
-
-
           </screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
@@ -1014,81 +727,27 @@ else
  and activity.</para>
           <screen>
   import org.objectweb.proactive.*;
-
-
-
-
   public class A implements InitActive, RunActive {
-
-
     private String myName;
-
-
-
-
     public String getName() {
-
-
       return myName;
-
-
     }
-
-
-
-
     // -- implements InitActive
-
-
     public void initActivity(Body body) {
-
-
       myName = body.getName();
-
-
     }
-
-
-
-
     // -- implements RunActive for serving request in a LIFO fashion
-
-
     public void runActivity(Body body) {
-
-
       Service service = new Service(Body);
-
-
       while (body.isActive()) {
-
-
         service.blockingServeYoungest();
-
-
       }
-
-
     }
-
-
-
-
     public static void main(String[] args) throws Exception {
-
-
       A a = (A) ProActive.newActive(A.class.getName,null);
-
-
       System.out.println(&quot;Name = &quot;+a.getName());
-
-
     }
-
-
   }
-
-
           </screen>
           <para><emphasis remap="h3" role="bold">Passing an object implementing the interfaces when creating the active object</emphasis></para>
           <para>This is the solution to use when you do not control the class that you
@@ -1102,96 +761,34 @@ else
  variables of the reified object.</para>
           <screen>
   import org.objectweb.proactive.*;
-
-
   public class LIFOActivity implements RunActive {
-
-
     // -- implements RunActive for serving request in a LIFO fashion
-
-
     public void runActivity(Body body) {
-
-
       Service service = new Service(Body);
-
-
       while (body.isActive()) {
-
-
         service.blockingServeYoungest();
-
-
       }
-
-
     }
-
-
   }
-
-
-
-
   import org.objectweb.proactive.*;
-
-
   public class A implements InitActive {
-
-
     private String myName;
-
-
-
-
     public String getName() {
-
-
       return myName;
-
-
     }
-
-
-
-
     // -- implements InitActive
-
-
     public void initActivity(Body body) {
-
-
       myName = body.getName();
-
-
     }
-
-
-
-
     public static void main(String[] args) throws Exception {
-
-
       // newActive(classname, constructor parameter (null = none), 
-
-
       //           node (null = local), active, MetaObjectFactory (null = d\
 efault)
-
-
       A a = (A) ProActive.newActive(A.class.getName(), null, null, new LIFO\
 Activity(), null);
-
-
       System.out.println(&quot;Name = &quot;+a.getName());
-
-
     }
-
-
   }
-
-
           </screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
@@ -1236,9 +833,7 @@ Activity(), null);
           <para>where</para>
           <screen>
  public class MyInteger{
-
   protected int i;
-
   public MyInteger(){
   //empty constructor with no-args
   }
@@ -1265,7 +860,6 @@ Activity(), null);
  above, so even if the method returns null, result_from_method cannot be null:</para>
           <screen>
 public class MyObject{
-
  public MyObject(){
  //empty constructor with no-args
  }

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>0.1 Structure of the API</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/structure.html  -->
   
-
     <sect1 remap="h2">
       <title>Goals of the API</title>
       <itemizedlist>

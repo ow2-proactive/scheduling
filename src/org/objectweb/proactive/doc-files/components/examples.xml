@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Examples</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/examples.html  -->
   
-
     <para> <anchor id="dbdoclet.id.examples_html_examples"/></para>
     <para>3 examples are presented : code snippets for visualizing the transition between active objects
  and components, the &quot;hello world&quot;, from the Fractal tutorial, and C3D component
@@ -17,43 +15,17 @@
  first consider the &quot;A&quot; interface :</para>
       <screen>
 public interface A {
-
-
   public String foo(); // dummy method
-
-
 }
-
-
-
-
       </screen>
       <para>&quot;AImpl&quot; is the class implementing this interface :</para>
       <screen>
 public class AImpl implements A {
-
-
-
-
  public AImpl() {}
-
-
-
-
  public String foo() {
-
-
  // do something
-
-
  }
-
-
 }
-
-
-
-
       </screen>
       <para>The class is then instantiated in a standard way :</para>
       <screen>
@@ -64,22 +36,10 @@ A object = new AImpl();
  meta-objects, using the appropriate factory method.</para>
       <screen>
 A active_object = (A)ProActive.newActive(
-
-
  AImpl, // signature of the base class
-
-
  new Object[] {}, // Object[]
-
-
  aNode, // location, could also be a virtual node
-
-
 );
-
-
-
-
       </screen>
       <para>As components are also active objects in this implementation, they benefit from the same
  features, and are configurable in a similar way. Constructor parameters, nodes, activity, or
@@ -96,30 +56,18 @@ A active_object = (A)ProActive.newActive(
  system property, and uses this instance to get the bootstrap component):</para>
         <screen>
 Component boot = Fractal.getBootstrapComponent();
-
-
         </screen>
         <para>We then get the TypeFactory interface provided by this bootstrap component:</para>
         <screen>
 TypeFactory tf = (TypeFactory)boot.getFcInterface(&quot;type-factory&quot;);
-
-
         </screen>
         <para>We can then create the type of the first component, which only provides a A server interface
  named &quot;a&quot;:</para>
         <screen>
 // type of the a component
-
-
 ComponentType aType = tf.createFcType(new InterfaceType[] {
-
-
  tf.createFcItfType(&quot;a&quot;, &quot;A&quot;, false, false, false)
-
-
 });
-
-
         </screen>
       </sect2>
       <sect2 remap="h3">
@@ -128,20 +76,10 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
  implementation, this is done through the ContentDescription class :</para>
         <screen>
 ContentDescription contentDesc = new ContentDescription(
-
-
  AImpl, // signature of the base class
-
-
  new Object[] {}, // Object[]
-
-
  aNode, // location, could also be a virtual node
-
-
 );
-
-
         </screen>
       </sect2>
       <sect2 remap="h3">
@@ -149,40 +87,20 @@ ContentDescription contentDesc = new ContentDescription(
         <para>Properties relative to the controller can be specified in the ControllerDescription :</para>
         <screen>
 ControllerDescription controllerDesc = new ControllerDescription(
-
-
  &quot;myName&quot;, // name of the component
-
-
  Constants.PRIMITIVE // the hierarchical type of the component
-
-
  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
-
-
 );
-
-
         </screen>
         <para>Eventually, the component definition is instantiated using the standard Fractal API. This
  component can then be manipulated as any other Fractal component.</para>
         <screen>
 Component component = componentFactory.newFcInstance(
-
-
  componentType, // type of the component (defining the client and server in\
 terfaces)
-
-
  controllerDesc, // implementation-specific description for the controller
-
-
  contentDesc // implementation-specific description for the content
-
-
 );
-
-
         </screen>
       </sect2>
       <sect2 remap="h3">
@@ -201,132 +119,48 @@ terfaces)
         <para>First, the type of the component is changed :</para>
         <screen>
 // type of the a component
-
-
 ComponentType aType = tf.createFcType(new InterfaceType[] {
-
-
  tf.createFcItfType(&quot;a&quot;, &quot;A&quot;, false, false, false),
-
-
  tf.createFcItfType(&quot;requiredService&quot;, &quot;A&quot;, true, false, false)
-
-
 });
-
-
         </screen>
         <para>The Service interface is the following :</para>
         <screen>
 // The Service interface
-
-
 public interface Service {
-
-
  public String bar();
-
-
 }
-
-
         </screen>
         <para>And the AImpl class is :</para>
         <screen>
 // The modified AImpl class
-
-
 public class AImpl implements A, BindingController {
-
-
  Service service; // attribute corresponding to a client interface
-
-
-
-
  public AImpl() {}
-
-
-
-
  // implementation of the A interface
-
-
  public String foo() {
-
-
    return s.bar(); // for example
-
-
  }
-
-
-
-
  // implementation of BindingController
-
-
  public Object lookupFc (final String cItf) {
-
-
    if (cItf.equals(&quot;requiredService&quot;)) {
-
-
      return service;
-
-
    }
-
-
    return null;
-
-
  }
-
-
-
-
  // implementation of BindingController
-
-
  public void bindFc (final String cItf, final Object sItf) {
-
-
    if (cItf.equals(&quot;requiredService&quot;)) {
-
-
      service = (Service)sItf;
-
-
    }
-
-
  }
-
-
-
-
  // implementation of BindingController
-
-
  public void unbindFc (final String cItf) {
-
-
    if (cItf.equals(&quot;requiredService&quot;)) {
-
-
      service = null;
-
-
    }
-
-
  }
-
-
 }
-
-
         </screen>
       </sect2>
     </sect1>
@@ -387,11 +221,7 @@ public class AImpl implements A, BindingController {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/http://fractal.objectweb.org/tutorials/fractal/model.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/http://fractal.objectweb.org/tutorials/fractal/model.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/http://fractal.objectweb.org/tutorials/fractal/model.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/model.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -421,11 +251,7 @@ public class AImpl implements A, BindingController {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/distributed-components-no-wrappers.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/pics/distributed-components-no-wrappers.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/pics/distributed-components-no-wrappers.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/distributed-components-no-wrappers.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -436,11 +262,7 @@ public class AImpl implements A, BindingController {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/distributed-components-wrappers.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/pics/distributed-components-wrappers.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/pics/distributed-components-wrappers.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/distributed-components-wrappers.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -461,35 +283,17 @@ public class AImpl implements A, BindingController {
  components, and local deployment) , you should get something like this:</para>
         <screen>
 01 --&gt; This ClassFileServer is reading resources from classpath
-
-
 02 Jini enabled
-
-
 03 Ibis enabled
-
-
 04 Created a new registry on port 1099
-
-
 05 //crusoe.inria.fr/Node363257273 successfully bound in registry at //crus\
 oe.inria.fr/Node363257273
-
-
 06 Generating class : pa.stub.org.objectweb.proactive.core.component.type.S\
 tub_Composite
-
-
 07 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ClientImpl
-
-
 08 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ServerImpl
-
-
-
-
         </screen>
         <para>You can see :</para>
         <itemizedlist>
@@ -512,67 +316,31 @@ elloworld.Stub_ServerImpl
  show the execution path) :</para>
         <screen>
 01 Server: print method called
-
-
 02 at org.objectweb.proactive.examples.components.helloworld.ServerImpl.pri\
 nt(ServerImpl.java:37)
-
-
 03 at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-
-
 04 at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.\
 java:39)
-
-
 05 at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAcces\
 sorImpl.java:25)
-
-
 06 at java.lang.reflect.Method.invoke(Method.java:324)
-
-
 07 at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:3\
 73)
-
-
 08 at org.objectweb.proactive.core.component.request.ComponentRequestImpl.s\
 erveInternal(ComponentRequestImpl.java:163)
-
-
 09 at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestIm\
 pl.java:108)
-
-
 10 at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.se\
 rve(BodyImpl.java:297)
-
-
 11 at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.jav\
 a:799)
-
-
 12 at org.objectweb.proactive.core.body.ActiveBody$FIFORunActive.runActivit\
 y(ActiveBody.java:230)
-
-
 13 at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:145)
-
-
 14 at java.lang.Thread.run(Thread.java:534)
-
-
 15 Server: begin printing...
-
-
 16 --------&gt; hello world
-
-
 17 Server: print done.
-
-
-
-
         </screen>
         <para>What can be seen is very different from the output you would get with the Julia
  implementation. Here is what happens (from bottom to top of the stack):</para>
@@ -598,128 +366,56 @@ y(ActiveBody.java:230)
  &quot;distributed parser&quot;. You should get something similar to the following :</para>
         <screen>
 01 --&gt; This ClassFileServer is reading resources from classpath
-
-
 02 Jini enabled
-
-
 03 Ibis enabled
-
-
 04 Created a new registry on port 1099
-
-
 05 ************* Reading deployment descriptor: file:/0/user/mmorel/ProActi\
 ve/classes/org/objectweb/proactive/examplescomponents/helloworld/deployment\
 .xml ********************
-
-
 06 created VirtualNode name=VN1
-
-
 07 created VirtualNode name=VN2
-
-
 08 created VirtualNode name=VN3
-
-
 09 **** Starting jvm on crusoe.inria.fr
-
-
 10 --&gt; This ClassFileServer is reading resources from classpath
-
-
 11 Jini enabled
-
-
 12 Ibis enabled
-
-
 13 Detected an existing RMI Registry on port 1099
-
-
 14 //crusoe.inria.fr/VN1462549848 successfully bound in registry at //cruso\
 e.inria.fr/VN1462549848
-
-
 15 **** Mapping VirtualNode VN1 with Node: //crusoe.inria.fr/VN1462549848 d\
 one
-
-
 16 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ClientImpl
-
-
 17 **** Starting jvm on crusoe.inria.fr
-
-
 18 --&gt; This ClassFileServer is reading resources from classpath
-
-
 19 Jini enabled
-
-
 20 Ibis enabled
-
-
 21 Detected an existing RMI Registry on port 1099
-
-
 22 //crusoe.inria.fr/VN21334775605 successfully bound in registry at //crus\
 oe.inria.fr/VN21334775605
-
-
 23 **** Mapping VirtualNode VN2 with Node: //crusoe.inria.fr/VN21334775605 \
 done
-
-
 24 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ServerImpl
-
-
 25 //crusoe.inria.fr/Node1145479146 successfully bound in registry at //cru\
 soe.inria.fr/Node1145479146
-
-
 26 Generating class : pa.stub.org.objectweb.proactive.core.component.type.S\
 tub_Composite
-
-
 27 MOPClassLoader: class not found, trying to generate it
-
-
 28 ClassServer sent class Generated_java_lang_Runnable_r_representative suc\
 cessfully
-
-
 39 MOPClassLoader: class not found, trying to generate it
-
-
 30 ClassServer sent class Generated_java_lang_Runnable_r_representative suc\
 cessfully
-
-
 31 MOPClassLoader: class not found, trying to generate it
-
-
 32 ClassServer sent class Generated_org_objectweb_proactive_examples_compon\
 ents_helloworld_Service_s_representative successfully
-
-
 33 MOPClassLoader: class not found, trying to generate it
-
-
 34 ClassServer sent class Generated_org_objectweb_proactive_examples_compon\
 ents_helloworld_ServiceAttributes_attribute_controller_representative succe\
 ssfully
-
-
 35 ClassServer sent class pa.stub.org.objectweb.proactive.examples.componen\
 ts.helloworld.Stub_ServerImpl successfully
-
-
-
-
         </screen>
         <para>What is new is :</para>
         <itemizedlist>
@@ -748,67 +444,31 @@ ts.helloworld.Stub_ServerImpl successfully
  independent from its location.</para>
         <screen>
 01 Server: print method called
-
-
 02 at org.objectweb.proactive.examples.components.helloworld.ServerImpl.pri\
 nt(ServerImpl.java:37)
-
-
 03 at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-
-
 04 at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.\
 java:39)
-
-
 05 at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAcces\
 sorImpl.java:25)
-
-
 06 at java.lang.reflect.Method.invoke(Method.java:324)
-
-
 07 at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:3\
 73)
-
-
 08 at org.objectweb.proactive.core.component.request.ComponentRequestImpl.s\
 erveInternal(ComponentRequestImpl.java:163)
-
-
 09 at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestIm\
 pl.java:108)
-
-
 10 at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.se\
 rve(BodyImpl.java:297)
-
-
 11 at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.jav\
 a:799)
-
-
 12 at org.objectweb.proactive.core.body.ActiveBody$FIFORunActive.runActivit\
 y(ActiveBody.java:230)
-
-
 13 at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:145)
-
-
 14 at java.lang.Thread.run(Thread.java:534)
-
-
 15 Server: begin printing...
-
-
 16 -&gt;hello world
-
-
 17 Server: print done.
-
-
-
-
         </screen>
       </sect2>
     </sect1>
@@ -848,9 +508,9 @@ y(ActiveBody.java:230)
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/C3D-Components-UML.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/C3D-Components-UML.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/C3D-Components-UML.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/C3D-Components-UML.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -930,7 +590,6 @@ y(ActiveBody.java:230)
 &lt;!DOCTYPE definition PUBLIC &quot;-//objectweb.org//DTD Fractal ADL 2.0//EN&quot; 
      &quot;classpath://org/objectweb/proactive/core/component/adl/xml/proactive.d\
 td&quot;&gt;
-
 &lt;definition name=&quot;org.objectweb.proactive.examples.components.c3d.fractal.dis\
 tributed&quot;&gt;
   &lt;interface signature=&quot;java.lang.Runnable&quot; role=&quot;server&quot; name=&quot;r&quot;/&gt;
@@ -967,9 +626,9 @@ e&quot;/&gt;
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/c3d_components.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/c3d_components.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/c3d_components.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/c3d_components.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -988,10 +647,6 @@ e&quot;/&gt;
  version</ulink>  ( examples/components/c3d )</para>
           </listitem>
 </itemizedlist>
-        <para>&#160;</para>
-        <para></para>
-        <para>
- Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
       </sect2>
     </sect1>
   

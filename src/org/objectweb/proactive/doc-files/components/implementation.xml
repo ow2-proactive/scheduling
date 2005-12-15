@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>An implementation of the Fractal component model with ProActive</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/implementation.html  -->
   
-
     <para> <anchor id="dbdoclet.id.implementation_html_implementation_of_fractal_with_proactive"/></para>
     <para>Fractal defines a general conceptual model, along with a programming
  application interface (API) in Java. According to the official documentation, the Fractal
@@ -77,10 +75,6 @@
  With asynchronous method calls, the caller gets a future object and will continue its tasks until
  it really uses the result of the method call. The process is then blocked (it is called
  wait-by-necessity) until the result has effectively been calculated.</para>
-        <para>&#160;</para>
-        <para></para>
-        <para>
- Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
       </sect2>
     </sect1>
   

@@ -3,7 +3,6 @@
  <anchor id="dbdoclet.id.XML_Descriptors"/>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Descriptor.html  -->
   
-
     <para> <anchor id="dbdoclet.id.Descriptor_html_objectives"/></para>
     <sect1 remap="h2">
       <title>Objectives</title>
@@ -160,11 +159,7 @@
           <para>
             <screen>
        newActiveAsGroup(String, Object[], VirtualNode);
-
-
     turnActiveAsGroup(Object, String, VirtualNode);
-
-
             </screen>
 </para>
         </listitem>
@@ -420,7 +415,6 @@
                 </informaltable>
                 <para>Since it is the current jvm, it has not to be redifined later in the descriptor. This
  will be shown in a complete example</para>
-
               </listitem>
               <listitem>
                 <para> Mapping one to n: 1 VN --&gt; N JVMs</para>
@@ -527,7 +521,6 @@
  VirtualNode starts to give access to its nodes. Those options are very usefull when there
  is no idea about how many nodes will be mapped on the VirtualNode(which is often
  unususal). Those attributes are optional.</para>
-
               </listitem>
               <listitem>
                 <para> Mapping n to one: N VN --&gt; 1 JVMs</para>
@@ -596,7 +589,6 @@
  In this example both VirtualNodes <emphasis role="bold">Dispatcher</emphasis> and <emphasis role="bold">Renderer</emphasis> have a mapping
  with <emphasis role="bold">Jvm1</emphasis>, it means that at deployment time, both VirtualNodes will get nodes
  created in the same JVM. Here is the notion of <emphasis role="bold">co-allocation</emphasis> in a JVM.</para>
-
               </listitem>
               <listitem>
                 <para> VirtualNode registration</para>
@@ -740,7 +732,6 @@
           <programlisting>ProActiveDescriptor
  pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
           </programlisting>
-
           <para>
  //----------- Returns a ProActiveDescriptor object from the xml file</para>
           <para><literal>pad.activateMappings;</literal></para>
@@ -751,7 +742,6 @@
           <para><literal>..........................</literal></para>
           <para><literal>vnDispatcher.setRuntimeInformations(&quot;LOOKUP_HOST&quot;,&quot;machine_name);</literal></para>
           <para>
-
  //--------------set the property &quot;LOOKUP_HOST at runtime</para>
           <para></para>
           <para>To summarize all VirtualNodes are activated by calling activate methods except if
@@ -766,15 +756,12 @@
  virtualNode, String registrationProtocol, boolean replacePreviousBinding )\
 ;
           </programlisting>
-
           <programlisting>ProActive.lookupVirtualNode(String url, String
  protocol);
           </programlisting>
-
           <programlisting>ProActive.unregisterVirtualNode(VirtualNode
  virtualNode);
           </programlisting>
-
         </listitem>
 </itemizedlist>
       <para><anchor id="dbdoclet.id.Descriptor_html_jvms"/></para>
@@ -826,7 +813,6 @@
                   </informaltable>
  In this example, <emphasis role="bold">jvm1</emphasis> will be created using the process called <emphasis role="bold">jvmProcess</emphasis> (discussed later, this process represents a java process and can be
  seen as java ProActiveClassname command)</para>
-
               </listitem>
               <listitem>
                 <para> 1 JVM --&gt; N Nodes on a single JVM</para>
@@ -1174,7 +1160,6 @@
  mapped to the jvm running the main(), whose acquisition method is performed by looking up the
  RMIRegistry and <emphasis role="bold">Dispatcher</emphasis> in the <emphasis role="bold">virtualNodesAcquisition</emphasis> part which will be
  the result of a lookup in the RMIRegistry of a host to be specified at runtime.</para>
-
         </listitem>
 </itemizedlist>
       <para><anchor id="dbdoclet.id.Descriptor_html_infrastructure"/></para>
@@ -1267,11 +1252,9 @@
  &#160;&#160;&#160;&#160;&#160;&lt;parameter
  value=&quot;-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib&quot;/&gt;</para>
                           <para>
-
  &#160;&#160;&#160;&#160;&#160;&lt;parameter
  value=&quot;-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib&quot;/&gt;</para>
                           <para>
-
  &#160;&#160;&#160;&#160;&#160;&lt;parameter value=-Xms512
  -Xmx512&quot;/&gt;</para>
                           <para>
@@ -1339,8 +1322,6 @@
               </tbody>
             </tgroup>
           </informaltable>
-
-
         </listitem>
         <listitem>
           <para> Remote JVMs</para>
@@ -1400,7 +1381,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                                 <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">rshProcess</emphasis>&quot;&gt;</para>
@@ -1436,7 +1416,6 @@
  defined by <emphasis role="bold">jvmProcess</emphasis>.</para>
               <para>Check <ulink url="../../../../../xml_examples/RSH_Example.xml">here</ulink> for
  a complete rsh deployment example.</para>
-
             </listitem>
             <listitem>
               <para> RLOGIN</para>
@@ -1474,7 +1453,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                                 <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">rloginProcess</emphasis>&quot;&gt;</para>
@@ -1501,7 +1479,6 @@
                   </tgroup>
                 </informaltable>
  You can use <emphasis role="bold">rlogin</emphasis> in the same way that you would use <emphasis role="bold">rsh</emphasis></para>
-
             </listitem>
             <listitem>
               <para> SSH</para>
@@ -1539,7 +1516,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                                 <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">sshProcess</emphasis>&quot;&gt;</para>
@@ -1586,7 +1562,6 @@
  These steps must be performed <emphasis role="bold">before</emphasis> running any ProActive application using <emphasis role="bold">ssh</emphasis> protocol. If you are not familiar with ssh, see <ulink url="http://www.openssh.org">openSSH</ulink></para>
               <para>Check <ulink url="../../../../../xml_examples/SSH_Example.xml">here</ulink> for
  a complete ssh deployment example.</para>
-
             </listitem>
             <listitem>
               <para><anchor id="dbdoclet.id.Descriptor_html_processlist" xreflabel="Process
@@ -1629,7 +1604,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">processlist</emphasis>&quot;&gt;</para>
@@ -1700,7 +1674,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">processlist</emphasis>&quot;&gt;</para>
@@ -1731,7 +1704,6 @@
  the hostlist attribute. In the example, a jvm is going to be created using ssh on
  crusoe.inria.fr, waha.inria.fr, nahuel.inria.fr.</para>
               <para>Check <ulink url="../../../../../xml_examples/SSHList_example.xml">SSHList_example.xml</ulink> or <ulink url="../../../../../xml_examples/SSHListbyHost_Example.xml">SSHListbyHost_Example.xml</ulink> for list examples.</para>
-
             </listitem>
             <listitem>
               <para> LSF</para>
@@ -1772,7 +1744,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">bsubInriaCluster</emphasis>&quot;&gt;</para>
@@ -1780,7 +1751,6 @@
  &#160;&#160;&lt;bsubProcess
  class=&quot;org.objectweb.proactive.core.process.lsf.LSFBSubProcess&quot;&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&lt;processReference
  refid=&quot;<emphasis role="bold">jvmProcess</emphasis>&quot;/&gt;</para>
                               <para>
@@ -1878,7 +1848,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">bsubInriaCluster</emphasis>&quot;&gt;</para>
@@ -1902,7 +1871,6 @@
  &#160;&#160;&#160;&#160;&#160;&lt;absolutePath
  value=&quot;/home/ProActive/scripts/unix/cluster/startRuntime.sh&quot;/&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;/scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&lt;/bsubOption&gt;</para>
@@ -1925,7 +1893,6 @@
  appear. They are optional, and have a default value: respectively <emphasis role="bold">false</emphasis> and <emphasis role="bold">normal</emphasis>. They represent option in the bsub command: interactive mode, and the name
  of the queue.</para>
               <para>Check also <ulink url="../../../../../xml_examples/SSH_LSF_Example.xml">SSH_LSF_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> PBS</para>
@@ -1966,7 +1933,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">pbsCluster</emphasis>&quot;&gt;</para>
@@ -1974,7 +1940,6 @@
  &#160;&#160;&lt;pbsProcess
  class=&quot;org.objectweb.proactive.core.process.pbs.PBSSubProcess&quot;&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&lt;processReference
  refid=&quot;<emphasis role="bold">jvmProcess</emphasis>&quot;/&gt;</para>
                               <para>
@@ -1984,19 +1949,15 @@
                               <para>
  &#160;&#160;&#160;&#160;&lt;processorPerNode&gt;1&lt;/processorPerNode&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;bookingDuration&gt;00:15:00&lt;/bookingDuration&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;outputFile&gt;/home1/rquilici/out.log&lt;/outputFile&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&#160;&#160;&lt;absolutePath
  value=&quot;/home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh&quot;/&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;/scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&lt;/pbsOption&gt;</para>
@@ -2037,7 +1998,6 @@
  frontend_host of the script pbsStartRuntime.sh(default is
  /user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</para>
               <para>Check also <ulink url="../../../../../xml_examples/SSH_PBS_Example.xml">SSH_PBS_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> Sun Grid Engine</para>
@@ -2078,7 +2038,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">sgeCluster</emphasis>&quot;&gt;</para>
@@ -2086,7 +2045,6 @@
  &#160;&#160;&lt;gridengineProcess
  class=&quot;org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess&quot;&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&lt;processReference
  refid=&quot;<emphasis role="bold">jvmProcess</emphasis>&quot;/&gt;</para>
                               <para>
@@ -2096,13 +2054,11 @@
                               <para>
  &#160;&#160;&#160;&#160;&lt;bookingDuration&gt;00:15:00&lt;/bookingDuration&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&#160;&#160;&lt;absolutePath
  value=&quot;/home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh&quot;/&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;/scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&lt;/gridEngineOption&gt;</para>
@@ -2139,7 +2095,6 @@
  frontend_host of the script gridEngineStartRuntime.sh (default is
  /user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</para>
               <para>Check also <ulink url="../../../../../xml_examples/SSH_SGE_Example.xml">SSH_SGE_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> OAR:</para>
@@ -2179,7 +2134,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">oarCluster</emphasis>&quot;&gt;</para>
@@ -2187,7 +2141,6 @@
  &#160;&#160;&lt;oarProcess
  class=&quot;org.objectweb.proactive.core.process.oar.OARSubProcess&quot;&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&lt;processReference
  refid=&quot;<emphasis role="bold">jvmProcess</emphasis>&quot;/&gt;</para>
                               <para>
@@ -2195,13 +2148,11 @@
                               <para>
  &#160;&#160;&#160;&#160;&lt;resources&gt;node=2,weight=2&lt;/resources&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&#160;&#160;&lt;absolutePath
  value=&quot;/home/ProActive/scripts/unix/cluster/oarStartRuntime.sh&quot;/&gt;</para>
                               <para>
-
  &#160;&#160;&#160;&#160;&lt;/scriptPath&gt;</para>
                               <para>
  &#160;&#160;&#160;&lt;/oarOption&gt;</para>
@@ -2238,7 +2189,6 @@
  frontend_host of the script oarStartRuntime.sh (default is
  /user.home/ProActive/scripts/unix/cluster/oarStartRuntime.sh).</para>
               <para>Check also <ulink url="../../../../../xml_examples/SSH_OAR_Example.xml">SSH_OAR_Example.xml</ulink> and <ulink url="../../../../../xml_examples/SSH_OARGRID_Example.xml">SSH_OARGRID_Example.xml</ulink></para>
-
             </listitem>
             <listitem>
               <para> PRUN:</para>
@@ -2247,7 +2197,6 @@
               <para> PRUN is a cluster protocol develloped at Amsterdam to manage their <ulink url="http://www.cs.vu.nl/das/prun/prun.1.xml">cluster</ulink>. ProActive provides <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
  to use such protocol.</para>
               <para>Check also <ulink url="../../../../../xml_examples/SSH_PRUN_Example.xml">SSH_PRUN_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> GLOBUS</para>
@@ -2289,7 +2238,6 @@
  &#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                               <para>
-
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &#160;&lt;processDefinition id=&quot;<emphasis role="bold">globusProcess</emphasis>&quot;&gt;</para>
@@ -2336,7 +2284,6 @@
  &lt;globusOption&gt; is neither manatory. Default value for &lt;count&gt; element is 1.
  It represents the number of processor requested.</para>
               <para>Check also <ulink url="../../../../../xml_examples/Globus_Example.xml">Globus_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> UNICORE:</para>
@@ -2345,7 +2292,6 @@
               <para> ProActive provides <literal>org.objectweb.proactive.core.process.unicore.UnicoreProcess</literal>
  to use such protocol.</para>
               <para>Check also <ulink url="../../../../../xml_examples/Unicore_Example.xml">Unicore_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> ARC (NorduGrid):</para>
@@ -2355,7 +2301,6 @@
  to use such protocol.</para>
               <para>To use ARC you will need to download the <ulink url="http://ftp.nordugrid.org/download/index.php">ARC Client</ulink></para>
               <para>Check also <ulink url="../../../../../xml_examples/NorduGrid_Example.xml">NorduGrid_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> GLITE</para>
@@ -2364,7 +2309,6 @@
               <para> ProActive provides <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
  to use such protocol.</para>
               <para>Check also <ulink url="../../../../../xml_examples/SSH_GLite_Example.xml">SSH_GLite_Example.xml</ulink>.</para>
-
             </listitem>
             <listitem>
               <para> Complete example of XML Deployment Descriptor</para>
@@ -2475,7 +2419,6 @@
  &#160;&#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
                                 <para>
-
  &#160;&#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &#160;&#160;&lt;processDefinition id=&quot;<emphasis role="bold">jvmProcess1</emphasis>&quot;&gt;</para>
@@ -2483,7 +2426,6 @@
  &#160;&#160;&#160;&lt;jvmProcess
  class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;&gt;</para>
                                 <para>
-
  &#160;&#160;&#160;&#160;&lt;classpath&gt;</para>
                                 <para>
  &#160;&#160;&#160;&#160;&#160;&lt;relativePath origin=&quot;userHome&quot;
@@ -2546,7 +2488,6 @@
  &#160;&#160;&#160;&lt;bsubProcess
  class=&quot;org.objectweb.proactive.core.process.lsf.LSFBSubProcess&quot;&gt;</para>
                                 <para>
-
  &#160;&#160;&#160;&#160;&lt;processReference
  refid=&quot;<emphasis role="bold">jvmProcess1</emphasis>&quot;/&gt;</para>
                                 <para>
@@ -2565,7 +2506,6 @@
  &#160;&#160;&#160;&#160;&#160;&#160;&lt;absolutePath
  value=&quot;/home/ProActive/scripts/unix/cluster/startRuntime.sh&quot;/&gt;</para>
                                 <para>
-
  &#160;&#160;&#160;&#160;&#160;&lt;/scriptPath&gt;</para>
                                 <para>
  &#160;&#160;&#160;&#160;&lt;/bsubOption&gt;</para>
@@ -2759,7 +2699,6 @@
                       <para>
  &#160;&#160;&#160;&#160;&#160;&#160;&lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;</para>
                       <para>
-
  &#160;&#160;&#160;&#160;&#160;&lt;/peerSet&gt;</para>
                       <para>
  &#160;&#160;&#160;&#160;&lt;/P2PService&gt;</para>

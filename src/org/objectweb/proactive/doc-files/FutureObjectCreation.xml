@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Asynchronous calls and futures</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FutureObjectCreation.html  -->
   
-
     <sect1 remap="h2">
       <title>Asynchronous calls and futures</title>
       <sect2 remap="h3">
@@ -66,11 +64,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/futureObject.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/images/futureObject.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/futureObject.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/images/futureObject.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/futureObject.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/images/futureObject.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -142,11 +140,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/sequentialCallUMLDiagram.gif" format="GIF"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/sequentialCallUMLDiagram.png" format="PNG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/sequentialCallUMLDiagram.svg" format="SVG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/sequentialCallUMLDiagram.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/sequentialCallUMLDiagram.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/sequentialCallUMLDiagram.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -169,11 +167,11 @@
                 <informalfigure>
                   <mediaobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/activeObjectComponents.gif" format="GIF"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.png" format="PNG"/>                    </imageobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/activeObjectComponents.svg" format="SVG"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.svg" format="SVG"/>                    </imageobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/activeObjectComponents.png" format="PNG"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.png" format="PNG"/>                    </imageobject>
                   </mediaobject>
                 </informalfigure>
 </para>
@@ -189,11 +187,11 @@
                 <informalfigure>
                   <mediaobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/futureObjectComponents.gif" format="GIF"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/futureObjectComponents.png" format="PNG"/>                    </imageobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/futureObjectComponents.svg" format="SVG"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/futureObjectComponents.svg" format="SVG"/>                    </imageobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/futureObjectComponents.png" format="PNG"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/futureObjectComponents.png" format="PNG"/>                    </imageobject>
                   </mediaobject>
                 </informalfigure>
 </para>
@@ -210,11 +208,11 @@
                 <informalfigure>
                   <mediaobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/futureObjectAllComponents.gif" format="GIF"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/futureObjectAllComponents.png" format="PNG"/>                    </imageobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/futureObjectAllComponents.svg" format="SVG"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/futureObjectAllComponents.svg" format="SVG"/>                    </imageobject>
                     <imageobject>
-                      <imagedata fileref="doc-files/futureObjectAllComponents.png" format="PNG"/>                    </imageobject>
+                      <imagedata width="6in" fileref="doc-files/images/futureObjectAllComponents.png" format="PNG"/>                    </imageobject>
                   </mediaobject>
                 </informalfigure>
 </para>
@@ -256,11 +254,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/usingFutureAfterGettingResultDiagram.gif" format="GIF"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/usingFutureAfterGettingResultDiagram.png" format="PNG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/usingFutureAfterGettingResultDiagram.svg" format="SVG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/usingFutureAfterGettingResultDiagram.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/usingFutureAfterGettingResultDiagram.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/usingFutureAfterGettingResultDiagram.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -274,11 +272,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/usingFutureBeforeGettingResultDiagram.gif" format="GIF"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/usingFutureBeforeGettingResultDiagram.png" format="PNG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/usingFutureBeforeGettingResultDiagram.svg" format="SVG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/usingFutureBeforeGettingResultDiagram.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/usingFutureBeforeGettingResultDiagram.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/images/usingFutureBeforeGettingResultDiagram.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -325,7 +323,6 @@ to use </para>
  ProActive provides more used primitive type wrappers, there are 2 versions of each, one <emphasis role="bold">mutable</emphasis>, and the other which is <emphasis role="bold">immutable</emphasis>. </para>
             <para>Only the methods return type are concerned not the
  parameters.</para>
-
           </listitem>
           <listitem>
             <para><emphasis role="bold">Avoid</emphasis>  to return null in Active Object methods: on the <emphasis role="bold">caller</emphasis> side the test <emphasis role="bold">if(result_from_method == null)</emphasis> has no sense. Indeed result_from_method is a couple
@@ -333,7 +330,6 @@ to use </para>
  cannot be null: </para>
             <screen>
 public class MyObject{
-
  public MyObject(){
  //empty constructor with no-args
  }

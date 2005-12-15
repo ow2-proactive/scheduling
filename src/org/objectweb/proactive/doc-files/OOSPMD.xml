@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>OOSPMD</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/OOSPMD.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.OOSPMD_html_intro"/>OOSPMD : Introduction</title>
       <para>SPMD stands for Single Program Multiple Data. Merged into an
@@ -58,7 +56,6 @@ class A {
           <screen>
   Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
-
   A agroup = (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params[], nodes); 
           </screen>
 </para>
@@ -134,7 +131,6 @@ class A {
           <screen>
   Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
-
   A agroup = (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params[], nodes); 
           </screen>
 </para>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Exporting Active Objects and components as web services</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/WSDoc.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.WSDoc_html_overview"/>Overview</title>
       <para>This feature allows the call and monitoring of active objects and ProActive
@@ -55,11 +53,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/webservices/provider_en.gif" format="GIF"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/webservices/provider_en.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/webservices/provider_en.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/webservices/provider_en.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/webservices/provider_en.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/webservices/provider_en.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -199,7 +197,6 @@ ProActive.exposeAsWebService(Object o,
  its location. Generally, WSDL files are used to generate a proxy to the service. For example, for
  a given service, say &quot;compute&quot; ,you can get the WSDL document at <ulink url="#">http://localhost:8080/servlet/wsdl?id=compute</ulink>.</para>
       <para>
-
  Now that this client knows what and where to call the service, it will send a SOAP message to the
  web server, the web server looks into the message and perform the right call then returns the
  reply into another SOAP message to the client.</para>
@@ -221,13 +218,10 @@ ProActive.exposeAsWebService(Object o,
  as a web service :</para>
         <screen>
 public class HelloWorld implements Serializable {
-
    public HelloWorld () {}
-
    public String helloWorld (String name) {
       return &quot;Hello world !&quot;;
    }
-
    public static void main (String [] args) {
     
     try {
@@ -292,7 +286,6 @@ string s = hw.helloWorld ();
  in order to a C# client for example controls it. Only one instruction has been added in the main
  method :</para>
         <screen>
-
 ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     &quot;http://localhost:8080&quot;,  new String [] {
                     &quot;rotateRight&quot;, &quot;getPicture&quot;, &quot;rotateLeft&quot;, &quot;rotateUp&quot;,
@@ -312,11 +305,11 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/webservices/dispatcher_en.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/webservices/dispatcher_en.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/webservices/dispatcher_en.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -336,8 +329,6 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
         <para>Here are screenshots of the user application :</para>
         <informaltable frame="none">
           <tgroup cols="2">
-            <colspec colname="c1" colwidth="50*"/>
-            <colspec colname="c2" colwidth="50*"/>
             <tbody>
               <row>
                 <entry><para> The first screenshot is a classic ProActive application ;</para></entry>
@@ -345,11 +336,7 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata fileref="doc-files/webservices/scc3djava.jpg" format="JPG"/>                        </imageobject>
-                        <imageobject>
-                          <imagedata fileref="doc-files/webservices/scc3djava.svg" format="SVG"/>                        </imageobject>
-                        <imageobject>
-                          <imagedata fileref="doc-files/webservices/scc3djava.png" format="PNG"/>                        </imageobject>
+                          <imagedata width="4in" fileref="doc-files/webservices/scc3djava.png" format="PNG"/>                        </imageobject>
                       </mediaobject>
                     </informalfigure>
 </para></entry>
@@ -361,11 +348,7 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata fileref="doc-files/webservices/scC3dcs.jpg" format="JPG"/>                        </imageobject>
-                        <imageobject>
-                          <imagedata fileref="doc-files/webservices/scC3dcs.svg" format="SVG"/>                        </imageobject>
-                        <imageobject>
-                          <imagedata fileref="doc-files/webservices/scC3dcs.png" format="PNG"/>                        </imageobject>
+                          <imagedata width="4in" fileref="doc-files/webservices/scC3dcs.png" format="PNG"/>                        </imageobject>
                       </mediaobject>
                     </informalfigure>
 </para></entry>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/index.html  -->
   
-
     <sect1 remap="h3">
       <title>version 3.0 (November 2005)</title>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis role="bold">GRID</emphasis> Java library for <emphasis role="bold">parallel</emphasis>, <emphasis role="bold">distributed</emphasis>, and <emphasis role="bold">concurrent</emphasis> computing, also featuring <emphasis role="bold">mobility</emphasis> and <emphasis role="bold">security</emphasis> in a uniform framework. With a reduced set of simple primitives, <emphasis role="bold">ProActive</emphasis>
@@ -974,11 +972,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.gif" format="GIF"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
           </mediaobject>
 <ulink url="http://www.objectweb.org/"></ulink>        </informalfigure>
 </para>

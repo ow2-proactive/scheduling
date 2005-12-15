@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Active Object Migration</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Migration.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.Migration_html_prim"/>Migration Primitive</title>
       <para>The migration of an active object can be triggered by the active object
@@ -81,10 +79,8 @@
           <screen>
   import org.objectweb.proactive.ProActive;
   public class SimpleAgent implements Serializable {
-
     public SimpleAgent() {
     }
-
     public void moveTo(String t) {
       try {
         ProActive.migrateTo(t);
@@ -92,7 +88,6 @@
         e.printStackTrace();
       }
     }
-
     public String whereAreYou() {
       try {
         return InetAddress.getLocalHost().getHostName();
@@ -100,7 +95,6 @@
         return &quot;Localhost lookup failed&quot;;
       }
     }
-
     public static void main (String[] args) {
       if (!(args.length&gt;0)) {
         System.out.println(&quot;Usage: java migration.test.TestSimple hostname/N\

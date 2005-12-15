@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Adding a Fault-Tolerance Protocol</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/FaultTolerance.html  -->
   
-
     <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
  ProActive. A more complete version should be released with the version 3.1. If you wish to get
  more informations, please feel free to send a mail to <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>.</para>
@@ -39,7 +37,6 @@ verReply(org.objectweb.proactive.core.body.reply.Reply)
         }
         return 0;
     }
-
     /**
      * Message must be synchronously logged before being delivered.
      * The LatestRcvdIndex table is updated
@@ -78,20 +75,16 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
         // recovery mode: received message no longer logged
         this.isRecovering = true;
-
          //get messages
         List replies = ci.getReplyLog();
         List request = ci.getRequestLog();
-
          // add messages in the body context
         Iterator itRequest = request.iterator();
         BlockingRequestQueue queue = owner.getRequestQueue();
-
         // requests
         while (itRequest.hasNext()) {
             queue.add((Request) (itRequest.next()));
         }
-
         // replies
         Iterator itReplies = replies.iterator();
         FuturePool fp = owner.getFuturePool();
@@ -105,13 +98,10 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         // normal mode
         this.isRecovering = false;
-
         // enable communication
         this.owner.acceptCommunication();
-
         try {
             // update servers
             this.location.updateLocation(ownerID, owner.getRemoteAdapter())\
@@ -140,11 +130,6 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
  case of the CIC protocol, all the active object of the application must recover after one
  failure, while only the faulty process must restart with the PML protocol; this specific behavior
  is coded in the recovery process.</para>
-        <para></para>
-        <para></para>
-        <para></para>
-        <para>
- Copyright � 2001-2005 INRIA All Rights Reserved. </para>
       </sect2>
     </sect1>
   

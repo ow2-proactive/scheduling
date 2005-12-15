@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive on top of OSGi</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/OSGi.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.OSGi_html_overview" xreflabel="Overview of OSGi -- Open Services Gateway
  initiative"/>Overview of OSGi -- Open Services Gateway
@@ -20,11 +18,11 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/osgi_files/framework.jpg" format="JPG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/osgi_files/framework.jpg" format="JPG"/>          </imageobject>
           <imageobject>
-            <imagedata fileref="doc-files/osgi_files/framework.svg" format="SVG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/osgi_files/framework.svg" format="SVG"/>          </imageobject>
           <imageobject>
-            <imagedata fileref="doc-files/osgi_files/framework.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/osgi_files/framework.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para><emphasis>The OSGi framework entities.</emphasis></para>
@@ -80,11 +78,11 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/osgi_files/proactive_bundle.jpg" format="JPG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/osgi_files/proactive_bundle.jpg" format="JPG"/>          </imageobject>
           <imageobject>
-            <imagedata fileref="doc-files/osgi_files/proactive_bundle.svg" format="SVG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/osgi_files/proactive_bundle.svg" format="SVG"/>          </imageobject>
           <imageobject>
-            <imagedata fileref="doc-files/osgi_files/proactive_bundle.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/osgi_files/proactive_bundle.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para><emphasis>The Proactive Bundle uses the standard Http Service</emphasis></para>
@@ -114,10 +112,8 @@
  it. Once we have the reference, we can create our active object thanks to the <literal>ProActiveService.newActive()</literal> method. Finally, we register our new service in the
  framework.</para>
       <screen>
-
  public void start(BundleContext context) throws Exception {
         this.context = context;
-
         /* gets the ProActive Service */
         ServiceReference sr = this.context.getServiceReference(ProActiveSer\
 vice.class.getName());
@@ -127,7 +123,6 @@ sr);
 ctive.examples.hello.Hello&quot;,
                                                                            \
                            new Object [] {});
-
         /* Register the service */
         Properties props = new Properties();
         props.put(&quot;name&quot;, &quot;helloWorld&quot;);

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive Eclipse plugin</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/plugin.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.plugin_html_external"/>Overview</title>
       <para>The main objective of this plugin is to facilitate the use of ProActive in
@@ -30,9 +28,7 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/development/plugin_files/guided_tour.png" format="PNG"/>          </imageobject>
+           <imagedata width="6in" fileref="doc-files/development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para>This guided tour (that is actually eclipse cheat sheet) purposes :</para>
@@ -70,9 +66,7 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/development/plugin_files/wizard_active.png" format="PNG"/>          </imageobject>
+           <imagedata width="6in" fileref="doc-files/development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
     </sect1>
@@ -83,15 +77,9 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/development/plugin_files/editor.png" format="PNG"/>          </imageobject>
+           <imagedata width="6in" fileref="doc-files/development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
-      <para></para>
-      <para></para>
-      <para>
- Copyright � 2001-2005 INRIA All Rights Reserved. </para>
     </sect1>
   
 </chapter>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Component perspectives : a support for our research work</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/perspectives.html  -->
   
-
     <para> <anchor id="dbdoclet.id.perspectives_html_perspectives"/></para>
     <para>Currently, we have a functional implementation of the Fractal API and
  model. One can configure and deploy a distributed system made of components.</para>
@@ -116,10 +114,6 @@
         </listitem>
 </itemizedlist>
       <para>Custom controllers cannot yet be specified in the ADL.</para>
-      <para>&#160;</para>
-      <para></para>
-      <para>
- Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
     </sect1>
   
 </chapter>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Adding a Deployment Protocol</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/DescriptorProcess.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.DescriptorProcess_html_objectives" xreflabel="Objectives"/>Objectives</title>
       <para>ProActive support several deployment protocols. This protocols can be configured through an
@@ -40,14 +38,9 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/development/imgs/descriptorProcessClassDiagram.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/development/imgs/descriptorProcessClassDiagram.svg" format="SVG"/>            </imageobject>
-            <imageobject>
               <imagedata fileref="doc-files/development/imgs/descriptorProcessClassDiagram.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
-
         <para>In this figure, <emphasis role="bold">OARSubProcess</emphasis> and <emphasis role="bold">SSHProcess</emphasis> both extend from <emphasis role="bold">AbstractExternalProcessDecorator</emphasis>. Notice, that in the case of SSH, more than one class
  maybe required to succesfully implement the protocol. This is why, every protocol is implemented
  within it&#39;s on directory in the process package:</para>
@@ -193,7 +186,6 @@ protected class OARGRIDProcessHandler extends ProcessHandler {
     super(proActiveDescriptor);
     this.addHandler(OARGRID_OPTIONS_TAG, new OARGRIDOptionHandler());
   }
-
   public void startContextElement(String name, Attributes attributes)
     throws org.xml.sax.SAXException {
     super.startContextElement(name, attributes);
@@ -208,12 +200,10 @@ protected class OARGRIDProcessHandler extends ProcessHandler {
 ;
     }
   }
-
   protected class OARGRIDOptionHandler extends PassiveCompositeUnmarshaller\
  {
     public OARGRIDOptionHandler() {
       UnmarshallerHandler pathHandler = new PathHandler();
-
       this.addHandler(OAR_RESOURCE_TAG, new SingleValueUnmarshaller());
       this.addHandler(OARGRID_WALLTIME_TAG, new SingleValueUnmarshaller());
       BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
@@ -221,17 +211,14 @@ protected class OARGRIDProcessHandler extends ProcessHandler {
       bch.addHandler(REL_PATH_TAG, pathHandler);
       this.addHandler(SCRIPT_PATH_TAG, bch);
     }
-
     public void startContextElement(String name, Attributes attributes)
       throws org.xml.sax.SAXException {
     }
-
     protected void notifyEndActiveHandler(String name, UnmarshallerHandler \
 activeHandler)
       throws org.xml.sax.SAXException {
       OARGRIDSubProcess oarGridSubProcess = (OARGRIDSubProcess) targetProce\
 ss;
-
       if (name.equals(OAR_RESOURCE_TAG)) {
         oarGridSubProcess.setResources((String) activeHandler.getResultObje\
 ct());
@@ -262,10 +249,6 @@ tObject());
  proActiveDescriptor){...}</literal></para>
             </listitem>
 </itemizedlist>
-          <para></para>
-          <para></para>
-          <para>
- Copyright � 2001-2005 INRIA All Rights Reserved. </para>
 </sect3>
       </sect2>
     </sect1>

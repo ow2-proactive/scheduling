@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>2. Your first Benchmark</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/first_bench.html  -->
   
-
     <para> This section describes how to write and execute a simple Benchmark.</para>
     <sect1 remap="h2">
       <title>Description</title>
@@ -19,27 +17,20 @@
 <literal>
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveBenchmark;
-
 public class BenchNewActive extends ProActiveBenchmark {
-
     public BenchNewActive() {
         super(null, &quot;Object Creation with newActive&quot;,
             &quot;Measure time to create an active object with newActive.&quot;);
     }
-
     public BenchNewActive(Node node) {
         super(node, &quot;Object Creation with newActive&quot;,
             &quot;Measure time to create an active object with newActive.&quot;);
     }
-
     public long action() throws Exception {
     }
-
     public void initTest() throws Exception {
     }
-
     public void endTest() throws Exception {
     }
 }
@@ -51,7 +42,6 @@ public class BenchNewActive extends ProActiveBenchmark {
 <literal>
    public boolean postConditions() throws Exception {
    }
-
    public boolean preConditions() throws Exception {
    }
         </literal>
@@ -79,7 +69,6 @@ public class BenchNewActive extends ProActiveBenchmark {
         <screen>
 <literal>
     private ReifiableObject object = null;
-
     public long action() throws Exception {
         ReifiableObject object;
         String className = ReifiableObject.class.getName();
@@ -119,9 +108,7 @@ public class BenchNewActive extends ProActiveBenchmark {
       <screen>
 <literal>
 import testsuite.manager.ProActiveBenchManager;
-
 public class Manager extends ProActiveBenchManager {
-
         public Manager() {
           super(&quot;Manager&quot;,&quot;To manage ProActive Benchmarks.&quot;);
         }
@@ -137,17 +124,14 @@ public class Manager extends ProActiveBenchManager {
         <screen>
 <literal>
 import testsuite.group.Group;
-
   public void initManager() throwsException {
     Group benchGroup = new Group(&quot;Bnechmark Group&quot;,&quot;no description.&quot;);
-
     // adding bench in same VM
     benchGroup.add(new BenchNewActive(getSameVMNode()));
     // adding bench in local VM
     benchGroup.add(new BenchNewActive(getLocalVMNode()));
     // adding bench in remote VM
     benchGroup.add(new BenchNewActive(getRemoteVMNode()));
-
     // adding the group
     add(benchGroup);
   }
@@ -158,16 +142,13 @@ import testsuite.group.Group;
 <literal>
   // ...
   Manager manager  = new Manager();
-
   Group  benchGroup = new Group(&quot;Bnechmark Group&quot;,&quot;no description.&quot;);
-
   // adding bench in same VM
   benchGroup.add(new BenchNewActive(getSameVMNode()));
   // adding bench in local VM
   benchGroup.add(new BenchNewActive(getLocalVMNode()));
   // adding bench in remote VM
   benchGroup.add(new BenchNewActive(getRemoteVMNode()));
-
   manager.add(benchGroup);
   // ...
           </literal>
@@ -270,24 +251,18 @@ manager.setVerbatim(true);
 <literal>
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveBenchmark;
 import util.ReifiableObject;
-
 public class BenchNewActive extends ProActiveBenchmark {
-
     private ReifiableObject object = null;
-
     public BenchNewActive() {
         super(null, &quot;Object Creation with newActive&quot;,
             &quot;Measure time to create an active object with newActive.&quot;);
     }
-
     public BenchNewActive(Node node) {
         super(node, &quot;Object Creation with newActive&quot;,
             &quot;Measure time to create an active object with newActive.&quot;);
     }
-
     public long action() throws Exception {
         String className = ReifiableObject.class.getName();
         Node node = getNode();
@@ -296,15 +271,12 @@ public class BenchNewActive extends ProActiveBenchmark {
         this.timer.stop();
         return this.timer.getCumulatedTime();
     }
-
     public void initTest() throws Exception {
         // nothing to do
     }
-
     public void endTest() throws Exception {
         // nothing to do
     }
-
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }
@@ -334,12 +306,9 @@ public class BenchNewActive extends ProActiveBenchmark {
                   <screen>
 <literal>
 import java.io.Serializable;
-
 public class ReifiableObject implements Serializable {
-
         public ReifiableObject() {
         }
-
 }
                     </literal>
                   </screen>
@@ -383,16 +352,11 @@ import org.apache.log4j.HTMLLayout;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.WriterAppender;
-
 import testsuite.group.Group;
-
 import testsuite.manager.ProActiveBenchManager;
-
 import java.io.File;
-
 public class Manager extends ProActiveBenchManager {
     private Logger logger = Logger.getLogger(Test1.class);
-
     public Manager() {
         super(&quot;Manager&quot;,&quot;To manage ProActive Benchmarks.&quot;);
         // Log in a HTML file
@@ -408,30 +372,23 @@ public class Manager extends ProActiveBenchManager {
         BasicConfigurator.configure();
         logger.setLevel(Level.DEBUG);
     }
-
     public void initManager() throws Exception {
         Group benchGroup = new Group(&quot;Bnechmark Group&quot;,&quot;no description.&quot;);
-
         // adding bench in same VM
         benchGroup.add(new BenchNewActive(getSameVMNode()));
         // adding bench in local VM
         benchGroup.add(new BenchNewActive(getLocalVMNode()));
         // adding bench in remote VM
         benchGroup.add(new BenchNewActive(getRemoteVMNode()));
-
         // adding the group
         add(benchGroup);
     }
-
     public static void main(String[] args) {
         Manager manager = new Manager();
-
         // To run all benchmarks 100 times
         manager.setNbRuns(100);
-
         // Execute all benchmarks
         manager.execute(true);
-
         //Write results in a HTML file
         try {
             File file = new File(System.getProperty(&quot;user.home&quot;) +

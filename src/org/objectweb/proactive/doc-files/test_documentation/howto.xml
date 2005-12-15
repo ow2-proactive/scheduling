@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>3. How to create a Test Suite with interlinked Tests</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/howto.html  -->
   
-
     <para> In this part we will not explain how to write a simple test, for this see <ulink url="first_test.xml">Your first Test</ulink> section.</para>
     <sect1 remap="h2">
       <title>Description of our Test</title>
@@ -20,37 +18,27 @@
         <screen>
 <literal>
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveFunctionalTest;
-
 import java.io.Serializable;
-
 public class TestGroupCreation extends ProActiveFunctionalTest
     implements Serializable {
-
     public TestGroupCreation() {
         super(null, &quot;Group Creation&quot;,
             &quot;Create a Group of active object in specify node.&quot;);
     }
-
     public TestGroupCreation(Node node) {
         super(node, &quot;Group Creation&quot;,
             &quot;Create a Group of active object in specify node.&quot;);
     }
-
     public void action() throws Exception {
     }
-
     public boolean postConditions() throws Exception {
     }
-
     public boolean preConditions() throws Exception {
     }
-
     public void initTest() throws Exception {
         // nothing to do
     }
-
     public void endTest() throws Exception {
         // nothing to do
     }
@@ -74,7 +62,6 @@ public class TestGroupCreation extends ProActiveFunctionalTest
      private Agent group = null;
  
     // ...
-
   public void action() throws Exception {
              createGroupAgent();
  }
@@ -90,9 +77,7 @@ public class TestGroupCreation extends ProActiveFunctionalTest
             group = (Agent) ProActiveGroup.newGroup(Agent.class.getName(), params,
               nodes);
      }
-
        // ...
-
 }</literal>
         </screen>
         <para><emphasis role="bold">Remarks :</emphasis> We use an external method to create the group is for the simple reason of we
@@ -115,7 +100,6 @@ public class TestGroupCreation extends ProActiveFunctionalTest
                 Agent agent2 = (Agent) agentGroup.get(2);
                 String nodeURL = getNode().getNodeInformation().getURL()
                                      .toUpperCase();
-
                 return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
                 (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
                 (agent2.getNodeName().compareTo(nodeURL) == 0);
@@ -177,13 +161,10 @@ public class TestGroupCreation extends ProActiveFunctionalTest
       <screen>
 <literal>
 import testsuite.manager.ProActiveFuncTestManager;
-
 public class Manager extends ProActiveFuncTestManager {
-
     public Manager(String name, String description) {
         super(name, description);
     }
-
     public static void main(String[] args) {
         Manager manager = new Manager(&quot;Migration Tests&quot;,
                 &quot;Create a group and migrate its objects.&quot;);
@@ -194,12 +175,10 @@ public class Manager extends ProActiveFuncTestManager {
       <screen>
 <literal>
 import testsuite.group.Group;
-
     // ...
       
     Group group = new Group(&quot;Group Migration&quot;,
                 &quot;Migration on an active group objects.&quot;);
-
  // ...</literal>
       </screen>
       <para>Create and add the 2 precends tests in the group :</para>
@@ -209,7 +188,6 @@ import testsuite.group.Group;
       
     TestGroupCreation creation = new TestGroupCreation(manager.getLocalVMNode());
         group.add(creation);
-
         TestGroupMigration migration = new TestGroupMigration(manager.getRemoteVMNode());
         group.add(migration);
      
@@ -219,7 +197,6 @@ import testsuite.group.Group;
       <screen>
 <literal>
  // ...
-
   FunctionalTest[] params = { creation };
              migration.setTests(params);
          
@@ -234,7 +211,6 @@ import testsuite.group.Group;
  // ...
       
     manager.add(group);
-
         manager.execute(group, migration, true);
  
     // ...</literal>
@@ -291,35 +267,25 @@ RemoteHostname=owenii</literal>
 <literal>
 import testsuite.group.Group;
 import testsuite.manager.ProActiveFuncTestManager;
-
 public class Manager extends ProActiveFuncTestManager {
-
     public Manager(String name, String description) {
         super(name, description);
     }
-
     public static void main(String[] args) {
         Manager manager = new Manager(&quot;Migration Tests&quot;,
                 &quot;Create a group and migrate its objects.&quot;);
         Group group = new Group(&quot;Group Migration&quot;,
                 &quot;Migration on an active group objects.&quot;);
-
         TestGroupCreation creation = new TestGroupCreation(manager.getLocalVMNode());
         group.add(creation);
-
         TestGroupMigration migration = new TestGroupMigration(manager.getRemoteVMNode());
         group.add(migration);
-
         FunctionalTest[] params = { creation };
         migration.setTests(params);
-
         manager.add(group);
-
         manager.execute(group, migration, true);
-
         manager.setVerbatim(true);
         manager.getResults().toOutPutStream(System.out);
-
         System.exit(0);
     }
 }
@@ -343,27 +309,21 @@ public class Manager extends ProActiveFuncTestManager {
  
 <literal>
  import java.io.Serializable;
-
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveFunctionalTest;
-
 public class TestGroupMigration extends ProActiveFunctionalTest
     implements Serializable {
     private Agent group = null;
-
     public TestGroupMigration() {
         super(null, &quot;Group Migration&quot;,
             &quot;Migrate all Group Element in a specified node.&quot;);
     }
-
     public TestGroupMigration(Node node) {
         super(node, &quot;Group Migration&quot;,
             &quot;Migrate all Group Element in a specified node.&quot;);
     }
-
     public boolean postConditions() throws Exception {
         if (group == null) {
             return false;
@@ -383,25 +343,20 @@ public class TestGroupMigration extends ProActiveFunctionalTest
             }
         }
     }
-
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }
-
     public void action() throws Exception {
         throw new Exception(&quot;This test doesn&#39;t work in standalone mode&quot;);
     }
-
     public Object action(Agent group) throws Exception {
         this.group = group;
         this.group.moveTo(getNode().getNodeInformation().getURL());
         return null;
     }
-
     public void initTest() throws Exception {
         // nothing to do
     }
-
     public void endTest() throws Exception {
         // nothing to do
     }
@@ -428,36 +383,28 @@ public class TestGroupMigration extends ProActiveFunctionalTest
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveFunctionalTest;
-
 import java.io.Serializable;
-
 public class TestGroupCreation extends ProActiveFunctionalTest
     implements Serializable {
     private Agent group = null;
-
     public TestGroupCreation() {
         super(null, &quot;Group Creation&quot;,
             &quot;Create a Group of active object in specify node.&quot;);
     }
-
     public TestGroupCreation(Node node) {
         super(node, &quot;Group Creation&quot;,
             &quot;Create a Group of active object in specify node.&quot;);
     }
-
     // Default action method
     public void action() throws Exception {
         createGroupAgent();
     }
-
     // For interlinked tests action method
     public Agent action(Object o) throws Exception {
         createGroupAgent();
         return this.group;
     }
-
     private void createGroupAgent() throws Exception {
         Object[][] params = {
             { &quot;Agent0&quot; },
@@ -469,7 +416,6 @@ public class TestGroupCreation extends ProActiveFunctionalTest
         group = (Agent) ProActiveGroup.newGroup(Agent.class.getName(), params,
                 nodes);
     }
-
     public boolean postConditions() throws Exception {
         if (group == null) {
             return false;
@@ -483,22 +429,18 @@ public class TestGroupCreation extends ProActiveFunctionalTest
                 Agent agent2 = (Agent) agentGroup.get(2);
                 String nodeURL = getNode().getNodeInformation().getURL()
                                      .toUpperCase();
-
                 return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
                 (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
                 (agent2.getNodeName().compareTo(nodeURL) == 0);
             }
         }
     }
-
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }
-
     public void initTest() throws Exception {
         // nothing to do
     }
-
     public void endTest() throws Exception {
         // nothing to do
     }
@@ -526,20 +468,16 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
-
 public class Agent implements InitActive, RunActive, EndActive,
     java.io.Serializable {
     private String name;
     private String nodename;
     private String hostname;
-
     public Agent() {
     }
-
     public Agent(String name) {
         this.name = name;
     }
-
     public String getName() {
         try {
             //return the name of the Host
@@ -550,7 +488,6 @@ public class Agent implements InitActive, RunActive, EndActive,
             return &quot;getName failed&quot;;
         }
     }
-
     public String getNodeName() {
         try {
             //return the name of the Node  
@@ -560,7 +497,6 @@ public class Agent implements InitActive, RunActive, EndActive,
             return &quot;getNodeName failed&quot;;
         }
     }
-
     public void moveTo(String nodeURL) {
         try {
             System.out.println(&quot; I am going to migate&quot;);
@@ -570,15 +506,12 @@ public class Agent implements InitActive, RunActive, EndActive,
             e.printStackTrace();
         }
     }
-
     public void endBodyActivity() {
         ProActive.getBodyOnThis().terminate();
     }
-
     public void initActivity(Body body) {
         System.out.println(&quot;Initialization of the Activity&quot;);
     }
-
     public void runActivity(Body body) {
         org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
         while (body.isActive()) {
@@ -586,7 +519,6 @@ public class Agent implements InitActive, RunActive, EndActive,
             service.blockingServeOldest();
         }
     }
-
     public void endActivity(Body body) {
         System.out.println(&quot;End of the activity of this Active Object&quot;);
     }

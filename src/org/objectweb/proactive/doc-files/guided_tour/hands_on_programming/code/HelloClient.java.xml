@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/HelloClient.java.html  -->
   
-
     <para>
       <screen>
 <emphasis role="bold">public</emphasis> 
@@ -25,19 +23,16 @@ Hello
  
 myServer
 ;
-
         
 String
  
 message
 ;
-
         
 <emphasis role="bold">try</emphasis> 
 <emphasis role="bold">{</emphasis>
             
 // checks for the server&#39;s URL
-
             
 <emphasis role="bold">if</emphasis> 
 <emphasis role="bold">(</emphasis>args
@@ -52,7 +47,6 @@ length
 <emphasis role="bold">{</emphasis>
                 
 // There is no url to the server, so create an active server within this VM
-
                 
 myServer
  
@@ -82,14 +76,12 @@ Object
 &quot;local&quot;
  
 <emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
-
             
 <emphasis role="bold">}</emphasis> 
 <emphasis role="bold">else</emphasis> 
 <emphasis role="bold">{</emphasis>
                 
 // Lookups the server object
-
                 
 System
 .
@@ -103,7 +95,6 @@ println
 args
 <emphasis role="bold">[</emphasis>0
 <emphasis role="bold">]</emphasis><emphasis role="bold">)</emphasis>;
-
                 
 myServer
  
@@ -129,13 +120,10 @@ getName
 args
 <emphasis role="bold">[</emphasis>0
 <emphasis role="bold">]</emphasis><emphasis role="bold">)</emphasis>;
-
             
 <emphasis role="bold">}</emphasis>
-
             
 // Invokes a remote method on this object to get the message
-
             
 message
  
@@ -145,10 +133,8 @@ myServer
 .
 sayHello
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
             
 // Prints out the message
-
             
 System
 .
@@ -161,7 +147,6 @@ println
  
 message
 <emphasis role="bold">)</emphasis>;
-
         
 <emphasis role="bold">}</emphasis> 
 <emphasis role="bold">catch</emphasis> 
@@ -178,26 +163,22 @@ err
 println
 <emphasis role="bold">(</emphasis>&quot;Could not reach/create server object&quot;
 <emphasis role="bold">)</emphasis>;
-
             
 e
 .
 printStackTrace
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
             
 System
 .
 exit
 <emphasis role="bold">(</emphasis>1
 <emphasis role="bold">)</emphasis>;
-
         
 <emphasis role="bold">}</emphasis>
     
 <emphasis role="bold">}</emphasis>
 <emphasis role="bold">}</emphasis>
-
       </screen>
 </para>
   

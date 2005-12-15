@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>1. Your first Test</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/first_test.html  -->
   
-
     <para> This section describes how to write simple test and execute it.</para>
     <sect1 remap="h2">
       <title>Description</title>
@@ -18,34 +16,23 @@
       <screen>
 <literal>
 import testsuite.test.ProActiveFunctionalTest;
-
 import org.objectweb.proactive.core.node.Node;
-
 public class TestNewActive extends ProActiveFunctionalTest {
-
  public TestNewActive() {
             super();
             setName(&quot;newActive&quot;);
                setDescription(&quot;Test object creation with newActive in a node.&quot;);
    }
-
        public TestNewActive(Node node, String name) {
               super(node,name,
                     &quot;Test object creation with newActive in a node.&quot;);
   }
-
        public void initTest() throws Exception {
-
        }
-
        public void action() throws Exception {
-
  }
-
        public void endTest() throws Exception {
-
         }
-
 }
         </literal>
       </screen>
@@ -54,7 +41,6 @@ public class TestNewActive extends ProActiveFunctionalTest {
 <literal>
  public boolean postConditions() throws Exception {
   }
-
        public boolean preConditions() throws Exception {
    }</literal>
       </screen>
@@ -79,7 +65,6 @@ public class TestNewActive extends ProActiveFunctionalTest {
         <screen>
 <literal>
  private ReifiableObject active = null;
-
   public void action() throws Exception {
         active = (ReifiableObject) ProActive.newActive(ReifiableObject.class.getName(),
                 null, getNode());
@@ -104,45 +89,35 @@ public class TestNewActive extends ProActiveFunctionalTest {
         <title>The complete code of the test</title>
         <screen>
 <literal>
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveFunctionalTest;
-
 public class TestNewActive extends ProActiveFunctionalTest {
     private ReifiableObject active = null;
-
     public TestNewActive() {
         super();
         setName(&quot;newActive&quot;);
         setDescription(&quot;Test object creation with newActive in a node.&quot;);
     }
-
     public TestNewActive(Node node, String name) {
         super(node, name,
             &quot;Test object creation with newActive in a node.&quot;);
     }
-
     public void initTest() throws Exception {
         // nothing to do
     }
-
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }
-
     public void action() throws Exception {
         active = (ReifiableObject) ProActive.newActive(ReifiableObject.class.getName(),
                 null, getNode());
     }
-
     public boolean postConditions() throws Exception {
         Object[] activeObjects = getNode().getActiveObjects();
         return (active != null) &amp;&amp; (activeObjects != null) &amp;&amp;
         (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(active);
     }
-
     public void endTest() throws Exception {
            // nothing to do
     }
@@ -159,13 +134,10 @@ public class TestNewActive extends ProActiveFunctionalTest {
       <screen>
 <literal>
 import testsuite.manager.ProActiveFuncTestManager;
-
 public class ObjectCreationManager extends ProActiveFuncTestManager {
-
   public ObjectCreationManager() {
             super(&quot;Object Creation&quot;,&quot;Manage objects creation tests.&quot;);
   }
-
 }</literal>
       </screen>
       <sect2 remap="h3">
@@ -177,17 +149,14 @@ public class ObjectCreationManager extends ProActiveFuncTestManager {
         <screen>
 <literal>
 import testsuite.group.Group;
-
     public void initManager() throws Exception {
         Group testGroup = new Group(&quot;Test Group&quot;, &quot;no description.&quot;);
-
         // adding a test in same VM
         testGroup.add(new TestNewActive(getSameVMNode(),&quot;NewActive same VM&quot;));
         // adding a test in local VM
         testGroup.add(new TestNewActive(getLocalVMNode(),&quot;NewActive local VM&quot;));
         // adding a test in remote VM
         testGroup.add(new TestNewActive(getRemoteVMNode(),&quot;NewActive remote VM&quot;));
-
         // adding the group
         add(testGroup);
     }</literal>
@@ -197,14 +166,12 @@ import testsuite.group.Group;
 <literal>
 ObjectCreationManager manager = new ObjectCreationManager();
 Group testGroup = new Group(&quot;Test Group&quot;, &quot;no description.&quot;);
-
 // adding a test in same VM
 testGroup.add(new TestNewActive(getSameVMNode(),&quot;NewActive same VM&quot;));
 // adding a test in local VM
 testGroup.add(new TestNewActive(getLocalVMNode(),&quot;NewActive local VM&quot;));
 // adding a test in remote VM
 testGroup.add(new TestNewActive(getRemoteVMNode(),&quot;NewActive remote VM&quot;));
-
 // adding the group
 manager.add(testGroup);</literal>
         </screen>
@@ -287,42 +254,33 @@ manager.setVerbatim(true);</literal>
 <literal>
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-
 import testsuite.test.ProActiveFunctionalTest;
-
 public class TestNewActive extends ProActiveFunctionalTest {
     private ReifiableObject active = null;
-
     public TestNewActive() {
         super();
         setName(&quot;newActive&quot;);
         setDescription(&quot;Test object creation with newActive in a node.&quot;);
     }
-
     public TestNewActive(Node node, String name) {
         super(node, name,
             &quot;Test object creation with newActive in a node.&quot;);
     }
-
     public void initTest() throws Exception {
      // nothing to do
     }
-
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }
-
     public void action() throws Exception {
         active = (ReifiableObject) ProActive.newActive(ReifiableObject.class.getName(),
                 null, getNode());
     }
-
     public boolean postConditions() throws Exception {
         Object[] activeObjects = getNode().getActiveObjects();
         return (active != null) &amp;&amp; (activeObjects != null) &amp;&amp;
         (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(active);
     }
-
     public void endTest() throws Exception {
            // nothing to do
     }
@@ -346,12 +304,9 @@ public class TestNewActive extends ProActiveFunctionalTest {
  
 <literal>
 import java.io.Serializable;
-
 public class ReifiableObject implements Serializable {
-
         public ReifiableObject() {
   }
-
 }</literal>
                   </screen>
 </para></entry>
@@ -391,29 +346,22 @@ RemoteHostname=owenii</literal>
  
 <literal>
 import testsuite.group.Group;
-
 import testsuite.manager.ProActiveFuncTestManager;
-
-
 public class ObjectCreationManager extends ProActiveFuncTestManager {
     public ObjectCreationManager() {
         super(&quot;Object Creation&quot;, &quot;Manage objects creation tests.&quot;);
     }
-
     public void initManager() throws Exception {
         Group testGroup = new Group(&quot;Test Group&quot;, &quot;no description.&quot;);
-
         // adding a test in same VM
         testGroup.add(new TestNewActive(getSameVMNode(),&quot;NewActive same VM&quot;));
         // adding a test in local VM
         testGroup.add(new TestNewActive(getLocalVMNode(),&quot;NewActive local VM&quot;));
         // adding a test in remote VM
         testGroup.add(new TestNewActive(getRemoteVMNode(),&quot;NewActive remote VM&quot;));
-
         // adding the group
         add(testGroup);
     }
-
     public static void main(String[] args) {
         ObjectCreationManager manager = new ObjectCreationManager();
         // the argument must have true value, because it is a ProActiveManager
@@ -421,7 +369,6 @@ public class ObjectCreationManager extends ProActiveFuncTestManager {
         manager.execute(true);
           manager.setVerbatim(true);
         System.out.println(manager.getResults());
-
          // for exit, also ProActive don&#39;t stop the application
         System.exit(0);
         

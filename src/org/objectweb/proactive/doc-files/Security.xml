@@ -1,32 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive Security Mechanism</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Security.html  -->
   
-
     <para> In order to use the Proactive Security features, you have to
  install<emphasis role="bold">the Java(TM) Cryptography Extension (JCE) Unlimited Strength
  Jurisdiction Policy Files</emphasis> available at <ulink url="http://www.java.sun.com">Sun&#39;s
  website</ulink>.&#160; Extract the file and copy jar files to your
  &lt;jre_home&gt;/lib/security.</para>
-    <para></para>
+    
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.Security_html_Overview"/>Overview</title>
       <para>Usually, applications and security are developed for a specific use. We
  propose here a security framework that allows to dynamically deploy applications and to configure
  security according to this deployment.</para>
-      <para></para>
+      
       <para>ProActive security mechanism provides a set of security features from basic
  ones like communications authentication, integrity, confidentiality to more high-level features
  including migration security mechanism, hierarchical security policies, dynamically negotiated
  policies. All theses features are expressed inside the meta-level of the middleware and used
  transparently by applications.</para>
-      <para></para>
+      
       <para>It is possible to attach security policies to Runtimes, Virtual Nodes,
        Nodes and Active Objects. Policies are expressed inside an XML descriptor.</para>
-      <para></para>
-      <para></para>
-      <para></para>
+      
+      
+      
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.Security_html_architecture"/>Security Architecture</title>
@@ -42,9 +40,9 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/activeObjects.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/activeObjects.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/activeObjects.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/activeObjects.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -59,9 +57,9 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/certificateGeneration.png" format="PNG"/>              </imageobject>
+                <imagedata width="4in" fileref="doc-files/security_images/certificateGeneration.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/certificateGeneration.svg" format="SVG"/>              </imageobject>
+                <imagedata width="4in" fileref="doc-files/security_images/certificateGeneration.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -77,33 +75,33 @@
             <para> Resource provider set policy for resource. People who have access to a cluster and wants to
  offer cpu time under some restrictions. The runtime loads its policy file at launch
  time.</para>
-            <para></para>
+            
           </listitem>
           <listitem>
             <para> Application level policy is set when an application is deployed through an XML
  descriptor.</para>
-            <para></para>
+            
           </listitem>
 </itemizedlist>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/security-hierarchy.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/security-hierarchy.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/security-hierarchy.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>Figure 1 : Hierarchical security</para>
         <para>When an interaction is happening, all participating entities&#39; security policy are verified
  and combined to find the policy to enforce to the interaction.</para>
-        <para></para>
-        <para></para>
+        
+        
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -121,8 +119,8 @@
  The user expresses policy between server and client object inside a descriptor file. The
  correspondence between Virtual Nodes and Nodes, the mapping, is done at application starting
  time.</para>
-        <para></para>
-        <para></para>
+        
+        
       </sect2>
       <sect2 remap="h3">
         <title><anchor id="dbdoclet.id.Security_html_SECTION00033000000000000000" xreflabel="Hierarchical Security Entities"/>Hierarchical Security Entities</title>
@@ -134,20 +132,20 @@
  are application abstractions, and nodes are only a run-time entity resulting from the deployment:
  a mapping of Virtual Nodes to processes and hosts. A first decisive feature allows to define
  application-level security on those application-level abstractions:</para>
-        <para></para>
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img3.png.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img3.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img3.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img3.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img3.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img3.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
-        <para></para>
+        
         <para>As such, virtual nodes are the support for intrinsic application level security. If, at design
  time, it appears that a process always requires a specific level of security (e.g. authenticated
  and encrypted communications at all time), then that process should be attached to a virtual node
@@ -170,17 +168,17 @@
         <para>Domains are a standard way to structure (virtual) organizations involved in a Grid
  infrastructure; they are organized in a hierarchical manner. They are the logical concept
  allowing to express security policies in a hierarchical way.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img4.png.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img4.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img4.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img4.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img4.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img4.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -201,19 +199,19 @@
  through external allocators, or even Web Services in an OGSA infrastructure [<ulink url="security_images/node18.xml#foster98security">5</ulink>]. Joker rules might be important in that
  case to cover all cases, and to provide a conservative security strategy for un-forecasted
  deployments.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>Finally, as active objects are active and mobile entities, there is a need to specify security
  at the level of such entities.</para>
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img6.png.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img6.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img6.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img6.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img6.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img6.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -223,18 +221,18 @@
  another principal. The principle above allows to keep specific security privileges in such case.
  Moreover, it can also serve as a basis to offer, in a secure manner, hosting environments for
  mobile agents.</para>
-        <para></para>
-        <para></para>
-        <para></para>
+        
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img8.png.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img8.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img8.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img8.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img8.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/security_images/img8.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -293,8 +291,8 @@
  accepted but not required, and confidentiality is not allowed.</para>
         <para>As a Grid operates in decentralized mode, without a central administrator controlling the
  correctness of all security policies, these policies must be <emphasis>combined</emphasis>, <emphasis>checked</emphasis>, and <emphasis>negotiated</emphasis> dynamically. The next two sections present that aspect.</para>
-        <para></para>
-        <para></para>
+        
+        
       </sect2>
       <sect2 remap="h3">
         <title><anchor id="dbdoclet.id.Security_html_SECTION00038000000000000000" xreflabel="Combining Policies"/>Combining Policies</title>
@@ -309,11 +307,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img9.png.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img9.png.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img9.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="0.5in" fileref="doc-files/security_images/img9.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 ). Figure <ulink url="security_images/node11.xml#hierarchicalsecurityrule">6</ulink>
@@ -322,22 +316,14 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img10.png.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img10.png.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img10.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="0.5in" fileref="doc-files/security_images/img10.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
  to 
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img9.png.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img9.png.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img9.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="0.5in" fileref="doc-files/security_images/img9.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 ), the virtual node policy (VN), and the Object (O)
@@ -347,11 +333,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/security_images/img11.png.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img11.png.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/security_images/img11.png.png" format="PNG"/>              </imageobject>
+                <imagedata width="5in" fileref="doc-files/security_images/img11.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -361,12 +343,9 @@
  levels accept it (absence of weakening of authorizations), (3) the security attributes retained
  are the most constrained based on a partial order (absence of weakening of security).</para>
         <screen>
- 
-
-
-        </screen>
-        <para>Domain[*] -&gt; Domain[*] : Q,P : [+A,+I,+C]</para>
-        <para>Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C]</para>
+          Domain[*] -&gt; Domain[*] : Q,P : [+A,+I,+C] 
+         Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C] 
+       </screen>
         <para>within the CardPlus domain, the second rule will be chosen (integrity and confidentiality will
  be optional). Of course, comparison of rules is only a partial order, and several incompatible
  most specific rules can exist within a single level (e.g. both ACCEPT and DENY most specific
@@ -376,8 +355,8 @@
  sub-domain or the Virtual Node requires it [+C], a domain&#160; D<subscript>i</subscript> prohibits loading
  of code while D<subscript>j</subscript> (j &lt;= i) authorizes it). In all incompatible cases, the
  interaction is not authorized and an error is reported.</para>
-        <para></para>
-        <para></para>
+        
+        
       </sect2>
       <sect2 remap="h3">
         <title>Dynamic Policy Negotiation</title>
@@ -395,32 +374,27 @@
         <para>
           <informaltable frame="all">
             <tgroup cols="5">
-              <colspec colname="c1" colwidth="20*"/>
+              <!--<colspec colname="c1" colwidth="20*"/>
               <colspec colname="c2" colwidth="20*"/>
               <colspec colname="c3" colwidth="20*"/>
               <colspec colname="c4" colwidth="20*"/>
-              <colspec colname="c5" colwidth="20*"/>
+              <colspec colname="c5" colwidth="20*"/> -->
               <tbody>
                 <row>
-                  <entry><para></para>                    <para></para>
-</entry>
-                  <entry><para></para>                    <para></para>
-</entry>
+                  <entry> </entry>
+                  <entry> </entry>
                   <entry align="center" nameend="c5" namest="c3" valign="middle"><para>Entity A</para></entry>
                 </row>
                 <row>
-                  <entry><para></para>                    <para></para>
-</entry>
-                  <entry><para></para>                    <para></para>
-</entry>
+                  <entry> </entry>
+                  <entry> </entry>
                   <entry><para>Required (+)</para></entry>
                   <entry><para>Optional (?)</para></entry>
                   <entry><para>Disallowed (-)</para></entry>
                 </row>
                 <row>
                   <entry align="center" morerows="2" valign="middle"><para>Entity B</para></entry>
-                  <entry><para>Required (+)</para>                    <para></para>
-</entry>
+                  <entry><para>Required (+)</para> </entry>
                   <entry><para>+</para></entry>
                   <entry><para>+</para></entry>
                   <entry><para>Error</para></entry>
@@ -472,116 +446,56 @@
       <para>Within descriptor, the tag &lt;security&gt; is used to specify the policy
  for the deployed application. It will be the policy for all Nodes and active that will be
  created.</para>
-      <para></para>
+      
       <para>the descriptor is:</para>
-      <para></para>
+      
       <screen>
  1:&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-
-
- 2:&lt;ProActiveDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; 
-
-
- xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;
-
-
- 3:
- 
-&lt;security file=&quot;../../descriptors/applicationPolicy.xml&quot;&gt;&lt;/security&gt;
-
-
+ 2:&lt;ProActiveDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;  xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;
+ 3: &lt;security file=&quot;../../descriptors/applicationPolicy.xml&quot;&gt;&lt;/security&gt;
  4: &lt;componentDefinition&gt;
-
-
  5: &lt;virtualNodesDefinition&gt;
-
-
  6: &lt;virtualNode name=&quot;
 Locale
 &quot; property=&quot;unique&quot;/&gt;
-
-
  7: &lt;virtualNode name=&quot;
 vm1
 &quot; property=&quot;unique&quot;/&gt;
-
-
  8: &lt;virtualNode name=&quot;
 vm2
 &quot; property=&quot;unique&quot;/&gt;
-
-
  9: &lt;/virtualNodesDefinition&gt;
-
-
  10: &lt;/componentDefinition&gt;
-
-
  11: ....
-
-
- 
-
-
  50:&lt;infrastructure&gt;
-
-
  51: &lt;processes&gt; 
-
-
  52: &lt;processDefinition id=&quot;linuxJVM&quot;&gt;
-
-
  53: &lt;jvmProcess class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;&gt;
-
-
  54: &lt;classpath&gt;
-
-
  ....
-
-
  74: &lt;/classpath&gt;
-
-
  75: &lt;jvmParameters&gt;
-
-
- 
- 
- 
- 
-&lt;parameter value=&quot;-Dproactive.runtime.security=/.../descriptors/jvm1-sec.xml&quot; \
+ &lt;parameter value=&quot;-Dproactive.runtime.security=/.../descriptors/jvm1-sec.xml&quot; \
 /&gt;
-
-
  82: &lt;/jvmParameters&gt;
-
-
  83: &lt;/jvmProcess&gt;
-
-
  84: &lt;/processDefinition&gt;
-
-
  ....
-
-
       </screen>
       <para>Inside the policy file, you can express policy between entities (domain, runtime, node, active
  object).</para>
       <para>
  The entity tag can be used to :</para>
-      <para></para>
+      
       <itemizedlist>
         <listitem>
           <para> express policies on entities described inside the descriptor (lines 13, 15)</para>
-          <para></para>
+          
         </listitem>
         <listitem>
           <para> express policies on existing entities by specifying theirs certificates (line
  32).</para>
-          <para></para>
+          
         </listitem>
 </itemizedlist>
       <sect2 remap="h3">
@@ -589,20 +503,15 @@ vm2
         <para>A policy file must begin with :</para>
         <screen>
  1:&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-
-
  2:&lt;Policy&gt;
         </screen>
         <para>next, application specific informations are given.</para>
         <screen>
  3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;
         </screen>
-        <para>&lt;ApplicationName&gt; sets the application name. This allows to identify easily which
- application an entity belongs to.</para>
+        <para>&lt;ApplicationName&gt; sets the application name. This allows to identify easily which application an entity belongs to.</para>
         <screen>
  4: &lt;Certificate&gt;/.../appli.cert&lt;/Certificate&gt;
-
-
  5: &lt;PrivateKey&gt;/.../appli.key&lt;/PrivateKey&gt;
         </screen>
         <para>&lt;Certificate&gt; is the X509 certificate of the application, generated from a user
@@ -610,16 +519,8 @@ vm2
         <para>&lt;PrivateKey&gt; the private key associated to the certificate.</para>
         <screen>
   6: &lt;CertificationAuthority&gt;
-
-
  7: &lt;Certificate&gt;/.../ca.cert&lt;/Certificate&gt;
-
-
  8: &lt;/CertificationAuthority&gt;
-
-
-
-
         </screen>
         <para>&lt;CertificationAuthority&gt; contains all trusted certificate authority. Each
  &lt;Certificate&gt; contains a certification authority certificate.</para>
@@ -635,11 +536,7 @@ vm2
  specify many entities in order to match a specific fine-grained policy.</para>
         <screen>
  12: &lt;From&gt;
-
-
  13: &lt;Entity type=&quot;VN&quot; name=&quot;vm2&quot;/&gt;
-
-
  14: &lt;/From&gt;
         </screen>
         <para>&lt;Entity&gt; is used to define an entity. the &quot;type&quot; parameter can be
@@ -652,7 +549,7 @@ vm2
           <listitem>
             <para> &quot;DefaultVirtualNode&quot; is a special tag. It allows to specify a default
  policy.</para>
-            <para></para>
+            
           </listitem>
           <listitem>
             <para> &quot;certificate&quot; supposes that a path to a file is set inside the &quot;name&quot;
@@ -663,11 +560,7 @@ vm2
  entities can be specified.</para>
         <screen>
  15: &lt;To&gt;
-
-
  16: &lt;Entity type=&quot;VN&quot; name=&quot;Locale&quot;/&gt;
-
-
  17: &lt;/To&gt;
         </screen>
         <para>The &lt;Communication&gt; tag defines security policies to apply to requests and replies.</para>
@@ -688,26 +581,16 @@ vm2
  or denied.</para>
         <screen>
   19: &lt;Request value=&quot;authorized&quot;&gt;
-
-
   20:   &lt;Attributes authentication=&quot;required&quot; integrity=&quot;optional&quot; confidentiali\
 ty=&quot;optional&quot;/&gt; 
-
-
   21: &lt;/Request&gt;
         </screen>
         <para>&lt;Reply&gt; tag has the same parameters that &lt;Request&gt;</para>
         <screen>
  22:&lt;Reply value=&quot;authorized&quot;&gt;
-
-
  23: &lt;Attributes authentication=&quot;required&quot; integrity=&quot;required&quot; confidentiality=&quot;\
 required&quot;/&gt;
-
-
  24:&lt;/Reply&gt;
-
-
  25:&lt;/Communication&gt;
         </screen>
         <para>&lt;Migration&gt; allows or not migration from &lt;from&gt; entities to &lt;To&gt; entities.
@@ -724,277 +607,122 @@ required&quot;/&gt;
         </screen>
         <screen>
  1:&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-
-
  2:&lt;Policy&gt;
-
-
  3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;
-
-
  4: &lt;Certificate&gt;/net/home/acontes/certif/appli.cert&lt;/Certificate&gt;
-
-
  5: &lt;PrivateKey&gt;/net/home/acontes/certif/appli.key&lt;/PrivateKey&gt;
-
-
  6: &lt;CertificationAuthority&gt;
-
-
  7: &lt;Certificate&gt;&lt;/Certificate&gt;
-
-
  8: &lt;/CertificationAuthority&gt;
-
-
  
-
-
  10: &lt;Rules&gt;
-
-
  11: &lt;Rule&gt;
-
-
  12: &lt;From&gt;
-
-
  13: &lt;Entity type=&quot;VN&quot; name=&quot;vm2&quot;/&gt;
-
-
  14: &lt;/From&gt;
-
-
  15: &lt;To&gt;
-
-
  16: &lt;Entity type=&quot;VN&quot; name=&quot;Locale&quot;/&gt;
-
-
  17: &lt;/To&gt;
-
-
  18: &lt;Communication&gt;
-
-
  19: &lt;Request value=&quot;authorized&quot;&gt;
-
-
  20: &lt;Attributes authentication=&quot;required&quot; integrity=&quot;required&quot; confidentiality=&quot;\
 required&quot;/&gt;
-
-
  21: &lt;/Request&gt;
-
-
  22: &lt;Reply value=&quot;authorized&quot;&gt;
-
-
  23: &lt;Attributes authentication=&quot;required&quot; integrity=&quot;required&quot; confidentiality=&quot;\
 required&quot;/&gt;
-
-
  24: &lt;/Reply&gt;
-
-
  25: &lt;/Communication&gt;
-
-
  26: &lt;Migration&gt;denied&lt;/Migration&gt;
-
-
  27: &lt;OACreation&gt;denied&lt;/OACreation&gt;
-
-
  28:
-
-
  29: &lt;/Rule&gt;
-
-
  30: &lt;Rule&gt;
-
-
  31: &lt;From&gt;
-
-
  32: &lt;Entity type=&quot;certificate&quot; name=&quot;certificateRuntime1.cert&quot;/&gt;
-
-
  33: &lt;/From&gt;
-
-
  34: &lt;To&gt;
-
-
  35: &lt;Entity type=&quot;VN&quot; name=&quot;Locale&quot;/&gt;
-
-
  36: &lt;/To&gt;
-
-
  37: &lt;Communication&gt;
-
-
  38: &lt;Request value=&quot;authorized&quot;&gt;
-
-
  39: &lt;Attributes authentication=&quot;required&quot; integrity=&quot;required&quot; confidentiality=&quot;\
 required&quot;/&gt;
-
-
  40: &lt;/Request&gt;
-
-
  41: &lt;Reply value=&quot;authorized&quot;&gt;
-
-
  42: &lt;Attributes authentication=&quot;required&quot; integrity=&quot;required&quot; confidentiality=&quot;\
 required&quot;/&gt;
-
-
  43: &lt;/Reply&gt;
-
-
  44: &lt;/Communication&gt;
-
-
  45: &lt;Migration&gt;denied&lt;/Migration&gt;
-
-
  46: &lt;OACreation&gt;denied&lt;/OACreation&gt;
-
-
  47:
-
-
  48: &lt;/Rule&gt;
-
-
  ...
-
-
  90: &lt;Rule&gt;
-
-
  91: &lt;From&gt;
-
-
  92: &lt;Entity type=&quot;DefaultVirtualNode&quot; name=&quot;*&quot;/&gt;
-
-
  93: &lt;/From&gt;
-
-
  94: &lt;To&gt;
-
-
  95: &lt;Entity type=&quot;DefaultVirtualNode&quot; name=&quot;*&quot;/&gt;
-
-
  96: &lt;/To&gt;
-
-
  97: &lt;Communication&gt;
-
-
  98: &lt;Request value=&quot;denied&quot;&gt;
-
-
  99: &lt;Attributes authentication=&quot;optional&quot; integrity=&quot;optional&quot; confidentiality=&quot;\
 optional&quot;/&gt;
-
-
  100: &lt;/Request&gt;
-
-
  101: &lt;Reply value=&quot;denied&quot;&gt;
-
-
  102: &lt;Attributes authentication=&quot;optional&quot; integrity=&quot;optional&quot; confidentiality\
 =&quot;optional&quot;/&gt;
-
-
  103:
-
-
  104: &lt;/Reply&gt;
-
-
  105: &lt;/Communication&gt;
-
-
  106: &lt;Migration&gt;denied&lt;/Migration&gt;
-
-
  107: &lt;OACreation&gt;authorized&lt;/OACreation&gt;
-
-
  108:
-
-
  109: &lt;/Rule&gt;
-
-
  110:
-
-
  111: &lt;/Rules&gt;
-
-
  112:&lt;/Policy&gt;
-
-
         </screen>
         <para>Note that the JVM that reads the deployment descriptor should be started with security policy.
  In order to start a secure JVM, you need to use the property proactive.runtime.security and give
  a path a security file descriptor.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>Here an example : java -Dproactive.runtime.security=jvmlocal.xml TestSecureDeployment
  secureDeployment.xml</para>
-        <para></para>
-        <para></para>
+        
+        
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Security_html_certificate"/>How to quickly generate certificate
- ?
-      </title>
+      <title><anchor id="dbdoclet.id.Security_html_certificate"/>How to quickly generate certificate  ?  </title>
       <para>A GUI has been created to facilitate certificate generation.</para>
       <para>
- The first screenshot presents a root certificate. Notice that the certificate chain table is
- empty.</para>
+ The first screenshot presents a root certificate. Notice that the certificate chain table is empty.</para>
       <para> 
         <informalfigure>
           <mediaobject>
-            <imageobject>
-              <imagedata fileref="doc-files/security_images/gui-oasis.jpg" format="JPG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/security_images/gui-oasis.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/security_images/gui-oasis.png" format="PNG"/>            </imageobject>
+             <imageobject>
+              <imagedata width="6in" fileref="doc-files/security_images/gui-oasis.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
-      <para></para>
-      <para></para>
+      
+      
       <para>The second screenshot presents a certificate generated from the previous one using menu entry
  &quot;Certificate -&gt; generate a sub-certificate&quot;.</para>
       <para>
  Notice that the certification table contains one entry and Distinguished Name of the Entity ID 1
  is the same as the subject DN of the certificate</para>
-      <para></para>
-      <para></para>
+      
+      
       <para> 
         <informalfigure>
           <mediaobject>
-            <imageobject>
-              <imagedata fileref="doc-files/security_images/gui-proactive.jpg" format="JPG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/security_images/gui-proactive.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/security_images/gui-proactive.png" format="PNG"/>            </imageobject>
+             <imageobject>
+              <imagedata width="6in" fileref="doc-files/security_images/gui-proactive.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

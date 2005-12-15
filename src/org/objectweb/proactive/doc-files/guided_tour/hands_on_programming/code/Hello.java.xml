@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/Hello.java.html  -->
   
-
     <para>
       <screen>
 <emphasis role="bold">import org.objectweb.proactive.ProActive;</emphasis>
-
-
 <emphasis role="bold">public</emphasis> 
 <emphasis role="bold">class</emphasis> 
 Hello
@@ -19,7 +15,6 @@ String
  
 name
 ;
-
     
 <emphasis role="bold">private</emphasis> 
 String
@@ -30,7 +25,6 @@ hi
  
 &quot;Hello world&quot;
 ;
-
     
 <emphasis role="bold">private</emphasis> 
 java
@@ -53,8 +47,6 @@ SimpleDateFormat
             
 &quot;dd/MM/yyyy HH:mm:ss&quot;
 <emphasis role="bold">)</emphasis>;
-
-
     
 <emphasis role="bold">public</emphasis> 
 Hello
@@ -62,7 +54,6 @@ Hello
 <emphasis role="bold">{</emphasis>
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis role="bold">public</emphasis> 
 Hello
@@ -79,10 +70,8 @@ name
  
 name
 ;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis role="bold">public</emphasis> 
 String
@@ -111,7 +100,6 @@ util
 Date
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis> 
 +
-
         
 &quot; from node : &quot;
  
@@ -123,10 +111,8 @@ getBodyOnThis
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>.
 getNodeURL
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis role="bold">public</emphasis> 
 <emphasis role="bold">static</emphasis> 
@@ -139,13 +125,11 @@ args
 <emphasis role="bold">{</emphasis>
         
 // Registers it with an URL
-
         
 <emphasis role="bold">try</emphasis> 
 <emphasis role="bold">{</emphasis>
             
 // Creates an active instance of class HelloServer on the local node
-
             
 Hello
  
@@ -177,7 +161,6 @@ Object
 &quot;remote&quot;
  
 <emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
-
             
 java
 .
@@ -197,7 +180,6 @@ InetAddress
 .
 getLocalHost
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
             
 org
 .
@@ -223,7 +205,6 @@ getHostName
  
 &quot;/Hello&quot;
 <emphasis role="bold">)</emphasis>;
-
         
 <emphasis role="bold">}</emphasis> 
 <emphasis role="bold">catch</emphasis> 
@@ -246,19 +227,16 @@ e
 .
 getMessage
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis>;
-
             
 e
 .
 printStackTrace
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
         
 <emphasis role="bold">}</emphasis>
     
 <emphasis role="bold">}</emphasis>
 <emphasis role="bold">}</emphasis>
-
       </screen>
 </para>
   

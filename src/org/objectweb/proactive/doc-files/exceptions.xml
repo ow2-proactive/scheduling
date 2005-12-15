@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Exception Handling</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/exceptions.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.exceptions_html_presentation"/>Exceptions and Asynchrony</title>
       <para>In the asynchronous environment provided by ProActive, exceptions cannot be
@@ -92,9 +90,7 @@ t can throw an exception
         <screen>
 $ ProActive/scripts/unix/trywithcatch.sh MyClass.java # A backup will be ma\
 de in MyClass.java~
-
 --- ProActive TryWithCatch annotator -----------------------
-
 $ diff -u MyClass.java~ MyClass.java
 --- MyClass.java~
 +++ MyClass.java
@@ -179,10 +175,8 @@ ProActive.addNFEListenerOnAO(myAO,
 <emphasis role="bold">public boolean</emphasis> handleNFE(NonFunctionalException nfe) {
         
 // Do something with the exception...
-
         
 // Return true if we were able to handle it
-
         
 <emphasis role="bold">return true</emphasis>;
     }
@@ -221,10 +215,8 @@ ProActive.addNFEListenerOnJVM(
 <emphasis role="bold">public boolean</emphasis> handleNFE(NonFunctionalException e) {
         
 // Do something with the SendRequestCommunicationException...
-
         
 // Return true if we were able to handle it
-
         
 <emphasis role="bold">return true</emphasis>;
     }

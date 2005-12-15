@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ReferenceCard.html  -->
   
-
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -179,27 +177,18 @@
                 <screen>
 A a = (A) ProActive.newActive(&quot;A&quot;, params, node);
    // Create an active Object of type A in the JVM specified by Node
-
 a.foo (param); 
    // A one way typed asynchronous communication towards the (remote) AO a
-
    // A request is sent to a,
-
 v = a.bar (param);
    // A typed asynchronous communication with result.
-
    // v is first an awaited Future, to be transparently filled up after
-
    // service of the request, and reply
-
 ...
 v.gee (param);
    // Use of the result of an asynchronous call.
-
    // If v is still an awaited future, it triggers an automatic 
-
    // wait: Wait-by-necessity
-
                 </screen>
 </para></entry>
           </row>
@@ -221,21 +210,14 @@ v.gee (param);
                 <screen>
 <emphasis role="bold">boolean </emphasis>isAwaited(Object);
    // Returns True if the object is still an awaited Future
-
 <emphasis role="bold">void </emphasis> waitFor(Object);
    // Blocks until the object is no longer awaited
-
    // A request is sent to a,
-
 <emphasis role="bold">void </emphasis> waitForAll(Vector);
    // Blocks until all the objects in Vector are no longer awaited
-
 <emphasis role="bold">int </emphasis>waitForAny(Vector);
    // Blocks until one of the objects in Vector is no longer awaited.
-
    // Returns the index of the available future.
-
-
                 </screen>
 </para></entry>
           </row>
@@ -275,14 +257,12 @@ while ( terminate ) {
       }
     }
 }
-
               </literal><para>Two other interfaces can also be specified:</para><literal>
 <emphasis role="bold">Interface </emphasis>InitActive
 <emphasis role="bold">void </emphasis> initActivity(Body body)
    // Initializes the activity of the active object.
    // not called in case of restart after migration
    // Called before runActivity() method, and only once:
-
 <emphasis role="bold">Interface </emphasis>EndActive
 <emphasis role="bold">void </emphasis> endActivity(Body body)
    // Finalizes the active object after the activity stops by itself.
@@ -307,9 +287,7 @@ while ( terminate ) {
             <entry><para> Even when an AO is busy doing its own work, it can remain reactive
  to external events (method calls). One just has to program non-blocking services to take
  into account external inputs.</para><literal>
-
 <emphasis role="bold">public class </emphasis> BusyButReactive  <emphasis role="bold">implements</emphasis>  RunActive {
-
 <emphasis role="bold">public void </emphasis> runActivity(Body body) {
 Service service = new Service(body);
 while ( ! hasToTerminate ) {
@@ -350,7 +328,6 @@ while ( ! hasToTerminate ) {
    // Serves the oldest request aimed at a method of name methodName
 <emphasis role="bold">void </emphasis>serveOldest(RequestFilter requestFilter)
    // Serves the oldest request matching the criteria given be the filter
-
               </literal><para><emphasis role="bold">Blocking services:</emphasis> waits until a matching request can be
  served</para><literal>
 <emphasis role="bold">void </emphasis>blockingServeOldest();
@@ -386,7 +363,6 @@ while ( ! hasToTerminate ) {
    // Serves the youngest request in the request queue
 <emphasis role="bold">void </emphasis> flushAll()
    // Removes all requests in the pending queue
-
               </literal></entry>
           </row>
         </tbody>
@@ -409,20 +385,14 @@ Object newActive(String classname, Object[] constructorParameters,Node node\
 );
    // Creates a new AO of type classname. The AO is located on the given no\
 de,
-
    // or on a default node in the local JVM if the given node is nul
-
 Object newActive(String classname,Object[] constructorParameters,VirtualNod\
 e virtualnode);
    // Creates a new set of AO of type classname.
-
    // The AO are located on each JVMs the Virtual Node is mapped onto
-
 Object turnActive(Object, Node node);
    // Copy an existing Java object and turns it into an AO.
-
    // The AO is located on the given node, or on a default node in 
-
                 </screen>
 </para></entry>
           </row>
@@ -447,56 +417,36 @@ A ga = (A) ProActiveGroup.newGroup( &quot;A&quot;, params, nodes);
    // by nodes. ga is a Typed Group of type &quot;A&quot;. 
    // The number of AO being created matches the number of param arrays.
    // Nodes can be a Virtual Node defined in an XML descriptor */
-
-
 ga.foo(...);
    // A general group communication without result.
    // A request to foo is sent in parallel to AO in group ga  */
-
-
 V gv = ga.bar(...);
    // A general group communication with a result.
    // gv is a typed group of &quot;V&quot;, which is first a group
    // of awaited Futures, to be filled up asynchronously 
-
-
 gv.gee (...);
    // Use of the result of an asynchronous group call. It is also a  
    // collective operation: gee method is called in parallel on each object\
  in group. 
    // Wait-by-necessity occurs when results are awaited */
-
-
 Group ag = ProActiveGroup.getGroup(ga);
    // Get the group representation of a typed group
-
-
 ag.add(o);
    // Add object in the group ag. o can be a standard Java object or an AO,
-
    // and in any case must be of a compatible type 
-
-
 ag.remove(index)
    // Removes the object at the specified index
-
-
 A ga2 = (A) ag.getGroupByType();
    // Returns to the typed view of a group 
-
-
 <emphasis role="bold">void </emphasis>  setScatterGroup(g);
    // By default, a group used as a parameter of a group communication
    // is sent to all as it is (deep copy of the group).
    // When set to scatter, upon a group call (ga.foo(g)) such a scatter 
    // parameter is dispatched in a round robing fashion to AOs in the
    // target group, e.g. upon ga.foo(g) */
-
 <emphasis role="bold">void </emphasis> unsetScatterGroup(g);
    // Get back to the default: entire group transmission in all group
    // communications, e.g. upon ga.foo(g) */
-
-
                 </screen>
 </para></entry>
           </row>
@@ -526,7 +476,6 @@ A ga2 = (A) ag.getGroupByType();
    // Wait for at least nb members in group to arrive
 <emphasis role="bold">int </emphasis> ProActiveGroup.waitOneAndGetIndex (Object);
    // Waits for at least one member to arrived, and returns its index
-
               </literal></entry>
           </row>
         </tbody>
@@ -548,27 +497,18 @@ A ga2 = (A) ag.getGroupByType();
 A spmdGroup  =  (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params, nodes);
    // Creates an SPMD group and creates all members with params on the node\
 s.
-
    // An SPMD group is a typed group in which every member has a reference \
 to
-
    // the others (the SPMD group itself).
-
 A mySpmdGroup = (A) ProSPMD.getSPMDGroup();
    // Returns the SPMD group of the activity.
-
 int rank = ProSPMD.getMyRank();
    // Returns the rank of the activity in its SPMD group.
-
 ProSPMD.barrier(&quot;barrierID&quot;);
    // Blocks the activity (after the end of the current service) until all
-
    // other members of the SPMD group invoke the same barrier. 
-
    // Three barriers are available : total barrier, neighbors based barrier
-
    // and method based barrier. 
-
                 </screen>
 </para></entry>
           </row>
@@ -653,8 +593,6 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
    // This method is used in primitive components.
    // It generates a client collective interface named itfName, and typed as itfSignature.
    // This collective interface is a typed ProActive group.
-
-
               </literal></entry>
           </row>
         </tbody>
@@ -816,29 +754,22 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
 ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String File);
    // Returns a ProActiveDescriptor object from the xml
    // descriptor file name 
-
 pad.activateMapping(String VN);
    // Activates the given Virtual Node: launches or acquires 
    // all the JVMs the VN is mapped onto 
-
 pad.activateMappings();
    // Activates all VNs defined in the ProActiveDescriptor 
-
 VirtualNode vn = pad.getVirtualNode(String)
    // Created at once a group of AO of type &quot;A&quot; in the JVMs specified
    // by the given vn. The Virtual Node is automatically activated if not
    // explicitly done before 
-
 Node[] n = vn.getNodes();
    // Returns all nodes mapped to the target Virtual Node
-
 Object[] n[0].getActiveObjects();
    // Returns a reference to all AOs deployed on the target Node
-
 ProActiveRuntime part = n[0].getProActiveRuntime();
    // Returns a reference to the ProActive Runtime (the JVM) where the 
    // node has been created 
-
 pad.killall(boolean softly);
    // Kills all the JVMs deployed with the descriptor
    // not softly: all JVMs are killed abruptely
@@ -928,13 +859,10 @@ ProActive.addNFEListenerOnJVM(<emphasis role="bold">new</emphasis> TypedNFEListe
 <literal>
 A a = (A) ProActive.newActive(&quot;A&quot;, new Object []{});
    // Constructs an active object 
-
 String [] methods = new String [] {&quot;foo&quot;, &quot;bar&quot;};
  //A String array containing the exported methods 
-
 ProActive.exposeAsWebService(a,&quot;http://localhost:8080&quot;,&quot;a&quot;,methods);
  //Export the active object as a web service 
-
 ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;); 
  //Undeploy the service &quot;a&quot; on the web server located at http://localhost:8080 
               </literal></entry>
@@ -1120,24 +1048,19 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
   <emphasis role="bold">public</emphasis> Result execute() {
     // Your code here for computing a solution
   }
-
   <emphasis role="bold">public</emphasis> Vector split() {
     // Your code for generating sub-tasks
   }
-
   <emphasis role="bold">public Result</emphasis> gather(Result[] results) {
         // Override optional
         // Default behavior based on the smallest gave by the compareTo
   }
-
   <emphasis role="bold">public void</emphasis> initLowerBound() {
         // Your code here for computing a lower bound
   }
-
   <emphasis role="bold">public void</emphasis> initUpperBound() {
     // Your code here for computing a lower bound
   }
-
   <emphasis role="bold">public int</emphasis> compareTo(Object arg) {
         // Strongly recommended to override this method
         // with your behavior
@@ -1149,16 +1072,12 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
                   <screen>
 <emphasis role="bold">protected</emphasis> Result initLowerBound; 
 // to store your lower bound
-
 <emphasis role="bold">protected</emphasis> Result initUpperBound; 
 // to store you upper bound
-
 <emphasis role="bold">protected</emphasis> Object bestKnownSolution; 
 // set by the framework with the best current solution
-
 <emphasis role="bold">protected</emphasis> Worker worker; 
 // to interact with the framework (see below)
-
                   </screen>
                 </listitem>
                 <listitem>
@@ -1166,14 +1085,11 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
                   <screen>
 <emphasis role="bold">this</emphasis>.worker.setBestCurrentResult(newBestSolution); 
 // the worker will broadcast the solution in all Tasks
-
 <emphasis role="bold">this</emphasis>.worker.sendSubTasksToTheManager(subTaskList); 
 // send a set of sub-tasks for computation to the framework
-
 BooleanWrapper workersAvailable = 
 <emphasis role="bold">this</emphasis>.worker.isHungry(); 
 // for a smart split, check for free workers
-
                   </screen>
                 </listitem>
 </itemizedlist>
@@ -1190,11 +1106,9 @@ BooleanWrapper workersAvailable =
 </itemizedlist>
 <para>Finally, start the compution:</para><literal>
 Task task = <emphasis role="bold">new</emphasis> YourTask(someArguments);
-
 Manager manager =  ProActiveBranchNBound.newBnB(task,
                         nodes,
                         LargerQueueImpl.class.getName());
-
 Result futureResult = manager.start(); // this call is asynchronous
 ...
               </literal><para>Keep in mind that is only &quot;initLower/UpperBound&quot; and
@@ -1241,8 +1155,6 @@ Result ri = splitted.execute();
           <row>
             <entry><para>
                 <screen>
-
-
  File Transfer Deployment is a tool for transfering files at deployment tim\
 e. This files are specified using the ProActive XML Deployment Descriptor i\
 n the following way:
@@ -1273,7 +1185,6 @@ n the following way:
 <emphasis role="bold">FileTransferDeploy</emphasis>=&quot;
 <emphasis role="bold">implicit</emphasis>&quot;&gt; 
 &lt;!-- referenceID or keyword &quot;implicit&quot; (inherit)--&gt;
-
       &lt;
 <emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, scp, rcp&lt;/
 <emphasis role="bold">copyProtocol</emphasis>&gt;

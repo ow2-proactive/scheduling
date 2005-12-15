@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive guided tour</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/index.html  -->
   
-
     <para> This tour is a practical introduction to ProActive, giving an illustrated introduction to some
  of the functionnalities and facilities offered by the library.</para>
     <para>First off, we give an explaination on how to install and configure ProActive. Next are

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Architecture Description Language</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/adl.html  -->
   
-
     <para> <anchor id="dbdoclet.id.adl_html_adl"/></para>
     <para>The Architecture Description Language (ADL) is used to configure and deploy
  component systems. The architecture of the system is described in a normalized XML file.</para>
@@ -115,38 +113,16 @@ virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;
  virtual nodes VN1 and VN2:</para>
       <screen>
 exportedVirtualNodes
-
-
  exportedVirtualNode name=&quot;VN1&quot;
-
-
   composedFrom
-
-
    composingVirtualNode component=&quot;client&quot; name=&quot;client-node&quot;
-
-
   /composedFrom
-
-
  /exportedVirtualNode
-
-
  exportedVirtualNode name=&quot;VN2&quot;
-
-
   composedFrom
-
-
    composingVirtualNode component=&quot;server&quot; name=&quot;server-node&quot;/
-
-
   /composedFrom
-
-
  /exportedVirtualNode
-
-
 /exportedVirtualNodes
       </screen>
       <para>VN1 is composed of the exported virtual node &quot;client-node&quot; from the component named
@@ -155,29 +131,13 @@ exportedVirtualNodes
  an exportation of a virtual node which is also name &quot;client-node&quot; :</para>
       <screen>
 exportedVirtualNodes
-
-
  exportedVirtualNode name=&quot;client-node&quot;
-
-
    composedFrom
-
-
      composingVirtualNode component=&quot;this&quot; name=&quot;client-node&quot;/
-
-
    /composedFrom
-
-
  /exportedVirtualNode
-
-
 /exportedVirtualNodes
-
-
 ...
-
-
 virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;/
       </screen>
       <para>Although this is a simplistic example, one should foresee a situation where ClientImpl would
@@ -187,26 +147,12 @@ virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;/
  (helloworld-distributed-wrappers.fractal) :</para>
       <screen>
 exportedVirtualNodes
-
-
  exportedVirtualNode name=&quot;VN1&quot;
-
-
   composedFrom
-
-
    composingVirtualNode component=&quot;client&quot; name=&quot;client-node&quot;
-
-
    composingVirtualNode component=&quot;server&quot; name=&quot;server-node&quot;/
-
-
   /composedFrom
-
-
  /exportedVirtualNode
-
-
 /exportedVirtualNodes
       </screen>
       <para>As a result, the client and server component will be colocated / deployed on the same virtual
@@ -228,10 +174,6 @@ Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descrip
  the name of its Runnable interface, if it has one, and &lt;deployment-descriptor&gt; the location
  of the ProActive deployment descriptor to use. It is also possible to use this class directly
  from its static main method.</para>
-      <para>&#160;</para>
-      <para></para>
-      <para>
- Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
     </sect1>
   
 </chapter>

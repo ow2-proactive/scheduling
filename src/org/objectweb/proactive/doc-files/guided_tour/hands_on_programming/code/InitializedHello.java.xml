@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/InitializedHello.java.html  -->
   
-
     <para>
       <screen>
 <emphasis role="bold">package org.objectweb.proactive.examples.hello;</emphasis>
-
-
 <emphasis role="bold">import org.objectweb.proactive.Body;</emphasis>
 <emphasis role="bold">import org.objectweb.proactive.EndActive;</emphasis>
 <emphasis role="bold">import org.objectweb.proactive.InitActive;</emphasis>
 <emphasis role="bold">import org.objectweb.proactive.ProActive;</emphasis>
-
-
 <emphasis role="bold">public</emphasis> 
 <emphasis role="bold">class</emphasis> 
 InitializedHello
@@ -27,7 +21,6 @@ InitActive
 EndActive
  
 <emphasis role="bold">{</emphasis>
-
     
 <emphasis>/**
      * Constructor for InitializedHello.
@@ -39,7 +32,6 @@ InitializedHello
 <emphasis role="bold">{</emphasis>
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/**
      * Constructor for InitializedHello.
@@ -56,10 +48,8 @@ name
         
 <emphasis role="bold">super</emphasis><emphasis role="bold">(</emphasis>name
 <emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/**
      * @see org.objectweb.proactive.InitActive#initActivity(Body)
@@ -83,10 +73,8 @@ out
 println
 <emphasis role="bold">(</emphasis>&quot;I am about to start my activity&quot;
 <emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/**
      * @see org.objectweb.proactive.EndActive#endActivity(Body)
@@ -110,10 +98,8 @@ out
 println
 <emphasis role="bold">(</emphasis>&quot;I have finished my activity&quot;
 <emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/**
      * this method will end the activity of the active object
@@ -126,10 +112,8 @@ terminate
 <emphasis role="bold">{</emphasis>
         
 // the termination of the activity is done through a call on the
-
         
 // terminate method of the body associated to the current active object
-
         
 ProActive
 .
@@ -137,10 +121,8 @@ getBodyOnThis
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>.
 terminate
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis role="bold">public</emphasis> 
 <emphasis role="bold">static</emphasis> 
@@ -153,13 +135,11 @@ args
 <emphasis role="bold">{</emphasis>
         
 // Registers it with an URL
-
         
 <emphasis role="bold">try</emphasis> 
 <emphasis role="bold">{</emphasis>
             
 // Creates an active instance of class HelloServer on the local node
-
             
 InitializedHello
  
@@ -191,7 +171,6 @@ Object
 &quot;remote&quot;
  
 <emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
-
             
 java
 .
@@ -211,7 +190,6 @@ InetAddress
 .
 getLocalHost
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
             
 org
 .
@@ -237,7 +215,6 @@ getHostName
  
 &quot;/Hello&quot;
 <emphasis role="bold">)</emphasis>;
-
         
 <emphasis role="bold">}</emphasis> 
 <emphasis role="bold">catch</emphasis> 
@@ -260,19 +237,16 @@ e
 .
 getMessage
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis><emphasis role="bold">)</emphasis>;
-
             
 e
 .
 printStackTrace
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
         
 <emphasis role="bold">}</emphasis>
     
 <emphasis role="bold">}</emphasis>
 <emphasis role="bold">}</emphasis>
-
       </screen>
 </para>
   

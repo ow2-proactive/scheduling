@@ -1,95 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive Peer-to-Peer Infrastructure</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/p2p.html  -->
   
-
-    <para> <anchor id="dbdoclet.id.mozTocId874379"/></para>
-    <para>The outline of this short handbook:</para>
-    <orderedlist>
-      <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId121981">Overview</link></para>
-      </listitem>
-      <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId1224">The P2P Infrastructure Model</link>          <orderedlist>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId356736">What is Peer-to-Peer?</link></para>
-            </listitem>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId928306">The P2P Infrastructure in short</link>                <orderedlist>
-                  <listitem>
-                    <para><link linkend="dbdoclet.id.mozTocId101413">Bootstrapping: First Contact</link></para>
-                  </listitem>
-                  <listitem>
-                    <para><link linkend="dbdoclet.id.mozTocId470123">Discovering and Self-Organizing in Continue</link></para>
-                  </listitem>
-                  <listitem>
-                    <para><link linkend="dbdoclet.id.mozTocId299524">Asking Computational Nodes</link></para>
-                  </listitem>
-</orderedlist>
-</para>
-            </listitem>
-</orderedlist>
-</para>
-      </listitem>
-      <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId197757">The P2P Infrastructure Implementation</link>          <orderedlist>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId467214">Peers Implementation</link></para>
-            </listitem>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId587594">Dynamic Shared ProActive Group</link></para>
-            </listitem>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId690451">Sharing Node Mechanism</link></para>
-            </listitem>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId586812">IC2D Screen shot</link></para>
-            </listitem>
-</orderedlist>
-</para>
-      </listitem>
-      <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId325247">Installing and Using the P2P Infrastructure</link>          <orderedlist>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId765069">Create your P2P Network</link>                <orderedlist>
-                  <listitem>
-                    <para><link linkend="dbdoclet.id.mozTocId117139">Quick Start Peer</link></para>
-                  </listitem>
-                  <listitem>
-                    <para><link linkend="dbdoclet.id.mozTocId979491">Usage Example</link></para>
-                  </listitem>
-                  <listitem>
-                    <para><link linkend="dbdoclet.id.mozTocId690540">The P2P Daemon</link>                      <orderedlist>
-                        <listitem>
-                          <para><link linkend="dbdoclet.id.mozTocId895651">Installation</link></para>
-                        </listitem>
-                        <listitem>
-                          <para><link linkend="dbdoclet.id.mozTocId799743">Configuration</link></para>
-                        </listitem>
-                        <listitem>
-                          <para><link linkend="dbdoclet.id.mozTocId994982">Control</link></para>
-                        </listitem>
-</orderedlist>
-</para>
-                  </listitem>
-</orderedlist>
-</para>
-            </listitem>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId315155">Acquiring Nodes by ProActive XML Deployment
- Descriptors</link></para>
-            </listitem>
-            <listitem>
-              <para><link linkend="dbdoclet.id.mozTocId294040">The P2P Infrastructure API</link></para>
-            </listitem>
-</orderedlist>
-</para>
-      </listitem>
-      <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId789872">Future Work</link></para>
-      </listitem>
-</orderedlist>
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.mozTocId121981"/>Overview</title>
       <para>Computational Peer-To-Peer (P2P) is becoming a key execution environment. The potential of
@@ -108,11 +20,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/p2p_files/overlaynetwork.jpg" format="JPG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/p2p_files/overlaynetwork.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/p2p_files/overlaynetwork.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/p2p_files/overlaynetwork.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
  <emphasis role="bold">Example of a ProActive P2P infrastructure.</emphasis></para>
@@ -135,7 +43,7 @@
  This infrastructure is completely self-organized and fully configurable.</para>
       <para>Before going on to consider the P2P infrastructure, it&#39;s important to define what
  Peer-to-Peer is.</para>
-      <para></para>
+       
       <sect2 remap="h3">
         <title><anchor id="dbdoclet.id.mozTocId356736"/>What is Peer-to-Peer?</title>
         <para>There are a lot of P2P definitions, many of them are similar to other distributed
@@ -181,7 +89,7 @@
  real life , i.e. when a person wants to join a community, this person has to first know another
  person who is already a member of the community. After the first person has contacted the
  community member, the new person is introduced to all the community members.</para>
-          <para></para>
+           
           <para>The ProActive P2P bootstrapping protocol works as follows:</para>
           <itemizedlist>
             <listitem>
@@ -192,7 +100,7 @@
             <listitem>
               <para> With this list the fresh peer tries to contact each server. When a server is reached the
  server is added to ithe fresh peer&#39;s list of known peers (acquaintances).</para>
-              <para></para>
+               
             </listitem>
             <listitem>
               <para> Then the fresh peer knows some servers, it is in the P2P Network and it is no longer a
@@ -206,16 +114,12 @@
  servers as explained earlier.</para>
           <para>An example of a fresh peer which is trying to join a P2P network is shown by the next Figure.
  The new peer has 2 servers to contact in order to join the existing P2P infrastructure.</para>
-          <para></para>
+           
           <para>
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/firstContact.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/firstContact.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/firstContact.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/p2p_files/firstContact.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Example of first contact (Bootstrapping).</emphasis></para>
@@ -225,7 +129,7 @@
  Self-Organizing in Continue</title>
           <para>The main particularity of a P2P network is the peers high volatility.&#160; This results from
  various attributes which compose P2P:</para>
-          <para></para>
+           
           <itemizedlist>
             <listitem>
               <para> Peers run on different kinds of computers: desktop workstations, laptops, servers, cluster
@@ -269,7 +173,7 @@
  Acquaintances (NOA)</emphasis>. This is a minimum size of the list of acquaintances of all peers. The
  more the peers are highly dynamic, the&#160; more NOA should be high. Thereby, a peer must
  discover new acquaintances through the P2P infrastructure.</para>
-          <para></para>
+           
           <para>In the next <link linkend="dbdoclet.id.mozTocId299524">section</link>, we will see in detail how the message
  protocol works. For the moment we will just explain briefly the discovering acquaintances process
  without going into detail about the message protocol.</para>
@@ -289,7 +193,7 @@
                 <listitem>
                   <para> Forward the message to acquaintances until the message Time To Live (TTL) reaches
  0.</para>
-                  <para></para>
+                   
                 </listitem>
                 <listitem>
                   <para> Choose to be or not to be an acquaintance of the asking peer.</para>
@@ -307,7 +211,7 @@
  using a new parameter Maximum Number of Acquaintances and improving the message protocol. For the
  moment, we don&#39;t consider peers IP addresses or geographical location of the peers as an
  acquaintances criteria.</para>
-          <para></para>
+           
           <para>As the P2P infrastructure is a dynamic environment, the list of acquaintances must also be
  dynamic. Many acquaintances could be unavailable and must be removed of the list. When the size
  of the list is less than the NOA, the peer has to discover new peers. Therefore, all peers keep
@@ -320,19 +224,13 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/heartbeat.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/heartbeat.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/heartbeat.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/p2p_files/heartbeat.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Heart beat sent every TTU.</emphasis></para>
 </sect3>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId299524"/>Asking Computational
- Nodes
-          </title>
+          <title><anchor id="dbdoclet.id.mozTocId299524"/>Asking Computational Nodes </title>
           <para>The main goal of this work is to provide an infrastructure for sharing computational nodes
  (JVMs). Therefore, a resource query mechanism is needed; there are 2 types of resources in this
  context, thus 2 query types:</para>
@@ -346,7 +244,7 @@
 </itemizedlist>
           <para>The mechanism is similar to Gnutella&#39;s communication system: <emphasis role="bold">Breadth-First Search</emphasis>
  algorithm (BFS). The system is message-based with application-level routing.</para>
-          <para></para>
+           
           <para>All BFS messages must contain this information:</para>
           <itemizedlist>
             <listitem>
@@ -432,16 +330,12 @@
  protocol is not good enough but we&#39;re working to improve it. We are inquiring into solutions
  with a not fixed TTL to avoid network flooding.</para>
           <para>The next Figure shows briefly the execution of the inspired BFS algorithm:</para>
-          <para></para>
+           
           <para>
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/sendingNode.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/sendingNode.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/sendingNode.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/p2p_files/sendingNode.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Asking nodes to acquaintances and getting a node.</emphasis></para>
@@ -490,11 +384,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/p2p_files/implementation.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/implementation.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/implementation.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/p2p_files/implementation.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -539,11 +429,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/p2p_files/dynamicGroup.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/dynamicGroup.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/dynamicGroup.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/p2p_files/dynamicGroup.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
  <emphasis role="bold">Dynamic Shared ProActive Typed Group.</emphasis></para>
@@ -604,11 +490,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/p2p_files/screenshot.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/screenshot.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/screenshot.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/p2p_files/screenshot.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -755,13 +637,7 @@ host
           <para>The file <emphasis>hosts.file</emphasis>:</para>
           <screen>
  rmi://first.peer.host:2410
-
-
  rmi://third.peer.host:2602
-
-
-
-
           </screen>
           <screen>
  file.peer.host$startP2PService.sh -acq rmi -port 8989 -f hosts.file
@@ -775,11 +651,7 @@ ost:2410
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/example.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/example.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="doc-files/p2p_files/example.png" format="PNG"/>                </imageobject>
+                  <imagedata width="6in" fileref="doc-files/p2p_files/example.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Usage example P2P network (after firsts connections).</emphasis></para>
@@ -846,57 +718,29 @@ C:&gt;ProActive\scripts\windows\p2p\Service\remove.bat
  matched and the <emphasis role="bold">&lt;default&gt;</emphasis> does, so the parsing ends.</para>
             <para>The proper configuration is contained in a <emphasis role="bold">&lt;configForHost&gt;</emphasis> or <emphasis role="bold">&lt;default&gt;</emphasis> element. It consists of the scheduled times for work and the hosts where
  we register ourselves. Here is an example:</para>
-            <informaltable frame="none">
-              <tgroup cols="1">
-                <colspec colname="c1" colwidth="100*"/>
-                <tbody>
-                  <row>
-                    <entrytbl cols="1">
-                      <colspec colname="c1"/>
-                      <tbody>
-                        <row>
-                          <entry><para> &lt;periods&gt;</para>                            <para>
- &#160;&lt;period&gt;</para>
-                            <para>
+<screen>
+ &lt;periods&gt; 
+ &#160;&lt;period&gt;
  &#160; &lt;start day=&quot;monday&quot; hour=&quot;18&quot;
- minute=&quot;0&quot;/&gt;</para>
-                            <para>
+ minute=&quot;0&quot;/&gt;
  &#160; &lt;end day=&quot;tuesday&quot; hour=&quot;6&quot;
- minute=&quot;0&quot;/&gt;</para>
-                            <para>
- &#160; &lt;/period&gt;</para>
-                            <para>
- &#160; &lt;period&gt;</para>
-                            <para>
+ minute=&quot;0&quot;/&gt;
+ &#160; &lt;/period&gt;
+ &#160; &lt;period&gt;
  &#160;&#160; &lt;start day=&quot;saturday&quot; hour=&quot;0&quot;
- minute=&quot;0&quot;/&gt;</para>
-                            <para>
+ minute=&quot;0&quot;/&gt;
  &#160;&#160; &lt;end day=&quot;monday&quot; hour=&quot;6&quot;
- minute=&quot;0&quot;/&gt;</para>
-                            <para>
- &#160; &lt;/period&gt;</para>
-                            <para>
- &lt;/periods&gt;</para>
-                            <para>
- &lt;register&gt;</para>
-                            <para>
- &#160;&lt;registry url=&quot;trinidad.inria.fr&quot;/&gt;</para>
-                            <para>
- &#160;&lt;registry url=&quot;amda.inria.fr&quot;/&gt;</para>
-                            <para>
- &#160;&lt;registry url=&quot;tranquility.inria.fr&quot;/&gt;</para>
-                            <para>
- &#160;&lt;registry url=&quot;psychoquack.inria.fr&quot;/&gt;</para>
-                            <para>
- &lt;/register&gt;</para>
-</entry>
-                        </row>
-                      </tbody>
-</entrytbl>
-                  </row>
-                </tbody>
-              </tgroup>
-            </informaltable>
+ minute=&quot;0&quot;/&gt;
+ &#160; &lt;/period&gt;
+ &lt;/periods&gt;
+ &lt;register&gt;
+ &#160;&lt;registry url=&quot;trinidad.inria.fr&quot;/&gt;
+ &#160;&lt;registry url=&quot;amda.inria.fr&quot;/&gt;
+ &#160;&lt;registry url=&quot;tranquility.inria.fr&quot;/&gt;
+ &#160;&lt;registry url=&quot;psychoquack.inria.fr&quot;/&gt;
+ &lt;/register&gt;
+</screen> 
+
             <para>In this example we clearly see that the JVM will wake up Monday evening and shut down Tuesday
  morning. It will also work during the weekend. In the <emphasis role="bold">&lt;register&gt;</emphasis> part we put the URL
  in which we will register ourselves, in the example we used the short form which is equivalent to <emphasis>rmi://host:9301</emphasis>.</para>
@@ -1007,36 +851,14 @@ ProActive/p2p/build/logs/hostname
         <screen>
  ProActiveDescriptor pad = ProActive.getProactiveDescriptor(&quot;myP2PXmlDescrip\
 tor.xml&quot;);
-
-
-
-
  // getting virtual node &quot;p2pvn&quot; defined in the ProActive Deployement Descrip\
 tor
-
-
  VirtualNode vn = pad.getVirtualNode(&quot;p2pvn&quot;);
-
-
  
-
-
  // adding &quot;this&quot; or anyother class has a listener of the &quot;NodeCreationEvent&quot;
-
-
  ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
-
-
-
-
  //activate that virtual node
-
-
  vn.activate();
-
-
-
-
         </screen>
         <para>As you can see, the class executing this code must implement an interface in order to be
  notified when a new node is available from the P2P infrastructure.</para>
@@ -1046,71 +868,30 @@ tor
  new host is acquired:</para>
         <screen>
  public void nodeCreated(NodeCreationEvent event) 
-
-
  {
-
-
  // get the node
-
-
  Node newNode = event.getNode();
-
-
-
-
    // now you can create an active object on your node.
-
-
  }
-
-
  
-
-
         </screen>
         <para>You should carefully notice that you can be notified at any time, whatever the code you are
  executing, once you have activated the virtual node.</para>
         <para>A short preview of a XML descriptor:</para>
-        <informaltable frame="none">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entrytbl cols="1">
-                  <colspec colname="c1"/>
-                  <tbody>
-                    <row>
-                      <entry><para> &lt;infrastructure&gt;</para>                        <para>
- &#160;&lt;services&gt;</para>
-                        <para>
- &#160; &lt;serviceDefinition id=&quot;p2pservice&quot;&gt;</para>
-                        <para>
- &#160;&#160; &lt;P2PService nodesAsked=&quot;2&quot; acq=&quot;rmi&quot;
- port=&quot;2410&quot; NOA=&quot;10&quot; TTU=&quot;60000&quot;
- TTL=&quot;10&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160; &lt;peerSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160; &lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;</para>
-                        <para>
- &#160;&#160;&#160; &lt;/peerSet&gt;</para>
-                        <para>
- &#160;&#160; &lt;/P2PService&gt;</para>
-                        <para>
- &#160; &lt;/serviceDefinition&gt;</para>
-                        <para>
- &#160;&lt;/services&gt;</para>
-                        <para>
- &lt;/infrastructure&gt;</para>
-</entry>
-                    </row>
-                  </tbody>
-</entrytbl>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
+<screen> &lt;infrastructure&gt;                        
+  &lt;services&gt;
+   &lt;serviceDefinition id=&quot;p2pservice&quot;&gt;
+    &lt;P2PService nodesAsked=&quot;2&quot; acq=&quot;rmi&quot; 
+             port=&quot;2410&quot; NOA=&quot;10&quot; TTU=&quot;60000&quot;
+             TTL=&quot;10&quot;&gt;
+     &lt;peerSet&gt;
+      &lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;
+     &lt;/peerSet&gt;
+    &lt;/P2PService&gt;
+   &lt;/serviceDefinition&gt;
+  &lt;/services&gt;
+ &lt;/infrastructure&gt;
+</screen>
         <para>A complete example of file is available <ulink url="p2p_files/sample_p2p.xml">here</ulink>.</para>
         <para>The next figure shows a P2P Service started with a XML deployment descriptor (xml_path
  attribute). Six nodes are shared on different hosts:</para>
@@ -1118,11 +899,7 @@ tor
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/p2p_files/descriptor.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/descriptor.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/p2p_files/descriptor.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/p2p_files/descriptor.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
  <emphasis role="bold">A P2P Service which is sharing nodes deployed by a descriptor.</emphasis></para>
@@ -1135,138 +912,44 @@ tor
         <para>The next little sample of code explains how, from an application, you can start a P2P Service
  and get nodes:</para>
         <screen>
-
-
 import org.objectweb.proactive.ProActive;
-
-
 import org.objectweb.proactive.core.ProActiveException;
-
-
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-
-
 import org.objectweb.proactive.core.node.Node;
-
-
 import org.objectweb.proactive.core.node.NodeException;
-
-
 import org.objectweb.proactive.core.node.NodeFactory;
-
-
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-
-
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-
-
 import org.objectweb.proactive.p2p.core.service.P2PService;
-
-
 import org.objectweb.proactive.p2p.core.service.StartP2PService;
-
-
 import org.objectweb.proactive.p2p.core.service.node.P2PNodeLookup;
-
-
 ...
-
-
 // This constructor uses a file with address of peers
-
-
 // See the Javadoc to choose different parameters
-
-
 StartP2PService startServiceP2P = new StartP2PService(p2pFile)
-
-
-
-
 // Start the P2P Service on the local host
-
-
 startServiceP2P.start();
-
-
-
-
 // Get the reference on the P2P Service
-
-
 P2PService serviceP2P = startServiceP2P.getP2PService();
-
-
-
-
 // By the application&#39;s P2P Service ask to the P2P infrastructure
-
-
 // for getting nodes.
-
-
 P2PNodeLookup p2pNodeLookup = p2pService.getNodes(nNodes,
-
-
  virtualNodeName, JobID);
-
-
-
-
 // You can migrate the P2P node lookup from the p2p service
-
-
 // to an another node:
-
-
 p2pNodeLookup.moveTo(&quot;//localhost/localNode&quot;);
-
-
-
-
 // Use method from p2pNodeLookup to get nodes
-
-
 // such as
-
-
 while (! p2pNodeLookup.allArrived()) {
-
-
  Vector arrivedNodes = p2pNodeLookup.getAndRemoveNodes();
-
-
  // Do something with nodes
-
-
  ...
-
-
 }
-
-
-
-
 // Your application
-
-
 ...
-
-
-
-
 // End of your program
-
-
 // Free shared nodes
-
-
 p2pNodeLookup.killAllNodes();
-
-
-
-
         </screen>
       </sect2>
     </sect1>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Automatic Continuation in ProActive</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/AC.html  -->
   
-
     <sect1 remap="h2">
       <title>Automatic Continuation in ProActive</title>
       <sect2 remap="h3">
@@ -70,23 +68,16 @@
             <screen>
 class C{
 ....
-
         public static void main(String[] args){
-
         ......
-
         A a = newActive(A);
         A b = newActive(B);
-
         Result r1 = a.foo();   //r1 is a future
         Result r2 = b.bar(r1); //r1 is passed as parameter
         Result r3 = b.bar2();  // see 
 <emphasis role="bold">**</emphasis>
-
         ........
-
         }       //end of main
-
 ...
 }       //end of class C
             </screen>
@@ -97,14 +88,12 @@ class C{
           <para>
             <screen>
 class A {
-
   ...
         public Result foo(){
         ...
         }
   ...
 } //end of class A
-
 class B{
 ...
          public Result bar (Result r) {
@@ -116,9 +105,7 @@ class B{
         return a.foo();     // 
 <emphasis role="bold">**</emphasis> future is sent as a result
          }
-
 } //end of class B
-
             </screen>
 </para>
         </blockquote>
@@ -129,11 +116,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e1.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e1.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e1.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e1.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e1.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e1.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -146,11 +133,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e2.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e2.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e2.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e2.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e2.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e2.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -162,11 +149,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e3.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e3.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e3.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e3.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e3.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e3.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -179,11 +166,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e4.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e4.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e4.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e4.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e4.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e4.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -197,11 +184,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e5.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e5.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e5.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e5.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e5.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e5.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -214,11 +201,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e6.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e6.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e6.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e6.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e6.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e6.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -230,11 +217,11 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e7.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e7.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e7.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e7.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/pics/e7.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/pics/e7.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>

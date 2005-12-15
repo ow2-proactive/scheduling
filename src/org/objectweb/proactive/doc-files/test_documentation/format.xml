@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>0.3 Results</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/format.html  -->
   
-
     <para> This section describes, how to format the Results of the tests.</para>
     <sect1 remap="h2">
       <title>What is a Result ?

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>3. Hands-on programming</title>
-
+<chapter><title> Hands-on programming</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming.html  -->
   
-
     <para> Here is an introduction to programming with ProActive. It should give you a first flavor, and
  you will be able to see some more advanced examples in the section &quot;introduction to some
  functionalities of the library&quot;.</para>
@@ -35,11 +33,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/guided_tour/pics/hello/clientserver.gif" format="GIF"/>            </imageobject>
+            <!--  <imagedata fileref="doc-files/guided_tour/pics/hello/clientserver.gif" format="GIF"/>            </imageobject>
             <imageobject>
               <imagedata fileref="doc-files/guided_tour/pics/hello/clientserver.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
+            <imageobject>-->
+              <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -63,18 +61,19 @@
         <para>The InitializedHello class extends the Hello class, and implements the interfaces InitActive
  and EndActive.It acts a a server for the InitializedHelloClient class.</para>
         <para>The main method is overriden so that it can instantiate the InitializedHello class</para>
+        
         <para>
           <informalfigure>
             <mediaobject>
-              <imageobject>
+              <!--<imageobject>
                 <imagedata fileref="doc-files/guided_tour/pics/hello/initializedhello.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/initializedhello.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/hello/initializedhello.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/initializedhello.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/initializedhello.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
-</para>
+</para>-->
       </sect2>
       <sect2 remap="h3">
         <title>Programming</title>
@@ -88,45 +87,23 @@
           <para>Here is the initActivity method :</para>
           <screen>
 public void initActivity(Body body) {
-
-
         System.out.println(&quot;I am about to start my activity&quot;);
-
-
 }
-
-
           </screen>
           <para>Here is the endActivity method :</para>
           <screen>
 public void endActivity(Body body) {
-
-
         System.out.println(&quot;I have finished my activity&quot;);
-
-
 }
-
-
           </screen>
           <para>The following code shows how to terminate the activity of the active object :</para>
           <screen>
 public void terminate() {
-
-
         // the termination of the activity is done through a call on the
-
-
         // terminate method of the body associated to the current active ob\
 ject
-
-
         ProActive.getBodyOnThis().terminate();
-
-
 }
-
-
           </screen>
           <para>The only differences from the the previous example is the classes instantiated, which are now
  InitializedHello (and not Hello) and InitializedHelloClient, and you will add a call to
@@ -138,17 +115,9 @@ ject
           <para>Now compile all proactive sources</para>
           <screen>
 cd compile
-
-
 windows&gt;build.bat examples
-
-
 linux&gt;build examples
-
-
 cd ..
-
-
           </screen>
           <para>Add &quot;./classes&quot; directory to CLASSPATH to use these two new source files</para>
           <para><literal>windows&gt;set
@@ -215,12 +184,12 @@ cd ..
         <para>
           <informalfigure>
             <mediaobject>
-              <imageobject>
+<!--              <imageobject>
                 <imagedata fileref="doc-files/guided_tour/pics/hello/migratablehello.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/migratablehello.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/hello/migratablehello.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/migratablehello.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/migratablehello.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -241,48 +210,20 @@ cd ..
           <para>The migration is initiated by the moveTo method :</para>
           <screen>
 /** method for migrating
-
-
 * @param destination_node destination node
-
-
 */
-
-
 public void moveTo(String destination_node) {
-
-
         System.out.println(&quot;\n-----------------------------&quot;);
-
-
         System.out.println(&quot;starting migration to node : &quot; + destination_node\
 );
-
-
         System.out.println(&quot;...&quot;);
-
-
         try {
-
-
                 // THIS MUST BE THE LAST CALL OF THE METHOD
-
-
                 ProActive.migrateTo(destination_node);
-
-
         } catch (MigrationException me) {
-
-
                 System.out.println(&quot;migration failed : &quot; + me.toString());
-
-
         }
-
-
 }
-
-
           </screen>
           <para>Note that the call to the ProActive primitive <literal>migrateTo</literal> is the last one of the
  method moveTo. See the <ulink url="../Migration.xml">manual</ulink> for more information.</para>
@@ -300,39 +241,19 @@ public void moveTo(String destination_node) {
         <para>- start several nodes using the <literal>startnode</literal> script.</para>
         <screen>
 windows&gt;cd scripts/windows
-
-
                                 startNode.bat //localhost/n1
-
-
                                 startNode.bat //localhost/n2
-
-
 linux&gt;cd scripts/linux
-
-
                 ./startNode.sh //localhost/n1
-
-
                 ./startNode.sh //localhost/n2
-
-
         </screen>
         <para>- compile and run the program (run MigratableHelloClient), passing in parameter the urls of
  the nodes you&#39;d like the agent to migrate to.</para>
         <screen>
 cd compile
-
-
 windows&gt;build.bat examples
-
-
 linux&gt;build examples
-
-
 cd ..
-
-
         </screen>
         <para><literal>linux&gt;java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
@@ -348,10 +269,10 @@ cd ..
         <para>
           <informalfigure>
             <mediaobject>
-              <imageobject>
+<!--              <imageobject>
                 <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
                 <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.png" format="PNG"/>              </imageobject>
             </mediaobject>
@@ -380,12 +301,12 @@ cd ..
         <para>
           <informalfigure>
             <mediaobject>
-              <imageobject>
+<!--              <imageobject>
                 <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/hellogui.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -407,67 +328,31 @@ cd ..
  interface), that we override :</para>
           <screen>
 /**
-
-
  * This method attaches a migration strategy manager to the current active \
 object.
-
-
  * The migration strategy manager will help to define which actions to take\
  before
-
-
  * and after migrating
-
-
  */
-
-
 public void initActivity(Body body) {
-
-
         // add a migration strategy manager on the current active object
-
-
         migrationStrategyManager = new MigrationStrategyManagerImpl((Migrat\
 able) ProActive.getBodyOnThis());
-
-
         // specify what to do when the active object is about to migrate
-
-
         // the specified method is then invoked by reflection
-
-
         migrationStrategyManager.onDeparture(&quot;clean&quot;);
-
-
 }
-
-
           </screen>
           <para>The MigrationStrategyManager defines methods such as &quot;onDeparture&quot;, that can be
  configured in the application. For example here, the method &quot;clean&quot; will be called
  before the migration, conveniently killing the frame :</para>
           <screen>
 public void clean() {
-
-
         System.out.println(&quot;killing frame&quot;);
-
-
         helloFrame.dispose();
-
-
         helloFrame = null;
-
-
         System.out.println(&quot;frame is killed&quot;);
-
-
 }
-
-
           </screen>
 </sect3>
         <sect3 remap="h4">
@@ -524,8 +409,8 @@ public void clean() {
             <mediaobject>
               <imageobject>
                 <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui-snapshot.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui-snapshot.svg" format="SVG"/>              </imageobject>
+<!--               <imageobject>  
+ <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui-snapshot.svg" format="SVG"/>              </imageobject> -->
             </mediaobject>
           </informalfigure>
 </para>

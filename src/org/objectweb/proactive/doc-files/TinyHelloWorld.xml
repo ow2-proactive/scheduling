@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Hello world ! (tiny example)</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/TinyHelloWorld.html  -->
   
-
     <para> This example implements the smallest program in ProActive. This is the
  easiest program you could write, using the Active Object concept. This is just to show quickly
  how code can be written, with minimal knowledge of the API.</para>
@@ -39,27 +37,22 @@
               <entry><para>
                   <screen>
 package org.objectweb.proactive.examples.hello;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.*;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import java.net.UnknownHostException;
-
 /** 
  * A stripped-down Active Object example.
  * The object has only one public method, sayHello()
  * The object does nothing but reflect the host its on. 
  */
-
 public class TinyHello implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private final String message = &quot;Hello World!&quot;;
-
     /** ProActive compulsory no-args constructor */
     public TinyHello() {
     }
-
     /** The Active Object creates and returns information on its location
      * @return a StringWrapper which is a Serialized version, for asynchron\
 y */
@@ -71,7 +64,6 @@ sayHello()
             new java.text.SimpleDateFormat(&quot;dd/MM/yyyy HH:mm:ss&quot;).format(new \
 java.util.Date()));
     }
-
     /** finds the name of the local machine */
     static String getHostName() {
         try {
@@ -80,7 +72,6 @@ java.util.Date()));
             return &quot;unknown&quot;;
         }
     }
-
     /** The call that starts the Acive Objects, and displays results.
      * @param args must contain the name of an xml descriptor */
     public static void main(String[] args)
@@ -92,7 +83,6 @@ java.util.Date()));
                 null 
 // the arguments to pass to the constructor, here none
             );  
-
         // get and display a value 
         StringMutableWrapper received = 
 tiny.sayHello();
@@ -164,7 +154,6 @@ ived); // potential wait-by-necessity
         <title>The output</title>
         <screen>
 [apple unix]tinyhello.sh
-
 --- Hello World tiny example ---------------------------------------------
  --&gt; This ClassFileServer is reading resources from classpath
 ProActive Security Policy (proactive.runtime.security) not set. Runtime Sec\

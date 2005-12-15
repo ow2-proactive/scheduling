@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>MOP : Metaobject Protocol</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/MOP.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.MOP_html_impl"/>Implementation: a Meta-Object Protocol</title>
       <para>ProActive is built on top of a metaobject protocol (MOP) that permits
@@ -64,7 +62,6 @@ class EchoProxy extends Object implements Proxy {
       return c.execute (targetObject);
   }
 }
-
 interface Echo extends Reflect {
   public String PROXY_CLASS= &quot;EchoProxy&quot;;
 }
@@ -125,11 +122,11 @@ reified. </para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/reflectInterfaceDiagram.gif" format="GIF"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/reflectInterfaceDiagram.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/reflectInterfaceDiagram.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

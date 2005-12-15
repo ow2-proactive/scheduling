@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Active Objects : creation and advanced concepts</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ActiveObjectCreation.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_creation"/>Active Object: creation and
  advanced concepts</title>
@@ -81,15 +79,12 @@
     public A (int i) {
         //
     }
-
     public A (Integer i) {
         //
     }
-
     public A (int i, String s) {
         //
     }
-
     public A (int i, Vector v) {
         //
     }
@@ -239,19 +234,15 @@ else
         <para><emphasis role="bold">Example1:</emphasis></para>
         <screen>
   import org.objectweb.proactive.*;
-
   public class A implements InitActive, RunActive {
         private String myName;
-
          public String getName() {
          return myName;
         }
-
         // -- implements InitActive
         public void initActivity(Body body) {
         myName = body.getName();
         }
-
         // -- implements RunActive for serving request in a LIFO fashion
          public void runActivity(Body body) {
         Service service = new Service(Body);
@@ -259,7 +250,6 @@ else
          service.blockingServeYoungest();
         }
         }
-
         public static void main(String[] args) throws Exception {
         A a = (A) ProActive.newActive(&quot;A&quot;,null);
         System.out.println(&quot;Name = &quot;+a.getName());
@@ -270,14 +260,11 @@ else
  algorithm in runActivity method</para>
         <screen>
 import org.objectweb.proactive.*;
-
 public class Simulation implements RunActive {
-
       private boolean stoppedSimulation=false;
         private boolean startedSimulation=false
         private boolean suspendedSimulation=false;
         private boolean notStarted = true;
-
         public void startSimulation(){
         //
 <emphasis role="bold">Simulation starts</emphasis>
@@ -290,20 +277,17 @@ public class Simulation implements RunActive {
         startedSimulation=true;
         suspendedSimulation=false;
         }
-
         public void suspendSimulation(){
         //
 <emphasis role="bold">Simulation is suspended</emphasis>
         suspendedSimulation=true;
         startedSimulation = false;
         }
-
         public void stoppedSimulation(){
         //
 <emphasis role="bold">Simulation is stopped</emphasis>
         stoppedSimulation=true;
         }
-
         public void runActivity(Body body) {
          Service service = new Service(Body);
         while (body.isActive()) {
@@ -328,7 +312,6 @@ ethod
  non-blocking services to take into account external inputs.</para>
         <screen>
 public class BusyButReactive implements RunActive {
-
 public void  runActivity(Body body) {
 Service service = new Service(body);
 while ( ! hasToTerminate ) {
@@ -368,20 +351,16 @@ public void terminate (){ hasToTerminate=true;}
       }
     }
   }
-
   import org.objectweb.proactive.*;
   public class A implements InitActive {
     private String myName;
-
     public String getName() {
       return myName;
     }
-
     // -- implements InitActive
     public void initActivity(Body body) {
       myName = body.getName();
     }
-
     public static void main(String[] args) throws Exception {
       // newActive(classname, constructor parameter (null = none), 
       //           node (null = local), active, MetaObjectFactory (null = d\
@@ -482,30 +461,23 @@ an exception: &quot;+e);
           <para>
             <screen>
 public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
-
   private static final MetaObjectFactory instance = new MyMetaObjectFactory\
 ();
-
   protected MyMetaObjectFactory() {
     super();
   }
-
   public static MetaObjectFactory newInstance() {
     return instance;
   }
-
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
-
   protected RequestFactory newRequestFactorySingleton() {
     return new MyRequestFactory();
   }
-
   //
   // -- INNER CLASSES -----------------------------------------------
   //
-
   protected class MyRequestFactory implements RequestFactory, java.io.Seria\
 lizable {
     public Request newRequest(MethodCall methodCall, UniversalBody sourceBo\
@@ -572,11 +544,11 @@ ce());
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/activeObjectComponents.gif" format="GIF"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/activeObjectComponents.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/activeObjectComponents.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming/code/HelloFrame.java.html  -->
   
-
     <para>
       <screen>
-
 <emphasis role="bold">package org.objectweb.proactive.examples.hello;</emphasis>
-
-
 <emphasis>/**
  * This class allows the creation of a graphical window
  * with a text field
@@ -37,8 +32,6 @@ JLabel
  
 jLabel1
 ;
-
-
     
 <emphasis>/** Creates new form HelloFrame */</emphasis>
     
@@ -52,15 +45,12 @@ text
         
 initComponents
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
         
 setText
 <emphasis role="bold">(</emphasis>text
 <emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/** This method is called from within the constructor to
      * initialize the form.
@@ -84,7 +74,6 @@ swing
 .
 JLabel
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
-
         
 addWindowListener
 <emphasis role="bold">(</emphasis><emphasis role="bold">new</emphasis> 
@@ -116,13 +105,10 @@ evt
 exitForm
 <emphasis role="bold">(</emphasis>evt
 <emphasis role="bold">)</emphasis>;
-
                 
 <emphasis role="bold">}</emphasis>
             
 <emphasis role="bold">}</emphasis><emphasis role="bold">)</emphasis>;
-
-
         
 jLabel1
 .
@@ -135,7 +121,6 @@ SwingConstants
 .
 CENTER
 <emphasis role="bold">)</emphasis>;
-
         
 getContentPane
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>.
@@ -150,10 +135,8 @@ BorderLayout
 .
 CENTER
 <emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/** Kill the frame */</emphasis>
     
@@ -173,16 +156,13 @@ evt
 <emphasis role="bold">{</emphasis>
         
 //        System.exit(0); would kill the VM !
-
         
 dispose
 <emphasis role="bold">(</emphasis><emphasis role="bold">)</emphasis>;
  
 // this way, the active object agentFrameController stays alive
-
     
 <emphasis role="bold">}</emphasis>
-
     
 <emphasis>/**
      * sets the text of the label inside the frame
@@ -202,18 +182,13 @@ jLabel1
 setText
 <emphasis role="bold">(</emphasis>text
 <emphasis role="bold">)</emphasis>;
-
     
 <emphasis role="bold">}</emphasis>
 <emphasis role="bold">}</emphasis>
-
       </screen>
       <screen>
-
       </screen>
       <screen>
-
-
       </screen>
 </para>
   

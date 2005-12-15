@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/architecture.html  -->
   
-
     <sect1 remap="h2">
       <title>Architecture and design</title>
       <para>The implementation of the Fractal model is achieved by reusing the
@@ -32,11 +30,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/standard-mop.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/pics/standard-mop.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/components/pics/standard-mop.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/standard-mop.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -63,11 +57,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/components-mop.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/components-mop.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/components-mop.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/components-mop.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/components-mop.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/components-mop.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -144,11 +138,11 @@ loop
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/collective-interfaces.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/collective-interfaces.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/collective-interfaces.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/collective-interfaces.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/components/pics/collective-interfaces.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/components/pics/collective-interfaces.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>

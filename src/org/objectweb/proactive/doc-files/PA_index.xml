@@ -40,11 +40,10 @@
 <!ENTITY devFaultTolerance SYSTEM "development/FaultTolerance.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
 <!-- <!ENTITY FAQ SYSTEM "FAQ.xml"> -->
-
 ]>
 <book>
-  <title>ProActive v3.01 Documentation</title>
-  <part> <title> Introduction</title>
+  <title>ProActive v3.0.1 Documentation</title>
+ <part> <title> Introduction</title>
   &Principles;
   &Installation;
  </part><part> <title> Programming</title>
@@ -89,5 +88,9 @@
   &devFaultTolerance;
   &MOP;
  </part>
-  <!-- &FAQ; -->
+<!--<part> <title> Back matters</title>  Should be called appendix, anyway -->
+ <!-- &FAQ; -->
+ <!-- &WordIndex; -->
+ <!-- &References; -->
+<!--  </part> -->
 </book>

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
    <chapter><title>Guided tour</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/intro.html  -->
   
-
     <para>This is an introduction to the functionalities offered by ProActive : you
  will be performing distributed computations, moving objects between virtual machines and verify
  the transparency of the</para>

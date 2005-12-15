@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Components introduction</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/intro.html  -->
   
-
     <para> <anchor id="dbdoclet.id.intro_html_Introduction"/></para>
     <para>Computing Grids and Peer-to-Peer networks are inherently heterogeneous and
  distributed, and for this reason they drive new technological challenges : complexity in the
@@ -19,9 +17,5 @@
     <para><emphasis>For a general overview of our work , you can also refer to a paper
  presented at the International Symposium on Distributed Objects and Applications (DOA), in
  November 2003. (<ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/HierarchicalGridComponents.pdf">.pdf</ulink>)</emphasis></para>
-    <para>&#160;</para>
-    <para></para>
-    <para>
- Copyright © April 2005 INRIA All Rights Reserved.  &#160;</para>
   
 </chapter>

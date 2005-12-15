@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Configuration File</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/descriptor.html  -->
   
-
     <sect1 remap="h2">
       <title>How many configuration files you need ?</title>
       <itemizedlist>
@@ -59,15 +57,12 @@
         <screen>
 <literal>
         // Level : Manager
-
         // At the execution load properties
         manager.execute(yes);
-
         // To load properties from differents  types of sources
         manager.loadAttributes();
         manager.loadAttributes(java.io.File propFile);
         manager.loadAttributes(java.util.Properties javaProp);
-
         // Level : Test
         
         // To load properties from differents  types of sources

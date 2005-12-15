@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Typed Group Communication</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/TypedGroupCommunication.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.TypedGroupCommunication_html_overview"/>Overview</title>
       <para>Group communication is a crucial feature for high-performance and Grid
@@ -30,12 +28,10 @@
    // with parameters specified  in params,
    // and on the nodes specified in nodes
 A ag1 = (A) ProActiveGroup.newGroup( &quot;A&quot;, params, [nodes]);
-
    // A general group communication without result
    // A request to foo is sent in parallel to all active objects 
    // in the target group (ag1)
 ag1.foo(...);
-
    // A general group communication with a result
 V vg = ag1.bar(...);
    // vg is a typed group of &quot;V&quot;: operation 
@@ -76,18 +72,15 @@ class A {
 Object[][] params = {{...} , {...} , ... };
    //   Nodes to identify JVMs to map objects
 Node[] nodes  = { ... , ..., ... };
-
    // Solution 1: 
    // create an empty group of type &quot;A&quot;
 A ag1 = (A) ProActiveGroup.newGroup(&quot;A&quot;);
-
    // Solution 2: 
    // a group of type &quot;A&quot; and its members are 
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
 A ag2 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params, nodes);
-
    // Solution 3: 
    // a group of type &quot;A&quot;  and its members are 
    // created at once, 
@@ -131,25 +124,21 @@ A a1 = new A();
 A a2 = (A) ProActive.newActive(&quot;A&quot;, paramsA[], node);
 B b  = (B) ProActive.newActive(&quot;B&quot;, paramsB[], node);
    // Note that B extends A
-
    // For management purposes, get the representation
    // as a group given a typed group, created with
    // code on the left column:
 Group gA = ProActiveGroup.getGroup(ag1);
-
    // Now, add objects to the group:
    // Note that active and non-active objects 
    // may be mixed in groups
 gA.add(a1);
 gA.add(a2);
 gA.add(b); 
-
    // The addition of members to a group immediately
    // reflects on the typed group form,  so a method
    // can be invoked on the typed group  and will
    // reach all its current members
 ag1.foo(); // the caller of ag1.foo() may not belong to ag1
-
    // A new reference to the typed group  
    // can also be built as follows
 A ag1new = (A) gA.getGroupByType();
@@ -195,11 +184,9 @@ vg.f1();
           <screen>
    // A method call on a typed group
 V vg = ag1.bar();
-
    // To wait and capture the first returned 
    // member of vg
 V v = (V) ProActiveGroup.waitAndGetOne(vg);
-
    // To wait all the members of vg are arrived
 ProActiveGroup.waitAll(vg);
           </screen>
@@ -235,11 +222,9 @@ ProActiveGroup.waitAll(vg);
    // Broadcast the group gb to all the members
    // of the group ag1:
 ag1.foo(gb);
-
    // Change the distribution mode of the 
    // parameter group:
 ProActiveGroup.setScatterGroup(gb);
-
    // Scatter the members of gb onto the 
    // members of ag1:
 ag1.foo(gb);

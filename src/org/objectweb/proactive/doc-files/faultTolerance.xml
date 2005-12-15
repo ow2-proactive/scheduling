@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Fault-Tolerance</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/faultTolerance.html  -->
   
-
     
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.faultTolerance_html_overview"/>Overview</title>
@@ -127,8 +125,6 @@ this.server.startProcess();
         <para>Note that if one of the servers is unreachable when a fault-tolerant
  application is deploying, fault-tolerance is automatically and transparently disabled for all the
  application.</para>
-        <para></para>
-        <para></para>
       </sect2>
       <sect2 remap="h3">
         <title><anchor id="dbdoclet.id.faultTolerance_html_configuration" xreflabel="Configure fault-tolerance for
@@ -169,8 +165,6 @@ this.server.startProcess();
 </itemizedlist>
         <para>Finally, the <emphasis role="bold">TTC</emphasis> value is set in fault-tolerance service, using <literal>&lt;ttc value=&quot;x&quot;/&gt;</literal>, where x is expressed in <emphasis>seconds</emphasis>. If not,
  the default value (30 sec) is used.</para>
-        <para></para>
-        <para></para>
       </sect2>
       <sect2 remap="h3">
         <title>A deployment descriptor example</title>
@@ -180,187 +174,85 @@ this.server.startProcess();
  correspond to two fault-tolerance services, <literal>appli</literal> and <literal>resource</literal>. Note
  that non-fault-tolerant active objects can communicate with fault-tolerant active objects as
  usual. Chosen protocol is CIC and TTC is set to 5 sec for all the application.</para>
-        <informaltable frame="none">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entrytbl cols="1">
-                  <colspec colname="c1"/>
-                  <tbody>
-                    <row>
-                      <entry><para> &lt;ProActiveDescriptor&gt;</para>                        <para>
- &#160;&lt;componentDefinition&gt;</para>
-                        <para>
- &#160;&#160;&lt;virtualNodesDefinition&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;virtualNode name=&quot;NonFT-Workers&quot;
- property=&quot;multiple&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;virtualNode name=&quot;FT-Workers&quot;
- property=&quot;multiple&quot; <emphasis role="bold">ftServiceId=&quot;appli&quot;</emphasis>/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;virtualNode name=&quot;Failed&quot;
- property=&quot;multiple&quot; <emphasis role="bold">ftServiceId=&quot;resource&quot;</emphasis>/&gt;</para>
-                        <para>
- &#160;&#160;&lt;/virtualNodesDefinition&gt;</para>
-                        <para>
- &#160;&lt;/componentDefinition&gt;</para>
-                        <para>
- &#160;&lt;deployment&gt;</para>
-                        <para>
- &#160;&#160;&lt;mapping&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;map virtualNode=&quot;NonFT-Workers&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;Jvm1&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/map&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;map virtualNode=&quot;FT-Workers&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;Jvm2&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/map&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;map virtualNode=&quot;Failed&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;JvmS1&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;JvmS2&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/map&gt;</para>
-                        <para>
- &#160;&#160;&lt;/mapping&gt;</para>
-                        <para>
- &#160;&#160;&lt;jvms&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;jvm name=&quot;Jvm1&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;processReference
- refid=&quot;linuxJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;jvm name=&quot;Jvm2&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;processReference
- refid=&quot;linuxJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;jvm name=&quot;JvmS1&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;processReference
- refid=&quot;linuxJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;jvm name=&quot;JvmS2&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;processReference
- refid=&quot;linuxJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/jvm&gt;</para>
-                        <para>
- &#160;&#160;&lt;/jvms&gt;</para>
-                        <para>
- &#160;&lt;/deployment&gt;</para>
-                        <para>
- &#160;&lt;infrastructure&gt;</para>
-                        <para>
- &#160;&#160;&lt;processes&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;processDefinition id=&quot;linuxJVM&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;jvmProcess
- class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/processDefinition&gt;</para>
-                        <para>
- &#160;&#160;&lt;/processes&gt;</para>
-                        <para>
- &#160;&#160;&lt;services&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;<emphasis role="bold">serviceDefinition id=&quot;appli&quot;</emphasis>&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;globalServer
- url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/serviceDefinition&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;<emphasis role="bold">serviceDefinition id=&quot;resource&quot;</emphasis>&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;globalServer
- url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;resourceServer
- url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/serviceDefinition&gt;</para>
-                        <para>
- &#160;&#160;&lt;/services&gt;</para>
-                        <para>
- &#160;&lt;/infrastructure&gt;</para>
-                        <para>
- &lt;/ProActiveDescriptor&gt;</para>
-                        <para></para>
-</entry>
-                    </row>
-                  </tbody>
-</entrytbl>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
-        <para></para>
-        <para></para>
-        <para></para>
-      </sect2>
+        <screen>
+ &lt;ProActiveDescriptor&gt;                        
+ &#160;&lt;componentDefinition&gt;
+ &#160;&#160;&lt;virtualNodesDefinition&gt;
+ &#160;&#160;&#160;&lt;virtualNode name=&quot;NonFT-Workers&quot; property=&quot;multiple&quot;/&gt;
+ &#160;&#160;&#160;&lt;virtualNode name=&quot;FT-Workers&quot; property=&quot;multiple&quot; <emphasis role="bold">ftServiceId=&quot;appli&quot;</emphasis>/&gt;
+ &#160;&#160;&#160;&lt;virtualNode name=&quot;Failed&quot; property=&quot;multiple&quot; <emphasis role="bold">ftServiceId=&quot;resource&quot;</emphasis>/&gt;
+ &#160;&#160;&lt;/virtualNodesDefinition&gt;
+ &#160;&lt;/componentDefinition&gt;
+ &#160;&lt;deployment&gt;
+ &#160;&#160;&lt;mapping&gt;
+ &#160;&#160;&#160;&lt;map virtualNode=&quot;NonFT-Workers&quot;&gt;
+ &#160;&#160;&#160;&#160;&lt;jvmSet&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;Jvm1&quot;/&gt;
+ &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;
+ &#160;&#160;&#160;&lt;/map&gt;
+ &#160;&#160;&#160;&lt;map virtualNode=&quot;FT-Workers&quot;&gt;
+ &#160;&#160;&#160;&#160;&lt;jvmSet&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;Jvm2&quot;/&gt;
+ &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;
+ &#160;&#160;&#160;&lt;/map&gt;
+ &#160;&#160;&#160;&lt;map virtualNode=&quot;Failed&quot;&gt;
+ &#160;&#160;&#160;&#160;&lt;jvmSet&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;JvmS1&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;JvmS2&quot;/&gt;
+ &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;
+ &#160;&#160;&#160;&lt;/map&gt;
+ &#160;&#160;&lt;/mapping&gt;
+ &#160;&#160;&lt;jvms&gt;
+ &#160;&#160;&#160;&lt;jvm name=&quot;Jvm1&quot;&gt;
+ &#160;&#160;&#160;&#160;&lt;creation&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt;processReference refid=&quot;linuxJVM&quot;/&gt;
+ &#160;&#160;&#160;&#160;&lt;/creation&gt;
+&#160;&#160;&#160;&lt;/jvm&gt;
+&#160;&#160;&#160;&lt;jvm name=&quot;Jvm2&quot;&gt;
+&#160;&#160;&#160;&#160;&lt;creation&gt;
+&#160;&#160;&#160;&#160;&#160;&lt;processReference refid=&quot;linuxJVM&quot;/&gt;
+&#160;&#160;&#160;&#160;&lt;/creation&gt;
+&#160;&#160;&#160;&lt;/jvm&gt;
+&#160;&#160;&#160;&lt;jvm name=&quot;JvmS1&quot;&gt;
+&#160;&#160;&#160;&#160;&lt;creation&gt;
+&#160;&#160;&#160;&#160;&#160;&lt;processReference refid=&quot;linuxJVM&quot;/&gt;
+&#160;&#160;&#160;&#160;&lt;/creation&gt;
+&#160;&#160;&#160;&lt;/jvm&gt;
+&#160;&#160;&#160;&lt;jvm name=&quot;JvmS2&quot;&gt;
+&#160;&#160;&#160;&#160;&lt;creation&gt;
+&#160;&#160;&#160;&#160;&#160;&lt;processReference refid=&quot;linuxJVM&quot;/&gt;
+&#160;&#160;&#160;&#160;&lt;/creation&gt;
+&#160;&#160;&#160;&lt;/jvm&gt;
+&#160;&#160;&lt;/jvms&gt;
+&#160;&lt;/deployment&gt;
+&#160;&lt;infrastructure&gt;
+&#160;&#160;&lt;processes&gt;
+&#160;&#160;&#160;&lt;processDefinition id=&quot;linuxJVM&quot;&gt;
+&#160;&#160;&#160;&#160;&lt;jvmProcess
+ class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;
+&#160;&#160;&#160;&lt;/processDefinition&gt;
+&#160;&#160;&lt;/processes&gt;
+&#160;&#160;&lt;services&gt;
+&#160;&#160;&#160;&lt;<emphasis role="bold">serviceDefinition id=&quot;appli&quot;</emphasis>&gt;
+&#160;&#160;&#160;&#160;&lt;faultTolerance&gt;
+&#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;
+  &#160;&#160;&#160;&#160;&#160;&lt;globalServer url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;
+&#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;
+&#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;
+&#160;&#160;&#160;&lt;/serviceDefinition&gt;
+&#160;&#160;&#160;&lt;<emphasis role="bold">serviceDefinition id=&quot;resource&quot;</emphasis>&gt;
+&#160;&#160;&#160;&#160;&lt;faultTolerance&gt;
+&#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;
+  &#160;&#160;&#160;&#160;&#160;&lt;globalServer  url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;
+  &#160;&#160;&#160;&#160;&#160;&lt;resourceServer url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;
+&#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;
+&#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;
+&#160;&#160;&#160;&lt;/serviceDefinition&gt;
+&#160;&#160;&lt;/services&gt;
+&#160;&lt;/infrastructure&gt;
+&lt;/ProActiveDescriptor&gt;
+                       </screen>         
+       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.faultTolerance_html_rules"/>Programming rules</title>
@@ -494,11 +386,7 @@ rvice(body);
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/./pics/nbodyft.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/./pics/nbodyft.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/./pics/nbodyft.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/images/nbodyft.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -512,108 +400,51 @@ rvice(body);
         <title>Running NBody example</title>
         <para>Before starting the fault-tolerant body example, you have to edit the <literal>ProActive/descriptors/FaultTolerantWorkers.xml</literal> deployment descriptor so as to deploy
  on your own hosts (<emphasis role="bold">HOSTNAME</emphasis>), as follow:</para>
-        <informaltable frame="none">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entrytbl cols="1">
-                  <colspec colname="c1"/>
-                  <tbody>
-                    <row>
-                      <entry><para> ...</para>                        <para>
- &#160;&lt;processDefinition id=&quot;jvmAppli1&quot;&gt;</para>
-                        <para>
- &#160;&#160;&lt;rshProcess
+<screen>
+ ...
+ &#160;&lt;processDefinition id=&quot;jvmAppli1&quot;&gt;
+  &#160;&#160;&lt;rshProcess
  class=&quot;org.objectweb.proactive.core.process.rsh.RSHJVMProcess&quot;
- hostname=&quot;<emphasis role="bold">HOSTNAME</emphasis>&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;processReference refid=&quot;jvmProcess&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&lt;/rshProcess&gt;</para>
-                        <para>
- &#160;&lt;/processDefinition&gt;</para>
-                        <para>
- ...</para>
-                        <para></para>
-</entry>
-                    </row>
-                  </tbody>
-</entrytbl>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
+ hostname=&quot;<emphasis role="bold">HOSTNAME</emphasis>&quot;&gt;
+ &#160;&#160;&#160;&lt;processReference refid=&quot;jvmProcess&quot;/&gt;
+ &#160;&#160;&lt;/rshProcess&gt;
+ &#160;&lt;/processDefinition&gt;
+ ...
+</screen>
         <para>Of course, more than one host is needed to run this example, as failure are
  triggered by killing all Java processes on the selected host.</para>
         <para>
  The deployment descriptor must also specify the GlobalFTServer location as follow, assuming that
  the script <literal>startGlobalFTServer.sh</literal> has been started on the host <emphasis role="bold">SERVER_HOSTAME</emphasis>:</para>
-        <informaltable frame="none">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entrytbl cols="1">
-                  <colspec colname="c1"/>
-                  <tbody>
-                    <row>
-                      <entry><para> ...</para>                        <para>
- &#160;&lt;services&gt;</para>
-                        <para>
- &#160;&#160;&lt;serviceDefinition id=&quot;appli&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
-                        <para>
+<screen>  
+...                        
+ &#160;&lt;services&gt;
+ &#160;&#160;&lt;serviceDefinition id=&quot;appli&quot;&gt;
+ &#160;&#160;&#160;&lt;faultTolerance&gt;
+ &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;
  &#160;&#160;&#160;&#160;&lt;globalServer
- url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
-                        <para>
-
- &#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&lt;/serviceDefinition&gt;</para>
-                        <para>
- &#160;&#160;&lt;serviceDefinition id=&quot;ressource&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;</para>
-                        <para>
+ url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/globalServer&gt;
+ &#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;
+ &#160;&#160;&#160;&lt;/faultTolerance&gt;
+ &#160;&#160;&lt;/serviceDefinition&gt;
+ &#160;&#160;&lt;serviceDefinition id=&quot;ressource&quot;&gt;
+ &#160;&#160;&#160;&lt;faultTolerance&gt;
+ &#160;&#160;&#160;&lt;protocol type=&quot;cic&quot;&gt;&lt;/protocol&gt;
  &#160;&#160;&#160;&#160;&lt;globalServer
- url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/globalServer&gt;</para>
-                        <para>
-
+ url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/globalServer&gt;
  &#160;&#160;&#160;&#160;&lt;resourceServer
- url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;</para>
-                        <para>
-
- &#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt;/faultTolerance&gt;</para>
-                        <para>
- &#160;&#160;&lt;/serviceDefinition&gt;</para>
-                        <para>
- &#160;&lt;/services&gt;</para>
-                        <para>
- ...</para>
-</entry>
-                    </row>
-                  </tbody>
-</entrytbl>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
-        <para>Finally, you can start the fault-tolerant ProActive NBody and choose the
+ url=&quot;rmi://<emphasis role="bold">SERVER_HOSTAME</emphasis>:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;
+ &#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;
+ &#160;&#160;&#160;&lt;/faultTolerance&gt;
+ &#160;&#160;&lt;/serviceDefinition&gt;
+ &#160;&lt;/services&gt;
+ ...
+</screen>  
+<para>Finally, you can start the fault-tolerant ProActive NBody and choose the
  version you want to run :</para>
         <screen>
 ~/ProActive/scripts/unix/FT&gt; ./nbodyFT.sh
 Starting Fault-Tolerant version of ProActive NBody...
-
 --- N-body with ProActive ---------------------------------
  **WARNING** : $PROACTIVE/descriptors/FaultTolerantWorkers.xml MUST BE SET \
 WITH EXISTING HOSTNAMES !
@@ -637,15 +468,6 @@ ub_Displayer
 ************* Reading deployment descriptor: file:./../../.././descriptors/\
 FaultTolerantWorkers.xml ********************
         </screen>
-        <screen>
-
-
-
-
-
-        </screen>
-        <para>
-  </para>
       </sect2>
     </sect1>
   

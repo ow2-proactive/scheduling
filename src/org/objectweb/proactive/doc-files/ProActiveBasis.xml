@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive Basis, Active Object definition</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ProActiveBasis.html  -->
   
-
     <sect1 remap="h2">
       <title>Active objects basis</title>
       <para>Active objects are the basic units of activity and distribution used for
@@ -35,11 +33,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/proActiveModel.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/proActiveModel.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/proActiveModel.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/proActiveModel.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -91,11 +85,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/activeObjectMethodCall.gif" format="GIF"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/activeObjectMethodCall.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/activeObjectMethodCall.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

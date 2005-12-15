@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Principles</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Principles.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.Principles_html_intro"/>Seamless sequential, multithreaded and
  distributed</title>
@@ -11,14 +9,11 @@
  beginning, and change over time. <emphasis role="bold">Seamless implies reuse, smooth and incremental
  transitions</emphasis>.</para>
       <para>
-        <informalfigure>
+        
+       <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/proActiveModelColor.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/proActiveModelColor.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/proActiveModelColor.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/proActiveModelColor.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -73,7 +68,6 @@ ProActive.newActive(&quot;example.A&quot;, params, node)
           <para>
             <screen>
 public class AA extends A implements Active {}
-
 Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
 A a = (A) 
 ProActive.newActive(&quot;example.AA&quot;, params, node)
@@ -159,11 +153,7 @@ ProActive.turnActive(a, node)
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/polymorphism.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/polymorphism.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/polymorphism.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/polymorphism.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

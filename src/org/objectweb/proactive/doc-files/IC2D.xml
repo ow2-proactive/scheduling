@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>IC2D: Interactive Control and Debugging of Distribution</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/IC2D.html  -->
   
-
     <para> <emphasis role="bold">IC2D</emphasis> is a <emphasis role="bold">graphical environment</emphasis> for remote monitoring and
  steering of <emphasis role="bold">distributed and grid applications</emphasis>. IC2D features <emphasis role="bold">graphical
  visualisation</emphasis> and <emphasis role="bold">drag and drop migration</emphasis> of remote objects. As it is being interfaced
  with <emphasis role="bold">Jini</emphasis> and <emphasis role="bold">Globus</emphasis>, it can also serve as a building block for <emphasis role="bold">grid</emphasis> and <emphasis role="bold">computing portals</emphasis>. <emphasis role="bold">IC2D</emphasis> is built on top of <emphasis role="bold">RMI</emphasis> and <emphasis role="bold">ProActive</emphasis> that
  provides asynchronous calls and migration.</para>
     <para><emphasis role="bold">The basic features of IC2D are:</emphasis></para>
-    <para>
- &#160;</para>
     <informaltable frame="all">
       <tgroup cols="3">
-        <colspec colname="c1" colwidth="33*"/>
+<!--        <colspec colname="c1" colwidth="33*"/>
         <colspec colname="c2" colwidth="33*"/>
         <colspec colname="c3" colwidth="33*"/>
+        -->
         <tbody>
           <row>
             <entry><para>Graphical Visualisation</para></entry>
@@ -60,11 +57,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/pics/ic2d_c3d.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/pics/ic2d_c3d.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/pics/ic2d_c3d.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/ic2d_c3d.png" format="PNG"/>            </imageobject>
           </mediaobject>
 <ulink url="ic2d_c3d.jpg"></ulink>        </informalfigure>
 </para>
@@ -76,11 +69,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/pics/RemoteControl.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/pics/RemoteControl.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/pics/RemoteControl.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/RemoteControl.png" format="PNG"/>            </imageobject>
           </mediaobject>
 <ulink url="RemoteControl.jpg"></ulink>        </informalfigure>
 </para>
@@ -89,33 +78,16 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/pics/ic2d_migrate_witharrow.jpg" format="JPG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/ic2d_migrate_witharrow.svg" format="SVG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/ic2d_migrate_witharrow.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/images/ic2d_migrate_witharrow.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
-      <para></para>
-      <para></para>
       <para><emphasis role="bold">IC2D permits to visualize related events and AOs state</emphasis></para>
-      <informalfigure>
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/ic2d_all50.gif" format="GIF"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/ic2d_all50.svg" format="SVG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/ic2d_all50.png" format="PNG"/>          </imageobject>
-        </mediaobject>
-      </informalfigure>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.IC2D_html_applications"/>Job monitoring and control</title>
       <para><anchor id="dbdoclet.id.IC2D_html_JobMonitoringTag"/><emphasis role="bold">IC2D now provides a Job
  monitoring tool, in order to visualize and control high number of resources. This tool offers
  different views of a deployed application: per hosts, per jobs,....
-
  To start the Job monitor tool, choose in the IC2D menu: windows --&gt; Show Job Monitor
  windows</emphasis></para>
       <para></para>
@@ -123,21 +95,13 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/pics/jobmonitor2_logo.jpg" format="JPG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/jobmonitor2_logo.svg" format="SVG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/jobmonitor2_logo.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/images/jobmonitor2_logo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/pics/jobmonitor1_logo.jpg" format="JPG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/jobmonitor1_logo.svg" format="SVG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/jobmonitor1_logo.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/images/jobmonitor1_logo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
     </sect1>
@@ -157,36 +121,15 @@
         <title>MainDefinition tag</title>
         <para>A new tag has been introduced, just before the component definition tag. This tag is named
  &quot;mainDefinition&quot; and its syntax is :</para>
-        <para></para>
-        <informaltable frame="none">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entrytbl cols="1">
-                  <colspec colname="c1"/>
-                  <tbody>
-                    <row>
-                      <entry><para> &#160;&lt;mainDefinition id=&quot;mainID&quot;
- class=&quot;theClassToLaunchContainingAMainMethod&quot;&gt;</para>                        <para>
- &#160;&#160;&lt;arg value=&quot;param1&quot;&gt;</para>
-                        <para>
- &#160;&#160;&lt;arg value=&quot;param2&quot;&gt;</para>
-                        <para>
- &#160;&#160;&lt;mapToVirtualNode value=&quot;main-Node&quot;/&gt;</para>
-                        <para>
- &#160;&lt;/mainDefinition&gt;</para>
-                        <para></para>
-</entry>
-                    </row>
-                  </tbody>
-</entrytbl>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
-        <para></para>
-        <para>
+<screen> 
+ &#160;&lt;mainDefinition id=&quot;mainID&quot; class=&quot;theClassToLaunchContainingAMainMethod&quot;&gt;
+ &#160;&#160;&lt;arg value=&quot;param1&quot;&gt; 
+ &#160;&#160;&lt;arg value=&quot;param2&quot;&gt;
+ &#160;&#160;&lt;mapToVirtualNode value=&quot;main-Node&quot;/&gt;
+ &#160;&lt;/mainDefinition&gt;
+</screen>
+         
+<para>
  Eventually, several mains might be defined so the <emphasis role="bold">id</emphasis> allows to identify all
  mainDefinitions.</para>
         <para></para>
@@ -201,149 +144,70 @@
         <para>
  And finally a <emphasis role="bold">mapToVirtualNode</emphasis> tag will link the main info to virtual node, declared with
  the same name in the virtualNodeDefinitions tag (in componentDefinition).</para>
-        <para></para>
-        <para><emphasis role="underline">This is a complete example of a launchable descriptor:</emphasis></para>
-        <informaltable frame="none">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entrytbl cols="1">
-                  <colspec colname="c1"/>
-                  <tbody>
-                    <row>
-                      <entry><para> &#160;&lt;?xml version=&quot;1.0&quot;
- encoding=&quot;UTF-8&quot;?&gt;</para>                        <para>
- &#160;&lt;ProActiveDescriptor
- xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
- xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;</para>
-                        <para>
- &#160;&#160;&lt;!-- &lt;security
- file=&quot;../../descriptors/c3dPolicy.xml&quot;&gt;&lt;/security&gt; --&gt;</para>
-                        <para>
- &#160;&#160;&lt; componentDefinition&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; virtualNodesDefinition&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; virtualNode name=&quot;Dispatcher&quot;
- property=&quot;unique_singleAO&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; virtualNode name=&quot;Renderer&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; /virtualNodesDefinition&gt;</para>
-                        <para>
- &#160;&#160;&lt; /componentDefinition&gt;</para>
-                        <para>
- &#160;&#160;&lt; deployment&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; register virtualNode=&quot;Dispatcher&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; mapping&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; map virtualNode=&quot;Dispatcher&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&#160;&lt; currentJVM/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; /jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; /map&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; map virtualNode=&quot;Renderer&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm1&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm2&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm3&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm4&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; /jvmSet&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; /map&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; /mapping&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; jvms&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm1&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference
- refid=&quot;localJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; /jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm2&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference
- refid=&quot;localJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; /jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm3&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference
- refid=&quot;localJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; /jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm4&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference
- refid=&quot;localJVM&quot;/&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; /jvm&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; /jvms&gt;</para>
-                        <para>
- &#160;&#160;&lt; /deployment&gt;</para>
-                        <para>
- &#160;&#160;&lt; infrastructure&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; processes&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&lt; processDefinition id=&quot;localJVM&quot;&gt;</para>
-                        <para>
- &#160;&#160;&#160;&#160;&#160;&lt; jvmProcess
- class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;&gt;&lt;/jvmProcess&gt;</para>
-                        <para>
 
- &#160;&#160;&#160;&#160;&lt; /processDefinition&gt;</para>
-                        <para>
- &#160;&#160;&#160;&lt; /processes&gt;</para>
-                        <para>
- &#160;&#160;&lt; /infrastructure&gt;</para>
-                        <para>
- &#160;&lt;/ProActiveDescriptor&gt;</para>
-                        <para></para>
-</entry>
-                    </row>
-                  </tbody>
-</entrytbl>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
+<screen>
+ &#160;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &#160;&lt;ProActiveDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+ xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;
+ &#160;&#160;&lt;!-- &lt;security file=&quot;../../descriptors/c3dPolicy.xml&quot;&gt;&lt;/security&gt; --&gt; 
+ &#160;&#160;&lt; componentDefinition&gt;
+ &#160;&#160;&#160;&lt; virtualNodesDefinition&gt;
+ &#160;&#160;&#160;&#160;&lt; virtualNode name=&quot;Dispatcher&quot;
+ property=&quot;unique_singleAO&quot;/&gt;
+ &#160;&#160;&#160;&#160;&lt; virtualNode name=&quot;Renderer&quot;/&gt;
+ &#160;&#160;&#160;&lt; /virtualNodesDefinition&gt;
+ &#160;&#160;&lt; /componentDefinition&gt;
+ &#160;&#160;&lt; deployment&gt;
+ &#160;&#160;&#160;&lt; register virtualNode=&quot;Dispatcher&quot;/&gt;
+ &#160;&#160;&#160;&lt; mapping&gt;
+ &#160;&#160;&#160;&#160;&lt; map virtualNode=&quot;Dispatcher&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; jvmSet&gt;
+ &#160;&#160;&#160;&#160;&#160;&#160;&lt; currentJVM/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; /jvmSet&gt;
+ &#160;&#160;&#160;&#160;&lt; /map&gt;
+ &#160;&#160;&#160;&#160;&lt; map virtualNode=&quot;Renderer&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; jvmSet&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm1&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm2&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm3&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; vmName value=&quot;Jvm4&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; /jvmSet&gt;
+ &#160;&#160;&#160;&#160;&lt; /map&gt;
+ &#160;&#160;&#160;&lt; /mapping&gt;
+ &#160;&#160;&#160;&lt; jvms&gt;
+ &#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm1&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;
+ &#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference
+ refid=&quot;localJVM&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;
+ &#160;&#160;&#160;&#160;&lt; /jvm&gt;
+ &#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm2&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;
+ &#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference
+ refid=&quot;localJVM&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;
+ &#160;&#160;&#160;&#160;&lt; /jvm&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm3&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;
+ &#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference refid=&quot;localJVM&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;
+ &#160;&#160;&#160;&#160;&lt; /jvm&gt;
+ &#160;&#160;&#160;&#160;&lt; jvm name=&quot;Jvm4&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; creation&gt;
+ &#160;&#160;&#160;&#160;&#160;&#160;&lt; processReference refid=&quot;localJVM&quot;/&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; /creation&gt;
+ &#160;&#160;&#160;&#160;&lt; /jvm&gt;
+ &#160;&#160;&#160;&lt; /jvms&gt;
+ &#160;&#160;&lt; /deployment&gt;
+ &#160;&#160;&lt; infrastructure&gt;
+ &#160;&#160;&#160;&lt; processes&gt;
+ &#160;&#160;&#160;&#160;&lt; processDefinition id=&quot;localJVM&quot;&gt;
+ &#160;&#160;&#160;&#160;&#160;&lt; jvmProcess class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;&gt;&lt;/jvmProcess&gt;
+ &#160;&#160;&#160;&#160;&lt; /processDefinition&gt;
+ &#160;&#160;&#160;&lt; /processes&gt;
+ &#160;&#160;&lt; /infrastructure&gt;
+ &#160;&lt;/ProActiveDescriptor&gt;
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>API</title>
@@ -371,11 +235,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/launcher_files/launcher_menu.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/launcher_files/launcher_menu.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/launcher_files/launcher_menu.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/images/launcher_menu.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -389,11 +249,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/launcher_files/launcher_frame.gif" format="GIF"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/launcher_files/launcher_frame.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="doc-files/launcher_files/launcher_frame.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="doc-files/images/launcher_frame.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -411,35 +267,18 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/pics/clusterLogo.gif" format="GIF"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/clusterLogo.svg" format="SVG"/>          </imageobject>
-          <imageobject>
-            <imagedata fileref="doc-files/pics/clusterLogo.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="doc-files/images/clusterLogo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para>This experiment was partly sponsored by &#160;&#160; 
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/pics/logoSun.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/pics/logoSun.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/pics/logoSun.png" format="PNG"/>            </imageobject>
+              <imagedata width="1in" fileref="doc-files/images/logoSun.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
-      <informaltable frame="none">
-        <tgroup cols="1">
-          <colspec colname="c1" colwidth="100*"/>
-          <tbody>
-            <row>
-              <entry align="right" valign="middle"><para>Feel free to send any suggestions to <ulink url="mailto:proactive@objectweb.org">ProActive support</ulink> 2001-2005 Inria Sophia Antipolis</para></entry>
-            </row>
-          </tbody>
-        </tgroup>
-      </informaltable>
-    </sect1>
+    
+</sect1>
   
 </chapter>

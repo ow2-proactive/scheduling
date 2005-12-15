@@ -41,7 +41,6 @@
 <!ENTITY devFaultTolerance SYSTEM "development/FaultTolerance.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
  <!ENTITY FAQ SYSTEM "FAQ.xml"> -->
-
 ]>
 <book>
   <title>ProActive v3.01 Documentation</title>

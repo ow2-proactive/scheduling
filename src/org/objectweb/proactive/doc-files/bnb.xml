@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Branch and Bound API</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/bnb.html  -->
   
-
     <para> The outline of this short handbook:</para>
     <orderedlist>
       <listitem>
@@ -58,11 +56,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/bnb_files/api_archi.jpg" format="JPG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/bnb_files/api_archi.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/bnb_files/api_archi.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/bnb_api_archi.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
  <emphasis role="bold">The API architecture.</emphasis></para>
@@ -89,11 +83,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/bnb_files/api_com.jpg" format="JPG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/bnb_files/api_com.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="doc-files/bnb_files/api_com.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="doc-files/images/bnb_api_com.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
  <emphasis role="bold">Broadcasting a new solution.</emphasis></para>
@@ -214,11 +204,9 @@ BooleanWrapper workersAvailable = this.worker.isHungry();
         <para>Finally, it is the main entry point for starting, and controlling your computation.</para>
         <screen>
 Task task = new YourTask(someArguments);
-
 Manager manager =  ProActiveBranchNBound.newBnB(task,
                         nodes,
                         LargerQueueImpl.class.getName());
-
 Result futureResult = manager.start(); // this call is asynchronous
         </screen>
         <para><emphasis role="bold">Tip:</emphasis> use the constructor <emphasis role="bold">ProActiveBranchNBound.newBnB(Task, VirtualNode[],
@@ -244,13 +232,10 @@ import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.branchnbound.core.exception.NoResultsExcepti\
 on;
-
 public class FlowShopTask extends Task {
-
  public FlowShopTask() {
    // the empty no args constructor for ProActive
  }
-
  /**
   * Contruct a Task which search solution for all permutations to the
   * Flowshop problem. Use it to create the root Task.
@@ -258,7 +243,6 @@ public class FlowShopTask extends Task {
  public FlowShopTask(FlowShop fs) {
    this.flowshopProblem = fs;
  }
-
 }
       </screen>
       <para>Now, implement all Task abstract methods.</para>
@@ -268,7 +252,6 @@ public class FlowShopTask extends Task {
 public void initLowerBound() {
   this.lowerBound = this.computeLowerBound(this.fs);
 }
-
 // Compute the upper bound
 public void initUpperBound() {
   this.upperBound = this.computeUpperBound(this.fs);
@@ -279,9 +262,7 @@ public void initUpperBound() {
 public Vector split() {
   // Divide the set of permutations in 10 sub-tasks
   int nbTasks = 10;
-
   Vector tasks = new Vector(nbTasks);
-
   for (int i = 0 ; i &lt; nbTasks ; i++){
     tasks.add(new FlowShopTask(this, i, nbTasks));
   }

@@ -9,7 +9,6 @@
 <!ENTITY IC2D SYSTEM "IC2D.xml">
 <!ENTITY plugin SYSTEM "development/plugin.xml">
 <!-- <!ENTITY FAQ SYSTEM "FAQ.xml"> -->
-
 ]>
 <book>
   <title>ProActive v3.01 Documentation</title>

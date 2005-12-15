@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>Using SSH tunneling for RMI or HTTP communications</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/SSHTunneling.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.SSHTunneling_html_overview"/>Overview</title>
       <para>ProActive allows users to <emphasis role="bold">tunnel</emphasis> all of their RMI or HTTP

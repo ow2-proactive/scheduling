@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter><title>ProActive Basic Configuration</title>
-
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Configuration.html  -->
   
-
     <sect1 remap="h2">
       <title><anchor id="dbdoclet.id.Configuration_html_overview"/>Overview</title>
       <para>In order to get easier and more flexible configuration in ProActive, we
@@ -73,26 +71,12 @@
  load once created:</para>
       <screen>
 &lt;jvmProcess class=&quot;org.objectweb.proactive.core.process.JVMNodeProcesss&quot;&gt;
-
-
 ...
-
-
  &lt;ProActiveUserPropertiesFile&gt;
-
-
  &lt;absolutePath value=&quot;/net/home/rquilici/config.xml&quot;/&gt;
-
-
  &lt;/ProActiveUserPropertiesFile&gt;
-
-
 ...
-
-
 &lt;/jvmProcess&gt;
-
-
  
       </screen>
     </sect1>
@@ -171,8 +155,6 @@
               <para></para>
             </listitem>
 </itemizedlist>
-
-
         </listitem>
         <listitem>
           <para><emphasis role="bold">Peer-to-Peer properties<anchor id="dbdoclet.id.Configuration_html_p2p_properties"/></emphasis></para>
@@ -385,48 +367,26 @@
       <para>Configuration file must have following structure:</para>
       <screen>
 &lt;ProActiveUserProperties&gt;
-
-
  &lt;properties&gt;
-
-
  &lt;prop 
 <emphasis role="bold">key</emphasis>=&quot;schema.validation&quot;
 <emphasis role="bold">value</emphasis>=&quot;disable&quot;/&gt;
-
-
  &lt;prop 
 <emphasis role="bold">key</emphasis>=&quot;proactive.future.ac&quot; 
 <emphasis role="bold">value</emphasis>=&quot;enable&quot;/&gt;
-
-
  &lt;prop 
 <emphasis role="bold">key</emphasis>=&quot;proactive.communication.protocol&quot; 
 <emphasis role="bold">value</emphasis>=&quot;rmi&quot;/&gt;
-
-
  &lt;prop 
 <emphasis role="bold">key</emphasis>=&quot;proactive.rmi.port&quot; 
 <emphasis role="bold">value</emphasis>=&quot;2001-2005&quot;/&gt;
-
-
  ....
-
-
  &lt;prop 
 <emphasis role="bold">key</emphasis>=&quot;myprop&quot; 
 <emphasis role="bold">value</emphasis>=&quot;myvalue&quot;/&gt;
-
-
  ....
-
-
  &lt;/properties&gt;
-
-
 &lt;/ProActiveUserProperties&gt;
-
-
       </screen>
       <para>Note that tag <emphasis role="bold">ProActiveUserProperties</emphasis>, tag <emphasis role="bold">properties</emphasis> and the
  model: &lt;prop <emphasis role="bold">key</emphasis>=&quot;somekey&quot; <emphasis role="bold">value</emphasis>=&quot;somevalue&quot;/&gt; are
