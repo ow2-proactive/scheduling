@@ -365,17 +365,17 @@ public abstract class AbstractListProcessDecorator
         return finished;
     }
 
-    /* XXX Erk ! */
+    /* Return true if this process is hierarchical, false otherwise  */
     public boolean isHierarchical() {
         return false;
     }
 
-    /* XXX Erk ! */
+    /* Return true if this process is dependent, false otherwise */
     public boolean isDependent() {
         return false;
     }
 
-    /* XXX Erk ! */
+    /* Return true if this process is sequential, false otherwise */
     public boolean isSequential() {
         return false;
     }
