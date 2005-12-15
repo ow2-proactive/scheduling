@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.process;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -148,6 +149,14 @@ public interface UniversalProcess extends java.io.Serializable {
     public int waitFor() throws InterruptedException;
 
     /**
+     *  This method returns the exit value of the subprocess. By convention, the value 0 indicates normal termination.
+     *  Subprocess has to be terminated, otherwise exception is thrown
+     * @return int exit value
+     * @exception java.lang.IllegalThreadStateException if the current thread is not yet terminated while it is trying to get a return value.
+     */
+    public int exitValue() throws IllegalThreadStateException;
+
+    /**
      * Returns true if and only if this process has been started. A process that has been
      * started can be finished or running.
      */
@@ -174,4 +183,19 @@ public interface UniversalProcess extends java.io.Serializable {
      * Returns true if and only if this process is hierarchical
      */
     public boolean isHierarchical();
+
+    /**
+     * Returns true if and only if this process is sequential
+     */
+    public boolean isSequential();
+
+    /**
+     * Returns true if and only if this process is dependent
+     */
+    public boolean isDependent();
+
+    /**
+     * Sets the state started of this process
+     */
+    public void setStarted(boolean isStarted);
 }

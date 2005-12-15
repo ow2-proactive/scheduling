@@ -30,11 +30,12 @@
  */
 package org.objectweb.proactive.core.process;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
 
 
 /**
@@ -142,24 +143,24 @@ public abstract class AbstractListProcessDecorator
     public FileTransferWorkShop getFileTransferWorkShopRetrieve() {
 
         /* TODO Check if this is the correct place
-             * implement this. Then implement it
-             */
+         * implement this. Then implement it
+         */
         return null;
     }
 
     public FileTransferWorkShop getFileTransferWorkShopDeploy() {
 
         /* TODO Check if this is the correct place
-             * implement this. Then implement it
-             */
+         * implement this. Then implement it
+         */
         return null;
     }
 
     public void startFileTransfer() {
 
         /* TODO Check if this is the correct place
-             * implement this. Then implement it
-             */
+         * implement this. Then implement it
+         */
     }
 
     /**
@@ -369,6 +370,16 @@ public abstract class AbstractListProcessDecorator
         return false;
     }
 
+    /* XXX Erk ! */
+    public boolean isDependent() {
+        return false;
+    }
+
+    /* XXX Erk ! */
+    public boolean isSequential() {
+        return false;
+    }
+
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#setCommandPath(java.lang.String)
      */
@@ -439,5 +450,14 @@ public abstract class AbstractListProcessDecorator
 
     protected boolean checkNonEmpty(String s) {
         return (s != null) && (s.length() > 0);
+    }
+
+    public int exitValue() throws IllegalThreadStateException {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    public void setStarted(boolean isStarted) {
+        // TODO Auto-generated method stub
     }
 }

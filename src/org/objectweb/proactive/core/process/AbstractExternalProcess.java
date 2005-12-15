@@ -30,14 +30,15 @@
  */
 package org.objectweb.proactive.core.process;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.process.filetransfer.CopyProtocol;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import java.io.IOException;
 
 
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess
@@ -215,6 +216,10 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
     protected int internalWaitFor() throws InterruptedException {
         return externalProcess.waitFor();
+    }
+
+    protected int internalExitValue() throws IllegalThreadStateException {
+        return externalProcess.exitValue();
     }
 
     /**

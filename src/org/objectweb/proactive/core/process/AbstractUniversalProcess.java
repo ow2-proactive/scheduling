@@ -93,8 +93,8 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     }
 
     /**
-         * @return A FileTransferWorkShop instance for the deploy queue
-         */
+     * @return A FileTransferWorkShop instance for the deploy queue
+     */
     abstract FileTransferWorkShop getFileTransferWorkShopDeploy();
 
     /**
@@ -162,6 +162,10 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         return internalWaitFor();
     }
 
+    public int exitValue() throws IllegalThreadStateException {
+        return internalExitValue();
+    }
+
     public boolean isStarted() {
         return isStarted;
     }
@@ -171,6 +175,14 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     }
 
     public boolean isHierarchical() {
+        return false;
+    }
+
+    public boolean isSequential() {
+        return false;
+    }
+
+    public boolean isDependent() {
         return false;
     }
 
@@ -186,6 +198,10 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         StringBuffer sb = new StringBuffer();
         toString(sb);
         return sb.toString();
+    }
+
+    public void setStarted(boolean isStarted) {
+        this.isStarted = isStarted;
     }
 
     //
@@ -235,6 +251,9 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     protected abstract void internalStopProcess();
 
     protected abstract int internalWaitFor() throws InterruptedException;
+
+    protected abstract int internalExitValue()
+        throws IllegalThreadStateException;
 
     /**
      * This method sets attributes into the FileTransferWorkshop.StructureInformation
