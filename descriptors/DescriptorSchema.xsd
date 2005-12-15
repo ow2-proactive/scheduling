@@ -640,6 +640,9 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="unicoreProcess" type="unicoreProcessType"/>
 			<xs:element name="ngProcess" type="NGProcessType"/>
 			<xs:element name="hierarchicalProcess" type="hierarchicalProcessType"/>
+			<xs:element name="mpiProcess" type="mpiProcessType"/>
+			<xs:element name="dependentProcessSequence" type="dependentProcessSequenceType"/>
+			<xs:element name="independentProcessSequence" type="independentProcessSequenceType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
