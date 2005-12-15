@@ -5,12 +5,16 @@
 <!-- Use ids for filenames -->
 <xsl:param name="use.id.as.filename" select="'1'"/>
 
+
+<!-- Make table usse up all space. -->
+<!-- <xsl:param name="default.table.width" select="100"></xsl:param> -->
+
 <!-- Turn on admonition graphics. -->
 <xsl:param name="admon.graphics" select="'1'"/>
 <xsl:param name="admon.graphics.path"></xsl:param>
 
 <!-- Configure the stylesheet to use -->
-<xsl:param name="html.stylesheet" select="'doc-files/ProActive.css'"/>
+<xsl:param name="html.stylesheet" select="'ProActive.css'"/>
 
 
 <xsl:param name="callout.graphics" select="'1'"></xsl:param>
@@ -59,23 +63,6 @@ qandaset  toc
 </xsl:param>
 
 
-<!--
-<xsl:template name="user.header.navigation" xmlns="http://www.w3.org/1999/xhtml">
-<center>
-<SCRIPT type="text/javascript">
-google_ad_client = "pub-9976612598143264";
-google_ad_width = 728;
-google_ad_height = 90;
-google_ad_format = "728x90_as";
-google_ad_channel ="";
-google_ad_type = "text_image";
-</SCRIPT>
-<SCRIPT type="text/javascript"
-  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</SCRIPT>
-</center>
-</xsl:template>
--->
 <xsl:template name="user.footer.content">
   <P class="copyright" align="right">
    <!--&#x00A9;-->  © 2001-2005 
