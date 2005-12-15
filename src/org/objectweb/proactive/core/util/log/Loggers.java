@@ -57,7 +57,8 @@ public interface Loggers {
     static final public String RMI = "proactive.communication.rmi";
     static final public String SSH = "proactive.communication.ssh";
     static final public String COMPONENTS = "proactive.components";
-    static final public String COMPONENTS_REQUESTS = COMPONENTS + ".request";
+    static final public String COMPONENTS_CONTROLLERS = "proactive.components.controllers";
+    static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
     static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
     static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS +
         ".bytecodegeneration";
