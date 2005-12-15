@@ -13,11 +13,12 @@ rm -rf $html_dir $pdf_dir
 mkdir -p $html_dir 
 mkdir -p $pdf_dir 
 
-echo "    COPYING IMAGE FILES comment : this should be more precise in copy, no?" 
+
+echo "    COPYING IMAGE FILES <comment : number of files copied should be more restrained, no?>" 
 cp -r $xml_src_dir $html_dir/
 
-echo "    HTML INDEX DOC FILE IS $html_dir/index.html"
+echo "    GENERATING html pages in $html_dir"
 xmlto xhtml -o $html_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/PA_index.xml 
 
-echo "    PDF doc is in $pdf_dir"
-xmlto pdf -o $pdf_dir $xml_src_dir/tiny_index.xml  
+echo "    GENERATING pdf in $pdf_dir"
+xmlto pdf -o $pdf_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/PA_index.xml   --searchpath $(pwd)/$base/src/org/objectweb/proactive/
