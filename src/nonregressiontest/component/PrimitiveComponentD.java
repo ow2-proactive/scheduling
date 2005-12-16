@@ -7,7 +7,6 @@ package nonregressiontest.component;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -85,10 +84,11 @@ public class PrimitiveComponentD implements I1, BindingController {
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
-    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName)
+        throws NoSuchInterfaceException {
         if (clientItfName.equals(I2_ITF_NAME)) {
             return i2;
-        } else if (i2Group.containsKey(clientItfName)){
+        } else if (i2Group.containsKey(clientItfName)) {
             return i2Group.getNamedElement(clientItfName);
         } else {
             if (logger.isDebugEnabled()) {

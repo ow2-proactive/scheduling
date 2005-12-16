@@ -35,7 +35,6 @@ import java.util.Properties;
 
 import javax.servlet.Servlet;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;

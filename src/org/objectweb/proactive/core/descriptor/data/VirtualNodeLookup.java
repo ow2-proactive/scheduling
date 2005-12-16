@@ -37,7 +37,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -291,10 +290,6 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     //
     //-------------------IMPLEMENTS Job-----------------------------------
     //
-
-    /**
-     * @see org.objectweb.proactive.Job#getJobID()
-     */
     public String getJobID() {
         if (!isActivated) {
             vnLogger.error(notActivatedMessage);

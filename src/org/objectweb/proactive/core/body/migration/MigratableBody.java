@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.exceptions.SecurityMigrationException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
@@ -59,8 +58,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-
-    /** The object responsible for the migration */
     protected MigrationManager migrationManager;
 
     /** signal that the body has just migrated */
@@ -108,10 +105,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-
-    /**
-     * Signals that the activity of this body, managed by the active thread has just started.
-     */
     protected void activityStarted() {
         super.activityStarted();
 
@@ -176,7 +169,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
                         result = psm.getPolicy(sc);
 
                         if (!result.isMigration()) {
-                            ProActiveLogger.getLogger(Loggers.SECURITY).info("NOTE : Security manager forbids the migration");
+                            ProActiveLogger.getLogger(Loggers.SECURITY)
+                                           .info("NOTE : Security manager forbids the migration");
                             return this;
                         }
                     } else {
@@ -184,7 +178,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
                         result = runtimeDestination.getPolicy(sc);
 
                         if (!result.isMigration()) {
-                            ProActiveLogger.getLogger(Loggers.SECURITY).info("NOTE : Security manager forbids the migration");
+                            ProActiveLogger.getLogger(Loggers.SECURITY)
+                                           .info("NOTE : Security manager forbids the migration");
                             return this;
                         }
                     }

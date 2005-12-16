@@ -38,10 +38,8 @@ import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.spy.Spy;
-import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {

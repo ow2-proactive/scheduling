@@ -43,8 +43,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntimeForwarder;
 
-import modelisation.forwarder.ForwarderMetaObjectFactory;
-
 import testsuite.test.FunctionalTest;
 
 
@@ -111,7 +109,8 @@ public class Test extends FunctionalTest {
             try {
                 Method forwarderMethod = forwarder.getMethod(method.getName(),
                         fParameters);
-                if (!forwarderMethod.getReturnType().equals(method.getReturnType())) {
+                if (!forwarderMethod.getReturnType()
+                                        .equals(method.getReturnType())) {
                     testPassed = false;
                     msg.append(forwarderMethod + "\n");
                     msg.append("     -> Incompatible return type\n");

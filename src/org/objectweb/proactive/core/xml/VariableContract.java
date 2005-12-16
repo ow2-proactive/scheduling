@@ -30,18 +30,16 @@
  */
 package org.objectweb.proactive.core.xml;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.descriptor.xml.VariablesHandler;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 import java.io.FileInputStream;
 import java.io.Serializable;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.descriptor.xml.VariablesHandler;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -206,7 +204,7 @@ public class VariableContract implements Serializable {
 
     /**
      * Method for setting a group of variables from the program.
-     * @see setVariableFromProgram(String name, String value, XMLPropertiesType type)
+     * @see #setVariableFromProgram(String name, String value, VariableContractType type)
      * @throws NullPointerException if the arguments are null.
      * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
      */

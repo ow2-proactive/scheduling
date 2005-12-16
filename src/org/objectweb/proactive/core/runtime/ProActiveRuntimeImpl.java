@@ -179,7 +179,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                 if ((file != null) && new File(file).exists()) {
                     // loading security from a file
-                    this.runtimeSecurityManager = new ProActiveSecurityManager(file);
+                    ProActiveRuntimeImpl.runtimeSecurityManager = new ProActiveSecurityManager(file);
                     logger.info(
                         "ProActive Security Policy (proactive.runtime.security) using " +
                         file);
@@ -190,7 +190,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     if (domainURL != null) {
                         SecurityEntity domain = (SecurityDomain) ProActive.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
                                 domainURL);
-                        this.runtimeSecurityManager.setParent(domain);
+                        ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
                 } else {
                     logger.info(

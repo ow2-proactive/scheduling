@@ -67,8 +67,6 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
-import ibis.rmi.AlreadyBoundException;
-
 
 /**
  *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
@@ -450,7 +448,8 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (ConnectException e) {
             //if we get a connect exception, the rmi registry is unreachable. We cannot throw
             //an exception otherwise the killRT method cannot reach the end!
-            if ((e.getCause().getClass().getName().equals("java.net.ConnectException") &&
+            if ((e.getCause().getClass().getName()
+                      .equals("java.net.ConnectException") &&
                     e.getCause().getMessage().equals("Connection refused"))) {
                 if (url.indexOf("PA_JVM") < 0) {
                     runtimeLogger.info("RMIRegistry unreachable on host " +

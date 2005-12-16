@@ -39,7 +39,6 @@ import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.NodeObjectListener;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredAO;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 
 
 public class NodePanel extends AbstractDataObjectPanel
@@ -246,13 +245,6 @@ public class NodePanel extends AbstractDataObjectPanel
     //
     // -- INNER CLASSES -----------------------------------------------
     //    
-
-    /**
-     * MyDropTargetListener
-     * a listener that tracks the state of the operation
-     * @see java.awt.dnd.DropTargetListener
-     * @see java.awt.dnd.DropTarget
-     */
     private class MyDropTargetListener extends UniqueIDDropTargetListener {
 
         /**

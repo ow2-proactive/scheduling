@@ -42,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -90,12 +89,6 @@ public class StartP2PService implements P2PConstants {
     // -------------------------------------------------------------------------
     // Class Constructors
     // -------------------------------------------------------------------------
-
-    /**
-     * Construct a new <code>StartP2PService</code> with peers specified from
-     * parsed command line.
-     * @param parsed parsed command line arguments.
-     */
     private StartP2PService(Args parsed) {
         // Adding peers from command line
         this.peers.addAll(parsed.peers);
@@ -359,14 +352,6 @@ public class StartP2PService implements P2PConstants {
     // -------------------------------------------------------------------------
     // Main method
     // -------------------------------------------------------------------------
-
-    /**
-     * Usage: java org.objectweb.proactive.p2p.service.StartP2PService
-     * [-acq acquisitionMethod] [-port portNumber] [-s Server ...] [-f ServerListFile]
-     *
-     * @param args
-     *            acquisitionMethod portNumber Servers List File
-     */
     public static void main(String[] args) {
         // Parsing command line
         Args parsed = parseArgs(args);
@@ -421,11 +406,6 @@ public class StartP2PService implements P2PConstants {
     // -------------------------------------------------------------------------
     // Class methods
     // -------------------------------------------------------------------------
-
-    /**
-     * Parse a text file with one host by line.
-     * @param <code>fileURL</code> URL of the file.
-     */
     private void peerFileParser(String fileURL) {
         try {
             FileReader serverList = new FileReader(fileURL);
@@ -545,10 +525,6 @@ public class StartP2PService implements P2PConstants {
     // -------------------------------------------------------------------------
     // Getters
     // -------------------------------------------------------------------------
-
-    /**
-     * @return the active P2P service if started else <code>null</code>.
-     */
     public P2PService getP2PService() {
         return this.p2pService;
     }

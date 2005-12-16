@@ -40,7 +40,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -73,7 +72,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     /** reference to the dispatcher logic, for image generation and message forwarding */
     protected Dispatcher c3ddispatcher;
-    VirtualNode dispatcherNode; 
+    VirtualNode dispatcherNode;
+
     /** AsyncRefto self, needed to add method on own queue */
     protected transient User me;
 
@@ -103,8 +103,6 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     public C3DUser(VirtualNode dispNode) {
         this.dispatcherNode = dispNode;
     }
-    
-     
 
     /** The initialization and linkage is made in this method, instead of using the constructor */
     public void run() {
@@ -135,7 +133,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
         // ask user through Dialog for userName & host 
         String localHost = getLocalHostString();
-        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog(localHost, this.dispatcherNode);
+        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog(localHost,
+                this.dispatcherNode);
         this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
         setUserName(userAndHostNameDialog.getValidatedUserName());
         if (this.c3ddispatcher == null) {
@@ -191,7 +190,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
      * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild
      */
     public void initActivity(Body body) {
-		// FIXME : this test should be stripped, only put here to circumvent component bug
+        // FIXME : this test should be stripped, only put here to circumvent component bug
         if (body == null) {
             logger.error("in C3DUser.initActivity, Body is " + body);
         } else {
@@ -283,7 +282,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         }
         proActiveDescriptor.activateMappings();
         VirtualNode user = proActiveDescriptor.getVirtualNode("User");
-        VirtualNode dispatcherN = proActiveDescriptor.getVirtualNode("Dispatcher");
+        VirtualNode dispatcherN = proActiveDescriptor.getVirtualNode(
+                "Dispatcher");
         Node node = null;
         try {
             node = user.getNode();
@@ -291,7 +291,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
             e1.printStackTrace();
             System.exit(-1);
         }
-        Object[] params = { dispatcherN }; 
+        Object[] params = { dispatcherN };
         C3DUser c3duser = null;
         try {
             c3duser = (C3DUser) org.objectweb.proactive.ProActive.newActive(C3DUser.class.getName(),
@@ -365,12 +365,12 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
             this.c3ddispatcher.getOSString(),
         };
     }
-    
+
     public void setUserName(String newName) {
         this.userName = newName;
     }
 
     public String getUserName() {
-        return this.userName ;
+        return this.userName;
     }
 }

@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.Body;
-
 
 /**
  * This interface describes methods which are accessible by classes

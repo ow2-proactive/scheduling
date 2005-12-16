@@ -30,15 +30,19 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
-import org.objectweb.proactive.core.process.DependentProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
@@ -53,12 +57,6 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -123,10 +121,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
-
-    /**
-     * Contructs a new intance of ProActiveDescriptor
-     */
     public ProActiveDescriptorImpl(String url) {
         mainDefinitionMapping = new HashMap();
         virtualNodeMapping = new java.util.HashMap();
@@ -621,12 +615,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     //  ----- PRIVATE METHODS -----------------------------------------------------------------------------------
     //
-
-    /**
-     * return the main definition matching with the id mainDefinitionID
-     * @param mainDefinitionID Id of the mainDefinition
-     * @return MainDefinition
-     */
     private MainDefinition getMainDefinition(String mainDefinitionID) {
         return (MainDefinition) mainDefinitionMapping.get(mainDefinitionID);
     }
@@ -905,7 +893,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#setVariableContract(org.objectweb.proactive.core.xml.XMLProperties)
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#setVariableContract(org.objectweb.proactive.core.xml.VariableContract)
      */
     public void setVariableContract(VariableContract variableContract) {
         this.variableContract = variableContract;

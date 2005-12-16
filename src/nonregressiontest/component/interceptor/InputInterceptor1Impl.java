@@ -6,7 +6,6 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 
@@ -29,22 +28,22 @@ public class InputInterceptor1Impl extends AbstractProActiveController
         super(owner);
     }
 
-    
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(InputInterceptor1.INPUT_INTERCEPTOR1_NAME,
+            setItfType(ProActiveTypeFactory.instance()
+                                           .createFcItfType(InputInterceptor1.INPUT_INTERCEPTOR1_NAME,
                     InputInterceptor1.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
         }
-	}
+    }
 
-
-	public void setDummyValue(String value) {
+    public void setDummyValue(String value) {
         try {
-            ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
+            ((DummyController) getFcItfOwner()
+                                   .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -52,7 +51,8 @@ public class InputInterceptor1Impl extends AbstractProActiveController
 
     public String getDummyValue() {
         try {
-            return ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
+            return ((DummyController) getFcItfOwner()
+                                          .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
             return null;

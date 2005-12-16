@@ -49,10 +49,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.ext.security.Communication;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
@@ -63,8 +60,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe remote objects library.
  */
-public class RmiRemoteBodyForwarderImpl
-    extends java.rmi.server.UnicastRemoteObject
+public class RmiRemoteBodyForwarderImpl extends java.rmi.server.UnicastRemoteObject
     implements RmiRemoteBodyForwarder {
 
     /**
@@ -74,11 +70,6 @@ public class RmiRemoteBodyForwarderImpl
     //    protected static RandomPortSocketFactory factory = new RandomPortSocketFactory(37002,
     //            5000);
     //  protected static BenchSocketFactory factory = new BenchSocketFactory();
-
-    /**
-     * The encapsulated local body
-     * transient to deal with custom serialization of requests.
-     */
     protected transient UniversalBodyForwarder body;
 
     //

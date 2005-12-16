@@ -44,7 +44,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
@@ -284,9 +283,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         // and also redraw first intervals, hoping to get faster rendering...
         int intervalToRecompute;
         while (-1 != (intervalToRecompute = allArrived(received))) { // we're sure not all have yet arrived
-            // intervalToRecompute is the next not-yet-returned interval
-            //assert !received[stillComputing] : "Oups, recomputing one already received! " + stillComputing;
-            // assign to newly freed engine an interval not yet received
+                                                                     // intervalToRecompute is the next not-yet-returned interval
+                                                                     //assert !received[stillComputing] : "Oups, recomputing one already received! " + stillComputing;
+                                                                     // assign to newly freed engine an interval not yet received
             Interval redrawInterval = intervalsToDraw[intervalToRecompute];
             images.add(engine[engineFree].render(engineFree, redrawInterval));
             log("Interval " + redrawInterval.number +
@@ -373,7 +372,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             return;
         }
 
-        allLog("Scene is being spun along " + angle.direction()); 
+        allLog("Scene is being spun along " + angle.direction());
 
         /* rotate every object ... */
         int objects = this.scene.getNbPrimitives();
@@ -506,7 +505,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         //  Do some initialization, if this was the first consumer to register
         if (this.userBag.size() == 1) {
-
             /* Sets the scene */
             this.scene = createNewScene();
 
@@ -582,9 +580,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             this.election.terminate();
             this.election = null; // so as not to be reused.
         } else {
-        	if(nbUsers != 0){
-            this.election.setNbUsers(nbUsers);
-        	}
+            if (nbUsers != 0) {
+                this.election.setNbUsers(nbUsers);
+            }
         }
     }
 
@@ -668,7 +666,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     }
 
     public void addSphere(Sphere s) {
-        if (this.election != null && this.election.isRunning()) {
+        if ((this.election != null) && this.election.isRunning()) {
             allLog("A Sphere Cannot be added while election is running!");
             return;
         }
@@ -720,7 +718,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                 for (int j = 0; j < 16; j++) {
                     if (service.hasRequestToServe("doBenchmarks")) {
                         break;
-                        
                     }
                     rotateScene(0, rotation);
                     timer.start();

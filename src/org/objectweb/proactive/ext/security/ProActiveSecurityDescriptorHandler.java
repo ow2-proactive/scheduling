@@ -30,16 +30,13 @@
  */
 package org.objectweb.proactive.ext.security;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.security.KeyStore;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
@@ -489,7 +486,8 @@ public class ProActiveSecurityDescriptorHandler
             return (PolicyServer) h.getResultObject();
         } catch (Exception e) {
             e.printStackTrace();
-            ProActiveLogger.getLogger(Loggers.SECURITY).warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler");
+            ProActiveLogger.getLogger(Loggers.SECURITY)
+                           .warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler");
             throw new InvalidPolicyFile(e);
         }
     }

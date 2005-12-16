@@ -30,11 +30,6 @@
  */
 package org.objectweb.proactive.ext.security.domain;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.RemoteException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;

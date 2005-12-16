@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
@@ -41,9 +44,6 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -322,11 +322,6 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     //   * @param vitualNodeName name of the virtualNode to be desactivated
     //   */
     //  public void desactivateMapping(String virtualNodeName);
-
-    /**
-     * Returns the size of virualNodeMapping HashMap
-     * @return int
-     */
     public int getVirtualNodeMappingSize();
 
     // SECURITY
@@ -344,7 +339,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
 
     /**
      * Keeps a reference to the Variable Contract passed as parameter
-     * @param  The Variable Contract (ex XMLProperties)
+     * @param  properties The Variable Contract (ex XMLProperties)
      */
     public void setVariableContract(VariableContract properties);
 
@@ -357,7 +352,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     /**
      * Add the process given by the specified processID in the list of sequential processes.
      * @param sequentialListProcess
-     * @param processID
+     * @param string a processID
      */
     public void addProcessToSequenceList(
         AbstractSequentialListProcessDecorator sequentialListProcess,

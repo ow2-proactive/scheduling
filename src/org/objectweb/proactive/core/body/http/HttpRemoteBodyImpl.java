@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
-import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
 import org.objectweb.proactive.core.body.http.util.messages.BodyRequest;
@@ -56,9 +55,7 @@ import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
@@ -68,18 +65,13 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  *   code into a small set of specific classes.
  * @author virginie
  */
+
 /**
  * @author vlegrand
  *
  */
 public class HttpRemoteBodyImpl implements RemoteBody {
 
-    /*
-       static initializations
-       A runtime MUST be launched when using this class. Indeed, when one gets a reference on an active objet
-       (for instance  when performing a lookupActive ), it is necessary to launched the http runtime with its classserver that
-       will receive the reply from the reference
-     */
     static {
         try {
             RuntimeFactory.getDefaultRuntime();

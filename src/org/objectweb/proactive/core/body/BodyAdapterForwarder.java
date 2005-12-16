@@ -183,8 +183,8 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
         this.bodyID = id;
         this.proxiedRemoteBody = localBody.proxiedRemoteBody;
 
-        if (super.bodyLogger.isDebugEnabled()) {
-            super.bodyLogger.debug(proxiedRemoteBody.getClass());
+        if (BodyAdapter.bodyLogger.isDebugEnabled()) {
+            BodyAdapter.bodyLogger.debug(proxiedRemoteBody.getClass());
         }
 
         this.bodyID = remoteBody.getID();
@@ -194,10 +194,6 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     //--------------------------------------------
     // implements Job
     //--------------------------------------------
-
-    /**
-     * @see org.objectweb.proactive.Job#getJobID()
-     */
     public String getJobID() {
         return jobID;
     }
@@ -205,10 +201,6 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     //--------------------------------------------
     // implements UniversalBody
     //--------------------------------------------
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#receiveRequest(org.objectweb.proactive.core.body.request.Request)
-     */
     public int receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
         return proxiedRemoteBody.receiveRequest(bodyID, request);

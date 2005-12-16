@@ -30,19 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
-import java.util.Iterator;
-
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
-import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
-import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class HostPanel extends AbstractDataObjectPanel
@@ -71,7 +63,8 @@ public class HostPanel extends AbstractDataObjectPanel
         parent = (WorldPanel) getParentDataObjectPanel(); // get parent
 
         alignLayout(parent.getAlignLayout()); //the host default alignement is the worldpanel alignement
-        // Popup menu
+                                              // Popup menu
+
         popup = new PanelPopupMenu("Host " + name + " OS " +
                 hostObject.getOperatingSystem());
         popup.addGenericMenu();

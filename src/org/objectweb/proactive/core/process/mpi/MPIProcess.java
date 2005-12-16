@@ -107,9 +107,9 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         mpiSubCommand.append(this.hostsNumber).append(" ");
         if (remotePath != null) {
             mpiSubCommand.append(remotePath).append("/");
+        } else {
+            mpiSubCommand.append(localPath).append("/");
         }
-        else{
-        	mpiSubCommand.append(localPath).append("/");}
         mpiSubCommand.append(this.mpiFileName).append(" ");
         if (mpiCommandOptions != null) {
             mpiSubCommand.append(this.mpiCommandOptions).append(" ");
@@ -201,7 +201,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param remmotePath The remotePath to set.
+     * @param remotePath The remotePath to set.
      */
     public void setRemotePath(String remotePath) {
         this.remotePath = remotePath;

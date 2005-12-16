@@ -30,10 +30,8 @@
  */
 package org.objectweb.proactive.core.node;
 
-import java.io.IOException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -47,7 +45,6 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**
@@ -103,13 +100,6 @@ public class NodeFactory {
     //
     // -- PUBLIC METHODS - STATIC -----------------------------------------------
     //
-
-    /**
-     * Returns the reference to the default node associated to the current JVM
-     * If no default node yet exists, it creates a new one.
-     * @return a reference to the default node associated to this JVM
-     * @exception NodeException if the default node cannot be instantiated
-     */
     public static synchronized Node getDefaultNode() throws NodeException {
         String nodeURL = null;
 
@@ -142,7 +132,8 @@ public class NodeFactory {
      * @return true if the given node belongs to this JVM false else
      */
     public static boolean isNodeLocal(Node node) {
-        return node.getNodeInformation().getVMID().equals(UniqueID.getCurrentVMID());
+        return node.getNodeInformation().getVMID()
+                   .equals(UniqueID.getCurrentVMID());
     }
 
     /**

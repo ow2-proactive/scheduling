@@ -50,12 +50,6 @@ import javax.swing.border.TitledBorder;
 
 import org.objectweb.fractal.gui.menu.control.SimpleFileFilter;
 import org.objectweb.proactive.core.descriptor.Launcher;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.ic2d.gui.IC2DFrame;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorPanel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
-import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class LauncherFrame extends JFrame {

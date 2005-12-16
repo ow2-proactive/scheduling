@@ -31,14 +31,12 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**

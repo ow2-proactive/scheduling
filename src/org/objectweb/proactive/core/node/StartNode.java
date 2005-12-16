@@ -36,10 +36,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
 import org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -142,22 +138,6 @@ public class StartNode {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-
-    /**
-     * Starts a ProActive node on the localhost host
-     * usage: java org.objectweb.proactive.core.node.StartNode &lt;node URL> [options]<br>
-     * where options are amongst<br>
-     * <ul>
-     * <li>noClassServer : indicates not to create a ClassServer for JINI.
-     *                     By default a ClassServer is automatically created
-     *                     to serve class files on demand.</li>
-     * <li>noRebind      : indicates not to use rebind when registering the
-     *                     node to the RMIRegistry. If a node of the same name
-     *                     already exists, the creation of the new node will fail.</li>
-     * </ul>
-     * for instance: java org.objectweb.proactive.core.node.StartNode //localhost/node1<br>
-     *               java org.objectweb.proactive.core.node.StartNode //localhost/node2 -noClassServer -noRebind<br>
-     */
     public static void main(String[] args) {
         try {
             new StartNode(args).run();
@@ -170,11 +150,6 @@ public class StartNode {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Checks options from the arguments
-     */
     protected void checkOptions(String[] args, int start) {
         for (int i = start; i < args.length; i++)
             checkOption(args[i]);
@@ -211,11 +186,6 @@ public class StartNode {
     //        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
     //        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
     //    }
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Creates the node at the given URL with the rebind option
-     */
     protected void createNode(String nodeURL, boolean noRebind)
         throws NodeException, AlreadyBoundException {
         int exceptionCount = 0;
@@ -372,5 +342,3 @@ public class StartNode {
             MULTICAST_LOCATOR_NAME);
     }
 }
-
-// end class

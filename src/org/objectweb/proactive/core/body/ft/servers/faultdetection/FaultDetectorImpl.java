@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.faultdetection;
 
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Iterator;
