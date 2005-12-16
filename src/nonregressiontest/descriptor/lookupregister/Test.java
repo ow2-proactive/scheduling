@@ -37,20 +37,22 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 
 import testsuite.test.FunctionalTest;
 
-
-/**
- * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
- */
 public class Test extends FunctionalTest {
+  
+   // private static String FS = System.getProperty("file.separator");
+    private static String AGENT_XML_LOCATION_UNIX ;
+    
+  static {
+	  if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+	      "/nonregressiontest/descriptor/lookupregister/AgentIbis.xml").getPath();
+	  } else {
+	  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+      "/nonregressiontest/descriptor/lookupregister/Agent.xml").getPath();
+	  }
+  }
+    
     ProActiveDescriptor proActiveDescriptorAgent;
-    private static String FS = System.getProperty("file.separator");
-    private static String AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-            "/nonregressiontest/descriptor/lookupregister/Agent.xml").getPath();
     A a;
 
     public Test() {
@@ -66,9 +68,8 @@ public class Test extends FunctionalTest {
                 AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
-        A b = (A) ProActive.newActive(A.class.getName(),
+       ProActive.newActive(A.class.getName(),
                 new Object[] { "local" }, vnAgent.getNode());
-        Thread.sleep(3000);
         VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties(
                     "localhost", "Agent"));
         a = (A) vnLookup.getUniqueAO();

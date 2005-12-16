@@ -49,14 +49,22 @@ public class TestNodes extends FunctionalTest {
     static {
         String value = System.getProperty(
                 "nonregressiontest.descriptor.defaultnodes.file");
+        System.out.println("TestNodes.enclosing_method() " + value);
         if (value != null) {
             XML_LOCATION = TestNodes.class.getResource(value).getPath();
-        } else {
-            XML_LOCATION = TestNodes.class.getResource(
-                    "/nonregressiontest/descriptor/defaultnodes/Nodes.xml")
-                                          .getPath();
-        }
+        } else {  
+      	  if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+      		XML_LOCATION = TestNodes.class.getResource(
+            "/nonregressiontest/descriptor/defaultnodes/NodesIbis.xml")
+                                  .getPath();
+    	  } else {
+    		  XML_LOCATION = TestNodes.class.getResource(
+              "/nonregressiontest/descriptor/defaultnodes/Nodes.xml")
+                                    .getPath();
+    	  }
+      }
     }
+           
 
     private static String FS = System.getProperty("file.separator");
     private static ProActiveDescriptor proActiveDescriptor = null;

@@ -28,8 +28,8 @@ public class Test extends FunctionalTest {
     private A group3 = null;
     private A a1 = null;
     private A a2 = null;
-    private nonregressiontest.activeobject.lookupactive.A registeredA1 = null;
-    private nonregressiontest.activeobject.lookupactive.A registeredA2 = null;
+    private nonregressiontest.activeobject.equality.RegisteredObject registeredA1 = null;
+    private nonregressiontest.activeobject.equality.RegisteredObject registeredA2 = null;
 
     public Test() {
         super("comparisons with active objects using equals",
@@ -46,12 +46,12 @@ public class Test extends FunctionalTest {
         group2 = (A) ProActiveGroup.newGroup(A.class.getName());
         group3 = (A) ProActiveGroup.newGroup(A.class.getName());
 
-        registeredA1 = (nonregressiontest.activeobject.lookupactive.A) ProActive.newActive(nonregressiontest.activeobject.lookupactive.A.class.getName(),
+        registeredA1 = (nonregressiontest.activeobject.equality.RegisteredObject) ProActive.newActive(nonregressiontest.activeobject.equality.RegisteredObject.class.getName(),
                 new Object[] { "toto" });
-        Thread.sleep(5000);
-        registeredA2 = (nonregressiontest.activeobject.lookupactive.A) ProActive.lookupActive(nonregressiontest.activeobject.lookupactive.A.class.getName(),
+        registeredA1.register();
+        registeredA2 = (nonregressiontest.activeobject.equality.RegisteredObject) ProActive.lookupActive(nonregressiontest.activeobject.equality.RegisteredObject.class.getName(),
                 UrlBuilder.buildUrlFromProperties("localhost", "A"));
-
+        
         ProActiveGroup.getGroup(group1).add(a1);
         ProActiveGroup.getGroup(group1).add(a2);
 

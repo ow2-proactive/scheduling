@@ -28,23 +28,20 @@
  *
  * ################################################################
  */
-package nonregressiontest.activeobject.lookupactive;
+package nonregressiontest.activeobject.equality;
 
 import java.io.IOException;
-
-import nonregressiontest.activeobject.equality.RegisteredObject;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-
-public class A  {
+public class RegisteredObject {
     String name;
 
-    public A() {
+    public RegisteredObject() {
     }
 
-    public A(String name) {
+    public RegisteredObject(String name) {
         this.name = name;
     }
 
@@ -52,13 +49,14 @@ public class A  {
         return name;
     }
 
+    
     public int register() {
-  	  try {
-            ProActive.register((A) ProActive.getStubOnThis(),
-                UrlBuilder.buildUrlFromProperties("localhost", "A"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-  	return 0;
-  }
+    	  try {
+              ProActive.register((RegisteredObject) ProActive.getStubOnThis(),
+                  UrlBuilder.buildUrlFromProperties("localhost", "A"));
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+    	return 0;
+    }
 }

@@ -30,17 +30,17 @@
  */
 package nonregressiontest.descriptor.extendedjvm;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 import testsuite.test.FunctionalTest;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 
 
 public class Test extends FunctionalTest {
@@ -58,9 +58,9 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        VirtualNode vn1 = descriptor.getVirtualNode("vn1");
-        VirtualNode vn2 = descriptor.getVirtualNode("vn2");
-        VirtualNode vn3 = descriptor.getVirtualNode("vn3");
+        VirtualNode vn1 = descriptor.getVirtualNode("evn1");
+        VirtualNode vn2 = descriptor.getVirtualNode("evn2");
+        VirtualNode vn3 = descriptor.getVirtualNode("evn3");
         a1 = (A) ProActive.newActive(A.class.getName(), new Object[] {  },
                 vn1.getNode());
         a2 = (A) ProActive.newActive(A.class.getName(), new Object[] {  },
@@ -73,11 +73,18 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
+        String fileName = null;
+
+        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+            fileName = "JVMExtensionIbis";
+        } else {
+            fileName = "JVMExtension";
+        }
         String oldFilePath = getClass()
-                                 .getResource("/nonregressiontest/descriptor/extendedjvm/JVMExtension.xml")
-                                 .getPath();
-        String newFilePath = oldFilePath.replaceFirst("JVMExtension.xml",
-                "JVMExtension-tmp.xml");
+                                 .getResource("/nonregressiontest/descriptor/extendedjvm/" +
+                fileName + ".xml").getPath();
+        String newFilePath = oldFilePath.replaceFirst(fileName + ".xml",
+                fileName + "-tmp.xml");
 
         // if tests are run from the /compile directory : getParent for root directory 
         File userDir = new File(System.getProperty("user.dir"));
@@ -90,8 +97,8 @@ public class Test extends FunctionalTest {
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
         descriptor = ProActive.getProactiveDescriptor(getClass()
-                                                          .getResource("/nonregressiontest/descriptor/extendedjvm/JVMExtension-tmp.xml")
-                                                          .getPath());
+                                                          .getResource("/nonregressiontest/descriptor/extendedjvm/" +
+                    fileName + "-tmp.xml").getPath());
         descriptor.activateMappings();
     }
 

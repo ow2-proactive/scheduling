@@ -49,9 +49,18 @@ import testsuite.test.FunctionalTest;
 public class Test extends FunctionalTest {
     ProActiveDescriptor proActiveDescriptor;
     private static String FS = System.getProperty("file.separator");
-    private static String AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-            "/nonregressiontest/descriptor/coallocation/coallocation.xml")
-                                                              .getPath();
+    private static String AGENT_XML_LOCATION_UNIX = null;  
+    static {
+    	  if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+    		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+              "/nonregressiontest/descriptor/coallocation/coallocationIbis.xml")
+                                                                .getPath();
+    	  } else {
+    		  AGENT_XML_LOCATION_UNIX = Test.class.getResource(
+              "/nonregressiontest/descriptor/coallocation/coallocation.xml")
+                                                                .getPath(); 
+    	  }
+      }
     Node node1;
     Node node2;
 
@@ -67,8 +76,8 @@ public class Test extends FunctionalTest {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         proActiveDescriptor.activateMappings();
-        VirtualNode vn1 = proActiveDescriptor.getVirtualNode("vn1");
-        VirtualNode vn2 = proActiveDescriptor.getVirtualNode("vn2");
+        VirtualNode vn1 = proActiveDescriptor.getVirtualNode("covn1");
+        VirtualNode vn2 = proActiveDescriptor.getVirtualNode("covn2");
         node1 = vn1.getNode();
         node2 = vn2.getNode();
     }

@@ -52,6 +52,19 @@ import testsuite.test.FunctionalTest;
 public class Test extends FunctionalTest {
     private static String P2P_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/p2p/TestP2P.xml").getPath();
+
+    static {
+        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+            P2P_XML_LOCATION_UNIX = Test.class.getResource(
+                    "/nonregressiontest/descriptor/services/p2p/TestP2PIbis.xml")
+                                              .getPath();
+        } else {
+            P2P_XML_LOCATION_UNIX = Test.class.getResource(
+                    "/nonregressiontest/descriptor/services/p2p/TestP2P.xml")
+                                              .getPath();
+        }
+    }
+
     JVMProcessImpl process1;
     JVMProcessImpl process;
     Node[] nodeTab;

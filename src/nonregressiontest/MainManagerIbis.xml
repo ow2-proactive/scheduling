@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Manager>
+
+	<name>Main unit test manager</name>
+	<description>Manage all unit non-regression tests</description>
+	
+	<!-- all classes in package nonregressiontest are added, only the specified
+		tests are sorted. -->
+	<packageGroup name="Unit test group" description="group of unit tests" 
+		dir="../classes" 
+		packageName="nonregressiontest" >
+			<unitTest exclude="yes" class="nonregressiontest.runtime.defaultruntime.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.node.nodefactory.Test" /> 
+			<!-- the next test create 3 nodes, accessible by 3 static methods -->
+			<unitTest exclude="no" class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
+			<unitTest exclude="yes" class="nonregressiontest.stub.stubgeneration.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.stub.stubinterface.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.creation.local.newactive.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.creation.remote.turnactive.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.request.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.request.immediateservice.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.request.terminate.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.lookupactive.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.node.getactiveobject.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.migration.simplemigration.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.migration.multiplemigration.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.migration.loopmigration.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.migration.strategy.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.locationserver.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.acontinuation.Test" /> 
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.wrapper.Test" /> 
+			<unitTest exclude="yes" class="nonregressiontest.exception.Test" /> 
+			<unitTest exclude="yes" class="nonregressiontest.descriptor.lookupregister.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.descriptor.coallocation.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.descriptor.extendedjvm.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.descriptor.services.rmilookup.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.descriptor.services.p2p.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.descriptor.launcher.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.creation.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.onewaycall.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.asynchronouscall.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.result.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.scatter.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.oneserialization.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.exception.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.dynamicthreadpool.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.javaobject.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.barrier.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.group.accessbyname.Test" />
+			<unitTest exclude="yes" class="nonregressiontest.activeobject.equality.Test" />
+			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.parallel.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.binding.local.collective.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.binding.remote.collective.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.binding.local.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.descriptor.fractaladl.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.descriptor.arguments.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.controller.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.shortcuts.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
+			<unitTest exclude="yes" class="nonregressiontest.ft.Test"/>
+			<unitTest exclude="yes" class="nonregressiontest.runtime.classloader.Test" />
+		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.keygeneration.SecurityTestKeyGen"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
+		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>		
+	</packageGroup>
+	
+    <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
+    	<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
+		<idTest class="nonregressiontest.component.creation.local.newactive.composite.Test" id="1" />
+		<idTest class="nonregressiontest.component.assembly.local.composite.Test" id="2" />
+		<idTest class="nonregressiontest.component.binding.local.composite.Test" id="3" /> 
+
+		<idTest class="nonregressiontest.component.creation.remote.newactive.composite.Test" id="4" />
+		<idTest class="nonregressiontest.component.assembly.remote.composite.Test" id="5" />
+		<idTest class="nonregressiontest.component.binding.remote.composite.Test" id="6" /> 
+		<interLinks>
+			<!-- deployment  of virtual nodes-->
+			<link id="1">
+				<parent id="0" />
+			</link>
+			<!-- local tests - composite-->
+			<link id="2">
+				<parent id="1" />
+			</link>
+			<link id="3">
+				<parent id="2" />
+			</link>-->
+			<!-- remote tests - composite-->
+			<link id="5">
+				<parent id="4" />
+			</link>
+			<link id="6">
+				<parent id="5" />
+			</link>
+		</interLinks>
+	</interLinkedGroup> 
+	
+    <interLinkedGroup name="parallel components interlinked tests" description="creation, assembly, binding, local and remote of parallel components ">
+    		<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
+		<idTest class="nonregressiontest.component.creation.local.newactive.parallel.Test" id="7" />
+		<idTest class="nonregressiontest.component.assembly.local.parallel.Test" id="8" />
+		<idTest class="nonregressiontest.component.binding.local.parallel.Test" id="9" />
+
+		<idTest class="nonregressiontest.component.creation.remote.newactive.parallel.Test" id="10" />
+		<idTest class="nonregressiontest.component.assembly.remote.parallel.Test" id="11" />
+		<idTest class="nonregressiontest.component.binding.remote.parallel.Test" id="12" /> 
+
+		<interLinks>
+			<!-- deployment  of virtual nodes-->
+			<link id="7">
+				<parent id="0" />
+			</link>
+			<!-- local tests - parallel-->
+			<link id="8">
+				<parent id="7" />
+			</link>
+			<link id="9">
+				<parent id="8" />
+			</link>
+			<!-- remote tests - parallel-->
+			<link id="11">
+				<parent id="10" />
+			</link>
+			<link id="12">
+				<parent id="11" />
+			</link> 
+		</interLinks>
+	</interLinkedGroup>
+
+	<packageGroup name="Security tests group" description="Check security architecture" 
+		dir="../classes" packageName="nonregressiontest.security" >
+		    <unitTest exclude="no" class="nonregressiontest.security.SecurityTests"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.keygeneration.SecurityTestKeyGen"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
+			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
+		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>		
+	</packageGroup>
+
+	<!--<log4j>../compile/proactive-log4j</log4j>-->
+	
+	<result type="html" file="../test.html" />
+	
+	<!--<properties>
+		<prop key="RemoteHostname" value="nahuel />
+	</properties>-->
+	
+</Manager>

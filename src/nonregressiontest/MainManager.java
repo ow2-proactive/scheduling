@@ -92,9 +92,13 @@ public class MainManager extends FunctionalTestManager {
         //removeLogfile();
         ProActiveConfiguration.load();
         MainManager manager = null;
-
-        String path = MainManager.class.getResource(
+        String path = null;
+        if (args.length>0) {
+                path = MainManager.class.getResource(args[0]).getPath();	
+        }  else {
+             path = MainManager.class.getResource(
                 "/nonregressiontest/MainManager.xml").getPath();
+}
         File xml = new File(path);
 
         try {

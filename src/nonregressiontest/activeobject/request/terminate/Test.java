@@ -59,7 +59,7 @@ public class Test extends FunctionalTest {
         a = (A) ProActive.newActive(A.class.getName(), new Object[0]);
         a.method1();
         a.exit();
-        Thread.sleep(5000);
+      //  Thread.sleep(5000);
     }
 
     /**

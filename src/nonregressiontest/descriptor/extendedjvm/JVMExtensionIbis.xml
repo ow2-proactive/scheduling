@@ -48,7 +48,12 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 				<jvmParameters>
-						<parameter value="-Dtiti=titi"/>
+						<parameter value="-Dtiti=titi"/>	
+						<parameter value="-Dproactive.communication.protocol=ibis"/>
+						<parameter value="-Dibis.serialization=ibis"/>
+						<parameter value="-Dibis.name_server.host=localhost"/>
+						<parameter value="-Dibis.name_server.pool=rutget"/>
+						<parameter value="-Dibis.name_server.key=12"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -58,17 +63,27 @@
 				<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
 				     <absolutePath value="proactive.home/dist/ProActive/ProActive.jar"/>
+				     <absolutePath value="proactive.home/classes"/>
 				     <absolutePath value="proactive.home/lib/asm.jar"/>
 				     <absolutePath value="proactive.home/lib/log4j.jar"/>
 				     <absolutePath value="proactive.home/lib/xercesImpl.jar"/>
 				     <absolutePath value="proactive.home/lib/bouncycastle.jar"/>
 				     <absolutePath value="proactive.home/lib/components/fractal.jar"/>
+				     <absolutePath value="proactive.home/lib/ibis/ibis.jar"/>
+				     <absolutePath value="proactive.home/lib/ibis/ibis-connect.jar"/>
+				     <absolutePath value="proactive.home/lib/ibis/ibis-util.jar"/>
+   				     <absolutePath value="proactive.home/lib/ibis/colobus.jar"/>
 					</classpath>
 					<policyFile>
 						  <absolutePath value="proactive.home/src/nonregressiontest/descriptor/extendedjvm/test.policy"/>
 					</policyFile>
 					<jvmParameters >
 						<parameter value="-Dtata=tata"/>
+						<parameter value="-Dproactive.communication.protocol=ibis"/>
+						<parameter value="-Dibis.serialization=ibis"/>
+						<parameter value="-Dibis.name_server.host=localhost"/>
+						<parameter value="-Dibis.name_server.pool=rutget"/>
+						<parameter value="-Dibis.name_server.key=12"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -77,6 +92,11 @@
 				<extendedJvm refid="localJVM"/>
 					<jvmParameters>
 						<parameter value="-Dtoto=toto"/>
+						<parameter value="-Dproactive.communication.protocol=ibis"/>
+						<parameter value="-Dibis.serialization=ibis"/>
+						<parameter value="-Dibis.name_server.host=localhost"/>
+						<parameter value="-Dibis.name_server.pool=rutget"/>
+						<parameter value="-Dibis.name_server.key=12"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

@@ -45,9 +45,19 @@ import testsuite.test.FunctionalTest;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static String XML_LOCATION = Test.class.getResource(
-            "/nonregressiontest/descriptor/launcher/TestLauncher.xml").getPath();
+    private static String XML_LOCATION;
 
+    static {
+    	  if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+    		  XML_LOCATION = Test.class.getResource(
+              "/nonregressiontest/descriptor/launcher/TestLauncherIbis.xml").getPath();
+          } else {
+        	  XML_LOCATION = Test.class.getResource(
+          "/nonregressiontest/descriptor/launcher/TestLauncher.xml").getPath();
+          }
+    	
+    }
+    
     /** node array for VN1 */
     Node[] nodeTab;
 
@@ -70,7 +80,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         launcher = new Launcher(XML_LOCATION);
         launcher.activate();
-        Thread.sleep(5000);
+  //      Thread.sleep(5000);
     }
 
     /* (non-Javadoc)
@@ -84,18 +94,20 @@ public class Test extends FunctionalTest {
      */
     public void endTest() throws Exception {
         // kill the runtimes where the nodes are deployed.
-        part.getVirtualNode("VN1").killAll(true);
-        part.getVirtualNode("VN2").killAll(true);
+        part.getVirtualNode("lVN1").killAll(true);
+        part.getVirtualNode("lVN2").killAll(true);
         vnMain.killAll(true);
     }
 
     public boolean postConditions() throws Exception {
         pad = launcher.getProActiveDescriptor();
-        vnMain = pad.getVirtualNode("VNmain");
+        vnMain = pad.getVirtualNode("lVNmain");
         mainNode = vnMain.getNode();
         part = mainNode.getProActiveRuntime();
-        nodeTab = part.getVirtualNode("VN1").getNodes();
-        nodeTab2 = part.getVirtualNode("VN2").getNodes();
+        System.out.println("XXXXXXXXXXXXXXXX " + part);
+        Thread.sleep(5000);
+        nodeTab = part.getVirtualNode("lVN1").getNodes();
+        nodeTab2 = part.getVirtualNode("lVN2").getNodes();
 
         // 1) there must be exactly 2 nodes
         if ((nodeTab.length != 1) || (nodeTab2.length != 1)) {
