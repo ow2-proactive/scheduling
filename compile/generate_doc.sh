@@ -16,6 +16,7 @@ mkdir -p $pdf_dir
 
 echo "    COPYING IMAGE FILES <comment : number of files copied should be more restrained, no?>" 
 cp -r $xml_src_dir $html_dir/
+cp $xml_src_dir/ProActive.css $html_dir/
 
 echo "    GENERATING html pages in $html_dir"
 xmlto xhtml -o $html_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/PA_index.xml 
