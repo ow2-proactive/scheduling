@@ -27,7 +27,7 @@
       <processes>                            <!-- Define how the jvms should be created -->
          
          <processDefinition id="rsh_amda">     <!-- Creation of a node on a distant machine called "amda"  -->
-            <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess"  hostname="amda">
+            <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess"  hostname="amda">
                <processReference refid="jvmProcess"/>
             </rshProcess>
          </processDefinition>
