@@ -2002,7 +2002,7 @@ public class ProActive {
      */
     public static void addNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
-            ((AbstractProxy) ao).addNFEListener(listener);
+            ((AbstractProxy) ((org.objectweb.proactive.core.mop.StubObject) ao).getProxy()).addNFEListener(listener);
         } catch (ClassCastException cce) {
             throw new IllegalArgumentException(
                 "The object must be a proxy to an active object");
@@ -2017,7 +2017,7 @@ public class ProActive {
      */
     public static void removeNFEListenerOnProxy(Object ao, NFEListener listener) {
         try {
-            ((AbstractProxy) ao).removeNFEListener(listener);
+            ((AbstractProxy) ((org.objectweb.proactive.core.mop.StubObject) ao).getProxy()).removeNFEListener(listener);
         } catch (ClassCastException cce) {
             throw new IllegalArgumentException(
                 "The object must be a proxy to an active object");
