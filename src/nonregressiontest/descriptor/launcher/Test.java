@@ -104,7 +104,6 @@ public class Test extends FunctionalTest {
         vnMain = pad.getVirtualNode("lVNmain");
         mainNode = vnMain.getNode();
         part = mainNode.getProActiveRuntime();
-        System.out.println("XXXXXXXXXXXXXXXX " + part);
         Thread.sleep(5000);
         nodeTab = part.getVirtualNode("lVN1").getNodes();
         nodeTab2 = part.getVirtualNode("lVN2").getNodes();
