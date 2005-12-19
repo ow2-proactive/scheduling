@@ -529,7 +529,7 @@
 		<!-- 
 			create zip version of ProActive without source
 		-->
-		<zip zipfile="${dist.dir}/ProActive_3_0.zip">
+		<zip zipfile="${dist.dir}/ProActive_3_0_1.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**"/>
 				<exclude name="compile/**"/>
