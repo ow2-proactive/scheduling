@@ -106,17 +106,20 @@ public class ComponentRequestImpl extends RequestImpl
         Throwable exception = null;
 
         try {
-            if (isControllerRequest()) {
+            String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                                               .getComponentParameters()
+                                               .getHierarchicalType();
+            if (isControllerRequest() &&
+                    !(Constants.PRIMITIVE.equals(hierarchical_type) &&
+                    ("attribute-controller".equals(
+                        methodCall.getComponentInterfaceName())))) {
+                // attribute controllers are actually implemented by primitive components --> need to delegate in that case
                 result = ((ProActiveComponentImpl) ((ComponentBodyImpl) targetBody)
                           .getProActiveComponentImpl()).getControllerRequestHandler()
                           .handleRequest(this);
             } else {
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);
-
-                    String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                                                       .getComponentParameters()
-                                                       .getHierarchicalType();
 
                     // if the component is a composite OR A PARALLEL , forward to functional interface 
                     if (hierarchical_type.equals(Constants.COMPOSITE) ||
@@ -139,11 +142,11 @@ public class ComponentRequestImpl extends RequestImpl
                                       .getFcInterface(methodCall.getComponentInterfaceName()))
                                       .getFcItfImpl()).getProxy().reify(methodCall);
                         } catch (IllegalArgumentException e) {
-                        	throw new ServeException(
-                            "could not reify method call : ", e);
+                            throw new ServeException("could not reify method call : ",
+                                e);
                         } catch (Throwable e) {
-                        	throw new ServeException(
-                                    "could not reify method call : ", e);
+                            throw new ServeException("could not reify method call : ",
+                                e);
                         }
                     } else {
                         // the component is a primitive
@@ -197,7 +200,8 @@ public class ComponentRequestImpl extends RequestImpl
                     InputInterceptor interceptor = (InputInterceptor) it.next();
                     interceptor.beforeInputMethodInvocation(methodCall);
                 } catch (NullPointerException e) {
-                    logger.error("could not intercept invocation : " + e.getMessage());
+                    logger.error("could not intercept invocation : " +
+                        e.getMessage());
                 }
             }
         }
@@ -229,7 +233,9 @@ public class ComponentRequestImpl extends RequestImpl
      */
     public boolean isControllerRequest() {
         // according to the Fractal spec v2.0 , section 4.1
-        return ((methodCall.getComponentInterfaceName()!=null) && (methodCall.getComponentInterfaceName().endsWith("-controller") || methodCall.getComponentInterfaceName().equals("component"))); 
+        return ((methodCall.getComponentInterfaceName() != null) &&
+        (methodCall.getComponentInterfaceName().endsWith("-controller") ||
+        methodCall.getComponentInterfaceName().equals("component")));
     }
 
     /*

@@ -53,11 +53,12 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        Assertions.assertEquals("This component is storing the info : hello world",
-            ((Action) dummy.getFcInterface("action")).doSomething());
     }
 
     public boolean postConditions() throws Exception {
+        Assertions.assertEquals("This component is storing the info : hello world",
+                ((Action) dummy.getFcInterface("action")).doSomething());
+
         return true;
     }
 
