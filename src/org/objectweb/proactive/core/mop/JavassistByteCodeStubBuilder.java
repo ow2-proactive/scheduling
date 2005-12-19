@@ -64,7 +64,11 @@ public class JavassistByteCodeStubBuilder {
             ClassPool pool = ClassPool.getDefault();
             generatedClass = pool.makeClass(Utils.convertClassNameToStubClassName(
                         className));
+            
             CtClass superClass = pool.get(className);
+            CtField outsideOfConstructorField = new CtField(pool.get(CtClass.booleanType.getName()), "outsideOfConstructor", generatedClass);
+            
+            generatedClass.addField(outsideOfConstructorField, (superClass.isInterface()? " false" : "true"));
             if (superClass.isInterface()) {
                 generatedClass.addInterface(superClass);
                 generatedClass.setSuperclass(pool.get(Object.class.getName()));
@@ -73,11 +77,15 @@ public class JavassistByteCodeStubBuilder {
             }
             generatedClass.addInterface(pool.get(Serializable.class.getName()));
             generatedClass.addInterface(pool.get(StubObject.class.getName()));
+
             createStubObjectMethods(generatedClass);
 
+            
             CtField methodsField = new CtField(pool.get(
                         "java.lang.reflect.Method[]"), "overridenMethods",
                     generatedClass);
+            
+            
             methodsField.setModifiers(Modifier.STATIC);
             generatedClass.addField(methodsField);
 
@@ -215,9 +223,9 @@ public class JavassistByteCodeStubBuilder {
             createStaticInitializer(generatedClass, reifiedMethods,
                 classesIndexer);
 
-            createReifiedMethods(generatedClass, reifiedMethods);
-            //            generatedClass.writeFile();
-            //            System.out.println("[JAVASSIST] generated class : " + className);
+            createReifiedMethods(generatedClass, reifiedMethods, superClass.isInterface());
+//                        generatedClass.writeFile();
+//                        System.out.println("[JAVASSIST] generated class : " + className);
             return generatedClass.toBytecode();
         } catch (Exception e) {
             e.printStackTrace();
@@ -233,7 +241,7 @@ public class JavassistByteCodeStubBuilder {
      * @throws CannotCompileException
      */
     private static void createReifiedMethods(CtClass generatedClass,
-        CtMethod[] reifiedMethods)
+        CtMethod[] reifiedMethods, boolean stubOnInterface)
         throws NotFoundException, CannotCompileException {
         for (int i = 0; i < reifiedMethods.length; i++) {
             CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
@@ -302,9 +310,31 @@ public class JavassistByteCodeStubBuilder {
                 body += postWrap;
             }
             body += ";";
+            
+            // the following is for inserting conditional statement for method code executing
+            // within or outside the construction of the object
+            if (!stubOnInterface) {
+                String preReificationCode = "if (outsideOfConstructor) ";
+                // outside of constructor : object is already constructed
+                
+                String postReificationCode = "\n} else {\n";
+                // if inside constructor (i.e. in a method called by a
+                // constructor from a super class)
+                if (!reifiedMethods[i].getReturnType().equals(CtClass.voidType)) {
+                    postReificationCode += "return ";
+                }
+                postReificationCode += "super." + reifiedMethods[i].getName() + "(";
+                for (int j = 0; j < paramTypes.length; j++) {
+                    postReificationCode += "$" + (j + 1)
+                            + (((j + 1) < paramTypes.length) ? "," : "");
+                }
+
+                postReificationCode += ");";
+                body = preReificationCode + body + postReificationCode;
+            }
             body += "\n}";
-            //             System.out.println("method : " + reifiedMethods[i].getName() +
-            //                 " : \n" + body);
+//            System.out.println("method : " + reifiedMethods[i].getName()
+//                    + " : \n" + body);
             CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
                     reifiedMethods[i].getName(),
                     reifiedMethods[i].getParameterTypes(),
@@ -484,4 +514,5 @@ public class JavassistByteCodeStubBuilder {
             addSuperInterfaces(super_interfaces[i], superItfs);
         }
     }
+    
 }
