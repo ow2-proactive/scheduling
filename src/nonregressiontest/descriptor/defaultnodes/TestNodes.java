@@ -49,7 +49,6 @@ public class TestNodes extends FunctionalTest {
     static {
         String value = System.getProperty(
                 "nonregressiontest.descriptor.defaultnodes.file");
-        System.out.println("TestNodes.enclosing_method() " + value);
         if (value != null) {
             XML_LOCATION = TestNodes.class.getResource(value).getPath();
         } else {  
