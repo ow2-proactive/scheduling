@@ -96,6 +96,19 @@ public class Assertions {
     }
 
     /**
+     * Asserts the null value of an element <br>
+     * If the element is not null , a runtime exception is thrown (AssertionFailedException) and
+     * the current test is terminated
+     *
+     * @param o the reference to test
+     */
+   static public void assertNull(Object o) {
+	  if (o!=null) {
+		  throw new AssertionFailedException(null);
+	  }
+    }
+   
+    /**
      * Asserts the non-equality of 2 elements. <br>
      * The elements  can be null
      * If the elements are equal , a runtime exception is thrown (AssertionFailedException) and
@@ -130,10 +143,24 @@ public class Assertions {
             throw new AssertionFailedException(failureMessage);
         }
     }
-
-    static private void failureNotification() {
-        failureNotification(null);
+    
+    /**
+     * Asserts that an element is not null<br>
+     * If the element is  null , a runtime exception is thrown (AssertionFailedException) and
+     * the current test is terminated
+     *
+     * @param o the reference to test
+     */
+   static public void assertNotNull(Object o) {
+	  if (o==null) {
+		  throw new AssertionFailedException(null);
+	  }
     }
+    
+
+//    static private void failureNotification() {
+//        failureNotification(null);
+//    }
 
     static private void failureNotification(String message) {
         if (message == null) {
