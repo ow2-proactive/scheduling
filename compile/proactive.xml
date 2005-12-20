@@ -976,57 +976,58 @@
 
 
 	<!--
-	================================================================
-	==
-    ==  Tests coverage : need clover license in user.home directory
-    ==
-    ================================================================-->
-  <property name="coverage.dir" value="${base}/compile/coverage"/>
-
-  	<path id="coverage.classpath">
+		================================================================
+		==
+		==  Tests coverage : need clover license in user.home directory
+		==
+		================================================================-->
+	<!-- Commented for the release
+		<property name="coverage.dir" value="${base}/compile/coverage"/>
+		
+		<path id="coverage.classpath">
 		<path refid="test.classpath"/>
 		<pathelement location="${base}/dev/lib/clover.jar"/>
 		<pathelement location="${base}/dev/lib/cenquatasks.jar"/>
-	</path>
-  
-  
-  <taskdef resource="com/cenqua/ant/antlib.xml" classpath="${base}/dev/lib/cenquatasks.jar"/>
-  <extendclasspath path="${base}/dev/lib/clover.jar"/>
-  <taskdef resource="clovertasks" classpath="${base}/dev/lib/clover.jar"/>
-  
-  
-  <target name="coverage-init">
-  	<delete file="coverage*.*"/>
-  	<copy file="${user.home}/clover.license" todir="${base}/dev/lib"/>
-    <clover-setup initString="coverage.db">
-	    <files>
-		    <exclude name="org/objectweb/proactive/ic2d/**/*.java"/>
-		    <exclude name="org/objectweb/proactive/examples/**/*.java"/>
-		    <exclude name="org/objectweb/proactive/ext/**/*.java"/>
-		    <exclude name="nonregressiontest/**/*.java"/>
-		    <exclude name="testsuite/**/*.java"/>
+		</path>
+		
+		
+		<taskdef resource="com/cenqua/ant/antlib.xml" classpath="${base}/dev/lib/cenquatasks.jar"/>
+		<extendclasspath path="${base}/dev/lib/clover.jar"/>
+		<taskdef resource="clovertasks" classpath="${base}/dev/lib/clover.jar"/>
+		
+		
+		<target name="coverage-init">
+		<delete file="coverage*.*"/>
+		<copy file="${user.home}/clover.license" todir="${base}/dev/lib"/>
+		<clover-setup initString="coverage.db">
+		<files>
+		<exclude name="org/objectweb/proactive/ic2d/**/*.java"/>
+		<exclude name="org/objectweb/proactive/examples/**/*.java"/>
+		<exclude name="org/objectweb/proactive/ext/**/*.java"/>
+		<exclude name="nonregressiontest/**/*.java"/>
+		<exclude name="testsuite/**/*.java"/>
 		</files>
-    </clover-setup>
-  </target>
-  
-  
-  <target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
- 	 <delete file="${base}/compile/tests.log"/>
-	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file--> 
-	 <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
-	  <java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="coverage.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
-			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
-	  </java>
-      <clover-report>
-         <current outfile="clover_html">
-            <format type="html"/>
-         </current>
-      </clover-report>
- </target>
- 
+		</clover-setup>
+		</target>
+		
+		
+		<target name="testsCoverage" depends="coverage-init, compile, proActiveJar, testsuite, nonregressiontest">
+		<delete file="${base}/compile/tests.log"/>-->
+	<!-- classloader test needs clover tasks as specified in deployment-coverage.xml file 
+		<move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
+		<java classname="nonregressiontest.MainManager" fork="true">
+		<classpath refid="coverage.classpath"/>
+		<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
+		<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
+		<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
+		</java>
+		<clover-report>
+		<current outfile="clover_html">
+		<format type="html"/>
+		</current>
+		</clover-report>
+		</target> -->
+	
 	  <!-- ==================================================================== -->
 	  <!-- Formats the project sources                                          -->
 	  <!-- ==================================================================== -->
