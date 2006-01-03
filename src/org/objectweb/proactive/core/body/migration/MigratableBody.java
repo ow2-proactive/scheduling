@@ -224,8 +224,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
             }
             acceptCommunication();
             throw e;
-        } catch (ProActiveException e) {
-            e.printStackTrace();
         }
 
         if (!byCopy) {
