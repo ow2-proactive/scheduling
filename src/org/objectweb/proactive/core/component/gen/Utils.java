@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.component.gen;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * Utility class for bytecode generation operations.
@@ -43,28 +46,50 @@ public class Utils {
     public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = "_composite";
     public static final String OUTPUT_INTERCEPTOR_SUFFIX = "_outputInterceptor";
     public static final String STUB_DEFAULT_PACKAGE = null;
+    public static final char GEN_PACKAGE_SEPARATOR = '_';
+    public static final String GEN_ITF_NAME_SEPARATOR = "_I_";
+    public static final String GEN_MIDDLE_SEPARATOR = "_O_";
 
-    public static String convertClassNameToRepresentativeClassName(
-        String classname) {
-        if (classname.length() == 0) {
-            return classname;
-        }
+    public static boolean isRepresentativeClassName(String classname) {
+        return (classname.startsWith(GENERATED_DEFAULT_PREFIX) &&
+        classname.endsWith(REPRESENTATIVE_DEFAULT_SUFFIX));
+    }
 
-        int n = classname.lastIndexOf('.');
-        if (n == -1) {
-            // no package
-            return STUB_DEFAULT_PACKAGE + GENERATED_DEFAULT_PREFIX + classname;
-        } else {
-            return STUB_DEFAULT_PACKAGE + classname.substring(0, n + 1) +
-            GENERATED_DEFAULT_PREFIX + classname.substring(n + 1);
+    public static String getInterfaceSignatureFromRepresentativeClassName(
+        String className) {
+        if (!isRepresentativeClassName(className)) {
+            return null;
         }
+        String tmp = className.replaceAll(GENERATED_DEFAULT_PREFIX, "");
+        tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX, "");
+        tmp = tmp.substring(0, tmp.indexOf(GEN_MIDDLE_SEPARATOR));
+        tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-").replace(GEN_PACKAGE_SEPARATOR,
+                '.');
+
+        return tmp;
+    }
+
+    public static String getInterfaceNameFromRepresentativeClassName(
+        String className) {
+        if (!isRepresentativeClassName(className)) {
+            return null;
+        }
+        String tmp = className.replaceAll(GENERATED_DEFAULT_PREFIX, "");
+        tmp = tmp.replaceAll(REPRESENTATIVE_DEFAULT_SUFFIX, "");
+        tmp = tmp.substring(tmp.indexOf(GEN_MIDDLE_SEPARATOR) +
+                GEN_MIDDLE_SEPARATOR.length(), tmp.length());
+        tmp = tmp.replaceAll(GEN_ITF_NAME_SEPARATOR, "-").replace(GEN_PACKAGE_SEPARATOR,
+                '.');
+        return tmp;
     }
 
     public static String getMetaObjectClassName(
         String functionalInterfaceName, String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ? ... but readable)
-        return (GENERATED_DEFAULT_PREFIX + javaInterfaceName.replace('.', '_') +
-        "_" + functionalInterfaceName.replace('.', '/').replace('-', '_'));
+        return (GENERATED_DEFAULT_PREFIX +
+        javaInterfaceName.replace('.', GEN_PACKAGE_SEPARATOR) +
+        GEN_MIDDLE_SEPARATOR +
+        functionalInterfaceName.replaceAll("-", GEN_ITF_NAME_SEPARATOR));
     }
 
     public static String getMetaObjectComponentRepresentativeClassName(

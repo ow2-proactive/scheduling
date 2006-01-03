@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveLifeCycleControllerImpl
     extends AbstractProActiveController implements ProActiveLifeCycleController,
         Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private String fcState = LifeCycleController.STOPPED;
 
     public ProActiveLifeCycleControllerImpl(Component owner) {

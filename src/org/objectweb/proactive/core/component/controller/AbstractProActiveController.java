@@ -41,7 +41,6 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 
 
 /**
@@ -52,7 +51,6 @@ import org.objectweb.proactive.core.component.Fractive;
  */
 public abstract class AbstractProActiveController extends AbstractRequestHandler
     implements Interface, Serializable, ProActiveController {
-    private Component owner;
     private boolean isInternal = true;
     private InterfaceType interfaceType;
 
@@ -64,16 +62,6 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     public AbstractProActiveController(Component owner) {
         this.owner = owner;
         setControllerItfType();
-    }
-
-    /*
-     * see {@link org.objectweb.fractal.api.Interface#getFcItfOwner()}
-     */
-    /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveController#getFcItfOwner()
-     */
-    public Component getFcItfOwner() {
-        return owner;
     }
 
     /*
@@ -120,29 +108,6 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
             throw new ProActiveRuntimeException(
                 "life cycle controller interface not found");
         }
-    }
-
-    // component parameters controller has to to be instantiated prior to this call
-    protected String getHierarchicalType() {
-        try {
-            return Fractive.getComponentParametersController(getFcItfOwner())
-                           .getComponentParameters().getHierarchicalType();
-        } catch (NoSuchInterfaceException e) {
-            throw new ProActiveRuntimeException(
-                "There is no component parameters controller for this component");
-        }
-    }
-
-    protected boolean isPrimitive() {
-        return Constants.PRIMITIVE.equals(getHierarchicalType());
-    }
-
-    protected boolean isComposite() {
-        return Constants.COMPOSITE.equals(getHierarchicalType());
-    }
-
-    protected boolean isParallel() {
-        return Constants.PARALLEL.equals(getHierarchicalType());
     }
 
     protected void setItfType(InterfaceType itfType) {

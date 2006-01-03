@@ -76,7 +76,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ProActiveBindingControllerImpl extends AbstractProActiveController
     implements ProActiveBindingController, Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private Bindings bindings; // key = clientInterfaceName ; value = Binding
     private List collectiveInterfacesNames = null;
     private List singleInterfacesNames = null;
@@ -228,6 +228,16 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
     public void bindFc(String clientItfName, Object serverItf)
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
+        if (logger.isDebugEnabled()) {
+            String serverComponentName;
+            if (ProActiveGroup.isGroup(serverItf)) {
+                serverComponentName = "a group of components ";
+            } else {
+                serverComponentName = Fractal.getNameController(((Interface)serverItf).getFcItfOwner()).getFcName();
+            }
+            logger.debug("binding " + Fractal.getNameController(getFcItfOwner()).getFcName() + "." + clientItfName + " to " +serverComponentName + "." + ((Interface)serverItf).getFcItfName());
+        }
+        
         checkBindability(clientItfName, (Interface) serverItf);
 
         // if output interceptors are defined
@@ -237,9 +247,6 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         List outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner()).getOutputInterceptors();
         if (!outputInterceptors.isEmpty()) {
             try {
-                // serverItf =
-                // ProActiveOutputInterfaceInterceptor.newInstance((ProActiveInterface)serverItf,
-                // outputInterceptors);
                 serverItf = OutputInterceptorClassGenerator.instance()
                                                            .generateInterface((ProActiveInterface) serverItf,
                         outputInterceptors);

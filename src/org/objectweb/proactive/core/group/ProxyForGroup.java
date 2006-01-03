@@ -83,7 +83,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     /** Unique identificator for body (avoid infinite loop in some hierarchicals groups) */
 
     // NOT FULLY IMPLEMENTED !!!
-    transient private UniqueID proxyForGroupID;
+    transient protected UniqueID proxyForGroupID;
 
     /** Number of awaited methodcall on the group's member. The Semantic is : we wait all call are done before continuing */
     protected int waited = 0;
@@ -98,7 +98,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     protected StubObject stub;
 
     /** A pool of thread to serve the request */
-    transient private ThreadPool threadpool;
+    transient protected ThreadPool threadpool;
 
     /** Used for profiling */
     private CompositeAverageMicroTimer timer;
@@ -676,7 +676,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     /**
      * Returns an Object (a <b>typed group</b> Object) representing the Group
-     * @return a typed group corresponding to the Group.
+     * @return a typed group corresponding to the Group, <code>null</code> if an exception occured
      */
     public Object getGroupByType() {
         Object result;

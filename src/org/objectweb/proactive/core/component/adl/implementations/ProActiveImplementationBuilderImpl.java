@@ -38,13 +38,16 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.RegistryManager;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
 import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
+import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -95,6 +98,7 @@ public class ProActiveImplementationBuilderImpl
     public Object createComponent(Object type, String name, String definition,
         ControllerDescription controllerDesc, ContentDescription contentDesc,
         VirtualNode adlVN, Map context) throws Exception {
+        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN = null;
         Component bootstrap = null;
         if (context != null) {
             bootstrap = (Component) ((Map) context).get("bootstrap");
@@ -119,9 +123,9 @@ public class ProActiveImplementationBuilderImpl
                     adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
-                org.objectweb.proactive.core.descriptor.data.VirtualNode proactive_vn =
+                deploymentVN =
                     ((ProActiveDescriptor) context.get("deployment-descriptor")).getVirtualNode(adlVN.getName());
-                if (proactive_vn == null) {
+                if (deploymentVN == null) {
                     if (adlVN.getName().equals("null")) {
                         logger.info(name +
                             " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
@@ -131,11 +135,11 @@ public class ProActiveImplementationBuilderImpl
                             null);
                     }
                 } else {
-                    if (proactive_vn.isMultiple() &&
+                    if (deploymentVN.isMultiple() &&
                             (adlVN.getCardinality().equals(VirtualNode.SINGLE))) {
                         // there will be only one instance of the component, on one node of the virtual node 
                         contentDesc.forceSingleInstance();
-                    } else if (!(proactive_vn.isMultiple()) &&
+                    } else if (!(deploymentVN.isMultiple()) &&
                             (adlVN.getCardinality().equals(VirtualNode.MULTIPLE))) {
                         throw new ADLException(
                             "Cannot deploy on a single virtual node when the cardinality of this virtual node named " +
@@ -143,12 +147,18 @@ public class ProActiveImplementationBuilderImpl
                             null);
                     }
                 }
-                contentDesc.setVirtualNode(proactive_vn);
             }
         }
-
-        Component result = Fractal.getGenericFactory(bootstrap).newFcInstance((ComponentType) type,
-                controllerDesc, contentDesc);
+        Component result;
+        
+        // FIXME : exhaustively specify the behaviour
+        if (deploymentVN!=null && deploymentVN.getNbMappedNodes()>1 && controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
+            result = (Component)((Group)((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstanceAsList((ComponentType) type,
+                    controllerDesc, contentDesc, deploymentVN)).getGroupByType();
+        } else {
+            result = ((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstance((ComponentType) type,
+                    controllerDesc, contentDesc, deploymentVN);
+        }
         registry.addComponent(result); // the registry can handle groups
 
         return result;

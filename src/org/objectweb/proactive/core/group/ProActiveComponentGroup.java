@@ -34,6 +34,7 @@ import java.lang.reflect.Constructor;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -83,16 +84,20 @@ public class ProActiveComponentGroup {
         throws ClassNotFoundException, ClassNotReifiableException {
         try {
             Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(),
-                    null, ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
+                    null, ProxyForComponentInterfaceGroup.class.getName(), null);
 
-            ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ((StubObject) result).getProxy();
-            proxy.className = ProActiveInterfaceImpl.class.getName();
+            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result).getProxy();
+            proxy.className = Interface.class.getName();
 
             //return a reference on the generated interface reference corresponding to the interface type
             ProActiveInterface generated = RepresentativeInterfaceClassGenerator.instance()
                                                                                 .generateFunctionalInterface(interfaceType.getFcItfName(),
                     owner, interfaceType);
             ((StubObject) generated).setProxy(proxy);
+
+            proxy.interfaceType = interfaceType;
+            proxy.owner = owner;
+
             return generated;
         } catch (InvalidProxyClassException e) {
             logger.error("**** InvalidProxyClassException ****");
@@ -111,8 +116,8 @@ public class ProActiveComponentGroup {
      * Creates an empty  component stub+a group proxy.
      * The stub in front of the group proxy is a component stub (instance of ComponentRepresentativeImpl),
      * that offers references to the functional interfaces defined in the type of the component.
-     * @param componentType type of this component
-     * @param controllerDesc configuration of the controllers
+     * @param componentType parameters of this component
+     * @param controllerDesc TODO
      * @return a stub/proxy
      * @throws ClassNotFoundException
      * @throws java.lang.InstantiationException
@@ -142,13 +147,15 @@ public class ProActiveComponentGroup {
                     });
 
             // Instanciates the proxy object
-            ProxyForGroup proxy = (ProxyForGroup) MOP.createProxyObject(ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME,
+            ProxyForComponentGroup proxy = (ProxyForComponentGroup) MOP.createProxyObject(ProxyForComponentGroup.class.getName(),
                     MOP.EMPTY_OBJECT_ARRAY, reifiedCall);
 
             // connect the stub to the proxy
             result.setProxy(proxy);
 
-            proxy.className = ProActiveComponentRepresentative.class.getName();
+            proxy.className = Component.class.getName();
+            proxy.componentType = componentType;
+            proxy.controllerDesc = controllerDesc;
 
             return result;
         } catch (Exception e) {

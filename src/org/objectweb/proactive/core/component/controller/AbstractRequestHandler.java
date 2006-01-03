@@ -33,6 +33,13 @@ package org.objectweb.proactive.core.component.controller;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.AttributeController;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
@@ -49,6 +56,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 public abstract class AbstractRequestHandler implements RequestHandler,
     Serializable {
     private RequestHandler nextHandler = null;
+    protected Component owner;
 
     /*
      * @see org.objectweb.proactive.core.component.controller.RequestHandler#nextHandler()
@@ -72,9 +80,40 @@ public abstract class AbstractRequestHandler implements RequestHandler,
         if (nextHandler() != null) {
             return nextHandler().handleRequest(request);
         }
+        // special case for attribute controllers for primitive components
+        if (AttributeController.class.isAssignableFrom(request.getTargetClass()) && isPrimitive()) {
+            // delegate to implementation
+            return request.getMethodCall().execute(((ProActiveComponent)getFcItfOwner()).getReferenceOnBaseObject());
+        }
         throw new MethodCallExecutionFailedException(
             "cannot find a suitable handler for this request");
     }
     
     abstract public String getFcItfName();
+
+    public Component getFcItfOwner() {
+        return owner;
+    }
+
+    protected String getHierarchicalType() {
+        try {
+            return Fractive.getComponentParametersController(getFcItfOwner())
+                           .getComponentParameters().getHierarchicalType();
+        } catch (NoSuchInterfaceException e) {
+            throw new ProActiveRuntimeException(
+                "There is no component parameters controller for this component");
+        }
+    }
+
+    protected boolean isPrimitive() {
+        return Constants.PRIMITIVE.equals(getHierarchicalType());
+    }
+
+    protected boolean isComposite() {
+        return Constants.COMPOSITE.equals(getHierarchicalType());
+    }
+
+    protected boolean isParallel() {
+        return Constants.PARALLEL.equals(getHierarchicalType());
+    }
 }

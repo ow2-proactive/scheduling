@@ -32,8 +32,6 @@ package org.objectweb.proactive.core.component;
 
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
 
 
 /**
@@ -48,8 +46,6 @@ public class ContentDescription {
     private Object[] constructorParameters;
     private Active activity;
     private MetaObjectFactory factory;
-    private VirtualNode virtualNode = null;
-    private Node node = null;
     private boolean uniqueInstance = false;
 
     /**
@@ -58,38 +54,17 @@ public class ContentDescription {
      * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
      * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
      * @param constructorParameters parameters of the constructor of the base class
-     * @param virtualNode virtual node where this component will be instantiated
      * @param activity the activity as defined in the ProActive model
      * @param factory overriden meta-object factory for the component. Can be null.
      */
     public ContentDescription(String className, Object[] constructorParameters,
-        VirtualNode virtualNode, Active activity, MetaObjectFactory factory) {
+        Active activity, MetaObjectFactory factory) {
         this.className = className;
         this.constructorParameters = constructorParameters;
-        this.virtualNode = virtualNode;
         this.activity = activity;
         this.factory = factory;
     }
-
-    /**
-     * constructor
-     * @param className the name of the base class of the component
-     * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
-     * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
-     * @param constructorParameters parameters of the constructor of the base class
-     * @param node node where this component will be instantiated
-     * @param activity the activity as defined in the ProActive model
-     * @param factory overriden meta-object factory for the component. Can be null.
-     */
-    public ContentDescription(String className, Object[] constructorParameters,
-        Node node, Active activity, MetaObjectFactory factory) {
-        this.className = className;
-        this.constructorParameters = constructorParameters;
-        this.node = node;
-        this.activity = activity;
-        this.factory = factory;
-    }
-
+    
     /**
      * constructor
      * @param className the name of the base class of the component
@@ -98,44 +73,18 @@ public class ContentDescription {
      * @param constructorParameters parameters of the constructor of the base class
      */
     public ContentDescription(String className, Object[] constructorParameters) {
-        this(className, constructorParameters, (Node) null, null, null);
+        this(className, constructorParameters, null, null);
     }
+
 
     /**
      * constructor
-     * @param className the name of the base class of the component
-     * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
-     * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
-     * @param constructorParameters parameters of the constructor of the base class
-     * @param virtualNode virtual node where this component will be instantiated
-     */
-    public ContentDescription(String className, Object[] constructorParameters,
-        VirtualNode virtualNode) {
-        this(className, constructorParameters, virtualNode, null, null);
-    }
-
-    /**
-     * constructor
-     * @param className the name of the base class of the component
-     * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
-     * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
-     * @param constructorParameters parameters of the constructor of the base class
-     * @param node node where this component will be instantiated
-     */
-    public ContentDescription(String className, Object[] constructorParameters,
-        Node node) {
-        this(className, constructorParameters, node, null, null);
-    }
-
-    /**
-     * constructor. As no node nor virtual node is specified, the component will be instantiated in the
-     * current virtual machine
      * @param className the name of the base class of the component
      * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
      * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
      */
     public ContentDescription(String className) {
-        this(className, null, (Node) null, null, null);
+        this(className, null, null, null);
     }
 
     /**
@@ -170,54 +119,19 @@ public class ContentDescription {
         return factory;
     }
 
-    /**
-     * gives deployment information
-     * @return true if the component is to be deployed on a virtual node
-     */
-    public boolean isLocalizedOnAVirtualNode() {
-        return ((virtualNode != null) && (node == null));
-    }
 
     /**
-     * getter for the node
-     * @return the node where the component is to be deployed
+     * Indicates that there should only be one instance of this component 
+     * when instantiating the component on a given multiple virtual node 
+     *
      */
-    public Node getNode() {
-        return node;
-    }
-
-    /**
-     * getter for the virtual node
-     * @return the virtual node where the component is to be deployed
-     */
-    public VirtualNode getVirtualNode() {
-        return virtualNode;
-    }
-
-    /**
-     * setter (one can only change the virtual node BEFORE instantiating the component)
-     * @param virtualNode the new virtual node
-     */
-    public void setVirtualNode(VirtualNode virtualNode) {
-        this.virtualNode = virtualNode;
-        node = null;
-    }
-
-    /**
-     * setter (one can only change the node BEFORE instantiating the component)
-     * @param node the new node
-     */
-    public void setNode(Node node) {
-        this.node = node;
-        virtualNode = null;
-    }
-
     public void forceSingleInstance() {
         uniqueInstance = true;
     }
 
     /**
-     * Method uniqueInstance.
+     * Returns whether there should only be one instance of this component 
+     * when instantiating the component on a given multiple virtual node 
      * @return boolean
      */
     public boolean uniqueInstance() {
@@ -225,7 +139,7 @@ public class ContentDescription {
     }
 
     /**
-     * setter (visibility is reduced)
+     * setter 
      * @param factory MetaObjectFactory
      */
     public void setFactory(MetaObjectFactory factory) {
@@ -233,7 +147,7 @@ public class ContentDescription {
     }
 
     /**
-     * Method setActivity.
+     * setter
      * @param activity Active
      */
     void setActivity(Active activity) {

@@ -105,15 +105,22 @@ public class ComponentRequestImpl extends RequestImpl
         Object result = null;
         Throwable exception = null;
 
+        if (logger.isDebugEnabled()) {
+            try {
+                logger.debug("invocation on method [" + methodCall.getName() +
+                    "] of interface [" +
+                    methodCall.getComponentInterfaceName() +
+                    "] on component : [" +
+                    ((ComponentParametersController) ((ComponentBodyImpl) targetBody)
+                     .getProActiveComponentImpl().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
+                     .getName() + "]");
+            } catch (NoSuchInterfaceException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
-            String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                                               .getComponentParameters()
-                                               .getHierarchicalType();
-            if (isControllerRequest() &&
-                    !(Constants.PRIMITIVE.equals(hierarchical_type) &&
-                    ("attribute-controller".equals(
-                        methodCall.getComponentInterfaceName())))) {
-                // attribute controllers are actually implemented by primitive components --> need to delegate in that case
+            if (isControllerRequest()) {
                 result = ((ProActiveComponentImpl) ((ComponentBodyImpl) targetBody)
                           .getProActiveComponentImpl()).getControllerRequestHandler()
                           .handleRequest(this);
@@ -121,18 +128,14 @@ public class ComponentRequestImpl extends RequestImpl
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);
 
+                    String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                                                       .getComponentParameters()
+                                                       .getHierarchicalType();
+
                     // if the component is a composite OR A PARALLEL , forward to functional interface 
                     if (hierarchical_type.equals(Constants.COMPOSITE) ||
                             hierarchical_type.equals(Constants.PARALLEL)) {
                         //						// forward to functional interface whose name is given as a parameter in the method call
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("forwarding an invocation on method [" +
-                                methodCall.getComponentInterfaceName() +
-                                "] to : " +
-                                ((ComponentParametersController) ((ComponentBodyImpl) targetBody)
-                                 .getProActiveComponentImpl().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                                 .getName());
-                        }
                         try {
                             if (getShortcut() != null) {
                                 // TODO_M allow stopping shortcut here
@@ -152,10 +155,6 @@ public class ComponentRequestImpl extends RequestImpl
                         // the component is a primitive
                         // directly execute the method on the active object
                         if (logger.isDebugEnabled()) {
-                            logger.debug("executing the method [" +
-                                methodCall.getComponentInterfaceName() +
-                                "] on a primitive component");
-
                             if (getShortcutLength() > 0) {
                                 logger.debug("request has crossed " +
                                     (getShortcutLength() - 1) +

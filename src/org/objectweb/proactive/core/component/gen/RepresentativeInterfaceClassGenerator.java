@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.gen;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,7 +85,20 @@ public class RepresentativeInterfaceClassGenerator
      * retreives the bytecode associated to the generated class of the given name
      */
     public static byte[] getClassData(String classname) {
-        return (byte[]) getGeneratedClassesCache().get(classname);
+        byte[] b = (byte[]) getGeneratedClassesCache().get(classname);
+        if (b!=null) {
+            return b;
+        }
+        if (Utils.isRepresentativeClassName(classname)) {
+            // try to generate a representative
+            logger.info(
+            "Trying to generate representative class : " + classname);
+            b = generateInterfaceByteCode(classname);
+            if (b != null) {
+                return b;
+            }
+        }
+        return null;
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
@@ -92,135 +106,7 @@ public class RepresentativeInterfaceClassGenerator
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
-            String representativeClassName = org.objectweb.proactive.core.component.gen.Utils.getMetaObjectComponentRepresentativeClassName(interfaceName,
-                    interfaceType.getFcItfSignature());
-            Class generated_class;
-
-            // check whether class has already been generated
-            try {
-                generated_class = loadClass(representativeClassName);
-            } catch (ClassNotFoundException cnfe) {
-                CtMethod[] reifiedMethods;
-                CtClass generatedCtClass = pool.makeClass(representativeClassName);
-
-                //this.fcInterfaceName = fcInterfaceName;
-                //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
-                //                                                    .equals(ComponentParameters.PRIMITIVE);
-                List interfacesToImplement = new ArrayList();
-
-                // add interface to reify
-                CtClass functional_itf = pool.get(interfaceType.getFcItfSignature());
-                generatedCtClass.addInterface(functional_itf);
-
-                interfacesToImplement.add(functional_itf);
-
-                // add Serializable interface
-                interfacesToImplement.add(pool.get(Serializable.class.getName()));
-                generatedCtClass.addInterface(pool.get(
-                        Serializable.class.getName()));
-
-                // add StubObject, so we can set the proxy
-                generatedCtClass.addInterface(pool.get(
-                        StubObject.class.getName()));
-
-                //interfacesToImplement.add(pool.get(StubObject.class.getName()));
-                List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
-                addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
-                generatedCtClass.setSuperclass(pool.get(
-                        ProActiveInterfaceImpl.class.getName()));
-                JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
-                CtField interfaceNameField = new CtField(ClassPool.getDefault()
-                                                                  .get(String.class.getName()),
-                        "interfaceName", generatedCtClass);
-                interfaceNameField.setModifiers(Modifier.STATIC);
-                generatedCtClass.addField(interfaceNameField,
-                    "\"" + interfaceName + "\"");
-
-                CtField methodsField = new CtField(pool.get(
-                            "java.lang.reflect.Method[]"), "overridenMethods",
-                        generatedCtClass);
-                methodsField.setModifiers(Modifier.STATIC);
-
-                generatedCtClass.addField(methodsField);
-
-                // list all methods to implement
-                Map methodsToImplement = new HashMap();
-                List classesIndexer = new Vector();
-
-                CtClass[] params;
-                CtClass itf;
-
-                // now get the methods from implemented interfaces
-                Iterator it = interfacesToImplementAndSuperInterfaces.iterator();
-                while (it.hasNext()) {
-                    itf = (CtClass) it.next();
-                    if (!classesIndexer.contains(itf.getName())) {
-                        classesIndexer.add(itf.getName());
-                    }
-
-                    CtMethod[] declaredMethods = itf.getDeclaredMethods();
-
-                    for (int i = 0; i < declaredMethods.length; i++) {
-                        CtMethod currentMethod = declaredMethods[i];
-
-                        // Build a key with the simple name of the method
-                        // and the names of its parameters in the right order
-                        String key = "";
-                        key = key + currentMethod.getName();
-                        params = currentMethod.getParameterTypes();
-                        for (int k = 0; k < params.length; k++) {
-                            key = key + params[k].getName();
-                        }
-
-                        // this gives the actual declaring Class of this method
-                        methodsToImplement.put(key, currentMethod);
-                    }
-                }
-
-                reifiedMethods = (CtMethod[]) (methodsToImplement.values()
-                                                                 .toArray(new CtMethod[methodsToImplement.size()]));
-
-                // Determines which reifiedMethods are valid for reification
-                // It is the responsibility of method checkMethod in class Utils
-                // to decide if a method is valid for reification or not
-                Vector v = new Vector();
-                int initialNumberOfMethods = reifiedMethods.length;
-
-                for (int i = 0; i < initialNumberOfMethods; i++) {
-                    if (JavassistByteCodeStubBuilder.checkMethod(
-                                reifiedMethods[i])) {
-                        v.addElement(reifiedMethods[i]);
-                    }
-                }
-                CtMethod[] validMethods = new CtMethod[v.size()];
-                v.copyInto(validMethods);
-
-                reifiedMethods = validMethods;
-
-                JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
-                    reifiedMethods, classesIndexer);
-
-                createReifiedMethods(generatedCtClass, reifiedMethods,
-                    isFunctionalInterface);
-
-                //                generatedCtClass.writeFile("generated/");
-                //                System.out.println("[JAVASSIST] generated class : " +
-                //                    representativeClassName);
-                byte[] bytecode = generatedCtClass.toBytecode();
-                RepresentativeInterfaceClassGenerator.generatedClassesCache.put(representativeClassName,
-                    generatedCtClass.toBytecode());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("added " + representativeClassName +
-                        " to cache");
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("generated classes cache is : " +
-                        generatedClassesCache.toString());
-                }
-
-                // convert the bytes into a Class
-                generated_class = defineClass(representativeClassName, bytecode);
-            }
+            Class generated_class = generateInterfaceClass(interfaceName, interfaceType.getFcItfSignature(), isFunctionalInterface);
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
             reference.setFcItfName(interfaceName);
@@ -232,6 +118,152 @@ public class RepresentativeInterfaceClassGenerator
         } catch (Exception e) {
             throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
                 e);
+        }
+    }
+
+    public Class generateInterfaceClass(final String interfaceName, String interfaceSignature, boolean isFunctionalInterface) throws NotFoundException, CannotCompileException, IOException {
+        String representativeClassName = org.objectweb.proactive.core.component.gen.Utils.getMetaObjectComponentRepresentativeClassName(interfaceName,
+                interfaceSignature);
+        Class generated_class;
+
+        // check whether class has already been generated
+        try {
+            generated_class = loadClass(representativeClassName);
+        } catch (ClassNotFoundException cnfe) {
+            byte[] bytecode = generateInterfaceByteCode(representativeClassName);
+
+            // convert the bytes into a Class
+            generated_class = defineClass(representativeClassName, bytecode);
+        }
+        return generated_class;
+    }
+
+    public static byte[] generateInterfaceByteCode(String representativeClassName) {
+        try {
+            String interfaceName = Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName);
+            String interfaceSignature = Utils.getInterfaceSignatureFromRepresentativeClassName(representativeClassName);
+            boolean isFunctionalInterface = (!Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName).endsWith("-controller"));
+        CtMethod[] reifiedMethods;
+        CtClass generatedCtClass = pool.makeClass(representativeClassName);
+
+        //this.fcInterfaceName = fcInterfaceName;
+        //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
+        //                                                    .equals(ComponentParameters.PRIMITIVE);
+        List interfacesToImplement = new ArrayList();
+
+        // add interface to reify
+        CtClass functional_itf = pool.get(interfaceSignature);
+        generatedCtClass.addInterface(functional_itf);
+
+        interfacesToImplement.add(functional_itf);
+
+        // add Serializable interface
+        interfacesToImplement.add(pool.get(Serializable.class.getName()));
+        generatedCtClass.addInterface(pool.get(
+                Serializable.class.getName()));
+
+        // add StubObject, so we can set the proxy
+        generatedCtClass.addInterface(pool.get(
+                StubObject.class.getName()));
+
+        //interfacesToImplement.add(pool.get(StubObject.class.getName()));
+        List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
+        addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
+        generatedCtClass.setSuperclass(pool.get(
+                ProActiveInterfaceImpl.class.getName()));
+        JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
+        CtField interfaceNameField = new CtField(ClassPool.getDefault()
+                                                          .get(String.class.getName()),
+                "interfaceName", generatedCtClass);
+        interfaceNameField.setModifiers(Modifier.STATIC);
+        generatedCtClass.addField(interfaceNameField,
+            "\"" + interfaceName + "\"");
+
+        CtField methodsField = new CtField(pool.get(
+                    "java.lang.reflect.Method[]"), "overridenMethods",
+                generatedCtClass);
+        methodsField.setModifiers(Modifier.STATIC);
+
+        generatedCtClass.addField(methodsField);
+
+        // list all methods to implement
+        Map methodsToImplement = new HashMap();
+        List classesIndexer = new Vector();
+
+        CtClass[] params;
+        CtClass itf;
+
+        // now get the methods from implemented interfaces
+        Iterator it = interfacesToImplementAndSuperInterfaces.iterator();
+        while (it.hasNext()) {
+            itf = (CtClass) it.next();
+            if (!classesIndexer.contains(itf.getName())) {
+                classesIndexer.add(itf.getName());
+            }
+
+            CtMethod[] declaredMethods = itf.getDeclaredMethods();
+
+            for (int i = 0; i < declaredMethods.length; i++) {
+                CtMethod currentMethod = declaredMethods[i];
+
+                // Build a key with the simple name of the method
+                // and the names of its parameters in the right order
+                String key = "";
+                key = key + currentMethod.getName();
+                params = currentMethod.getParameterTypes();
+                for (int k = 0; k < params.length; k++) {
+                    key = key + params[k].getName();
+                }
+
+                // this gives the actual declaring Class of this method
+                methodsToImplement.put(key, currentMethod);
+            }
+        }
+
+        reifiedMethods = (CtMethod[]) (methodsToImplement.values()
+                                                         .toArray(new CtMethod[methodsToImplement.size()]));
+
+        // Determines which reifiedMethods are valid for reification
+        // It is the responsibility of method checkMethod in class Utils
+        // to decide if a method is valid for reification or not
+        Vector v = new Vector();
+        int initialNumberOfMethods = reifiedMethods.length;
+
+        for (int i = 0; i < initialNumberOfMethods; i++) {
+            if (JavassistByteCodeStubBuilder.checkMethod(
+                        reifiedMethods[i])) {
+                v.addElement(reifiedMethods[i]);
+            }
+        }
+        CtMethod[] validMethods = new CtMethod[v.size()];
+        v.copyInto(validMethods);
+
+        reifiedMethods = validMethods;
+
+        JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
+            reifiedMethods, classesIndexer);
+
+        createReifiedMethods(generatedCtClass, reifiedMethods,
+            isFunctionalInterface);
+
+        //                generatedCtClass.writeFile("generated/");
+        //                System.out.println("[JAVASSIST] generated class : " +
+        //                    representativeClassName);
+        byte[] bytecode = generatedCtClass.toBytecode();
+        RepresentativeInterfaceClassGenerator.generatedClassesCache.put(representativeClassName,
+            generatedCtClass.toBytecode());
+        if (logger.isDebugEnabled()) {
+            logger.debug("added " + representativeClassName +
+                " to cache");
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("generated classes cache is : " +
+                generatedClassesCache.toString());
+        }
+        return bytecode;
+        } catch (Exception e) {
+            logger.error("Cannot generate class : " + representativeClassName);
+            return null;
         }
     }
 
@@ -315,4 +347,5 @@ public class RepresentativeInterfaceClassGenerator
             generatedClass.addMethod(methodToGenerate);
         }
     }
+    
 }

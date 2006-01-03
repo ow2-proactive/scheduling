@@ -124,7 +124,7 @@ public abstract class AbstractInterfaceClassGenerator {
         }
     }
 
-    protected static Class defineClass(final String className,
+    public static Class defineClass(final String className,
         final byte[] bytes) {
         // The following code invokes defineClass on the current thread classloader by reflection
         try {
