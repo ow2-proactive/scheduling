@@ -39,6 +39,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 
 import nonregressiontest.component.ComponentTest;
@@ -114,7 +115,7 @@ public class Test extends ComponentTest {
     public Component[] action(Object obj) throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                     type_factory.createFcItfType("i1", I1.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -136,11 +137,11 @@ public class Test extends ComponentTest {
                     }),
                 new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(),
-                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+                    new Object[] {  }), TestNodes.getRemoteACVMNode());
         c1 = cf.newFcInstance(i1_i2_type,
                 new ControllerDescription(C1_NAME, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
-                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+                    new Object[] {  }), TestNodes.getRemoteACVMNode());
         c2 = cf.newFcInstance(i1_i2_type,
                 new ControllerDescription(C2_NAME, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),

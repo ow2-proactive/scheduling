@@ -14,6 +14,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
@@ -27,7 +28,7 @@ public class Setup {
     private static ComponentType d_type = null;
     private static ComponentType A_TYPE = null;
     private static ComponentType B_TYPE = null;
-    private static GenericFactory CF = null;
+    private static ProActiveGenericFactory CF = null;
     private static TypeFactory TF = null;
 
     private static void createTypes() throws Exception {
@@ -47,7 +48,7 @@ public class Setup {
             }
 
             if (CF == null) {
-                CF = Fractal.getGenericFactory(boot);
+                CF = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
             }
         }
     }
@@ -140,7 +141,7 @@ public class Setup {
         return CF.newFcInstance(B_TYPE,
             new ControllerDescription("primitiveB1", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentB.class.getName(),
-                new Object[] {  }, TestNodes.getLocalVMNode()));
+                new Object[] {  }), TestNodes.getLocalVMNode());
     }
 
     public static Component createRemoteSlowPrimitiveB()
@@ -149,7 +150,7 @@ public class Setup {
         return CF.newFcInstance(B_TYPE,
             new ControllerDescription("slowPrimitiveB1", Constants.PRIMITIVE),
             new ContentDescription(SlowPrimitiveComponentB.class.getName(),
-                new Object[] {  }, TestNodes.getLocalVMNode()));
+                new Object[] {  }), TestNodes.getLocalVMNode());
     }
 
     public static Component createPrimitiveA() throws Exception {
@@ -229,7 +230,7 @@ public class Setup {
         Component compositeB1 = CF.newFcInstance(B_TYPE,
                 new ControllerDescription("compositeB1", Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
-                    new Object[] {  }, TestNodes.getLocalVMNode()));
+                    new Object[] {  }), TestNodes.getLocalVMNode());
         return compositeB1;
     }
 

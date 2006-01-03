@@ -39,8 +39,12 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+
+import testsuite.test.Assertions;
 
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
@@ -92,7 +96,8 @@ public class Test extends ComponentTest {
     String name;
     String nodeUrl;
     Message message;
-    Component parallelizedComponents; // typed group
+    Component parallelizedComponentsOnVirtualNode; // typed group
+    Component parallelizedComponentsOnArrayOfNodes; // typed group created from Node[]
     Component p3;
     Component parallelComponent;
 
@@ -107,7 +112,7 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                     type_factory.createFcItfType("i1", I1.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -123,10 +128,20 @@ public class Test extends ComponentTest {
                         TypeFactory.SINGLE)
                 });
 
-        parallelizedComponents = cf.newFcInstance(i1_i2_type,
+        // those are created on a VirtualNode (multiple)
+        parallelizedComponentsOnVirtualNode = (Component)((Group)cf.newFcInstanceAsList(i1_i2_type,
                 new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentA.class.getName(),
-                    new Object[] {  }, TestNodes.getVirtualNode("Cyclic-AC")));
+                    new Object[] {  }),  TestNodes.getVirtualNode("Cyclic-AC"))).getGroupByType();
+
+        // those are created on Node[]
+        
+        parallelizedComponentsOnArrayOfNodes = (Component)((Group)cf.newFcInstanceAsList(i1_i2_type,
+                new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComponentA.class.getName(),
+                    new Object[] {  }), TestNodes.getVirtualNode("Cyclic-AC").getNodes())).getGroupByType();
+
+        
         p3 = cf.newFcInstance(i2_type,
                 new ControllerDescription(P3_NAME, Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(),
@@ -134,7 +149,7 @@ public class Test extends ComponentTest {
         parallelComponent = cf.newFcInstance(i1_i2_type,
                 new ControllerDescription(PARALLEL_NAME, Constants.PARALLEL),
                 new ContentDescription(ParallelComposite.class.getName(),
-                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+                    new Object[] {  }), TestNodes.getRemoteACVMNode());
     }
 
     /**
@@ -150,18 +165,35 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        String parallelizedComponent_1_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
-                    parallelizedComponents).get(0)).getFcName();
-        String parallelizedComponent_2_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
-                    parallelizedComponents).get(1)).getFcName();
+        String parallelizedComponentOnVirtualNode_1_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
+                    parallelizedComponentsOnVirtualNode).get(0)).getFcName();
+        String parallelizedComponentOnVirtualNode_2_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
+                    parallelizedComponentsOnVirtualNode).get(1)).getFcName();
+
+        String parallelizedComponentOnArrayOfNodes_1_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
+                parallelizedComponentsOnVirtualNode).get(0)).getFcName();
+    String parallelizedComponentOnArrayOfNodes_2_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
+                parallelizedComponentsOnVirtualNode).get(1)).getFcName();
+
+        
         String p3_name = Fractal.getNameController(p3).getFcName();
         String pr1_name = Fractal.getNameController(parallelComponent)
                                  .getFcName();
-        return (parallelizedComponent_1_name.equals(P1_NAME +
-            Constants.CYCLIC_NODE_SUFFIX + 0) &&
-        parallelizedComponent_2_name.equals(P1_NAME +
-            Constants.CYCLIC_NODE_SUFFIX + 1) && p3_name.equals(P3_NAME) &&
-        pr1_name.equals(PARALLEL_NAME));
+
+        Assertions.assertEquals(parallelizedComponentOnVirtualNode_1_name, (P1_NAME +
+            Constants.CYCLIC_NODE_SUFFIX + 0));
+        Assertions.assertEquals(parallelizedComponentOnVirtualNode_2_name, (P1_NAME +
+            Constants.CYCLIC_NODE_SUFFIX + 1));
+        Assertions.assertEquals(parallelizedComponentOnArrayOfNodes_1_name, (P1_NAME +
+                Constants.CYCLIC_NODE_SUFFIX + 0));
+        Assertions.assertEquals(parallelizedComponentOnArrayOfNodes_2_name, (P1_NAME +
+                Constants.CYCLIC_NODE_SUFFIX + 1));
+        
+        Assertions.assertEquals(p3_name, P3_NAME);
+        Assertions.assertEquals(pr1_name, PARALLEL_NAME);
+        
+        
+        return true;
     }
 
     public static void main(String[] args) {

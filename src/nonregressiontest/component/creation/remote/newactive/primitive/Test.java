@@ -38,6 +38,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 
 import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.creation.ComponentA;
@@ -67,7 +68,7 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
 
         componentA = cf.newFcInstance(type_factory.createFcType(
                     new InterfaceType[] {
@@ -77,7 +78,7 @@ public class Test extends ComponentTest {
                     }),
                 new ControllerDescription("componentA", Constants.PRIMITIVE),
                 new ContentDescription(ComponentA.class.getName(),
-                    new Object[] { "toto" }, TestNodes.getRemoteACVMNode()));
+                    new Object[] { "toto" }), TestNodes.getRemoteACVMNode());
         //logger.debug("OK, instantiated the component");
         // start the component!
         Fractal.getLifeCycleController(componentA).startFc();

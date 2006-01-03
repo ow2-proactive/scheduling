@@ -58,7 +58,6 @@ public class Test extends ComponentTest {
     public boolean postConditions() throws Exception {
         Assertions.assertEquals("This component is storing the info : hello world",
                 ((Action) dummy.getFcInterface("action")).doSomething());
-
         return true;
     }
 

@@ -39,6 +39,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import nonregressiontest.component.ComponentTest;
@@ -72,7 +73,7 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
+        ProActiveGenericFactory cf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
 
         ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
                     type_factory.createFcItfType("i1", I1.class.getName(),
@@ -92,7 +93,7 @@ public class Test extends ComponentTest {
         pD1 = cf.newFcInstance(D_Type,
                 new ControllerDescription("pD1", Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentD.class.getName(),
-                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+                    new Object[] {  }), TestNodes.getRemoteACVMNode());
         pB1 = cf.newFcInstance(B_Type,
                 new ControllerDescription("pB1", Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(),
@@ -100,7 +101,7 @@ public class Test extends ComponentTest {
         pB2 = cf.newFcInstance(B_Type,
                 new ControllerDescription("pB2", Constants.PRIMITIVE),
                 new ContentDescription(PrimitiveComponentB.class.getName(),
-                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+                    new Object[] {  }), TestNodes.getRemoteACVMNode());
 
         // bind the components
         Fractal.getBindingController(pD1).bindFc("i2", pB1.getFcInterface("i2"));
