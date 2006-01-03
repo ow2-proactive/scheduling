@@ -68,7 +68,6 @@ public class ExceptionThrower {
                     "public void throwException(Throwable t) {" +
                     "    throw t;}", thrower);
             thrower.addMethod(throwException);
-            thrower.writeFile();
             return loadClass(THROWER_CLASS_FULLNAME, thrower.toBytecode());
         } catch (Exception e) {
             e.printStackTrace();
