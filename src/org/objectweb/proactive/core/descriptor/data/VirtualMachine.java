@@ -54,13 +54,14 @@ public interface VirtualMachine extends ServiceUser {
      * @param nodeNumber
      * @throws IOException
      */
-    public void setHostsNumber(String nodeNumber) throws java.io.IOException;
+    public void setNbNodes(String nodeNumber) throws java.io.IOException;
 
     /**
-     * Returns the number of nodes that will be created on this VirtualMachine
+     * Returns the number of nodes that will be created for each of the virtual machines 
+     * associated to this VirtualMachine object
      * @return String
      */
-    public String getNodeNumber();
+    public String getNbNodesOnCreatedVMs();
 
     /**
      * Sets the name of this VirtualMachine

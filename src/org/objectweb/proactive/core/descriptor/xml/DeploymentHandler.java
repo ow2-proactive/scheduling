@@ -288,7 +288,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             String nodeNumber = attributes.getValue("askedNodes");
             try {
                 if (checkNonEmpty(nodeNumber)) {
-                    currentVM.setHostsNumber(nodeNumber);
+                    currentVM.setNbNodes(nodeNumber);
                 }
             } catch (java.io.IOException e) {
                 throw new org.xml.sax.SAXException(e);

@@ -31,12 +31,14 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -90,9 +92,11 @@ public interface VirtualNode extends java.io.Serializable, Job {
 
     /**
      * Returns the number of Nodes mapped to this VirtualNode in the XML Descriptor
-     * @return int
+     * @return int number of mapped nodes, {@link org.objectweb.proactive.core.process.UniversalProcess#UNKNOWN_NODE_NUMBER} if
+     * the number of mapped nodes cannot be determined (when this method is invoked).
+     * This method returns the exact number of mapped nodes once the virtual node has been activated.
      */
-    public int getNodeCount();
+    public int getNbMappedNodes();
 
     /**
      * @deprecated use {@link #getNumberOfCurrentlyCreatedNodes()} or {@link #getNumberOfCreatedNodesAfterDeployment()} instead

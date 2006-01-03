@@ -469,7 +469,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.error(e.getMessage());
             }
         } else {
-            logger.info("VirtualNode " + this.name + " already activated !!!");
+            logger.debug("VirtualNode " + this.name + " already activated");
         }
     }
 
@@ -477,6 +477,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * start the MPI process attached with this virtual node
      * @return int, the termination status of the mpi process
      */
+
+    // start the MPI process attached with this virtual node
+    // returns the termination status of process
     public int startMPI() {
         int exitValue = -1;
         if (mpiProcess != null) {
@@ -572,12 +575,31 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.padURL = XMLpadURL;
     }
 
-    /**
-     * Returns the number of Nodes mapped to this VirtualNode in the XML Descriptor
-     * @return int
+    
+    /*
+     * 
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNbMappedNodes()
      */
-    public int getNodeCount() {
-        return nbMappedNodes;
+    public int getNbMappedNodes() {
+        if (isActivated) {
+            return nbMappedNodes;
+        } else {
+            int nbMappedNodesTmp = 0;
+            for (int i = 0; i < virtualMachines.size(); i++) {
+                VirtualMachine vm = getVirtualMachine();
+                // first check if it is a process that is attached to the vm
+                if (vm.hasProcess()) {
+                    ExternalProcess process = vm.getProcess();
+                    int nbNodesPerCreatedVM = new Integer(vm.getNbNodesOnCreatedVMs()).intValue();
+                    if (process.getNodeNumber() == UniversalProcess.UNKNOWN_NODE_NUMBER) {
+                        return UniversalProcess.UNKNOWN_NODE_NUMBER;
+                    } else {
+                        nbMappedNodesTmp = nbMappedNodesTmp + process.getNodeNumber()*nbNodesPerCreatedVM;
+                    }
+                }
+            }
+            return nbMappedNodesTmp;
+        }
     }
 
     /**
@@ -952,7 +974,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             try {
                 //get the node on the registered runtime
                 // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
-                int nodeNumber = (new Integer((String) virtualMachine.getNodeNumber())).intValue();
+                int nodeNumber = (new Integer((String) virtualMachine.getNbNodesOnCreatedVMs())).intValue();
 
                 for (int i = 1; i <= nodeNumber; i++) {
                     ProActiveSecurityManager siblingPSM = null;
@@ -1009,7 +1031,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             // it is the only way to get accurate value of askedNodes
             VirtualMachine vm = (VirtualMachine) awaitedVirtualNodes.get(event.getCreatorID());
-            int nodeNumber = (new Integer((String) vm.getNodeNumber())).intValue();
+            int nodeNumber = (new Integer((String) vm.getNbNodesOnCreatedVMs())).intValue();
 
             for (int i = 1; i <= nodeNumber; i++) {
                 try {
@@ -1285,7 +1307,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             //increment the node count by askedNodes
             increaseNumberOfNodes(process.getNodeNumber() * new Integer(
-                    vm.getNodeNumber()).intValue());
+                    vm.getNbNodesOnCreatedVMs()).intValue());
 
             return process;
         }
@@ -1300,7 +1322,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         //jobID = ProActive.getJobId();
         String protocolId = "";
-        int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
+        int nodeNumber = new Integer(vm.getNbNodesOnCreatedVMs()).intValue();
 
         if (logger.isDebugEnabled()) {
             logger.debug("asked for " + nodeNumber + " nodes");

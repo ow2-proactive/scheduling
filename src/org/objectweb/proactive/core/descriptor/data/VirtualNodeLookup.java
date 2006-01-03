@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -138,19 +139,19 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 throw new ProActiveRuntimeException(e);
             }
         } else {
-            vnLogger.info("VirtualNode " + this.name +
-                " already activated !!!");
+            vnLogger.debug("VirtualNode " + this.name +
+                " already activated");
         }
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNodeCount()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNbMappedNodes()
      */
-    public int getNodeCount() {
+    public int getNbMappedNodes() {
         if (!isActivated) {
             vnLogger.error(notActivatedMessage);
         }
-        return virtualNode.getNodeCount();
+        return virtualNode.getNbMappedNodes();
     }
 
     /**
@@ -290,6 +291,10 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     //
     //-------------------IMPLEMENTS Job-----------------------------------
     //
+
+    /**
+     * @see org.objectweb.proactive.Job#getJobID()
+     */
     public String getJobID() {
         if (!isActivated) {
             vnLogger.error(notActivatedMessage);

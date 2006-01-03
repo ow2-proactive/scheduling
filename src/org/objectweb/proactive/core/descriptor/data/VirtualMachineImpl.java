@@ -52,7 +52,7 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     private String name;
 
     /** number of nodes that will be deployed on this VM. One node is the default */
-    private String nodeNumber = "1";
+    private String nbNodes = "1";
 
     /** the acquisition method to use to find the VirtualMachine once created */
     private String acquisitionMethod;
@@ -88,16 +88,16 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
-    public void setHostsNumber(String nodeNumber) throws java.io.IOException {
-        if (new Integer(nodeNumber).intValue() < 1) {
+    public void setNbNodes(String nbNodes) throws java.io.IOException {
+        if (new Integer(nbNodes).intValue() < 1) {
             throw new java.io.IOException(
-                "Cannot define nodeNumber with a value < 1");
+                "Cannot define nbNodes with a value < 1");
         }
-        this.nodeNumber = nodeNumber;
+        this.nbNodes = nbNodes;
     }
 
-    public String getNodeNumber() {
-        return this.nodeNumber;
+    public String getNbNodesOnCreatedVMs() {
+        return this.nbNodes;
     }
 
     public void setName(String s) {

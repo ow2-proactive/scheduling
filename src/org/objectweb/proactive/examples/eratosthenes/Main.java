@@ -220,7 +220,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             logger.info(
                 "This may print out some exception messages, but that's OK.");
             java.util.Vector killedRTs = new java.util.Vector();
-            for (int i = -2; i < containersVirtualNode.getNodeCount(); i++) {
+            for (int i = -2; i < containersVirtualNode.getNbMappedNodes(); i++) {
                 try {
                     Node node;
                     if (i == -2) {
