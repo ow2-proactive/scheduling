@@ -68,7 +68,7 @@ public class ProActiveClassLoaderHelper {
      * 2. runtime parents
      * 3. tries to generate it (stub, component interface representative, or component interface metaobject)
      */
-    public byte[] getClassData(String className) throws ClassNotFoundException {
+    public synchronized byte[] getClassData(String className) throws ClassNotFoundException {
         byte[] class_data = null;
 
         // 1. look in class cache

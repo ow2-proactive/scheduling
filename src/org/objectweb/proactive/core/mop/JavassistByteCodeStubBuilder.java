@@ -57,6 +57,14 @@ public class JavassistByteCodeStubBuilder {
     private static CtMethod proxyGetter;
     private static CtMethod proxySetter;
 
+    /**
+     * <p>Creates the bytecode for a stub on the given class</p>
+     * <p>This method should be accessed by one thread only for a given class name, otherwise
+     * it may lead to unsupported concurrent class generation, resulting in a "frozen class" javassist runtime exception </p>
+     * @param className the name of the class on which a stub class is created
+     * @return the bytecode for the corresponding stub class
+     * @throws NoClassDefFoundError if the specified classname does not correspond to a class in the classpath
+     */
     public static byte[] create(String className) throws NoClassDefFoundError {
         CtClass generatedClass = null;
         CtMethod[] reifiedMethods;

@@ -926,7 +926,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return null;
     }
 
-    public byte[] getClassDataFromThisRuntime(String className)
+    public synchronized byte[] getClassDataFromThisRuntime(String className)
         throws ProActiveException {
         byte[] classData = null;
 
@@ -980,7 +980,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     // tries to generate a stub without using MOP methods
-    private byte[] generateStub(String className) {
+    public byte[] generateStub(String className) {
         byte[] classData = null;
 
         if (Utils.isStubClassName(className)) {
