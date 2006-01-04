@@ -63,10 +63,10 @@ public class ProActiveClassLoaderHelper {
     }
 
     /**
-     * Looks for the bytecode of the given class in different places :
-     * 1. cache
-     * 2. runtime parents
-     * 3. tries to generate it (stub, component interface representative, or component interface metaobject)
+     * Looks for the bytecode of the given class in different places :<ul>
+     * <li>1. cache</li>
+     * <li>2. runtime parents</li>
+     * <li>3. tries to generate it (stub, component interface representative, or component interface metaobject)</li></ul>
      */
     public synchronized byte[] getClassData(String className) throws ClassNotFoundException {
         byte[] class_data = null;

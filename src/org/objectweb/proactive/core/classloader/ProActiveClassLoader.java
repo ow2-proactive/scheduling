@@ -59,9 +59,9 @@ public class ProActiveClassLoader extends URLClassLoader {
         super(URLClassPath.pathToURLs(System.getProperty("java.class.path")));
     }
 
-    /**
-     * see {@link ClassLoader#ClassLoader(java.lang.ClassLoader)} and
-     * {@link ClassLoader#getSystemClassLoader()}
+    /*
+     * @see ClassLoader#ClassLoader(java.lang.ClassLoader)
+     * @see ClassLoader#getSystemClassLoader()
      */
     public ProActiveClassLoader(ClassLoader parent) {
         super(URLClassPath.pathToURLs(System.getProperty("java.class.path")),
@@ -79,9 +79,9 @@ public class ProActiveClassLoader extends URLClassLoader {
     }
 
     /**
-     * see {@link ClassLoader#findClass(java.lang.String)}
      * Looks for the given class in parents, classpath, and if not found delegates
      * the search to a ProActiveClassLoaderHelper
+     * @see ClassLoader#findClass(java.lang.String)
      */
     protected Class findClass(String name) throws ClassNotFoundException {
         Class c = null;
@@ -114,7 +114,7 @@ public class ProActiveClassLoader extends URLClassLoader {
     }
 
     /*
-     * see {@link ClassLoader#loadClass(java.lang.String)}
+     * see ClassLoader#loadClass(java.lang.String)
      */
     public Class loadClass(String name) throws ClassNotFoundException {
         Class c = null;

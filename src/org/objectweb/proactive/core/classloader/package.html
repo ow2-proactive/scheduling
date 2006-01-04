@@ -10,11 +10,13 @@ involved are {@link
 org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl} and {@link
 org.objectweb.proactive.core.util.ClassDataCache}.
 </p>
-<p>This mechanism can be used for hierarchical deployment using
+<p>This mechanism is <b>not</b> the default class downloading mechanism. 
+It can be used for hierarchical deployment using
 deployment descriptors. It provides an alternative solution to RMI
-dynamic class downloading <span style="font-weight: bold;">when the
+dynamic class downloading <b>when the
 codebase is not available or incorrectly set, or when http is not
-available for class downloading</span>.<br>
+available for class downloading</b> (for instance with some firewalls setups, 
+or with subnetworks with private IPs).<br>
 </p>
 <h3><a name="example"></a>Example : hierarchical deployment</h3>
 <p>Consider three runtimes 1, 2 and 3. We want to perform a
@@ -108,6 +110,6 @@ dynamic downloading only occurs through inter-runtimes communications.</p>
 one parent runtime for a given runtime. We may later add the
 possibility to look for classes in runtime acquaintances.<br>
 - There are no performance / stress benchmarks so far.<br>
-<!-- Put @see and @since tags down here. --> @author Matthieu Morel
+@author Matthieu Morel
 </body>
 </html>
