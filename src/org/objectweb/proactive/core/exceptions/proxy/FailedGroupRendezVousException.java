@@ -43,19 +43,23 @@ class AutomaticPurgeGroup implements NFEListener {
     public boolean handleNFE(NonFunctionalException nfe) {
         Iterator exceptions;
         ProxyForGroup group;
+        ExceptionListException exceptionList;
 
         try {
             FailedGroupRendezVousException fgrve = (FailedGroupRendezVousException) nfe;
-            ExceptionListException list = (ExceptionListException) fgrve.getCause();
-            exceptions = list.iterator();
+            exceptionList = (ExceptionListException) fgrve.getCause();
             group = fgrve.getGroup();
         } catch (ClassCastException cce) {
             return false;
         }
 
-        while (exceptions.hasNext()) {
-            ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
-            group.remove(eig.getObject());
+        synchronized (exceptionList) {
+            exceptions = exceptionList.iterator();
+
+            while (exceptions.hasNext()) {
+                ExceptionInGroup eig = (ExceptionInGroup) exceptions.next();
+                group.remove(eig.getObject());
+            }
         }
 
         return true;
