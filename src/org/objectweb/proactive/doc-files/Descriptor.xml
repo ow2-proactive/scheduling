@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>XML Deployment Descriptors</title>
- <anchor id="dbdoclet.id.XML_Descriptors"/>
+<chapter id="Descriptor"><title>XML Deployment Descriptors</title>
+ <anchor id="XML_Descriptors"/>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Descriptor.html  -->
   
-    <para> <anchor id="dbdoclet.id.Descriptor_html_objectives"/></para>
+    <para> <anchor id="Descriptor_html_objectives"/></para>
     <sect1 remap="h2">
       <title>Objectives</title>
       <para>Parameters tied to the deployment of an application should be totally described in a xml
@@ -315,7 +315,7 @@
  several VirtualNodes at the same time .... and in
  org.objectweb.proactive.core.descriptors.VirtualNode to manipulate and get nodes associated to
  VirtualNodes.</para>
-      <para><anchor id="dbdoclet.id.Descriptor_html_vn"/></para>
+      <para><anchor id="Descriptor_html_vn"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Different types of VirtualNodes</title>
@@ -764,7 +764,7 @@
           </programlisting>
         </listitem>
 </itemizedlist>
-      <para><anchor id="dbdoclet.id.Descriptor_html_jvms"/></para>
+      <para><anchor id="Descriptor_html_jvms"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Different types of JVMs</title>
@@ -859,7 +859,7 @@
               </listitem>
               <listitem>
                 <para> This is the case when the process referenced is a cluster process(LSF, PBS, GLOBUS,
- ....) or a <link linkend="dbdoclet.id.processlist">process list</link></para>
+ ....) or a <link linkend="processlist">process list</link></para>
               </listitem>
 </itemizedlist>
 </para>
@@ -905,7 +905,7 @@
  (discussed later, this service represents a way to acquire a JVM). Note that the name <emphasis role="bold">lookup</emphasis> is totally abstract, with the condition that a service with the id <emphasis role="bold">lookup</emphasis> is defined in the infrastructure part</para>
         </listitem>
 </itemizedlist>
-      <para><anchor id="dbdoclet.id.Descriptor_html_validation"/></para>
+      <para><anchor id="Descriptor_html_validation"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Validation against XML Schema</title>
@@ -922,7 +922,7 @@
  validation, an error message is displayed otherwise if the validation is successful no message
  appear. An XML validation tool such as XMLSPY5.0(windows) can also be used to validate XML
  descriptors.</para>
-      <para><anchor id="dbdoclet.id.Descriptor_html_example"/></para>
+      <para><anchor id="Descriptor_html_example"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Complete description and examples</title>
@@ -1162,7 +1162,7 @@
  the result of a lookup in the RMIRegistry of a host to be specified at runtime.</para>
         </listitem>
 </itemizedlist>
-      <para><anchor id="dbdoclet.id.Descriptor_html_infrastructure"/></para>
+      <para><anchor id="Descriptor_html_infrastructure"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Infrastructure and processes</title>
@@ -1564,7 +1564,7 @@
  a complete ssh deployment example.</para>
             </listitem>
             <listitem>
-              <para><anchor id="dbdoclet.id.Descriptor_html_processlist" xreflabel="Process
+              <para><anchor id="Descriptor_html_processlist" xreflabel="Process
  list"/>Process
  list</para>
             </listitem>
@@ -2598,7 +2598,7 @@
  are not familiar with ssh, see <ulink url="http://www.openssh.org">openSSH</ulink></para>
         </listitem>
 </itemizedlist>
-      <para><anchor id="dbdoclet.id.Descriptor_html_services"/></para>
+      <para><anchor id="Descriptor_html_services"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Infrastructure and services</title>
@@ -2731,7 +2731,7 @@
  represents two jvms that will be found in the P2P infrastructure, so at the end 3 acquired jvms
  are expected.</para>
       <para>Fault Tolerance can also be defined at the service level. See <ulink url="faultTolerance.xml">Fault Tolerance documentation</ulink> for more information.</para>
-      <para><anchor id="dbdoclet.id.Descriptor_html_killing"/></para>
+      <para><anchor id="Descriptor_html_killing"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Killing the application</title>
@@ -2754,7 +2754,7 @@
  abruptely. If true a jvm that originates the creation of a rmi registry waits until registry is
  empty before dying. To be more precise a thread is created to ask periodically the registry if
  objects are still registered.</para>
-      <para><anchor id="dbdoclet.id.Descriptor_html_processes"/></para>
+      <para><anchor id="Descriptor_html_processes"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>Processes</title>

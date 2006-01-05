@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title> Hands-on programming</title>
+<chapter id="hands_on_programming"><title> Hands-on programming</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming.html  -->
   
     <para> Here is an introduction to programming with ProActive. It should give you a first flavor, and

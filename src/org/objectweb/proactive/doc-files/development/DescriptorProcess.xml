@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Adding a Deployment Protocol</title>
+<chapter id="DescriptorProcess"><title>Adding a Deployment Protocol</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/DescriptorProcess.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.DescriptorProcess_html_objectives" xreflabel="Objectives"/>Objectives</title>
+      <title><anchor id="DescriptorProcess_html_objectives" xreflabel="Objectives"/>Objectives</title>
       <para>ProActive support several deployment protocols. This protocols can be configured through an
  XML Descriptor file in the <emphasis role="bold">process</emphasis> section. From time to time, new protocols are added.
  This documentation describes how to add a new deployment protocol (process) to ProActive.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.DescriptorProcess_html_overview" xreflabel="Overview"/>Overview</title>
+      <title><anchor id="DescriptorProcess_html_overview" xreflabel="Overview"/>Overview</title>
       <para>Adding a new process can be divided into two related tasks:</para>
       <itemizedlist>
         <listitem>
@@ -29,7 +29,7 @@
  Descriptor XML.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.DescriptorProcess_html_javaProcess" xreflabel="Java Process Class"/>Java Process Class</title>
+      <title><anchor id="DescriptorProcess_html_javaProcess" xreflabel="Java Process Class"/>Java Process Class</title>
       <para>The Java Process Classes are defined in the <emphasis role="bold">org.objectweb.proactive.core.process</emphasis>
  package.</para>
       <sect2 remap="h3">
@@ -91,7 +91,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.DescriptorProcess_html_xmlProcess" xreflabel="XML Descriptor Process"/>XML Descriptor Process</title>
+      <title><anchor id="DescriptorProcess_html_xmlProcess" xreflabel="XML Descriptor Process"/>XML Descriptor Process</title>
       <sect2 remap="h3">
         <title>Schema Modifications</title>
         <para>The schema file is located at: <emphasis role="bold">ProActive/descriptors/DescriptorSchema.sxd</emphasis>. This file

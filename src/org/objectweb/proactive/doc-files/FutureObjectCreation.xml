@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Asynchronous calls and futures</title>
+<chapter id="FutureObjectCreation"><title>Asynchronous calls and futures</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FutureObjectCreation.html  -->
   
     <sect1 remap="h2">
@@ -286,7 +286,7 @@
       </sect2>
       <sect2 remap="h3">
         <title>Important Notes: Errors to avoid</title>
-        <para><anchor id="dbdoclet.id.FutureObjectCreation_html_commonerror"/> there are few things to
+        <para><anchor id="FutureObjectCreation_html_commonerror"/> there are few things to
  remember with asynchronous method call and futures, in order to avoid annoying debugs:</para>
         <para></para>
         <para></para>

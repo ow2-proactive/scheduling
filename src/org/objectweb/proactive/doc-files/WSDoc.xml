@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Exporting Active Objects and components as web services</title>
+<chapter id="WSDoc"><title>Exporting Active Objects and components as web services</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/WSDoc.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_overview"/>Overview</title>
+      <title><anchor id="WSDoc_html_overview"/>Overview</title>
       <para>This feature allows the call and monitoring of active objects and ProActive
  components from any client written in any foreign language.</para>
       <para>
@@ -13,7 +13,7 @@
  language.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_principle"/>Principles</title>
+      <title><anchor id="WSDoc_html_principle"/>Principles</title>
       <para>A <emphasis role="bold">web service</emphasis> is a software entity, providing one or several
  functionnalities, that can be exposed, discovered and accessed over the network. Moreover, web
  services technology allows heterogenous applications to communicate and exchange data in a
@@ -65,7 +65,7 @@
  SOAP.</emphasis></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_pre"/>Pre-requisite : Installing the Web Server and the SOAP
+      <title><anchor id="WSDoc_html_pre"/>Pre-requisite : Installing the Web Server and the SOAP
  engine</title>
       <para>First of all, you need to install the Jakarta Tomcat web server here and
  install it. You can find some documentation about it <ulink url="http://apache.crihan.fr/dist/jakarta/tomcat-4/v4.1.31/bin/">here</ulink> .</para>
@@ -93,7 +93,7 @@
       <para>&#160;</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_expose"/>Steps to expose an active object or a component
+      <title><anchor id="WSDoc_html_expose"/>Steps to expose an active object or a component
  as a web services</title>
       <para>The steps for exporting and using an active object as a web service are the
  following :</para>
@@ -166,7 +166,7 @@ ProActive.exposeAsWebService(Object o,
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_undeploy"/> Undeploy the services</title>
+      <title><anchor id="WSDoc_html_undeploy"/> Undeploy the services</title>
       <para>To undeploy an active object as a service, use the ProActive static method
  :</para>
       <screen>
@@ -188,7 +188,7 @@ ProActive.exposeAsWebService(Object o,
       </screen>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_access"/> Accessing the services</title>
+      <title><anchor id="WSDoc_html_access"/> Accessing the services</title>
       <para>Once the active object or the interfaces component are deployed, you can
  access it via any web service enabled client ( such as C#).</para>
       <para>
@@ -202,7 +202,7 @@ ProActive.exposeAsWebService(Object o,
  reply into another SOAP message to the client.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_limits"/> Limitations</title>
+      <title><anchor id="WSDoc_html_limits"/> Limitations</title>
       <para>Apache Soap supports all defined types in the SOAP 1.1 specification. All
  Java primitive types are supported but it is not always the case for complex types. For Java Bean
  Objects, ProActive register them in the Apache SOAP mapping registry, in order to use a specific
@@ -211,7 +211,7 @@ ProActive.exposeAsWebService(Object o,
  return types are Java Beans, you have to copy the beans classes you wrote into the <literal>$APACHE_SOAP_HOME/WEB_INF/classes</literal>.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_example"/> A simple example : Hello World</title>
+      <title><anchor id="WSDoc_html_example"/> A simple example : Hello World</title>
       <sect2 remap="h3">
         <title>Hello World web service code</title>
         <para>Let&#39;s start with a simple example, an Hello world active object exposed
@@ -248,7 +248,7 @@ ect []{});
       </sect2>
       <sect2 remap="h3">
         <title>Access with Visual Studio</title>
-        <para><anchor id="dbdoclet.id.WSDoc_html_steps"/></para>
+        <para><anchor id="WSDoc_html_steps"/></para>
         <para>In your new Visual Studio Project :</para>
         <itemizedlist>
           <listitem>
@@ -273,7 +273,7 @@ string s = hw.helloWorld ();
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.WSDoc_html_interop"/> C# interoperability : an example with C3D</title>
+      <title><anchor id="WSDoc_html_interop"/> C# interoperability : an example with C3D</title>
       <sect2 remap="h3">
         <title>Overview</title>
         <para><ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.xml">C3D</ulink> is

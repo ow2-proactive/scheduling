@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Examples</title>
+<chapter id="componentExamples"><title>Examples</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/examples.html  -->
   
-    <para> <anchor id="dbdoclet.id.examples_html_examples"/></para>
+    <para> <anchor id="examples_html_examples"/></para>
     <para>3 examples are presented : code snippets for visualizing the transition between active objects
  and components, the &quot;hello world&quot;, from the Fractal tutorial, and C3D component
  version. The programming model is Fractal, and one should refer to the Fractal documentation for
  detailed examples.</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.examples_html_From_objects_to_active_objects_to_distributed_components"/>From objects to active objects to
+      <title><anchor id="examples_html_From_objects_to_active_objects_to_distributed_components"/>From objects to active objects to
  distributed components</title>
       <para>In Java, objects are created by instantiation of classes. With ProActive, one can create
  active objects from Java classes, while components are created from component definitions. Let us
@@ -165,7 +165,7 @@ public class AImpl implements A, BindingController {
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.examples_html_The_HelloWorld_example"/>The HelloWorld
+      <title><anchor id="examples_html_The_HelloWorld_example"/>The HelloWorld
  example</title>
       <para>The mandatory helloworld example (from the Fractal tutorial) shows the
  different ways of creating a component system (programmatically and using the ADL), and it can
@@ -473,7 +473,7 @@ y(ActiveBody.java:230)
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.examples_html_The_Comanche_example"/>The Comanche
+      <title><anchor id="examples_html_The_Comanche_example"/>The Comanche
  example</title>
       <para><ulink url="http://fractal.objectweb.org/tutorial/index.xml">The Comanche
  example</ulink> is a nice introduction to component based development with Fractal. It explains how
@@ -491,7 +491,7 @@ y(ActiveBody.java:230)
  possible to encapsulate some of the needed resource classes into active objects.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.examples_html_The_C3D_example_turning_Active_Objects_into_Components"/>C3D - from Active Objects to
+      <title><anchor id="examples_html_The_C3D_example_turning_Active_Objects_into_Components"/>C3D - from Active Objects to
  Components</title>
       <sect2 remap="h3">
         <title>Reason for this example</title>

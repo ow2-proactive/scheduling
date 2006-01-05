@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>How to add a new FileTransfer CopyProtocol</title>
+<chapter id="FileTransfer"><title>How to add a new FileTransfer CopyProtocol</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/FileTransfer.html  -->
   
     <para> FileTransfer protocols can be of two types: <emphasis role="bold">external</emphasis> or <emphasis role="bold">internal</emphasis>. Examples of
@@ -10,7 +10,7 @@
  be used with other process (ex: unicore file transfer can not be used when deploying with ssh),
  but the other way around is valid (ex: scp can be used when deploying with unicore).</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_external"/>Adding external FileTransfer
+      <title><anchor id="FileTransfer_html_external"/>Adding external FileTransfer
  CopyProtocol</title>
       <itemizedlist>
         <listitem>
@@ -29,7 +29,7 @@
  with scp), and in some cases to an internal protocol (ex: unicore with unicore)</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_internal"/>Adding internal FileTransfer
+      <title><anchor id="FileTransfer_html_internal"/>Adding internal FileTransfer
  CopyProtocol</title>
       <itemizedlist>
         <listitem>

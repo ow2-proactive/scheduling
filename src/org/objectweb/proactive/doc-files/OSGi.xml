@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>ProActive on top of OSGi</title>
+<chapter id="OSGi"><title>ProActive on top of OSGi</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/OSGi.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OSGi_html_overview" xreflabel="Overview of OSGi -- Open Services Gateway
+      <title><anchor id="OSGi_html_overview" xreflabel="Overview of OSGi -- Open Services Gateway
  initiative"/>Overview of OSGi -- Open Services Gateway
  initiative</title>
       <para><emphasis role="bold">OSGi</emphasis> is a corporation that works on the definition and promotion of
@@ -65,7 +65,7 @@
  objectweb implementation. For more information on OSGi, please visit the <ulink url="http://www.osgi.org"></ulink>OSGi website .</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OSGi_html_proactiveBundle" xreflabel="ProActive bundle and
+      <title><anchor id="OSGi_html_proactiveBundle" xreflabel="ProActive bundle and
  service"/>ProActive bundle and
  service</title>
       <para>In order to use ProActive on top of OSGi, we have developped the <emphasis role="bold">ProActive Bundle</emphasis> that contains all classes required to launch a ProActive runtime.</para>
@@ -95,7 +95,7 @@
  service.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OSGi_html_helloWorld" xreflabel="Yet another Hello World"/>Yet another Hello World</title>
+      <title><anchor id="OSGi_html_helloWorld" xreflabel="Yet another Hello World"/>Yet another Hello World</title>
       <para>The example above is <emphasis role="bold">a simple hello world that uses ProActive
  Service</emphasis> . It creates an Hello active Object and register it as a service. We use the hello
  basic service in the ProActive example. We have to write a <emphasis role="bold">bundle Activator</emphasis> that will
@@ -215,7 +215,7 @@ r
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OSGi_html_futureWorks" xreflabel="Current and Future works"/>Current and Future works</title>
+      <title><anchor id="OSGi_html_futureWorks" xreflabel="Current and Future works"/>Current and Future works</title>
       <para>&#160;</para>
       <itemizedlist>
         <listitem>

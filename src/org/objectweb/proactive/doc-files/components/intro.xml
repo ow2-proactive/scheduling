@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Components introduction</title>
+<chapter id="intro"><title>Components introduction</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/intro.html  -->
   
-    <para> <anchor id="dbdoclet.id.intro_html_Introduction"/></para>
+    <para> <anchor id="intro_html_Introduction"/></para>
     <para>Computing Grids and Peer-to-Peer networks are inherently heterogeneous and
  distributed, and for this reason they drive new technological challenges : complexity in the
  design of applications, complexity of deployment, reusability and performance issues. The

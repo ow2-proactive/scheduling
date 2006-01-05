@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>1. Your first Test</title>
+<chapter id="first_test"><title>1. Your first Test</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/first_test.html  -->
   
     <para> This section describes how to write simple test and execute it.</para>

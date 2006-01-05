@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>OOSPMD</title>
+<chapter id="OOSPMD"><title>OOSPMD</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/OOSPMD.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OOSPMD_html_intro"/>OOSPMD : Introduction</title>
+      <title><anchor id="OOSPMD_html_intro"/>OOSPMD : Introduction</title>
       <para>SPMD stands for Single Program Multiple Data. Merged into an
  object-oriented framework, an SPMD programming model becomes an OOSPMD programming model.</para>
       <para>
@@ -31,7 +31,7 @@
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OOSPMD_html_spmdGroups"/>SPMD Groups</title>
+      <title><anchor id="OOSPMD_html_spmdGroups"/>SPMD Groups</title>
       <para>An spmd group is a ProActive typed group built with the <emphasis role="bold">ProSPMD.newSPMDGroup()</emphasis> method. This method looks like the <emphasis role="bold">ProActiveGroup.newGroup()</emphasis>; they have similar behavior (and overloads). The difference is
  that each members of an spmd group have a reference to a group containing all the others members
  and itself (i.e. a reference to the spmd group itself).</para>
@@ -69,7 +69,7 @@ class A {
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OOSPMD_html_introBarrier"/>Barrier : Introduction</title>
+      <title><anchor id="OOSPMD_html_introBarrier"/>Barrier : Introduction</title>
       <para>ProActive provides three kinds of barrier to synchronize activities. The
  feature is specially useful in a SPMD programming style. A barrier stops the activity of the
  active object that invokes it until a special condition is satisfied. Notice that, as the
@@ -96,7 +96,7 @@ class A {
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OOSPMD_html_totalBarrier"/>Total Barrier</title>
+      <title><anchor id="OOSPMD_html_totalBarrier"/>Total Barrier</title>
       <para>Total barrier directly involves the spmd group. A call to <emphasis role="bold">barrier(String)</emphasis> will block until all the members in the spmd group have themselves reach
  and called the identical <emphasis role="bold">ProSPMD.barrier()</emphasis> primitive. A call communicates with all the
  members of the spmd group. The barrier is released when the Active Object has received a <emphasis>barrier message</emphasis> from all other members of the spmd group (including itself).</para>
@@ -154,7 +154,7 @@ class A {
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OOSPMD_html_neighbourBarrier"/>Neighbor barrier</title>
+      <title><anchor id="OOSPMD_html_neighbourBarrier"/>Neighbor barrier</title>
       <para>The Neighbor barrier is a kind of light weighted barrier, involving not all
  the member of an spmd group, but only the Active Objects specified in a given group.</para>
       <para></para>
@@ -191,7 +191,7 @@ class A {
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.OOSPMD_html_methodBarrier"/>Method Barrier</title>
+      <title><anchor id="OOSPMD_html_methodBarrier"/>Method Barrier</title>
       <para>The Method barrier does no more involve extra messages to communicate (i.e.
  the <emphasis>barrier messages</emphasis>). Communications between objects to release a barrier are achieved by
  the standard method call and request reception of ProActive.</para>

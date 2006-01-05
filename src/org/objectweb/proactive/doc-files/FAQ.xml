@@ -1,123 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Frequently Asked Questions</title>
+<chapter id="FAQ"><title>Frequently Asked Questions</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FAQ.html  -->
   
     <para> <emphasis role="bold">Note:</emphasis> This FAQ is under construction. If one of your question is not
  answered here, just send it at <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and we&#39;ll update the FAQ.</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FAQ_html_list"/>Questions</title>
+      <title><anchor id="FAQ_html_list"/>Questions</title>
       <orderedlist>
         <listitem>
-          <para><link linkend="dbdoclet.id.build">How do I build ProActive from the distribution
+          <para><link linkend="build">How do I build ProActive from the distribution
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.perm">Why do I get a Permission denied when trying to launch
+          <para><link linkend="perm">Why do I get a Permission denied when trying to launch
  examples scripts under Linux</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.asm">Why do I get an exception java.lang.NoClassDefFoundError
+          <para><link linkend="asm">Why do I get an exception java.lang.NoClassDefFoundError
  about asm?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.bcel">Why do I get an exception java.lang.NoClassDefFoundError
+          <para><link linkend="bcel">Why do I get an exception java.lang.NoClassDefFoundError
  about bcel ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.javaSecurity">Why do I get an exception
+          <para><link linkend="javaSecurity">Why do I get an exception
  java.security.AccessControlException access denied ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.win">Why examples and compilation do not work under
+          <para><link linkend="win">Why examples and compilation do not work under
  Windows?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.nodeCreation">How does the node creation happen ?</link></para>
+          <para><link linkend="nodeCreation">How does the node creation happen ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.rmiregistryCreation">How does the RMI Registry creation happen
+          <para><link linkend="rmiregistryCreation">How does the RMI Registry creation happen
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.classServer">What is a class server, why do we need one
+          <para><link linkend="classServer">What is a class server, why do we need one
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.reifiable">What is a reifiable object ?</link></para>
+          <para><link linkend="reifiable">What is a reifiable object ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.body">What is the body of an active object ? What are its
+          <para><link linkend="body">What is the body of an active object ? What are its
  local and remote representations ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.stub">What is a ProActive stub, how are they generated
+          <para><link linkend="stub">What is a ProActive stub, how are they generated
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.stubProperties">Why my object&#39;s properties aren&#39;t
+          <para><link linkend="stubProperties">Why my object&#39;s properties aren&#39;t
  updated ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.stubReference">How can I pass a reference on an active object
+          <para><link linkend="stubReference">How can I pass a reference on an active object
  or the difference between <literal>this</literal> and <literal>ProActive.getStubOnThis()</literal>
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.create">How can I create an active object ?</link></para>
+          <para><link linkend="create">How can I create an active object ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.createMethods">What are the differences between instantiation
+          <para><link linkend="createMethods">What are the differences between instantiation
  based and object based active objects creation ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.noArgsConstructor">Why do I have do write a no-args
+          <para><link linkend="noArgsConstructor">Why do I have do write a no-args
  constructor ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.activity">How do I control the activity of an active object
+          <para><link linkend="activity">How do I control the activity of an active object
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.implementActivity">How do I implement the custom activity of
+          <para><link linkend="implementActivity">How do I implement the custom activity of
  an active object ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.liveAndActive">What happened to the former <emphasis role="bold">live()</emphasis>
+          <para><link linkend="liveAndActive">What happened to the former <emphasis role="bold">live()</emphasis>
  method and <emphasis role="bold">Active</emphasis> interface ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.asynch">Are the call to an Active Object always asynchronous
+          <para><link linkend="asynch">Are the call to an Active Object always asynchronous
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.future">Why should I avoid to return null in methods body
+          <para><link linkend="future">Why should I avoid to return null in methods body
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.JiniUse">How can I use <emphasis role="bold">Jini</emphasis> in ProActive ?</link></para>
+          <para><link linkend="JiniUse">How can I use <emphasis role="bold">Jini</emphasis> in ProActive ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.JiniPb">Why do I get an exception when using <emphasis role="bold">Jini</emphasis>
+          <para><link linkend="JiniPb">Why do I get an exception when using <emphasis role="bold">Jini</emphasis>
  ?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.config">What is the difference between passing parameters in
+          <para><link linkend="config">What is the difference between passing parameters in
  Deployment Descriptor and setting properties in ProActive Configuration file?</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.valid_error">Why do I get the following message when parsing
+          <para><link linkend="valid_error">Why do I get the following message when parsing
  my xml deployment file:
  ERROR: file:~/ProActive/descriptor.xml Line:2 Message:cvc-elt.1: Cannot find the declaration of
  element &#39;ProActiveDescriptor&#39;</link></para>
         </listitem>
         <listitem>
-          <para><link linkend="dbdoclet.id.AO2comp">How do I make a Component version out of an Active
+          <para><link linkend="AO2comp">How do I make a Component version out of an Active
  Object version ?</link></para>
         </listitem>
 </orderedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FAQ_html_answers"/>Answers</title>
+      <title><anchor id="FAQ_html_answers"/>Answers</title>
       <orderedlist>
         <listitem>
           <para><emphasis remap="h3" role="bold">How do I build ProActive from the distribution
@@ -500,7 +500,7 @@ a to 2
     }
           </screen>
           <para>When you reference an active object, you always reference it through
- its associated stub (<link linkend="dbdoclet.id.stub">see definition of Stub</link>). The stub class inheriting
+ its associated stub (<link linkend="stub">see definition of Stub</link>). The stub class inheriting
  from the reified class, it has also all its attributes. But those attributes are totally
  useless as the only role of the generated stub is to reify every public methods call into a
  request passed to the associated proxy. Therefore accessing directly the attributes of an
@@ -709,7 +709,7 @@ else
         <listitem>
           <para><emphasis remap="h3" role="bold">How do I implement the custom
  activity of an active object ?</emphasis></para>
-          <para>As explained <link linkend="dbdoclet.id.activity">before</link>, there are two ways to
+          <para>As explained <link linkend="activity">before</link>, there are two ways to
  define the activity of your active object</para>
           <itemizedlist>
             <listitem>

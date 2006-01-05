@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Branch and Bound API</title>
+<chapter id="bnb"><title>Branch and Bound API</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/bnb.html  -->
   
     <para> The outline of this short handbook:</para>
     <orderedlist>
       <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId894456">Overview</link></para>
+        <para><link linkend="mozTocId894456">Overview</link></para>
       </listitem>
       <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId664917">The API Architecture</link></para>
+        <para><link linkend="mozTocId664917">The API Architecture</link></para>
       </listitem>
       <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId204520">The API Description</link></para>
+        <para><link linkend="mozTocId204520">The API Description</link></para>
       </listitem>
       <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId733244">An Example: FlowShop</link></para>
+        <para><link linkend="mozTocId733244">An Example: FlowShop</link></para>
       </listitem>
       <listitem>
-        <para><link linkend="dbdoclet.id.mozTocId331057">Future Work</link></para>
+        <para><link linkend="mozTocId331057">Future Work</link></para>
       </listitem>
 </orderedlist>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId894456"/>Overview</title>
+      <title><anchor id="mozTocId894456"/>Overview</title>
       <para>The Branch and Bound (BnB) consists to an algorithmic technique for exploring a solution tree
  from which returns the optimal solution.</para>
       <para>The main goal of this BnB API is to provide a set of tools for helping the developpers to
@@ -50,7 +50,7 @@
       <para>Further research information is available <ulink url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.xml">here</ulink>.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId664917"/>The Model Architecture</title>
+      <title><anchor id="mozTocId664917"/>The Model Architecture</title>
       <para>The next figure show the architecture of the API:</para>
       <para>
         <informalfigure>
@@ -116,7 +116,7 @@
  task.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId204520"/>The API Details</title>
+      <title><anchor id="mozTocId204520"/>The API Details</title>
       <sect2 remap="h3">
         <title>The Task Description</title>
         <para>The <emphasis role="bold">Task</emphasis> object is located in this followed package:</para>
@@ -217,7 +217,7 @@ Result futureResult = manager.start(); // this call is asynchronous
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId733244"/>An Example: FlowShop</title>
+      <title><anchor id="mozTocId733244"/>An Example: FlowShop</title>
       <para>This example solves the permutation flowshop scheduling problem, with the monoobjective case.
  The main objective is to minimized the overall completion time for all the jobs, i.e. makespan. A
  flowshop problem can be represented as a set of n jobs; this jobs have to scheduled on a set of m
@@ -313,7 +313,7 @@ ion;
       <para>This example is available in a complete version <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/flowshop.xml">here</ulink>.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId331057"/>Future Work</title>
+      <title><anchor id="mozTocId331057"/>Future Work</title>
       <itemizedlist>
         <listitem>
           <para> An auto-dynamic task splitting mechanism.</para>

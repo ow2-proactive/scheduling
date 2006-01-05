@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>An implementation of the Fractal component model with ProActive</title>
+<chapter id="implementation"><title>An implementation of the Fractal component model with ProActive</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/implementation.html  -->
   
-    <para> <anchor id="dbdoclet.id.implementation_html_implementation_of_fractal_with_proactive"/></para>
+    <para> <anchor id="implementation_html_implementation_of_fractal_with_proactive"/></para>
     <para>Fractal defines a general conceptual model, along with a programming
  application interface (API) in Java. According to the official documentation, the Fractal
  component model is &quot;<emphasis>a modular and extensible component model that can be used with
@@ -35,7 +35,7 @@
  programming techniques and the architecture of the implementation is described in a following
  section.</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.implementation_html_Specific_features_of_this_implementation"/>Specific features of this implementation</title>
+      <title><anchor id="implementation_html_Specific_features_of_this_implementation"/>Specific features of this implementation</title>
       <para>The combination of the Fractal model with the ProActive library leverages
  the capabilities of both of them.</para>
       <sect2 remap="h3">

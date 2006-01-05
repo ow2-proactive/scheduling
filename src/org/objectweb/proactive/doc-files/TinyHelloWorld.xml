@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Hello world ! (tiny example)</title>
+<chapter id="TinyHelloWorld"><title>Hello world ! (tiny example)</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/TinyHelloWorld.html  -->
   
     <para> This example implements the smallest program in ProActive. This is the

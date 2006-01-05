@@ -1,13 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<chapter>
-  <title>SPMD PROGRAMMING</title>
+<chapter id="OOSPMDJacobiexample">  <title>SPMD PROGRAMMING</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/OOSPMDJacobiexample.html  -->
   
     <sect1 remap="h2">
       <title>OO SPMD on a Jacobi example</title>
       <para>&nbsp;</para>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_firstglance"/>1.
+        <title><anchor id="OOSPMDJacobiexample_html_firstglance"/>1.
  Execution and first glance at the Jacobi code</title>
         <sect3 remap="h4">
           <title>1.1 Source files:
@@ -72,7 +71,7 @@
 </sect3>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_modifs"/>2. Modification
+        <title><anchor id="OOSPMDJacobiexample_html_modifs"/>2. Modification
  and compilation</title>
         <sect3 remap="h4">
           <title>2.1 Source modification</title>
@@ -98,7 +97,7 @@
 </sect3>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_detail"/>3. Detailed
+        <title><anchor id="OOSPMDJacobiexample_html_detail"/>3. Detailed
  understanding of the OO SPMD Jacobi</title>
         <sect3 remap="h4">
           <title>3.1 Structure of the code</title>
@@ -254,7 +253,7 @@
 </sect3>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_deploy"/>4. Virtual Nodes
+        <title><anchor id="OOSPMDJacobiexample_html_deploy"/>4. Virtual Nodes
  and Deployment descriptors</title>
         <sect3 remap="h4">
           <title>4.1 Virtual Nodes</title>
@@ -293,7 +292,7 @@
 </sect3>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.OOSPMDJacobiexample_html_execute"/>5. Execution
+        <title><anchor id="OOSPMDJacobiexample_html_execute"/>5. Execution
  on several machines and Clusters</title>
         <sect3 remap="h4">
           <title>5.1 Execution on several machines in the room</title>

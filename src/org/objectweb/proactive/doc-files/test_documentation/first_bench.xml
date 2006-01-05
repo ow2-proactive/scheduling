@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>2. Your first Benchmark</title>
+<chapter id="first_bench"><title>2. Your first Benchmark</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/first_bench.html  -->
   
     <para> This section describes how to write and execute a simple Benchmark.</para>

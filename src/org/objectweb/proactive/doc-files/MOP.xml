@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>MOP : Metaobject Protocol</title>
+<chapter id="MOP"><title>MOP : Metaobject Protocol</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/MOP.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.MOP_html_impl"/>Implementation: a Meta-Object Protocol</title>
+      <title><anchor id="MOP_html_impl"/>Implementation: a Meta-Object Protocol</title>
       <para>ProActive is built on top of a metaobject protocol (MOP) that permits
  reification of method invocation and constructor call. As this MOP is not limited to the
  implementation of our transparent remote objects library, it also provides an open framework for
@@ -15,7 +15,7 @@
  language access control checks when executing reified non-public method or constructor calls.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.MOP_html_principles"/>Principles</title>
+      <title><anchor id="MOP_html_principles"/>Principles</title>
       <para>If the programmer wants to implement a new metabehavior using our
  metaobject protocol, he or she has to write both a concrete (as opposed to abstract) class and an
  interface. The concrete class provides an implementation for the metabehavior he or she wants to
@@ -45,7 +45,7 @@
  feature.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.MOP_html_echoproxy"/>Example of a different metabehavior:
+      <title><anchor id="MOP_html_echoproxy"/>Example of a different metabehavior:
  EchoProxy</title>
       <para>Here&#39;s the implementation of a very simple yet useful metabehavior :
  for each reified call, the name of the invoked method is printed out on the standard output
@@ -112,7 +112,7 @@ reified. </para>
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.MOP_html_reflect"/>The Reflect interface</title>
+      <title><anchor id="MOP_html_reflect"/>The Reflect interface</title>
       <para>All the interfaces used for declaring <emphasis>metabehaviors</emphasis> inherit directly
  or indirectly from <literal>Reflect</literal>. This leads to a hierarchy of metabehaviors such as shown
  in the figure below.</para>
@@ -139,7 +139,7 @@ reified. </para>
  ones.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.MOP_html_limitations"/>Limitations</title>
+      <title><anchor id="MOP_html_limitations"/>Limitations</title>
       <para>Due to its commitment to be a 100% Java library, the MOP has a few
  limitations:</para>
       <itemizedlist>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>ProActive File Transfer Model</title>
+<chapter id="FileTransfer"><title>ProActive File Transfer Model</title>
 
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FileTransfer.html  -->
   
@@ -8,7 +8,7 @@
     <para> The following document describes our current proposal model for supporting file transfer in
  ProActive.</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_intro" xreflabel="Introduction and Concepts"/>Introduction and Concepts</title>
+      <title><anchor id="FileTransfer_html_intro" xreflabel="Introduction and Concepts"/>Introduction and Concepts</title>
       <para>We believe it is interesting for us, and the ProActive users, to provide support for
  FileTransfer</para>
       <para>Currently we recognize the following type of files:</para>
@@ -53,7 +53,7 @@
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_objectives" xreflabel="Objectives"/>Objectives</title>
+      <title><anchor id="FileTransfer_html_objectives" xreflabel="Objectives"/>Objectives</title>
       <sect2 remap="h3">
         <title>Main objective</title>
         <itemizedlist>
@@ -80,7 +80,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_protocols" xreflabel="Supported Protocols"/>Supported Protocols</title>
+      <title><anchor id="FileTransfer_html_protocols" xreflabel="Supported Protocols"/>Supported Protocols</title>
       <itemizedlist>
         <listitem>
           <para> scp</para>
@@ -97,7 +97,7 @@
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_design" xreflabel="FileTransfer Design"/>FileTransfer Design</title>
+      <title><anchor id="FileTransfer_html_design" xreflabel="FileTransfer Design"/>FileTransfer Design</title>
       <para>FileTransfer definitions are divided in two:</para>
       <sect2 remap="h3">
         <title>Abstract Definition</title>
@@ -157,7 +157,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FileTransfer_html_xmlTags" xreflabel="Descriptor FileTransfer XML Tags"/>Descriptor FileTransfer XML Tags</title>
+      <title><anchor id="FileTransfer_html_xmlTags" xreflabel="Descriptor FileTransfer XML Tags"/>Descriptor FileTransfer XML Tags</title>
       <para>The abstract concept: &quot;FileTransfer&quot; is introduced. This concept is independent off
  the actual process used, but also flexible and configurable at the process level. To define this
  abstract representation of the FileTransfer:</para>

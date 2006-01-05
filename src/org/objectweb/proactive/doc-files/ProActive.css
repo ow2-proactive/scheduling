@@ -3,19 +3,23 @@ BODY {
  color: black;
 }
 
+td {font-size: 9pt;}
+p {margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
+
+code {	font-size: 3px;}
+li {	font-size: 9pt;}
+
+.codeexample {	font-family: "Courier New", Courier, mono;}
+
+
 /* P  { margin-left:  8px; padding-left: 8px; } */
 th { background-color: #00257E; color: white; font-weight: bold; }
 H1 { font-weight: bold; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 18pt;}
-h2 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
+H2 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
 H3 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold;}
-H4 { margin-left: 15px; padding-left: 5px; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; font-weight: bold;}
+H4 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; font-weight: bold;}
 B  { color: #00257E; }
-b.java { color: #0000FF ; font-weight: bold }
-P{ margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
-LI{margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
-table.xml{ background-color: #C0C0C0; border: double #FFFFFF}
 
-.xml{font-family: Courier; font-size: 10pt;}
 .regularLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .regularLink2 { background-color: white; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .smallLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 8pt; font-weight: bold; }
@@ -26,15 +30,6 @@ table.xml{ background-color: #C0C0C0; border: double #FFFFFF}
 .textNormal { margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
 .textSmall {  font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 8pt; }
 .listWithSpace { line-height: 1.5;}
-.snippet{ color: #00257e; font-size:0.75em; padding-top: 0; padding-left: 6em; padding-right: 0; /*font-family:monospace;*/  background-color:white; font-family: "Lucida Console", Courier; font-size: 10pt; border-style: none;border-width: medium; }
-.alignleftsnippet{ color: #00257e; font-size:0.75em; padding-top: 0;padding-right: 0; /*font-family:monospace;*/  background-color:white; font-family: "Lucida Console", Courier; font-size: 10pt; }
-.print {  page-break-after: always}
-
-/* Make a "red" class, to avoid purple on blue for <h2> <a ...  */
-a.red:link {color: #ee7b3e; background: #00257E; }
-a.red:active {color: #ee7b3e; background: #00257E;}
-a.red:visited {color: #e06712; background: #00257E;}
-a.red:hover {color: #ff0000; background: #00257E;}
 
 /* Token Colours */
 #CharacerLiteral	{ color: #FF00FF; }
@@ -55,7 +50,7 @@ a.red:hover {color: #ff0000; background: #00257E;}
 #Default		{ color: #0000FF ; font-weight: bold }
 #Do			{ color: #0000FF ; font-weight: bold }
 #Double		{ color: #0000FF ; font-weight: bold }
-#Else			 { color: #0000FF ; font-weight: bold }
+#Else			{ color: #0000FF ; font-weight: bold }
 #Extends		{ color: #0000FF ; font-weight: bold }
 #False			{ color: #0000FF ; font-weight: bold }
 #Final			{ color: #0000FF ; font-weight: bold }
@@ -97,3 +92,39 @@ a.red:hover {color: #ff0000; background: #00257E;}
 #HexLiteral		{ color: #000000 }
 #OctalLiteral		{ color: #000000 }
 #FloatPointLiteral	{ color: #000000 }
+
+.command {
+	font-family:		monospace;
+}
+
+.filename {
+	font-family:		monospace;
+}
+
+.screen {
+        font-family: monospace;
+        font-size: 10px;
+        display: block;
+        padding: 10px;
+        border: 1px solid #bbb;
+        background-color: #eee;
+        color: #000;
+        overflow: auto;
+        border-radius: 2.5px;
+        -moz-border-radius: 2.5px;
+        margin: 0.5em 2em;
+}
+
+.programlisting {
+        font-family: monospace;
+        font-size: 10px;
+        display: block;
+        padding: 10px;
+        border: 1px solid #bbb;
+        background-color: #ddd;
+        color: #000;
+        overflow: auto;
+        border-radius: 2.5px;
+        -moz-border-radius: 2.5px;
+        margin: 0.5em 2em;
+}

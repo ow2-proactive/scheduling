@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title> Introduction to some of the functionalities of ProActive</title>
+<chapter id="capabilities-intro"><title> Introduction to some of the functionalities of ProActive</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/capabilities-intro.html  -->
   
     <para> This chapter will present some of the facilities offered by ProActive, namely :</para>

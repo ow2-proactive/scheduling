@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Exception Handling</title>
+<chapter id="exceptions"><title>Exception Handling</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/exceptions.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.exceptions_html_presentation"/>Exceptions and Asynchrony</title>
+      <title><anchor id="exceptions_html_presentation"/>Exceptions and Asynchrony</title>
       <para>In the asynchronous environment provided by ProActive, exceptions cannot be
  handled the same as in a sequential environment. Let&#39;s see the problem with exceptions and
  asynchrony in a piece of code:</para>
@@ -131,7 +131,7 @@ $ diff -u MyClass.java~ MyClass.java
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.exceptions_html_nfe"/>Non-Functional Exceptions</title>
+      <title><anchor id="exceptions_html_nfe"/>Non-Functional Exceptions</title>
       <sect2 remap="h3">
         <title>Overview</title>
         <para>In the first part, we were concerned with functional exception. That is,

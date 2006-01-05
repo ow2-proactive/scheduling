@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>0.2 Timer for the Benchmarks</title>
+<chapter id="timer"><title>0.2 Timer for the Benchmarks</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/timer.html  -->
   
     <para> In this API, it is the benchmark programmer who make the measure, he can simply use : <emphasis>System.currentTimeMillis()</emphasis> of Java. This method is in the wrong !</para>

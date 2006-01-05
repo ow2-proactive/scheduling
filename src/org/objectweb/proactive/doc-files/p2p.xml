@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>ProActive Peer-to-Peer Infrastructure</title>
+<chapter id="p2p"><title>ProActive Peer-to-Peer Infrastructure</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/p2p.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId121981"/>Overview</title>
+      <title><anchor id="mozTocId121981"/>Overview</title>
       <para>Computational Peer-To-Peer (P2P) is becoming a key execution environment. The potential of
  100,000 nodes interconnected to execute a single application is rather appealing, especially for
  Grid computing. Mimicking data P2P, one could start a computation that no failure would ever be
@@ -29,7 +29,7 @@
       <para>Further research information is available <ulink url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.xml">here</ulink>.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId1224"/><anchor id="dbdoclet.id.p2p_html_infrastructure_model"/>The P2P Infrastructure Model</title>
+      <title><anchor id="mozTocId1224"/><anchor id="p2p_html_infrastructure_model"/>The P2P Infrastructure Model</title>
       <para>The goals of this work are to use sparse CPU cycles from institutions&#39; desktop
  workstations combined with grids and clusters. Desktop workstations are not available all the
  time for sharing computation times with different users other than the workstation owner. Grids
@@ -45,7 +45,7 @@
  Peer-to-Peer is.</para>
        
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId356736"/>What is Peer-to-Peer?</title>
+        <title><anchor id="mozTocId356736"/>What is Peer-to-Peer?</title>
         <para>There are a lot of P2P definitions, many of them are similar to other distributed
  infrastructures, such as Grid, client / server, etc. There are 2 better definitions which
  describe really P2P well:</para>
@@ -69,10 +69,10 @@
         <para><emphasis role="bold">P2P&#39;s focus on sharing, decentralization, instability and fault tolerance.</emphasis></para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId928306"/>The P2P Infrastructure in
+        <title><anchor id="mozTocId928306"/>The P2P Infrastructure in
  short</title>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId101413"/>Bootstrapping: First
+          <title><anchor id="mozTocId101413"/>Bootstrapping: First
  Contact</title>
           <para>A fresh (or new) peer which would like to join the P2P network, will encounter a serious
  bootstrapping problem or first contact problem: &quot;How can it connect to the P2P
@@ -125,7 +125,7 @@
  <emphasis role="bold">Example of first contact (Bootstrapping).</emphasis></para>
 </sect3>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId470123"/>Discovering and
+          <title><anchor id="mozTocId470123"/>Discovering and
  Self-Organizing in Continue</title>
           <para>The main particularity of a P2P network is the peers high volatility.&#160; This results from
  various attributes which compose P2P:</para>
@@ -164,7 +164,7 @@
  address or geographically).</para>
           <para>In the same way, this idea was selected to keep the ProActive P2P infrastructure up. All peers
  have to maintain a list of <emphasis role="bold">acquaintances</emphasis>. At the beginning, when a fresh peer has just
- joined the P2P infrastructure, it knows only peers from its <link linkend="dbdoclet.id.mozTocId101413">bootstrapping</link> step. However, depending on how long the list of servers is,
+ joined the P2P infrastructure, it knows only peers from its <link linkend="mozTocId101413">bootstrapping</link> step. However, depending on how long the list of servers is,
  many of them could be unreachable, unavailable, etc. and the fresh peer ends up knowing a small
  number of acquaintances. Knowing a small number of acquaintances is a real problem in a dynamic
  P2P network when all the servers will be unavailable, the fresh peer will be unconnected from the
@@ -174,7 +174,7 @@
  more the peers are highly dynamic, the&#160; more NOA should be high. Thereby, a peer must
  discover new acquaintances through the P2P infrastructure.</para>
            
-          <para>In the next <link linkend="dbdoclet.id.mozTocId299524">section</link>, we will see in detail how the message
+          <para>In the next <link linkend="mozTocId299524">section</link>, we will see in detail how the message
  protocol works. For the moment we will just explain briefly the discovering acquaintances process
  without going into detail about the message protocol.</para>
           <para>The peer called &quot;Alice&quot; has 2 acquaintances resulting from its first contact with
@@ -207,7 +207,7 @@
  acquaintance list if it doesn&#39;t already know the asking peer. Next, if it&#39;s an unknown
  peer, the peer decides with a random function to be an acquaintance or not. With the parameter of <emphasis role="bold">agree responses</emphasis>, it is possible to configure the percentage of positive responses to an
  exploring message. The random function is a temporary solution to solve the flooding problem due
- to the message protocol (see next <link linkend="dbdoclet.id.mozTocId299524">section</link>), we are thinking of
+ to the message protocol (see next <link linkend="mozTocId299524">section</link>), we are thinking of
  using a new parameter Maximum Number of Acquaintances and improving the message protocol. For the
  moment, we don&#39;t consider peers IP addresses or geographical location of the peers as an
  acquaintances criteria.</para>
@@ -230,7 +230,7 @@
  <emphasis role="bold">Heart beat sent every TTU.</emphasis></para>
 </sect3>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId299524"/>Asking Computational Nodes </title>
+          <title><anchor id="mozTocId299524"/>Asking Computational Nodes </title>
           <para>The main goal of this work is to provide an infrastructure for sharing computational nodes
  (JVMs). Therefore, a resource query mechanism is needed; there are 2 types of resources in this
  context, thus 2 query types:</para>
@@ -343,9 +343,9 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId197757"/><anchor id="dbdoclet.id.p2p_html_implementation"/>The P2P Infrastructure Implementation</title>
+      <title><anchor id="mozTocId197757"/><anchor id="p2p_html_implementation"/>The P2P Infrastructure Implementation</title>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId467214"/>Peers Implementation</title>
+        <title><anchor id="mozTocId467214"/>Peers Implementation</title>
         <para>The P2P infrastructure is implemented with ProActive. Thus the shared resource is not a JVMs
  but a ProActive node, nodes are like a container which receives work.</para>
         <para>The P2P infrastructure is not directly implemented in the ProActive core at the ProActive
@@ -364,11 +364,11 @@
           </listitem>
           <listitem>
             <para><emphasis role="bold">P2PNodeManager</emphasis> : works together with the P2PService, this active object manages one
- or several shared nodes. It handles the booking node system, see <link linkend="dbdoclet.id.mozTocId690451">here</link> for more details.</para>
+ or several shared nodes. It handles the booking node system, see <link linkend="mozTocId690451">here</link> for more details.</para>
           </listitem>
           <listitem>
             <para><emphasis role="bold">P2PAcquaintanceManager</emphasis> : manages the list of acquaintances and provides group
- communication, see next <link linkend="dbdoclet.id.mozTocId587594">section</link>.</para>
+ communication, see next <link linkend="mozTocId587594">section</link>.</para>
           </listitem>
           <listitem>
             <para><emphasis role="bold">P2PNodeLookup</emphasis> : works as a broker when the P2PService asks nodes. All the asking node
@@ -376,7 +376,7 @@
  application.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">FirstContact</emphasis> : it&#39;s the <link linkend="dbdoclet.id.mozTocId101413">bootstrapping</link> object.</para>
+            <para><emphasis role="bold">FirstContact</emphasis> : it&#39;s the <link linkend="mozTocId101413">bootstrapping</link> object.</para>
           </listitem>
 </itemizedlist>
         <para> The Figure below shows the connection between all active objects:</para>
@@ -402,7 +402,7 @@
  ProActive typed group of P2PService. This is the point of the next section.</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId587594"/>Dynamic Shared ProActive
+        <title><anchor id="mozTocId587594"/>Dynamic Shared ProActive
  Group</title>
         <para>ProActive typed group does not allow access to group elements and make calls from different
  active objects to the same group is not possible, i.e. a group can not be shared. However, the
@@ -439,7 +439,7 @@
  working to add member exclusion in a group method call.</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId690451"/>Sharing Node Mechanism</title>
+        <title><anchor id="mozTocId690451"/>Sharing Node Mechanism</title>
         <para>The sharing node mechanism is an independent activity from the P2P service. Nodes are the
  sharing resource of this P2P network. This activity is handled by the P2PNodeManager active
  object.</para>
@@ -482,7 +482,7 @@
  deployment descriptor.</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId586812"/>IC2D Screen shot</title>
+        <title><anchor id="mozTocId586812"/>IC2D Screen shot</title>
         <para>A screen shot made with IC2D. You can see 3 P2P services which are sharing 2 nodes
  (bi-processors machines). Inside the nodes there are some active Domain objects from the nBody
  application which is deployed on this small P2P infrastructure.</para>
@@ -498,10 +498,10 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId325247"/>Installing and Using the
+      <title><anchor id="mozTocId325247"/>Installing and Using the
  P2P Infrastructure</title>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId765069"/><anchor id="dbdoclet.id.p2p_html_network"/>Create your P2P Network</title>
+        <title><anchor id="mozTocId765069"/><anchor id="p2p_html_network"/>Create your P2P Network</title>
         <para>The P2P infrastructure is self-organized and configurable. When the infrastructure is running
  you have nothing to do to keep it up. There are 3 main parameters to configure:</para>
         <itemizedlist>
@@ -526,7 +526,7 @@
  of peers.</para>
         <para>Now, you just have to start peers. There are two ways to do so:</para>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId117139"/>Quick Start Peer</title>
+          <title><anchor id="mozTocId117139"/>Quick Start Peer</title>
           <para>This method explains how to rapidly launch a simple P2P Service on one host.</para>
           <para>ProActive provides a very simple <emphasis>script</emphasis> to start a P2P Service on your local host. The
  name of this script is <emphasis role="bold">startP2PService</emphasis>.</para>
@@ -616,7 +616,7 @@ rmi://applepie.proactive.org:8080
  stop (for a Java exception) the script re-starts a new one.</para>
 </sect3>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId979491"/>Usage Example</title>
+          <title><anchor id="mozTocId979491"/>Usage Example</title>
           <para>In this illustration, we will explain how to start a first peer and then how new peers can
  create a P2P network with the first one.</para>
           <para>Start the first peer with <emphasis>rmi</emphasis> protocol and listening on port <emphasis>2410</emphasis>:</para>
@@ -657,13 +657,13 @@ ost:2410
  <emphasis role="bold">Usage example P2P network (after firsts connections).</emphasis></para>
 </sect3>
         <sect3 remap="h4">
-          <title><anchor id="dbdoclet.id.mozTocId690540"/>The P2P Daemon</title>
+          <title><anchor id="mozTocId690540"/>The P2P Daemon</title>
           <para>The daemon aims to use computers in Peer-to-Peer computations. There will be a Java virtual
  machine sleeping on your computer and waking up at scheduled times to get some work done.</para>
           <para>By default, the JVM is scheduled to wake up during the weekend and during the night. Next, we
  will explain how to change the schedule. The JVM is running with the lowest priority.</para>
           <sect4 remap="h5">
-            <title><anchor id="dbdoclet.id.mozTocId895651"/>Installation</title>
+            <title><anchor id="mozTocId895651"/>Installation</title>
             <para><emphasis role="bold">UNIX</emphasis></para>
             <para>Go to the directory: <emphasis role="bold">ProActive/compile</emphasis> and run this command:</para>
             <screen>
@@ -696,7 +696,7 @@ C:&gt;ProActive\scripts\windows\p2p\Service\remove.bat
             <para><emphasis role="bold">Comment</emphasis>: By default the port number of the daemon is <emphasis role="bold">9015</emphasis>.</para>
 </sect4>
           <sect4 remap="h5">
-            <title><anchor id="dbdoclet.id.mozTocId799743"/>Configuration</title>
+            <title><anchor id="mozTocId799743"/>Configuration</title>
             <para>The daemon is configured with XML files in the <emphasis role="bold">ProActive/p2p/config/</emphasis> directory. To find
  the correct configuration file, the daemon will first try with a host dependent file: <emphasis role="bold">config/proactivep2p.${HOST}.xml</emphasis> for example: <emphasis role="bold">config/proactivep2p.camel.inria.fr.xml</emphasis>
  if the daemon is running on the host named <emphasis role="bold">camel.inria.fr.</emphasis></para>
@@ -746,7 +746,7 @@ C:&gt;ProActive\scripts\windows\p2p\Service\remove.bat
  in which we will register ourselves, in the example we used the short form which is equivalent to <emphasis>rmi://host:9301</emphasis>.</para>
 </sect4>
           <sect4 remap="h5">
-            <title><anchor id="dbdoclet.id.mozTocId994982"/>Control</title>
+            <title><anchor id="mozTocId994982"/>Control</title>
             <para>The following commands only work with UNIX friendly systems.</para>
             <itemizedlist>
               <listitem>
@@ -794,7 +794,7 @@ ProActive/p2p/build/logs/hostname
 </sect3>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId315155"/><anchor id="dbdoclet.id.p2p_html_appli"/>Example of Acquiring Nodes by ProActive XML Deployment Descriptors</title>
+        <title><anchor id="mozTocId315155"/><anchor id="p2p_html_appli"/>Example of Acquiring Nodes by ProActive XML Deployment Descriptors</title>
         <para>You can customize some P2P settings such as:</para>
         <itemizedlist>
           <listitem>
@@ -907,7 +907,7 @@ tor
  page</ulink>.</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.mozTocId294040"/>The P2P Infrastructure API
+        <title><anchor id="mozTocId294040"/>The P2P Infrastructure API
  Usage Example</title>
         <para>The next little sample of code explains how, from an application, you can start a P2P Service
  and get nodes:</para>
@@ -954,7 +954,7 @@ p2pNodeLookup.killAllNodes();
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.mozTocId789872"/><anchor id="dbdoclet.id.p2p_html_limitations"/>Future Work</title>
+      <title><anchor id="mozTocId789872"/><anchor id="p2p_html_limitations"/>Future Work</title>
       <itemizedlist>
         <listitem>
           <para> Plug technical services, such as Fault-tolerance schemes or Load Balancing, for each

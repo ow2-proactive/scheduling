@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Active Objects : creation and advanced concepts</title>
+<chapter id="ActiveObjectCreation"><title>Active Objects : creation and advanced concepts</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ActiveObjectCreation.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_creation"/>Active Object: creation and
+      <title><anchor id="ActiveObjectCreation_html_creation"/>Active Object: creation and
  advanced concepts</title>
       <para>Active objects are created on a per-object basis: an application can
  contain active as well as passive instances of a given class. In the remaining part of this
@@ -28,7 +28,7 @@
  object.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_instantiationCreation"/>Instantiation-Based Creation</title>
+      <title><anchor id="ActiveObjectCreation_html_instantiationCreation"/>Instantiation-Based Creation</title>
       <para>When using instantiation based creation, any argument passed to the
  constructor of the reified object through <literal>ProActive.newActive</literal> is serialized and
  passed by copy to the object. This is because the model behind <emphasis role="bold">ProActive</emphasis> is uniform
@@ -110,7 +110,7 @@ Node&quot;);
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_objectCreation"/>Object-Based
+      <title><anchor id="ActiveObjectCreation_html_objectCreation"/>Object-Based
  Creation</title>
       <para>Object-based creation is used for turning an existing passive object
  instance into an active one. It has been introduced in ProActive as an answer to the following
@@ -143,7 +143,7 @@ Node&quot;);
  guaranteed.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_activity"/>Specifying the activity of an
+      <title><anchor id="ActiveObjectCreation_html_activity"/>Specifying the activity of an
  active object</title>
       <para>Customizing the activity of the active object is at the core of ProActive
  because it allows to specify fully the behavior of an active object. By default, an object turned
@@ -374,7 +374,7 @@ efault)
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_restrictions"/>Restrictions on
+      <title><anchor id="ActiveObjectCreation_html_restrictions"/>Restrictions on
  reifiable objects</title>
       <para>Not all classes can give birth to active objects. There exist some
  restrictions, most of them caused by the 100% Java compliance, which forbids modifying the Java
@@ -405,7 +405,7 @@ efault)
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_factory"/>Using the Factory Method Design
+      <title><anchor id="ActiveObjectCreation_html_factory"/>Using the Factory Method Design
  Pattern</title>
       <para>Creating an active object using ProActive might be a little bit cumbersome
  and requires more lines of code that for creating a regular object. A nice solution to this
@@ -433,7 +433,7 @@ an exception: &quot;+e);
  object have to be dealt with somewhere in the code.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_customize"/>Advanced : Customizing the
+      <title><anchor id="ActiveObjectCreation_html_customize"/>Advanced : Customizing the
  Body of an Active Object</title>
       <sect2 remap="h3">
         <title>Motivations</title>
@@ -514,7 +514,7 @@ ce());
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.ActiveObjectCreation_html_elementRole"/>Advanced : Role of the
+      <title><anchor id="ActiveObjectCreation_html_elementRole"/>Advanced : Role of the
  elements of an active object</title>
       <para>In this section, we&#39;ll have a very close look at what happens when an
  active object is created. This section aims at providing a better understanding of how the

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Configuration </title>
+<chapter id="configuration"><title>Configuration </title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/configuration.html  -->
   
-    <para> <anchor id="dbdoclet.id.configuration_html_Configuration"/></para>
+    <para> <anchor id="configuration_html_Configuration"/></para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.configuration_html_Controllers_and_interceptors"/>Controllers and interceptors</title>
+      <title><anchor id="configuration_html_Controllers_and_interceptors"/>Controllers and interceptors</title>
       <para>This section explains how to customize the membranes of component through the configuration,
  composition and creation of controllers and interceptors.</para>
       <sect2 remap="h3">
@@ -212,7 +212,7 @@ MyInputInterceptor
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle"/>Lifecycle :
+      <title><anchor id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle"/>Lifecycle :
  encapsulation of functional activity in component lifecycle</title>
       <para>In this implementation of the Fractal component model, Fractal components are active
  objects.&#160;Therefore it is possible to redefine their&#160;activity. In this context of
@@ -241,7 +241,7 @@ MyInputInterceptor
  it will end when the lifecycle of the component is set to STOPPED.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.configuration_html_Shortcuts"/>Shortcuts</title>
+      <title><anchor id="configuration_html_Shortcuts"/>Shortcuts</title>
       <sect2 remap="h3">
         <title>Principles</title>
         <para>Communications between&#160;components in a hierarchical model may involve the crossing of

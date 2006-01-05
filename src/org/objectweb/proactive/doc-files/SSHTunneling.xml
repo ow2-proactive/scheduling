@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Using SSH tunneling for RMI or HTTP communications</title>
+<chapter id="SSHTunneling"><title>Using SSH tunneling for RMI or HTTP communications</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/SSHTunneling.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.SSHTunneling_html_overview"/>Overview</title>
+      <title><anchor id="SSHTunneling_html_overview"/>Overview</title>
       <para>ProActive allows users to <emphasis role="bold">tunnel</emphasis> all of their RMI or HTTP
  communications over <emphasis role="bold">SSH</emphasis>: it is possible to specify in ProActive deployment descriptors
  which JVMs should <emphasis role="bold">export</emphasis> their RMI objects through a SSH tunnel.</para>
@@ -38,7 +38,7 @@
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.SSHTunneling_html_configuration"/>Configuration of the
+      <title><anchor id="SSHTunneling_html_configuration"/>Configuration of the
  network</title>
       <para>No two networks are alike. The only thing they share is the fact that they
  are all different. Usually, what you must look for is:</para>
@@ -68,7 +68,7 @@ A    | &lt;----                    ----&gt;  |    B
  22. Host B is also protected by a similar firewall.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.SSHTunneling_html_runtimecom"/>ProActive runtime communication
+      <title><anchor id="SSHTunneling_html_runtimecom"/>ProActive runtime communication
  patterns</title>
       <para>To execute a ProActive application, you need to <emphasis role="bold">&quot;deploy&quot;</emphasis>
  it. Deployment is performed by the ProActive runtime and is configured by the ProActive
@@ -80,7 +80,7 @@ A    | &lt;----                    ----&gt;  |    B
  the normal operation of the ProActive runtimes.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.SSHTunneling_html_applicom"/>ProActive application communication
+      <title><anchor id="SSHTunneling_html_applicom"/>ProActive application communication
  patterns.</title>
       <para>Once an application is properly deployed, the application objects deployed
  by the ProActive runtime start making requests to each other. It is important to properly
@@ -88,7 +88,7 @@ A    | &lt;----                    ----&gt;  |    B
  configuration on these communication patterms.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.SSHTunneling_html_protocols"/>ProActive communication
+      <title><anchor id="SSHTunneling_html_protocols"/>ProActive communication
  protocols</title>
       <para>Whenever a request is made to a non-local ProActive object, this request is
  performed with the communication protocol specified by the destination JVM. Namely, each JVM is
@@ -147,7 +147,7 @@ A    | &lt;----                    ----&gt;  |    B
  -Dproactive.communication.protocol=rmissh argument yourself on the JVM command line.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.SSHTunneling_html_rmissh"/>The rmissh communication protocol.</title>
+      <title><anchor id="SSHTunneling_html_rmissh"/>The rmissh communication protocol.</title>
       <para>This protocol is a bit special because it keeps a lot of compatibility with
  the rmi protocol and a lot of options are available to <emphasis role="bold">&quot;optimize&quot;</emphasis> it.</para>
       <para>This protocol can be used to automatically <emphasis role="bold">tunnel</emphasis> all RMI

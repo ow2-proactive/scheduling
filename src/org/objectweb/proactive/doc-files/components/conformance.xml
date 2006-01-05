@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Conformance to the Fractal model and extensions</title>
+<chapter id="conformance"><title>Conformance to the Fractal model and extensions</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/conformance.html  -->
   
-    <para> <anchor id="dbdoclet.id.conformance_html_conformance_to_fractal"/></para>
+    <para> <anchor id="conformance_html_conformance_to_fractal"/></para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.conformance_html_Model"/>Model</title>
+      <title><anchor id="conformance_html_Model"/>Model</title>
       <para>The conceptual model of Fractal is the base of our work, and as it is
  extensible, we have added a few concepts to fulfill our needs. The Fractal specification defines
  conformance levels for implementations of the API (section 7.1. of the Fractal 2 specification).
@@ -42,7 +42,7 @@
  active objects).</emphasis></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.conformance_html_Implementation_specific_API"/>Implementation specific API</title>
+      <title><anchor id="conformance_html_Implementation_specific_API"/>Implementation specific API</title>
       <sect2 remap="h3">
         <title>fractal.provider</title>
         <para>The API is the same for any Fractal implementation, though some classes are

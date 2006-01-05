@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Typed Group Communication</title>
+<chapter id="TypedGroupCommunication"><title>Typed Group Communication</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/TypedGroupCommunication.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.TypedGroupCommunication_html_overview"/>Overview</title>
+      <title><anchor id="TypedGroupCommunication_html_overview"/>Overview</title>
       <para>Group communication is a crucial feature for high-performance and Grid
  computing. While previous works and libraries proposed such a characteristic (e.g. MPI, or
  object-oriented frameworks), the use of groups imposed specific constraints on programmers, for
@@ -43,7 +43,7 @@ vg.f1();
       </blockquote>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.TypedGroupCommunication_html_Creation"/>Creation of a Group</title>
+      <title><anchor id="TypedGroupCommunication_html_Creation"/>Creation of a Group</title>
       <para>Any object that is reifiable has the ability to be included in a group.
  Groups are created using the static method <literal>ProActiveGroup.newGroup</literal>.
  The common superclass for all the group members has to be specified, thus giving the group a
@@ -98,7 +98,7 @@ A ag3 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params[],
  in the class A can be invoked on the group.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.TypedGroupCommunication_html_repr"/>Group representation and
+      <title><anchor id="TypedGroupCommunication_html_repr"/>Group representation and
  manipulation</title>
       <para>The <emphasis role="bold">typed group representation</emphasis> we have presented corresponds to the
  functional view of groups of objects. In order to provide a dynamic management of groups, a
@@ -147,7 +147,7 @@ A ag1new = (A) gA.getGroupByType();
       </blockquote>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.TypedGroupCommunication_html_result"/>Group as result of group
+      <title><anchor id="TypedGroupCommunication_html_result"/>Group as result of group
  communications</title>
       <para>The particularity of our group communication mechanism is that the <emphasis role="bold">result</emphasis> of a typed group communication <emphasis role="bold">is also a group</emphasis>. The result group is
  transparently built at invocation time, with a future for each elementary reply. It will be
@@ -194,7 +194,7 @@ ProActiveGroup.waitAll(vg);
       </blockquote>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.TypedGroupCommunication_html_comms"/>Broadcast vs Dispatching</title>
+      <title><anchor id="TypedGroupCommunication_html_comms"/>Broadcast vs Dispatching</title>
       <para>Regarding the parameters of a method call towards a group of objects, the
  default behaviour is to broadcast them to all members. But sometimes, only a specific portion of
  the parameters, usually dependent of the rank of the member in the group, may be really useful

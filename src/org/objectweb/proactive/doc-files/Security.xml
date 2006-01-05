@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>ProActive Security Mechanism</title>
+<chapter id="Security"><title>ProActive Security Mechanism</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Security.html  -->
   
     <para> In order to use the Proactive Security features, you have to
@@ -9,7 +9,7 @@
  &lt;jre_home&gt;/lib/security.</para>
     
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Security_html_Overview"/>Overview</title>
+      <title><anchor id="Security_html_Overview"/>Overview</title>
       <para>Usually, applications and security are developed for a specific use. We
  propose here a security framework that allows to dynamically deploy applications and to configure
  security according to this deployment.</para>
@@ -27,7 +27,7 @@
       
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Security_html_architecture"/>Security Architecture</title>
+      <title><anchor id="Security_html_architecture"/>Security Architecture</title>
       <sect2 remap="h3">
         <title>Base model</title>
         <para>A distributed or concurrent application built using <emphasis>ProActive</emphasis>&#160;is composed of a
@@ -105,7 +105,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Security_html_detail"/>Detailed Security Architecture</title>
+      <title><anchor id="Security_html_detail"/>Detailed Security Architecture</title>
       <sect2 remap="h3">
         <title>Virtual Nodes and Nodes</title>
         <para>The security architecture relies on two related abstractions for deploying Grid applications: <emphasis>Node</emphasis> and <emphasis>Virtual Node</emphasis>. A node gathers several objects in a logical entity. It
@@ -123,7 +123,7 @@
         
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.Security_html_SECTION00033000000000000000" xreflabel="Hierarchical Security Entities"/>Hierarchical Security Entities</title>
+        <title><anchor id="Security_html_SECTION00033000000000000000" xreflabel="Hierarchical Security Entities"/>Hierarchical Security Entities</title>
         <para>Grid programming is about deploying processes (activities) on various machines. In the end,
  the security policy that must be ensured for those processes depends upon many factors: first of
  all, the application policy that is needed, but also the machine locations, the security policies
@@ -239,7 +239,7 @@
         <para><emphasis role="bold">Figure 5:</emphasis> Syntax and attributes for policy rules</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.Security_html_SECTION00034000000000000000" xreflabel="Resource
+        <title><anchor id="Security_html_SECTION00034000000000000000" xreflabel="Resource
  provider security features"/>Resource
  provider security features</title>
         <para>Prior to start application on a Grid, a user needs to acquire some resources (CPU time, disk
@@ -250,7 +250,7 @@
  policy. Theses runtimes could be worldwide distributed.</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.Security_html_SECTION00037000000000000000" xreflabel="Interactions, Security Attributes"/>Interactions, Security Attributes</title>
+        <title><anchor id="Security_html_SECTION00037000000000000000" xreflabel="Interactions, Security Attributes"/>Interactions, Security Attributes</title>
         <para>Security policies are able to control all the <emphasis>interactions</emphasis> that can occur when
  deploying and executing a multi-principals Grid application. With this goal in mind, interactions
  span over the creation of processes, to the monitoring of activities (Objects) within processes,
@@ -295,7 +295,7 @@
         
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.Security_html_SECTION00038000000000000000" xreflabel="Combining Policies"/>Combining Policies</title>
+        <title><anchor id="Security_html_SECTION00038000000000000000" xreflabel="Combining Policies"/>Combining Policies</title>
         <para>As the proposed infrastructure takes into account different actors of the Grid (domain
  administrator, Grid user), even for a single-principal single-domain application, there are
  potentially several security policies activated. This section deals with the combination of those
@@ -442,7 +442,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Security_html_descriptors"/>Activating security mechanism</title>
+      <title><anchor id="Security_html_descriptors"/>Activating security mechanism</title>
       <para>Within descriptor, the tag &lt;security&gt; is used to specify the policy
  for the deployed application. It will be the policy for all Nodes and active that will be
  created.</para>
@@ -697,7 +697,7 @@ optional&quot;/&gt;
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Security_html_certificate"/>How to quickly generate certificate  ?  </title>
+      <title><anchor id="Security_html_certificate"/>How to quickly generate certificate  ?  </title>
       <para>A GUI has been created to facilitate certificate generation.</para>
       <para>
  The first screenshot presents a root certificate. Notice that the certificate chain table is empty.</para>

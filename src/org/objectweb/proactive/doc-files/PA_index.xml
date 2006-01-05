@@ -43,23 +43,24 @@
 ]>
 <book>
   <title>ProActive v3.0.1 Documentation</title>
- <part> <title> Introduction</title>
+
+ <part id="ProActiveIntroduction"> <title> Introduction</title>
   &Principles;
   &Installation;
- </part><part> <title> Programming</title>
+ </part><part id="ProActiveProgramming"> <title> Programming</title>
    &ProActiveBasis;
   &TypedGroupCommunication;
   &OOSPMD;
   &Migration;
   &exceptions;
   &bnb;
- </part><part> <title> Deploying</title>
+ </part><part id="ProActiveDeployment"> <title> Deploying</title>
   &PAConfiguration;
   &VariableContract;
   &FileTransfer;
   &SSHTunneling;
   &faultTolerance;
- </part><part> <title> Composing</title>
+ </part><part id="ProActiveComponents"> <title> Composing</title>
   &intro;
   &implementation;
   &conformance;
@@ -67,28 +68,30 @@
   &adl;
   &examples;
   &perspectives;
- </part><part> <title> Advanced</title>
+
+ </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title>
   &p2p;
   &Security;
   &WSDoc;
   &OSGi;
- </part><part> <title> User Interface and tools</title>
+ </part><part id="ProActiveTools"> <title> User Interface and tools</title>
   &IC2D;
   &plugin;
- </part><part> <title> Guided Tour</title>
+ </part><part id="ProActiveGuidedTour"> <title> Guided Tour</title>
   &guidedindex;
   &capabilities-intro;
   &hands_on_programming;
   &OOSPMDJacobiexample;
   &nbody;
   &conclusion;
- </part><part> <title> Extending ProActive</title>
+ </part><part id="extensionsPart"> <title> Extending ProActive</title>
   &DescriptorProcess;
   &devFileTransfer;
   &devFaultTolerance;
   &MOP;
+
  </part>
-<!--<part> <title> Back matters</title>  Should be called appendix, anyway -->
+ <!--<part id="backMattersPart"> <title> Back matters</title>  Should be called appendix, anyway -->
  <!-- &FAQ; -->
  <!-- &WordIndex; -->
  <!-- &References; -->

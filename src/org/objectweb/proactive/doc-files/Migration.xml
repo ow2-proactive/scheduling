@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Active Object Migration</title>
+<chapter id="Migration"><title>Active Object Migration</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Migration.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Migration_html_prim"/>Migration Primitive</title>
+      <title><anchor id="Migration_html_prim"/>Migration Primitive</title>
       <para>The migration of an active object can be triggered by the active object
  itself, or by an external agent. In both cases a single primitive will eventually get called to
  perform the migration. It is the method <literal>
@@ -48,7 +48,7 @@
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Migration_html_use"/>Using migration</title>
+      <title><anchor id="Migration_html_use"/>Using migration</title>
       <para>Any active object has the ability to migrate. If it references some passive
  objects, they will also migrate to the new location. Since we rely on the serialization to send
  the object on the network, <emphasis role="bold">the active object must implement the serializable interface</emphasis>. To
@@ -73,7 +73,7 @@
  make this object move, you just have to call its <literal>moveTo()</literal> method.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Migration_html_example"/>Complete example</title>
+      <title><anchor id="Migration_html_example"/>Complete example</title>
       <blockquote>
         <para>
           <screen>
@@ -131,7 +131,7 @@ de URL
  and then we ask it what is its current location.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Migration_html_non_seri"/>Dealing with non-serializable
+      <title><anchor id="Migration_html_non_seri"/>Dealing with non-serializable
  attributes</title>
       <para>The migration of an active object uses the serialization. Unfortunately,
  not all the objects in the Java language are serializable. We are going to see a simple method to

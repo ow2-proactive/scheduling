@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Fault-Tolerance</title>
+<chapter id="faultTolerance"><title>Fault-Tolerance</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/faultTolerance.html  -->
   
     
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.faultTolerance_html_overview"/>Overview</title>
+      <title><anchor id="faultTolerance_html_overview"/>Overview</title>
       <para>ProActive can provide fault-tolerance capabilities through two differents
  protocols: a Communication-Induced Checkpointing protocol (CIC) or a pessimistic message logging
  protocol (PML). Making a ProActive application fault-tolerant is <emphasis role="bold">fully transparent</emphasis>; active
@@ -51,7 +51,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.faultTolerance_html_making"/>Making a ProActive application
+      <title><anchor id="faultTolerance_html_making"/>Making a ProActive application
  fault-tolerant</title>
       <sect2 remap="h3">
         <title>Resource Server</title>
@@ -127,7 +127,7 @@ this.server.startProcess();
  application.</para>
       </sect2>
       <sect2 remap="h3">
-        <title><anchor id="dbdoclet.id.faultTolerance_html_configuration" xreflabel="Configure fault-tolerance for
+        <title><anchor id="faultTolerance_html_configuration" xreflabel="Configure fault-tolerance for
  a ProActive application"/>Configure fault-tolerance for
  a ProActive application</title>
         <para>Fault-tolerance capabilities of a ProActive application are set in the
@@ -255,7 +255,7 @@ this.server.startProcess();
        </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.faultTolerance_html_rules"/>Programming rules</title>
+      <title><anchor id="faultTolerance_html_rules"/>Programming rules</title>
       <sect2 remap="h3">
         <title>Serializable</title>
         <para>Persistence of active objects is obtained through standard Java
@@ -370,7 +370,7 @@ rvice(body);
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.faultTolerance_html_nbody" xreflabel="A complete example"/>A complete example</title>
+      <title><anchor id="faultTolerance_html_nbody" xreflabel="A complete example"/>A complete example</title>
       <sect2 remap="h3">
         <title>Description</title>
         <para>You can find in <literal>ProActive/scripts/[unix|windows]/ft/nbodyft.[sh|bat]</literal> a script that starts a

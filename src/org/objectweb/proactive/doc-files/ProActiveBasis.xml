@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>ProActive Basis, Active Object definition</title>
+<chapter id="ProActiveBasis"><title>ProActive Basis, Active Object definition</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ProActiveBasis.html  -->
   
     <sect1 remap="h2">
@@ -95,7 +95,7 @@
 </para>
       <para><emphasis role="bold">A call onto an active object as opposed to a call onto passive one</emphasis></para>
       <para></para>
-      <para><anchor id="dbdoclet.id.ProActiveBasis_html_def"/></para>
+      <para><anchor id="ProActiveBasis_html_def"/></para>
     </sect1>
     <sect1 remap="h2">
       <title>What is an active object</title>

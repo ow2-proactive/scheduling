@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Principles</title>
+<chapter id="Principles"><title>Principles</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Principles.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Principles_html_intro"/>Seamless sequential, multithreaded and
+      <title><anchor id="Principles_html_intro"/>Seamless sequential, multithreaded and
  distributed</title>
       <para>Most of the time, activities and distribution are not known at the
  beginning, and change over time. <emphasis role="bold">Seamless implies reuse, smooth and incremental
@@ -31,7 +31,7 @@
  distribution, mapping and load balancing.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Principles_html_active"/>Active objects: Unifying threads and remote
+      <title><anchor id="Principles_html_active"/>Active objects: Unifying threads and remote
  objects</title>
       <para>Given a standard object, we provide the ability to give it:</para>
       <itemizedlist>
@@ -95,7 +95,7 @@ ProActive.turnActive(a, node)
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Principles_html_model"/>Model of Computation: Based on previous works
+      <title><anchor id="Principles_html_model"/>Model of Computation: Based on previous works
  and studies</title>
       <itemizedlist>
         <listitem>
@@ -121,7 +121,7 @@ ProActive.turnActive(a, node)
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Principles_html_reuse" xreflabel="Reuse and Seamless: why and how do we achieve
+      <title><anchor id="Principles_html_reuse" xreflabel="Reuse and Seamless: why and how do we achieve
  better reuse ?"/>Reuse and Seamless: why and how do we achieve
  better reuse ?</title>
       <para>Two key features :</para>

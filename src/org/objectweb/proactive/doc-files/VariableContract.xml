@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Variable Contracts for Descriptors</title>
+<chapter id="VariableContract"><title>Variable Contracts for Descriptors</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/VariableContract.html  -->
   
     <sect1 remap="h2">
@@ -15,7 +15,7 @@
  and the Descriptor.</para>
       </sect2>
       <sect2 remap="h3">
-       <title><anchor id="dbdoclet.id.VariableContract_html_variableTypes" xreflabel="Variable Types"/>Variable Types</title>
+       <title><anchor id="VariableContract_html_variableTypes" xreflabel="Variable Types"/>Variable Types</title>
        <para>
         <informaltable frame="none">
          <tgroup cols="4">
@@ -68,7 +68,7 @@
         the definition specified in the priority column will take precedence.</para>
       </sect2>
       <sect2 remap="h3">
-       <title><anchor id="dbdoclet.id.VariableContract_html_variableTypesDesc" xreflabel="Variable Types User
+       <title><anchor id="VariableContract_html_variableTypesDesc" xreflabel="Variable Types User
                       Guide"/>Variable Types User
         Guide</title>
        <para>To help identify the user cases where the variable types might be useful, we have defined the
@@ -191,7 +191,7 @@
        </sect3>
       </sect2>  
             <sect2 remap="h3">
-       <title><anchor id="dbdoclet.id.VariableContract_html_variableTypesDesc" xreflabel="Variable Types User
+       <title><anchor id="VariableContract_html_variableTypesDesc" xreflabel="Variable Types User
                       Guide"/>Variable Types User
         Guide</title>
        <para>To help identify the user cases where the variable types might be useful, we have defined the

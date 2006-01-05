@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Architecture Description Language</title>
+<chapter id="adl"><title>Architecture Description Language</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/adl.html  -->
   
-    <para> <anchor id="dbdoclet.id.adl_html_adl"/></para>
+    <para> <anchor id="adl_html_adl"/></para>
     <para>The Architecture Description Language (ADL) is used to configure and deploy
  component systems. The architecture of the system is described in a normalized XML file.</para>
     <para><emphasis role="bold">The ADL has been updated</emphasis> and is now an extension of the standard Fractal ADL, allowing
@@ -19,7 +19,7 @@
  (included in the /lib directory of the ProActive distribution) : fractal-adl.jar, dtdparser.jar,
  ow_deployment_scheduling.jar</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.adl_html_Overview"/>Overview</title>
+      <title><anchor id="adl_html_Overview"/>Overview</title>
       <para>Components are defined in <emphasis role="bold">definition</emphasis> files, which are .fractal files. The syntax of the
  document is validated against a DTD retreived from the classpath</para>
       <screen>
@@ -94,13 +94,13 @@ virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.adl_html_Example"/>Example</title>
+      <title><anchor id="adl_html_Example"/>Example</title>
       <para>The easiest way to understand the ADL is to see <ulink url="helloworld-distributed.xml">an example</ulink>. It corresponds to the helloworld
  example described later in this document.</para>
-      <para><anchor id="dbdoclet.id.adl_html_composition_of_virtual_nodes"/></para>
+      <para><anchor id="adl_html_composition_of_virtual_nodes"/></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.adl_html_Exportation_and_composition_of_virtual_nodes"/>Exportation and composition of virtual
+      <title><anchor id="adl_html_Exportation_and_composition_of_virtual_nodes"/>Exportation and composition of virtual
  nodes</title>
       <para>Components are deployed on the virtual node that is specified in their definition ; it has to
  appear in the deployment descriptor <emphasis role="underline">unless</emphasis> this virtual node is exported. In this case,
@@ -162,7 +162,7 @@ exportedVirtualNodes
  be deployed on the current virtual machine. This can be useful for debugging purposes.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.adl_html_usage" xreflabel="Usage"/>Usage</title>
+      <title><anchor id="adl_html_usage" xreflabel="Usage"/>Usage</title>
       <para>The launcher, which parses the ADL, creates a corresponding component factory, and
  instantiates and assembles the components as defined in the ADL, is started from the <literal>org.objectweb.proactive.core.component.adl.Launcher</literal> class :</para>
       <screen>

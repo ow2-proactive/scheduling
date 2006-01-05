@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>ProActive Basic Configuration</title>
+<chapter id="Configuration"><title>ProActive Basic Configuration</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Configuration.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Configuration_html_overview"/>Overview</title>
+      <title><anchor id="Configuration_html_overview"/>Overview</title>
       <para>In order to get easier and more flexible configuration in ProActive, we
  introduced an xml file where all ProActive related configuration is located. It represents
  properties that will be added to the System when an application using ProActive is launched. Some
@@ -14,7 +14,7 @@
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Configuration_html_howItWorks"/>How does it work ?</title>
+      <title><anchor id="Configuration_html_howItWorks"/>How does it work ?</title>
       <para>Using this file is very straightforward, since all lines must follow the
  model: &lt;prop <emphasis role="bold">key</emphasis>=&quot;somekey&quot; <emphasis role="bold">value</emphasis>=&quot;somevalue&quot;/&gt;</para>
       <para></para>
@@ -47,7 +47,7 @@
       <para></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Configuration_html_whereIsIt"/>Where to access this file ?</title>
+      <title><anchor id="Configuration_html_whereIsIt"/>Where to access this file ?</title>
       <para>There is a default file with default ProActive options located under
  ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml. This file is
  automatically copied with the same package structure under the classes directory when compiling
@@ -81,7 +81,7 @@
       </screen>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Configuration_html_properties"/>ProActive properties</title>
+      <title><anchor id="Configuration_html_properties"/>ProActive properties</title>
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">Required</emphasis></para>
@@ -157,7 +157,7 @@
 </itemizedlist>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">Peer-to-Peer properties<anchor id="dbdoclet.id.Configuration_html_p2p_properties"/></emphasis></para>
+          <para><emphasis role="bold">Peer-to-Peer properties<anchor id="Configuration_html_p2p_properties"/></emphasis></para>
           <para></para>
           <para>
             <itemizedlist>
@@ -363,7 +363,7 @@
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.Configuration_html_Example"/>Example</title>
+      <title><anchor id="Configuration_html_Example"/>Example</title>
       <para>Configuration file must have following structure:</para>
       <screen>
 &lt;ProActiveUserProperties&gt;

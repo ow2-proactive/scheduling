@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>IC2D: Interactive Control and Debugging of Distribution</title>
+<chapter id="IC2D"><title>IC2D: Interactive Control and Debugging of Distribution</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/IC2D.html  -->
   
     <para> <emphasis role="bold">IC2D</emphasis> is a <emphasis role="bold">graphical environment</emphasis> for remote monitoring and
@@ -48,7 +48,7 @@
  browseable on line.</para>
     <para><ulink url="../doc/ProActive_src_html/index.xml">Source code index</ulink></para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.IC2D_html_visualisation"/>Graphical Visualisation within
+      <title><anchor id="IC2D_html_visualisation"/>Graphical Visualisation within
  IC2D</title>
       <para><emphasis role="bold">IC2D features graphical visualisation of hosts, Java Virtual Machines,
  and active objects, including the topology and volume of communications.</emphasis></para>
@@ -63,7 +63,7 @@
 </para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.IC2D_html_control"/>Control within IC2D</title>
+      <title><anchor id="IC2D_html_control"/>Control within IC2D</title>
       <para><emphasis role="bold">IC2D permits to interactively and dynamically create new Jvms and Nodes.</emphasis></para>
       <para>
         <informalfigure>
@@ -84,8 +84,8 @@
       <para><emphasis role="bold">IC2D permits to visualize related events and AOs state</emphasis></para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.IC2D_html_applications"/>Job monitoring and control</title>
-      <para><anchor id="dbdoclet.id.IC2D_html_JobMonitoringTag"/><emphasis role="bold">IC2D now provides a Job
+      <title><anchor id="IC2D_html_applications"/>Job monitoring and control</title>
+      <para><anchor id="IC2D_html_JobMonitoringTag"/><emphasis role="bold">IC2D now provides a Job
  monitoring tool, in order to visualize and control high number of resources. This tool offers
  different views of a deployed application: per hosts, per jobs,....
  To start the Job monitor tool, choose in the IC2D menu: windows --&gt; Show Job Monitor
@@ -106,7 +106,7 @@
       </informalfigure>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.IC2D_html_launcher"/>Launcher</title>
+      <title><anchor id="IC2D_html_launcher"/>Launcher</title>
       <sect2 remap="h3">
         <title>Principles</title>
         <para>The launcher allows users to launch applications directly from an XML descriptor file, without
@@ -258,7 +258,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.IC2D_html_gridcomp"/>Grid and cluster computing</title>
+      <title><anchor id="IC2D_html_gridcomp"/>Grid and cluster computing</title>
       <para><emphasis role="bold">As ProActive is interfaced with Globus and LSF, IC2D permits to interactively control and
  debug applications that execute on intercontinental-wide networks.</emphasis> Below is C3D application
  deployed with JINI and RMI protocol between Baltimore US and Nice France on a globus cluster and

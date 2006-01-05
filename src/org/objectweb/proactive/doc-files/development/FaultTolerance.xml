@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Adding a Fault-Tolerance Protocol</title>
+<chapter id="FaultTolerance"><title>Adding a Fault-Tolerance Protocol</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/FaultTolerance.html  -->
   
     <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
  ProActive. A more complete version should be released with the version 3.1. If you wish to get
  more informations, please feel free to send a mail to <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>.</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.FaultTolerance_html_objectives" xreflabel="Overview"/>Overview</title>
+      <title><anchor id="FaultTolerance_html_objectives" xreflabel="Overview"/>Overview</title>
       <sect2 remap="h3">
         <title>Active Object side</title>
         <para>Fault-tolerance mechanism in ProActive is mainly based on the <literal>org.objectweb.proactive.core.body.ft.protocols.FTManager</literal> class. This class contains

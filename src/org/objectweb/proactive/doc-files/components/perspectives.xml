@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter><title>Component perspectives : a support for our research work</title>
+<chapter id="perspectives"><title>Component perspectives : a support for our research work</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/perspectives.html  -->
   
-    <para> <anchor id="dbdoclet.id.perspectives_html_perspectives"/></para>
+    <para> <anchor id="perspectives_html_perspectives"/></para>
     <para>Currently, we have a functional implementation of the Fractal API and
  model. One can configure and deploy a distributed system made of components.</para>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.perspectives_html_Optimizations"/>Optimizations</title>
+      <title><anchor id="perspectives_html_Optimizations"/>Optimizations</title>
       <para>However, there are currently no optimizations apart from those already
  offered by ProActive, such as direct communications when communicating entities are in the same
  virtual machine.</para>
@@ -16,13 +16,13 @@
  currently working on a more sophisticated version that will allow dynamic reconfigurations.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.perspectives_html_Packaging"/>Packaging</title>
+      <title><anchor id="perspectives_html_Packaging"/>Packaging</title>
       <para>Reusability and Components should be accessible through predefined / preconfigured packages. A
  bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of
  composition of deployment that should be addressed.</para>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.perspectives_html_GUI" xreflabel="Graphical user interface"/>Graphical user interface</title>
+      <title><anchor id="perspectives_html_GUI" xreflabel="Graphical user interface"/>Graphical user interface</title>
       <para>Another area of investigation is the tools for configuring, deploying and
  monitoring distributed component systems.</para>
       <para>Because component based programming is somewhat analogous to the assembly
@@ -78,7 +78,7 @@
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.perspectives_html_Other"/>Other</title>
+      <title><anchor id="perspectives_html_Other"/>Other</title>
       <para>Other areas of research that we are opening around this work include :</para>
       <itemizedlist>
         <listitem>
@@ -103,7 +103,7 @@
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="dbdoclet.id.perspectives_html_limitations"/>Limitations</title>
+      <title><anchor id="perspectives_html_limitations"/>Limitations</title>
       <para>Some features of the Fractal model are not implemented :</para>
       <itemizedlist>
         <listitem>
