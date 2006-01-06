@@ -64,7 +64,7 @@
   &VariableContract;
   &FileTransfer;
   &SSHTunneling;
-  &faultTolerance; <!--
+  &faultTolerance; 
  </part><part id="ProActiveComponents"> <title> Composing</title>
   &intro;
   &implementation;
@@ -73,7 +73,6 @@
   &adl;
   &examples;
   &perspectives;
--->
  </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title>
   &p2p;
   &Security;
