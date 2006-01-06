@@ -1,18 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<chapter id="HelloWorld"><title>Hello world ! example</title>
+<sect1 id="HelloWorld"><title>Hello world ! example</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/HelloWorld.html  -->
   
-    <sect1 remap="h2">
-      <title>Hello world ! example</title>
       <para>This example implements a very simple client-server application. A client
  object display a <literal>String</literal> received from a remote server. We will see how to write
  classes from which active and remote objects can be created, how to find a remote object and how
  to invoke methods on remote objects.</para>
-      <sect2 remap="h3">
+      <sect2 >
         <title>The two classes</title>
         <para>Only two classes are needed: one for the server object <literal>Hello</literal>
  and one for the client that accesses it <literal>HelloClient</literal>.</para>
-        <sect3 remap="h4">
+        <sect3 >
           <title>The Hello class</title>
           <para>This class implements server-side functionalities. Its creation involves
  the following steps:</para>
@@ -33,15 +30,6 @@
           
           
           
-          <informaltable frame="all">
-            <tgroup cols="1">
-              <colspec colname="c1" colwidth="100*"/>
-              <tbody>
-                <row>
-                  <entry align="center" valign="middle"><para><emphasis role="bold">Hello.java</emphasis></para></entry>
-                </row>
-                <row>
-                  <entry><para>
 <screen>
 public class Hello {
   private String name;
@@ -75,16 +63,9 @@ ostName() + &quot;/Hello&quot;);
   }
 }
 </screen>
-</para></entry>
-                </row>
-              </tbody>
-            </tgroup>
-          </informaltable>
+         
           
-          
-          
-</sect3>
-        <sect3 remap="h4">
+         <sect4 >
           <title>Implement the required functionalities</title>
           <para>Implementing any remotely-accessible functionality is simply done through
  normal Java methods in a normal Java class, in exactly the same manner it would have been done in
@@ -103,8 +84,8 @@ ostName() + &quot;/Hello&quot;);
               <para> Add remote exceptions handling to the code.</para>
             </listitem>
 </itemizedlist>
-</sect3>
-        <sect3 remap="h4">
+</sect4>
+        <sect4 >
           <title>Why an empty no-arg constructor ?</title>
           <para>You may have noticed that class <literal>Hello</literal> has a constructor with
  no parameters and an empty implementation. The presence of this empty no-arg constructor is
@@ -119,8 +100,8 @@ ostName() + &quot;/Hello&quot;);
  constructor is provided but its implementation is not empty, unwanted behavior may appear because
  the no-arg constructor is always called when an active object is created, whatever code the user
  can write.</para>
-</sect3>
-        <sect3 remap="h4">
+</sect4>
+        <sect4 >
           <title>Creating the remote <literal>Hello</literal> object</title>
           <para>Now that we know how to write the class that implements the required
  server-side functionalities, let us see how to create the server object. In ProActive, there is
@@ -130,22 +111,14 @@ ostName() + &quot;/Hello&quot;);
  parameters. In order for the client to obtain an initial reference onto this remote object, we
  need to register it in the registry (which is actually the well-known <literal>rmiregistry</literal>)
  with a valid RMI URL.</para>
-</sect3>
-        <sect3 remap="h4">
+</sect4>
+</sect3 ><sect2 >
           <title>The <literal>HelloClient</literal> Class</title>
           <para>The responsibility of this class is first to locate the remote server object, then to invoke a
  method on it in order to retrieve a message, and finally display that message.</para>
           
-          
-          <informaltable frame="all">
-            <tgroup cols="1">
-              <colspec colname="c1" colwidth="100*"/>
-              <tbody>
-                <row>
-                  <entry align="center" valign="middle"><para><emphasis role="bold">HelloClient.java</emphasis></para></entry>
-                </row>
-                <row>
-                  <entry><para>
+<para>HelloClient.java</para>
+<!-- <title>HelloClient.java</title>   -->
 <screen>
 public class HelloClient {
   public static void main(String[] args) {
@@ -178,34 +151,29 @@ llo.class.getName(),
   }
 }
 </screen>
-</para></entry>
-                </row>
-              </tbody>
-            </tgroup>
-          </informaltable>
-</sect3>
-        <sect3 remap="h4">
+        <sect4 >
           <title>Looking up a remote object</title>
           <para>The operation of <emphasis>lookup</emphasis> simply means obtaining a reference onto an
  object from the URL it is bound to. The return type of method <literal>Proactive.lookupActive()</literal> is <literal>Object</literal>, then we need to cast it down into
  the type of the variable that holds the reference (<literal>Hello</literal> here). If no object is
  found at this URL, the call to <literal>Proactive.lookupActive()</literal> returns <literal>null</literal>.</para>
-</sect3>
-        <sect3 remap="h4">
+</sect4>
+        <sect4 >
           <title>Invoking a method on a remote object</title>
           <para>This is exactly like invoking a method on a local object of the same type.
  The user does not have to deal with catching distribution-related exceptions like, for example,
  when using RMI or CORBA. Future versions of ProActive will provide an exception handler mechanism
  in order to process these exceptions in a separate place than the functional code. As class <literal>String</literal> is <literal>final</literal>, there cannot be any asynchronism here since the object
  returned from the call cannot be replaced by a future object (this restriction on <literal>final</literal> classes is imposed by ProActive&#39;s implementation).</para>
-</sect3>
-        <sect3 remap="h4">
+</sect4>
+        <sect4 >
           <title>Printing out the message</title>
           <para>As already stated, the only modification brought to the code by ProActive
  is located at the place where active objects are created. All the rest of the code remains the
  same, which fosters software reuse.</para>
+</sect4>
 </sect3>
-        <sect3 remap="h4">
+</sect2><sect1 >
           <title>Hello World within the same VM</title>
           <para>In order to run both the client and server in the same VM, the client
  creates an active object in the same VM if it doesn&#39;t find the server&#39;s URL. The code
@@ -220,62 +188,56 @@ VM
 </screen>
           <para>To launch the Client and the Server, just type:</para>
           
-          <para><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
+<screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient
- windows&gt; java -Djava.security.policy=scripts\unix\proactive.java.policy
+ org.objectweb.proactive.examples.hello.HelloClient</screen>
+<screen>windows&gt; java -Djava.security.policy=scripts\unix\proactive.java.policy
  -Dlog4j.configuration=file:scripts\unix\proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient &amp;</literal></para>
-</sect3>
-        <sect3 remap="h4">
+ org.objectweb.proactive.examples.hello.HelloClient &amp;</screen>
+</sect2>
+        <sect2 >
           <title>Hello World from another VM on the same host</title>
-</sect3>
-        <sect3 remap="h4">
+        <sect3 >
           <title>Starting the server</title>
           <para>Just start the <literal>main</literal> method in the <literal>Hello</literal> class.</para>
-          <para><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
+<screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.Hello
- windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
+ org.objectweb.proactive.examples.hello.Hello</screen>
+<screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
  -Dlog4j.configuration=file:scripts\proactive-log4j org.objectweb.proactive.examples.hello.Hello
- &amp;</literal></para>
+ &amp;</screen>
 </sect3>
-        <sect3 remap="h4">
+        <sect3 >
           <title>Launching the client</title>
-          <para><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
+          <screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello
- windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
+ org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</screen>
+<screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
  -Dlog4j.configuration=file:scripts\proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</literal></para>
+ org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</screen>
 </sect3>
-        <sect3 remap="h4">
+</sect2 ><sect1 >
           <title>Hello World from abroad: another VM on a different host</title>
-</sect3>
-        <sect3 remap="h4">
+      <sect3 >
           <title>Starting the server</title>
           <para>Log on to the server&#39;s host, and launch the <literal>Hello</literal> class.</para>
-          <para><literal>linux remoteHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
+          <screen>linux remoteHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.Hello
- windows remoteHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
+ org.objectweb.proactive.examples.hello.Hello</screen>
+<screen>windows remoteHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
  -Dlog4j.configuration=file:scripts\proactive-log4j org.objectweb.proactive.examples.hello.Hello
- &amp;</literal></para>
+ &amp;</screen>
 </sect3>
-        <sect3 remap="h4">
+        <sect3 >
           <title>Launching the client</title>
           <para>Log on to the client Host, and launch the client</para>
-          <para><literal>linux clientHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
+          <screen>linux clientHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello
- windows clientHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
+ org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
+<screen>windows clientHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
  -Dlog4j.configuration=file:scripts\proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</literal></para>
+ org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
           
-          <para>
-  </para>
 </sect3>
       </sect2>
-    </sect1>
-  
-</chapter>
+</sect1>

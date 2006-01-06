@@ -873,7 +873,7 @@ if(result_from_method == null){
 </screen>
           <para>This test is never true, indeed, result_from_method is <emphasis role="bold">Stub--&gt;Proxy--&gt;null</emphasis> if
 the future is not yet available or the method returns null or <emphasis role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if
-the future is available, but result_from_method is <emphasis role="bold">never null</emphasis>. see <ulink url="FutureObjectCreation.xml#commonerror">Future documentation</ulink> for more documentation about
+the future is available, but result_from_method is <emphasis role="bold">never null</emphasis>. see <link linkend="FutureObjectCreation_commonerror">Future documentation</link> for more documentation about
 common errors to avoid </para>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>

@@ -1,8 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<chapter id="FutureObjectCreation"><title>Asynchronous calls and futures</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FutureObjectCreation.html  -->
   
-    <sect1 remap="h2">
+<sect1 remap="h2" id="FutureObjectCreation">
       <title>Asynchronous calls and futures</title>
       <sect2 remap="h3">
         <title>Creation of a Future Object</title>
@@ -286,7 +283,7 @@
       </sect2>
       <sect2 remap="h3">
         <title>Important Notes: Errors to avoid</title>
-        <para><anchor id="FutureObjectCreation_html_commonerror"/> there are few things to
+        <para><anchor id="FutureObjectCreation_commonerror"/> there are few things to
  remember with asynchronous method call and futures, in order to avoid annoying debugs:</para>
         
         
@@ -352,11 +349,5 @@ the future is not yet available or the method returns null or <emphasis role="bo
 the future is available, but result_from_method is <emphasis role="bold">never null</emphasis></para>
           </listitem>
 </itemizedlist>
-        
-        
-        <para>
-  </para>
       </sect2>
     </sect1>
-  
-</chapter>

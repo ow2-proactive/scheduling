@@ -6,6 +6,7 @@
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
 <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
+<!ENTITY AOCreation SYSTEM "ActiveObjectCreation.xml">
 <!ENTITY TypedGroupCommunication SYSTEM "TypedGroupCommunication.xml">
 <!ENTITY OOSPMD SYSTEM "OOSPMD.xml">
 <!ENTITY Migration SYSTEM "Migration.xml">
@@ -50,10 +51,10 @@
   &Installation;
  </part><part id="ProActiveProgramming"> <title> Programming
 		 <anchor id="Descriptor"/>      <!--    TO REMOVE! -->
-		 <anchor id="AC"/>      <!--    TO REMOVE! -->
 	 </title>
 	 
-	 &ProActiveBasis;
+  &ProActiveBasis;
+  &AOCreation;
   &TypedGroupCommunication;
   &OOSPMD;
   &Migration;

@@ -914,8 +914,8 @@
       <para>Note that this schema is available in the ProActive distribution package under
  ProActive\descriptor directory. Using descriptors related methods
  (Proactive.getProactiveDescriptor(file)) triggers automatic and transparent validation of the
- file using <ulink url="http://xml.apache.org/xerces2-j/index.xml">Xerces2_4_0</ulink> if the ProActive
- property <emphasis role="bold">schema.validation</emphasis> is set to <emphasis role="bold">enable</emphasis>(see <ulink url="Configuration.xml">configuration file</ulink> for more details). If a problem occurs during the
+ file using <ulink url="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</ulink> if the ProActive
+ property <emphasis role="bold">schema.validation</emphasis> is set to <emphasis role="bold">enable</emphasis>(see <ulink url="Configuration">configuration file</ulink> for more details). If a problem occurs during the
  validation, an error message is displayed otherwise if the validation is successful no message
  appear. An XML validation tool such as XMLSPY5.0(windows) can also be used to validate XML
  descriptors.</para>

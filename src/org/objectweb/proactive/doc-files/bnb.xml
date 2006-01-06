@@ -47,7 +47,7 @@
           <para> Open API for extensions.</para>
         </listitem>
 </itemizedlist>
-      <para>Further research information is available <ulink url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.xml">here</ulink>.</para>
+<para>Further research information is available <ulink url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</ulink>.</para>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="mozTocId664917"/>The Model Architecture</title>
@@ -302,7 +302,7 @@ ion;
   return r;
 }
 </screen>
-      <para>This example is available in a complete version <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/flowshop.xml">here</ulink>.</para>
+<para>This example is available in a complete version <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/flowshop.html">here</ulink>.</para>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="mozTocId331057"/>Future Work</title>

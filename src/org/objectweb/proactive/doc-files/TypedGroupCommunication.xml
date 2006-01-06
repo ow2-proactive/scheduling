@@ -234,7 +234,7 @@ ag1.foo(gb);
       
       
       <para>
- To learn more, see the <ulink url="../../../../index.xml">JavaDoc</ulink> and the paper <emphasis role="bold">Efficient,
+ To learn more, see the <ulink url="../../../../index.html">JavaDoc</ulink> and the paper <emphasis role="bold">Efficient,
  Flexible and Typed Group Communications for Java</emphasis> located in the <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/index.xml">Documentation page</ulink>.</para>
       
       <para>

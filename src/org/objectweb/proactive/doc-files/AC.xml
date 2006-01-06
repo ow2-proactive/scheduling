@@ -1,8 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<chapter id="AC"><title>Automatic Continuation in ProActive</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/AC.html  -->
-  
-    <sect1 remap="h2">
+    <sect1 remap="h2" id ="AC">
       <title>Automatic Continuation in ProActive</title>
       <sect2 remap="h3">
         <title>Objectives</title>
@@ -227,12 +223,5 @@ class B{
 </para>
         <para>
  B returns the value for the call to method <emphasis role="bold">bar()</emphasis> and updates the value of <emphasis role="bold">Future_r2</emphasis> for C</para>
-        
-        
-        
-        <para>
- </para>
       </sect2>
     </sect1>
-  
-</chapter>
