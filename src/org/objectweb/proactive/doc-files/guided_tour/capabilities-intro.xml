@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="capabilities-intro"><title> Introduction to some of the functionalities of ProActive</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/capabilities-intro.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/capabilities-intro.html  -->
   
     <para> This chapter will present some of the facilities offered by ProActive, namely :</para>
     <itemizedlist>
@@ -35,7 +35,7 @@
        <informalfigure>
         <mediaobject>
          <imageobject>
-          <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/c3d.png" format="PNG"/>            </imageobject>
+          <imagedata width="6in" fileref="guided_tour/pics/hello/c3d.png" format="PNG"/>            </imageobject>
         </mediaobject>
        </informalfigure>
 </para>
@@ -50,11 +50,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_renderers_consoles.jpg" format="JPG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.jpg" format="JPG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_renderers_consoles.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_renderers_consoles.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -63,11 +63,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_dispatcher_app.jpg" format="JPG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.jpg" format="JPG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_dispatcher_app.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -85,11 +85,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_user_alice.jpg" format="JPG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.jpg" format="JPG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_user_alice.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -113,11 +113,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_specify_host.jpg" format="JPG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.jpg" format="JPG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_specify_host.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -145,11 +145,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-               <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/c3d_topology_with_new_user.jpg" format="JPG"/>              </imageobject>
+               <imagedata width="6in" fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.jpg" format="JPG"/>              </imageobject>
               <imageobject>
-               <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/c3d_topology_with_new_user.svg" format="SVG"/>              </imageobject>
+               <imagedata width="6in" fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.svg" format="SVG"/>              </imageobject>
               <imageobject>
-               <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/c3d_topology_with_new_user.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -254,11 +254,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/readers_console.jpg" format="JPG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/readers_console.svg" format="SVG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/readers_console.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -269,11 +269,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/readers_app.jpg" format="JPG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/readers_app.svg" format="SVG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/readers_app.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -322,11 +322,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/philosophers_console.jpg" format="JPG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/philosophers_console.svg" format="SVG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/philosophers_console.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -336,11 +336,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/philosophers_app.jpg" format="JPG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/philosophers_app.svg" format="SVG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -406,11 +406,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_console.jpg" format="JPG"/>                </imageobject>
+                 <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_console.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/ic2d_console.svg" format="SVG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                  <imagedata fileref="doc-files/guided_tour/pics/screenshots/ic2d_console.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -419,11 +419,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/jc2d_main_panel.jpg" format="JPG"/>                </imageobject>
+                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/jc2d_main_panel.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/jc2d_main_panel.svg" format="SVG"/>                </imageobject>
+                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/jc2d_main_panel.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/jc2d_main_panel.png" format="PNG"/>                </imageobject>
+                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/jc2d_main_panel.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -431,11 +431,11 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_evt_listener_panel.jpg" format="JPG"/>                </imageobject>
+                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.jpg" format="JPG"/>                </imageobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_evt_listener_panel.svg" format="SVG"/>                </imageobject>
+                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.svg" format="SVG"/>                </imageobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_evt_listener_panel.png" format="PNG"/>                </imageobject>
+                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -448,11 +448,11 @@
                 <para> <emphasis>menu monitoring - monitor new RMI host</emphasis></para>
                 <para><emphasis><inlinemediaobject>
                       <imageobject>
-                        <imagedata fileref="doc-files/guided_tour/pics/screenshots/monitor_new_rmi_host_menu.jpg" format="JPG"/>                      </imageobject>
+                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.jpg" format="JPG"/>                      </imageobject>
                       <imageobject>
-                        <imagedata fileref="doc-files/guided_tour/pics/screenshots/monitor_new_rmi_host_menu.svg" format="SVG"/>                      </imageobject>
+                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.svg" format="SVG"/>                      </imageobject>
                       <imageobject>
-                        <imagedata fileref="doc-files/guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png" format="PNG"/>                      </imageobject>
+                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png" format="PNG"/>                      </imageobject>
 </inlinemediaobject></emphasis></para>
               </blockquote>
  It is possible to visualize the status of each active object (processing,
@@ -468,11 +468,11 @@
                         <informalfigure>
                           <mediaobject>
                             <imageobject>
-                             <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_world_panel_philosophers.jpg" format="JPG"/>                            </imageobject>
+                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.jpg" format="JPG"/>                            </imageobject>
                             <imageobject>
-                             <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_world_panel_philosophers.svg" format="SVG"/>                            </imageobject>
+                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.svg" format="SVG"/>                            </imageobject>
                             <imageobject>
-                             <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png" format="PNG"/>                            </imageobject>
+                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png" format="PNG"/>                            </imageobject>
                           </mediaobject>
                         </informalfigure>
 </para></entry>
@@ -480,11 +480,11 @@
                         <informalfigure>
                           <mediaobject>
                             <imageobject>
-                             <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_legend.jpg" format="JPG"/>                            </imageobject>
+                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_legend.jpg" format="JPG"/>                            </imageobject>
                             <imageobject>
-                             <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_legend.svg" format="SVG"/>                            </imageobject>
+                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_legend.svg" format="SVG"/>                            </imageobject>
                             <imageobject>
-                             <imagedata width="3in" fileref="doc-files/guided_tour/pics/screenshots/ic2d_legend.png" format="PNG"/>                            </imageobject>
+                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_legend.png" format="PNG"/>                            </imageobject>
                           </mediaobject>
                         </informalfigure>
 </para></entry>
@@ -521,11 +521,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/penguin.jpg" format="JPG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/penguin.jpg" format="JPG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/penguin.svg" format="SVG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/penguin.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/screenshots/penguin.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="nbody"><title>5. The nbody example</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/nbody.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/nbody.html  -->
   
     <sect1 remap="h2">
       <title>Using facilities provided by ProActive on a complete example</title>
@@ -20,7 +20,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/./pics/nbody/gui.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/./pics/nbody/gui.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -42,7 +42,7 @@
                       <informalfigure>
                         <mediaobject>
                          <imageobject>
-                           <imagedata width="3in" fileref="doc-files/guided_tour/pics/nbody/forces_simple.png" format="PNG"/>   
+                           <imagedata width="3in" fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>   
                           </imageobject>
                         </mediaobject>
                       </informalfigure>
@@ -54,7 +54,7 @@
                       <informalfigure>
                         <mediaobject>
                           <imageobject>
-                            <imagedata fileref="doc-files/guided_tour/pics/nbody/forces_sum.png" format="PNG"/>    
+                            <imagedata fileref="guided_tour/pics/nbody/forces_sum.png" format="PNG"/>    
                            </imageobject>
                         </mediaobject>
                       </informalfigure>
@@ -68,7 +68,7 @@
                       <informalfigure>
                         <mediaobject>
                           <imageobject>
-                            <imagedata fileref="doc-files/guided_tour/pics/nbody/acc.png" format="PNG"/>                          </imageobject>
+                            <imagedata fileref="guided_tour/pics/nbody/acc.png" format="PNG"/>                          </imageobject>
                         </mediaobject>
                       </informalfigure>
 </para>
@@ -80,7 +80,7 @@
                       <informalfigure>
                         <mediaobject>
                           <imageobject>
-                            <imagedata fileref="doc-files/guided_tour/pics/nbody/movement_equations.png" format="PNG"/>                          </imageobject>
+                            <imagedata fileref="guided_tour/pics/nbody/movement_equations.png" format="PNG"/>                          </imageobject>
                         </mediaobject>
                       </informalfigure>
 </para>
@@ -89,7 +89,7 @@
                   <entry><para>
                       <informalfigure>
                           <imageobject>
-                            <imagedata fileref="doc-files/guided_tour/pics/nbody/interactions.png" format="PNG"/>     </imageobject>
+                            <imagedata fileref="guided_tour/pics/nbody/interactions.png" format="PNG"/>     </imageobject>
                       </informalfigure>
 </para>                     
 </entry>
@@ -108,7 +108,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/nbody/directory.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/nbody/directory.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -163,7 +163,7 @@
               <informalfigure>
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="doc-files/guided_tour/pics/nbody/forces_simple.png" format="PNG"/>                  </imageobject>
+                    <imagedata fileref="guided_tour/pics/nbody/forces_simple.png" format="PNG"/>                  </imageobject>
                 </mediaobject>
               </informalfigure>
 </para>
@@ -194,8 +194,8 @@
  }</screen>
             <para>the <literal>Node [] nodes</literal> are the different JVMs that were created on
  possibly different machines. They are used for Active Object creation. They were specified in
- the descriptor used to deploy the application. You may find more information on these <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Descriptor.xml">
- descriptors here</ulink>, while Active Object creation is explained in <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/ActiveObjectCreation.xml">
+ the descriptor used to deploy the application. You may find more information on these <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/Descriptor.xml">
+ descriptors here</ulink>, while Active Object creation is explained in <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/ActiveObjectCreation.xml">
  this page</ulink>. Just as an example, in the simple package, the Maestro is created on the first
  of theses JVMs, and takes three parameters, a <literal>Domain []</literal>, an <literal>Integer</literal>, and a <literal>Start</literal> (it will be detailed later) :</para>
             <screen>
@@ -472,7 +472,7 @@
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata fileref="doc-files/guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>   </imageobject>
+                          <imagedata fileref="guided_tour/pics/nbody/Domain_subdivision.png" format="PNG"/>   </imageobject>
                       </mediaobject>
                     </informalfigure>
 </para></entry>
@@ -482,7 +482,7 @@
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata fileref="doc-files/guided_tour/pics/nbody/tree.png" format="PNG"/>                        </imageobject>
+                          <imagedata fileref="guided_tour/pics/nbody/tree.png" format="PNG"/>                        </imageobject>
                       </mediaobject>
                     </informalfigure>
 </para></entry>

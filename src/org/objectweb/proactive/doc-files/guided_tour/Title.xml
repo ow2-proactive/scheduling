@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/Title.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/Title.html  -->
   
     <para>
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="doc-files/guided_tour/../ProActiveLogo.gif" format="GIF"/>          </imageobject>
+            <imagedata fileref="guided_tour/../ProActiveLogo.gif" format="GIF"/>          </imageobject>
           <imageobject>
-            <imagedata fileref="doc-files/guided_tour/../ProActiveLogo.svg" format="SVG"/>          </imageobject>
+            <imagedata fileref="guided_tour/../ProActiveLogo.svg" format="SVG"/>          </imageobject>
           <imageobject>
-            <imagedata fileref="doc-files/guided_tour/../ProActiveLogo.png" format="PNG"/>          </imageobject>
+            <imagedata fileref="guided_tour/../ProActiveLogo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
 </para>

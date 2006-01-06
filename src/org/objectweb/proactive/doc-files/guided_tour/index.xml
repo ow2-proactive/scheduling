@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="index"><title>ProActive guided tour</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/index.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/index.html  -->
   
     <para> This tour is a practical introduction to ProActive, giving an illustrated introduction to some
  of the functionnalities and facilities offered by the library.</para>
@@ -18,7 +18,7 @@
     <para>&#160;</para>
     <sect1 remap="h2">
       <title>Installation and setup</title>
-      <para>Follow the <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Installation.xml">instructions</ulink> for downloading and installing ProActive.</para>
+      <para>Follow the <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/Installation.xml">instructions</ulink> for downloading and installing ProActive.</para>
       <para>&#160;</para>
       <para>The programming exercises in the first part imply that you :</para>
       <itemizedlist>
@@ -59,11 +59,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/guided_tour/pics/screenshots/proactive_directories.jpg" format="JPG"/>            </imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.jpg" format="JPG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/guided_tour/pics/screenshots/proactive_directories.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/guided_tour/pics/screenshots/proactive_directories.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

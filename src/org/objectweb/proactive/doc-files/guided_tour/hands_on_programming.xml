@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="hands_on_programming"><title> Hands-on programming</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/hands_on_programming.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/hands_on_programming.html  -->
   
     <para> Here is an introduction to programming with ProActive. It should give you a first flavor, and
  you will be able to see some more advanced examples in the section &quot;introduction to some
@@ -33,11 +33,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-            <!--  <imagedata fileref="doc-files/guided_tour/pics/hello/clientserver.gif" format="GIF"/>            </imageobject>
+            <!--  <imagedata fileref="guided_tour/pics/hello/clientserver.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/guided_tour/pics/hello/clientserver.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="guided_tour/pics/hello/clientserver.svg" format="SVG"/>            </imageobject>
             <imageobject>-->
-              <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -66,11 +66,11 @@
           <informalfigure>
             <mediaobject>
               <!--<imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/initializedhello.gif" format="GIF"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/initializedhello.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/initializedhello.svg" format="SVG"/>              </imageobject>-->
+                <imagedata fileref="guided_tour/pics/hello/initializedhello.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-               <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/initializedhello.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="guided_tour/pics/hello/initializedhello.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>-->
@@ -164,7 +164,7 @@ cd ..
  network).&lt;/&gt;</para>
         <para>Hello, the superclass, must be able to be serialized, in order to be transferred remotely. It
  does not have to implement directly java.io.Serializable, but its attributes should be
- serializable - or transient. For more information on this topic, check the <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Migration.xml">
+ serializable - or transient. For more information on this topic, check the <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.xml">
  manual</ulink>.</para>
       </sect2>
       <sect2 remap="h3">
@@ -176,7 +176,7 @@ cd ..
  created. The Hello class (and InitializedHello) is left unmodified.</para>
         <para><emphasis>Note that the migration has to be initiated <emphasis role="underline">by the active object itself</emphasis>. This
  explains why we have to write the moveTo method in the code of MigratableHello - i.e. a method
- that contains an explicit call to the migration primitive. (cf <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Migration.xml">
+ that contains an explicit call to the migration primitive. (cf <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.xml">
  migration documentation</ulink>)</emphasis></para>
         <para>MigratableHello also implements a factory method for instanciating itself as an active object
  : <literal>static MigratableHello createMigratableHello(String : name)</literal></para>
@@ -185,11 +185,11 @@ cd ..
           <informalfigure>
             <mediaobject>
 <!--              <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/migratablehello.gif" format="GIF"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/migratablehello.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/migratablehello.svg" format="SVG"/>              </imageobject>-->
+                <imagedata fileref="guided_tour/pics/hello/migratablehello.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-               <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/migratablehello.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="guided_tour/pics/hello/migratablehello.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -270,11 +270,11 @@ cd ..
           <informalfigure>
             <mediaobject>
 <!--              <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.gif" format="GIF"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/agent_execution.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.svg" format="SVG"/>              </imageobject>-->
+                <imagedata fileref="guided_tour/pics/hello/agent_execution.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/agent_execution.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/agent_execution.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -302,11 +302,11 @@ cd ..
           <informalfigure>
             <mediaobject>
 <!--              <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui.gif" format="GIF"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/hellogui.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui.svg" format="SVG"/>              </imageobject>-->
+                <imagedata fileref="guided_tour/pics/hello/hellogui.svg" format="SVG"/>              </imageobject>-->
               <imageobject>
-               <imagedata width="6in" fileref="doc-files/guided_tour/pics/hello/hellogui.png" format="PNG"/>              </imageobject>
+               <imagedata width="6in" fileref="guided_tour/pics/hello/hellogui.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -408,9 +408,9 @@ public void clean() {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui-snapshot.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.png" format="PNG"/>              </imageobject>
 <!--               <imageobject>  
- <imagedata fileref="doc-files/guided_tour/pics/hello/hellogui-snapshot.svg" format="SVG"/>              </imageobject> -->
+ <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.svg" format="SVG"/>              </imageobject> -->
             </mediaobject>
           </informalfigure>
 </para>

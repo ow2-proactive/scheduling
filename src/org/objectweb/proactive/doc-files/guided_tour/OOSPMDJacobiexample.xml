@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <chapter id="OOSPMDJacobiexample">  <title>SPMD PROGRAMMING</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/guided_tour/OOSPMDJacobiexample.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/OOSPMDJacobiexample.html  -->
   
     <sect1 remap="h2">
       <title>OO SPMD on a Jacobi example</title>
@@ -205,9 +205,9 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </sect3>
@@ -231,23 +231,23 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobi9-allcoms.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-allcoms.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
           <para>&nbsp;</para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobi9-ratio-ligne.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
           <para>In order to get details and documentation on Groups and OO SPMD, have a
  look at:</para>
-          <para><literal>ProActive/src/org/objectweb/proactive/doc-files/</literal></para>
+          <para><literal>ProActive/src/org/objectweb/proactive/</literal></para>
           <para><literal>TypedGroupCommunication.html</literal></para>
           <para><literal>OOSPMD.html</literal></para>
 </sect3>
@@ -282,9 +282,9 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in"  fileref="doc-files/guided_tour/pics/screenshots/jacobiic2d9vm.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d9vm.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
           <para>You do not need to recompile, just restart the execution. Use IC2D to
@@ -650,7 +650,7 @@
           <para>If you have access to your own clusters, configure the XML descriptor to
  launch the Jacobi on them, using the appropriate protocol:</para>
           <para>ssh, LSF, PBS, Globus, etc.</para>
-          <para>Have a look at <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Descriptor.xml">
+          <para>Have a look at <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/Descriptor.xml">
  XML Descriptors documentation</ulink> to get the format of the XML descriptor for each of the
  supported protocols.</para>
           <para>&nbsp;</para>
