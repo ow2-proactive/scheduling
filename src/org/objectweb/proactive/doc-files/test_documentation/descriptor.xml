@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="descriptor"><title>Configuration File</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/descriptor.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/descriptor.html  -->
   
     <sect1 remap="h2">
       <title>How many configuration files you need ?</title>
@@ -34,27 +34,21 @@
         <title>How to use it ?</title>
         <para>It is very simple to use it. Just do like this example :</para>
         <para>You have a private variable in your Manager or Test :</para>
-        <screen>
-<literal>private int packetSize = 1024;</literal>
-        </screen>
+<screen> private int packetSize = 1024;</screen>
         <para>First add a setter of which it take a <emphasis role="bold">String</emphasis> in input :</para>
-        <screen>
+<screen>
 <literal>
         public void setPacketSize(String value){
           this.packetSize = Integer.parseInt(value);
         }
     </literal>
-        </screen>
+</screen>
         <para>Next, int the prop file :</para>
-        <screen>
-<literal>
-        PacketSize=2048
-     </literal>
-        </screen>
+<screen> PacketSize=2048 </screen>
         <para><emphasis role="bold">Warning :</emphasis> the key in the prop file must be the same of the setter name without the
  prefix set.</para>
         <para>Now, to load the prop file :</para>
-        <screen>
+<screen>
 <literal>
         // Level : Manager
         // At the execution load properties
@@ -70,21 +64,17 @@
         test.loadAttributes(java.io.File propFile);
         test.loadAttributes(java.util.Properties javaProp);
       </literal>
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title>A XML properties file</title>
       <para>To configure all from just one file.</para>
       <para>Like a simple prop file this one must be have the same name of the Manager class :</para>
-      <screen>
-<literal>
-        YourManager &lt;-&gt; YourManager.xml
-     </literal>
-      </screen>
+<screen> YourManager &lt;-&gt; YourManager.xml </screen>
       <sect2 remap="h3">
         <title>The structure of the XML document</title>
-        <screen>
+<screen>
 <literal>
             &lt;Manager&gt;
            &lt;name&gt;A Manager &lt;/name&gt;
@@ -94,11 +84,11 @@
            &lt;nbRuns&gt;100 &lt;/nbRuns&gt;
             &lt;/Manager&gt;
       </literal>
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>Add a simple group of tests</title>
-        <screen>
+<screen>
 <literal>
          &lt;simpleGroup name=&quot;A simple Group&quot; description=&quot;just for test.&quot;&gt;
              &lt;unitTest class=&quot;test.objectcreation.TestNewActive&quot;/&gt;
@@ -107,22 +97,22 @@
              &lt;unitTest class=&quot;test.objectcreation.TestNewActive&quot;/&gt;
              &lt;/simpleGroup&gt;
     </literal>
-        </screen>
+</screen>
         <para>You have created a group with 4 tests.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Add a group from a Java package</title>
-        <screen>
+<screen>
 <literal>
   &lt;packageGroup name=&quot;A Package Group&quot; description=&quot;Construct Group from  package.&quot; 
                 dir=&quot;/net/home/adicosta/workspace/ProActive/classes&quot; 
                 packageName=&quot;nonregressiontest&quot; &gt;
  &lt;/packageGroup&gt;
       </literal>
-        </screen>
+</screen>
         <para>You have created a group with all Tests was found in the package <emphasis>nonregressiontest</emphasis></para>
         <para>With this method you don&#39;t have any order on Tests, but you can specify some order :</para>
-        <screen>
+<screen>
 <literal>
  &lt;packageGroup name=&quot;A Package Group&quot; description=&quot;Construct Group from  package.&quot; 
                 dir=&quot;/net/home/adicosta/workspace/ProActive/classes&quot; 
@@ -137,12 +127,12 @@
                          &lt;unitTest class=&quot;nonregressiontest.activeobject.creation.remote.turnactive.Test&quot; /&gt;
  &lt;/packageGroup&gt;
       </literal>
-        </screen>
+</screen>
         <para>All classes in package nonregressiontest are added, only the specified tests are sorted.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Add a group of InterLinked Tests</title>
-        <screen>
+<screen>
 <literal>
  &lt;interLinkedGroup name=&quot;Group with interlinked tests&quot; description=&quot;Construct a Group with interlinked tests&quot;&gt;
          &lt;!-- Declare the tests in the execution order --&gt;
@@ -157,63 +147,45 @@
            &lt;/interLinks&gt;
  &lt;/interLinkedGroup&gt;
           </literal>
-        </screen>
+</screen>
         <para>TestGroupMessage depends from TestGroupCreation and TestGroupMigration.</para>
       </sect2>
       <sect2 remap="h3">
         <title>How to configure log4j</title>
-        <screen>
+<screen>
 <literal>
  &lt;log4j&gt;
 /net/home/adicosta/log4j/config/file/path/log4j-file-config
  &lt;/log4j&gt;
           </literal>
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>How to configure results output ?</title>
         <para>Results in a text file :</para>
-        <screen>
-<literal>
- &lt;result type=&quot;text&quot; file=&quot;/net/home/adicosta/tmp/results.txt&quot; /&gt;
-          </literal>
-        </screen>
+<screen> &lt;result type=&quot;text&quot; file=&quot;/net/home/adicosta/tmp/results.txt&quot; /&gt; </screen>
         <para>Results in a HTML file :</para>
-        <screen>
-<literal>
- &lt;result type=&quot;html&quot; file=&quot;/net/home/adicosta/tmp/results.html&quot; /&gt;
-          </literal>
-        </screen>
+<screen> &lt;result type=&quot;html&quot; file=&quot;/net/home/adicosta/tmp/results.html&quot; /&gt; </screen>
         <para>Results in the console :</para>
-        <screen>
-<literal>
- &lt;result type=&quot;console&quot; /&gt;
-          </literal>
-        </screen>
+<screen> &lt;result type=&quot;console&quot; /&gt; </screen>
         <para>Results in a XML file :</para>
-        <screen>
-<literal>
- &lt;result type=&quot;xml&quot; file=&quot;/net/home/adicosta/tmp/results.xml&quot;/&gt;
-          </literal>
-        </screen>
+<screen> &lt;result type=&quot;xml&quot; file=&quot;/net/home/adicosta/tmp/results.xml&quot;/&gt; </screen>
         <para>To execute all with the XML file configuration:</para>
-        <screen>
-<literal>
+<screen> 
 Manager manager = new Manager(java.io.File xmlConfigFile);
 manager.execute();
-          </literal>
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>Configure properties</title>
         <para>Like in simple prop file :</para>
-        <screen>
+<screen>
 <literal>
          &lt;properties&gt;
            &lt;prop key=&quot;RemoteHostname&quot; value=&quot;nahuel&quot;/&gt;
         &lt;/properties&gt;
           </literal>
-        </screen>
+</screen>
       </sect2>
     </sect1>
   

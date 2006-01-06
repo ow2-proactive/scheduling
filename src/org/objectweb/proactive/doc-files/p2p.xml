@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="p2p"><title>ProActive Peer-to-Peer Infrastructure</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/p2p.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/p2p.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="mozTocId121981"/>Overview</title>
@@ -20,7 +20,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/p2p_files/overlaynetwork.png" format="PNG"/>            </imageobject>
+              <imagedata  fileref="p2p_files/overlaynetwork.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
  <emphasis role="bold">Example of a ProActive P2P infrastructure.</emphasis></para>
@@ -119,7 +119,7 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata width="6in" fileref="doc-files/p2p_files/firstContact.png" format="PNG"/>                </imageobject>
+                  <imagedata  fileref="p2p_files/firstContact.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Example of first contact (Bootstrapping).</emphasis></para>
@@ -224,7 +224,7 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata width="6in" fileref="doc-files/p2p_files/heartbeat.png" format="PNG"/>                </imageobject>
+                  <imagedata  fileref="p2p_files/heartbeat.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Heart beat sent every TTU.</emphasis></para>
@@ -335,7 +335,7 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata width="6in" fileref="doc-files/p2p_files/sendingNode.png" format="PNG"/>                </imageobject>
+                  <imagedata  fileref="p2p_files/sendingNode.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Asking nodes to acquaintances and getting a node.</emphasis></para>
@@ -384,7 +384,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/p2p_files/implementation.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/implementation.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -429,7 +429,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/p2p_files/dynamicGroup.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/dynamicGroup.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
  <emphasis role="bold">Dynamic Shared ProActive Typed Group.</emphasis></para>
@@ -490,7 +490,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/p2p_files/screenshot.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="p2p_files/screenshot.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -539,10 +539,7 @@
             </listitem>
 </itemizedlist>
           <para>Before launching this script, you have to specify some parameters to this command:</para>
-          <screen>
-startP2PService [-acq acquisitionMethod] [-port portNumber] [-s Peer ...] [\
--f PeersListFile]
-          </screen>
+<screen> startP2PService [-acq acquisitionMethod] [-port portNumber] [-s Peer ...] [-f PeersListFile]</screen>
           <itemizedlist>
             <listitem>
               <para><emphasis role="bold">-acq acquisitionMethod</emphasis>  the ProActive Runtime communication protocol used. Examples:
@@ -555,9 +552,7 @@ startP2PService [-acq acquisitionMethod] [-port portNumber] [-s Peer ...] [\
             <listitem>
               <para><emphasis role="bold">-s Peer ...</emphasis>  specify addresses of peers which are used to join the P2P infrastructure.
  Example: </para>
-              <screen>
-rmi://applepie.proactive.org:8080
-              </screen>
+<screen>rmi://applepie.proactive.org:8080</screen>
             </listitem>
             <listitem>
               <para><emphasis role="bold">-f PeersListFile</emphasis>  same of <emphasis role="bold">-s</emphasis> but peers are specified in file <emphasis role="bold">ServerListFile</emphasis>. One per line.</para>
@@ -620,38 +615,27 @@ rmi://applepie.proactive.org:8080
           <para>In this illustration, we will explain how to start a first peer and then how new peers can
  create a P2P network with the first one.</para>
           <para>Start the first peer with <emphasis>rmi</emphasis> protocol and listening on port <emphasis>2410</emphasis>:</para>
-          <screen>
-first.peer.host$startP2PService.sh -acq rmi -port 2410
-          </screen>
+<screen>first.peer.host$startP2PService.sh -acq rmi -port 2410</screen>
           <para>Now, start new peers and connect them to the first peer to create a tiny P2P network:</para>
-          <screen>
-second.peer.host$startP2PService.sh -acq rmi -port 2410 -s rmi://first.peer\
-.host
-          </screen>
-          <screen>
-third.peer.host$startP2PService.sh -acq rmi -port 2602 -s rmi://first.peer.\
-host
-          </screen>
+<screen>
+		  second.peer.host$startP2PService.sh -acq rmi -port 2410 -s rmi://first.peer.host 
+		  third.peer.host$startP2PService.sh -acq rmi -port 2602 -s rmi://first.peer.host 
+</screen>
           <para>You could specify a different port number for each peer.</para>
           <para>Use a file to specify the addresses of peers:</para>
           <para>The file <emphasis>hosts.file</emphasis>:</para>
-          <screen>
+<screen>
  rmi://first.peer.host:2410
  rmi://third.peer.host:2602
-          </screen>
-          <screen>
- file.peer.host$startP2PService.sh -acq rmi -port 8989 -f hosts.file
-          </screen>
+</screen>
+<screen> file.peer.host$startP2PService.sh -acq rmi -port 8989 -f hosts.file </screen>
           <para>Lastly, a new peer joins the P2P network:</para>
-          <screen>
-last.peer.host$startP2PService.sh -acq rmi -port 6666 -s rmi://third.peer.h\
-ost:2410
-          </screen>
+<screen> last.peer.host$startP2PService.sh -acq rmi -port 6666 -s rmi://third.peer.host:2410 </screen>
           <para>
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                  <imagedata width="6in" fileref="doc-files/p2p_files/example.png" format="PNG"/>                </imageobject>
+                  <imagedata  fileref="p2p_files/example.png" format="PNG"/>                </imageobject>
               </mediaobject>
             </informalfigure>
  <emphasis role="bold">Usage example P2P network (after firsts connections).</emphasis></para>
@@ -666,19 +650,13 @@ ost:2410
             <title><anchor id="mozTocId895651"/>Installation</title>
             <para><emphasis role="bold">UNIX</emphasis></para>
             <para>Go to the directory: <emphasis role="bold">ProActive/compile</emphasis> and run this command:</para>
-            <screen>
-$ ./build daemon
-            </screen>
-            <para>Before compiling you should change some parameters like the daemon user or the port in the
- file:</para>
-            <screen>
-ProActive/p2p/src/common/proactivep2p.h
-            </screen>
+<screen> $ ./build daemon </screen>
+            <para>Before compiling you should change some parameters like the daemon 
+		    user or the port in the file:</para>
+<screen> ProActive/p2p/src/common/proactivep2p.h </screen>
             <para>Ask your system administrator to add the daemon in a crontab or init.d. The process to run is
  located here:</para>
-            <screen>
-ProActive/p2p/build/proactivep2p
-            </screen>
+<screen> ProActive/p2p/build/proactivep2p </screen>
             <para><emphasis role="bold">Microsoft Windows</emphasis></para>
             <para>To compile daemon source (in c++), we don&#39;t provide any automatic script, you have to do
  it yourself. All sources for Windows are in the directory: <emphasis role="bold">ProActive/p2p/src/windows</emphasis>. If
@@ -686,13 +664,9 @@ ProActive/p2p/build/proactivep2p
  files.</para>
             <para>After that you are ready to install the daemon with Windows, you just have to run this
  script:</para>
-            <screen>
-C:&gt;ProActive\scripts\windows\p2p\Service\install.bat
-            </screen>
+<screen> C:&gt;ProActive\scripts\windows\p2p\Service\install.bat </screen>
             <para>To remove the daemon:</para>
-            <screen>
-C:&gt;ProActive\scripts\windows\p2p\Service\remove.bat
-            </screen>
+<screen> C:&gt;ProActive\scripts\windows\p2p\Service\remove.bat </screen>
             <para><emphasis role="bold">Comment</emphasis>: By default the port number of the daemon is <emphasis role="bold">9015</emphasis>.</para>
 </sect4>
           <sect4 remap="h5">
@@ -752,33 +726,23 @@ C:&gt;ProActive\scripts\windows\p2p\Service\remove.bat
               <listitem>
                 <para><emphasis role="bold">Stop the JVM</emphasis> : This command will stop the JVM and will restart it at the next scheduled
  time, which is the day after:</para>
-                <screen>
-$ProActive/p2p/build/p2pctl stop [hostname]
-                </screen>
+<screen> $ProActive/p2p/build/p2pctl stop [hostname] </screen>
               </listitem>
               <listitem>
                 <para><emphasis role="bold">Kill the daemon</emphasis> :</para>
-                <screen>
-$ProActive/p2p/build/p2pctl killdaemon [hostname]
-                </screen>
+<screen> $ProActive/p2p/build/p2pctl killdaemon [hostname] </screen>
               </listitem>
               <listitem>
                 <para><emphasis role="bold">Restart the daemon</emphasis> : </para>
-                <screen>
-$ProActive/p2p/build/p2pctl restart [hostname]
-                </screen>
+<screen> $ProActive/p2p/build/p2pctl restart [hostname] </screen>
               </listitem>
               <listitem>
                 <para><emphasis role="bold">Test the daemon</emphasis> : </para>
-                <screen>
-$ProActive/p2p/build/p2pctl alive [hostname]
-                </screen>
+<screen> $ProActive/p2p/build/p2pctl alive [hostname] </screen>
               </listitem>
               <listitem>
                 <para><emphasis role="bold">Flush the daemon logs</emphasis> : </para>
-                <screen>
-$ProActive/p2p/build/p2pctl flush [hostname]
-                </screen>
+<screen> $ProActive/p2p/build/p2pctl flush [hostname] </screen>
               </listitem>
 </itemizedlist>
             <para><emphasis role="bold">hostname</emphasis> is the name of the remote host which the daemon command is sent to. This
@@ -787,9 +751,7 @@ $ProActive/p2p/build/p2pctl flush [hostname]
             <para>Under Windows you could use some littles scripts in <emphasis role="bold">ProActive//script/windows/p2p/JVM</emphasis>
  to do that.</para>
             <para>All daemon logs are written in a file. All logs are available in:</para>
-            <screen>
-ProActive/p2p/build/logs/hostname
-            </screen>
+<screen> ProActive/p2p/build/logs/hostname </screen>
 </sect4>
 </sect3>
       </sect2>
@@ -848,25 +810,23 @@ ProActive/p2p/build/logs/hostname
         <para>
  In fact you will ask for a certain number of nodes and ProActive will notify a
  &quot;listener&quot; (one of your class), every time a new node is available.</para>
-        <screen>
- ProActiveDescriptor pad = ProActive.getProactiveDescriptor(&quot;myP2PXmlDescrip\
-tor.xml&quot;);
- // getting virtual node &quot;p2pvn&quot; defined in the ProActive Deployement Descrip\
-tor
+<screen>
+ ProActiveDescriptor pad = ProActive.getProactiveDescriptor(&quot;myP2PXmlDescriptor.xml&quot;);
+ // getting virtual node &quot;p2pvn&quot; defined in the ProActive Deployement Descriptor
  VirtualNode vn = pad.getVirtualNode(&quot;p2pvn&quot;);
  
  // adding &quot;this&quot; or anyother class has a listener of the &quot;NodeCreationEvent&quot;
  ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
  //activate that virtual node
  vn.activate();
-        </screen>
+</screen>
         <para>As you can see, the class executing this code must implement an interface in order to be
  notified when a new node is available from the P2P infrastructure.</para>
         <para>
  Basically you will have to implement the interface NodeCreationEventListener that can be found in
  package org.objectweb.proactive.core.event. For example, this method will be called every time a
  new host is acquired:</para>
-        <screen>
+<screen>
  public void nodeCreated(NodeCreationEvent event) 
  {
  // get the node
@@ -874,7 +834,7 @@ tor
    // now you can create an active object on your node.
  }
  
-        </screen>
+</screen>
         <para>You should carefully notice that you can be notified at any time, whatever the code you are
  executing, once you have activated the virtual node.</para>
         <para>A short preview of a XML descriptor:</para>
@@ -899,11 +859,11 @@ tor
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/p2p_files/descriptor.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/descriptor.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
  <emphasis role="bold">A P2P Service which is sharing nodes deployed by a descriptor.</emphasis></para>
-        <para>For more information about ProActive XML Deployment Descriptor see this <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Descriptor.xml">
+        <para>For more information about ProActive XML Deployment Descriptor see this <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Descriptor.xml">
  page</ulink>.</para>
       </sect2>
       <sect2 remap="h3">
@@ -911,7 +871,7 @@ tor
  Usage Example</title>
         <para>The next little sample of code explains how, from an application, you can start a P2P Service
  and get nodes:</para>
-        <screen>
+<screen>
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -950,7 +910,7 @@ while (! p2pNodeLookup.allArrived()) {
 // End of your program
 // Free shared nodes
 p2pNodeLookup.killAllNodes();
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">

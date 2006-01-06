@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="HelloWorld"><title>Hello world ! example</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/HelloWorld.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/HelloWorld.html  -->
   
     <sect1 remap="h2">
       <title>Hello world ! example</title>
@@ -30,9 +30,9 @@
             </listitem>
 </itemizedlist>
           <para>Here is a possible implementation for the <literal>Hello</literal> class:</para>
-          <para></para>
-          <para></para>
-          <para></para>
+          
+          
+          
           <informaltable frame="all">
             <tgroup cols="1">
               <colspec colname="c1" colwidth="100*"/>
@@ -42,7 +42,7 @@
                 </row>
                 <row>
                   <entry><para>
-                      <screen>
+<screen>
 public class Hello {
   private String name;
   private String hi = &quot;Hello world&quot;;
@@ -74,15 +74,15 @@ ostName() + &quot;/Hello&quot;);
     }
   }
 }
-                      </screen>
+</screen>
 </para></entry>
                 </row>
               </tbody>
             </tgroup>
           </informaltable>
-          <para></para>
-          <para></para>
-          <para></para>
+          
+          
+          
 </sect3>
         <sect3 remap="h4">
           <title>Implement the required functionalities</title>
@@ -112,7 +112,7 @@ ostName() + &quot;/Hello&quot;);
  of active remote objects (as a matter of fact, this side-effect is caused by ProActive being
  implemented on top of a 100% Java metaobject protocol). If no such constructor is provided,
  active objects cannot be created.</para>
-          <para></para>
+          
           <para>
  If no constructor at all is provided, active objects can still be created because, in this
  specific case, all Java compilers provide a default no-arg empty constructor. If a no-arg
@@ -135,8 +135,8 @@ ostName() + &quot;/Hello&quot;);
           <title>The <literal>HelloClient</literal> Class</title>
           <para>The responsibility of this class is first to locate the remote server object, then to invoke a
  method on it in order to retrieve a message, and finally display that message.</para>
-          <para></para>
-          <para></para>
+          
+          
           <informaltable frame="all">
             <tgroup cols="1">
               <colspec colname="c1" colwidth="100*"/>
@@ -146,7 +146,7 @@ ostName() + &quot;/Hello&quot;);
                 </row>
                 <row>
                   <entry><para>
-                      <screen>
+<screen>
 public class HelloClient {
   public static void main(String[] args) {
     Hello myServer;
@@ -177,15 +177,12 @@ llo.class.getName(),
     }
   }
 }
-                      </screen>
+</screen>
 </para></entry>
                 </row>
               </tbody>
             </tgroup>
           </informaltable>
-          <para></para>
-          <para></para>
-          <para></para>
 </sect3>
         <sect3 remap="h4">
           <title>Looking up a remote object</title>
@@ -213,16 +210,16 @@ llo.class.getName(),
           <para>In order to run both the client and server in the same VM, the client
  creates an active object in the same VM if it doesn&#39;t find the server&#39;s URL. The code
  snippet which instantiates the Server in the same VM is the following:</para>
-          <screen>
+<screen>
 if (args.length == 0) {
   // There is no url to the server, so create an active server within this \
 VM
   myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class\
 .getName(), new Object[]{&quot;local&quot;});
 }
-          </screen>
+</screen>
           <para>To launch the Client and the Server, just type:</para>
-          <para></para>
+          
           <para><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
  org.objectweb.proactive.examples.hello.HelloClient
@@ -274,7 +271,7 @@ VM
  windows clientHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
  -Dlog4j.configuration=file:scripts\proactive-log4j
  org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</literal></para>
-          <para></para>
+          
           <para>
   </para>
 </sect3>

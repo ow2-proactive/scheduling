@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Descriptor"><title>XML Deployment Descriptors</title>
- <anchor id="XML_Descriptors"/>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Descriptor.html  -->
+	<anchor id="XML_Descriptors"/>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Descriptor.html  -->
   
     <para> <anchor id="Descriptor_html_objectives"/></para>
     <sect1 remap="h2">
@@ -93,10 +93,8 @@
         </listitem>
         <listitem>
           <para>
-            <screen>
-       newActive(String, Object[], Node);
-            </screen>
-</para>
+<screen> newActive(String, Object[], Node); </screen>
+          </para>
         </listitem>
 </itemizedlist>
       <itemizedlist>
@@ -157,10 +155,9 @@
         </listitem>
         <listitem>
           <para>
-            <screen>
+<screen>
        newActiveAsGroup(String, Object[], VirtualNode);
-    turnActiveAsGroup(Object, String, VirtualNode);
-            </screen>
+       turnActiveAsGroup(Object, String, VirtualNode); </screen>
 </para>
         </listitem>
 </itemizedlist>
@@ -271,7 +268,7 @@
  &#160;&lt;/infrastructure&gt;</para>
                             <para>
  &lt;/ProActiveDescriptor&gt;</para>
-                            <para></para>
+                            
 </entry>
                         </row>
                       </tbody>
@@ -330,7 +327,7 @@
                 <para> Mapping one to one: 1 VN --&gt; 1 JVM</para>
               </listitem>
               <listitem>
-                <para></para>
+                
                 <para>
                   <informaltable frame="none">
                     <tgroup cols="1">
@@ -361,7 +358,7 @@
  &#160;&lt;/map&gt;</para>
                                   <para>
  &lt;/mapping&gt;</para>
-                                  <para></para>
+                                  
 </entry>
                               </row>
                             </tbody>
@@ -404,7 +401,7 @@
  &#160;&lt;/map&gt;</para>
                                 <para>
  &lt;/mapping&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -420,7 +417,7 @@
                 <para> Mapping one to n: 1 VN --&gt; N JVMs</para>
               </listitem>
               <listitem>
-                <para></para>
+                
                 <para>
                   <informaltable frame="none">
                     <tgroup cols="1">
@@ -460,7 +457,7 @@
  &#160;&#160;&lt;/map&gt;</para>
                                   <para>
  &#160;&lt;/mapping&gt;</para>
-                                  <para></para>
+                                  
 </entry>
                               </row>
                             </tbody>
@@ -498,7 +495,7 @@
  timeout=&quot;<emphasis role="bold">200</emphasis>&quot; minNodeNumber=&quot;<emphasis role="bold">3</emphasis>&quot;/&gt;</para>
                                 <para>
  &lt;virtualNodesDefinition/&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -526,7 +523,7 @@
                 <para> Mapping n to one: N VN --&gt; 1 JVMs</para>
               </listitem>
               <listitem>
-                <para></para>
+                
                 <para>
                   <informaltable frame="none">
                     <tgroup cols="1">
@@ -577,7 +574,7 @@
  &#160;&#160;&lt;/map&gt;</para>
                                   <para>
  &#160;&lt;/mapping&gt;</para>
-                                  <para></para>
+                                  
 </entry>
                               </row>
                             </tbody>
@@ -592,7 +589,7 @@
               </listitem>
               <listitem>
                 <para> VirtualNode registration</para>
-                <para></para>
+                
                 <para>Descriptors provide the ability to register a VirtualNode in a registry such
  RMIRegistry, JINI Lookup, HTTP registry, IBIS/RMI Registry Service. Hence this
  VirtualNode will be accessible by another application as it is described in the <emphasis role="bold">VirtualNodes Acquisition</emphasis> section. The protocol(registry) to use can be specified
@@ -637,7 +634,7 @@
  &#160;&#160;&lt;/map&gt;</para>
                                 <para>
  &#160;&lt;/mapping&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -655,14 +652,14 @@
 </para>
         </listitem>
 </itemizedlist>
-      <para></para>
+      
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">VirtualNodes Acquisition</emphasis></para>
-          <para></para>
+          
         </listitem>
         <listitem>
-          <para></para>
+          
           <para> Descriptors provide the ability to acquire a VirtualNode already deployed by another
  application. Such VirtualNodes are defined in <emphasis role="bold">VirtualNodes Acquisition</emphasis> tag as it is
  done for <emphasis role="bold">VirtualNodesDefinition</emphasis> except that no property and no mapping with jvms are
@@ -694,7 +691,7 @@
  port=&quot;2020&quot;/&gt;</para>
                           <para>
  &lt;/deployment&gt;</para>
-                          <para></para>
+                          
 </entry>
                       </row>
                     </tbody>
@@ -717,7 +714,7 @@
                     <tbody>
                       <row>
                         <entry><para> &lt;lookup virtualNode=&quot;<emphasis role="bold">Dispatcher</emphasis>&quot;
- host=&quot;<emphasis role="bold">*</emphasis>&quot; protocol=&quot;rmi&quot;/&gt;</para>                          <para></para>
+ host=&quot;<emphasis role="bold">*</emphasis>&quot; protocol=&quot;rmi&quot;/&gt;</para>                          
 </entry>
                       </row>
                     </tbody>
@@ -743,11 +740,11 @@
           <para><literal>vnDispatcher.setRuntimeInformations(&quot;LOOKUP_HOST&quot;,&quot;machine_name);</literal></para>
           <para>
  //--------------set the property &quot;LOOKUP_HOST at runtime</para>
-          <para></para>
+          
           <para>To summarize all VirtualNodes are activated by calling activate methods except if
  &quot;*&quot; is set for a VirtualNode to be acquired. In that case the lookup will be
  performed when giving host informations.</para>
-          <para></para>
+          
           <para>
  Registration and lookup can be performed automatically when using tags in the descriptor as
  well as programmatically using static methods provided in org.objectweb.Proactive
@@ -802,7 +799,7 @@
  &lt;/jvm&gt;</para>
                                   <para>
  .................................</para>
-                                  <para></para>
+                                  
 </entry>
                               </row>
                             </tbody>
@@ -842,7 +839,7 @@
  &lt;/jvm&gt;</para>
                                   <para>
  .................................</para>
-                                  <para></para>
+                                  
 </entry>
                               </row>
                             </tbody>
@@ -852,7 +849,7 @@
                     </tgroup>
                   </informaltable>
 </para>
-                <para></para>
+                
               </listitem>
               <listitem>
                 <para> 1 JVM --&gt; N Nodes on N JVMs</para>
@@ -1340,7 +1337,7 @@
           <para>
  You can find <ulink url="../../../../../xml_examples/">here</ulink> several
  examples of supported protocols and useful combinations.</para>
-          <para></para>
+          
           <para><emphasis role="bold">Note that it is mandatory for using all these features, that
  ProActive is installed on each host, of course on the local host as well as on each host
  where you want to create Nodes</emphasis></para>
@@ -1349,7 +1346,7 @@
               <para> RSH</para>
             </listitem>
             <listitem>
-              <para></para>
+              
               <para>
                 <informaltable frame="none">
                   <tgroup cols="1">
@@ -1397,7 +1394,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &lt;/processes&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -1421,7 +1418,7 @@
               <para> RLOGIN</para>
             </listitem>
             <listitem>
-              <para></para>
+              
               <para>
                 <informaltable frame="none">
                   <tgroup cols="1">
@@ -1469,7 +1466,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &lt;/processes&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -1484,7 +1481,7 @@
               <para> SSH</para>
             </listitem>
             <listitem>
-              <para></para>
+              
               <para>
                 <informaltable frame="none">
                   <tgroup cols="1">
@@ -1532,7 +1529,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                                 <para>
  &lt;/processes&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -1551,13 +1548,13 @@
  it automatically when logging on your station. Then launching <emphasis role="bold">ssh-add</emphasis> command to
  add your identity. Running this command will ask you to enter your <emphasis role="bold">passphrase</emphasis>, it
  is the one you provided when asking for an ssh key pair.</para>
-              <para></para>
+              
               <para>
  Note also that if the generated key pair is not encrypted (no passphrase), you do not
  need to run neither the ssh-agent, nor the ssh-add command. Indeed it is sufficient when
  using non encrypted private key, to only copy the public key on the remote host (as
  mentionned above) in order to get logged automatically on the remote host.</para>
-              <para></para>
+              
               <para>
  These steps must be performed <emphasis role="bold">before</emphasis> running any ProActive application using <emphasis role="bold">ssh</emphasis> protocol. If you are not familiar with ssh, see <ulink url="http://www.openssh.org">openSSH</ulink></para>
               <para>Check <ulink url="../../../../../xml_examples/SSH_Example.xml">here</ulink> for
@@ -1621,7 +1618,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -1690,7 +1687,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -1788,7 +1785,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -1814,10 +1811,10 @@
  necessary to run ProActive on a cluster. This script is located under
  Proactive/scripts/unix/cluster. If not set the default location is set as
  ~/Proactive/scripts/unix/cluster.</para>
-              <para></para>
+              
               <para>
  It is exactly the same with <emphasis role="bold">rlogin</emphasis> instead of <emphasis role="bold">ssh.</emphasis></para>
-              <para></para>
+              
               <para>
  If you want to submit the job directly from the cluster entry point, define only the <emphasis role="bold">bsubProcess</emphasis>, like in the above example and skip the ssh definition.</para>
               <informaltable frame="none">
@@ -1880,7 +1877,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -1980,7 +1977,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -2081,7 +2078,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -2175,7 +2172,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -2208,7 +2205,7 @@
  you have to initialize your proxy by running <emphasis role="bold">COG_INSTALLATION/bin
  /grid-proxy-init</emphasis>, you will be asked for a passphrase, it is the one you provided when
  requesting a user certificate at globus.org. Once these steps are performed you can run <emphasis role="bold">ProActive</emphasis> application using <emphasis role="bold">GRAM</emphasis> protocol.</para>
-              <para></para>
+              
               <para><emphasis role="bold">ProActive</emphasis> provides <literal>org.objectweb.proactive.core.process.globus.GlobusProcess</literal>
  to create <emphasis role="bold">globus</emphasis> process.</para>
               <informaltable frame="none">
@@ -2267,7 +2264,7 @@
  &#160;&lt;/processDefinition&gt;</para>
                               <para>
  &lt;/processes&gt;</para>
-                              <para></para>
+                              
 </entry>
                           </row>
                         </tbody>
@@ -2314,7 +2311,7 @@
               <para> Complete example of XML Deployment Descriptor</para>
             </listitem>
             <listitem>
-              <para></para>
+              
               <para>
                 <informaltable frame="none">
                   <tgroup cols="1">
@@ -2560,7 +2557,7 @@
  &lt;/infrastructure&gt;</para>
                                 <para>
  &lt;/ProActiveDescriptor&gt;</para>
-                                <para></para>
+                                
 </entry>
                             </row>
                           </tbody>
@@ -2586,7 +2583,7 @@
  need to define these value, since the home directory is different between the local machine,
  and globus and the cluster(home dir is the same on globus machines and on the cluster, that
  is why both processes reference the same local process : <emphasis role="bold">jvmProcess1</emphasis>).</para>
-          <para></para>
+          
           <para>
  Even if quite a lot of things can be configured in the xml files, sometimes you will have to
  perform additional steps to get everything working properly, it is the case when using ssh,
@@ -2748,8 +2745,8 @@
       <para><literal>pad.killall(false);</literal></para>
       <para>
  //----------- Kills every jvms deployed with the descriptor</para>
-      <para></para>
-      <para></para>
+      
+      
       <para>If <emphasis role="bold">softly</emphasis> is set to false, all jvms created when activating the descriptor are killed
  abruptely. If true a jvm that originates the creation of a rmi registry waits until registry is
  empty before dying. To be more precise a thread is created to ask periodically the registry if
@@ -2764,7 +2761,7 @@
  XML Deployment Descriptor. You can programmatically create such processes.</para>
       <para>
  In order to get familiar on how to create processes programmatically see <ulink url="../core/process/package-use.xml">Process package</ulink></para>
-      <para></para>
+      
       <para>
   </para>
     </sect1>

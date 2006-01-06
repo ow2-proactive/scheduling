@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="componentExamples"><title>Examples</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/examples.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/examples.html  -->
   
     <para> <anchor id="examples_html_examples"/></para>
     <para>3 examples are presented : code snippets for visualizing the transition between active objects
@@ -13,34 +13,30 @@
       <para>In Java, objects are created by instantiation of classes. With ProActive, one can create
  active objects from Java classes, while components are created from component definitions. Let us
  first consider the &quot;A&quot; interface :</para>
-      <screen>
+<screen>
 public interface A {
   public String foo(); // dummy method
-}
-      </screen>
+} </screen>
       <para>&quot;AImpl&quot; is the class implementing this interface :</para>
-      <screen>
+<screen>
 public class AImpl implements A {
  public AImpl() {}
  public String foo() {
  // do something
  }
-}
-      </screen>
+}  </screen>
       <para>The class is then instantiated in a standard way :</para>
-      <screen>
-A object = new AImpl();
-      </screen>
+<screen> A object = new AImpl(); </screen>
       <para>Active objects are instantiated using factory methods from the ProActive class (see the <ulink url="../HelloWorld.xml">ProActive Hello World example</ulink> ). It is also possible to specify
  the activity of the active object, the location (node or virtual node), or a factory for
  meta-objects, using the appropriate factory method.</para>
-      <screen>
+<screen>
 A active_object = (A)ProActive.newActive(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode, // location, could also be a virtual node
 );
-      </screen>
+</screen>
       <para>As components are also active objects in this implementation, they benefit from the same
  features, and are configurable in a similar way. Constructor parameters, nodes, activity, or
  factories, that can be specified for active objects, are also specifiable for components. The
@@ -54,54 +50,46 @@ A active_object = (A)ProActive.newActive(
  order to do this, we must first get a bootstrap component. The standard way to do this is the
  following one (this method creates an instance of the class specified in the fractal.provider
  system property, and uses this instance to get the bootstrap component):</para>
-        <screen>
-Component boot = Fractal.getBootstrapComponent();
-        </screen>
+<screen> Component boot = Fractal.getBootstrapComponent(); </screen>
         <para>We then get the TypeFactory interface provided by this bootstrap component:</para>
-        <screen>
-TypeFactory tf = (TypeFactory)boot.getFcInterface(&quot;type-factory&quot;);
-        </screen>
+<screen> TypeFactory tf = (TypeFactory)boot.getFcInterface(&quot;type-factory&quot;); </screen>
         <para>We can then create the type of the first component, which only provides a A server interface
  named &quot;a&quot;:</para>
-        <screen>
+<screen>
 // type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType(&quot;a&quot;, &quot;A&quot;, false, false, false)
-});
-        </screen>
+}); </screen>
       </sect2>
       <sect2 remap="h3">
         <title>Description of the content</title>
         <para>The second step in the definition of a component is the definition of its content. In this
  implementation, this is done through the ContentDescription class :</para>
-        <screen>
+<screen>
 ContentDescription contentDesc = new ContentDescription(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode, // location, could also be a virtual node
-);
-        </screen>
+); </screen>
       </sect2>
       <sect2 remap="h3">
         <title>Description of the controller</title>
         <para>Properties relative to the controller can be specified in the ControllerDescription :</para>
-        <screen>
+<screen>
 ControllerDescription controllerDesc = new ControllerDescription(
  &quot;myName&quot;, // name of the component
  Constants.PRIMITIVE // the hierarchical type of the component
  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
-);
-        </screen>
+); </screen>
         <para>Eventually, the component definition is instantiated using the standard Fractal API. This
  component can then be manipulated as any other Fractal component.</para>
-        <screen>
+<screen>
 Component component = componentFactory.newFcInstance(
  componentType, // type of the component (defining the client and server in\
 terfaces)
  controllerDesc, // implementation-specific description for the controller
  contentDesc // implementation-specific description for the content
-);
-        </screen>
+); </screen>
       </sect2>
       <sect2 remap="h3">
         <title>From attributes to client interfaces</title>
@@ -117,22 +105,20 @@ terfaces)
  provided, and a binding operation on the &quot;requiredService&quot; interface will actually set
  the value of the &quot;service&quot; attribute, of type &quot;Service&quot;.</para>
         <para>First, the type of the component is changed :</para>
-        <screen>
+<screen>
 // type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType(&quot;a&quot;, &quot;A&quot;, false, false, false),
  tf.createFcItfType(&quot;requiredService&quot;, &quot;A&quot;, true, false, false)
-});
-        </screen>
+}); </screen>
         <para>The Service interface is the following :</para>
-        <screen>
+<screen>
 // The Service interface
 public interface Service {
  public String bar();
-}
-        </screen>
+} </screen>
         <para>And the AImpl class is :</para>
-        <screen>
+<screen>
 // The modified AImpl class
 public class AImpl implements A, BindingController {
  Service service; // attribute corresponding to a client interface
@@ -160,8 +146,7 @@ public class AImpl implements A, BindingController {
      service = null;
    }
  }
-}
-        </screen>
+} </screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -221,7 +206,7 @@ public class AImpl implements A, BindingController {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/model.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/model.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -251,7 +236,7 @@ public class AImpl implements A, BindingController {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/distributed-components-no-wrappers.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/distributed-components-no-wrappers.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -262,7 +247,7 @@ public class AImpl implements A, BindingController {
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/distributed-components-wrappers.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/distributed-components-wrappers.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -281,7 +266,7 @@ public class AImpl implements A, BindingController {
  not forget to set the fractal.provider system property.</para>
         <para>If you run the program with no arguments (i.e. not using the parser, no wrapper composite
  components, and local deployment) , you should get something like this:</para>
-        <screen>
+<screen>
 01 --&gt; This ClassFileServer is reading resources from classpath
 02 Jini enabled
 03 Ibis enabled
@@ -293,8 +278,7 @@ tub_Composite
 07 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ClientImpl
 08 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
-elloworld.Stub_ServerImpl
-        </screen>
+elloworld.Stub_ServerImpl </screen>
         <para>You can see :</para>
         <itemizedlist>
           <listitem>
@@ -314,7 +298,7 @@ elloworld.Stub_ServerImpl
 </itemizedlist>
         <para>Then you have (the exception that pops out is actually the expected result, and is intended to
  show the execution path) :</para>
-        <screen>
+<screen>
 01 Server: print method called
 02 at org.objectweb.proactive.examples.components.helloworld.ServerImpl.pri\
 nt(ServerImpl.java:37)
@@ -341,7 +325,7 @@ y(ActiveBody.java:230)
 15 Server: begin printing...
 16 --------&gt; hello world
 17 Server: print done.
-        </screen>
+</screen>
         <para>What can be seen is very different from the output you would get with the Julia
  implementation. Here is what happens (from bottom to top of the stack):</para>
         <itemizedlist>
@@ -364,7 +348,7 @@ y(ActiveBody.java:230)
 </itemizedlist>
         <para>Now let us have a look at the distributed deployment : execute the program with the parameters
  &quot;distributed parser&quot;. You should get something similar to the following :</para>
-        <screen>
+<screen>
 01 --&gt; This ClassFileServer is reading resources from classpath
 02 Jini enabled
 03 Ibis enabled
@@ -416,7 +400,7 @@ ents_helloworld_ServiceAttributes_attribute_controller_representative succe\
 ssfully
 35 ClassServer sent class pa.stub.org.objectweb.proactive.examples.componen\
 ts.helloworld.Stub_ServerImpl successfully
-        </screen>
+</screen>
         <para>What is new is :</para>
         <itemizedlist>
           <listitem>
@@ -442,7 +426,7 @@ ts.helloworld.Stub_ServerImpl successfully
 </itemizedlist>
         <para>Then we get the same output than for a local deployment, the activity of active objects is
  independent from its location.</para>
-        <screen>
+<screen>
 01 Server: print method called
 02 at org.objectweb.proactive.examples.components.helloworld.ServerImpl.pri\
 nt(ServerImpl.java:37)
@@ -469,7 +453,7 @@ y(ActiveBody.java:230)
 15 Server: begin printing...
 16 -&gt;hello world
 17 Server: print done.
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -483,7 +467,7 @@ y(ActiveBody.java:230)
  Comanche, a simplistic http server. However, this example extensively uses reference passing
  through components. For example <literal>Request</literal> objects are passed by reference. This is
  incompatible with the ProActive programming model, where, to avoid shared passive objects, all
- passive objects passed to active objects are actually <emphasis role="bold">passed by copy</emphasis>(see <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/ProActiveBasis.xml">
+ passive objects passed to active objects are actually <emphasis role="bold">passed by copy</emphasis>(see <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/ProActiveBasis.xml">
  ProActive basis</ulink>). As active objects are themselves passed by reference, one could argue that
  we could turn some passive object into active objects. This would allow remote referencing
  through stubs. Unfortunately, for reasons specific to the Sockets and Streams implementations,
@@ -508,9 +492,9 @@ y(ActiveBody.java:230)
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/C3D-Components-UML.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/C3D-Components-UML.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/C3D-Components-UML.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/C3D-Components-UML.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -522,7 +506,7 @@ y(ActiveBody.java:230)
  itself, and make theses references component bindings. Of course, we also have to expose the
  interfaces that we are goining to use, hence the Dispatcher, Engine and User interface that have
  to be implemented.</para>
-        <para></para>
+        
       </sect2>
       <sect2 remap="h3">
         <title>How the application is written</title>
@@ -585,7 +569,7 @@ y(ActiveBody.java:230)
  creation of a Composite component, just for the fun. You may want to explore it with the Fractal
  GUI provided with IC2D, it&#39;s easier to understand graphically. Here&#39;s the code,
  nevertheless, for you curiosity :</para>
-        <screen>
+<screen>
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot; ?&gt;
 &lt;!DOCTYPE definition PUBLIC &quot;-//objectweb.org//DTD Fractal ADL 2.0//EN&quot; 
      &quot;classpath://org/objectweb/proactive/core/component/adl/xml/proactive.d\
@@ -620,15 +604,15 @@ e&quot;/&gt;
     &lt;coordinates color=&quot;-73&quot; y0=&quot;0.12&quot; x1=&quot;0.67&quot; y1=&quot;0.42&quot; name=&quot;disp&quot; x0=&quot;0.09&quot;/&gt;
   &lt;/coordinates&gt;
 &lt;/definition&gt;
-        </screen>
+</screen>
         <para>Here&#39;s what it looks like when you explore it through the IC2D Component
  explorer 
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/c3d_components.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/c3d_components.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/c3d_components.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/c3d_components.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>

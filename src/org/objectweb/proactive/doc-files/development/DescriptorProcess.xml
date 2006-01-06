@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="DescriptorProcess"><title>Adding a Deployment Protocol</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/DescriptorProcess.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/DescriptorProcess.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="DescriptorProcess_html_objectives" xreflabel="Objectives"/>Objectives</title>
@@ -38,7 +38,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/development/imgs/descriptorProcessClassDiagram.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="development/imgs/descriptorProcessClassDiagram.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
         <para>In this figure, <emphasis role="bold">OARSubProcess</emphasis> and <emphasis role="bold">SSHProcess</emphasis> both extend from <emphasis role="bold">AbstractExternalProcessDecorator</emphasis>. Notice, that in the case of SSH, more than one class
@@ -101,7 +101,7 @@
             <para><emphasis role="bold">processDefinition Childs</emphasis></para>
             <para> 
  The first thing to do, is add the new process tag in: </para>
-            <screen>
+<screen>
 &lt;xs:complexType name=&quot;ProcessDefinitionType&quot;&gt;
     &lt;xs:choice&gt;
         &lt;xs:element name=&quot;jvmProcess&quot; type=&quot;JvmProcessType&quot;/&gt;
@@ -121,14 +121,14 @@
     &lt;/xs:choice&gt;
     &lt;xs:attribute name=&quot;id&quot; type=&quot;xs:string&quot; use=&quot;required&quot;/&gt;
 &lt;/xs:complexType&gt;  
-            </screen>
+</screen>
           </listitem>
           <listitem>
             <para><emphasis role="bold">Specific Process Tag</emphasis></para>
             <para> 
  Afterwards, all the tag attributes and subtags need to be defined. In this example, we show
  the OARGRID tag: </para>
-            <screen>
+<screen>
 &lt;!--oarGridProcess--&gt;
 &lt;xs:complexType name=&quot;oarGridProcessType&quot;&gt;
     &lt;xs:sequence&gt;
@@ -157,7 +157,7 @@
         &lt;xs:element name=&quot;scriptPath&quot; type=&quot;FilePathType&quot; minOccurs=&quot;0&quot;/&gt;
     &lt;/xs:sequence&gt;
 &lt;/xs:complexType&gt;
-            </screen>
+</screen>
           </listitem>
 </itemizedlist>
       </sect2>
@@ -180,7 +180,7 @@
  This class will parse all the process specific tags and attributes. It is an innerclass in
  the <emphasis role="bold">ProcessDefinitinonHandler.java</emphasis> file. Sometimes, this class will have a subclass in
  charge of parsing a subsection of the process tag. </para>
-              <screen>
+<screen>
 protected class OARGRIDProcessHandler extends ProcessHandler {
   public OARGRIDProcessHandler(ProActiveDescriptor proActiveDescriptor) {
     super(proActiveDescriptor);
@@ -237,14 +237,14 @@ tObject());
     }
   }
 }
-              </screen>
+</screen>
             </listitem>
             <listitem>
               <para><emphasis role="bold">Registering the new XML handler innerclass</emphasis></para>
               <para> 
  The new XML handler innerclass must be registered to handle the parsing of the newprocess tag.
  This is donde in the constructor:</para>
-              <para></para>
+              
               <para><literal>public ProcessDefinitionHandler(ProActiveDescriptor
  proActiveDescriptor){...}</literal></para>
             </listitem>

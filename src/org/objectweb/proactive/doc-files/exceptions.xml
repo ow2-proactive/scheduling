@@ -1,24 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="exceptions"><title>Exception Handling</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/exceptions.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/exceptions.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="exceptions_html_presentation"/>Exceptions and Asynchrony</title>
       <para>In the asynchronous environment provided by ProActive, exceptions cannot be
  handled the same as in a sequential environment. Let&#39;s see the problem with exceptions and
  asynchrony in a piece of code:</para>
-      <screen>
-1  
-<emphasis role="bold">try</emphasis> {
-2     Result r = someAO.someMethodCall(); // Asynchronous method call that \
-can throw an exception
+<screen>
+1 <emphasis role="bold">try</emphasis> {
+2     Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
 3     // ...
 4     doSomethingWith(r);
-5 } 
-<emphasis role="bold">catch</emphasis> (SomeException se) {
+5 }  <emphasis role="bold">catch</emphasis> (SomeException se) {
 6     doSomethingWithMyException(se);
-7 }
-      </screen>
+7 }  </screen>
       <para>In this piece of code, as the method call in line 2 is asynchronous, we
  don&#39;t wait for its completion and continue the execution. So, it&#39;s possible the control
  flow exits the <emphasis role="bold">try</emphasis>. In this case, if the method call ends up with an
@@ -43,27 +39,18 @@ can throw an exception
           </listitem>
 </itemizedlist>
         <para>Let&#39;s reuse the previous example to see how to use these barriers</para>
-        <screen>
-1    
-<emphasis role="bold">ProActive.tryWithCatch(SomeException.class);</emphasis>
-2    
-<emphasis role="bold">try</emphasis> {
-3       Result r = someAO.someMethodCall(); // Asynchronous method call tha\
-t can throw an exception
+<screen>
+1 <emphasis role="bold">ProActive.tryWithCatch(SomeException.class);</emphasis>
+2 <emphasis role="bold">try</emphasis> {
+3       Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
 4       // ...
 5       doSomethingWith(r);
-6       
-<emphasis role="bold">ProActive.endTryWithCatch();</emphasis>
-7    } 
-<emphasis role="bold">catch</emphasis> (SomeException se) {
+6 <emphasis role="bold">ProActive.endTryWithCatch();</emphasis>
+7    } <emphasis role="bold">catch</emphasis> (SomeException se) {
 8       doSomethingWithMyException(se);
-9    } 
-<emphasis role="bold">finally {</emphasis>
-10      
-<emphasis role="bold">ProActive.removeTryWithCatch();</emphasis>
-11   
-<emphasis role="bold">}</emphasis>
-        </screen>
+9    } <emphasis role="bold">finally {</emphasis>
+10 <emphasis role="bold">ProActive.removeTryWithCatch();</emphasis>
+11 <emphasis role="bold">}</emphasis> </screen>
         <para>With this code, the call in line 3 will be asynchronous, and the exception
  will be handled in the correct <emphasis role="bold">catch</emphasis> block. Even if this implies waiting at
  the end of the <emphasis role="bold">try</emphasis> block for the completion of the call.</para>
@@ -87,7 +74,7 @@ t can throw an exception
         <para>These needed annotations can be seen as cumbersome, so we provide a tool to
  add them automatically to a given source file. It transforms the first example code in the
  second. Here is a sample session with the tool:</para>
-        <screen>
+<screen>
 $ ProActive/scripts/unix/trywithcatch.sh MyClass.java # A backup will be ma\
 de in MyClass.java~
 --- ProActive TryWithCatch annotator -----------------------
@@ -108,7 +95,7 @@ $ diff -u MyClass.java~ MyClass.java
          }
      }
  }
-        </screen>
+</screen>
         <para>As we can see, ProActive method calls are added to make sure all calls
  within <emphasis role="bold">try</emphasis>/<emphasis role="bold">catch</emphasis> blocks are handled asynchronously.</para>
       </sect2>
@@ -150,11 +137,11 @@ $ diff -u MyClass.java~ MyClass.java
         <title>Exception handlers</title>
         <para>The NFE mechanism in ProActive calls user defined handlers when a NFE is
  thrown. A handler implements the following interface:</para>
-        <screen>
+<screen>
 public interface NFEListener {
     public boolean handleNFE(NonFunctionalException e);
 }
-        </screen>
+</screen>
         <para>The handleNFE method is called with the exception to handle as parameter.
  The boolean return code indicates if the handler could do something with the exception. This way,
  if no handler could do anything with a given exception, the default behavior is used.</para>
@@ -168,7 +155,7 @@ public interface NFEListener {
  executed, then either those associated to the proxy or the body depending on the exception.</para>
           <para>Here is an example about how to add a handler to an active object on its
  side (body):</para>
-          <screen>
+<screen>
 ProActive.addNFEListenerOnAO(myAO, 
 <emphasis role="bold">new</emphasis> NFEListener() {
     
@@ -181,30 +168,24 @@ ProActive.addNFEListenerOnAO(myAO,
 <emphasis role="bold">return true</emphasis>;
     }
 });
-          </screen>
+</screen>
           <para>Handlers can also be added to the client side (proxy) of an active object
  with</para>
-          <screen>
-ProActive.addNFEListenerOnProxy(ao, handler)
-          </screen>
+<screen> ProActive.addNFEListenerOnProxy(ao, handler) </screen>
           <para>or to a JVM with</para>
-          <screen>
-ProActive.addNFEListenerOnJVM(handler)
-          </screen>
+<screen> ProActive.addNFEListenerOnJVM(handler) </screen>
           <para>and even to a group with</para>
-          <screen>
-ProActive.addNFEListenerOnGroup(group, handler)
-          </screen>
+<screen> ProActive.addNFEListenerOnGroup(group, handler) </screen>
           <para>These handlers can also be removed with</para>
-          <screen>
+<screen>
 ProActive.removeNFEListenerOnAO(ao, handler),
 ProActive.removeNFEListenerOnProxy(ao, handler),
 ProActive.removeNFEListenerOnJVM(handler)
 ProActive.removeNFEListenerOnGroup(group, handler)
-          </screen>
+</screen>
           <para>It&#39;s also possible to define an handler only for some exception types,
  for example:</para>
-          <screen>
+<screen>
 ProActive.addNFEListenerOnJVM(
 <emphasis role="bold">new</emphasis> TypedNFEListener(
     SendRequestCommunicationException.
@@ -221,21 +202,13 @@ ProActive.addNFEListenerOnJVM(
 <emphasis role="bold">return true</emphasis>;
     }
 }));
-          </screen>
+</screen>
           <para>You can use NFE for example, to automatically remove dead elements from a
  ProActive group when trying to contact them. This can be achieved using the following
  construction:</para>
-          <screen>
-ProActive.addNFEListenerOnGroup(group, FailedGroupRendezVousException.AUTO_\
-GROUP_PURGE);
-          </screen>
+<screen> ProActive.addNFEListenerOnGroup(group, FailedGroupRendezVousException.AUTO_GROUP_PURGE); </screen>
           <para>Note that this currently works only for one-way calls.</para>
-          <para></para>
-          <para></para>
-          <para>
-  </para>
-</sect3>
+  </sect3>
       </sect2>
     </sect1>
-  
-</chapter>
+ </chapter>

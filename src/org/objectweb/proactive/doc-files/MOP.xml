@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="MOP"><title>MOP : Metaobject Protocol</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/MOP.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/MOP.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="MOP_html_impl"/>Implementation: a Meta-Object Protocol</title>
@@ -25,9 +25,7 @@
  behavior through the method <emphasis role="bold">reify</emphasis>:</para>
       <blockquote>
         <para>
-          <screen>
-  public Object reify (MethodCall c) throws Throwable;
-          </screen>
+<screen> public Object reify (MethodCall c) throws Throwable; </screen>
 </para>
       </blockquote>
       <para>This method takes a reified call as a parameter and returns the value
@@ -53,7 +51,7 @@
  profiling environments.</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
 class EchoProxy extends Object implements Proxy {
   // here are constructor and variables declaration
   // [...]
@@ -65,7 +63,7 @@ class EchoProxy extends Object implements Proxy {
 interface Echo extends Reflect {
   public String PROXY_CLASS= &quot;EchoProxy&quot;;
 }
-          </screen>
+</screen>
 </para>
       </blockquote>
       <sect2 remap="h3">
@@ -76,33 +74,31 @@ interface Echo extends Reflect {
         <itemizedlist>
           <listitem>
             <para> Standard Java code would be : </para>
-            <screen>
-  Vector v = new Vector(3);
-            </screen>
+<screen> Vector v = new Vector(3); </screen>
           </listitem>
           <listitem>
             <para> ProActive code, with instantiation-based declaration of the metabehavior
  (the last parameter is <literal>null</literal> because we do not have any additional parameter to
  pass to the proxy) : </para>
-            <screen>
+<screen>
   Object[] params = {new Integer (3)};
   Vector v = (Vector) MOP.newInstance(&quot;Vector&quot;, params, &quot;EchoProxy&quot;, null);
-            </screen>
+</screen>
           </listitem>
           <listitem>
             <para> with class-based declaration : </para>
-            <screen>
+<screen>
   public class MyVector extends Vector implements Echo {}
   Object[] params = {new Integer (3)} ;
   Vector v = (Vector) MOP.newInstance(&quot;Vector&quot;, params, null);
-            </screen>
+</screen>
           </listitem>
           <listitem>
             <para> with object-based declaration : </para>
-            <screen>
+<screen>
   Vector v = new Vector (3);
   v=(Vector) MOP.newWrapper(&quot;EchoProxy&quot;,v);
-            </screen>
+</screen>
             <para>This is the only way to give a metabehavior to an object that is created in a place where we
 cannot edit source code. A typical example could be an object returned by a method that is part of
 an API distributed as a JAR file, without source code. Please note that, when using <literal>newWrapper</literal>, the invocation of the constructor of the class <literal>Vector</literal> is not
@@ -116,22 +112,22 @@ reified. </para>
       <para>All the interfaces used for declaring <emphasis>metabehaviors</emphasis> inherit directly
  or indirectly from <literal>Reflect</literal>. This leads to a hierarchy of metabehaviors such as shown
  in the figure below.</para>
-      <para></para>
-      <para></para>
+      
+      
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/reflectInterfaceDiagram.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/reflectInterfaceDiagram.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
       <para><emphasis role="bold">Reflect Interface and sub-interfaces diagram</emphasis></para>
-      <para></para>
+      
       <para>Note that <literal>ImplicitActive</literal> inherits from <literal>Active</literal> to
  highlight the fact that implicit synchronization somewhere always relies on some hidden explicit
  mechanism. Interfaces inheriting from <literal>Reflect</literal> can thus be logically grouped and
@@ -156,8 +152,8 @@ reified. </para>
  cannot be subclassed.</para>
         </listitem>
 </itemizedlist>
-      <para></para>
-      <para></para>
+      
+      
       <para>
   </para>
     </sect1>

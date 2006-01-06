@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="ProActiveBasis"><title>ProActive Basis, Active Object definition</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ProActiveBasis.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ProActiveBasis.html  -->
   
     <sect1 remap="h2">
       <title>Active objects basis</title>
@@ -27,18 +27,18 @@
           <para> There are no shared passive objects between subsystems.</para>
         </listitem>
 </itemizedlist>
-      <para></para>
-      <para></para>
+      
+      
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/proActiveModel.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/proActiveModel.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
       <para><emphasis role="bold">The Model</emphasis></para>
-      <para></para>
+      
       <para>These two main features have a lot of important consequences on the
  topology of the application:</para>
       <itemizedlist>
@@ -79,22 +79,19 @@
  object): this inter-object synchronization policy is known as <emphasis>wait-by-necessity</emphasis>.</para>
         </listitem>
 </itemizedlist>
-      <para></para>
-      <para></para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/activeObjectMethodCall.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/activeObjectMethodCall.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
       <para><emphasis role="bold">A call onto an active object as opposed to a call onto passive one</emphasis></para>
-      <para></para>
       <para><anchor id="ProActiveBasis_html_def"/></para>
     </sect1>
     <sect1 remap="h2">
@@ -115,10 +112,8 @@
  objects for representing future values, transform calls into Request objects (in terms of
  metaobject, this is a reification) and perform deep-copy of passive objects passed as
  parameters.</para>
-      <para></para>
-      <para></para>
-      <para>
-  </para>
+</sect1>
+    <sect1 remap="h2" id="HelloWorld"><title>Hello World (and Tiny too!)</title>
+	    <para>Hey, HelloWorld missing!</para>
     </sect1>
-  
 </chapter>

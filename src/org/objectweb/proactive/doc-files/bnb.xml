@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="bnb"><title>Branch and Bound API</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/bnb.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/bnb.html  -->
   
     <para> The outline of this short handbook:</para>
     <orderedlist>
@@ -56,7 +56,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/bnb_api_archi.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/bnb_api_archi.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
  <emphasis role="bold">The API architecture.</emphasis></para>
@@ -83,7 +83,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/bnb_api_com.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/bnb_api_com.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
  <emphasis role="bold">Broadcasting a new solution.</emphasis></para>
@@ -120,9 +120,7 @@
       <sect2 remap="h3">
         <title>The Task Description</title>
         <para>The <emphasis role="bold">Task</emphasis> object is located in this followed package:</para>
-        <screen>
-org.objectweb.proactive.branchnbound.core
-        </screen>
+<screen> org.objectweb.proactive.branchnbound.core </screen>
         <para>All abstract methods are described bellow:</para>
         <sect3 remap="h4">
           <title>public Result execute()</title>
@@ -150,13 +148,13 @@ org.objectweb.proactive.branchnbound.core
  recommended to override the <emphasis role="bold">compareTo(Object)</emphasis> method.</para>
           <para>Some class variables are provided by the API to help the user for keeping a code clear. See
  next their descriptions:</para>
-          <screen>
+<screen>
 protected Result initLowerBound; // to store the lower bound
 protected Result initUpperBound; // to store the upper bound
 protected Object bestKnownSolution; // setted automaticaly by the API 
                                 // with the best current solution
 protected Worker worker; // to interact with the API (see after)
-          </screen>
+</screen>
           <para>From the Task, specialy within the execute() method, the user has to interact with the API for
  sending sub-tasks, which result from a split call, to the task queue, or broadcasting to other
  tasks a new better solution, etc.</para>
@@ -164,21 +162,15 @@ protected Worker worker; // to interact with the API (see after)
           <itemizedlist>
             <listitem>
               <para> Broadcasting a new better solution to all the other class:</para>
-              <screen>
-this.worker.setBestCurrentResult(newBetterSolution);
-              </screen>
+<screen> this.worker.setBestCurrentResult(newBetterSolution); </screen>
             </listitem>
             <listitem>
               <para> Sending a set of sub-tasks for computing:</para>
-              <screen>
-this.worker.sendSubTasksToTheManager(subTaskList);
-              </screen>
+<screen> this.worker.sendSubTasksToTheManager(subTaskList); </screen>
             </listitem>
             <listitem>
               <para> For a smarter split, checking that the task queue needs more tasks:</para>
-              <screen>
-BooleanWrapper workersAvailable = this.worker.isHungry();
-              </screen>
+<screen> BooleanWrapper workersAvailable = this.worker.isHungry(); </screen>
             </listitem>
 </itemizedlist>
 </sect3>
@@ -202,13 +194,13 @@ BooleanWrapper workersAvailable = this.worker.isHungry();
       <sect2 remap="h3">
         <title>The ProActiveBranchNBound Description</title>
         <para>Finally, it is the main entry point for starting, and controlling your computation.</para>
-        <screen>
+<screen>
 Task task = new YourTask(someArguments);
 Manager manager =  ProActiveBranchNBound.newBnB(task,
                         nodes,
                         LargerQueueImpl.class.getName());
 Result futureResult = manager.start(); // this call is asynchronous
-        </screen>
+</screen>
         <para><emphasis role="bold">Tip:</emphasis> use the constructor <emphasis role="bold">ProActiveBranchNBound.newBnB(Task, VirtualNode[],
  String)</emphasis> and <emphasis role="bold">do not activate</emphasis> virtual nodes. This method provides a faster deployment
  and active objects creation way. Communications between workers are also optimized by a
@@ -226,7 +218,7 @@ Result futureResult = manager.start(); // this call is asynchronous
       <para>The algorithm used to find the best solution, tests all permutations and try to cut bad
  branches.</para>
       <para>Firstly, the <emphasis role="bold">Flowshop Task</emphasis>:</para>
-      <screen>
+<screen>
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
@@ -244,10 +236,10 @@ public class FlowShopTask extends Task {
    this.flowshopProblem = fs;
  }
 }
-      </screen>
+</screen>
       <para>Now, implement all Task abstract methods.</para>
       <para>Computation <emphasis role="bold">bound</emphasis> methods:</para>
-      <screen>
+<screen>
 // Compute the lower bound
 public void initLowerBound() {
   this.lowerBound = this.computeLowerBound(this.fs);
@@ -256,9 +248,9 @@ public void initLowerBound() {
 public void initUpperBound() {
   this.upperBound = this.computeUpperBound(this.fs);
 }
-      </screen>
+</screen>
       <para>The <emphasis role="bold">split</emphasis> method:</para>
-      <screen>
+<screen>
 public Vector split() {
   // Divide the set of permutations in 10 sub-tasks
   int nbTasks = 10;
@@ -269,9 +261,9 @@ public Vector split() {
         
   return tasks;
 }
-      </screen>
+</screen>
       <para>Then, the <emphasis role="bold">execute</emphasis> method:</para>
-      <screen>
+<screen>
 public Result execute() {
        
   if (! this.iHaveToSplit()) {
@@ -309,7 +301,7 @@ ion;
   r.setSolution(bestKnownSolution);
   return r;
 }
-      </screen>
+</screen>
       <para>This example is available in a complete version <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/flowshop.xml">here</ulink>.</para>
     </sect1>
     <sect1 remap="h2">

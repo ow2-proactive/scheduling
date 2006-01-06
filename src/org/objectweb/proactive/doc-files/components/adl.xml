@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="adl"><title>Architecture Description Language</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/adl.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/adl.html  -->
   
     <para> <anchor id="adl_html_adl"/></para>
     <para>The Architecture Description Language (ADL) is used to configure and deploy
@@ -22,39 +22,26 @@
       <title><anchor id="adl_html_Overview"/>Overview</title>
       <para>Components are defined in <emphasis role="bold">definition</emphasis> files, which are .fractal files. The syntax of the
  document is validated against a DTD retreived from the classpath</para>
-      <screen>
-classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd
-      </screen>
+<screen> classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd </screen>
       <para>The <emphasis role="bold">definition</emphasis> element has a name (which must be the same name that the file&#39;s) and
  inheritance is supported through the attribute &quot;extends&quot; :</para>
-      <screen>
-definition name=&quot;org.objectweb.proactive.examples.components.helloworld.hell\
-oworld-distributed-wrappers&quot;
-      </screen>
+<screen> definition name=&quot;org.objectweb.proactive.examples.components.helloworld.hell oworld-distributed-wrappers&quot; </screen>
       <para>The exportedVirtualNodes elements is described later in this section</para>
       <para>Components can be specified and created in this definition, and these components can
  themselves be defined in other definition files :</para>
-      <screen>
-component name=&quot;client-wrapper&quot; definition=&quot;org.objectweb.proactive.examples.c\
-omponents.helloworld.ClientType&quot;
-      </screen>
+<screen>component name=&quot;client-wrapper&quot; definition=&quot;org.objectweb.proactive.examples.c omponents.helloworld.ClientType&quot;</screen>
       <para>Nesting is allowed for composite components and is done by adding other &quot;component&quot;
  elements.</para>
       <para>The <emphasis role="bold">binding</emphasis> element specifies bindings between interfaces of components &quot;, and
  specifying &quot;this&quot; as the name of the component refers to the current enclosing
  component.</para>
-      <screen>
-binding client=&quot;this.r&quot; server=&quot;client.r&quot;/
-      </screen>
+<screen> binding client=&quot;this.r&quot; server=&quot;client.r&quot; </screen>
       <para>The <emphasis role="bold">controller</emphasis> elements can have the following &quot;desc&quot; values :
  &quot;composite&quot;, &quot;parallel&quot; or &quot;primitive&quot;. A parallel component and
  the components it contains should be type-compatible</para>
       <para>Primitive components specify the <emphasis role="bold">content</emphasis> element, which indicates the implementation
  class containing the business logic for this component :</para>
-      <screen>
-content class=&quot;org.objectweb.proactive.examples.components.helloworld.Client\
-Impl&quot;
-      </screen>
+<screen> content class=&quot;org.objectweb.proactive.examples.components.helloworld.ClientImpl&quot; </screen>
       <para>The <emphasis role="bold">virtual-node</emphasis> element offers distributed deployment information. It can be exported
  and composed in the exportedVirtualNodes element.</para>
       <para>
@@ -66,9 +53,7 @@ Impl&quot;
  have a suffixed name looking like : &quot;primiveComponentName-cyclicInstanceNumber-n&quot;,
  where primitiveComponentName is the name defined in the ADL. This automatic replication is used
  in the parallel components.</para>
-      <screen>
-virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;
-      </screen>
+<screen> virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot; </screen>
       <para>The syntax is similar to the standard Fractal ADL, and the parsing engine has been extended.
  Features specific to ProActive are :</para>
       <itemizedlist>
@@ -95,7 +80,7 @@ virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="adl_html_Example"/>Example</title>
-      <para>The easiest way to understand the ADL is to see <ulink url="helloworld-distributed.xml">an example</ulink>. It corresponds to the helloworld
+      <para>The easiest way to understand the ADL is to see <link linkend="helloworld-distributed">an example</link>. It corresponds to the helloworld
  example described later in this document.</para>
       <para><anchor id="adl_html_composition_of_virtual_nodes"/></para>
     </sect1>
@@ -111,7 +96,7 @@ virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;
  forthcoming feature of Fractal) components.</para>
       <para>In the example, the component defined in helloworld-distributed-wrappers.fractal exports the
  virtual nodes VN1 and VN2:</para>
-      <screen>
+<screen>
 exportedVirtualNodes
  exportedVirtualNode name=&quot;VN1&quot;
   composedFrom
@@ -124,12 +109,12 @@ exportedVirtualNodes
   /composedFrom
  /exportedVirtualNode
 /exportedVirtualNodes
-      </screen>
+</screen>
       <para>VN1 is composed of the exported virtual node &quot;client-node&quot; from the component named
  client</para>
       <para>In the definition of the client component (ClientImpl.fractal), we can see that client-node is
  an exportation of a virtual node which is also name &quot;client-node&quot; :</para>
-      <screen>
+<screen>
 exportedVirtualNodes
  exportedVirtualNode name=&quot;client-node&quot;
    composedFrom
@@ -139,13 +124,13 @@ exportedVirtualNodes
 /exportedVirtualNodes
 ...
 virtual-node name=&quot;client-node&quot; cardinality=&quot;single&quot;/
-      </screen>
+</screen>
       <para>Although this is a simplistic example, one should foresee a situation where ClientImpl would
  be a prepackaged component, where its ADL could not be modified ; the exportation and composition
  of virtual nodes allow to adapt the deployment of the system depending on the existing
  infrastructure. Colocation can be specified in the enclosing component definition
  (helloworld-distributed-wrappers.fractal) :</para>
-      <screen>
+<screen>
 exportedVirtualNodes
  exportedVirtualNode name=&quot;VN1&quot;
   composedFrom
@@ -154,7 +139,7 @@ exportedVirtualNodes
   /composedFrom
  /exportedVirtualNode
 /exportedVirtualNodes
-      </screen>
+</screen>
       <para>As a result, the client and server component will be colocated / deployed on the same virtual
  node. This can be profitable if there is a lot of communications between these two
  components.</para>
@@ -165,9 +150,7 @@ exportedVirtualNodes
       <title><anchor id="adl_html_usage" xreflabel="Usage"/>Usage</title>
       <para>The launcher, which parses the ADL, creates a corresponding component factory, and
  instantiates and assembles the components as defined in the ADL, is started from the <literal>org.objectweb.proactive.core.component.adl.Launcher</literal> class :</para>
-      <screen>
-Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descriptor]) 
-      </screen>
+<screen> Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descriptor])  </screen>
       <para>where [-java|-fractal] comes from the Fractal ADL Launcher (put -fractal for ProActive
  components, this will be made optional for ProActive components in the next release),
  &lt;definition&gt; is the name of the component to be instantiated and started, &lt;itf&gt; is

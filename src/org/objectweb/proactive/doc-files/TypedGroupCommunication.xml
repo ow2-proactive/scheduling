@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="TypedGroupCommunication"><title>Typed Group Communication</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/TypedGroupCommunication.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/TypedGroupCommunication.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="TypedGroupCommunication_html_overview"/>Overview</title>
@@ -8,22 +8,22 @@
  computing. While previous works and libraries proposed such a characteristic (e.g. MPI, or
  object-oriented frameworks), the use of groups imposed specific constraints on programmers, for
  instance the use of dedicated interfaces to trigger group communications.</para>
-      <para></para>
+      
       <para>
  We aim at a more flexible mechanism. We propose a scheme where, given a Java class, one can
  initiate group communications using the standard public methods of the class together with the
  classical dot notation; in that way, group communications remains typed.</para>
-      <para></para>
+      
       <para>
  In order to ease the use of the group communication, we provide a set of static methods on the <literal>ProActiveGroup</literal> class and a set of
  methods on the <literal>Group</literal> interface.</para>
-      <para></para>
+      
       <para>
  Here, a short compilation about the syntax and some method used in the Group Communication API is
  presented. More informations follow.</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
@@ -38,7 +38,7 @@ V vg = ag1.bar(...);
    // below is also a collective operation
    // triggered on results
 vg.f1();
-          </screen>
+</screen>
 </para>
       </blockquote>
     </sect1>
@@ -48,25 +48,25 @@ vg.f1();
  Groups are created using the static method <literal>ProActiveGroup.newGroup</literal>.
  The common superclass for all the group members has to be specified, thus giving the group a
  minimal type.</para>
-      <para></para>
+      
       <para>
  Let us take a standard Java class:</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
 class A { 
   public A() {}
   public void foo (...) {...}
   public V bar (...) {...}
   ...
 }
-          </screen>
+</screen>
 </para>
       </blockquote>
       <para>Here are examples of some group creation operations:</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    // Pre-construction of some parameters: 
    //   For constructors:
 Object[][] params = {{...} , {...} , ... };
@@ -89,7 +89,7 @@ A ag2 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params, nodes);
 A ag3 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params[], 
                    {rmi://globus1.inria.fr/Node1,
                     rmi://globus2.inria.fr/Node2});
-          </screen>
+</screen>
 </para>
       </blockquote>
       <para>Elements can be included into a typed group only if their class equals or
@@ -105,19 +105,19 @@ A ag3 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params[],
  second and complementary representation of a group has been designed. In order to manage a group,
  this second representation must be used instead. This second representation, <emphasis role="bold">the management
  representation</emphasis>, follows a more standard pattern for grouping objects : the <literal>Group</literal> interface.</para>
-      <para></para>
+      
       <para>
  We are careful to have a strong coherence between both representations of the same group, which
  implies that modifications executed through one representation are immediately reported on the
  other one. In order to switch from one representation to the other, two methods have been defined
  : the static method named <literal>ProActiveGroup.getGroup</literal>,
  returns the Group form associated to the given group object; the method <literal>getGroupBytype</literal> defined in the <literal>Group</literal> interface does the opposite.</para>
-      <para></para>
+      
       <para>
  Below is an example of when and how to use each representation of a group:</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    // definition of one standard Java object
    // and two active objects
 A a1 = new A();
@@ -142,7 +142,7 @@ ag1.foo(); // the caller of ag1.foo() may not belong to ag1
    // A new reference to the typed group  
    // can also be built as follows
 A ag1new = (A) gA.getGroupByType();
-          </screen>
+</screen>
 </para>
       </blockquote>
     </sect1>
@@ -157,14 +157,14 @@ A ag1new = (A) gA.getGroupByType();
  used.</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    // A method call on a group, returning a result
 V vg = ag1.bar();
    // vg is a typed group of &quot;V&quot;: operation 
    // below is also a collective operation
    // triggered on results
 vg.f1();
-          </screen>
+</screen>
 </para>
       </blockquote>
       <para>As said in the Group creation section, groups whose type is based on final
@@ -173,7 +173,7 @@ vg.f1();
  void or is a &#39;reifiable type&#39;, in the sense of the Meta Object Protocol of ProActive, may
  be called on a group of objects; otherwise, they will raise an exception at run-time, because the
  transparent construction of a group of futures of non-reifiable types fails.</para>
-      <para></para>
+      
       <para>
  To take advantage with the asynchronous remote method call model of ProActive, some new
  synchronization mechanisms have been added. Static methods defined in the <literal>ProActiveGroup</literal> class enable to execute various
@@ -181,7 +181,7 @@ vg.f1();
  an exemple :</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    // A method call on a typed group
 V vg = ag1.bar();
    // To wait and capture the first returned 
@@ -189,7 +189,7 @@ V vg = ag1.bar();
 V v = (V) ProActiveGroup.waitAndGetOne(vg);
    // To wait all the members of vg are arrived
 ProActiveGroup.waitAll(vg);
-          </screen>
+</screen>
 </para>
       </blockquote>
     </sect1>
@@ -201,14 +201,14 @@ ProActiveGroup.waitAll(vg);
  for the method execution, and so, parts of the parameter transmissions are useless. In other
  words, in some cases, there is a need to transmit different parameters to the various
  members.</para>
-      <para></para>
+      
       <para>
  A common way to achieve the scattering of a global parameter is to use the rank of each member of
  the group, in order to select the appropriate part that it should get in order to execute the
  method. There is a natural traduction of this idea inside our group communication
  mechanism:<emphasis role="bold">the use of a group of objects in order to represent a parameter of a group method
  call that must be scattered to its members</emphasis>.</para>
-      <para></para>
+      
       <para>
  The default behaviour regarding parameters passing for method call on a group, is to pass a deep
  copy of the group of type P to all members. Thus, in order to scatter this group of elements of
@@ -218,7 +218,7 @@ ProActiveGroup.waitAll(vg);
  is available.</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    // Broadcast the group gb to all the members
    // of the group ag1:
 ag1.foo(gb);
@@ -228,15 +228,15 @@ ProActiveGroup.setScatterGroup(gb);
    // Scatter the members of gb onto the 
    // members of ag1:
 ag1.foo(gb);
-          </screen>
+</screen>
 </para>
       </blockquote>
-      <para></para>
-      <para></para>
+      
+      
       <para>
  To learn more, see the <ulink url="../../../../index.xml">JavaDoc</ulink> and the paper <emphasis role="bold">Efficient,
  Flexible and Typed Group Communications for Java</emphasis> located in the <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/index.xml">Documentation page</ulink>.</para>
-      <para></para>
+      
       <para>
   </para>
     </sect1>

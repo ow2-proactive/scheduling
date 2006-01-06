@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="WSDoc"><title>Exporting Active Objects and components as web services</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/WSDoc.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/WSDoc.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="WSDoc_html_overview"/>Overview</title>
@@ -48,16 +48,16 @@
  client developer doesn&#39;t have to worry about how the service is implemented.</para>
         </listitem>
 </itemizedlist>
-      <para></para>
+      
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/webservices/provider_en.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="webservices/provider_en.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/webservices/provider_en.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="webservices/provider_en.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/webservices/provider_en.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="webservices/provider_en.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -87,7 +87,8 @@
           <para> Copy the ProActive.jar file into the $APACHE-SOAP/WEB-INF/lib/</para>
         </listitem>
         <listitem>
-          <para> Replace the $TOMCAT/webapps/soap/WEB-INF/web.xml by <ulink url="web.xml">this one</ulink></para>
+          <para> Replace the $TOMCAT/webapps/soap/WEB-INF/web.xml by 
+		 <ulink url="webservices/web.xml">this one</ulink>.</para>
         </listitem>
 </itemizedlist>
       <para>&#160;</para>
@@ -100,25 +101,16 @@
       <itemizedlist>
         <listitem>
           <para> Write your active object or your component in a classic way; for example: </para>
-          <screen>
-A a = (A)ProActive.newActive(&quot;A&quot;, new Object [] {});
-          </screen>
+<screen> A a = (A)ProActive.newActive(&quot;A&quot;, new Object [] {}); </screen>
         </listitem>
         <listitem>
           <para> Once the element is created and activated, deploy it onto a web server by using : </para>
           <itemizedlist>
             <listitem>
               <para> For an active object : </para>
-              <screen>
- 
-<emphasis role="bold">
-ProActive.exposeAsWebService(Object o, 
-                             String url, 
-                             String urn, 
-                             String [] methods);
-                             </emphasis>
-   
-              </screen>
+	      <emphasis role="bold">
+<screen> ProActive.exposeAsWebService(Object o, String url, String urn, String [] methods); </screen>
+      </emphasis>
               <para>where : </para>
               <itemizedlist>
                 <listitem>
@@ -138,14 +130,10 @@ ProActive.exposeAsWebService(Object o,
             </listitem>
             <listitem>
               <para> For a component : </para>
-              <screen>
-  
-<emphasis role="bold"> Proactive.exposeComponentAsWebService(Component component,
-                                                  String url, 
-                                                  String
-                                                  componentName);
-                                                  </emphasis>
-              </screen>
+	      <emphasis role="bold"> <screen> 
+ Proactive.exposeComponentAsWebService(Component component, String url, String componentName); </screen>
+	      </emphasis>
+              
               <para>where : </para>
               <itemizedlist>
                 <listitem>
@@ -169,9 +157,10 @@ ProActive.exposeAsWebService(Object o,
       <title><anchor id="WSDoc_html_undeploy"/> Undeploy the services</title>
       <para>To undeploy an active object as a service, use the ProActive static method
  :</para>
-      <screen>
-<emphasis role="bold">ProActive.unExposeAsWebService ( String urn, String url ); </emphasis>
-      </screen>
+<emphasis role="bold">
+<screen>
+ProActive.unExposeAsWebService ( String urn, String url );  </screen>
+</emphasis>
       <para>where :</para>
       <itemizedlist>
         <listitem>
@@ -183,9 +172,9 @@ ProActive.exposeAsWebService(Object o,
 </itemizedlist>
       <para>To undeploy a component you have to specify the component name and the
  component( needed to know the interfaces to undeploy) :</para>
-      <screen>
-<emphasis role="bold">ProActive.unExposeAsWebService ( String componentName , String url,  Component component); </emphasis>
-      </screen>
+<emphasis role="bold">      <screen>
+ProActive.unExposeAsWebService ( String componentName , String url,  Component component);  </screen>
+</emphasis>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="WSDoc_html_access"/> Accessing the services</title>
@@ -216,7 +205,7 @@ ProActive.exposeAsWebService(Object o,
         <title>Hello World web service code</title>
         <para>Let&#39;s start with a simple example, an Hello world active object exposed
  as a web service :</para>
-        <screen>
+<screen>
 public class HelloWorld implements Serializable {
    public HelloWorld () {}
    public String helloWorld (String name) {
@@ -237,14 +226,14 @@ ect []{});
     }
    }
 }
-        </screen>
+</screen>
         <para>The active object <literal>hw</literal> has been deployed as a web service on the
  web server located at <literal>&quot;http://localhost:8080&quot;</literal> . The accessible service
  method is <literal>helloWorld</literal>.</para>
         <para>
  Now that the server-side Web service is deployed, we can create a new client application in
  Visual Studio .NET.</para>
-        <para></para>
+        
       </sect2>
       <sect2 remap="h3">
         <title>Access with Visual Studio</title>
@@ -262,12 +251,12 @@ ect []{});
           <listitem>
             <para> Once the web reference is added, you can use the helloWorld service as an object and
  perform calls on it : </para>
-            <screen>
+<screen>
 ...
 localhost.helloWorld hw = new localhost.helloWorld();
 string s = hw.helloWorld ();
 ...
-            </screen>
+</screen>
           </listitem>
 </itemizedlist>
       </sect2>
@@ -285,7 +274,7 @@ string s = hw.helloWorld ();
  language. To perform such an enhancement, the Dispatcher object must be exposed as a web service
  in order to a C# client for example controls it. Only one instruction has been added in the main
  method :</para>
-        <screen>
+<screen>
 ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     &quot;http://localhost:8080&quot;,  new String [] {
                     &quot;rotateRight&quot;, &quot;getPicture&quot;, &quot;rotateLeft&quot;, &quot;rotateUp&quot;,
@@ -293,7 +282,7 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     &quot;spinClock&quot;, &quot;spinUnclock&quot;, &quot;addRandomSphere&quot;, &quot;resetScene&quot;,
                     &quot;registerWSUser&quot;, &quot;unregisterWSUser&quot;
                 });
-        </screen>
+</screen>
         <para>Once the dispatcher is deployed as a web service, we have a WSDL url : <ulink url="#">http://localhost:8080/soap/servlet/id=C3DDispactcher</ulink>
  It will be usefull to construct the dispatcher client.</para>
       </sect2>
@@ -305,11 +294,11 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/webservices/dispatcher_en.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="webservices/dispatcher_en.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="webservices/dispatcher_en.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -336,7 +325,7 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata width="4in" fileref="doc-files/webservices/scc3djava.png" format="PNG"/>                        </imageobject>
+                          <imagedata width="4in" fileref="webservices/scc3djava.png" format="PNG"/>                        </imageobject>
                       </mediaobject>
                     </informalfigure>
 </para></entry>
@@ -348,7 +337,7 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata width="4in" fileref="doc-files/webservices/scC3dcs.png" format="PNG"/>                        </imageobject>
+                          <imagedata width="4in" fileref="webservices/scC3dcs.png" format="PNG"/>                        </imageobject>
                       </mediaobject>
                     </informalfigure>
 </para></entry>
@@ -361,7 +350,7 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
         <title>Download the C# example</title>
         <para>You can find <ulink url="http://www-sop.inria.fr/oasis/proactive/C3DCSharp.zip">here</ulink> the whole C# Visual Studio .Net
  project. N.B : In order to run this project, you must install the Microsoft IIS server.</para>
-        <para></para>
+        
         <para>
   </para>
       </sect2>

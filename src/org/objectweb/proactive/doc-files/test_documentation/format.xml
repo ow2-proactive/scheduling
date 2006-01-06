@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="format"><title>0.3 Results</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/format.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/format.html  -->
   
     <para> This section describes, how to format the Results of the tests.</para>
     <sect1 remap="h2">
@@ -21,7 +21,7 @@
       <para>The problem with a real logger (like log4J) is we don&#39;t have the notion of
  results.</para>
       <para>In the TestSuite APi we decide to split logs of the program and results.</para>
-      <para></para>
+      
     </sect1>
     <sect1 remap="h2">
       <title>Structure of Results classes in TestSuite</title>
@@ -71,11 +71,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/result2.gif" format="GIF"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/result2.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/result2.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/result2.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/result2.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/result2.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -93,14 +93,12 @@
         </listitem>
         <listitem>
           <para> Group</para>
-          <para></para>
+          
         </listitem>
 </itemizedlist>
       <para>These classes implements the <emphasis role="bold">ResultsExporter</emphasis> interface. After the execution of your
  Manager you can choose where and how to print results :</para>
-      <screen>
-<literal>yourManager.toXXX();</literal>
-      </screen>
+<screen> yourManager.toXXX();  </screen>
       <para>Where toXXX() is :</para>
       <itemizedlist>
         <listitem>
@@ -128,9 +126,7 @@
       <sect2 remap="h3">
         <title>About the Manager Verbatim option</title>
         <para>In Manager you can modify this by :</para>
-        <screen>
-<literal>yourManager.setVerbatim(true/false)</literal>
-        </screen>
+<screen>yourManager.setVerbatim(true/false)  </screen>
         <para>If Verbatim value is :</para>
         <itemizedlist>
           <listitem>
@@ -145,9 +141,7 @@
         <para>By default Verbatim is at <emphasis role="bold">false</emphasis></para>
         <para>This option has no effect on XML and HTML exports.</para>
         <para>To see the value of Verbatim :</para>
-        <screen>
-<literal>yourManager.isVerbatim()</literal>
-        </screen>
+<screen>  yourManager.isVerbatim() </screen>
       </sect2>
       <sect2 remap="h3">
         <title>By the file configurator</title>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="ActiveObjectCreation"><title>Active Objects : creation and advanced concepts</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ActiveObjectCreation.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ActiveObjectCreation.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="ActiveObjectCreation_html_creation"/>Active Object: creation and
@@ -17,9 +17,7 @@
       <para>The code for creating a passive instance of <literal>A</literal> could be :</para>
       <blockquote>
         <para>
-          <screen>
-    A a = new A(26, &quot;astring&quot;);
-          </screen>
+<screen> A a = new A(26, &quot;astring&quot;); </screen>
 </para>
       </blockquote>
       <para>In <emphasis role="bold">ProActive</emphasis> there are two ways to create active objects. One way is
@@ -37,7 +35,7 @@
  you must make sure that the arguments of the constructor are <literal>Serializable</literal>. On the
  other hand, the class used to create the active object <emphasis role="bold">does not need to be</emphasis><literal>Serializable</literal> even in the case of remotely created active objects. Remind also that
  to be created properly, the reified object must have a declared empty no-args constructor.</para>
-      <screen>
+<screen>
     A a;
     Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
     try {
@@ -49,7 +47,7 @@
     catch(NodeException ex){
         ex.printStackTrace();
     }
-      </screen>
+</screen>
       <para>This code creates an active object of class <literal>A</literal> in the local
  JVM. If the invocation of the constructor of class <literal>A</literal> throws an exception, it is
  placed inside an exception of type <literal>ActiveObjectCreationException</literal>. When the call to <literal>newActive</literal> returns, the active object has been created and its active thread is
@@ -75,7 +73,7 @@
  the third and the fourth constructors if the second element of the array is <literal>null</literal>.</para>
           </listitem>
 </itemizedlist>
-        <screen>
+<screen>
     public A (int i) {
         //
     }
@@ -88,7 +86,7 @@
     public A (int i, Vector v) {
         //
     }
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>Using a Node</title>
@@ -100,13 +98,13 @@
         <para>A node is identified by a node URL which is formed using the protocol, the
  hostname hosting the JVM where is the node located and the name of the node. The <literal>NodeFactory</literal> allows to create or lookup nodes. The
  method <literal>newActive</literal> can take in parameter a nodeURL as a <literal>String</literal> or a <literal>Node</literal> object that points to an existing node. Here an example :</para>
-        <screen>
+<screen>
       a = (A) ProActive.newActive(&quot;example.A&quot;, params, &quot;rmi://pluto.inria.fr/a\
 Node&quot;);
   or
       Node node = NodeFactory.getNode(&quot;rmi://pluto.inria.fr/aNode&quot;);
       a = (A) ProActive.newActive(&quot;example.A&quot;, params, node);
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -130,10 +128,10 @@ Node&quot;);
  object are kept by other objects after the call to turnActive. A direct call to a method of the
  originating object without passing by a ProActive stub on this object will break the model.</para>
       <para>Code for object-based creation looks like this :</para>
-      <screen>
+<screen>
     A a = new A (26, &quot;astring&quot;);
     a = (A) ProActive.turnActive(a);
-      </screen>
+</screen>
       <para>As for <literal>newActive</literal>, the second parameter of <literal>turnActive</literal> if given is the location of the active object to be created. No parameter
  or <literal>null</literal> means that the active object is created locally in the current node.</para>
       <para>When using this method, the programmer has to make sure that no other
@@ -198,32 +196,32 @@ Node&quot;);
         <para>The algorithms that decide for each phase what to do are the following
  (<literal>activity</literal> is the eventual object passed as a parameter to <literal>newActive</literal> or <literal>turnActive</literal>) :</para>
         <para><emphasis role="bold">InitActive</emphasis></para>
-        <screen>
+<screen>
 if activity is non null and implements InitActive
   we invoke the method initActivity defined in the object activity
 else if the class of the reified object implements InitActive
   we invoke the method initActivity of the reified object
 else
   we don&#39;t do any initialization
-        </screen>
+</screen>
         <para><emphasis role="bold">RunActive</emphasis></para>
-        <screen>
+<screen>
 if activity is non null and implements RunActive
   we invoke the method runActivity defined in the object activity
 else if the class of the reified object implements RunActive
   we invoke the method runActivity of the reified object
 else
   we run the standard FIFO activity
-        </screen>
+</screen>
         <para><emphasis role="bold">EndActive</emphasis></para>
-        <screen>
+<screen>
 if activity is non null and implements EndActive
   we invoke the method endActivity defined in the object activity
 else if the class of the reified object implements EndActive
   we invoke the method endActivity of the reified object
 else
   we don&#39;t do any cleanup
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>Implementing the interfaces directly in the class used to create the active object</title>
@@ -232,7 +230,7 @@ else
  implement the corresponding interface (one or more) amongst <literal>InitActive</literal>, <literal>RunActive</literal> and <literal>EndActive</literal>. Here is an example that has a custom initialization and
  activity.</para>
         <para><emphasis role="bold">Example1:</emphasis></para>
-        <screen>
+<screen>
   import org.objectweb.proactive.*;
   public class A implements InitActive, RunActive {
         private String myName;
@@ -255,10 +253,10 @@ else
         System.out.println(&quot;Name = &quot;+a.getName());
         }
   }
-        </screen>
+</screen>
         <para><emphasis role="bold">Example2:</emphasis><emphasis role="bold">start, stop, suspend, restart</emphasis> a simulation
  algorithm in runActivity method</para>
-        <screen>
+<screen>
 import org.objectweb.proactive.*;
 public class Simulation implements RunActive {
       private boolean stoppedSimulation=false;
@@ -306,11 +304,11 @@ ethod
 <emphasis role="bold">       if(stoppedSimulation) exit();</emphasis>
         }
 }
-        </screen>
+</screen>
         <para><emphasis role="bold">Example3: Reactive Active Object</emphasis>. Even when an AO is busy doing its
  own work, it can remain reactive to external events (method calls). One just has to program
  non-blocking services to take into account external inputs.</para>
-        <screen>
+<screen>
 public class BusyButReactive implements RunActive {
 public void  runActivity(Body body) {
 Service service = new Service(body);
@@ -325,7 +323,7 @@ while ( ! hasToTerminate ) {
 public void changeParameters () {...   // change computation parameters}
 public void terminate (){ hasToTerminate=true;}
 }
-        </screen>
+</screen>
         <para>It also allows one to specify explicit termination of AOs (there is
  currently no Distributed Garbage Collector). Of course, the reactivity is up to the length of
  going around the loop.</para>
@@ -340,7 +338,7 @@ public void terminate (){ hasToTerminate=true;}
  in the reified class, there is one restriction here : you cannot access the internal state of the
  reified object. Using an external object should therefore be used when the implementation of the
  activity is generic enough not to have to access the member variables of the reified object.</para>
-        <screen>
+<screen>
   import org.objectweb.proactive.*;
   public class LIFOActivity implements RunActive {
     // -- implements RunActive for serving request in a LIFO fashion
@@ -370,7 +368,7 @@ efault)
       System.out.println(&quot;Name = &quot;+a.getName());
     }
   }
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -412,7 +410,7 @@ efault)
  problem is through the use of the <emphasis role="bold">factory</emphasis> pattern. This mainly applies to class-based
  creation. It consists in adding a static method to class <literal>pA</literal> that takes care of
  instantiating the active object and returns it. The code is :</para>
-      <screen>
+<screen>
   public class AA extends A {
     public static A createActiveA (int i, String s, Node node) {
       Object[] params = new Object[] {new Integer (i), s};
@@ -425,7 +423,7 @@ an exception: &quot;+e);
       }
     }
   }
-      </screen>
+</screen>
       <para>It is up to the programmer to decide whether this method has to throw
  exceptions or not. We recommend that this method only throws exceptions that appear in the
  signature of the reified constructor (none here as the constructor of A that we call doesn&#39;t
@@ -459,7 +457,7 @@ an exception: &quot;+e);
  saver as you only redefine what you really need to. Here is an example :</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
   private static final MetaObjectFactory instance = new MyMetaObjectFactory\
 ();
@@ -487,7 +485,7 @@ rver);
     }
   } // end inner class MyRequestFactory
 }
-            </screen>
+</screen>
 </para>
         </blockquote>
         <para>The factory above simply redefines the <literal>RequestFactory</literal> in order
@@ -496,7 +494,7 @@ rver);
  creation of factories as singleton. More explanations can be found in the javadoc of that class.
  The use of that new factory is fairly simple. All you have to do is to pass an instance of the
  factory when creating a new active object. If we take the same example as before we have :</para>
-        <screen>
+<screen>
   Object[] params = new Object[] {new Integer (26), &quot;astring&quot;};
   try {
     A a = (A) ProActive.newActive(&quot;example.AA&quot;, params, null, null, MyMetaObj\
@@ -504,13 +502,13 @@ ectFactory.newInstance());
   } catch (Exception e) {
     e.printStackTrace() ;
   }
-        </screen>
+</screen>
         <para>In the case of a <literal>turnActive</literal> we would have :</para>
-        <screen>
+<screen>
   A a = new A(26, &quot;astring&quot;);
   a = (A) ProActive.turnActive(a, null, null, MyMetaObjectFactory.newInstan\
 ce());
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -519,12 +517,12 @@ ce());
       <para>In this section, we&#39;ll have a very close look at what happens when an
  active object is created. This section aims at providing a better understanding of how the
  library works and where the restrictions of Proactive come from.</para>
-      <para></para>
+      
       <para>
  Consider that some code in an instance of class <literal>A</literal> creates an active object of class <literal>B</literal> using a piece of code like this :</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
     B b;
     Object[] params = {&lt;some parameters for the constructor&gt;};
     try {
@@ -533,27 +531,27 @@ ce());
     } catch (Exception e) {
       e.printStackTrace () ;
     }
-          </screen>
+</screen>
 </para>
       </blockquote>
       <para>If the creation of the active instance of B is successful, the graph of
  objects is as described in figure below (with arrows denoting references).</para>
-      <para></para>
-      <para></para>
+      
+      
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/activeObjectComponents.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/activeObjectComponents.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/activeObjectComponents.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/activeObjectComponents.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
       <para><emphasis role="bold">The components of an active object</emphasis></para>
-      <para></para>
+      
       <para>The active instance of B is actually composed of 4 objects :</para>
       <itemizedlist>
         <listitem>
@@ -656,8 +654,8 @@ ce());
  consequence, the use of the keyword <literal>synchronized</literal> in class <literal>B</literal> should not
  be necessary. Any synchronization scheme that can be expressed through monitors and <literal>synchronized</literal> statements can be expressed using ProActive&#39;s high-level
  synchronization mechanism in a much more natural and user-friendly way.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
   </para>
       </sect2>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="configuration"><title>Configuration </title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/configuration.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/configuration.html  -->
   
     <para> <anchor id="configuration_html_Configuration"/></para>
     <sect1 remap="h2">
@@ -13,15 +13,14 @@
  implementation.</para>
         <para>Controllers are configured in a simple XML configuration file, which has the following
  structure :</para>
-        <screen>
+<screen>
 &lt;componentConfiguration&gt;
  &lt;controllers&gt;
    &lt;controller&gt;
  &lt;interface&gt;ControllerInterface&lt;/interface&gt;
       &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
    &lt;/controller&gt;
-...
-        </screen>
+... </screen>
         <para>Unless they some controllers are also interceptors (see later on), the controllers do not have
  to be ordered.</para>
         <para>A default configuration file is provided,&#160;it defines the default controllers available
@@ -30,15 +29,14 @@
         <para>A custom configuration file can be specified (in this example with
  &quot;thePathToMyConfigFile&quot;) for any component in the controller description parameter of
  the newFcInstance method from the Fractal API :</para>
-        <screen>
+<screen>
  componentInstance = componentFactory.newFcInstance(
    myComponentType,
    new ControllerDescription(
      &quot;name&quot;,
      myHierarchicalType,
      thePathToMyControllerConfigFile),
-   myContentDescription);
-        </screen>
+   myContentDescription); </screen>
       </sect2>
       <sect2 remap="h3">
         <title>Writing a custom controller</title>
@@ -55,18 +53,17 @@
             <para> The controller implementation must override this constructor&#160;:</para>
           </listitem>
 </orderedlist>
-        <screen>
+<screen>
 public ControllerImplementation(Component owner) {
- super(owner);
-}
-        </screen>
+    super(owner);
+} </screen>
         <orderedlist>
           <listitem>
             <para> The controller implementation must also override the abstract method setControllerItfType(), which sets the type of the controller
  interface :</para>
           </listitem>
 </orderedlist>
-        <screen>
+<screen>
 protected void setControllerItfType() {
  try {
    setItfType(ProActiveTypeFactory.instance().createFcItfType(
@@ -76,8 +73,7 @@ protected void setControllerItfType() {
      throw new ProActiveRuntimeException(&quot;cannot create controller type : &quot; +
        this.getClass().getName());
    }
- }
-        </screen>
+ } </screen>
         <orderedlist>
           <listitem>
             <para> The controller interface and its implementation have to be declared in the component
@@ -96,7 +92,7 @@ protected void setControllerItfType() {
  controller element in the definition of a controller (provided of course the specified
  interceptor is an input or/and output interceptor). For example a controller that would be an
  input interceptor and an output interceptor would be defined as follows :</para>
-        <screen>
+<screen>
 &lt;componentConfiguration&gt;
  &lt;controllers&gt;
  ....
@@ -106,8 +102,7 @@ input-interceptor=&quot;true&quot; output-interceptor=&quot;true&quot;
      &lt;interface&gt;InterceptorControllerInterface&lt;/interface&gt;
      &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
    &lt;/controller&gt;
-...
-        </screen>
+... </screen>
         <para>Interceptors can be composed in a basic manner : sequentially.&#160;</para>
         <para>For input interceptors, the beforeInputMethodInvocation&#160; method is called sequentially for
  each controller in the order they are defined in the controllers configuration file. The afterInputMethodInvocation method is called
@@ -115,41 +110,41 @@ input-interceptor=&quot;true&quot; output-interceptor=&quot;true&quot;
  order they are defined in the controllers configuration file.</para>
         <para>If in the controller config file, the list of input interceptors is in this order (the order
  in the controller config file is from top to bottom) :</para>
-        <screen>
+<screen>
 InputInterceptor1
 InputInterceptor2
-        </screen>
+</screen>
         <para>This means that an invocation on a server interface will follow this path :</para>
-        <para></para>
-        <screen>
+        
+<screen>
 --&gt; caller
 --&gt; InputInterceptor1.beforeInputMethodInvocation
 --&gt; InputInterceptor2.beforeInputMethodInvocation
 --&gt; callee.invocation
 --&gt; InputInterceptor2.afterInputMethodInvocation
 --&gt; InputInterceptor1.afterInputMethodInvocation
-        </screen>
+</screen>
         <para>For output interceptors, the&#160;beforeOutputMethodInvocation method is called sequentially
  for each controller in the order they are defined in the controllers configuration file.
  The&#160;afterOutputMethodInvocationmethod is called sequentially for each controller in the reverse order they are defined in the</para>
         <para>
  controllers configuration file.</para>
         <para>If in the controller config file, the list of input interceptors is in this order (the order
- in the controller config file is from top to bottom) :&#160;</para>
-        <screen>
+ in the controller config file is from top to bottom) :</para>
+<screen>
 OutputInterceptor1
 OutputInterceptor2 
-        </screen>
+</screen>
         <para>This means that an invocation on a server interface will follow this path&#160;</para>
-        <para></para>
-        <screen>
+        
+<screen>
 --&gt; currentComponent 
 --&gt; OutputInterceptor1.beforeOutputMethodInvocation 
 --&gt; OutputInterceptor2.beforeOutputMethodInvocation 
 --&gt; callee.invocation
 --&gt; OutputInterceptor2.afterOutputMethodInvocation
 --&gt; OutputInterceptor1.afterOutputMethodInvocation
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>Writing a custom interceptor</title>
@@ -158,7 +153,7 @@ OutputInterceptor2
         <para>Input interceptors and output interceptors must implement respectively the interfaces InputInterceptor and OutputInterceptor, which declare interception methods (pre/post
  interception) that have to be implemented.</para>
         <para>Here is a simple example of an input interceptor :</para>
-        <screen>
+<screen>
 public class MyInputInterceptor extends AbstractProActiveController
  implements InputInterceptor, MyController {
   public MyInputInterceptor(Component owner) {
@@ -191,9 +186,9 @@ l invocation&quot;);
     // interception code
  }
 }
-        </screen>
+</screen>
         <para>The configuration file would state :</para>
-        <screen>
+<screen>
 &lt;componentConfiguration&gt;
  &lt;controllers&gt;
  ....
@@ -208,7 +203,7 @@ MyInputInterceptor
 &lt;/implementation&gt;
    &lt;/controller&gt;
    ...
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -269,7 +264,7 @@ MyInputInterceptor
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata width="3in" fileref="doc-files/components/pics/remote-components-no-shortcuts.png" format="PNG"/>                
+                          <imagedata width="3in" fileref="components/pics/remote-components-no-shortcuts.png" format="PNG"/>                
                          </imageobject>
                       </mediaobject>
                     </informalfigure>
@@ -279,7 +274,7 @@ MyInputInterceptor
                     <informalfigure>
                       <mediaobject>
                         <imageobject>
-                          <imagedata width="3in" fileref="doc-files/components/pics/remote-components-with-shortcuts.png" format="PNG"/>              
+                          <imagedata width="3in" fileref="components/pics/remote-components-with-shortcuts.png" format="PNG"/>              
                          </imageobject>
                       </mediaobject>
                     </informalfigure>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="extends"><title>0.6 Extends the API</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/extends.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/extends.html  -->
   
     <para> Thanks to the structure of the API, with many <emphasis role="bold">Interfaces</emphasis> and <emphasis role="bold">Abstracts</emphasis> classes,
  you can easily extends the API for you needs.</para>

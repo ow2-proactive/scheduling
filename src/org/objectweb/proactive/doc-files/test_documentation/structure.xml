@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="structure"><title>0.1 Structure of the API</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/structure.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/structure.html  -->
   
     <sect1 remap="h2">
       <title>Goals of the API</title>
@@ -48,24 +48,15 @@
         <sect3 remap="h4">
           <title>Mechanism in details</title>
           <para>In standalone mode the test runs with this method :</para>
-          <screen>
-<literal>
-void action() throws Exception;
-            </literal>
-          </screen>
+<screen> void action() throws Exception;  </screen>
           <para>In interlinked mode, the developer must to add a similar method in his code Test :</para>
-          <screen>
-<literal>
-A action(B toto, C tutu, &#8230;) throws Exception;
-            </literal>
-          </screen>
+<screen>  A action(B toto, C tutu, &#8230;) throws Exception; </screen>
           <para>Where <emphasis>toto</emphasis> is the result output of the first parent of this test and <emphasis>tutu</emphasis> the
  result output of second parent, &#8230; <emphasis>A</emphasis> is the type of result output of this Test.</para>
           <sect4 remap="h5">
             <title>Reflection code</title>
             <para>Find the first action method :</para>
-            <screen>
-<literal>
+<screen>
  Method[] methods = getClass().getMethods();
             Method actionWithParams = null;
             for (int i = 0; i &lt; methods.length; i++) {
@@ -75,11 +66,10 @@ A action(B toto, C tutu, &#8230;) throws Exception;
                     break;
                 }
             }
-              </literal>
-            </screen>
+</screen>
             <para>Array of params type :</para>
-            <screen>
-<literal>
+<screen>
+
             if (actionWithParams != null) {
                 Object[] args = null;
                 if (tests != null) {
@@ -90,14 +80,10 @@ A action(B toto, C tutu, &#8230;) throws Exception;
                     args = new Object[1];
                     args[0] = null;
                 }
-              </literal>
-            </screen>
+              
+</screen>
             <para>Call the method :</para>
-            <screen>
-<literal>
-out = actionWithParams.invoke(this, args);
-              </literal>
-            </screen>
+<screen> out = actionWithParams.invoke(this, args); </screen>
 </sect4>
 </sect3>
       </sect2>
@@ -163,11 +149,11 @@ out = actionWithParams.invoke(this, args);
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/general.gif" format="GIF"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/general.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/general.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/general.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/general.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/general.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -176,11 +162,11 @@ out = actionWithParams.invoke(this, args);
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/details.gif" format="GIF"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/details.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/details.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/details.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/details.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/details.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -189,11 +175,11 @@ out = actionWithParams.invoke(this, args);
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/execution.gif" format="GIF"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/execution.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/execution.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/execution.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/execution.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/execution.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -202,11 +188,11 @@ out = actionWithParams.invoke(this, args);
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/test.gif" format="GIF"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/test.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/test.svg" format="SVG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/test.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/test_documentation/Files/test.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="test_documentation/Files/test.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

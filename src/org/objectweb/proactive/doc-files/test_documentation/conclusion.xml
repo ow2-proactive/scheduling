@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="conclusion"><title>4. Conclusion</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/conclusion.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/conclusion.html  -->
   
     <para> This tour was intented to guide you through an overview of ProActive TestSuite API.</para>
     <para>You can now easily use it for testing and benchmarking your ProActive&#39;s applications.</para>

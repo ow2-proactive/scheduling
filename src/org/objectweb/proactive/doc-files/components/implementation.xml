@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="implementation"><title>An implementation of the Fractal component model with ProActive</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/implementation.html  -->
-  
-    <para> <anchor id="implementation_html_implementation_of_fractal_with_proactive"/></para>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/implementation.html  -->
+<!--     <para> <anchor id="implementation_html_implementation_of_fractal_with_proactive"/></para> -->
     <para>Fractal defines a general conceptual model, along with a programming
  application interface (API) in Java. According to the official documentation, the Fractal
  component model is &quot;<emphasis>a modular and extensible component model that can be used with
@@ -63,12 +62,12 @@
       </sect2>
       <sect2 remap="h3">
         <title>Activities</title>
-        <para>A fundamental concept of the ProActive library is this of <ulink url="../ProActiveBasis.xml">active objects</ulink>, where activities can actually be <ulink url="../ActiveObjectCreation.xml">redefined</ulink> so as to customize their <emphasis role="bold">behavior</emphasis>.</para>
+        <para>A fundamental concept of the ProActive library is this of <link linkend="ProActiveBasis">active objects</link>, where activities can actually be <link linkend="ActiveObjectCreation">redefined</link> so as to customize their <emphasis role="bold">behavior</emphasis>.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Asynchronous method calls with futures</title>
-        <para><ulink url="../FutureObjectCreation.xmlAsynchronous">Asynchronous method calls with transparent
- futures</ulink> is a core feature of ProActive, and it allows concurrent processing. Indeed, suppose
+        <para><link linkend="FutureObjectCreation.xml">Asynchronous method calls with transparent
+ futures</link> is a core feature of ProActive, and it allows concurrent processing. Indeed, suppose
  a caller invokes a method on a callee. This method returns a result on a component. With
  synchronous method calls, the flow of execution of the caller is blocked until the result of the
  method called is received. In the case of intensive computations, this can be relatively long.

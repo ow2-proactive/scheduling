@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="FileTransfer"><title>ProActive File Transfer Model</title>
 
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FileTransfer.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FileTransfer.html  -->
   
 
     
@@ -142,11 +142,11 @@
         <informalfigure>
           <mediaobject>
 <!--            <imageobject>
-              <imagedata fileref="doc-files/development/imgs/fileTransferDesign.gif" format="GIF"/>            </imageobject>
+              <imagedata fileref="development/imgs/fileTransferDesign.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="doc-files/development/imgs/fileTransferDesign.svg" format="SVG"/>            </imageobject>-->
+              <imagedata fileref="development/imgs/fileTransferDesign.svg" format="SVG"/>            </imageobject>-->
             <imageobject>
-              <imagedata fileref="doc-files/development/imgs/fileTransferDesign.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="development/imgs/fileTransferDesign.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
         <para>When a FileTransfer starts, both abstract and concrete information are merged using the
@@ -161,7 +161,7 @@
       <para>The abstract concept: &quot;FileTransfer&quot; is introduced. This concept is independent off
  the actual process used, but also flexible and configurable at the process level. To define this
  abstract representation of the FileTransfer:</para>
-      <screen>
+<screen>
 ....
 &lt;/deployment&gt;
 &lt;
@@ -184,7 +184,7 @@
 <emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
 &lt;infrastructure&gt;
 ....   
-      </screen>
+</screen>
       <para><emphasis role="bold">Note</emphasis>: exclude and include are not yet supported features</para>
       <para>This tags can be referenced at the the VirtualNode level and the Process level.</para>
       <itemizedlist>
@@ -193,7 +193,7 @@
 &lt;VirtualNode name=&quot;exampleVNode&quot; 
 <emphasis role="bold">FileTransferDeploy</emphasis>=&quot;
 <emphasis role="bold">example</emphasis>&quot;/&gt;
-            </screen>
+</screen>
 </para>
         </listitem>
         <listitem>
@@ -225,7 +225,7 @@ ic.
 <emphasis role="bold">FileTransferDeploy</emphasis>&gt;
   &lt;/sshProcess&gt;
 &lt;/processDefinition&gt;
-            </screen>
+</screen>
 </para>
         </listitem>
 </itemizedlist>
@@ -236,7 +236,7 @@ ic.
  and therefore on the same process, all files inherited from the multiple VN definitions will be
  transfered.</para>
       <para><emphasis role="bold">Note</emphasis>: FileTransferRetrieve is not yet supported.</para>
-      <para></para>
+      
       <para>
  </para>
     </sect1>

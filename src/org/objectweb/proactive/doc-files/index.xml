@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/index.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/index.html  -->
   
     <sect1 remap="h3">
       <title>version 3.0 (November 2005)</title>
@@ -96,9 +96,9 @@
               <entry align="center" nameend="c2" namest="c1" valign="middle"><para><emphasis role="bold">Content</emphasis></para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry>
-                <para></para>
+                
 </entry>
             </row>
             <row>
@@ -106,7 +106,7 @@
               <entry><para>INTRODUCTION</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -173,7 +173,7 @@
               <entry><para>PROGRAMMING</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -330,7 +330,7 @@
               <entry><para>DEPLOYING</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -461,7 +461,7 @@
               <entry><para>COMPOSING</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -574,7 +574,7 @@
               <entry><para>ADVANCED FEATURES</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -679,7 +679,7 @@
               <entry><para>USER INTERFACE AND TOOLS</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -713,11 +713,11 @@
               <entry><para>GUIDED TOUR</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
-                      <para><ulink url="guided_tour/index.xml">Setup</ulink></para>
+                      <para><ulink url="guided_tour/guided_index.xml">Setup</ulink></para>
                     </listitem>
                     <listitem>
                       <para><ulink url="guided_tour/capabilities-intro.xml">Introduction to the Environment</ulink>                        <orderedlist>
@@ -822,7 +822,7 @@
               <entry><para>EXTENDING PROACTIVE</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -890,7 +890,7 @@
               <entry><para>APPENDIX</para></entry>
             </row>
             <row>
-              <entry align="center" valign="top"><para></para></entry>
+              <entry align="center" valign="top"></entry>
               <entry><para>
                   <orderedlist>
                     <listitem>
@@ -965,23 +965,23 @@
           <para> Strategy</para>
         </listitem>
 </itemizedlist>
-      <para></para>
-      <para></para>
+      
+      
       <para><emphasis role="bold">ProActive</emphasis> is part of the <emphasis role="bold"><ulink url="http://www.objectweb.org/">ObjectWeb consortium</ulink></emphasis> for <emphasis role="bold">OpenSource middleware</emphasis></para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.svg" format="SVG"/>            </imageobject>
+              <imagedata width="6in" fileref="http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.svg" format="SVG"/>            </imageobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="http://www-sop.inria.fr/oasis/ProActive/images/objectweb150x60.png" format="PNG"/>            </imageobject>
           </mediaobject>
 <ulink url="http://www.objectweb.org/"></ulink>        </informalfigure>
 </para>
-      <para></para>
-      <para></para>
+      
+      
       <para>
   </para>
     </sect1>

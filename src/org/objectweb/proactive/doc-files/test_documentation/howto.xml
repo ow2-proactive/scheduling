@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="howto"><title>3. How to create a Test Suite with interlinked Tests</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/howto.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/howto.html  -->
   
     <para> In this part we will not explain how to write a simple test, for this see <ulink url="first_test.xml">Your first Test</ulink> section.</para>
     <sect1 remap="h2">
@@ -15,7 +15,7 @@
         <para>Create a new class who extends <emphasis role="bold">testsuite.test.ProActiveFunctionalTest</emphasis>, it is an
  abstract class.</para>
         <para>See this template code :</para>
-        <screen>
+<screen>
 <literal>
 import org.objectweb.proactive.core.node.Node;
 import testsuite.test.ProActiveFunctionalTest;
@@ -43,17 +43,17 @@ public class TestGroupCreation extends ProActiveFunctionalTest
         // nothing to do
     }
 }</literal>
-        </screen>
+</screen>
         <para>Next we will simply test in preconditions if the node exists (different of null) :</para>
-        <screen>
+<screen>
 <literal>
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }</literal>
-        </screen>
+</screen>
         <para>Now we will implement the action method to create a ProActive Group with 3 Agent (see the
  Agent code at <link linkend="agent">the end of this document</link>) :</para>
-        <screen>
+<screen>
 <literal>
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -79,13 +79,13 @@ public class TestGroupCreation extends ProActiveFunctionalTest
      }
        // ...
 }</literal>
-        </screen>
+</screen>
         <para><emphasis role="bold">Remarks :</emphasis> We use an external method to create the group is for the simple reason of we
  use this code after in another method.</para>
         <para><emphasis role="bold">Remarks :</emphasis> We don&#39;t explain the Agent code because it is a ProActive example.</para>
         <para>For the postconditions we will test if the group containts 3 elements and they are in the good
  node :</para>
-        <screen>
+<screen>
 <literal>
     public boolean postConditions() throws Exception {
         if (group == null) {
@@ -106,19 +106,19 @@ public class TestGroupCreation extends ProActiveFunctionalTest
             }
         }
     }</literal>
-        </screen>
+</screen>
         <para>This class is now readi for a standalone use.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Action method for interlinked mode</title>
         <para>Now, we will add a new <emphasis role="bold">action</emphasis> method who <emphasis role="bold">return</emphasis> a ProActive Group :</para>
-        <screen>
+<screen>
 <literal>
     public Agent action(Object o) throws Exception {
         createGroupAgent();
         return this.group;
     }</literal>
-        </screen>
+</screen>
         <para>This method return an Agent (who is the group) and have one argument : o. This argument will
  not use , we must to put this argument is for have a different method signature from
  action().</para>
@@ -133,32 +133,32 @@ public class TestGroupCreation extends ProActiveFunctionalTest
         <title>The default action method</title>
         <para>In this test we can&#39;t run this method in a standalone test, but for other maybe you can.
  It is just for this test.</para>
-        <screen>
+<screen>
 <literal>
     public void action() throws Exception {
         throw new Exception(&quot;This test doesn&#39;t work in standalone mode&quot;);
     }</literal>
-        </screen>
+</screen>
       </sect2>
       <sect2 remap="h3">
         <title>The action method for interlinked tests</title>
         <para>The result of the precedent test is an Agent, so the argument will be an Agent. This test have
  no result but we must to return an Object here it is null because the API use the reflection
  mechanism of Java.</para>
-        <screen>
+<screen>
 <literal>
     public Object action(Agent group) throws Exception {
         this.group = group;
         this.group.moveTo(getNode().getNodeInformation().getURL());
         return null;
     }</literal>
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title>Run your tests</title>
       <para>Create a simple <emphasis role="bold">ProActiveFuncTestManager</emphasis> with a <emphasis role="bold">main</emphasis> :</para>
-      <screen>
+<screen>
 <literal>
 import testsuite.manager.ProActiveFuncTestManager;
 public class Manager extends ProActiveFuncTestManager {
@@ -170,9 +170,9 @@ public class Manager extends ProActiveFuncTestManager {
                 &quot;Create a group and migrate its objects.&quot;);
     }
 }</literal>
-      </screen>
+</screen>
       <para>Create a new Group (testsuite.group.Group) in our main :</para>
-      <screen>
+<screen>
 <literal>
 import testsuite.group.Group;
     // ...
@@ -180,9 +180,9 @@ import testsuite.group.Group;
     Group group = new Group(&quot;Group Migration&quot;,
                 &quot;Migration on an active group objects.&quot;);
  // ...</literal>
-      </screen>
+</screen>
       <para>Create and add the 2 precends tests in the group :</para>
-      <screen>
+<screen>
 <literal>
  // ...
       
@@ -192,21 +192,21 @@ import testsuite.group.Group;
         group.add(migration);
      
     // ...</literal>
-      </screen>
+</screen>
       <para>Specify the ancestor test of migration is creation :</para>
-      <screen>
+<screen>
 <literal>
  // ...
   FunctionalTest[] params = { creation };
              migration.setTests(params);
          
     // ...</literal>
-      </screen>
+</screen>
       <para>You can see in the <ulink url="descriptor.xml">configuration file part</ulink> how to do this by a
  configuration file.</para>
       <para><emphasis role="bold">Warning :</emphasis> Don&#39;t forget to write a prop file with the name of the remote host.</para>
       <para>Add the group and launch the test :</para>
-      <screen>
+<screen>
 <literal>
  // ...
       
@@ -214,12 +214,12 @@ import testsuite.group.Group;
         manager.execute(group, migration, true);
  
     // ...</literal>
-      </screen>
+</screen>
       <para><emphasis role="bold">Warning :</emphasis> when you use a ProActiveManager you must to had <emphasis role="bold">System.exit(0)</emphasis> at the
  end of the <emphasis role="bold">main</emphasis> method. If don&#39;t do that, the manager can&#39;t properly.</para>
       <sect2 remap="h3">
         <title>An example of results for this test with verbatim option</title>
-        <screen>
+<screen>
 <literal>
 8/26/03 12:40:47.407 [MESSAGE] Local hostname : amda.inria.fr
 8/26/03 12:40:47.408 [MESSAGE] Remote hostname : owenii
@@ -229,7 +229,7 @@ import testsuite.group.Group;
 8/26/03 12:40:50.149 [RESULT] Group Migration : Test run with success [SUCCESS]
 8/26/03 12:40:50.149 [RESULT] Group : Group Migration Runs : 2 Errors : 0 [SUCCESS]
 8/26/03 12:40:50.243 [MESSAGE] ... Finish</literal>
-        </screen>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -243,11 +243,7 @@ import testsuite.group.Group;
             </row>
             <row>
               <entry><para>
-                  <screen>
- 
-<literal>
-RemoteHostname=owenii</literal>
-                  </screen>
+<screen> RemoteHostname=owenii </screen>
 </para></entry>
             </row>
           </tbody>
@@ -262,7 +258,7 @@ RemoteHostname=owenii</literal>
             </row>
             <row>
               <entry><para>
-                  <screen>
+<screen>
  
 <literal>
 import testsuite.group.Group;
@@ -290,7 +286,7 @@ public class Manager extends ProActiveFuncTestManager {
     }
 }
   </literal>
-                  </screen>
+</screen>
 </para></entry>
             </row>
           </tbody>
@@ -305,7 +301,7 @@ public class Manager extends ProActiveFuncTestManager {
             </row>
             <row>
               <entry><para>
-                  <screen>
+<screen>
  
 <literal>
  import java.io.Serializable;
@@ -362,7 +358,7 @@ public class TestGroupMigration extends ProActiveFunctionalTest
     }
 }
  </literal>
-                  </screen>
+</screen>
 </para></entry>
             </row>
           </tbody>
@@ -377,7 +373,7 @@ public class TestGroupMigration extends ProActiveFunctionalTest
             </row>
             <row>
               <entry><para>
-                  <screen>
+<screen>
  
 <literal>
 import org.objectweb.proactive.core.group.Group;
@@ -445,7 +441,7 @@ public class TestGroupCreation extends ProActiveFunctionalTest
         // nothing to do
     }
 }</literal>
-                  </screen>
+</screen>
 </para></entry>
             </row>
           </tbody>
@@ -460,7 +456,7 @@ public class TestGroupCreation extends ProActiveFunctionalTest
             </row>
             <row>
               <entry><para>
-                  <screen>
+<screen>
  
 <literal>
 import org.objectweb.proactive.Body;
@@ -524,7 +520,7 @@ public class Agent implements InitActive, RunActive, EndActive,
     }
 }
  </literal>
-                  </screen>
+</screen>
 </para></entry>
             </row>
           </tbody>

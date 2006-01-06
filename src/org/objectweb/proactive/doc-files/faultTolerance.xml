@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="faultTolerance"><title>Fault-Tolerance</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/faultTolerance.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/faultTolerance.html  -->
   
     
     <sect1 remap="h2">
@@ -8,7 +8,7 @@
       <para>ProActive can provide fault-tolerance capabilities through two differents
  protocols: a Communication-Induced Checkpointing protocol (CIC) or a pessimistic message logging
  protocol (PML). Making a ProActive application fault-tolerant is <emphasis role="bold">fully transparent</emphasis>; active
- objects are turned fault-tolerant using Java properties that can be set in the <ulink url="Descriptor.xml">deployment descriptor</ulink> . The programmer can select <emphasis>at deployment time</emphasis>
+ objects are turned fault-tolerant using Java properties that can be set in the <link linkend="Descriptor">deployment descriptor</link> . The programmer can select <emphasis>at deployment time</emphasis>
  the most adapted protocol regarding the application and the execution environment.</para>
       <para>
  Persistence of active objects is obtained through standard Java serialization; a checkpoint thus
@@ -41,13 +41,13 @@
         <para>Regarding the CIC protocol, the PML protocol induces a higher overhead on
  failure-free execution, but the recovery time is lower as a single failure does not involve all
  the system.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para><emphasis role="bold">Warning:</emphasis> For the version 3.0, those two protocols are not compatible: a fault-tolerance
  application can use <emphasis role="bold">only</emphasis> one of the two protocols. This compatibility will be provide in
  the next version.</para>
-        <para></para>
-        <para></para>
+        
+        
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -68,8 +68,8 @@
  the specified resource server.</para>
           </listitem>
           <listitem>
-            <para> at execution time: the resource server can use an <ulink url="p2p.xml">underlying p2p
- network</ulink> to reclaim free nodes when a hosting node is needed.</para>
+            <para> at execution time: the resource server can use an <link linkend="p2p">underlying p2p
+ network</link> to reclaim free nodes when a hosting node is needed.</para>
           </listitem>
 </itemizedlist>
         <para>Note that those two mechanisms can be combined. In that case, the resource
@@ -107,19 +107,19 @@
  unable to receive a message from another active object.</para>
           </listitem>
           <listitem>
-            <para> the URL of a <ulink url="p2p.xml">p2p service</ulink> that can be used by the resource server: <literal>-p2p &lt;serviceURL&gt;</literal>. There is no default value for this option.</para>
+            <para> the URL of a <link linkend="p2p">p2p service</link> that can be used by the resource server: <literal>-p2p &lt;serviceURL&gt;</literal>. There is no default value for this option.</para>
           </listitem>
 </itemizedlist>
         <para>The server can also be directly launched in the java source code, using <literal>org.objectweb.proactive.core.process.JVMProcessImpl</literal> class:</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 GlobalFTServer server = new JVMProcessImpl(new org.objectweb.proactive.core\
 .process.AbstractExternalProcess.StandardOutputMessageLogger());
 this.server.setClassname(&quot;org.objectweb.proactive.core.body.ft.servers.Start\
 FTServer&quot;);
 this.server.startProcess();
-            </screen>
+</screen>
 </para>
         </blockquote>
         <para>Note that if one of the servers is unreachable when a fault-tolerant
@@ -174,7 +174,7 @@ this.server.startProcess();
  correspond to two fault-tolerance services, <literal>appli</literal> and <literal>resource</literal>. Note
  that non-fault-tolerant active objects can communicate with fault-tolerant active objects as
  usual. Chosen protocol is CIC and TTC is set to 5 sec for all the application.</para>
-        <screen>
+<screen>
  &lt;ProActiveDescriptor&gt;                        
  &#160;&lt;componentDefinition&gt;
  &#160;&#160;&lt;virtualNodesDefinition&gt;
@@ -251,7 +251,7 @@ this.server.startProcess();
 &#160;&#160;&lt;/services&gt;
 &#160;&lt;/infrastructure&gt;
 &lt;/ProActiveDescriptor&gt;
-                       </screen>         
+</screen>         
        </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -271,14 +271,14 @@ this.server.startProcess();
  fault-tolerant. As a consequence, if a standard main method interacts with active objects during
  the execution, consistency after a failure can no more be ensured: after a failure, all the
  active objects will roll back to the most recent global state <emphasis>but the main will not</emphasis>.</para>
-        <para></para>
+        
         <para>
  So as to avoid such inconsistency on recovery, the programmer must minimizes the use of standard
  main by, for example, delegating the initialization and launching procedure to an active
  object.</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 ...
 public static void main(String[] args){
    Initializer init = (Initializer)(ProActive.newActive(&quot;Initializer.getClas\
@@ -287,7 +287,7 @@ s.getName()&quot;, args);
    System.out.println(&quot;End of main thread&quot;);
 }
 ...
-            </screen>
+</screen>
 </para>
         </blockquote>
         <para>The object <literal>init</literal> is an active object, and as such will be
@@ -303,7 +303,7 @@ s.getName()&quot;, args);
  to the beginning of the execution. The programmer must thus avoid infinite method such as</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 ...
 public void infiniteMethod(){
    while (true){
@@ -311,14 +311,14 @@ public void infiniteMethod(){
    }
 }
 ...
-            </screen>
+</screen>
 </para>
         </blockquote>
         <para>The second consequence concerns the definition of the <literal>runActivity()</literal> method (see <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/RunActive.xml"><literal>runActive</literal></ulink>).
  Let us consider the following example :</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 ...
 public void runActivity(Body body) {
    org.objectweb.proactive.Service service = new org.objectweb.proactive.Se\
@@ -333,7 +333,7 @@ rvice(body);
    }
 }
 ...
-            </screen>
+</screen>
 </para>
         </blockquote>
         <para>If a checkpoint is triggered before the service of <literal>r</literal>, it characterizes the state
@@ -359,11 +359,11 @@ rvice(body);
  features :</para>
         <itemizedlist>
           <listitem>
-            <para> active objects exposed as <ulink url="WSDoc.xml">Web services</ulink>, or reachable using http
+            <para> active objects exposed as <link linkend="WSDoc">Web services</link>, or reachable using http
  protocol,</para>
           </listitem>
           <listitem>
-            <para> and <ulink url="./Security.xml">security</ulink>, as fault-tolerance servers are implemented
+		  <para> and <link linkend="Security">security</link>, as fault-tolerance servers are implemented
  using standard RMI.</para>
           </listitem>
 </itemizedlist>
@@ -386,7 +386,7 @@ rvice(body);
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/images/nbodyft.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="images/nbodyft.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -442,7 +442,7 @@ rvice(body);
 </screen>  
 <para>Finally, you can start the fault-tolerant ProActive NBody and choose the
  version you want to run :</para>
-        <screen>
+<screen>
 ~/ProActive/scripts/unix/FT&gt; ./nbodyFT.sh
 Starting Fault-Tolerant version of ProActive NBody...
 --- N-body with ProActive ---------------------------------
@@ -467,7 +467,7 @@ Generating class : pa.stub.org.objectweb.proactive.examples.nbody.common.St\
 ub_Displayer
 ************* Reading deployment descriptor: file:./../../.././descriptors/\
 FaultTolerantWorkers.xml ********************
-        </screen>
+</screen>
       </sect2>
     </sect1>
   

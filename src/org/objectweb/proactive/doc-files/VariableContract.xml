@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="VariableContract"><title>Variable Contracts for Descriptors</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/VariableContract.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/VariableContract.html  -->
   
     <sect1 remap="h2">
       <title>Variable Contracts for Descriptors</title>
@@ -136,7 +136,7 @@
         <title>Descriptor Variables</title>
         <para>All variables must be set in a variable section at the beginning of the descriptor file in the
          following way:</para>
-        <screen>
+<screen>
          &lt;variables&gt;
          &lt; <emphasis role="bold">DescriptorVariable</emphasis> name=&quot;
          <emphasis role="bold">PROACTIVE_HOME</emphasis>&quot; value=&quot;
@@ -167,11 +167,11 @@
          ...
          &lt;/classpath&gt;
          ...
-        </screen>
+</screen>
        </sect3>
        <sect3 remap="h4">
         <title>Program Variables</title>
-        <screen>
+<screen>
          VariableContract variableContract= new VariableContract();
          
          variableContract.setVariableFromProgram( &quot;
@@ -185,9 +185,9 @@
          
          ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, va\
          riableContract);
-        </screen>
-        <para></para>
-        <para></para>
+</screen>
+        
+        
        </sect3>
       </sect2>  
             <sect2 remap="h3">
@@ -258,7 +258,7 @@
         <title>Descriptor Variables</title>
         <para>All variables must be set in a variable section at the beginning of the descriptor file in the
          following way:</para>
-        <screen>
+<screen>
          &lt;variables&gt;
          &lt; <emphasis role="bold">DescriptorVariable</emphasis> name=&quot;
          <emphasis role="bold">PROACTIVE_HOME</emphasis>&quot; value=&quot;
@@ -295,11 +295,11 @@
          ...
          &lt;/classpath&gt;
          ...
-        </screen>
+</screen>
        </sect3>
        <sect3 remap="h4">
         <title>Program Variables</title>
-        <screen>
+<screen>
          VariableContract variableContract= new VariableContract();
          
          variableContract.setVariableFromProgram( &quot;
@@ -313,9 +313,9 @@
          
          ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, va\
          riableContract);
-        </screen>
-        <para></para>
-        <para></para>
+</screen>
+        
+        
        </sect3>
       </sect2> 
       <sect2 remap="h3">
@@ -325,7 +325,7 @@
         <para>Is built using XML property tags.</para>
         <para><emphasis role="bold">File :
           file.xml</emphasis></para>
-                 <screen>
+<screen>
                   &lt;!-- Definition of the specific context --&gt;
                   &lt;variables&gt;
                   &lt; <emphasis role="bold">DescriptorVariable</emphasis> name=&quot;
@@ -338,7 +338,7 @@
                   <emphasis role="bold">NUM_NODES</emphasis>&quot; value=&quot;
                   <emphasis role="bold">45</emphasis>&quot;/&gt;
                   &lt;/variables&gt;
-                 </screen>
+</screen>
        </sect3>
        <sect3 remap="h4">
         <title>Properties Files</title>
@@ -347,12 +347,12 @@
          the format <emphasis role="bold">variable = value</emphasis>, as shown in the following example:</para>
         <para><emphasis role="bold">File :
           file.properties</emphasis></para>
-                  <screen>
+<screen>
                   # Definition of the specific context
                   USER_HOME = /usr/home/team
                   PROACTIVE_HOME = ProActive/dist/ProActive
                   NUM_NODES : 45
-                 </screen>
+</screen>
          <para>Variables defined in this format will be declared as <emphasis role="bold">DescriptorVariable</emphasis> type. Note that
          colon (:) can be used instead of equal (=).</para>
        </sect3>
@@ -361,10 +361,10 @@
        <title>Program Variable API</title>
        <sect3 remap="h4">
         <title>Relevant import packages</title>
-        <screen>
+<screen>
          import org.objectweb.proactive.core.xml.VariableContract;
          import org.objectweb.proactive.core.xml.VariableContractType;
-        </screen>
+</screen>
        </sect3>
        <sect3 remap="h4">
         <title>Available Variable Types</title>
@@ -391,7 +391,7 @@
         <para>The API for setting variables from the Program is shown below. The <emphasis role="bold">name</emphasis> corresponds to
          the variable name, and the <emphasis role="bold">value</emphasis> to the variable content. The <emphasis role="bold">type</emphasis> corresponds to
          a VariableContractType.</para>
-        <screen>
+<screen>
          public void VariableContract.setVariableFromProgram( String 
          <emphasis role="bold">name</emphasis>, String 
          <emphasis role="bold">value</emphasis>, VariableContractType 
@@ -399,7 +399,7 @@
          public void VariableContract.setVariableFromProgram( HashMap 
          <emphasis role="bold">map</emphasis>, VariableContractType 
          <emphasis role="bold">type</emphasis>);
-        </screen>
+</screen>
         <para>The API for adding a multiple variables is shown above. The variable <emphasis role="bold">name</emphasis>/<emphasis role="bold">value</emphasis>
          pair is specified as the key/content of the HashMap.</para>
        </sect3>
@@ -412,7 +412,7 @@
         <para>Is built using XML property tags.</para>
         <para><emphasis role="bold">File :
           file.xml</emphasis></para>
-                  <screen>
+<screen>
                   &lt;!-- Definition of the specific context --&gt;
                   &lt;variables&gt;
                   &lt; <emphasis role="bold">DescriptorVariable</emphasis> name=&quot;
@@ -425,7 +425,7 @@
                   <emphasis role="bold">NUM_NODES</emphasis>&quot; value=&quot;
                   <emphasis role="bold">45</emphasis>&quot;/&gt;
                   &lt;/variables&gt;
-                 </screen>
+</screen>
         </sect3>
        <sect3 remap="h4">
         <title>Properties Files</title>
@@ -434,12 +434,12 @@
          the format <emphasis role="bold">variable = value</emphasis>, as shown in the following example:</para>
         <para><emphasis role="bold">File :
           file.properties</emphasis></para>
-                  <screen>
+<screen>
                   # Definition of the specific context
                   USER_HOME = /usr/home/team
                   PROACTIVE_HOME = ProActive/dist/ProActive
                   NUM_NODES : 45
-                 </screen>
+</screen>
          <para>Variables defined in this format will be declared as <emphasis role="bold">DescriptorVariable</emphasis> type. Note that
          colon (:) can be used instead of equal (=).</para>
        </sect3>
@@ -448,10 +448,10 @@
        <title>Program Variable API</title>
        <sect3 remap="h4">
         <title>Relevant import packages</title>
-        <screen>
+<screen>
          import org.objectweb.proactive.core.xml.VariableContract;
          import org.objectweb.proactive.core.xml.VariableContractType;
-        </screen>
+</screen>
        </sect3>
        <sect3 remap="h4">
         <title>Available Variable Types</title>
@@ -478,7 +478,7 @@
         <para>The API for setting variables from the Program is shown below. The <emphasis role="bold">name</emphasis> corresponds to
          the variable name, and the <emphasis role="bold">value</emphasis> to the variable content. The <emphasis role="bold">type</emphasis> corresponds to
          a VariableContractType.</para>
-        <screen>
+<screen>
          public void VariableContract.setVariableFromProgram( String 
          <emphasis role="bold">name</emphasis>, String 
          <emphasis role="bold">value</emphasis>, VariableContractType 
@@ -486,7 +486,7 @@
          public void VariableContract.setVariableFromProgram( HashMap 
          <emphasis role="bold">map</emphasis>, VariableContractType 
          <emphasis role="bold">type</emphasis>);
-        </screen>
+</screen>
         <para>The API for adding a multiple variables is shown above. The variable <emphasis role="bold">name</emphasis>/<emphasis role="bold">value</emphasis>
          pair is specified as the key/content of the HashMap.</para>
        </sect3>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Migration"><title>Active Object Migration</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Migration.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Migration.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="Migration_html_prim"/>Migration Primitive</title>
@@ -57,7 +57,7 @@
  is an example of a method in an active object :</para>
       <blockquote>
         <para>
-          <screen>
+<screen>
    public void moveTo(String t) {
      try {
        ProActive.migrateTo(t);
@@ -65,7 +65,7 @@
        e.printStackTrace();
      }
    }
-          </screen>
+</screen>
 </para>
       </blockquote>
       <para>We don&#39;t provide any test to check if the call to migrateTo is the last
@@ -76,7 +76,7 @@
       <title><anchor id="Migration_html_example"/>Complete example</title>
       <blockquote>
         <para>
-          <screen>
+<screen>
   import org.objectweb.proactive.ProActive;
   public class SimpleAgent implements Serializable {
     public SimpleAgent() {
@@ -117,7 +117,7 @@ de URL
 ));
     }
   }
-          </screen>
+</screen>
 </para>
       </blockquote>
       <para>The class SimpleAgent implements <literal>Serializable</literal> so the objects
@@ -145,14 +145,11 @@ de URL
  providing in the active object the standard method</para>
       <blockquote>
         <para>
-          <screen>
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IO\
-Exception, ClassNotFoundException;
-          </screen>
+<screen> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </screen>
 </para>
       </blockquote>
       <para>See the <literal>Serializable</literal> interface in the standard JavaDoc to learn more.</para>
-      <para></para>
+      
       <para>
   </para>
     </sect1>

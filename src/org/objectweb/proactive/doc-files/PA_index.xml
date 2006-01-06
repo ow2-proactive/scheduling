@@ -29,16 +29,17 @@
 <!ENTITY OSGi SYSTEM "OSGi.xml">
 <!ENTITY IC2D SYSTEM "IC2D.xml">
 <!ENTITY plugin SYSTEM "development/plugin.xml">
-<!ENTITY guidedindex SYSTEM "guided_tour/index.xml">
+<!ENTITY guidedindex SYSTEM "guided_tour/guidedIndex.xml">
 <!ENTITY capabilities-intro SYSTEM "guided_tour/capabilities-intro.xml">
 <!ENTITY hands_on_programming SYSTEM "guided_tour/hands_on_programming.xml">
 <!ENTITY OOSPMDJacobiexample SYSTEM "guided_tour/OOSPMDJacobiexample.xml">
 <!ENTITY nbody SYSTEM "guided_tour/nbody.xml">
 <!ENTITY conclusion SYSTEM "guided_tour/conclusion.xml">
 <!ENTITY DescriptorProcess SYSTEM "development/DescriptorProcess.xml">
-<!ENTITY devFileTransfer SYSTEM "development/FileTransfer.xml">
-<!ENTITY devFaultTolerance SYSTEM "development/FaultTolerance.xml">
+<!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
+<!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
+
 <!-- <!ENTITY FAQ SYSTEM "FAQ.xml"> -->
 ]>
 <book>
@@ -47,8 +48,12 @@
  <part id="ProActiveIntroduction"> <title> Introduction</title>
   &Principles;
   &Installation;
- </part><part id="ProActiveProgramming"> <title> Programming</title>
-   &ProActiveBasis;
+ </part><part id="ProActiveProgramming"> <title> Programming
+		 <anchor id="Descriptor"/>      <!--    TO REMOVE! -->
+		 <anchor id="AC"/>      <!--    TO REMOVE! -->
+	 </title>
+	 
+	 &ProActiveBasis;
   &TypedGroupCommunication;
   &OOSPMD;
   &Migration;
@@ -59,7 +64,7 @@
   &VariableContract;
   &FileTransfer;
   &SSHTunneling;
-  &faultTolerance;
+  &faultTolerance; <!--
  </part><part id="ProActiveComponents"> <title> Composing</title>
   &intro;
   &implementation;
@@ -68,7 +73,7 @@
   &adl;
   &examples;
   &perspectives;
-
+-->
  </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title>
   &p2p;
   &Security;

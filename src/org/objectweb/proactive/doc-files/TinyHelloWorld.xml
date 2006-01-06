@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="TinyHelloWorld"><title>Hello world ! (tiny example)</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/TinyHelloWorld.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/TinyHelloWorld.html  -->
   
     <para> This example implements the smallest program in ProActive. This is the
  easiest program you could write, using the Active Object concept. This is just to show quickly
@@ -35,7 +35,7 @@
             </row>
             <row>
               <entry><para>
-                  <screen>
+<screen>
 package org.objectweb.proactive.examples.hello;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -91,14 +91,14 @@ tiny.sayHello();
 ived); // potential wait-by-necessity 
     }
 }
-                  </screen>
+</screen>
 </para></entry>
             </row>
           </tbody>
         </tgroup>
       </informaltable>
-      <para></para>
-      <para></para>
+      
+      
     </sect1>
     <sect1 remap="h2">
       <title>Implement the required functionalities</title>
@@ -114,12 +114,12 @@ ived); // potential wait-by-necessity
  two parameters (done in the <literal>main</literal> method).</para>
       <para>The code snippet which instantiates the <literal>TinyHello</literal> in the same VM is the following
  (in the <literal>main</literal> method):</para>
-      <screen>
+<screen>
         TinyHello tiny = (TinyHello) ProActive.newActive(
                 TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
             ); // which jvm should be used to hold the Active Object
-      </screen>
+</screen>
     </sect1>
     <sect1 remap="h2">
       <title>Invoking a method on a remote object and printing out the message</title>
@@ -129,12 +129,10 @@ ived); // potential wait-by-necessity
  is located at the place where active objects are created. All the rest of the code remains the
  same, which fosters software reuse. So the way to call the <literal>sayHello</literal> method in this
  example is the following (in the <literal>main</literal> method):</para>
-      <screen>
-        StringMutableWrapper received = tiny.sayHello(); // possibly remote\
- call
-        logger.info(&quot;On &quot; + getHostName() + &quot;, a message was received: &quot; + rece\
-ived); // potential wait-by-necessity 
-      </screen>
+<screen>
+        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
+        logger.info(&quot;On &quot; + getHostName() + &quot;, a message was received: &quot; + received); // potential wait-by-necessity 
+</screen>
     </sect1>
     <sect1 remap="h2">
       <title>Launching</title>
@@ -152,28 +150,20 @@ ived); // potential wait-by-necessity
  windows&gt; tinyHello.bat</literal></para>
       <sect2 remap="h3">
         <title>The output</title>
-        <screen>
+<screen>
 [apple unix]tinyhello.sh
---- Hello World tiny example ---------------------------------------------
- --&gt; This ClassFileServer is reading resources from classpath
-ProActive Security Policy (proactive.runtime.security) not set. Runtime Sec\
-urity disabled
+--- Hello World tiny example ---------------------------------
+&gt; This ClassFileServer is reading resources from classpath
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled
 Created a new registry on port 1099
-//apple.inria.fr/Node628280013 successfully bound in registry at //apple.in\
-ria.fr/Node628280013
-Generating class : pa.stub.org.objectweb.proactive.examples.hello.Stub_Tiny\
-Hello
-Generating class : pa.stub.org.objectweb.proactive.core.util.wrapper.Stub_S\
-tringMutableWrapper
+//apple.inria.fr/Node628280013 successfully bound in registry at //apple.inria.fr/Node628280013
+Generating class : pa.stub.org.objectweb.proactive.examples.hello.Stub_TinyHello
+Generating class : pa.stub.org.objectweb.proactive.core.util.wrapper.Stub_StringMutableWrapper
 On apple/138.96.218.62, a message was received: Hello World!
- from apple/138.96.218.62
- at 03/11/2005 14:25:32
-        </screen>
-        <para></para>
-        <para></para>
-        <para>
-  </para>
-      </sect2>
+  from apple/138.96.218.62
+  at 03/11/2005 14:25:32
+</screen>
+       </sect2>
     </sect1>
   
 </chapter>

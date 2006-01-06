@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Principles"><title>Principles</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Principles.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Principles.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="Principles_html_intro"/>Seamless sequential, multithreaded and
  distributed</title>
-      <para>Most of the time, activities and distribution are not known at the
+<para>       Most of the time, activities and distribution are not known at the
  beginning, and change over time. <emphasis role="bold">Seamless implies reuse, smooth and incremental
  transitions</emphasis>.</para>
       <para>
@@ -13,12 +13,12 @@
        <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/proActiveModelColor.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/proActiveModelColor.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
-      <para></para>
-      <para></para>
+      
+      
       <para>A huge gap yet exists between multithreaded and distributed Java
  applications which forbids code reuse in order to build distributed applications from
  multithreaded applications. Both JavaRMI and JavaIDL, as examples of distributed object libraries
@@ -53,12 +53,9 @@
         <title>Class-based</title>
         <blockquote>
           <para>
-            <screen>
+<screen>
 Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
-A a = (A) 
-ProActive.newActive(&quot;example.A&quot;, params, node)
-;
-            </screen>
+A a = (A) ProActive.newActive(&quot;example.A&quot;, params, node); </screen>
 </para>
         </blockquote>
       </sect2>
@@ -66,13 +63,10 @@ ProActive.newActive(&quot;example.A&quot;, params, node)
         <title>Instantiation-based</title>
         <blockquote>
           <para>
-            <screen>
+<screen>
 public class AA extends A implements Active {}
 Object[] params = new Object[] { new Integer (26), &quot;astring&quot; };
-A a = (A) 
-ProActive.newActive(&quot;example.AA&quot;, params, node)
-;
-            </screen>
+A a = (A) ProActive.newActive(&quot;example.AA&quot;, params, node); </screen>
 </para>
         </blockquote>
       </sect2>
@@ -82,12 +76,9 @@ ProActive.newActive(&quot;example.AA&quot;, params, node)
  source code; a necessary feature in the context of code mobility.</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 A a = new A (26, &quot;astring&quot;);
-a = (A) 
-ProActive.turnActive(a, node)
-;
-            </screen>
+a = (A) ProActive.turnActive(a, node) ; </screen>
 </para>
         </blockquote>
         <para><emphasis role="bold">Notes:</emphasis><emphasis>Node allows to control the
@@ -128,7 +119,7 @@ ProActive.turnActive(a, node)
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">Wait-by-necessity : inter-objects synchronization</emphasis></para>
-          <para></para>
+          
         </listitem>
 </itemizedlist>
       <para>Systematic, implicit and transparent futures. Ease the programming of
@@ -153,13 +144,13 @@ ProActive.turnActive(a, node)
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/polymorphism.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/polymorphism.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
-      <para></para>
-      <para></para>
-      <para></para>
+      
+      
+      
       <para>
  </para>
     </sect1>

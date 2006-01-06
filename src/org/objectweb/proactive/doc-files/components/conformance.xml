@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="conformance"><title>Conformance to the Fractal model and extensions</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/conformance.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/conformance.html  -->
   
     <para> <anchor id="conformance_html_conformance_to_fractal"/></para>
     <sect1 remap="h2">
@@ -33,7 +33,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/components/pics/kinds-of-components.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="components/pics/kinds-of-components.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -75,32 +75,27 @@
  automatically. For primitive component, the developer has to implement the bindings explicitely
  in the code. We provide a method in the <literal>org.objectweb.proactive.core.component.Fractal</literal> class for creating collective
  bindings :</para>
-        <screen>
+<screen>
 public static ProActiveInterface createCollectiveClientInterface(String itf\
 Name, String itfSignature) throws ProActiveRuntimeException
-        </screen>
+</screen>
         <para>where <literal>itfName</literal> is the name of the interface, and <literal>itfSignature</literal> is the signature of the interface.</para>
         <para>Suppose you have an attribute of the base class of the primitive component
  of type I, named i. The initialization of the binding would be :</para>
-        <screen>
-i= (I) Fractal.createCollectiveClientInterface(&quot;i&quot;,I.class.getName());
-        </screen>
+<screen> i= (I) Fractal.createCollectiveClientInterface(&quot;i&quot;,I.class.getName()); </screen>
         <para>Then the binding method (implementation of the BindingController interface)
  would be :</para>
-        <screen>
+<screen>
 public void bindFc(String clientItfName, Object serverItf) {
  if (clientItfName.equals(&quot;i&quot;)) {
  ProActiveGroup.getGroup(i).add(serverItf);
  }
-}
-        </screen>
+} </screen>
         <para>You will be able to see the collective interface as an object of type I,
  and therefore invoke methods defined by I. But you will also be able to see the collective
  interface as a <ulink url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Collection.xml">collection</ulink>, as a group
  can also be manipulated as a collection :</para>
-        <screen>
-Collection c = ProActiveGroup.getGroup(i);
-        </screen>
+<screen> Collection c = ProActiveGroup.getGroup(i); </screen>
       </sect2>
       <sect2 remap="h3">
         <title>Requirements</title>

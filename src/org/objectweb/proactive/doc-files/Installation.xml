@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Installation"><title>ProActive Installation</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Installation.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Installation.html  -->
   
-    <para> ProActive is made available for <ulink url="http://www-sop.inria.fr/oasis/proactive/disclaimer.xml">download</ulink> under a <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>. ProActive requires the <ulink url="http://java.sun.com/j2se/1.4/">JDK 1.4</ulink> or later to be installed on your computer. Please
+<para>     ProActive is made available for <ulink url="http://www-sop.inria.fr/oasis/proactive/disclaimer.xml">download</ulink> under a <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>. ProActive requires the <ulink url="http://java.sun.com/j2se/1.4/">JDK 1.4</ulink> or later to be installed on your computer. Please
  note that ProActive will NOT run with any version prior to 1.4 since some features introduced in
  JDK 1.4 are essential.</para>
 <sect1 remap="h2">

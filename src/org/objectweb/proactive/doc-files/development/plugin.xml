@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="plugin"><title>ProActive Eclipse plugin</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/plugin.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/plugin.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="plugin_html_external"/>Overview</title>
@@ -9,15 +9,15 @@
       <itemizedlist>
         <listitem>
           <para><emphasis><emphasis role="bold">A ProActive guided Tour</emphasis></emphasis></para>
-          <para></para>
+          
         </listitem>
         <listitem>
           <para><emphasis><emphasis role="bold">ProActive Wizards</emphasis></emphasis></para>
-          <para></para>
+          
         </listitem>
         <listitem>
           <para><emphasis><emphasis role="bold">A ProActive editor</emphasis></emphasis></para>
-          <para></para>
+          
         </listitem>
 </itemizedlist>
     </sect1>
@@ -28,7 +28,7 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-           <imagedata width="6in" fileref="doc-files/development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
+           <imagedata width="6in" fileref="development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para>This guided tour (that is actually eclipse cheat sheet) purposes :</para>
@@ -66,7 +66,7 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-           <imagedata width="6in" fileref="doc-files/development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
+           <imagedata width="6in" fileref="development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
     </sect1>
@@ -77,7 +77,7 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-           <imagedata width="6in" fileref="doc-files/development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
+           <imagedata width="6in" fileref="development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
     </sect1>

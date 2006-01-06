@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="Security"><title>ProActive Security Mechanism</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/Security.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Security.html  -->
   
     <para> In order to use the Proactive Security features, you have to
  install<emphasis role="bold">the Java(TM) Cryptography Extension (JCE) Unlimited Strength
@@ -40,9 +40,9 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/activeObjects.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/activeObjects.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/activeObjects.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/activeObjects.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -57,9 +57,9 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="4in" fileref="doc-files/security_images/certificateGeneration.png" format="PNG"/>              </imageobject>
+                <imagedata width="4in" fileref="security_images/certificateGeneration.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="4in" fileref="doc-files/security_images/certificateGeneration.svg" format="SVG"/>              </imageobject>
+                <imagedata width="4in" fileref="security_images/certificateGeneration.svg" format="SVG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -89,11 +89,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/security-hierarchy.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/security-hierarchy.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/security-hierarchy.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -137,11 +137,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img3.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img3.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img3.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img3.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img3.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img3.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -174,11 +174,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img4.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img4.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img4.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img4.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img4.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img4.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -207,11 +207,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img6.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img6.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img6.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img6.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img6.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img6.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -228,11 +228,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img8.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img8.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img8.png.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img8.png.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/security_images/img8.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="security_images/img8.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -307,7 +307,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="0.5in" fileref="doc-files/security_images/img9.png" format="PNG"/>              </imageobject>
+                <imagedata width="0.5in" fileref="security_images/img9.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 ). Figure <ulink url="security_images/node11.xml#hierarchicalsecurityrule">6</ulink>
@@ -316,14 +316,14 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="0.5in" fileref="doc-files/security_images/img10.png" format="PNG"/>              </imageobject>
+                <imagedata width="0.5in" fileref="security_images/img10.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
  to 
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="0.5in" fileref="doc-files/security_images/img9.png" format="PNG"/>              </imageobject>
+                <imagedata width="0.5in" fileref="security_images/img9.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 ), the virtual node policy (VN), and the Object (O)
@@ -333,7 +333,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="5in" fileref="doc-files/security_images/img11.png" format="PNG"/>              </imageobject>
+                <imagedata width="5in" fileref="security_images/img11.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -342,10 +342,10 @@
  domain (as a single Grid actor is responsible for it), (2) an interaction is valid only if all
  levels accept it (absence of weakening of authorizations), (3) the security attributes retained
  are the most constrained based on a partial order (absence of weakening of security).</para>
-        <screen>
+<screen>
           Domain[*] -&gt; Domain[*] : Q,P : [+A,+I,+C] 
-         Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C] 
-       </screen>
+          Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C] 
+</screen>
         <para>within the CardPlus domain, the second rule will be chosen (integrity and confidentiality will
  be optional). Of course, comparison of rules is only a partial order, and several incompatible
  most specific rules can exist within a single level (e.g. both ACCEPT and DENY most specific
@@ -449,7 +449,7 @@
       
       <para>the descriptor is:</para>
       
-      <screen>
+<screen>
  1:&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
  2:&lt;ProActiveDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;  xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;
  3: &lt;security file=&quot;../../descriptors/applicationPolicy.xml&quot;&gt;&lt;/security&gt;
@@ -481,7 +481,7 @@ vm2
  83: &lt;/jvmProcess&gt;
  84: &lt;/processDefinition&gt;
  ....
-      </screen>
+</screen>
       <para>Inside the policy file, you can express policy between entities (domain, runtime, node, active
  object).</para>
       <para>
@@ -501,44 +501,38 @@ vm2
       <sect2 remap="h3">
         <title>Construction of an XML policy :</title>
         <para>A policy file must begin with :</para>
-        <screen>
+<screen>
  1:&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
  2:&lt;Policy&gt;
-        </screen>
+</screen>
         <para>next, application specific informations are given.</para>
-        <screen>
- 3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;
-        </screen>
+<screen> 3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt; </screen>
         <para>&lt;ApplicationName&gt; sets the application name. This allows to identify easily which application an entity belongs to.</para>
-        <screen>
+<screen>
  4: &lt;Certificate&gt;/.../appli.cert&lt;/Certificate&gt;
  5: &lt;PrivateKey&gt;/.../appli.key&lt;/PrivateKey&gt;
-        </screen>
+</screen>
         <para>&lt;Certificate&gt; is the X509 certificate of the application, generated from a user
  certificate, and</para>
         <para>&lt;PrivateKey&gt; the private key associated to the certificate.</para>
-        <screen>
+<screen>
   6: &lt;CertificationAuthority&gt;
  7: &lt;Certificate&gt;/.../ca.cert&lt;/Certificate&gt;
  8: &lt;/CertificationAuthority&gt;
-        </screen>
+</screen>
         <para>&lt;CertificationAuthority&gt; contains all trusted certificate authority. Each
  &lt;Certificate&gt; contains a certification authority certificate.</para>
-        <screen>
-  10: &lt;Rules&gt;
-        </screen>
+<screen> 10: &lt;Rules&gt; </screen>
         <para>Then we can define policy rules. All rules are located within the &lt;Rules&gt;</para>
         <para>A &lt;Rule&gt; is constructed according the following syntax :</para>
-        <screen>
- 11: &lt;Rule&gt;
-        </screen>
+<screen> 11: &lt;Rule&gt; </screen>
         <para>&lt;From&gt; tag contains all entities from which the interaction is made. It is possible to
  specify many entities in order to match a specific fine-grained policy.</para>
-        <screen>
+<screen>
  12: &lt;From&gt;
  13: &lt;Entity type=&quot;VN&quot; name=&quot;vm2&quot;/&gt;
  14: &lt;/From&gt;
-        </screen>
+</screen>
         <para>&lt;Entity&gt; is used to define an entity. the &quot;type&quot; parameter can be
  &quot;VN&quot;, &quot;certificate&quot;.</para>
         <itemizedlist>
@@ -558,15 +552,13 @@ vm2
 </itemizedlist>
         <para>&lt;To&gt; tag contains all entities onto the interaction is made. As &lt;From&gt; tag, many
  entities can be specified.</para>
-        <screen>
+<screen>
  15: &lt;To&gt;
  16: &lt;Entity type=&quot;VN&quot; name=&quot;Locale&quot;/&gt;
  17: &lt;/To&gt;
-        </screen>
+</screen>
         <para>The &lt;Communication&gt; tag defines security policies to apply to requests and replies.</para>
-        <screen>
- 18: &lt;Communication&gt;
-        </screen>
+<screen> 18: &lt;Communication&gt; </screen>
         <para>&lt;Request&gt; sets the policy associated a request. the &quot;value&quot; parameter can be
  :</para>
         <itemizedlist>
@@ -579,33 +571,29 @@ vm2
 </itemizedlist>
         <para>Each &lt;Attribute&gt; (authentication,integrity, confidentiality) can be required, optional
  or denied.</para>
-        <screen>
+<screen>
   19: &lt;Request value=&quot;authorized&quot;&gt;
   20:   &lt;Attributes authentication=&quot;required&quot; integrity=&quot;optional&quot; confidentiali\
 ty=&quot;optional&quot;/&gt; 
   21: &lt;/Request&gt;
-        </screen>
+</screen>
         <para>&lt;Reply&gt; tag has the same parameters that &lt;Request&gt;</para>
-        <screen>
+<screen>
  22:&lt;Reply value=&quot;authorized&quot;&gt;
  23: &lt;Attributes authentication=&quot;required&quot; integrity=&quot;required&quot; confidentiality=&quot;\
 required&quot;/&gt;
  24:&lt;/Reply&gt;
  25:&lt;/Communication&gt;
-        </screen>
+</screen>
         <para>&lt;Migration&gt; allows or not migration from &lt;from&gt; entities to &lt;To&gt; entities.
  Values can be &quot;denied&quot; or &quot;authorized&quot;.</para>
-        <screen>
- 26: &lt;Migration&gt;denied&lt;/Migration&gt;
-        </screen>
+<screen> 26: &lt;Migration&gt;denied&lt;/Migration&gt; </screen>
         <para>&lt;OACreation&gt; allows or not creation of active objects by &lt;From&gt; entities onto
  &lt;To&gt; entities.</para>
         <para>
  Values can be &quot;denied&quot; or &quot;authorized&quot;.</para>
-        <screen>
- 27: &lt;OACreation&gt;denied&lt;/OACreation&gt;
-        </screen>
-        <screen>
+<screen> 27: &lt;OACreation&gt;denied&lt;/OACreation&gt; </screen>
+<screen>
  1:&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
  2:&lt;Policy&gt;
  3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;
@@ -684,7 +672,7 @@ optional&quot;/&gt;
  110:
  111: &lt;/Rules&gt;
  112:&lt;/Policy&gt;
-        </screen>
+</screen>
         <para>Note that the JVM that reads the deployment descriptor should be started with security policy.
  In order to start a secure JVM, you need to use the property proactive.runtime.security and give
  a path a security file descriptor.</para>
@@ -705,7 +693,7 @@ optional&quot;/&gt;
         <informalfigure>
           <mediaobject>
              <imageobject>
-              <imagedata width="6in" fileref="doc-files/security_images/gui-oasis.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="security_images/gui-oasis.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -722,7 +710,7 @@ optional&quot;/&gt;
         <informalfigure>
           <mediaobject>
              <imageobject>
-              <imagedata width="6in" fileref="doc-files/security_images/gui-proactive.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="security_images/gui-proactive.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

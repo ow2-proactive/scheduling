@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="FaultTolerance"><title>Adding a Fault-Tolerance Protocol</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/development/FaultTolerance.html  -->
+<chapter id="AddingAFaultToleranceProtocol"><title>Adding a Fault-Tolerance Protocol</title>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/FaultTolerance.html  -->
   
     <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
  ProActive. A more complete version should be released with the version 3.1. If you wish to get
@@ -16,7 +16,7 @@
  For example, with the Pessimistic Message Logging protocol (PML), messages are logged just before
  the delivery of the message to the active object. Main methods for the FTManager of the PML
  protocol are then:</para>
-        <screen>
+<screen>
    /**
      * Message must be synchronously logged before being delivered.
      * The LatestRcvdIndex table is updated
@@ -57,7 +57,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
         }
         return 0;
     }
-        </screen>
+</screen>
         <para>The local variable <literal>this.storage</literal> is remote reference to the checkpoint server. The
  FTManager class contains a reference to each fault-tolerance server: fault-detector, checkpoint
  storage and localization server. Those reference are initialized during the creation of the
@@ -68,7 +68,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
         <para>
  For example, with the PML protocol, all the messages logged before the failure must be delivered
  to the active object. The method <literal>beforeRestartAfterRecovery()</literal> thus looks like:</para>
-        <screen>
+<screen>
     /**
      * Message logs are contained in the checkpoint info structure.
      */
@@ -113,7 +113,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
         }
         return 0;
     }
-        </screen>
+</screen>
         <para>The parameter <literal>ci</literal> is a <literal>org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo</literal>. This object
  contains all the informations linked to the checkpoint used for recovering the active object, and
  is used to restore its state. The programmer might defines his own class implementing <literal>CheckpointInfo</literal>, to add needed informations, depending on the protocol.</para>

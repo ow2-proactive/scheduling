@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="IC2D"><title>IC2D: Interactive Control and Debugging of Distribution</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/IC2D.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/IC2D.html  -->
   
     <para> <emphasis role="bold">IC2D</emphasis> is a <emphasis role="bold">graphical environment</emphasis> for remote monitoring and
  steering of <emphasis role="bold">distributed and grid applications</emphasis>. IC2D features <emphasis role="bold">graphical
@@ -43,7 +43,7 @@
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
+    
     <para>The full source of IC2D is included in the distribution and is also
  browseable on line.</para>
     <para><ulink url="../doc/ProActive_src_html/index.xml">Source code index</ulink></para>
@@ -57,7 +57,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/ic2d_c3d.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/ic2d_c3d.png" format="PNG"/>            </imageobject>
           </mediaobject>
 <ulink url="ic2d_c3d.jpg"></ulink>        </informalfigure>
 </para>
@@ -69,7 +69,7 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="doc-files/images/RemoteControl.png" format="PNG"/>            </imageobject>
+              <imagedata width="6in" fileref="images/RemoteControl.png" format="PNG"/>            </imageobject>
           </mediaobject>
 <ulink url="RemoteControl.jpg"></ulink>        </informalfigure>
 </para>
@@ -78,7 +78,7 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/images/ic2d_migrate_witharrow.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="images/ic2d_migrate_witharrow.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para><emphasis role="bold">IC2D permits to visualize related events and AOs state</emphasis></para>
@@ -90,18 +90,18 @@
  different views of a deployed application: per hosts, per jobs,....
  To start the Job monitor tool, choose in the IC2D menu: windows --&gt; Show Job Monitor
  windows</emphasis></para>
-      <para></para>
-      <para></para>
+      
+      
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/images/jobmonitor2_logo.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="images/jobmonitor2_logo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/images/jobmonitor1_logo.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="images/jobmonitor1_logo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
     </sect1>
@@ -115,7 +115,7 @@
         <para>
  first, a new node, a &quot;main node&quot; will be created and activated and then, it is this
  node that will deploy the rest of the application.</para>
-        <para></para>
+        
       </sect2>
       <sect2 remap="h3">
         <title>MainDefinition tag</title>
@@ -132,15 +132,15 @@
 <para>
  Eventually, several mains might be defined so the <emphasis role="bold">id</emphasis> allows to identify all
  mainDefinitions.</para>
-        <para></para>
+        
         <para>
  The <emphasis role="bold">class</emphasis> attribute is the path where can be found the class to launch.</para>
         <para><emphasis role="bold">This class MUST contain a main method.</emphasis></para>
-        <para></para>
+        
         <para>
  Then any number of parameters can be declared in <emphasis role="bold">arg</emphasis> tags. The parameters will be given to
  the main method in the same order the were declared.</para>
-        <para></para>
+        
         <para>
  And finally a <emphasis role="bold">mapToVirtualNode</emphasis> tag will link the main info to virtual node, declared with
  the same name in the virtualNodeDefinitions tag (in componentDefinition).</para>
@@ -216,31 +216,31 @@
  descriptor (this descriptor must contain a <emphasis role="bold">mainDefinition tag</emphasis>). The constructor will parse
  the file and reify a ProActiveDescriptor. You only have to call the <emphasis role="bold">activate()</emphasis> method on
  the launcher instance to launch the application.</para>
-        <para></para>
+        
         <para><emphasis role="underline">For example:</emphasis><literal>Launcher launcher = new Launcher
  (&quot;myDescriptor.xml&quot;) ;</literal></para>
         <para><literal>launcher.activate() ;</literal></para>
-        <para></para>
+        
         <para>
  you can also get the ProActiveDescriptor built by the launcher by calling the getDescriptor()
  method on the launcher instance.</para>
-        <para></para>
+        
         <para><literal>ProActiveDescriptor pad = launcher.getDescriptor() ;</literal></para>
       </sect2>
       <sect2 remap="h3">
         <title>Launcher in IC2D</title>
         <para>You will find the launcher in the <emphasis role="bold">launcher menu</emphasis>, in the menu bar. Click then on <emphasis role="bold">launch a new application</emphasis>.</para>
-        <para></para>
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/images/launcher_menu.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="images/launcher_menu.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
-        <para></para>
-        <para></para>
+        
+        
         <para>Now it opens a new window proposing you to browse your file system for a XML descriptor and
  load it into a descriptors list. A right click on the list items allows you to launch (activate)
  the application. Two checkbox control the graphical monitoring and textual job monitoring your
@@ -249,7 +249,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/images/launcher_frame.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="images/launcher_frame.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -267,14 +267,14 @@
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/images/clusterLogo.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="images/clusterLogo.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para>This experiment was partly sponsored by &#160;&#160; 
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata width="1in" fileref="doc-files/images/logoSun.png" format="PNG"/>            </imageobject>
+              <imagedata width="1in" fileref="images/logoSun.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="AC"><title>Automatic Continuation in ProActive</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/AC.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/AC.html  -->
   
     <sect1 remap="h2">
       <title>Automatic Continuation in ProActive</title>
@@ -44,8 +44,8 @@
             <para> When a message is received(request or reply) by an Active Object, this
  message can contain a future. So the Active Object registers this future in the <emphasis role="bold">FuturePool</emphasis> to be able to update it when the value will be available. This registration
  takes place in two steps:</para>
-            <para></para>
-            <para></para>
+            
+            
             <itemizedlist>
               <listitem>
                 <para> When the future is deserialized, it registers in a static table
@@ -65,7 +65,7 @@
  or as a result.</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 class C{
 ....
         public static void main(String[] args){
@@ -80,13 +80,13 @@ class C{
         }       //end of main
 ...
 }       //end of class C
-            </screen>
+</screen>
 </para>
         </blockquote>
         <para>where</para>
         <blockquote>
           <para>
-            <screen>
+<screen>
 class A {
   ...
         public Result foo(){
@@ -106,7 +106,7 @@ class B{
 <emphasis role="bold">**</emphasis> future is sent as a result
          }
 } //end of class B
-            </screen>
+</screen>
 </para>
         </blockquote>
       </sect2>
@@ -116,61 +116,61 @@ class B{
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e1.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e1.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e1.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e1.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e1.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e1.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>
  Let us say that some piece of code in main method of an object C calls method <emphasis role="bold">foo()</emphasis> on
  an instance of class A.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e2.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e2.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e2.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e2.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e2.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e2.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>
  This calll is asynhronous and returns a future object <emphasis role="bold">Future_r1</emphasis> of class Result.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e3.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e3.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e3.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e3.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e3.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e3.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>
  Then method <emphasis role="bold">bar()</emphasis> is called on an instance of class B passing future <emphasis role="bold">Future_r1</emphasis> as
  a parameter to the method</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e4.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e4.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e4.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e4.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e4.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e4.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -178,58 +178,58 @@ class B{
  This calll is asynhronous and returns a future object <emphasis role="bold">Future_r2</emphasis> of class Result. B needs
  the value of <emphasis role="bold">Future_r1</emphasis> which is not yet available in order to return the result of
  method <emphasis role="bold">bar()</emphasis>, so it gets the future too.</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e5.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e5.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e5.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e5.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e5.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e5.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>
  The value of the result for the call to method <emphasis role="bold">foo</emphasis> is now available, so A updates the
  value of <emphasis role="bold">Future_r1</emphasis></para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e6.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e6.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e6.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e6.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e6.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e6.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>
  C updates the value of <emphasis role="bold">Future_r1</emphasis> for B</para>
-        <para></para>
-        <para></para>
+        
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e7.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e7.png" format="PNG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e7.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e7.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/pics/e7.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="pics/e7.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>
  B returns the value for the call to method <emphasis role="bold">bar()</emphasis> and updates the value of <emphasis role="bold">Future_r2</emphasis> for C</para>
-        <para></para>
-        <para></para>
-        <para></para>
+        
+        
+        
         <para>
  </para>
       </sect2>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="OSGi"><title>ProActive on top of OSGi</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/OSGi.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/OSGi.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="OSGi_html_overview" xreflabel="Overview of OSGi -- Open Services Gateway
@@ -9,25 +9,25 @@
       <para><emphasis role="bold">OSGi</emphasis> is a corporation that works on the definition and promotion of
  open specifications. These specifications are mainly aimed to packaging and delivering services
  among all kinds of networks.</para>
-      <para></para>
+      
       <para><emphasis><emphasis role="bold">OSGi Framework</emphasis></emphasis></para>
       <para>The OSGi specification define <emphasis role="bold">a framework</emphasis> that allows to a diversity
  of services to be executed in a service gateway, by this way, many applications can <emphasis role="bold">share a
  single JVM</emphasis> .</para>
-      <para></para>
+      
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/osgi_files/framework.jpg" format="JPG"/>          </imageobject>
+            <imagedata width="6in" fileref="osgi_files/framework.jpg" format="JPG"/>          </imageobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/osgi_files/framework.svg" format="SVG"/>          </imageobject>
+            <imagedata width="6in" fileref="osgi_files/framework.svg" format="SVG"/>          </imageobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/osgi_files/framework.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="osgi_files/framework.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para><emphasis>The OSGi framework entities.</emphasis></para>
-      <para></para>
-      <para></para>
+      
+      
       <para><emphasis><emphasis role="bold">Bundles</emphasis></emphasis></para>
       <para>
  In order to be <emphasis role="bold">delivered and deployed</emphasis> on OSGi, each piece of code is packaged into
@@ -48,19 +48,19 @@
 </itemizedlist>
       <para>Bundles can be plugged dynamically and their so called <emphasis>lifecycle</emphasis> can
  be managed through the framework ( start, stop, update, ...).</para>
-      <para></para>
+      
       <para><emphasis><emphasis role="bold">Manifest file</emphasis></emphasis></para>
       <para>
  This important file contains crucial parameters for the bundle file. It specifies which Activator
  (entry point) the bundle has to use, the bundle classpath, the imported and exported packages,
  ...</para>
-      <para></para>
+      
       <para><emphasis><emphasis role="bold">Services</emphasis></emphasis></para>
       <para>
  Bundles communicates with each other thanks to <emphasis role="bold">services and packages sharing</emphasis>. A <emphasis role="bold">service</emphasis> is an object registered into the framework in order to be used by other
  applications. The definition of a service is specified in a Java interface. OSGi specify a set of
  standard services like Http Service, Log Service ...</para>
-      <para></para>
+      
       <para>We currently use the <ulink url="http://oscar.objectweb.org"></ulink> OSCAR
  objectweb implementation. For more information on OSGi, please visit the <ulink url="http://www.osgi.org"></ulink>OSGi website .</para>
     </sect1>
@@ -74,19 +74,19 @@
  same interface that the ProActive static classe. When installed, the ProActive bundle starts a
  new runtime, and clients that use the ProActive Service will be able to create active object on
  this runtime.</para>
-      <para></para>
+      
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/osgi_files/proactive_bundle.jpg" format="JPG"/>          </imageobject>
+            <imagedata width="6in" fileref="osgi_files/proactive_bundle.jpg" format="JPG"/>          </imageobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/osgi_files/proactive_bundle.svg" format="SVG"/>          </imageobject>
+            <imagedata width="6in" fileref="osgi_files/proactive_bundle.svg" format="SVG"/>          </imageobject>
           <imageobject>
-            <imagedata width="6in" fileref="doc-files/osgi_files/proactive_bundle.png" format="PNG"/>          </imageobject>
+            <imagedata width="6in" fileref="osgi_files/proactive_bundle.png" format="PNG"/>          </imageobject>
         </mediaobject>
       </informalfigure>
       <para><emphasis>The Proactive Bundle uses the standard Http Service</emphasis></para>
-      <para></para>
+      
       <para>
  The active object will be accessible remotely from any java application, or any other OSGi
  gateway. The communication can be either <emphasis>rmi</emphasis> or <emphasis>http</emphasis>; in case of using http, the
@@ -102,37 +102,35 @@
  create the active object and register it as a OSGi service.</para>
       <para>
  The HelloActivator has to implements the BundleActivator interface.</para>
-      <screen>
+<screen>
         public class HelloActivator implements BundleActivator {
                 ...
         } 
-      </screen>
+</screen>
       <para>The <literal>start ()</literal> method is the one executed when the bundle
  starts. When the hello bundle start we need to get the reference on the ProActive service and use
  it. Once we have the reference, we can create our active object thanks to the <literal>ProActiveService.newActive()</literal> method. Finally, we register our new service in the
  framework.</para>
-      <screen>
+<screen>
  public void start(BundleContext context) throws Exception {
         this.context = context;
-        /* gets the ProActive Service */
-        ServiceReference sr = this.context.getServiceReference(ProActiveSer\
-vice.class.getName());
-        this.proActiveService = (ProActiveService) this.context.getService(\
-sr);
-        Hello h = (Hello)this.proActiveService.newActive(&quot;org.objectweb.proa\
-ctive.examples.hello.Hello&quot;,
-                                                                           \
-                           new Object [] {});
-        /* Register the service */
+
+	/* gets the ProActive Service */
+        ServiceReference sr = this.context.getServiceReference(ProActiveService.class.getName());
+        this.proActiveService = (ProActiveService) this.context.getService(sr);
+        Hello h = (Hello)this.proActiveService.newActive(
+		&quot;org.objectweb.proactive.examples.hello.Hello&quot;,
+		new Object [] {});
+        
+
+/* Register the service */
         Properties props = new Properties();
         props.put(&quot;name&quot;, &quot;helloWorld&quot;);
-                
-        reg = this.context.registerService(&quot;org.objectweb.proactive.osgi.Pro\
+
+	reg = this.context.registerService(&quot;org.objectweb.proactive.osgi.Pro\
 ActiveService&quot;,
                                                                 h, props);
-        }
-                
-      </screen>
+        }      </screen>
       <para>Now that we created the hello active service, we have to <emphasis role="bold">package the
  application</emphasis> into a bundle. First of all, we have to write a <emphasis role="bold">Manifest File</emphasis> where we
  specify :</para>
@@ -154,24 +152,21 @@ ActiveService&quot;,
         </listitem>
 </itemizedlist>
       <para>Here is what the Manifest looks like :</para>
-      <screen>
+<screen>
 Bundle-Name: ProActive Hello World Bundle
 Bundle-Description: Bundle containing Hello World ProActive example
 Bundle-Vendor: OASIS - INRIA Sophia Antipolis
 Bundle-version: 1.0.0
 Export-Package: org.objectweb.proactive.examples.hello
 DynamicImport-Package: org.objectweb.proactive ...
-Bundle-Activator: org.objectweb.proactive.examples.osgi.hello.HelloActivato\
-r
-      </screen>
+Bundle-Activator: org.objectweb.proactive.examples.osgi.hello.HelloActivator
+</screen>
       <para><emphasis><emphasis role="bold">Installing the ProActive Bundle and the Hello Bundle.</emphasis></emphasis></para>
       <para>
  In order to run the example you need to install an OSGi framework. You can download and install
  one from the <ulink url="http://oscar.objectweb.org">OSCAR website</ulink>. Install the required
  services on the OSCAR framework :</para>
-      <screen>
-        --&gt; obr start &quot;Http Service&quot;
-      </screen>
+<screen> --&gt; obr start &quot;Http Service&quot; </screen>
       <itemizedlist>
         <listitem>
           <para> &#160;</para>
@@ -180,15 +175,13 @@ r
           <para><emphasis>Generation of the ProActive Bundle</emphasis></para>
           <para> 
  To generate the proActiveBundle you have to run the <emphasis role="bold">build</emphasis> script with the <emphasis role="bold"><literal>proActiveBundle</literal></emphasis> target. </para>
-          <screen>
+<screen>
         &gt; cd $PROACTIVE_DIR/compile
         &gt; ./build proActiveBundle
-          </screen>
+</screen>
           <para>The bundle jar file will be generated in the <emphasis role="bold"><literal>$PROACTIVE_DIR/dist/ProActive/bundle/</literal></emphasis> directory. We need now to install
  and start it into the OSGi Framework :</para>
-          <screen>
---&gt; start file:///$PROACTIVE_DIR/dist/ProActive/bundle/proActiveBundle.jar
-          </screen>
+<screen> --&gt; start file:///$PROACTIVE_DIR/dist/ProActive/bundle/proActiveBundle.jar </screen>
         </listitem>
         <listitem>
           <para> This command will install and start the proActive bundle on the
@@ -198,15 +191,13 @@ r
           <para> <emphasis>Generation of the Hello World example bundle</emphasis></para>
           <para>
  To generate the Hello World bundle you have to run the <emphasis role="bold">build</emphasis> script with the <emphasis role="bold"><literal>helloWorldBundle</literal></emphasis> target.</para>
-          <screen>
+<screen>
         &gt; cd $PROACTIVE_DIR/compile
         &gt; ./build helloWorldBundle
-          </screen>
+</screen>
           <para>The bundle jar file will be generated in the <emphasis role="bold"><literal>$PROACTIVE_DIR/dist/ProActive/bundle/</literal></emphasis> directory. We need now to install
  and start it into the OSGi Framework :</para>
-          <screen>
---&gt; start file:///$PROACTIVE_DIR/dist/ProActive/bundle/helloWorldBundle.jar
-          </screen>
+<screen> --&gt; start file:///$PROACTIVE_DIR/dist/ProActive/bundle/helloWorldBundle.jar </screen>
         </listitem>
         <listitem>
           <para> The command will install and start the Hello active service. The hello
@@ -229,8 +220,8 @@ r
           <para> We plan to deploy remotely active objects and fractal components on OSGi gateways.</para>
         </listitem>
 </itemizedlist>
-      <para></para>
-      <para></para>
+      
+      
       <para>
  </para>
     </sect1>

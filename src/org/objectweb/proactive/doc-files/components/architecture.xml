@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/components/architecture.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/architecture.html  -->
   
     <sect1 remap="h2">
       <title>Architecture and design</title>
@@ -30,7 +30,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/standard-mop.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/standard-mop.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -57,11 +57,11 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/components-mop.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/components-mop.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/components-mop.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/components-mop.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/components-mop.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/components-mop.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -95,8 +95,8 @@
  life cycle of the components is controlled</emphasis> : the dispatching of the request is dependent upon
  the nature of the request, and corresponds to the following algorithm :</para>
         <para>
-          <screen>
-loop
+<screen>
+  loop
         if componentLifeCycle.isStarted()
                 get next request
                 // all requests are served
@@ -108,8 +108,7 @@ loop
                 if request is start --&gt; set component state to started ;
                 if request is stop --&gt; set component state to stopped ;
         ;
-;
-          </screen>
+; </screen>
 </para>
       </sect2>
       <sect2 remap="h3">
@@ -138,11 +137,11 @@ loop
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/collective-interfaces.gif" format="GIF"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/collective-interfaces.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/collective-interfaces.svg" format="SVG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/collective-interfaces.svg" format="SVG"/>              </imageobject>
               <imageobject>
-                <imagedata width="6in" fileref="doc-files/components/pics/collective-interfaces.png" format="PNG"/>              </imageobject>
+                <imagedata width="6in" fileref="components/pics/collective-interfaces.png" format="PNG"/>              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>

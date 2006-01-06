@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="FAQ"><title>Frequently Asked Questions</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/FAQ.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FAQ.html  -->
   
     <para> <emphasis role="bold">Note:</emphasis> This FAQ is under construction. If one of your question is not
  answered here, just send it at <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and we&#39;ll update the FAQ.</para>
@@ -199,7 +199,7 @@
  directory <literal>lib</literal> of <emphasis role="bold">ProActive</emphasis> is needed in order for any active object to
  function properly. If the library is not in the <literal>CLASSPATH</literal> you will get the
  following exception or a similar one :</para>
-          <screen>
+<screen>
     Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/objectweb/\
 asm/Constants
         at java.lang.ClassLoader.defineClass0(Native Method)
@@ -224,7 +224,7 @@ a:830)
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:180)
         at org.objectweb.proactive.examples.binarytree.TreeApplet.main(Tree\
 Applet.java:103)
-          </screen>
+</screen>
           <para>The problem can simply be fixed by adding asm<literal>.jar</literal> in the <literal>CLASSPATH</literal>.</para>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
@@ -236,7 +236,7 @@ Applet.java:103)
  directory <literal>lib</literal> of <emphasis role="bold">ProActive</emphasis> is needed in order for any active object to
  function properly. If the library if not in the <literal>CLASSPATH</literal> you will get the
  following exception or a similar one :</para>
-          <screen>
+<screen>
     Exception in thread &quot;main&quot; java.lang.NoClassDefFoundError: org/apache/bce\
 l/generic/Type
         at org.objectweb.proactive.core.mop.MOPClassLoader.loadClass(MOPCla\
@@ -258,7 +258,7 @@ a:585)
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:170)
         at org.objectweb.proactive.ProActive.newActive(ProActive.java:137)
         at DiscoveryManager.main(DiscoveryManager.java:226)
-          </screen>
+</screen>
           <para>The problem can simply be fixed by adding <literal>bcel.jar</literal> in the <literal>CLASSPATH</literal>.</para>
         </listitem>
         <listitem>
@@ -266,7 +266,7 @@ a:585)
  java.security.AccessControlException access denied?</emphasis></para>
           <para>If you don&#39;t properly set permissions when launching code using
  ProActive you may get the following exception or a similar one.</para>
-          <screen>
+<screen>
     java.security.AccessControlException: access denied (java.net.SocketPer\
 mission 127.0.0.1:1099 connect,resolve)
         at java.security.AccessControlContext.checkPermission(AccessControl\
@@ -321,7 +321,7 @@ tory.java:179)
         at org.objectweb.proactive.core.node.NodeFactory.createNode(NodeFac\
 tory.java:158)
         ...
-          </screen>
+</screen>
           <para>ProActive uses <ulink url="http://java.sun.com/products/jdk/rmi/">RMI</ulink>
  as its underlying transport technology. Moreover it uses code downloading features to
  automatically move generated stub classes from one JVM to another one. For those reasons,
@@ -335,15 +335,9 @@ tory.java:158)
           <para>
  As a first approximation, in order to run your code, you can create a simple policy file
  granting all permissions for all code :</para>
-          <screen>
-    grant {
-        permission java.security.AllPermission;
-    };
-          </screen>
+<screen> grant { permission java.security.AllPermission; }; </screen>
           <para>Then you need to start your Java program using the property <literal>-Djava.security.policy</literal>. For instance :</para>
-          <screen>
-    java -Djava.security.policy=my.policy.file MyMainClass
-          </screen>
+<screen> java -Djava.security.policy=my.policy.file MyMainClass </screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
         <listitem>
@@ -378,15 +372,13 @@ tory.java:158)
  creation of nodes using various protocol.</para>
           <para>It is nevertheless possible to create an object on a remote node once
  it is created. On host X you can use startNode to start a new node</para>
-          <screen>
-   startNode.sh ///node1
-          </screen>
+<screen> startNode.sh ///node1 </screen>
           <para>On host Y you can create an active object on host X</para>
-          <screen>
+<screen>
   org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.n\
 ode.NodeFactory.getNode(&quot;//X/node1&quot;);
   ProActive.turnActive(myObject, n);
-          </screen>
+</screen>
           <para>You do not need to start any rmiregistry manually as they are started
  automatically as needed.</para>
           <para>As we support other ways of registration and discovery (such as Jini),
@@ -466,10 +458,10 @@ ode.NodeFactory.getNode(&quot;//X/node1&quot;);
  return a reference on an automatically generated <emphasis role="bold">ProActive</emphasis> stub. <emphasis role="bold">ProActive</emphasis> uses <ulink url="http://asm.objectweb.org/">ASM</ulink> to generate the stub on the fly. Suppose you have
  a class <literal>A</literal> and an instance <literal>a</literal> of this class. A way to turn the
  instance <literal>a</literal> into an active object is to use the method <literal>ProActive.turnActive</literal> :</para>
-          <screen>
+<screen>
     A a = new A();
     A activeA = (A) ProActive.turnActive(a);
-          </screen>
+</screen>
           <para>In the code above, the variable <literal>a</literal> is a direct reference
  onto the instance of <literal>A</literal> stored somewhere in memory. In contrast, the variable <literal>activeA</literal> is a direct reference onto an instance of the generated ProActive stub
  for the class <literal>A</literal>. By convention, the ProActive stub of a class <literal>A</literal> is
@@ -486,7 +478,7 @@ ode.NodeFactory.getNode(&quot;//X/node1&quot;);
           <para><emphasis remap="h3" role="bold">Why my object&#39;s properties
  aren&#39;t updated ?</emphasis></para>
           <para>Suppose you have a class <literal>A</literal> with an attribute <literal>a1</literal> as the example below.</para>
-          <screen>
+<screen>
     public class A {
       public int a1;
       public static void main(String[] args) {
@@ -498,7 +490,7 @@ a to 2
  2
       }
     }
-          </screen>
+</screen>
           <para>When you reference an active object, you always reference it through
  its associated stub (<link linkend="stub">see definition of Stub</link>). The stub class inheriting
  from the reified class, it has also all its attributes. But those attributes are totally
@@ -516,13 +508,13 @@ a to 2
  active object or the difference between this and ProActive.getStubOnThis() ?</emphasis></para>
           <para>Suppose you have a class <literal>A</literal> that you want to make active.
  In <literal>A</literal> you want to have a method that returns a reference on that instance of <literal>A</literal> as the example below.</para>
-          <screen>
+<screen>
   public class A {
     public A getRef() {
       return this;  // !!!! THIS IS WRONG FOR AN ACTIVE OBJECT
     }
   }
-          </screen>
+</screen>
           <para>There is indeed a problem in the code above. If an instance of <literal>A</literal> is created as, or turned into an active object, the method <literal>getRef</literal>
  will in fact be called through the <emphasis role="bold">Body</emphasis> of the active object by its active thread. The
  value returned by the method will be the direct reference on the reified object and not a
@@ -533,13 +525,13 @@ a to 2
  code of the reified object, is to use the method <literal>ProActive.getStubOnThis()</literal>. This
  method will return the reference to the stub associated to the active object whose thread is
  calling the method. The correct version of the previous class is :</para>
-          <screen>
+<screen>
   public class A {
     public A getRef() {
       return ProActive.getStubOnThis(); // returns a reference on the stub
     }
   }
-          </screen>
+</screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
         <listitem>
@@ -552,7 +544,7 @@ a to 2
           <para>Here is a simple example creating an active object of class <literal>A</literal> in the local JVM. If the invocation of the constructor of class <literal>A</literal>
  throws an exception, it is placed inside an exception of type <literal>ActiveObjectCreationException</literal>. When the call to <literal>newActive</literal> returns,
  the active object has been created and its active thread is started.</para>
-          <screen>
+<screen>
   public class A {
     private int i;
     private String s;
@@ -579,7 +571,7 @@ a to 2
     // creation of ActiveObject failed
     e.printStackTrace();
   }
-          </screen>
+</screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
         <listitem>
@@ -676,34 +668,34 @@ a to 2
  or <literal>turnActive</literal>) :</para>
           <simpara>
             <emphasis role="bold">InitActive</emphasis>          </simpara>
-          <screen>
+<screen>
 if activity is non null and implements InitActive
   we invoke the method initActivity defined in the object activity
 else if the class of the reified object implements InitActive
   we invoke the method initActivity of the reified object
 else
   we don&#39;t do any initialization
-          </screen>
+</screen>
           <simpara>
             <emphasis role="bold">RunActive</emphasis>          </simpara>
-          <screen>
+<screen>
 if activity is non null and implements RunActive
   we invoke the method runActivity defined in the object activity
 else if the class of the reified object implements RunActive
   we invoke the method runActivity of the reified object
 else
   we run the standard FIFO activity
-          </screen>
+</screen>
           <simpara>
             <emphasis role="bold">EndActive</emphasis>          </simpara>
-          <screen>
+<screen>
 if activity is non null and implements EndActive
   we invoke the method endActivity defined in the object activity
 else if the class of the reified object implements EndActive
   we invoke the method endActivity of the reified object
 else
   we don&#39;t do any cleanup
-          </screen>
+</screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
         <listitem>
@@ -725,7 +717,7 @@ else
  make active. Depending on which phase in the life of the active object you want to customize,
  you implement the corresponding interface (one or more) amongst <literal>InitActive</literal>, <literal>RunActive</literal> and <literal>EndActive</literal>. Here is an example that has a custom initialization
  and activity.</para>
-          <screen>
+<screen>
   import org.objectweb.proactive.*;
   public class A implements InitActive, RunActive {
     private String myName;
@@ -748,7 +740,7 @@ else
       System.out.println(&quot;Name = &quot;+a.getName());
     }
   }
-          </screen>
+</screen>
           <para><emphasis remap="h3" role="bold">Passing an object implementing the interfaces when creating the active object</emphasis></para>
           <para>This is the solution to use when you do not control the class that you
  make active or when you want to write generic activities policy and reused them with several
@@ -759,7 +751,7 @@ else
  internal state of the reified object. Using an external object should therefore be used when
  the implementation of the activity is generic enough not to have to access the member
  variables of the reified object.</para>
-          <screen>
+<screen>
   import org.objectweb.proactive.*;
   public class LIFOActivity implements RunActive {
     // -- implements RunActive for serving request in a LIFO fashion
@@ -789,7 +781,7 @@ Activity(), null);
       System.out.println(&quot;Name = &quot;+a.getName());
     }
   }
-          </screen>
+</screen>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
         <listitem>
@@ -822,16 +814,12 @@ Activity(), null);
  conditions. This is explained <ulink url="FutureObjectCreation.xml">here</ulink>. If for instance
  the return type of a method call is not reifiable, you can use wrappers to keep asynchronism
  capabilities: suppose that one of your object has a method</para>
-          <screen>
-<emphasis role="bold"> int</emphasis> getNumber()
-          </screen>
+<screen> <emphasis role="bold"> int</emphasis> getNumber() </screen>
           <para>calling this method with ProActive is sychronous since int type is not
  reifiable. To keep the asynchronism it is advised to use</para>
-          <screen>
-<emphasis role="bold">MyInteger </emphasis>getNumber()
-          </screen>
+<screen> <emphasis role="bold">MyInteger </emphasis>getNumber() </screen>
           <para>where</para>
-          <screen>
+<screen>
  public class MyInteger{
   protected int i;
   public MyInteger(){
@@ -847,7 +835,7 @@ Activity(), null);
   }
  
 }
-          </screen>
+</screen>
           <para>In that case call to this method is asynchronous. Only the methods
  return type are concerned not the parameters.</para>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
@@ -858,7 +846,7 @@ Activity(), null);
           <para>On the <emphasis role="bold">caller</emphasis> side the test <emphasis role="bold">if(result_from_method ==
  null)</emphasis> has no sense. Indeed result_from_method is a couple Stub-FutureProxy as explained
  above, so even if the method returns null, result_from_method cannot be null:</para>
-          <screen>
+<screen>
 public class MyObject{
  public MyObject(){
  //empty constructor with no-args
@@ -874,15 +862,15 @@ public class MyObject{
  }
  
 }
-          </screen>
+</screen>
           <para>On the caller side: </para>
-          <screen>
+<screen>
 MyObject o = new MyObject();
 Object result_from_method = o.getObject();
 if(result_from_method == null){
 ......
 }
-          </screen>
+</screen>
           <para>This test is never true, indeed, result_from_method is <emphasis role="bold">Stub--&gt;Proxy--&gt;null</emphasis> if
 the future is not yet available or the method returns null or <emphasis role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if
 the future is available, but result_from_method is <emphasis role="bold">never null</emphasis>. see <ulink url="FutureObjectCreation.xml#commonerror">Future documentation</ulink> for more documentation about
@@ -966,11 +954,11 @@ common errors to avoid </para>
           <para><literal>[Top] [Questions] [Answers]</literal></para>
         </listitem>
 </orderedlist>
-      <para></para>
+      
       <para>
  </para>
-      <para></para>
-      <para></para>
+      
+      
     </sect1>
   
 </chapter>

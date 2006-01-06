@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="logs"><title>0.4 Logs</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/test_documentation/logs.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/logs.html  -->
   
     <para> TestSuite API offers to tests developers a log system, to tace or debug their tests.</para>
     <sect1 remap="h2">
@@ -24,12 +24,10 @@
         <sect3 remap="h4">
           <title>Example</title>
           <para>In your Test code just add logs like this :</para>
-          <screen>
-<literal>
- if (logger.isDebugEnabled())
-   logger.debug(&quot;A debug message ...&quot;);
-            </literal>
-          </screen>
+<screen>
+  if (logger.isDebugEnabled())
+     logger.debug(&quot;A debug message ...&quot;);
+</screen>
           <para>For more information about use logger see the <ulink url="http://jakarta.apache.org/log4j/docs/manual.xml">log4J manual</ulink>.</para>
 </sect3>
       </sect2>
@@ -44,14 +42,14 @@
         <sect3 remap="h4">
           <title>Example</title>
           <para>Use default configuration of log4J. Add this code Manager constructor :</para>
-          <screen>
+<screen>
 <literal>
  // Set up a simple configuration that logs on the console.
  BasicConfigurator.configure();
             </literal>
-          </screen>
+</screen>
           <para>An another example to write logs in a HTML file :</para>
-          <screen>
+<screen>
 <literal>
 public YourManager() {
         super(&quot;Function calls&quot;, &quot;Alpha version&quot;);
@@ -67,7 +65,7 @@ public YourManager() {
         logger.setLevel(Level.DEBUG);
     }
             </literal>
-          </screen>
+</screen>
           <para>For more information about logger configuration see the <ulink url="http://jakarta.apache.org/log4j/docs/manual.xml">log4J manual</ulink>.</para>
 </sect3>
       </sect2>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/ReferenceCard.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ReferenceCard.html  -->
   
     <informaltable frame="all">
       <tgroup cols="1">
@@ -12,8 +12,8 @@
       </tgroup>
     </informaltable>
     <para><emphasis role="bold"><ulink url="http://ProActive.ObjectWeb.org">ProActive.ObjectWeb.org</ulink></emphasis></para>
-    <para></para>
-    <para></para>
+    
+    
     <para><emphasis role="bold">ProActive</emphasis> is a Java library for <emphasis role="bold">parallel</emphasis>, <emphasis role="bold">distributed</emphasis>,
  and <emphasis role="bold">concurrent</emphasis> computing, also featuring <emphasis role="bold">mobility</emphasis> and <emphasis role="bold">security</emphasis> in a uniform
  framework. <emphasis role="bold">ProActive</emphasis> provides a comprehensive API and a graphical interface. The library
@@ -27,7 +27,7 @@
         <colspec colname="c5" colwidth="5*"/>
         <tbody>
           <row>
-            <entry><para></para></entry>
+            <entry></entry>
             <entry align="left" valign="middle"><para>
                 <itemizedlist>
                   <listitem>
@@ -41,7 +41,7 @@
                   </listitem>
 </itemizedlist>
 </para></entry>
-            <entry><para></para></entry>
+            <entry></entry>
             <entry align="left" valign="middle"><para>
                 <itemizedlist>
                   <listitem>
@@ -55,7 +55,7 @@
                   </listitem>
 </itemizedlist>
 </para></entry>
-            <entry><para></para></entry>
+            <entry></entry>
           </row>
         </tbody>
       </tgroup>
@@ -153,18 +153,18 @@
  environment for monitoring and steering Grid applications</para>
                   </listitem>
 </itemizedlist>
-</para>              <para></para>
-              <para></para>
+</para>              
+              
 </entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -174,7 +174,7 @@
           </row>
           <row>
             <entry><para>
-                <screen>
+<screen>
 A a = (A) ProActive.newActive(&quot;A&quot;, params, node);
    // Create an active Object of type A in the JVM specified by Node
 a.foo (param); 
@@ -189,15 +189,15 @@ v.gee (param);
    // Use of the result of an asynchronous call.
    // If v is still an awaited future, it triggers an automatic 
    // wait: Wait-by-necessity
-                </screen>
+</screen>
 </para></entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -207,7 +207,7 @@ v.gee (param);
           </row>
           <row>
             <entry><para>
-                <screen>
+<screen>
 <emphasis role="bold">boolean </emphasis>isAwaited(Object);
    // Returns True if the object is still an awaited Future
 <emphasis role="bold">void </emphasis> waitFor(Object);
@@ -218,15 +218,15 @@ v.gee (param);
 <emphasis role="bold">int </emphasis>waitForAny(Vector);
    // Blocks until one of the objects in Vector is no longer awaited.
    // Returns the index of the available future.
-                </screen>
+</screen>
 </para></entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -273,9 +273,9 @@ while ( terminate ) {
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -309,9 +309,9 @@ while ( ! hasToTerminate ) {
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -368,9 +368,9 @@ while ( ! hasToTerminate ) {
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -380,7 +380,7 @@ while ( ! hasToTerminate ) {
           </row>
           <row>
             <entry><para>
-                <screen>
+<screen>
 Object newActive(String classname, Object[] constructorParameters,Node node\
 );
    // Creates a new AO of type classname. The AO is located on the given no\
@@ -393,15 +393,15 @@ e virtualnode);
 Object turnActive(Object, Node node);
    // Copy an existing Java object and turns it into an AO.
    // The AO is located on the given node, or on a default node in 
-                </screen>
+</screen>
 </para></entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -411,7 +411,7 @@ Object turnActive(Object, Node node);
           </row>
           <row>
             <entry><para>
-                <screen>
+<screen>
 A ga = (A) ProActiveGroup.newGroup( &quot;A&quot;, params, nodes);
    // Created at once a group of AO of type &quot;A&quot; in the JVMs specified 
    // by nodes. ga is a Typed Group of type &quot;A&quot;. 
@@ -447,15 +447,15 @@ A ga2 = (A) ag.getGroupByType();
 <emphasis role="bold">void </emphasis> unsetScatterGroup(g);
    // Get back to the default: entire group transmission in all group
    // communications, e.g. upon ga.foo(g) */
-                </screen>
+</screen>
 </para></entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -481,9 +481,9 @@ A ga2 = (A) ag.getGroupByType();
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -493,7 +493,7 @@ A ga2 = (A) ag.getGroupByType();
           </row>
           <row>
             <entry><para>
-                <screen>
+<screen>
 A spmdGroup  =  (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params, nodes);
    // Creates an SPMD group and creates all members with params on the node\
 s.
@@ -509,15 +509,15 @@ ProSPMD.barrier(&quot;barrierID&quot;);
    // other members of the SPMD group invoke the same barrier. 
    // Three barriers are available : total barrier, neighbors based barrier
    // and method based barrier. 
-                </screen>
+</screen>
 </para></entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -561,9 +561,9 @@ ProSPMD.barrier(&quot;barrierID&quot;);
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -598,11 +598,11 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -614,7 +614,7 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
             <entry><para> An X.509 Public Key Infrastructure (PKI) allowing communication
  Authentication, Integrity, and Confidentiality (AIC) to be configured in an XML security
  file, at deployment, outside any source code. Security is compatible with mobility,
- allows for hierarchical domain specificationand dynamically negotiated policies.</para>              <para></para>
+ allows for hierarchical domain specificationand dynamically negotiated policies.</para>              
               <para><emphasis role="bold">Example of specification:</emphasis></para>
 <literal>
 &lt;Rule&gt;
@@ -638,9 +638,9 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -656,9 +656,9 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
  JVMs onto machines (ssh, Globus, LSF, PBS, rsh, rlogin, Web Services, etc.). After
  activation, a VN contains a set of nodes, living in a set of JVMs. Overall, VNs and
  deployment descriptors allow to abstract away from source code: machines, creation,
- lookup and registry protocols.</para>              <para></para>
+ lookup and registry protocols.</para>              
               <para><emphasis role="bold">Descriptor example: creates one jvm on the local machine</emphasis></para>
-              <para></para>
+              
               <para>
  &lt;ProActiveDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
  xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;</para>
@@ -744,12 +744,12 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
  &#160;&lt;/infrastructure&gt;</para>
               <para>
  &lt;/ProActiveDescriptor&gt;</para>
-              <para></para>
-              <para></para>
-              <para></para>
+              
+              
+              
               <para><emphasis role="bold">Deployment API</emphasis></para>
-              <para></para>
-              <para></para>
+              
+              
 <literal>
 ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String File);
    // Returns a ProActiveDescriptor object from the xml
@@ -780,9 +780,9 @@ pad.killall(boolean softly);
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -838,9 +838,9 @@ ProActive.addNFEListenerOnJVM(<emphasis role="bold">new</emphasis> TypedNFEListe
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -870,9 +870,9 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
     <informaltable frame="all">
       <tgroup cols="1">
         <colspec colname="c1" colwidth="100*"/>
@@ -887,9 +887,9 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
  is <emphasis role="bold">fully transparent</emphasis>; active objects are turned fault-tolerant using Java
  properties that can be set in the deployment descriptor. The programmer can select <emphasis>at
  deployment time</emphasis> the most adapted protocol regarding the application and the execution
- environment.</para>              <para></para>
+ environment.</para>              
               <para><emphasis role="bold">A Fault-tolerant deployment descriptor</emphasis></para>
-              <para></para>
+              
               <para><literal>&lt;ProActiveDescriptor&gt; &#160;&#160;...
  &#160;&#160;&lt;virtualNodesDefinition&gt;
  &#160;&#160;&#160;&lt;virtualNode name=&quot;NonFT-Workers&quot;
@@ -923,7 +923,7 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
  &#160;&#160;...
  &lt;/ProActiveDescriptor&gt;</literal></para>
               <para><emphasis role="bold">Starting the fault-tolerance server</emphasis></para>
-              <para></para>
+              
               <para>
  The global fault-tolerance server can be launched using the
  ProActive/scripts/[unix|windows]/FT/startGlobalFTServer.[sh|bat] script, with 5 optional
@@ -1069,7 +1069,7 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
               </literal><para>How to interact with the framework from inside a task:</para>              <itemizedlist>
                 <listitem>
                   <para> Some class variables: </para>
-                  <screen>
+<screen>
 <emphasis role="bold">protected</emphasis> Result initLowerBound; 
 // to store your lower bound
 <emphasis role="bold">protected</emphasis> Result initUpperBound; 
@@ -1078,11 +1078,11 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
 // set by the framework with the best current solution
 <emphasis role="bold">protected</emphasis> Worker worker; 
 // to interact with the framework (see below)
-                  </screen>
+</screen>
                 </listitem>
                 <listitem>
                   <para> Interact with the framework (inside a Task): </para>
-                  <screen>
+<screen>
 <emphasis role="bold">this</emphasis>.worker.setBestCurrentResult(newBestSolution); 
 // the worker will broadcast the solution in all Tasks
 <emphasis role="bold">this</emphasis>.worker.sendSubTasksToTheManager(subTaskList); 
@@ -1090,7 +1090,7 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
 BooleanWrapper workersAvailable = 
 <emphasis role="bold">this</emphasis>.worker.isHungry(); 
 // for a smart split, check for free workers
-                  </screen>
+</screen>
                 </listitem>
 </itemizedlist>
 <para>Secondly, choose your task queue:</para>              <itemizedlist>
@@ -1129,11 +1129,11 @@ Result futureResult = manager.start(); // this call is asynchronous
                 <listitem>
                   <para><emphasis role="bold">for</emphasis>  i <emphasis role="bold">in</emphasis> splitted <emphasis role="bold">do in
  parallel</emphasis></para>
-                  <screen>
+<screen>
 splitted[i].initLowerBound();
 splitted[i].initUpperBound();
 Result ri = splitted.execute();
-                  </screen>
+</screen>
                 </listitem>
                 <listitem>
                   <para> Result final = rootTask.gather(Result[] ri); //
@@ -1154,7 +1154,7 @@ Result ri = splitted.execute();
           </row>
           <row>
             <entry><para>
-                <screen>
+<screen>
  File Transfer Deployment is a tool for transfering files at deployment tim\
 e. This files are specified using the ProActive XML Deployment Descriptor i\
 n the following way:
@@ -1197,14 +1197,14 @@ n the following way:
   &lt;/sshProcess&gt;
 &lt;/processDefinition&gt;
 ...
-                </screen>
+</screen>
 </para></entry>
           </row>
         </tbody>
       </tgroup>
     </informaltable>
-    <para></para>
-    <para></para>
-    <para></para>
+    
+    
+    
   
 </chapter>

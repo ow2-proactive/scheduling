@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="SSHTunneling"><title>Using SSH tunneling for RMI or HTTP communications</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/doc-files/SSHTunneling.html  -->
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/SSHTunneling.html  -->
   
     <sect1 remap="h2">
       <title><anchor id="SSHTunneling_html_overview"/>Overview</title>
@@ -56,13 +56,13 @@
  open a connection to ?&quot;. Once you have answered this question for all the hosts used by your
  application, write down a small diagram which outlines what kind of connection is possible. For
  example:</para>
-      <screen>
+<screen>
   Firewall                         Firewall
      |   *                        *    |
      | ----&gt;     Internet       &lt;----  |
 A    | &lt;----                    ----&gt;  |    B
      |   22                       22   |
-      </screen>
+</screen>
       <para>This diagram summarizes the fact that host A is protected by a firewall
  which allows outgoing connections without control but allows only incoming connections on port
  22. Host B is also protected by a similar firewall.</para>
@@ -121,7 +121,7 @@ A    | &lt;----                    ----&gt;  |    B
         </listitem>
         <listitem>
           <para>
-            <screen>
+<screen>
 <emphasis role="bold">&lt;jvmProcess class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;
 ....
 &lt;jvmParameters&gt;
@@ -130,16 +130,17 @@ A    | &lt;----                    ----&gt;  |    B
 ...
 &lt;/jvmProcess&gt;
               </emphasis>
-            </screen>
+</screen>
 </para>
         </listitem>
         <listitem>
           <para> the other one is to set in the <emphasis role="bold">ProActive Configuration
  file</emphasis>(introduced in a previous chapter) on the remote host the property
  proactive.communication.protocol to the desired protocol </para>
-          <screen>
-<emphasis role="bold">&lt;prop key=&quot;proactive.communication.protocol&quot; value=&quot;rmissh&quot;/&gt;</emphasis>
-          </screen>
+<emphasis role="bold">
+<screen>
+&lt;prop key=&quot;proactive.communication.protocol&quot; value=&quot;rmissh&quot;/&gt; </screen>
+  </emphasis>
         </listitem>
 </itemizedlist>
       <para>Finally, if you want to set this property on the <emphasis role="bold">initial</emphasis> deployment
@@ -230,8 +231,8 @@ A    | &lt;----                    ----&gt;  |    B
  HTTP, in order to get missing classes. It is also important to notice that all you have to do in
  order to use SSH tunneling is to set the <emphasis role="bold">proactive.communiaction.protocol</emphasis> property to <emphasis role="bold">rmissh</emphasis> and to use the related properties if needed(in major cases default behavior is
  sufficient), ProActive takes care of everything else.</para>
-      <para></para>
-      <para></para>
+      
+      
       <para>
   </para>
     </sect1>
