@@ -1346,6 +1346,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(GLITE_PATH_TAG, bch);
                 this.addHandler(GLITE_CONFIG_TAG, bch);
                 this.addHandler(GLITE_REMOTE_PATH_TAG, bch);
+                this.addHandler(GLITE_INPUTSANDBOX_TAG,
+                        new SingleValueUnmarshaller());
                 this.addHandler(GLITE_OUTPUTSANDBOX_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(GLITE_ARGUMENTS_TAG,
@@ -1369,8 +1371,12 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                         ((GLiteProcess) targetProcess).setConfigFile((String) activeHandler.getResultObject());
                         ((GLiteProcess) targetProcess).setConfigFileOption(true);
                     } else if (name.equals(GLITE_INPUTSANDBOX_TAG)) {
-                        GLiteProcess.jad.addAttribute(Jdl.INPUTSB,
-                            (String) activeHandler.getResultObject());
+                    	String sandbox = (String) activeHandler.getResultObject();
+                        StringTokenizer st = new StringTokenizer(sandbox);
+                        while (st.hasMoreTokens()) {
+                            GLiteProcess.jad.addAttribute(Jdl.INPUTSB,
+                                st.nextToken());
+                        }
                     } else if (name.equals(GLITE_OUTPUTSANDBOX_TAG)) {
                         String sandbox = (String) activeHandler.getResultObject();
                         StringTokenizer st = new StringTokenizer(sandbox);
