@@ -110,6 +110,10 @@ public class ServiceThread extends Thread {
                 while (askForNodes() &&
                         ((nodeRequested == MAX_NODE) ? true
                                                          : (System.currentTimeMillis() < this.expirationTime))) {
+                    if (step > LOOK_UP_FREQ) {
+                        step = LOOK_UP_FREQ;
+                    }
+
                     Vector nodes;
                     try {
                         Vector future = p2pNodesLookup.getAndRemoveNodes();
@@ -132,17 +136,16 @@ public class ServiceThread extends Thread {
                     }
 
                     // Sleeping with FastStart algo
-                    if (askForNodes() && (this.nodeCount == 0)) {
+                    if ((this.nodeRequested == MAX_NODE) &&
+                            (nodes.size() == 0) && (this.nodeCount != 0)) {
+                        Thread.sleep(LOOK_UP_FREQ);
+                    } else if (askForNodes() && (this.nodeCount == 0)) {
                         // still no node
                         Thread.sleep(step);
                         step += 100;
-                    } else if (askForNodes() &&
-                            (nodeRequested == P2PConstants.MAX_NODE)) {
-                        // Askig max nodes
-                        Thread.sleep(LOOK_UP_FREQ);
-                    } else if (askForNodes()) {
+                    } else {
                         // normal waiting
-                        if (step >= LOOK_UP_FREQ) {
+                        if (step > LOOK_UP_FREQ) {
                             step = LOOK_UP_FREQ;
                             Thread.sleep(LOOK_UP_FREQ);
                         } else {
@@ -162,8 +165,7 @@ public class ServiceThread extends Thread {
         }
     }
 
-    public void notifyVirtualNode(ProActiveRuntime[] part)
-        throws ProActiveException {
+    public void notifyVirtualNode(ProActiveRuntime[] part) {
         for (int i = 0; i < part.length; i++) {
             String url = part[i].getURL();
             String protocol = UrlBuilder.getProtocol(url);
@@ -182,8 +184,7 @@ public class ServiceThread extends Thread {
         if (nodeRequested == MAX_NODE) {
             // nodeRequested = -1 means try to get the max number of nodes
             return true;
-        } else {
-            return nodeCount < nodeRequested;
         }
+        return nodeCount < nodeRequested;
     }
 }
