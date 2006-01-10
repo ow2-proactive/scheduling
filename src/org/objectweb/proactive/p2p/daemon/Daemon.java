@@ -54,10 +54,13 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.Vector;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.WriterAppender;
+import org.apache.log4j.nt.NTEventLogAppender;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -635,7 +638,11 @@ public class Daemon {
         File.separator;
     private static final String MAX_SIZE = "100KB";
     private static final String LOG_PATTERN = "%d %c %x %m\n\n";
-    private static final RollingFileAppender appender = configureLogging();
+    private static WriterAppender writerAppender;
+
+    static {
+        configureLogging();
+    }
 
     /* Shared with the native daemon */
     private static final int DAEMON_PORT = 9015;
@@ -661,31 +668,35 @@ public class Daemon {
         }
     }
 
-    private static RollingFileAppender configureLogging() {
-        String hostname = XMLConfig.getLocalHostName();
-
-        Layout layout = new PatternLayout(LOG_PATTERN);
-        String filename = LOG_DIR + hostname;
-
-        RollingFileAppender rfa;
+    private static void configureLogging() {
+        Appender appender;
         try {
-            new File(LOG_DIR).mkdir();
-            rfa = new RollingFileAppender(layout, filename, true);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            return null;
+            appender = new NTEventLogAppender("ProActiveP2P");
+        } catch (java.lang.UnsatisfiedLinkError e) {
+            String hostname = XMLConfig.getLocalHostName();
+
+            Layout layout = new PatternLayout(LOG_PATTERN);
+            String filename = LOG_DIR + hostname;
+            RollingFileAppender rfa;
+            try {
+                new File(LOG_DIR).mkdir();
+                rfa = new RollingFileAppender(layout, filename, true);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                return;
+            }
+
+            rfa.setMaxBackupIndex(0);
+            rfa.setMaxFileSize(MAX_SIZE);
+            rfa.setImmediateFlush(false);
+            writerAppender = rfa;
+            appender = rfa;
         }
-
-        rfa.setMaxBackupIndex(0);
-        rfa.setMaxFileSize(MAX_SIZE);
-        rfa.setImmediateFlush(false);
-
         Logger root = Logger.getRootLogger();
-        root.addAppender(rfa);
+        root.addAppender(appender);
 
         /* First message :) */
         log("Starting P2P Daemon", false);
-        return rfa;
     }
 
     private Daemon(boolean nextRun) {
@@ -756,14 +767,14 @@ public class Daemon {
     }
 
     private static void flush(String message) {
-        if (appender != null) {
-            appender.setImmediateFlush(true);
+        if (writerAppender != null) {
+            writerAppender.setImmediateFlush(true);
         }
 
         log(message, false);
 
-        if (appender != null) {
-            appender.setImmediateFlush(false);
+        if (writerAppender != null) {
+            writerAppender.setImmediateFlush(false);
         }
     }
 
