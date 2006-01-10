@@ -30,6 +30,36 @@
 	<infrastructure>
 		<processes>
 
+			<processDefinition id="localJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="/home/smariani/ProActive/lib/ProActive.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/asm.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/log4j.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/components/fractal.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/xercesImpl.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/bouncycastle.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/jsch.jar" />
+						<absolutePath value="/home/smariani/ProActive/lib/javassist.jar" />
+						<absolutePath value="/home/smariani/ProActive/classes" />
+					</classpath>
+					<javaPath>
+						<absolutePath value="/home/smariani/jdk1.5.0_05/bin/java" />
+					</javaPath>
+					<policyFile>
+						<absolutePath value="/home/smariani/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="/home/smariani/ProActive/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter value="-Djava.library.path=/home/smariani/" />
+						<parameter value="-Dproactive.useIPaddress=true" />
+						<parameter value="-Dproactive.rmi.port=6099" />
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+
 			<!-- remote jvm Process -->
 			<processDefinition id="jvmProcess">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
@@ -43,10 +73,10 @@
 			<!-- pbs Process -->
 			<processDefinition id="pbsProcess">
 				<pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess">
-					<processReference refid="jvmProcess" />
+					<processReference refid="localJVM1" />
 					<commandPath value="/opt/torque/bin/qsub" />
 					<pbsOption>
-						<hostsNumber>5</hostsNumber>
+						<hostsNumber>2</hostsNumber>
 						<processorPerNode>1</processorPerNode>
 						<bookingDuration>00:02:00</bookingDuration>
 						<scriptPath>
@@ -59,15 +89,15 @@
 			<!-- mpi Process -->
 			<processDefinition id="mpiCPI">
 				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi">
-					<commandPath value="/usr/bin/mpirun" />
+					<commandPath value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun" />
 					<mpiOptions>
-						<hostsNumber>5</hostsNumber>
+						<hostsNumber>2</hostsNumber>
 						<localRelativePath>
-							<relativePath origin="user.home" value="/ProActive/src/org/objectweb/proactive/examples/mpi" />
+							<relativePath origin="user.home" value="/ProActive/scripts/unix" />
 						</localRelativePath>
-						<remoteAbsolutePath>
+						<remoteHomedir>
 							<absolutePath value="/home/smariani" />
-						</remoteAbsolutePath>
+						</remoteHomedir>
 					</mpiOptions>
 				</mpiProcess>
 			</processDefinition>
@@ -87,9 +117,9 @@
 					<FileTransferDeploy refid="transfer">
 						<copyProtocol>scp</copyProtocol>
 						<!-- local host path -->
-						<sourceInfo prefix="/user/smariani/home/mpiPA/bin" />
+						<sourceInfo prefix="/user/smariani/home/ProActive/src/org/objectweb/proactive/examples/mpi" />
 						<!-- remote host path -->
-						<destinationInfo prefix="/home/smariani" />
+						<destinationInfo prefix="/home/smariani/MyApp" />
 					</FileTransferDeploy>
 				</sshProcess>
 			</processDefinition>
