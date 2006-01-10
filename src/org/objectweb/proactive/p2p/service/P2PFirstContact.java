@@ -90,14 +90,12 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
         connectingPeer();
         while (body.isAlive()) {
             if (this.peers.size() != 0) {
-                //  if (this.acqGroup.size() == 0) {
                 // We have some url and we know nobody
                 connectingPeer();
-                //}
-                try {
-                    Thread.sleep(Long.parseLong(System.getProperty(PROPERTY_TTU)));
-                } catch (Exception e) {
-                }
+            }
+            try {
+                Thread.sleep(Long.parseLong(System.getProperty(PROPERTY_TTU)));
+            } catch (Exception e) {
             }
         }
     }
