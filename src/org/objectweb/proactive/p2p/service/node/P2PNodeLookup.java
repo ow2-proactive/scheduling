@@ -43,7 +43,6 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -75,7 +74,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private int acquiredNodes = 0;
     private P2PService localP2pService;
     private String vnName;
-    private VirtualNode vn;
     private String jobId;
     private P2PNodeLookup stub;
     private ProActiveRuntime paRuntime;
@@ -229,9 +227,32 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             logger.info("Node at " + nodeUrl + " succefuly added");
             logger.info("Lookup got " + this.acquiredNodes + " nodes");
             return new P2PNodeAck(true);
-        } else {
-            return new P2PNodeAck(false);
         }
+        return new P2PNodeAck(false);
+    }
+
+    public void giveNodeForMax(Vector givenNodes,
+        P2PNodeManager remoteNodeManager) {
+        // Get currrent nodes accessor
+        this.waitingNodesList.addAll(givenNodes);
+        for (int i = 0; i < givenNodes.size(); i++) {
+            Node current = (Node) givenNodes.get(i);
+            String nodeUrl = current.getNodeInformation().getURL();
+            this.nodeManagerMap.put(nodeUrl, remoteNodeManager);
+            this.acquiredNodes++;
+            ProActiveRuntime remoteRt = current.getProActiveRuntime();
+            try {
+                remoteRt.addAcquaintance(this.parUrl);
+                this.paRuntime.addAcquaintance(remoteRt.getURL());
+                this.paRuntime.register(remoteRt, remoteRt.getURL(), "p2p",
+                    System.getProperty(PROPERTY_ACQUISITION) + ":",
+                    remoteRt.getVMInformation().getName());
+            } catch (ProActiveException e) {
+                logger.warn("Couldn't recgister the remote runtime", e);
+            }
+            logger.info("Node at " + nodeUrl + " succefuly added");
+        }
+        logger.info("Lookup MAX got " + this.acquiredNodes + " nodes");
     }
 
     /**
