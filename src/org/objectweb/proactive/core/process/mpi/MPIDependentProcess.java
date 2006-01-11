@@ -82,7 +82,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
         try {
             PrintWriter mf_writer;
             mf_writer = new PrintWriter(new BufferedWriter(
-                        new FileWriter("machinefile")));
+                        new FileWriter(hostsFileName)));
             for (int i = 0; i < nodes.length; i++) {
                 mf_writer.println(nodes[i].getNodeInformation().getHostName());
             }
