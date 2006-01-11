@@ -76,7 +76,7 @@
 					<processReference refid="localJVM1" />
 					<commandPath value="/opt/torque/bin/qsub" />
 					<pbsOption>
-						<hostsNumber>2</hostsNumber>
+						<hostsNumber>16</hostsNumber>
 						<processorPerNode>1</processorPerNode>
 						<bookingDuration>00:02:00</bookingDuration>
 						<scriptPath>
@@ -91,7 +91,7 @@
 				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi">
 					<commandPath value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun" />
 					<mpiOptions>
-						<hostsNumber>2</hostsNumber>
+						<hostsNumber>16</hostsNumber>
 						<localRelativePath>
 							<relativePath origin="user.home" value="/ProActive/scripts/unix" />
 						</localRelativePath>
