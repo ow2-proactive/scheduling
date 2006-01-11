@@ -1243,7 +1243,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:sequence>
 			<xs:element minOccurs="1" name="hostsNumber" type="xs:string"/>
 			<xs:element minOccurs="1" name="localRelativePath" type="FilePathType"/>
-			<xs:element minOccurs="0" name="remoteHomedir" type="FilePathType"/>
+			<xs:element minOccurs="0" name="remoteAbsolutePath" type="FilePathType"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!-- end mpiOptions-->

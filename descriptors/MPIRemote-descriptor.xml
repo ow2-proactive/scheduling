@@ -95,9 +95,9 @@
 						<localRelativePath>
 							<relativePath origin="user.home" value="/ProActive/scripts/unix" />
 						</localRelativePath>
-						<remoteHomedir>
-							<absolutePath value="/home/smariani" />
-						</remoteHomedir>
+						<remoteAbsolutePath>
+							<absolutePath value="/home/smariani/MyApp" />
+						</remoteAbsolutePath>
 					</mpiOptions>
 				</mpiProcess>
 			</processDefinition>
