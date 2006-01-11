@@ -1227,6 +1227,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 if (checkNonEmpty(myProxyServer)) {
                     GLiteProcess.jad.addAttribute(Jdl.MYPROXY, myProxyServer);
                 }
+                String cpuNumber = (attributes.getValue("cpuNumber"));
+                if (checkNonEmpty(cpuNumber)){
+                	((GLiteProcess) targetProcess).setCpuNumber(Integer.parseInt(cpuNumber));
+                }
 
                 //((GLiteProcess) targetProcess).setJad(jad);
             } catch (IllegalArgumentException e) {

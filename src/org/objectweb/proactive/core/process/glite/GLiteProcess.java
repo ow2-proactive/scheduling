@@ -83,6 +83,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     protected boolean jdlRemote = false;
     protected String netServer;
     protected String logBook;
+    protected int cpuNumber = 1;
 
     // WARNING : variable appartenant a toutes les instances de la classe GLiteProcess
     public static GLiteJobAd jad;
@@ -117,7 +118,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             pad = ProActive.getProactiveDescriptor(args[0]);
             pad.activateMappings();
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -399,6 +399,16 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         ft.addFile(filePath + "/" + fileName, remoteFilePath + "/" + fileName);
         return ft;
     }
+
+	public int getCpuNumber() {
+		return cpuNumber;
+	}
+
+	public void setCpuNumber(int cpuNumber) {
+		this.cpuNumber = cpuNumber;
+	}
+
+	
 
     /******************************************************************************************
      *                                END OF GETTERS AND SETTERS                              *

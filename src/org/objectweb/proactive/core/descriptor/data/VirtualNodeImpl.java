@@ -56,7 +56,9 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
+import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
+import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -351,10 +353,29 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 if (vm.hasProcess()) {
                     boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
                     ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
-
+                                      
                     // get the rank of sequential process - return -1 if it does not exist
                     int rankOfSequentialProcess = checkForSequentialProcess(process);
-
+                    
+                    
+                    
+                    //check if it's a gLiteProcess. If it's a gLiteProcess, get the cpu number and run the glite submission command "cpuNumber" times.
+                    int cpuNumber = checkGLiteProcess(process);
+                    if ( cpuNumber > -1) {
+                    	
+                    	while (cpuNumber > 0) {
+                    		try {
+                    			setParameters(process, vm);
+								process.startProcess();
+								process.setStarted(false);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}		
+							cpuNumber --;
+                    	}                   	
+                    }
+                    
+                    
                     // there's a sequential process in the hierarchical process
                     if (rankOfSequentialProcess > -1) {
                         ExternalProcess deepCopy = (ExternalProcess) makeDeepCopy(process);
@@ -541,6 +562,27 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
         return -1;
+    }
+    /**
+    *Check if the ExternalProcess is a gLiteProcess
+    *return boolean true if it's a gLiteProcess
+    **/
+    private int checkGLiteProcess(ExternalProcess process) {
+    	
+    	int res = 0;
+        while (!(process instanceof JVMProcess)) {
+        	
+            if (process instanceof GLiteProcess) {
+            	
+                return ((GLiteProcess)process).getCpuNumber();
+            } else {
+                res++;
+                process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+            }
+        }
+        return -1;
+    	
+    	//return ((process.getClass().getName()).equals(GLiteProcess.class.getName()));
     }
 
     /**
