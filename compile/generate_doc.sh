@@ -15,7 +15,7 @@ mkdir -p $pdf_dir
 
 # This copy part is done very easily with ant, even with file selection
 echo "    COPYING IMAGE FILES "
-for f in components/ development/ eclipse_files/ guided_tour/ images/ osgi_files/ p2p_files/ PA_config.xsl ProActive.css ProActiveRefBook.pdf security_images/ test_documentation/ webservices/ ; do
+for f in components/ development/ eclipse_files/ guided_tour/ images/ osgi_files/ p2p_files/ mpi_files/ PA_config.xsl ProActive.css ProActiveRefBook.pdf security_images/ test_documentation/ webservices/ ; do
     cp -r $xml_src_dir/$f $html_dir/
 done
 
