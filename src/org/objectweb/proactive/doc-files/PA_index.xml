@@ -28,6 +28,7 @@
 <!ENTITY Security SYSTEM "Security.xml">
 <!ENTITY WSDoc SYSTEM "WSDoc.xml">
 <!ENTITY OSGi SYSTEM "OSGi.xml">
+<!ENTITY mpi SYSTEM "mpi.xml">
 <!ENTITY IC2D SYSTEM "IC2D.xml">
 <!ENTITY plugin SYSTEM "development/plugin.xml">
 <!ENTITY guidedindex SYSTEM "guided_tour/guidedIndex.xml">
@@ -79,6 +80,7 @@
   &Security;
   &WSDoc;
   &OSGi;
+  &mpi;
  </part><part id="ProActiveTools"> <title> User Interface and tools</title>
   &IC2D;
   &plugin;

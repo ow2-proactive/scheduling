@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter>
+	<title>Wrapping MPI and Legacy code</title>
+
+	<sect1 remap="h2">
+		<title>
+			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_Overview" />Simple wrapping - Overview</title>
+
+		<para>The <emphasis role="bold">Message Passing Interface (MPI)</emphasis> is a widely adopted communication 
+library for parallel and distributed computing. This work aims at bringing SPMD 
+(Simple Program Multiple Data) MPI code into ProActive.</para>
+
+		<para>The <emphasis role="bold">simple wrapping</emphasis> allows an MPI cluster application to be embedded 
+through  ProActive in a problem-solving environment. It permits users to develop 
+conventional stand-alone Java applications that use a <emphasis role="bold">native MPI application</emphasis> on 
+cluster systems. Primary objective is <emphasis role="bold">to hide coupling application deployment</emphasis> on several clusters.
+This document expose a simple wrapping architecture designed to <emphasis role="bold">automatically deploy MPI application</emphasis> on a cluster through the use of deployment descriptor.</para>
+
+		<para>This work can also <emphasis role="bold">be combined with the ProActive Fractal component 
+model</emphasis> in order to write application as component tasks in a dataflow-style task graph.
+The idea is to encapsulate simulation codes into components and let 
+them communicate through ProActive. In fact, ProActive provides a communication layer 
+so that components can be distributed on different computing resources within a 
+Computational Grid. It also provides support to encapsulate parallel codes in 
+such a way that the coupling will be parallel.</para>
+		<para>
+			<emphasis role="bold">However</emphasis> the simple wrapping method 
+do not let SPMD processes associated with one code communicate with the SPMD 
+processors associated with another simulation code. We are currently studying this 
+last point in the <emphasis role="bold">complex wrapping context</emphasis>.</para>
+	</sect1>
+
+	<sect1 remap="h2">
+		<title>
+			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_Infrastructure_Model" />Simple Wrapping - Infrastructure Model</title>
+
+		<para>The goal of this work is mainly to deploy automatically and transparently 
+MPI parallel applications on cluster. Transparency means that user
+does not know what particular resources provides computer power. So the user should just have to carry out the deployment 
+descriptor file and get back the result of the application without worrying about resources
+selection, resource location and type, or mapping process on resources.
+	</para>
+
+		<para>
+			<informalfigure>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="mpi_files/deployment.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</informalfigure>
+			<emphasis role="bold">File transfer and asking for resources</emphasis>
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">(1) File Transfer</emphasis>
+				</para>
+				<para>As we said before, the primary objective is to provide user an automatic deployment of his application 
+through a file deployment descriptor. In fact, ProActive provides support for File Transfer. In this way, user can
+transfer MPI application <emphasis role="bold">input data</emphasis> and/or MPI <emphasis role="bold">application code</emphasis> to the remote host. The File Transfer happens before the user launches his application.
+For more details about File Transfer click <link linkend="FileTransfer_html_intro">here</link>.
+		</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">(2) Asking for resources</emphasis>
+				</para>
+				<para>User describes his requirements for the MPI job in the file deployment descriptor.
+He gets back a Virtual Node corresponding to the remote available hosts for the MPI Job execution. 
+Each MPI job is as embedded in a Virtual Node containing resources specification.</para>
+			</listitem>
+		</itemizedlist>
+		<para>
+			<informalfigure>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="mpi_files/launch.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</informalfigure>
+			<emphasis role="bold">start MPI process and get returned value</emphasis>
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">(3) starting MPI process</emphasis>
+				</para>
+				<para>After deployment, user obtains the Virtual Node attached with resources required for the MPI job.
+Then he just has to call the method <emphasis role="bold">startMPI</emphasis> on this Virtual Node to initiate the MPI job execution.
+In that way user can launch as many times the execution of the MPI job as the startMPI method is called on the Virtual Node.
+				
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">(4) get MPI code return value</emphasis>
+				</para>
+				<para>As the virtual Node is attached with an MPI process, user can get the MPI <emphasis role="bold">code exit value</emphasis>back into his application.
+Mostly this value corresponds to the termination status of the code, that is to say a status of zero unless a code 
+problem has been detected.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">(5) File Transfer Retrieve (not yet implemented)</emphasis>
+				</para>
+				<para>Like the File transfer deployment mentioned above, this work should profit from the File Tranfer functionality
+by retrieving files generated or modified by the MPI program on the remote host.
+This functionality is currently under development.
+				</para>
+			</listitem>
+		</itemizedlist>
+
+	</sect1>
+	<sect1 remap="h2">
+		<title>
+			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_Infrastructure_Implementation" />Simple Wrapping - Infrastructure Implementation</title>
+		<para>The section aims at having a look at the infrastructure implemented around MPI.</para>
+		<para>
+			<informalfigure>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="mpi_files/architecture.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</informalfigure>
+			<emphasis role="bold"> Process Package Architecture</emphasis>
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">DependentListProcess and IndependentListProcess (blue part on the picture)</emphasis>
+				</para>
+				<para>The <emphasis role="bold">Sequential List processes </emphasis>relative classes are defined in the <emphasis role="bold">org.objectweb.proactive.core.process</emphasis> package.
+The two classes share the same caracteristic: 
+both contain a <emphasis role="bold">list of processes which have to be executed sequentially</emphasis>.
+This dependent constraint has been integrated in order to satisfy the MPI process requirement. Indeed, the DependentListProcess class specifies
+a list of processes which have to extend the <emphasis role="bold">DependentProcess interface</emphasis>, unless the header process which is a simple allocation resources process.
+It provides user to be sure that the dependent process will be executed if and only if this dependent process gets back parameters from which it is 
+dependent. On the other hand the <emphasis role="bold">IndependentListProcess</emphasis> provides user to launch process sequentially but we do not use this last functionality for 
+the MPI process case.
+ 			</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">MPI Dependent Process (red part on the picture)</emphasis>
+				</para>
+				<para> The <emphasis role="bold">MPI</emphasis> relative classes are defined in the <emphasis role="bold">org.objectweb.proactive.core.process.mpi</emphasis> package.
+As we explain item above, MPI process preliminary requires a list of hosts for job execution. 
+Thus it is considered as a <emphasis role="bold">Dependent Process</emphasis>, dependent on process which sends back a list of hosts on which MPI could be deployed.
+ 			</para>
+			</listitem>
+
+		</itemizedlist>
+	</sect1>
+	<sect1 remap="h2">
+		<title>
+			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_Using_Infrastructure" />Using the Simple Wrapping Infrastructure</title>
+		<para>
+	Largest (to not say -only-) work is the XML file deployment descriptor writing.
+	We explain the functioning with the example included in the release. The entire file is available <ulink url="mpi_files/MPIRemote-descriptor.xml">here</ulink>.
+</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">File Transfer: </emphasis> specify all the files which
+ have to be transferred on the remote host like <emphasis role="bold">executive code</emphasis> and <emphasis role="bold">input data</emphasis>. 
+In the following example, "cpi" is the mpi progam name. 
+				</para>
+				<screen>&lt;componentDefinition&gt;
+   &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name=&quot;CPI&quot; /&gt;
+   &lt;/virtualNodesDefinition&gt;
+  &lt;/componentDefinition&gt;
+  &lt;deployment&gt;
+   ...
+  &lt;/deployment&gt;
+  &lt;FileTransferDefinitions&gt;
+   &lt;FileTransfer id=&quot;mpiCodeTransfer&quot;&gt;
+    &lt;file src=&quot;cpi&quot; dest=&quot;cpi&quot; /&gt;
+   &lt;/FileTransfer&gt;
+  &lt;/FileTransferDefinitions&gt;
+</screen>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Resources allocation:</emphasis> define all processes for connecting
+remote host and also processes for resources reservation.
+				</para>
+				<para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								<emphasis role="bold">SSHProcess:</emphasis>
+first define the process to connect the remote host. Make point the reference id
+ of the file transfer with the FileTransfer previously defined and make point the
+ reference id to the Dependent Process Sequence defined below.</para>
+
+							<screen>&lt;processDefinition id=&quot;sshProcess&quot;&gt;
+   &lt;sshProcess class=&quot;org.objectweb.proactive.core.process.ssh.SSHProcess&quot; hostname=&quot;nef.inria.fr&quot; username=&quot;smariani&quot;&gt;
+    &lt;processReference refid=&quot;dependentProcessCPI&quot;  /&gt;
+	&lt;FileTransferDeploy refid=&quot;mpiCodeTransfer&quot;&gt;
+	  &lt;copyProtocol&gt;scp&lt;/copyProtocol&gt;
+	   &lt;sourceInfo prefix=&quot;/user/smariani/home/ProActive/src/org/objectweb/proactive/examples/mpi&quot; /&gt;
+	   &lt;destinationInfo prefix=&quot;/home/smariani/MyApp&quot; /&gt;
+	&lt;/FileTransferDeploy&gt;
+   &lt;/sshProcess&gt;
+  &lt;/processDefinition&gt;
+</screen>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis role="bold">Dependent Process Sequence:</emphasis>
+ define the process to express the MPI process dependency towards PBS process. 
+				</para>
+							<screen>
+&lt;processDefinition id=&quot;dependentProcessCPI&quot;&gt;
+   &lt;dependentProcessSequence class=&quot;org.objectweb.proactive.core.process.DependentListProcessDecorator&quot;&gt;
+	&lt;processReference refid=&quot;pbsProcess&quot; /&gt;
+	&lt;processReference refid=&quot;mpiProcess&quot; /&gt;
+   &lt;/dependentProcessSequence&gt;
+  &lt;/processDefinition&gt;
+</screen>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis role="bold">PBS Process:</emphasis>
+ you can use any process/protocol defined in ProActive to allocate resources instead of the PBS one.
+				</para>
+							<screen>
+&lt;processDefinition id=&quot;pbsProcess&quot;&gt;
+  &lt;pbsProcess class=&quot;org.objectweb.proactive.core.process.pbs.PBSSubProcess&quot;&gt;
+	&lt;processReference refid=jvmProcess&quot; /&gt;
+	&lt;commandPath value=&quot;/opt/torque/bin/qsub&quot; /&gt;
+	&lt;pbsOption&gt;
+	 &lt;hostsNumber&gt;16&lt;/hostsNumber&gt;
+	 &lt;processorPerNode&gt;1&lt;/processorPerNode&gt;
+	 &lt;bookingDuration&gt;00:02:00&lt;/bookingDuration&gt;
+	 &lt;scriptPath&gt;
+	  &lt;absolutePath value=&quot;/home/smariani/pbsStartRuntime.sh&quot; /&gt;
+	 &lt;/scriptPath&gt;
+	&lt;/pbsOption&gt;
+  &lt;/pbsProcess&gt;
+ &lt;/processDefinition&gt;
+</screen>
+						</listitem>
+					</itemizedlist>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">MPI process: </emphasis> define the MPI process and its attributes. 
+It is possible to pass a command option to mpirun by filling the attribute <emphasis role="bold">mpiCommandOptions</emphasis>.
+Specify hosts number you whish the application to be deployed and at least the MPI code local path.
+The local path is the path from which you start the application.
+In the case of remote application, if the remote path field is not set, the host file will not be sent to remote host
+and MPI process will raise an error.
+
+				</para>
+				<screen>&lt;processDefinition id=&quot;mpiProcess&quot;&gt;
+ &lt;mpiProcess class=&quot;org.objectweb.proactive.core.process.mpi.MPIDependentProcess&quot; mpiFileName=&quot;cpi&quot;&gt;
+  &lt;commandPath value=&quot;/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun&quot; /&gt;
+  &lt;mpiOptions&gt;
+   &lt;hostsNumber&gt;16&lt;/hostsNumber&gt;
+   &lt;localRelativePath&gt;
+    &lt;relativePath origin=&quot;user.home&quot; value=&quot;/ProActive/scripts/unix&quot; /&gt;
+   &lt;/localRelativePath&gt;
+   &lt;remoteAbsolutePath&gt;
+    &lt;absolutePath value=&quot;/home/smariani/MyApp&quot; /&gt;
+   &lt;/remoteAbsolutePath&gt;
+  &lt;/mpiOptions&gt;
+ &lt;/mpiProcess&gt;
+&lt;/processDefinition&gt;</screen>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Sample of code: </emphasis> These few lines of code show how to start the MPI code from the application. 
+
+				</para>
+				<screen>
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+
+...
+// load the file desciptor 
+ProActiveDescriptor pad = ProActive.getProactiveDescriptor(&quot;file:descriptor.xml&quot;);
+
+// get the Virtual Node attached with the MPI code you want to execute
+VirtualNode vn = pad.getVirtualNode(&quot;CPI&quot;);
+
+// activate Virtual Node
+vn.activate();
+
+// launch MPI code and get the return value
+int exitValue = vn.startMPI();
+
+// run as many time as wanted the MPI code
+exitValue = vn.startMPI();
+
+...
+
+				</screen>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">Output result: </emphasis> The MPI code calculates an approximation 
+of PI number on 16 machines. Respectively to the java code just above we start twice the MPI code.
+				</para>
+				<para>
+					<screen>
+~/ sh cpi.sh 
+
+--- MPI deployment example ---------------------------------------------
+ --&gt; This ClassFileServer is reading resources from classpath 
+Created a new registry on port 6099 
+ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled  
+************* Reading deployment descriptor: file:./../../descriptors/MPIRemote-descriptor.xml ******************** 
+created VirtualNode name=CPI 
+Trying copyprotocol: scp 
+FileTransfer was successful 
+5577.nef.inria.fr 
+Process finished Thread=IN -&gt; ssh -l smariani nef. 
+Process finished Thread=ERR -&gt; ssh -l smariani nef. 
+**** Mapping VirtualNode CPI with Node: //193.51.209.143:6099/CPI1591771590 done 
+...
+</screen>
+				</para>
+				<para>
+Start MPI code.
+<screen>
+ -&gt; Iteration [0] 
+/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun -machinefile /home/smariani/MyApp/.machinefile -nolocal -np 16 /home/smariani/MyApp/cpi 
+Trying copyprotocol: scp 
+FileTransfer was successful 
+/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun -machinefile /home/smariani/MyApp/.machinefile -nolocal -np 16 /home/smariani/MyApp/cpi 
+Process 0 of 16 on nef013.inria.fr 
+pi is approximately 3.1415926544231274, Error is 0.0000000008333343 
+wall clock time = 0.004304 
+Process 8 of 16 on wagon002.inria.fr 
+Process 14 of 16 on nef011.inria.fr 
+Process 4 of 16 on wagon009.inria.fr 
+Process 6 of 16 on wagon012.inria.fr 
+Process 12 of 16 on wagon011.inria.fr 
+Process 15 of 16 on nef014.inria.fr 
+Process 7 of 16 on wagon005.inria.fr 
+Process 13 of 16 on nef012.inria.fr 
+Process 5 of 16 on wagon008.inria.fr 
+Process 2 of 16 on nef015.inria.fr 
+Process 10 of 16 on wagon003.inria.fr 
+Process 3 of 16 on wagon006.inria.fr 
+Process 11 of 16 on wagon004.inria.fr 
+Process 1 of 16 on nef016.inria.fr 
+Process 9 of 16 on wagon013.inria.fr 
+ MPI code returned value  0 
+ -&gt; Iteration [1] 
+Process finished Thread=IN -&gt; ssh -l smariani nef. 
+Process finished Thread=ERR -&gt; ssh -l smariani nef. 
+/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun -machinefile /home/smariani/MyApp/.machinefile -nolocal -np 16 /home/smariani/MyApp/cpi 
+Trying copyprotocol: scp 
+FileTransfer was successful 
+Process 0 of 16 on nef013.inria.fr 
+pi is approximately 3.1415926544231274, Error is 0.0000000008333343 
+wall clock time = 0.003859 
+Process 8 of 16 on wagon002.inria.fr 
+Process 4 of 16 on wagon009.inria.fr 
+Process 12 of 16 on wagon011.inria.fr 
+Process 15 of 16 on nef014.inria.fr 
+Process 3 of 16 on wagon006.inria.fr 
+Process 7 of 16 on wagon005.inria.fr 
+Process 11 of 16 on wagon004.inria.fr 
+Process 6 of 16 on wagon012.inria.fr 
+Process 14 of 16 on nef011.inria.fr 
+Process 1 of 16 on nef016.inria.fr 
+Process 9 of 16 on wagon013.inria.fr 
+Process 2 of 16 on nef015.inria.fr 
+Process 10 of 16 on wagon003.inria.fr 
+Process 13 of 16 on nef012.inria.fr 
+Process 5 of 16 on wagon008.inria.fr 
+ MPI code returned value  0 
+Process finished Thread=IN -&gt; ssh -l smariani nef. 
+Process finished Thread=ERR -&gt; ssh -l smariani nef. 
+
+Virtual Machine a38dfdf4d3df558a:375c0716:108b96acd65:-8000 on host nef013.inria.fr terminated!!! 
+...
+</screen>
+				</para>
+
+
+
+			</listitem>
+
+		</itemizedlist>
+
+
+
+
+
+
+
+	</sect1>
+
+	<sect1 remap="h2">
+		<title>
+			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_Example" />Usage Example With Components</title>
+		<para>Using the ProActive-Fractal component model, a user can construct 
+a scientific application by connecting together software components. The components may be normal 
+codes or they may be parallel codes that make use of <emphasis role="bold">native MPI code</emphasis>.</para>
+
+
+		<para>
+			<informalfigure>
+				<mediaobject>
+					<imageobject>
+						<imagedata fileref="mpi_files/MPI_Component.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</informalfigure>
+			<emphasis role="bold"> Vibro-Acoustic Numerical Simulation</emphasis>
+		</para>
+
+		<para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">Usage example in a problem-solving environment</emphasis>
+					</para>
+					<para>
+The term problem-solving environment (PSE) refers to a problem-oriented computing environment 
+that supports the entire range of scientific computational problem-solving activity:
+ from problem formulation, to algorithm selection, to numerical simulation, to solution visualization.
+</para>
+
+					<para>An "MPI component" is composed of two parts: one is the wrapper which can be invoked
+ by a client, the other is the MPI executive unit integrated within a component in the same manner that explained above. 
+This application can be seen as a collection of components running on 
+different machines or on the same one.  Each components deploys a native MPI
+executive on a corresponding cluster. This application interacts through ProActive which
+provides inter-operability between different components by specifying their interfaces. 
+The ability to re-use existing native code makes ProActive a good choice for developers interested in using high performance 
+codes containing low level message passing libraries as MPI in problem-solving environment context.
+We combine the MPI runtime with the ProActive environment and use it to manage the intra-communications of components.
+</para>
+
+					<para> Using this component model, user can write Workflow and Dataflow-based applications defined thanks to a XML descriptor
+from Fractal ADL. Benefit is that the user can start in parallel two components, in other words two MPI code.</para>
+				</listitem>
+			</itemizedlist>
+		</para>
+
+	</sect1>
+
+
+	<sect1 remap="h2">
+		<title>
+			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_FutureWork" />Future work</title>
+		<para>We plan a <emphasis role="bold">complex wrapping</emphasis> to use ProActive for distributed Java computing using 
+message passing interface (MPI) on a Grid.
+This extension would support MPI-style inter-process communication between multiple 
+MPI processes that are running on different Grid sites, through a special binding between ProActive and the native MPI library.
+</para>
+
+
+
+
+	</sect1>
+
+
+
+
+
+</chapter>
