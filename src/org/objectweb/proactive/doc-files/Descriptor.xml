@@ -2310,6 +2310,48 @@
             <listitem>
               <para> Complete example of XML Deployment Descriptor</para>
             </listitem>
+			<listitem>
+              <para> MPI </para>
+            </listitem>
+			<listitem>
+              <para> ProActive provides <literal>org.objectweb.proactive.core.process.mpi.MPIDependentProcess</literal>
+ to use such protocol. You have to couple this process with the DependentListProcessDecorator explained below.</para>
+              <para>Check also <ulink url="../../../../../xml_examples/SSH_MPI_Example.xml">SSH_MPI_Example.xml</ulink>.</para>
+<para>
+<screen>
+			&lt;processDefinition id=&quot;<emphasis role="bold">mpiProcess</emphasis>&quot;&gt;
+				&lt;mpiProcess class=&quot;<emphasis role="bold">org.objectweb.proactive.core.process.mpi.MPIDependentProcess</emphasis>&quot; mpiFileName=&quot;my_mpi_program&quot;&gt;
+					&lt;commandPath value=&quot;/usr/bin/mpirun&quot; /&gt;
+					&lt;mpiOptions&gt;
+						&lt;hostsNumber>16&lt;/hostsNumber&gt;
+						&lt;localRelativePath&gt;
+							&lt;relativePath origin="user.home" value=&quot;/ProActive/scripts/unix&quot; /&gt;
+						&lt;/localRelativePath&gt;
+						&lt;remoteAbsolutePath&gt;
+							&lt;absolutePath value=&quot;/home/user&quot; /&gt;
+						&lt;/remoteAbsolutePath&gt;
+					&lt;/mpiOptions&gt;
+				&lt;/mpiProcess&gt;
+			&lt;/processDefinition&gt;
+
+			&lt;processDefinition id=&quot;<emphasis role="bold">dependentProcessSequence</emphasis>&quot;&gt;
+				&lt;dependentProcessSequence class=&quot;<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcessDecorator</emphasis>&quot;&gt;
+					&lt;processReference refid=&quot;<emphasis role="bold">pbsProcess</emphasis>&quot; /&gt;
+					&lt;processReference refid=&quot;<emphasis role="bold">mpiProcess</emphasis>&quot; /&gt;
+				&lt;/dependentProcessSequence&gt;
+			&lt;/processDefinition&gt;
+
+			&lt;processDefinition id=&quot;<emphasis role="bold">sshProcess</emphasis>&quot;&gt;
+				&lt;sshProcess class=&quot;<emphasis role="bold">org.objectweb.proactive.core.process.ssh.SSHProcess</emphasis>&quot; hostname=&quot;frontend&quot; &gt;
+					&lt;processReference refid=&quot;<emphasis role="bold">dependentProcessSequence</emphasis>&quot; /&gt;
+				&lt;/sshProcess&gt;
+			&lt;/processDefinition&gt;
+
+
+</screen>
+</para>
+            </listitem>
+
             <listitem>
               
               <para>
@@ -2594,6 +2636,26 @@
  create under ~/.ssh a file called environment where you define the DISPLAY variable. If you
  are not familiar with ssh, see <ulink url="http://www.openssh.org">openSSH</ulink></para>
         </listitem>
+		<listitem>
+          <para> <emphasis role="bold">DependentListProcessDecorator</emphasis> : This process is used when a process is dependent on an another process.
+The first process of the list can be any process but the second one must be a DependentProcess thus has to implement the org.objectweb.proactive.core.process.DependentProcess interface.</para>
+<para>Check also <ulink url="../../../../../xml_examples/SSH_MPI_Example.xml">SSH_MPI_Example.xml</ulink>.</para>
+<para> 
+<screen>
+			&lt;processDefinition id=&quot;<emphasis role="bold">dependentProcessSequence</emphasis>&quot;&gt;
+				&lt;dependentProcessSequence class=&quot;<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcessDecorator</emphasis>&quot;&gt;
+					&lt;processReference refid=&quot;<emphasis role="bold">pbsProcess</emphasis>&quot; /&gt;
+					&lt;processReference refid=&quot;<emphasis role="bold">mpiProcess</emphasis>&quot; /&gt;
+				&lt;/dependentProcessSequence&gt;
+			&lt;/processDefinition&gt;
+
+			&lt;processDefinition id=&quot;<emphasis role="bold">sshProcess</emphasis>&quot;&gt;
+				&lt;sshProcess class=&quot;<emphasis role="bold">org.objectweb.proactive.core.process.ssh.SSHProcess</emphasis>&quot; hostname=&quot;frontend&quot; &gt;
+					&lt;processReference refid=&quot;<emphasis role="bold">dependentProcessSequence</emphasis>&quot; /&gt;
+				&lt;/sshProcess&gt;
+			&lt;/processDefinition&gt;</screen></para>
+
+        </listitem>		
 </itemizedlist>
       <para><anchor id="Descriptor_html_services"/></para>
     </sect1>

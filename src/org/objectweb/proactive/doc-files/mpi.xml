@@ -178,7 +178,7 @@ In the following example, "cpi" is the mpi progam name.
    ...
   &lt;/deployment&gt;
   &lt;FileTransferDefinitions&gt;
-   &lt;FileTransfer id=&quot;mpiCodeTransfer&quot;&gt;
+   &lt;FileTransfer id=&quot;<emphasis role="bold">mpiCodeTransfer</emphasis>&quot;&gt;
     &lt;file src=&quot;cpi&quot; dest=&quot;cpi&quot; /&gt;
    &lt;/FileTransfer&gt;
   &lt;/FileTransferDefinitions&gt;
@@ -196,15 +196,15 @@ remote host and also processes for resources reservation.
 								<emphasis role="bold">SSHProcess:</emphasis>
 first define the process to connect the remote host. Make point the reference id
  of the file transfer with the FileTransfer previously defined and make point the
- reference id to the Dependent Process Sequence defined below.</para>
+ reference id to the DependentProcessSequence process defined below.</para>
 
 							<screen>&lt;processDefinition id=&quot;sshProcess&quot;&gt;
    &lt;sshProcess class=&quot;org.objectweb.proactive.core.process.ssh.SSHProcess&quot; hostname=&quot;nef.inria.fr&quot; username=&quot;smariani&quot;&gt;
-    &lt;processReference refid=&quot;dependentProcessCPI&quot;  /&gt;
-	&lt;FileTransferDeploy refid=&quot;mpiCodeTransfer&quot;&gt;
+    &lt;processReference refid=&quot;<emphasis role="bold">dependentProcessCPI</emphasis>&quot;  /&gt;
+	&lt;FileTransferDeploy refid=&quot;<emphasis role="bold">mpiCodeTransfer</emphasis>&quot;&gt;
 	  &lt;copyProtocol&gt;scp&lt;/copyProtocol&gt;
-	   &lt;sourceInfo prefix=&quot;/user/smariani/home/ProActive/src/org/objectweb/proactive/examples/mpi&quot; /&gt;
-	   &lt;destinationInfo prefix=&quot;/home/smariani/MyApp&quot; /&gt;
+	   &lt;sourceInfo prefix=<emphasis role="bold">&quot;/user/smariani/home/ProActive/src/org/objectweb/proactive/examples/mpi&quot;</emphasis> /&gt;
+	   &lt;destinationInfo prefix=<emphasis role="bold">&quot;/home/smariani/MyApp&quot;</emphasis> /&gt;
 	&lt;/FileTransferDeploy&gt;
    &lt;/sshProcess&gt;
   &lt;/processDefinition&gt;
@@ -216,10 +216,10 @@ first define the process to connect the remote host. Make point the reference id
  define the process to express the MPI process dependency towards PBS process. 
 				</para>
 							<screen>
-&lt;processDefinition id=&quot;dependentProcessCPI&quot;&gt;
+&lt;processDefinition id=<emphasis role="bold">&quot;dependentProcessCPI&quot;</emphasis>&gt;
    &lt;dependentProcessSequence class=&quot;org.objectweb.proactive.core.process.DependentListProcessDecorator&quot;&gt;
-	&lt;processReference refid=&quot;pbsProcess&quot; /&gt;
-	&lt;processReference refid=&quot;mpiProcess&quot; /&gt;
+	&lt;processReference refid=<emphasis role="bold">&quot;pbsProcess&quot;</emphasis> /&gt;
+	&lt;processReference refid=<emphasis role="bold">&quot;mpiProcess&quot;</emphasis> /&gt;
    &lt;/dependentProcessSequence&gt;
   &lt;/processDefinition&gt;
 </screen>
@@ -230,7 +230,7 @@ first define the process to connect the remote host. Make point the reference id
  you can use any process/protocol defined in ProActive to allocate resources instead of the PBS one.
 				</para>
 							<screen>
-&lt;processDefinition id=&quot;pbsProcess&quot;&gt;
+&lt;processDefinition id=<emphasis role="bold">&quot;pbsProcess&quot;</emphasis>&gt;
   &lt;pbsProcess class=&quot;org.objectweb.proactive.core.process.pbs.PBSSubProcess&quot;&gt;
 	&lt;processReference refid=jvmProcess&quot; /&gt;
 	&lt;commandPath value=&quot;/opt/torque/bin/qsub&quot; /&gt;
@@ -259,16 +259,16 @@ In the case of remote application, if the remote path field is not set, the host
 and MPI process will raise an error.
 
 				</para>
-				<screen>&lt;processDefinition id=&quot;mpiProcess&quot;&gt;
+				<screen>&lt;processDefinition id=<emphasis role="bold">&quot;mpiProcess&quot;</emphasis>&gt;
  &lt;mpiProcess class=&quot;org.objectweb.proactive.core.process.mpi.MPIDependentProcess&quot; mpiFileName=&quot;cpi&quot;&gt;
   &lt;commandPath value=&quot;/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun&quot; /&gt;
   &lt;mpiOptions&gt;
-   &lt;hostsNumber&gt;16&lt;/hostsNumber&gt;
+   &lt;hostsNumber&gt;<emphasis role="bold">16</emphasis>&lt;/hostsNumber&gt;
    &lt;localRelativePath&gt;
-    &lt;relativePath origin=&quot;user.home&quot; value=&quot;/ProActive/scripts/unix&quot; /&gt;
+    &lt;relativePath origin=&quot;user.home&quot; value=<emphasis role="bold">&quot;/ProActive/scripts/unix&quot;</emphasis> /&gt;
    &lt;/localRelativePath&gt;
    &lt;remoteAbsolutePath&gt;
-    &lt;absolutePath value=&quot;/home/smariani/MyApp&quot; /&gt;
+    &lt;absolutePath value=<emphasis role="bold">&quot;/home/smariani/MyApp&quot;</emphasis> /&gt;
    &lt;/remoteAbsolutePath&gt;
   &lt;/mpiOptions&gt;
  &lt;/mpiProcess&gt;
