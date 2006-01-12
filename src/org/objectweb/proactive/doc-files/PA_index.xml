@@ -13,6 +13,7 @@
 <!ENTITY exceptions SYSTEM "exceptions.xml">
 <!ENTITY bnb SYSTEM "bnb.xml">
 <!ENTITY PAConfiguration SYSTEM "Configuration.xml">
+<!ENTITY Descriptor SYSTEM "Descriptor.xml">
 <!ENTITY VariableContract SYSTEM "VariableContract.xml">
 <!ENTITY FileTransfer SYSTEM "FileTransfer.xml">
 <!ENTITY SSHTunneling SYSTEM "SSHTunneling.xml">
@@ -63,6 +64,7 @@
   &bnb;
  </part><part id="ProActiveDeployment"> <title> Deploying</title>
   &PAConfiguration;
+  &Descriptor;
   &VariableContract;
   &FileTransfer;
   &SSHTunneling;
