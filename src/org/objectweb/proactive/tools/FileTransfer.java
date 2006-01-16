@@ -45,7 +45,7 @@ public class FileTransfer {
 	 */
 	public static File pullFile(Node node, File srcFile, File dstFile) throws IOException, ProActiveException{
 		
-		return pullFile(node, srcFile, dstFile);
+		return FileTransferService.pullFile(node, srcFile, dstFile);
 	}
 	
 	/**
@@ -53,6 +53,6 @@ public class FileTransfer {
 	 */
 	public static void pushFile(Node node, File srcFile, File dstFile) throws IOException, ProActiveException{
 	
-		pushFile(node, srcFile, dstFile);
+		FileTransferService.pushFile(node, srcFile, dstFile);
 	}
 }
