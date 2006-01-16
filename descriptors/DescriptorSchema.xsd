@@ -39,10 +39,13 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
-		<xs:keyref name="VirtNodeFileTransfer" refer="filetransferid">
+		<xs:keyref name="VirtNodeDeployFileTransfer" refer="filetransferid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@FileTransferDeploy"/>
-			<!--xs:field xpath="@FileTransferRetrieve"/-->
+		</xs:keyref>
+		<xs:keyref name="VirtNodeRetrieveFileTransfer" refer="filetransferid">
+			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:field xpath="@FileTransferRetrieve"/>
 		</xs:keyref>
 		<xs:keyref name="vnFtServiceId" refer="serviceid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
@@ -731,6 +734,16 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="password" type="xs:string" use="optional"/>
 	</xs:complexType>
+	<xs:complexType name="FileTransferRetrieveStructureType">
+		<xs:sequence>
+			<xs:element name="sourceInfo" type="FileTransferRetrieveStructureInfoType" minOccurs="0"/>
+			<xs:element name="destinationInfo" type="FileTransferRetrieveStructureInfoType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="refid" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="FileTransferRetrieveStructureInfoType">
+		<xs:attribute name="prefix" type="xs:string" use="optional"/>
+	</xs:complexType>
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
 	<xs:complexType name="RshProcessType">
 		<xs:sequence>
@@ -820,8 +833,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -934,7 +947,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="gLiteOptions" type="gLiteOptionsType" minOccurs="0"/>
-			<xs:element name="JdlTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="JdlTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.glite.GLiteProcess"/>
 		<xs:attribute name="hostname" type="xs:string"/>
@@ -1135,7 +1148,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="unicoreDirPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="keyFilePath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="unicoreOption" type="unicoreOptionType" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.unicore.UnicoreProcess"/>
 		<xs:attribute name="keypassword" type="xs:string" use="optional"/>
@@ -1187,8 +1201,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="processReference"/>
 			<xs:element name="hierarchicalReference" type="ProcessReferenceType"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
@@ -1208,8 +1222,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ngOption" type="NGOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.nordugrid.NGProcess"/>

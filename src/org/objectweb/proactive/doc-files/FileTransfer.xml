@@ -101,11 +101,11 @@ Node[] examplenode = testVNode.getNodes();
 
 File localSource = new File("/local/source/path/file");
 File remoteDest = new File("/remote/destination/path/file");
-<emphasis role="bold">filetransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+<emphasis role="bold">FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
 
 File remoteSource = new File("/remote/source/path/file");
 File localDest = new File("/local/destination/path/file");
-<emphasis role="bold">File filePulled = filetransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></screen>
+<emphasis role="bold">File filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></screen>
     </sect2>
   </sect1>
 
@@ -139,7 +139,7 @@ File localDest = new File("/local/destination/path/file");
       <title>XML Descriptor File Transfer Tags</title>
 
       <para>The File Transfer related tags, are placed inside the descriptor
-      at three different parts (or levels). </para>
+      at three different parts (or levels).</para>
 
       <para>The first one corresponds to the <emphasis
       role="bold">FileTransferDefinitions</emphasis> tag, which contains a
@@ -383,7 +383,8 @@ File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>()
       <informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="development/imgs/fileTransferDesign.png" format="PNG" />
+            <imagedata fileref="development/imgs/fileTransferDesign.png"
+                       format="PNG" />
           </imageobject>
         </mediaobject>
       </informalfigure>
@@ -418,7 +419,6 @@ File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>()
       all the nodes deployed from this virtualnode. The detailes of the
       specified file transfer will correspond to the ones present in the
       descriptor file.</para>
-      
     </sect2>
   </sect1>
 </chapter>

@@ -44,7 +44,7 @@ import java.io.IOException;
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     implements ExternalProcess {
     protected static Logger clogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
-    protected static Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+    protected static Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty(
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
@@ -232,11 +232,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         long beginning = System.currentTimeMillis();
         long end = beginning;
 
+        /*
         if (fileTransferLogger.isDebugEnabled()) {
             fileTransferLogger.debug(
                 "Using the following FileTransferWorkShop:\n" + fts);
         }
-
+        */
         if (!fts.check()) {
             return; //No files to transfer or some error.
         }

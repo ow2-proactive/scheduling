@@ -35,8 +35,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer.DirectoryDescription;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.DirectoryDescription;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop.StructureInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -52,10 +52,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 2.3
  */
 public abstract class AbstractCopyProtocol implements CopyProtocol {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     protected boolean isDefaultProtocol = false;
     protected String name;
-    protected FileTransfer[] fileTransfer;
+    protected FileTransferDefinition[] fileTransfer;
     protected StructureInformation srcInfoParams;
     protected StructureInformation dstInfoParams;
     protected boolean closeStream = false;
@@ -80,7 +80,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
         this.isDefaultProtocol = isDefaultProtocol;
     }
 
-    public void setFileTransferDefinitions(FileTransfer[] fileTransfer) {
+    public void setFileTransferDefinitions(FileTransferDefinition[] fileTransfer) {
         this.fileTransfer = fileTransfer;
     }
 

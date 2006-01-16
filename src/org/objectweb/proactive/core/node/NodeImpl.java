@@ -76,9 +76,14 @@ public class NodeImpl implements Node, Serializable {
     }
 
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
-        String protocol, String jobID) {
+            String protocol, String jobID) {
+    	this( proActiveRuntime, nodeURL, protocol, jobID, null);
+    }
+    
+    public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
+        String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
-        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
+        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID, vmName);
     }
 
     //
@@ -218,8 +223,9 @@ public class NodeImpl implements Node, Serializable {
         private java.net.InetAddress hostInetAddress;
         private java.rmi.dgc.VMID hostVMID;
         private String hostname;
-
-        public NodeInformationImpl(String url, String protocol, String jobID) {
+        private String vmName; 
+        	
+        public NodeInformationImpl(String url, String protocol, String jobID, String vmName) {
             this.nodeURL = url;
             this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
             this.hostInetAddress = proActiveRuntime.getVMInformation()
@@ -228,6 +234,7 @@ public class NodeImpl implements Node, Serializable {
             this.protocol = protocol;
             this.nodeName = extractNameFromUrl(url);
             this.jobID = jobID;
+            this.vmName= vmName;
         }
 
         /**
@@ -310,6 +317,13 @@ public class NodeImpl implements Node, Serializable {
         public String getHostName() {
             return this.hostname;
         }
+        
+        /**
+         * @see org.objectweb.proactive.core.node.NodeInformation#getDescriptorVMName()
+         */
+		public String getDescriptorVMName() {
+			return vmName;
+		}
     }
 
     // SECURITY

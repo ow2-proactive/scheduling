@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
@@ -62,7 +62,7 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
 
     public class FileTransferHandler extends PassiveCompositeUnmarshaller
         implements ProActiveDescriptorConstants {
-        protected FileTransfer fileTransfer;
+        protected FileTransferDefinition fileTransfer;
 
         public FileTransferHandler() {
             super(false);

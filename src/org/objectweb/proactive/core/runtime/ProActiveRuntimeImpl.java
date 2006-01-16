@@ -1190,6 +1190,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         public String getHostName() {
             return this.hostName;
         }
+
+		/**
+		 * @see org.objectweb.proactive.core.runtime.VMInformation#getDescriptorVMName()
+		 */
+		public String getDescriptorVMName() {
+			
+			return name;
+		}
     }
 
     //

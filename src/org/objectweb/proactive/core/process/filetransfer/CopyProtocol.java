@@ -53,7 +53,7 @@ public interface CopyProtocol {
 
     public boolean isDummyProtocol();
 
-    public void setFileTransferDefinitions(FileTransfer[] fileTransfer);
+    public void setFileTransferDefinitions(FileTransferDefinition[] fileTransfer);
 
     public void setSrcInfo(
         FileTransferWorkShop.StructureInformation srcInfoParams);

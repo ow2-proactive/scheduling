@@ -7,6 +7,7 @@
 	<property name="proactive.dir" value="org/objectweb/proactive"/>
 	<property name="proactive.core.dir" value="${proactive.dir}/core"/>
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
+	<property name="proactive.tools.dir" value="${proactive.dir}/tools"/>
 	<property name="classes.dir" value="${base}/classes"/>
 	<property name="classlibs.dir" value="${base}/classlibs"/>
 	<property name="dist.dir" value="${base}/dist"/>
@@ -193,6 +194,20 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 			<include name="${proactive.ext.dir}/**/*.java"/>
+		</javac>
+	</target>
+
+	<!--
+	   ================================================================
+	   ==
+       ==  Compile Tools
+       ==
+       ================================================================
+	-->
+	<target name="tools" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
+			<classpath refid="project.classpath"/>
+			<include name="${proactive.tools.dir}/**/*.java"/>
 		</javac>
 	</target>
 	<!--
@@ -419,7 +434,7 @@
       ==
       ================================================================
 	-->
-	<target name="proActiveJar" depends="ext">
+	<target name="proActiveJar" depends="ext,tools">
 		<mkdir dir="${dist.dir}/ProActive"/>
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">

@@ -39,7 +39,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 
 /**
  * This class stores the FileTransfer arquitecture specific
@@ -54,13 +54,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 2.3
  */
 public class FileTransferWorkShop implements Serializable {
-    public static final String PROCESSDEFAULT_KEYWORD = "processDefault";
-    public static final String IMPLICIT_KEYWORD = "implicit";
-    public static final String[] ALLOWED_COPY_PROTOCOLS = {
+	private static final String PROCESSDEFAULT_KEYWORD = "processDefault";
+    private static final String IMPLICIT_KEYWORD = "implicit";
+    private static final String[] ALLOWED_COPY_PROTOCOLS = {
             PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp", "nordugrid"
         };
-    public static final String[] URLPROTOCOLS = { "file://", "http://", "ftp://" };
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+    private static final String[] URLPROTOCOLS = { "file://", "http://", "ftp://" };
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
 
     /* Reference to filetransfer definitions */
     private HashMap fileTransfers;
@@ -68,10 +68,15 @@ public class FileTransferWorkShop implements Serializable {
     /*Array with protocols to try*/
     private String[] copyProtocol;
     private String processDefault;
-    boolean isImplicit;
+    private boolean isImplicit;
     public StructureInformation srcInfoParams;
     public StructureInformation dstInfoParams;
 
+    /**
+     * Constructs a FileTransferWorkshop.
+     * @param processDefault The default type of protocols to use. Should be one of the defined in
+     * the ALLOWED_COPY_PROTOCOLS
+     */
     public FileTransferWorkShop(String processDefault) {
         //Verification of ilegal name for processDefault=="processDefault"
         if ((processDefault == null) || (processDefault.length() <= 0) ||
@@ -114,7 +119,7 @@ public class FileTransferWorkShop implements Serializable {
         //FileTransfers
         Iterator it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            FileTransfer ft = (FileTransfer) fileTransfers.get(it.next());
+            FileTransferDefinition ft = (FileTransferDefinition) fileTransfers.get(it.next());
 
             sb.append(ft.toString()).append("\n");
         }
@@ -125,7 +130,11 @@ public class FileTransferWorkShop implements Serializable {
         return sb.toString();
     }
 
-    public synchronized void addFileTransfer(FileTransfer ft) {
+    /**
+     * Adds a File Transfer Definition to the FTW.
+     * @param ft
+     */
+    public synchronized void addFileTransfer(FileTransferDefinition ft) {
         if (ft == null) {
             return;
         }
@@ -138,6 +147,12 @@ public class FileTransferWorkShop implements Serializable {
         fileTransfers.put(ft.getId(), ft);
     }
 
+    /**
+     * Sets the copy protocol sequence, that should be executed in order to attempt
+     * the FileTransfer.
+     * @param copyProtocolString A coma separeted string, where each value represents
+     * a protocol specified in the ALLOWED_COPY_PROTOCOLS array.
+     */
     public void setFileTransferCopyProtocol(String copyProtocolString) {
         copyProtocol = copyProtocolString.split("\\s*,\\s*");
     }
@@ -219,21 +234,25 @@ public class FileTransferWorkShop implements Serializable {
         return cp;
     }
 
-    public synchronized FileTransfer[] getAllFileTransferDefinitions() {
+    /**
+     * Gives all the File Transfer Definitions mapped on to this FTW.
+     * @return A File Transfer Definition Array.
+     */
+    public synchronized FileTransferDefinition[] getAllFileTransferDefinitions() {
         ArrayList ftList = new ArrayList();
 
         Iterator it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            FileTransfer ft = (FileTransfer) fileTransfers.get(it.next());
+            FileTransferDefinition ft = (FileTransferDefinition) fileTransfers.get(it.next());
 
             ftList.add(ft);
         }
 
-        return (FileTransfer[]) ftList.toArray(new FileTransfer[0]);
+        return (FileTransferDefinition[]) ftList.toArray(new FileTransferDefinition[0]);
     }
 
     /**
-     * Sets the source information for a given Queue (Deploy, Retrieve).
+     * Sets the source information for this FTW.
      * @param name  The name of the parameter from: prefix, hostname, username, password
      * @param value The value of the parameter.
      */
@@ -242,7 +261,7 @@ public class FileTransferWorkShop implements Serializable {
     }
 
     /**
-     * Sets the destination information for a given Queue (Deploy, Retrieve).
+     * Sets the destination information for this FTW.
      * @param name  The name of the parameter from: prefix, hostname, username, password
      * @param value The value of the parameter.
      */
@@ -257,7 +276,7 @@ public class FileTransferWorkShop implements Serializable {
      * problem.
      */
     public boolean check() {
-        FileTransfer ft;
+        FileTransferDefinition ft;
 
         if (fileTransfers.size() <= 0) {
             if (logger.isDebugEnabled()) {
@@ -270,7 +289,7 @@ public class FileTransferWorkShop implements Serializable {
         boolean retval = false;
         Iterator it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            ft = (FileTransfer) fileTransfers.get(it.next());
+            ft = (FileTransferDefinition) fileTransfers.get(it.next());
             if (ft.isEmpty()) {
                 logger.warn("Warning: FileTransfer definition id=" +
                     ft.getId() + " is empty or undefined.");
@@ -285,6 +304,13 @@ public class FileTransferWorkShop implements Serializable {
         return retval;
     }
 
+    /**
+     * This method is used to determine if a direct file transfer definition
+     * reference has been specified at the process level, or wether the
+     * reference should be inherited from the upper levels (Virtual Node).
+     * @return true if the filetransfer process level definition should inherit
+     * the File Transfer Definitions from the upper levels (Virtual Node)
+     */
     public boolean isImplicit() {
         return isImplicit;
     }
@@ -293,6 +319,11 @@ public class FileTransferWorkShop implements Serializable {
         this.isImplicit = implicit;
     }
 
+    /**
+     * Tells if a specified copy protocol is an allowed protocol
+     * @param protocol
+     * @return true if it is allowed, false otherwise.
+     */
     public boolean isAllowedProtocol(String protocol) {
         for (int i = 0; i < ALLOWED_COPY_PROTOCOLS.length; i++)
             if (ALLOWED_COPY_PROTOCOLS[i].equalsIgnoreCase(protocol)) {
@@ -302,20 +333,46 @@ public class FileTransferWorkShop implements Serializable {
         return false;
     }
 
-    public String buildSrcFilePathString(String filename) {
+    /**
+     * Gives an array with all the FileDescriptions linked with this FTW.
+     * @return
+     */
+    public FileDescription[] getAllFileDescriptions(){
+    
+    	ArrayList fd = new ArrayList();
+
+        Iterator it = fileTransfers.keySet().iterator();
+        while (it.hasNext()) {
+            FileTransferDefinition ft = (FileTransferDefinition) fileTransfers.get(it.next());
+            
+            FileDescription fdesc[]=ft.getAllFiles();
+            for(int i=0; i < fdesc.length ; i++)
+            	fd.add(fdesc[i]);
+        }
+        
+        return (FileDescription[]) fd.toArray(new FileDescription[0]);
+    }
+    
+    /**
+     * For a given filename, it creates the Full Path using
+     * the source information of this FTW.
+     * @param fileDesc
+     * @return The full path String
+     */
+    public String getAbsoluteSrcPath(FileDescription fileDesc) {
         return buildFilePathString(srcInfoParams.getPrefix(),
-            srcInfoParams.getFileSeparator(), filename);
+            srcInfoParams.getFileSeparator(), fileDesc.getSrcName());
     }
 
+    public String getAbsoluteDstPath(FileDescription fileDesc) {
+        return buildFilePathString(dstInfoParams.getPrefix(),
+            dstInfoParams.getFileSeparator(), fileDesc.getDestName());
+    }
+    
     public static String buildFilePathString(StructureInformation infoParam,
         String filename) {
         return buildFilePathString(infoParam.getPrefix(),
             infoParam.getFileSeparator(), filename);
-    }
-
-    public String buildDstFilePathString(String filename) {
-        return buildFilePathString(dstInfoParams.getPrefix(),
-            dstInfoParams.getFileSeparator(), filename);
     }
 
     public static String buildFilePathString(String prefix, String fileSep,
@@ -324,7 +381,7 @@ public class FileTransferWorkShop implements Serializable {
         /*
          *BORDER CONDITIONS
          */
-
+ 	
         //Trim white spaces
         prefix = prefix.trim();
         fileSep = fileSep.trim();
@@ -373,15 +430,15 @@ public class FileTransferWorkShop implements Serializable {
         return false;
     }
 
-    public boolean checkLocalFileExistance(FileTransfer ft) {
+    public boolean checkLocalFileExistance(FileTransferDefinition ft) {
         boolean atLeastOneFile = false;
 
-        FileTransfer.FileDescription[] files = ft.getAll();
+        FileTransferDefinition.FileDescription[] files = ft.getAll();
 
         File f;
         String filefullname;
         for (int i = 0; i < files.length; i++) {
-            filefullname = buildSrcFilePathString(files[i].getSrcName());
+            filefullname = getAbsoluteSrcPath(files[i]);
 
             if (begginsWithProtocol(filefullname)) {
 

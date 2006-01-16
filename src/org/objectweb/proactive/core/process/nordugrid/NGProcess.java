@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -146,19 +146,19 @@ public class NGProcess extends AbstractExternalProcessDecorator {
 
     protected boolean internalFileTransferDefaultProtocol() {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
-        FileTransfer[] ftDefinitions = fts.getAllFileTransferDefinitions();
-        Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+        FileTransferDefinition[] ftDefinitions = fts.getAllFileTransferDefinitions();
+        Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < ftDefinitions.length; i++) {
             //Files and Dirs
             FileDescription[] files = ftDefinitions[i].getAll();
             for (int j = 0; j < files.length; j++) {
-                String fullfilename = fts.buildSrcFilePathString(files[j].getSrcName());
+                String fullfilename = fts.getAbsoluteSrcPath(files[j]);
 
                 //Skipping non existant local filenames, keep remote files
                 if (!FileTransferWorkShop.isLocalReadable(fullfilename) &&
                         !FileTransferWorkShop.isRemote(fullfilename)) {
-                    System.out.println(fullfilename);
+                    logger.info(fullfilename);
                     if (fileTransferLogger.isDebugEnabled()) {
                         fileTransferLogger.debug(
                             "Skiping. Unreadable for FileTransfer:" +

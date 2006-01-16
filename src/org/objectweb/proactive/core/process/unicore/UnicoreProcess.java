@@ -34,8 +34,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer.FileDescription;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -116,15 +116,15 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
 
     protected boolean internalFileTransferDefaultProtocol() {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
-        FileTransfer[] ftDefinitions = fts.getAllFileTransferDefinitions();
+        FileTransferDefinition[] ftDefinitions = fts.getAllFileTransferDefinitions();
 
-        Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+        Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
 
         for (int i = 0; i < ftDefinitions.length; i++) {
             //Files and Dirs
             FileDescription[] files = ftDefinitions[i].getAll();
             for (int j = 0; j < files.length; j++) {
-                String fullfilename = fts.buildSrcFilePathString(files[j].getSrcName());
+                String fullfilename = fts.getAbsoluteSrcPath(files[j]);
 
                 //Skipping non existant filenames
                 if (!FileTransferWorkShop.isLocalReadable(fullfilename)) {
@@ -146,7 +146,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
 
                 sb.append(",");
 
-                sb.append(fts.buildDstFilePathString(files[j].getDestName()));
+                sb.append(fts.getAbsoluteDstPath(files[j]));
 
                 if (files[j].isDir()) {
                     sb.append(fts.dstInfoParams.getFileSeparator());

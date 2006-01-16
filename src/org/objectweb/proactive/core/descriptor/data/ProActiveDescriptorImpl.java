@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -57,7 +57,6 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
-
 
 /**
  * <p>
@@ -328,8 +327,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * @param fileTransferID
      * @return a new FileTransfer definition
      */
-    protected FileTransfer createFileTransferDefinition(String fileTransferID) {
-        FileTransfer ft = new FileTransfer(fileTransferID);
+    protected FileTransferDefinition createFileTransferDefinition(String fileTransferID) {
+        FileTransferDefinition ft = new FileTransferDefinition(fileTransferID);
         fileTransferMapping.put(fileTransferID, ft);
 
         if (logger.isDebugEnabled()) {
@@ -436,10 +435,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-    public synchronized FileTransfer getFileTransfer(String fileTransferID) {
+    public synchronized FileTransferDefinition getFileTransfer(String fileTransferID) {
         //TODO throw new ProActiveException 
         //if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
-        FileTransfer ft = (FileTransfer) fileTransferMapping.get(fileTransferID);
+        FileTransferDefinition ft = (FileTransferDefinition) fileTransferMapping.get(fileTransferID);
 
         if (ft == null) {
             ft = createFileTransferDefinition(fileTransferID);
@@ -905,4 +904,5 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public VariableContract getVariableContract() {
         return this.variableContract;
     }
+
 }

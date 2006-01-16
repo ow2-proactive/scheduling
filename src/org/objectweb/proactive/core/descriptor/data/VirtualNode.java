@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.Job;
@@ -38,7 +40,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -231,4 +232,14 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return termination status of process i.e its exit value
      */
     public int startMPI();
+    
+    /**
+     * This methods triggers the remote retrieval of files, as specified
+     * in the instantiated descriptor file for this VirtualNode. 
+     * To achieve this, the file transfer push and pull API is used on 
+     * all the nodes created from this VirtualNode.
+     * 
+     * @return An array of Files (Futures) with the retrieved files.
+     */
+    public File[] fileTransferRetrieve() throws ProActiveException;
 }

@@ -67,6 +67,7 @@ public interface Loggers {
     static final public String DEPLOYMENT = "proactive.deployment";
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT + ".process";
     static final public String DEPLOYMENT_LOG = DEPLOYMENT + ".log";
+    static final public String DEPLOYMENT_FILETRANSFER = "proactive.deployment.filetransfer";
     static final public String FILETRANSFER = "proactive.filetransfer";
     public static final String LOAD_BALANCING = "proactive.loadbalancing";
     public static final String IC2D = "proactive.ic2d";

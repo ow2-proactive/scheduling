@@ -54,9 +54,10 @@ import org.objectweb.proactive.core.process.DependentProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
+import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
-import org.objectweb.proactive.core.process.glite.GLiteProcess;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -69,6 +70,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -76,6 +78,7 @@ import java.rmi.AlreadyBoundException;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 
@@ -96,6 +99,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger MPI_LOGGER = ProActiveLogger.getLogger(Loggers.MPI_DEPLOY);
+    private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     public static int counter = 0;
 
     //
@@ -127,12 +131,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private java.util.ArrayList createdNodes;
 
     /** the list of file transfers to deploy*/
-
-    //TODO check if this is the best place to init
-    private java.util.ArrayList fileTransferDeploy = new ArrayList();
+    private java.util.ArrayList fileTransferDeploy;
 
     /** the list of file transfers to retrieve*/
-    private java.util.ArrayList fileTransferRetrieve = new ArrayList();
+    private java.util.ArrayList fileTransferRetrieve;
 
     /** index of the last node used */
     private int lastNodeIndex;
@@ -223,6 +225,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         createdNodes = new java.util.ArrayList();
         createdRuntimeF = new ArrayList();
         awaitedVirtualNodes = new Hashtable();
+        fileTransferDeploy = new ArrayList();
+        fileTransferRetrieve = new ArrayList();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
         if (logger.isDebugEnabled()) {
@@ -302,7 +306,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
-    public void addFileTransferDeploy(FileTransfer ft) {
+    public void addFileTransferDeploy(FileTransferDefinition ft) {
         if (ft == null) {
             return;
         }
@@ -315,7 +319,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
-    public void addFileTransferRetrieve(FileTransfer ft) {
+    public void addFileTransferRetrieve(FileTransferDefinition ft) {
         if (ft == null) {
             return;
         }
@@ -336,6 +340,23 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine vm = (VirtualMachine) virtualMachines.get(lastVirtualMachineIndex);
 
         return vm;
+    }
+    
+    /**
+     * Gets the VirtualMachine object that represents the one defined
+     * in the XML Descriptor.
+     * @param name The name of the searched VM.
+     * @return A VirtualMachine associated with the name parameter. If no VM is found then null is returned. 
+     */
+    public VirtualMachine getVirtualMachine(String name){
+    	
+    	Iterator it = virtualMachines.iterator();
+    	while(it.hasNext()){
+    		VirtualMachine vm =(VirtualMachine)it.next();
+    		if(vm.getName().equals(name)) return vm;
+    	}
+    	
+    	return null;
     }
 
     /**
@@ -993,7 +1014,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
             }
         }
-
+        
         //Check if it this virtualNode that originates the process
         if ((event.getCreatorID().equals(this.name)) &&
                 (virtualMachine != null)) {
@@ -1051,7 +1072,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         }
                     }
 
-                    performOperations(proActiveRuntimeRegistered, url, protocol);
+                    performOperations(proActiveRuntimeRegistered, url, protocol, event.getVmName());
                 }
             } catch (ProActiveException e) {
                 e.printStackTrace();
@@ -1101,7 +1122,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         }
                     }
 
-                    performOperations(proActiveRuntimeRegistered, url, protocol);
+                    performOperations(proActiveRuntimeRegistered, url, protocol, event.getVmName());
                 } catch (ProActiveException e) {
                     e.printStackTrace();
                 }
@@ -1197,6 +1218,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
                         protocol));
 
+            
             //create the node
             ProActiveSecurityManager siblingPSM = null;
 
@@ -1220,7 +1242,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             //add this node to this virtualNode
-            performOperations(defaultRuntime, url, protocol);
+            performOperations(defaultRuntime, url, protocol, defaultRuntime.getVMInformation().getDescriptorVMName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1420,19 +1442,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
 
-        /* Setting the file transfer definitions to be copied */
+        /* Setting the file transfer definitions associated with the current process,
+         * and defined at the process level.
+         */
+        
         FileTransferWorkShop ftsDeploy = process.getFileTransferWorkShopDeploy();
         FileTransferWorkShop ftsRetrieve = process.getFileTransferWorkShopRetrieve();
 
         if ((ftsDeploy != null) && ftsDeploy.isImplicit()) {
             for (int i = 0; i < fileTransferDeploy.size(); i++)
-                ftsDeploy.addFileTransfer((FileTransfer) fileTransferDeploy.get(
+                ftsDeploy.addFileTransfer((FileTransferDefinition) fileTransferDeploy.get(
                         i));
         }
 
         if ((ftsRetrieve != null) && ftsRetrieve.isImplicit()) {
             for (int i = 0; i < fileTransferRetrieve.size(); i++)
-                ftsRetrieve.addFileTransfer((FileTransfer) fileTransferRetrieve.get(
+                ftsRetrieve.addFileTransfer((FileTransferDefinition) fileTransferRetrieve.get(
                         i));
         }
     }
@@ -1502,8 +1527,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     private synchronized void performOperations(ProActiveRuntime part,
-        String url, String protocol) {
-        Node node = new NodeImpl(part, url, checkProtocol(protocol), this.jobID);
+        String url, String protocol, String vmName) {
+        Node node = new NodeImpl(part, url, checkProtocol(protocol), this.jobID, vmName);
         createdNodes.add(node);
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
@@ -1617,4 +1642,69 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.p2pNodeslookupList.add(nodesLookup);
         P2P_LOGGER.debug("A P2P nodes lookup added to the vn: " + this.name);
     }
+    
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
+     */
+    public File[] fileTransferRetrieve() throws ProActiveException{
+
+    	Node nodes[];
+    	ArrayList arrayFiles = new ArrayList();
+    	
+		try {
+			nodes = getNodes();
+		} catch (NodeException e) {
+			throw new ProActiveException("Can not Retrieve Files, since no nodes where created for Virtual Node"+this.getName());
+		}
+		
+		if(FILETRANSFER_LOGGER.isDebugEnabled())
+			FILETRANSFER_LOGGER.debug("Retrieving files for "+nodes.length+" node(s).");
+		
+		/* For all the nodes we get the VirtualMachine that spawned it, and
+		 * then the process linked with this VirtualMachine. We then obtain 
+		 * the FileTransfer Retrieve Workshop from the process and using
+		 * the FileTransfer API we retrieve the Files.
+		 */
+    	for(int i=0;i<nodes.length;i++){
+    		String vmName=nodes[i].getNodeInformation().getDescriptorVMName();
+    		VirtualMachine vm= getVirtualMachine(vmName);
+    		
+    		if(vm == null){
+    			if(FILETRANSFER_LOGGER.isDebugEnabled())
+    				FILETRANSFER_LOGGER.info("No VM found with name: "+vmName+
+    						" for node: "+nodes[i].getNodeInformation().getName() );
+    			continue;
+    		}
+    		
+    		//TODO We only get the VN for the first process in the chain. We should check if it is a SSH RSH,etc...
+    		ExternalProcess eProcess= vm.getProcess();
+    		if(eProcess == null){
+    			if(FILETRANSFER_LOGGER.isDebugEnabled())
+    				FILETRANSFER_LOGGER.info("No Process linked with VM: "+vmName+
+						" for node: "+nodes[i].getNodeInformation().getName() );
+    				continue;
+    		}
+    		
+    		FileTransferWorkShop ftwRetrieve=eProcess.getFileTransferWorkShopRetrieve();
+    		logger.debug(ftwRetrieve);
+    		FileDescription fd[] = ftwRetrieve.getAllFileDescriptions();
+    		for(int j=0; j < fd.length;j++){
+    				File srcFile = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
+    				File dstFile = new File(ftwRetrieve.getAbsoluteDstPath(fd[j]));
+    				
+    				try {
+    					File f= FileTransferService.pullFile(nodes[i], srcFile, dstFile);
+    					arrayFiles.add(f);
+					} catch (Exception e) {
+						FILETRANSFER_LOGGER.error("Unable to retrieve file:"+
+						 		srcFile.getAbsolutePath()+" from node"+
+								nodes[i].getNodeInformation().getName());
+					}
+    				
+    		}
+    	}
+    	
+    	return (File[]) arrayFiles.toArray(new File[0]);
+    }
 }
+

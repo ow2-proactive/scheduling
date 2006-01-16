@@ -7,6 +7,7 @@ log4j.rootLogger= INFO,FILE
 
 #Both tests packages log on the console
 log4j.logger.nonregressiontest=INFO, CONSOLE
+#log4j.logger.nonregressiontest=DEBUG, CONSOLE
 log4j.logger.testsuite=INFO, CONSOLE
 
 ########### The following are existing categories in ProActive
@@ -21,7 +22,7 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.deployment = DEBUG, CONSOLE
 #log4j.logger.proactive.deployment.log = DEBUG, CONSOLE
 #log4j.logger.proactive.deployment.process = DEBUG, CONSOLE
-#log4j.logger.proactive.deployment = DEBUG, CONSOLE
+#log4j.logger.proactive.deployment.filetransfer = DEBUG,CONSOLE
 #log4j.logger.proactive.filetransfer = DEBUG, CONSOLE
 #log4j.logger.proactive.nfe = FATAL
 #log4j.logger.proactive.ft = DEBUG, CONSOLE

@@ -48,8 +48,8 @@ public class RemoteFileCopy extends SecureCopyProtocol {
         //Default is RCP_COMMAND
         FileTransferWorkShop fts = new FileTransferWorkShop("rcp");
 
-        FileTransfer ft1 = new FileTransfer("1");
-        FileTransfer ft2 = new FileTransfer("2");
+        FileTransferDefinition ft1 = new FileTransferDefinition("1");
+        FileTransferDefinition ft2 = new FileTransferDefinition("2");
 
         ft1.addFile("FileTransferTest.txt", "FileTransferTest-dest.txt");
         ft1.addFile("FileTransferTest.txt", "FileTransferTest.txt");

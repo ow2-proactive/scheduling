@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileDependant;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 
 
 /**
@@ -394,8 +394,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         this.remoteFilePath = remoteFilePath;
     }
 
-    public FileTransfer getFileTransfertDefiniton() {
-        FileTransfer ft = new FileTransfer("gliteProcess");
+    public FileTransferDefinition getFileTransfertDefiniton() {
+        FileTransferDefinition ft = new FileTransferDefinition("gliteProcess");
         ft.addFile(filePath + "/" + fileName, remoteFilePath + "/" + fileName);
         return ft;
     }

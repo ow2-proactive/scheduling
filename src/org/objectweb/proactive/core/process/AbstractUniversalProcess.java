@@ -78,8 +78,8 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     }
 
     public void startFileTransfer() {
-        if (ProActiveLogger.getLogger(Loggers.FILETRANSFER).isDebugEnabled()) {
-            ProActiveLogger.getLogger(Loggers.FILETRANSFER).debug("FileTransfer initializations ");
+        if (ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER).isDebugEnabled()) {
+            ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER).debug("FileTransfer initializations ");
         }
 
         FileTransferWorkShop ftwDeploy = getFileTransferWorkShopDeploy();

@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileDependant;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 
 
 /**
@@ -123,8 +123,8 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         return mpiSubCommand.toString();
     }
 
-    public FileTransfer getFileTransfertDefiniton() {
-        FileTransfer ft = new FileTransfer("mpiProcess");
+    public FileTransferDefinition getFileTransfertDefiniton() {
+        FileTransferDefinition ft = new FileTransferDefinition("mpiProcess");
         if (remotePath != null) {
             ft.addFile(localPath + "/" + hostsFileName,
                 remotePath + "/" + hostsFileName);

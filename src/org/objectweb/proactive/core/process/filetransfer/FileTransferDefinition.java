@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @version 1.0,  2005/08/26
  * @since   ProActive 2.3
  */
-public class FileTransfer implements Serializable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+public class FileTransferDefinition implements Serializable {
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     private ArrayList all;
     private ArrayList files;
     private ArrayList homonymousFiles;
@@ -56,7 +56,7 @@ public class FileTransfer implements Serializable {
     private ArrayList heteronymousDirs;
     String name;
 
-    public FileTransfer(String name) {
+    public FileTransferDefinition(String name) {
         all = new ArrayList();
         files = new ArrayList();
         directories = new ArrayList();
@@ -68,7 +68,7 @@ public class FileTransfer implements Serializable {
         this.name = name;
     }
 
-    public FileTransfer() {
+    public FileTransferDefinition() {
         this("");
     }
 
@@ -172,7 +172,7 @@ public class FileTransfer implements Serializable {
         return sb.toString();
     }
 
-    public boolean equals(FileTransfer fileTransfer) {
+    public boolean equals(FileTransferDefinition fileTransfer) {
         return (name.length() > 0) && (fileTransfer.getId().length() > 0) &&
         name.equalsIgnoreCase(fileTransfer.getId());
     }

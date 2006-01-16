@@ -58,7 +58,10 @@ public interface VMInformation extends java.io.Serializable, Job {
     public java.net.InetAddress getInetAddress();
 
     /**
-     * Returns the given name (identifier) of this VM
+     * Returns the given name (identifier) of this VM.
+     * For some reasson this has been used to get the name of the Node!
+     * when using de NodeInformation class.
+     * To really get the name of the VM use getVmName();
      * @return the given name (identifier) of this VM
      */
     public String getName();
@@ -78,4 +81,23 @@ public interface VMInformation extends java.io.Serializable, Job {
      * @return the host where the vm is located
      */
     public String getHostName();
+    
+	/**
+	 * Gives the name of the java virtual machine, that was used to create this node.
+	 * The name corresponds to the name specified in the descriptor file:
+	 *  <pre>
+	 *  ...
+	 *  &lt;deployment&gt;
+	 *  ...
+	 *  	&lt;jvms&gt;
+	 * 		...
+	 *		&lt;jvm name="The Name"&gt;...&lt;/jvm&gt;
+	 *		...
+	 *		&lt;/jvms&gt;
+	 *  ...
+	 *  &lt;/deployment&gt;
+	 *  </pre>
+	 * @return The java virtual machine name if created with a descriptor file, null otherwise.
+	 */
+    public String getDescriptorVMName();
 }

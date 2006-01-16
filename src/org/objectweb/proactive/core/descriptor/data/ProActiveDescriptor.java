@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
@@ -229,7 +229,7 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * @param fileTransferID The ID of the filetransfer
      * @return New or existing instance for the ID
      */
-    public FileTransfer getFileTransfer(String fileTransferID);
+    public FileTransferDefinition getFileTransfer(String fileTransferID);
 
     /**
      * Updates with the effective service, all objects that are mapped with the serviceID.

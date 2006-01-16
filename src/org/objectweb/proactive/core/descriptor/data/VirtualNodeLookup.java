@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.File;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -37,7 +39,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -396,4 +397,13 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         throw new RuntimeException(
             " ERROR: No MPI process attached with the virtual node !");
     }
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
+	 */
+	public File[] fileTransferRetrieve() throws ProActiveException {
+		
+			throw new ProActiveException("No File Transfer Retrieve support from VirtualNodeLookup");
+		
+	}
 }

@@ -234,6 +234,15 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             if (checkNonEmpty(serviceId)) {
                 pad.registerService(vn, serviceId);
             }
+            String fileTransferDeployName = attributes.getValue(FILE_TRANSFER_DEPLOY_TAG);
+            if (checkNonEmpty(fileTransferDeployName)) {
+                vn.addFileTransferDeploy(pad.getFileTransfer(fileTransferDeployName));
+            }
+            String fileTransferRetrieveName = attributes.getValue(FILE_TRANSFER_RETRIEVE_TAG);
+            if (checkNonEmpty(fileTransferRetrieveName)) {
+                vn.addFileTransferRetrieve(pad.getFileTransfer(fileTransferRetrieveName));
+            }
+            
         }
     } // end inner class VirtualNodeHandler
 

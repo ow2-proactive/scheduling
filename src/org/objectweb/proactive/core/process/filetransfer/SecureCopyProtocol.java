@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.process.filetransfer;
 
 import java.util.ArrayList;
 
-import org.objectweb.proactive.core.process.filetransfer.FileTransfer.*;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.*;
 
 
 /**
@@ -204,8 +204,8 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
         //Default is SCP_COMMAND
         FileTransferWorkShop fts = new FileTransferWorkShop("scp");
 
-        FileTransfer ft1 = new FileTransfer("1");
-        FileTransfer ft2 = new FileTransfer("2");
+        FileTransferDefinition ft1 = new FileTransferDefinition("1");
+        FileTransferDefinition ft2 = new FileTransferDefinition("2");
 
         ft1.addFile("homofile1", "homofile1");
         ft1.addFile("heterofile1A", "heterofile1B");
