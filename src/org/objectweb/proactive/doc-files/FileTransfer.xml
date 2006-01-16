@@ -1,244 +1,424 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="FileTransfer"><title>ProActive File Transfer Model</title>
+<chapter>
+  <title>ProActive File Transfer Model</title>
 
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FileTransfer.html  -->
-  
+  <sect1 remap="h2">
+    <title><anchor id="dbdoclet.id.FileTransfer_html_intro"
+    xreflabel="Introduction and Concepts" />Introduction and Concepts</title>
 
-    
-    <para> The following document describes our current proposal model for supporting file transfer in
- ProActive.</para>
-    <sect1 remap="h2">
-      <title><anchor id="FileTransfer_html_intro" xreflabel="Introduction and Concepts"/>Introduction and Concepts</title>
-      <para>We believe it is interesting for us, and the ProActive users, to provide support for
- FileTransfer</para>
-      <para>Currently we recognize the following type of files:</para>
-      <itemizedlist>
-        <listitem>
-          <para> 1. ProActive Deployment Required Files (jars, policy, log4, etc)</para>
-        </listitem>
-        <listitem>
-          <para> 2. User Application Data Files (User application input)</para>
-        </listitem>
-        <listitem>
-          <para> 3. User Application Code Files (jar, classes or native code)</para>
-        </listitem>
-        <listitem>
-          <para> 4. JDK files (the jvm runtime and libraries)</para>
-        </listitem>
-</itemizedlist>
-      <para>Also, this files can be transfered:</para>
-      <itemizedlist>
-        <listitem>
-          <para> 1. To a remote location (Deploy)</para>
-        </listitem>
-        <listitem>
-          <para> 2. From a remote location (Retrieve)</para>
-        </listitem>
-</itemizedlist>
-      <para>The FileTransfer could happen:</para>
-      <itemizedlist>
-        <listitem>
-          <para> 1. Before deployment.</para>
-        </listitem>
-        <listitem>
-          <para> 2. After deployment but before the user launches his/her
- application.</para>
-        </listitem>
-        <listitem>
-          <para> 3. During user application.</para>
-        </listitem>
-        <listitem>
-          <para> 4. After the user application has finished.</para>
-        </listitem>
-</itemizedlist>
-    </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="FileTransfer_html_objectives" xreflabel="Objectives"/>Objectives</title>
-      <sect2 remap="h3">
-        <title>Main objective</title>
-        <itemizedlist>
-          <listitem>
-            <para> Support File Transfer in ProActive</para>
-          </listitem>
-</itemizedlist>
-      </sect2>
-      <sect2 remap="h3">
-        <title>Specific Objectives</title>
-        <itemizedlist>
-          <listitem>
-            <para> Specify file transfer in descriptor files.</para>
-          </listitem>
-          <listitem>
-            <para> If the process supports FileTransfer use the protocol support
- (processDefault), or some other protocol.</para>
-          </listitem>
-          <listitem>
-            <para> Else, use FileTransfer as file streaming in ProActive Runtime
- (jvm2jvm)</para>
-          </listitem>
-</itemizedlist>
-      </sect2>
-    </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="FileTransfer_html_protocols" xreflabel="Supported Protocols"/>Supported Protocols</title>
-      <itemizedlist>
-        <listitem>
-          <para> scp</para>
-        </listitem>
-        <listitem>
-          <para> rcp</para>
-        </listitem>
-        <listitem>
-          <para> unicore (Unicore processDefault)</para>
-        </listitem>
-        <listitem>
-          <para> nordugrid (Nordugrid processDefault)</para>
-        </listitem>
-</itemizedlist>
-    </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="FileTransfer_html_design" xreflabel="FileTransfer Design"/>FileTransfer Design</title>
-      <para>FileTransfer definitions are divided in two:</para>
-      <sect2 remap="h3">
-        <title>Abstract Definition</title>
-        <para>This definitions can be referenced from a VirtualNode. They contain the most basic information
- of a FileTransfer:</para>
-        <itemizedlist>
-          <listitem>
-            <para> A unique definition identification name.</para>
-          </listitem>
-          <listitem>
-            <para> Files: source and optionally the destination name.</para>
-          </listitem>
-          <listitem>
-            <para> Directories: source and optionally the destination name. Also the exclude and include
- patterns (not yet available feature).</para>
-          </listitem>
-</itemizedlist>
-        <para>References from the VirtualNode are made using the unique definition name.</para>
-      </sect2>
-      <sect2 remap="h3">
-        <title>Concrete Definition</title>
-        <para>These definitions contain more architecture specific information, and are therefore contained
- within the Process:</para>
-        <itemizedlist>
-          <listitem>
-            <para> A reference to an abstract definition, or the &quot;implicit&quot; indicating the reference
- will be inherited from the VirtualNode.</para>
-          </listitem>
-          <listitem>
-            <para> A sequence of Copy Protocols that will be used.</para>
-          </listitem>
-          <listitem>
-            <para> Source and Destination information: prefix, username, hostname, file separator, etc...</para>
-          </listitem>
-</itemizedlist>
-        <para>If some of this information (like username or hostname) can be inferred from the process, it
- is not necessary to declare it in the definition. Optionally, the information contained in the
- protocol can be overridden if specified.</para>
-      </sect2>
-      <sect2 remap="h3">
-        <title>How it works</title>
-        <informalfigure>
-          <mediaobject>
-<!--            <imageobject>
-              <imagedata fileref="development/imgs/fileTransferDesign.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="development/imgs/fileTransferDesign.svg" format="SVG"/>            </imageobject>-->
-            <imageobject>
-              <imagedata fileref="development/imgs/fileTransferDesign.png" format="PNG"/>            </imageobject>
-          </mediaobject>
-        </informalfigure>
-        <para>When a FileTransfer starts, both abstract and concrete information are merged using the
- FileTransfer Workshop. The result of this process correspons to a sequence of CopyProtocols, as
- specified in the Concrete Definition.</para>
-        <para>Each CopyProtocol will be tried before the deployment takes place, until one succeeds. After
- one succeed are all fail, the process deployment will take place.</para>
-      </sect2>
-    </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="FileTransfer_html_xmlTags" xreflabel="Descriptor FileTransfer XML Tags"/>Descriptor FileTransfer XML Tags</title>
-      <para>The abstract concept: &quot;FileTransfer&quot; is introduced. This concept is independent off
- the actual process used, but also flexible and configurable at the process level. To define this
- abstract representation of the FileTransfer:</para>
-<screen>
-....
+    <para>Currently we provide support for the following type of
+    transfers:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>To a remote node (<emphasis role="bold">Push</emphasis>)</para>
+      </listitem>
+
+      <listitem>
+        <para>From a remote node (<emphasis
+        role="bold">Pull</emphasis>)</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>The transfer can take place at any of the following moments:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para><emphasis role="bold">Deployment</emphasis> Time: At the
+        beggining of the application to input the data.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Retrieval</emphasis> Time: At the end of
+        the application to collect results.</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">During the user application</emphasis>: To
+        transfer information between nodes.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>To achieve this, we have implemented File Transfer support in two
+    ways:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>File Transfer API</para>
+      </listitem>
+
+      <listitem>
+        <para>File Transfer Descriptor support.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+
+  <sect1 remap="h2">
+    <title><anchor id="dbdoclet.id.FileTransfer_html_objectives"
+    xreflabel="Objectives" />File Transfer API</title>
+
+    <sect2 remap="h3">
+      <title>API Definition</title>
+
+      <screen>import org.objectweb.proactive.tools;
+
+static public void <emphasis role="bold">filetransfer.pushFile</emphasis>(Node n, File source, File destination);
+static public File <emphasis role="bold">filetransfer.pullFile</emphasis>(Node n, File source, File destination);</screen>
+
+      <para>These methods can be used to put and get files on a remote Node
+      while the user's application is running. Note that these methods behave
+      <emphasis role="bold">asynchronously</emphasis>, and in the case of the
+      <emphasis role="bold">pullFile</emphasis> method, the returned <emphasis
+      role="bold">File</emphasis> is a future. For further information on
+      asynchronism and futures, please refer to the <emphasis>Asynchronous
+      calls and futures</emphasis> section of this manual.</para>
+
+      <para><!-- TODO: link the above referenced chapter. I don't know how to do this in the DocBook format.--></para>
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>How to use the API</title>
+
+      <para>In the following example, a Node is deployed using a descriptor
+      file. A <emphasis>file</emphasis> is then pushed from
+      <emphasis>localhost</emphasis>@<emphasis
+      role="bold">localSource</emphasis> to
+      <emphasis>nodehost</emphasis>@<emphasis
+      role="bold">remoteDest</emphasis>, using the <emphasis>paths</emphasis>
+      specified in a j<emphasis>ava.io.File</emphasis> type object.
+      Afterwards, a <emphasis>file</emphasis> is pulled from
+      <emphasis>nodehost</emphasis>@<emphasis
+      role="bold">remoteSource</emphasis> and saved at
+      <emphasis>localhost</emphasis>@<emphasis
+      role="bold">localDest</emphasis>, in the same fashion.</para>
+
+      <screen>import org.objectweb.proactive.tools;
+pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+
+VirtualNode testVNode = pad.getVirtualNode("example");
+testVNode.activate();
+Node[] examplenode = testVNode.getNodes();
+
+File localSource = new File("/local/source/path/file");
+File remoteDest = new File("/remote/destination/path/file");
+<emphasis role="bold">filetransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+
+File remoteSource = new File("/remote/source/path/file");
+File localDest = new File("/local/destination/path/file");
+<emphasis role="bold">File filePulled = filetransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></screen>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Descriptor File Transfer</title>
+
+    <para>File Transfers can also be specified using ProActive Descriptors.
+    The main advantage of this scheme is that it allows deployment and
+    retrieval of input and output (files). In this section we will concentrate
+    on mainly three topics:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>XML Descriptor File Transfer Tags</para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>Deployment File Transfer</para>
+      </listitem>
+    </itemizedlist>
+
+    <itemizedlist>
+      <listitem>
+        <para>Retrieval File Transfer</para>
+      </listitem>
+    </itemizedlist>
+
+    <sect2>
+      <title>XML Descriptor File Transfer Tags</title>
+
+      <para>The File Transfer related tags, are placed inside the descriptor
+      at three different parts (or levels). </para>
+
+      <para>The first one corresponds to the <emphasis
+      role="bold">FileTransferDefinitions</emphasis> tag, which contains a
+      list of FileTransfer definitions. A FileTransfer definition is a high
+      level representation of the File Transfer, containing mainly the file
+      names. It is created in such a way, that no low level information such
+      as: hosts, protocols, prefix is present (this is the role of the low
+      level representation). The following example shows a FileTranfer
+      definition named <emphasis>example</emphasis>:</para>
+
+      <para><screen>....
 &lt;/deployment&gt;
-&lt;
-<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
-   &lt;
-<emphasis role="bold">FileTransfer</emphasis> id=&quot;
-<emphasis role="bold">example</emphasis>&quot;&gt;
-      &lt;
-<emphasis role="bold">file</emphasis> src=&quot;hello.dat&quot; dest=&quot;world.dat&quot;/&gt;
-      &lt;
-<emphasis role="bold">file</emphasis> src=&quot;hello.jar&quot; dest=&quot;world.jar&quot;/&gt;
-      &lt;
-<emphasis role="bold">file</emphasis> src=&quot;hello.class&quot; dest=&quot;world.class&quot;/&gt;
-      &lt;
-<emphasis role="bold">dir</emphasis> src=&quot;exampledir&quot; dest=&quot;exampledir&quot;/&gt;
-  &lt;/
-<emphasis role="bold">FileTransfer</emphasis>&gt;
+&lt;<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
+   &lt;<emphasis role="bold">FileTransfer</emphasis> id="<emphasis role="bold">example</emphasis>"&gt;
+      &lt;<emphasis role="bold">file</emphasis> src="hello.dat" dest="world.dat"/&gt;
+      &lt;<emphasis role="bold">file</emphasis> src="hello.jar" dest="world.jar"/&gt;
+      &lt;<emphasis role="bold">file</emphasis> src="hello.class" dest="world.class"/&gt;
+      &lt;<emphasis role="bold">dir</emphasis> src="exampledir" dest="exampledir"/&gt;
+  &lt;/<emphasis role="bold">FileTransfer</emphasis>&gt;
+  &lt;<emphasis role="bold">FileTransfer</emphasis> id="<emphasis role="bold">anotherExample</emphasis>"&gt;
+      ...
+  &lt;/<emphasis role="bold">FileTransfer</emphasis>&gt;
   ...
-&lt;/
-<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
+&lt;/<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
 &lt;infrastructure&gt;
-....   
-</screen>
-      <para><emphasis role="bold">Note</emphasis>: exclude and include are not yet supported features</para>
-      <para>This tags can be referenced at the the VirtualNode level and the Process level.</para>
-      <itemizedlist>
-        <listitem>
-          <para><emphasis role="bold">VirtualNode</emphasis>            <screen>
-&lt;VirtualNode name=&quot;exampleVNode&quot; 
-<emphasis role="bold">FileTransferDeploy</emphasis>=&quot;
-<emphasis role="bold">example</emphasis>&quot;/&gt;
-</screen>
-</para>
-        </listitem>
-        <listitem>
-          <para><emphasis role="bold">Process</emphasis>            <screen>
-&lt;processDefinition id=&quot;xyz&quot;&gt;
-  &lt;sshProcess&gt;...
-    
-&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of \
-an attribute.
-            This happens because FileTransfer information is process specif\
-ic.
-            Note that the destination hostname and username can be omitted,\
- and implicitly inferred 
-            from the process information. --&gt;
+....         </screen></para>
 
-    &lt;
-<emphasis role="bold">FileTransferDeploy</emphasis>=&quot;
-<emphasis role="bold">implicit</emphasis>&quot;&gt; 
-&lt;!-- referenceID or keyword &quot;implicit&quot; (inherit)--&gt;
+      <para>The FileTransfer definitions can be referenced through their
+      names, from the <emphasis role="bold">VirtualNode</emphasis> tags using
+      two attributes:<emphasis role="bold">FileTransferDeploy</emphasis> and
+      <emphasis role="bold">FileTransferRetrieve</emphasis>. The first one,
+      corresponds to the file transfer that will take place at deployment
+      time, and the second one corresponds to the file transfer that the user
+      will trigger once the user application is done.</para>
 
-      &lt;
-<emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, scp, rcp&lt;/
-<emphasis role="bold">copyProtocol</emphasis>&gt;
-      &lt;
-<emphasis role="bold">sourceInfo</emphasis> prefix=&quot;/home/user&quot;/&gt;
-      &lt;
-<emphasis role="bold">destinationInfo</emphasis> prefix=&quot;/tmp&quot; hostname=&quot;foo.org&quot; username=&quot;smith&quot; /&gt;
-    &lt;/
-<emphasis role="bold">FileTransferDeploy</emphasis>&gt;
+      <para><screen>&lt;VirtualNode name="exampleVNode" <emphasis role="bold">FileTransferDeploy</emphasis>="<emphasis
+            role="bold"><emphasis><emphasis><emphasis role="bold"><emphasis>example</emphasis></emphasis></emphasis></emphasis></emphasis>" <emphasis
+            role="bold">FileTransferRetrieve</emphasis>="<emphasis>example</emphasis>"/&gt;</screen></para>
+
+      <para>All the low level information such as: hosts, username, protocols,
+      prefix, etc... is declared inside each process. Both <emphasis
+      role="bold">FileTransferDeploy</emphasis> and <emphasis
+      role="bold">FileTransferRetrieve</emphasis> are specified separetly
+      using a <emphasis role="bold">refid</emphasis> attribute. The <emphasis
+      role="bold">refid</emphasis> can be a direct reference to a FileTransfer
+      definition, or set using the keyword <emphasis
+      role="bold">implicit</emphasis>. If <emphasis
+      role="bold">implicit</emphasis> is used, then the reference will be
+      inherited from the corresponding VirtualNode. In the following example
+      both mechanisms (Deploy and Retrieve) reference indirectly and directly
+      the example definition:</para>
+
+      <para><screen>&lt;processDefinition id="xyz"&gt;
+  &lt;sshProcess&gt;
+  ...  
+&lt;!-- Inside the process, the FileTransfer tag becomes an element instead of
+an attribute.  This happens because FileTransfer information is process specific.
+Note that the destination hostname and username can be omitted,
+and implicitly inferred from the process information. --&gt;
+
+    &lt;<emphasis role="bold">FileTransferDeploy</emphasis> refid="<emphasis
+            role="bold">implicit</emphasis>"&gt; &lt;!-- referenceID or keyword "implicit" (inherit)--&gt;
+      &lt;<emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, rcp, scp&lt;/<emphasis
+            role="bold">copyProtocol</emphasis>&gt;
+      &lt;<emphasis role="bold">sourceInfo</emphasis> prefix="/home/user"/&gt;
+      &lt;<emphasis role="bold">destinationInfo</emphasis> prefix="/tmp" hostname="foo.org" username="smith" /&gt;
+    &lt;/<emphasis role="bold">FileTransferDeploy</emphasis>&gt;
+
+    &lt;<emphasis role="bold">FileTransferRetrieve</emphasis> refid="example"&gt;
+      &lt;<emphasis role="bold">sourceInfo</emphasis> prefix="/tmp"/&gt;
+      &lt;<emphasis role="bold">destinatinoInfo</emphasis> prefix="/home/user"/&gt;
+    &lt;/<emphasis role="bold">FileTransferRetrieve</emphasis>&gt;
   &lt;/sshProcess&gt;
 &lt;/processDefinition&gt;
-</screen>
-</para>
+</screen></para>
+
+      <para>In the example above, <emphasis
+      role="bold">FileTransferDeploy</emphasis> has an implicit refid. This
+      means that the File Transfer definitions used will be inherited from the
+      VirtualNode. The first element shown inside this tag corresponds to
+      <emphasis role="bold">copyProtocol</emphasis>. The <emphasis
+      role="bold">copyProtocol</emphasis> tag specified the sequence of
+      protocols that will be executed to achieve the FileTransfer at
+      deployment time. Notice the <emphasis
+      role="bold">processDefault</emphasis> keyword, which specifies the usage
+      of the default copy protocol associated with this process. In the case
+      of the example, this corresponds to an <emphasis
+      role="bold"><emphasis><emphasis>sshProcess</emphasis></emphasis></emphasis>
+      and therefore the Secure Copy Protocol (scp) will be tried first. To
+      complement the higher level File Transfer definition, other information
+      can be specified as attributes in the <emphasis
+      role="bold">sourceInfo</emphasis> and <emphasis
+      role="bold">destinationInfo</emphasis> elements. For the case of
+      FileTransferDeploy, these tags currently correspond to:
+      <emphasis>prefix</emphasis>, <emphasis>hostname</emphasis> and
+      <emphasis>username</emphasis>.</para>
+
+      <para>For <emphasis role="bold">FileTransferRetrieve</emphasis>, no
+      copyProtocol needs to be specified. ProActive will use it's internal
+      mechanism to transfer the files. This implies that no
+      <emphasis>hostname</emphasis> or <emphasis>username</emphasis> are
+      required.</para>
+
+      <sect3>
+        <title>Currently supported protocols for file transfer
+        deployment</title>
+
+        <para><itemizedlist>
+            <listitem>
+              <para>scp (ssh processDefault)</para>
+            </listitem>
+          </itemizedlist><itemizedlist>
+            <listitem>
+              <para>rcp (rsh processDefault)</para>
+            </listitem>
+          </itemizedlist><itemizedlist>
+            <listitem>
+              <para>unicore (Unicore processDefault)</para>
+            </listitem>
+          </itemizedlist><itemizedlist>
+            <listitem>
+              <para>nordugrid (Nordugrid processDefault)</para>
+            </listitem>
+          </itemizedlist></para>
+      </sect3>
+
+      <sect3>
+        <title>Triggering File Transfer Deploy</title>
+
+        <para>The trigger (start) of the File Transfer will take place when
+        the deployment of the descriptor file is executed. In the case of
+        external protocols (scp, rcp), this will take place before the runtime
+        deployment. In the case of internal protocols (unicore, nordugrid),
+        this will take place with the process deployment. In any case, it
+        should be noted that intersting things can be achieved, such as
+        transfering the ProActive libraries into the deployment time using an
+        on-the-fly style. And, if the network allows, also transfer things
+        like the JRE.</para>
+      </sect3>
+
+      <sect3>
+        <title>Triggering File Transfer Retrieve</title>
+
+        <para>Since distributed application's termination is difficult to
+        detect. The responsability of triggering the deployment corresponds to
+        the user. To achieve this, we have provided a specific mehod that will
+        trigger the retrieval of all files associated with a
+        VirtualNode.</para>
+
+        <para><screen>import org.objectweb.proactive.core.descriptor.data;
+
+public File[] <emphasis role="bold">VirtualNode.fileTransferRetrieve</emphasis>();</screen></para>
+
+        <para>This will trigger the retrieval of all the files specified in
+        the descriptor, from all the nodes that were deployed using this
+        virtual node. The following shows an example:</para>
+
+        <screen>import org.objectweb.proactive.core.descriptor.data;
+
+pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+
+VirtualNode <emphasis role="bold">testVNode</emphasis> = pad.getVirtualNode("example");
+testVNode.activate();
+Node[] examplenode = testVNode.getNodes();
+
+...
+
+File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>();</screen>
+
+        <para>As a result of calling this method an array of type File[] will
+        be created, representing all the retrieved files.</para>
+      </sect3>
+    </sect2>
+  </sect1>
+
+  <sect1 remap="h2">
+    <title><anchor id="dbdoclet.id.FileTransfer_html_design"
+    xreflabel="FileTransfer Design" />Advanced: FileTransfer Design</title>
+
+    <para>This section provides internal details and information on how the
+    File Transfer is implemented. Reading the following section to use the
+    File Transfer mechanisms provided by ProActive is not necessary.</para>
+
+    <sect2 remap="h3">
+      <title>Abstract Definition (High level)</title>
+
+      <para>This definitions can be referenced from a VirtualNode. They
+      contain the most basic information of a FileTransfer:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>A unique definition identification name.</para>
         </listitem>
-</itemizedlist>
-      <para>The <emphasis role="bold">implicit</emphasis> keyword means the <emphasis role="bold">FileTransferDeploy</emphasis> identifier is inherited from
- the VN definition. If hostname and username are implicitly defined in the process tag, then this
- information will be used. But, if the user desires to override this information he can specify it
- as an attribute in the <emphasis role="bold">destinationInfo</emphasis> tag. When coallocating more than one VN on a JVM,
- and therefore on the same process, all files inherited from the multiple VN definitions will be
- transfered.</para>
-      <para><emphasis role="bold">Note</emphasis>: FileTransferRetrieve is not yet supported.</para>
+
+        <listitem>
+          <para>Files: source and optionally the destination name.</para>
+        </listitem>
+
+        <listitem>
+          <para>Directories: source and optionally the destination name. Also
+          the exclude and include patterns (not yet available feature).</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>References from the VirtualNode are made using the unique
+      definition name.</para>
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>Concrete Definition (Low level)</title>
+
+      <para>These definitions contain more architecture specific information,
+      and are therefore contained within the Process:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>A reference to an abstract definition, or the "<emphasis
+          role="bold">implicit</emphasis>" key word indicating the reference
+          will be inherited from the VirtualNode.</para>
+        </listitem>
+
+        <listitem>
+          <para>A sequence of Copy Protocols that will be used.</para>
+        </listitem>
+
+        <listitem>
+          <para>Source and Destination information: prefix, username,
+          hostname, file separator, etc...</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>If some of this information (like username or hostname) can be
+      inferred from the process, it is not necessary to declare it in the
+      definition. Optionally, the information contained in the protocol can be
+      overridden if specified.</para>
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>How Deployment File Transfer Works</title>
+
+      <informalfigure>
+        <mediaobject>
+          <imageobject>
+            <imagedata fileref="development/imgs/fileTransferDesign.png" format="PNG" />
+          </imageobject>
+        </mediaobject>
+      </informalfigure>
+
+      <para>When a FileTransfer starts, both abstract and concrete information
+      are merged using the FileTransfer Workshop. The result of this process
+      correspons to a sequence of CopyProtocols, as specified in the Concrete
+      Definition.</para>
+
+      <para>Each CopyProtocol will be tried before the deployment takes place,
+      until one succeeds. After one succeed are all fail, the process
+      deployment will take place.</para>
+    </sect2>
+
+    <sect2>
+      <title>How File Transfer API Works</title>
+
+      <para>The File Transfer API is built on top of ProActive's active object
+      and future file asynchronism model. When pulling or pushing a file from
+      a Node, two service Active Objects (AO) are created. One is placed on
+      the local machine and the otherone on the remote site. The file is then
+      split into blocks, and transfered over the network using remote
+      invocations between these two AO.</para>
+
+      <para></para>
+    </sect2>
+
+    <sect2>
+      <title>How Retrieve File Transfer Works</title>
+
+      <para>For a given virtualnode, a File Transfer pull will take place with
+      all the nodes deployed from this virtualnode. The detailes of the
+      specified file transfer will correspond to the ones present in the
+      descriptor file.</para>
       
-      <para>
- </para>
-    </sect1>
-  
+    </sect2>
+  </sect1>
 </chapter>
