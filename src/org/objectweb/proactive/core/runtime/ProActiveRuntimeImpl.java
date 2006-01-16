@@ -677,9 +677,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     * Registers the specified body at the nodeName key in the <code>nodeMap</code>.
-     * In fact it is the <code>UniqueID</code> of the body that is attached to the nodeName
-     * in the <code>nodeMap</code>
+     * Registers the specified body in the node with the nodeName key.
+     * In fact it is the <code>UniqueID</code> of the body that is attached to the node.
      * @param nodeName. The name where to attached the body in the <code>nodeMap</code>
      * @param body. The body to register
      */
@@ -696,7 +695,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     * Unregisters the specified <code>UniqueID</code> from the <code>nodeMap</code> at the
+     * Unregisters the specified <code>UniqueID</code> from the node corresponding to the
      * nodeName key
      * @param nodeName. The key where to remove the <code>UniqueID</code>
      * @param bodyID. The <code>UniqueID</code> to remove
@@ -736,12 +735,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         defaultNodeVirtualNode = s;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
-     */
-   // public PolicyServer getNodePolicyServer(String nodeName) {
-    //    return (PolicyServer) nodeSecurityManagerMap.get(nodeName);
-   // }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
