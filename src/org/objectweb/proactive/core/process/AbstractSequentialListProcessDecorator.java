@@ -149,6 +149,13 @@ public abstract class AbstractSequentialListProcessDecorator
          */
     }
 
+    public boolean isRequiredFileTransferDeployOnNodeCreation(){
+        /* TODO Check if this is the correct place
+         * implement this. Then implement it
+         */
+    	return false;
+    }
+    
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
      */

@@ -59,8 +59,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     private FileTransferWorkShop ftsDeploy = null;
     private FileTransferWorkShop ftsRetrieve = null;
     protected String FILE_TRANSFER_DEFAULT_PROTOCOL = "dummy";
+    
+    //Used to determine if a File Transfer is required to the Nodes deployed from
+    //the VirtualNode. @see VirtualNodeImpl
+    private boolean requiresFileTransferDeployOnNodeCreation=false; 
 
-    //
+	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
     protected AbstractExternalProcess() {
@@ -252,9 +256,20 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
                 continue;
             }
 
-            //if can't handle the default protocol 
-            //then try the internal file transfer
-            if (copyProtocol[i].isDefaultProtocol() &&
+            //If ProActive File Transfer will be used then we stop trying
+            //more protocols. The file transfer will take place when
+            //the nodes register back to this runtime, in the VirtualNodeImpl class.
+            if(copyProtocol[i].getProtocolName().equalsIgnoreCase("pftp")){
+                if (fileTransferLogger.isDebugEnabled()) {
+                    fileTransferLogger.debug(
+                        "ProActive File Transfer will be used later on.");
+                }
+                //TODO transfer this info to the virtual node level
+                success = true;
+                requiresFileTransferDeployOnNodeCreation = true;
+            }
+            //it's an internal protocol
+            else if (copyProtocol[i].isDefaultProtocol() &&
                     copyProtocol[i].isDummyProtocol()) {
                 if (fileTransferLogger.isDebugEnabled()) {
                     fileTransferLogger.debug(
@@ -263,7 +278,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
                 success = internalFileTransferDefaultProtocol();
             }
-            //else simply try to start the filetransfer
+            //else simply try to start the external copy protocol
             else {
                 success = copyProtocol[i].startFileTransfer();
             }
@@ -276,10 +291,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
                 "[ms]");
         }
 
-        if (success) {
-            fileTransferLogger.info("FileTransfer was successful");
-        } else {
-            fileTransferLogger.info("FileTransfer faild");
+        if (!success) {
+        	fileTransferLogger.info("FileTransfer faild");
         }
     }
 
@@ -292,6 +305,13 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         //The default is false, to keep on trying the protocols
         return false;
     }
+    
+    /**
+     * @see ExternalProcess.isRequiredFileTransferDeployOnNodeCreation()
+	 */
+	public boolean isRequiredFileTransferDeployOnNodeCreation() {
+		return requiresFileTransferDeployOnNodeCreation;
+	}
 
     protected void handleProcess(java.io.BufferedReader in,
         java.io.BufferedWriter out, java.io.BufferedReader err) {

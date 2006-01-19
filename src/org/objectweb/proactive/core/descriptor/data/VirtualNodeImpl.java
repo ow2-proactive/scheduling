@@ -1535,6 +1535,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         nodeCreated = true;
         nbCreatedNodes++;
 
+        //Performe FileTransferDeploy (if needed)
+        try {
+			fileTransferDeploy(node);
+		} catch (ProActiveException e) {
+			FILETRANSFER_LOGGER.error("Error when performing FileTransferDeploy:"+e.getCause());
+			FILETRANSFER_LOGGER.error("Activate file transfer logger debug for further error details.");
+			if(FILETRANSFER_LOGGER.isDebugEnabled()){
+				e.printStackTrace();
+			}
+		}
+        
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
 
@@ -1686,7 +1697,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     		}
     		
     		FileTransferWorkShop ftwRetrieve=eProcess.getFileTransferWorkShopRetrieve();
-    		logger.debug(ftwRetrieve);
     		FileDescription fd[] = ftwRetrieve.getAllFileDescriptions();
     		for(int j=0; j < fd.length;j++){
     				File srcFile = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
@@ -1705,6 +1715,59 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     	}
     	
     	return (File[]) arrayFiles.toArray(new File[0]);
+    }
+    
+    /**
+     * This method transfers the deployment files specified in the descriptor. 
+     * To achieve this the VirtualMachine that spawned the node is obtained, 
+     * and then the process linked with this VirtualMachine. 
+     * From the process the FileTransfer Deploy Workshop is extracted, and the file
+     * is transfered using the FileTransfer API.
+     * @param node The node that the files will be transfered to.
+     */
+    private void fileTransferDeploy(Node node) throws ProActiveException{
+    	
+    	if(FILETRANSFER_LOGGER.isDebugEnabled())
+			FILETRANSFER_LOGGER.debug("File Transfer Deploy files for node"+node.getNodeInformation().getName());
+    	
+		String vmName=node.getNodeInformation().getDescriptorVMName();
+		VirtualMachine vm= getVirtualMachine(vmName);
+		
+		if(vm == null){
+			throw new ProActiveException("No VM found with name: "+vmName+
+						" for node: "+node.getNodeInformation().getName() );
+		}
+		
+		//TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
+		ExternalProcess eProcess= vm.getProcess();
+		if(eProcess == null){
+				throw new ProActiveException("No Process linked with VM: "+vmName+
+					" for node: "+node.getNodeInformation().getName() );
+		}
+		
+		//if the process handled the FileTransfer we have nothing to do
+		if(!eProcess.isRequiredFileTransferDeployOnNodeCreation()){
+			if(FILETRANSFER_LOGGER.isDebugEnabled())
+				FILETRANSFER_LOGGER.debug("No ProActive FileTransfer API is required for this node.");
+			return;
+		}
+			
+		FileTransferWorkShop ftwDeploy=eProcess.getFileTransferWorkShopDeploy();
+		FileDescription fd[] = ftwDeploy.getAllFileDescriptions();
+	 	if(FILETRANSFER_LOGGER.isDebugEnabled()){
+			FILETRANSFER_LOGGER.debug("Transfering "+fd.length+" file(s)");
+	 	}
+		for(int j=0; j < fd.length;j++){
+				File srcFile = new File(ftwDeploy.getAbsoluteSrcPath(fd[j]));
+				File dstFile = new File(ftwDeploy.getAbsoluteDstPath(fd[j]));
+				
+				try {
+					FileTransferService.pushFile(node, srcFile, dstFile);
+				} catch (IOException e) {
+					throw new ProActiveException(e.getCause());
+				}
+		}
+    	
     }
 }
 

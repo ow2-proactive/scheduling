@@ -7,7 +7,7 @@
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="test" FileTransferRetrieve="test" />
+			<virtualNode name="test" FileTransferDeploy="testDeploy" FileTransferRetrieve="testRetrieve" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -32,16 +32,25 @@
 		</jvms>
 	</deployment>
 	<FileTransferDefinitions>
-		<FileTransfer id="test">
+		<FileTransfer id="testRetrieve">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
+		</FileTransfer>
+		<FileTransfer id="testDeploy">
+			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed.dat" />
+			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed2.dat" />
 		</FileTransfer>
 	</FileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
 				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost">
-					<processReference refid="remoteJVM"/>
+					<processReference refid="localJVM"/> <!--  change to remoteJVM when testing from eclipse to avoid "Word to long" error -->
+					<FileTransferDeploy refid="implicit">
+						<copyProtocol>pftp,scp</copyProtocol>
+						<sourceInfo prefix="/tmp"/>
+						<destinationInfo prefix="/tmp"/>
+					</FileTransferDeploy>
 					<FileTransferRetrieve refid="implicit">
 						<sourceInfo prefix="/tmp"/>
 						<destinationInfo prefix="/tmp"/>

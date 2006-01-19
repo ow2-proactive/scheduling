@@ -113,4 +113,12 @@ public interface ExternalProcess extends UniversalProcess {
      * @return the type this process.
      */
     public int getCompositionType();
+    
+    /**
+     * This method will return true when a process requires that
+     * a File Transfer Deploy takes place to a node deployed
+     * from this process.
+	 * @return Returns the requiresFileTransferDeployOnNodeCreation.
+	 */
+	public boolean isRequiredFileTransferDeployOnNodeCreation();
 }

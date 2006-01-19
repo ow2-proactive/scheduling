@@ -162,6 +162,13 @@ public abstract class AbstractListProcessDecorator
          * implement this. Then implement it
          */
     }
+    
+    public boolean isRequiredFileTransferDeployOnNodeCreation(){
+        /* TODO Check if this is the correct place
+         * implement this. Then implement it
+         */
+    	return false;
+    }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
