@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter>
+<chapter id="WrappingMpiAndLegacyCode">
 	<title>Wrapping MPI and Legacy code</title>
 
 	<sect1 remap="h2">
@@ -89,7 +89,7 @@ Each MPI job is as embedded in a Virtual Node containing resources specification
 				<para>After deployment, user obtains the Virtual Node attached with resources required for the MPI job.
 Then he just has to call the method <emphasis role="bold">startMPI</emphasis> on this Virtual Node to initiate the MPI job execution.
 In that way user can launch as many times the execution of the MPI job as the startMPI method is called on the Virtual Node.
-				
+
 				</para>
 			</listitem>
 			<listitem>

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter>
+<chapter id="FileTransfer">
   <title>ProActive File Transfer Model</title>
 
   <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.FileTransfer_html_intro"
+    <title><anchor id="FileTransfer_html_intro"
     xreflabel="Introduction and Concepts" />Introduction and Concepts</title>
 
     <para>Currently we provide support for the following type of

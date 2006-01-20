@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="WSDoc"><title>Exporting Active Objects and components as web services</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/WSDoc.html  -->
-  
+
     <sect1 remap="h2">
       <title><anchor id="WSDoc_html_overview"/>Overview</title>
       <para>This feature allows the call and monitoring of active objects and ProActive
@@ -48,7 +48,7 @@
  client developer doesn&#39;t have to worry about how the service is implemented.</para>
         </listitem>
 </itemizedlist>
-      
+
       <para>
         <informalfigure>
           <mediaobject>
@@ -133,7 +133,7 @@
 	      <emphasis role="bold"> <screen> 
  Proactive.exposeComponentAsWebService(Component component, String url, String componentName); </screen>
 	      </emphasis>
-              
+
               <para>where : </para>
               <itemizedlist>
                 <listitem>
@@ -212,13 +212,13 @@ public class HelloWorld implements Serializable {
       return &quot;Hello world !&quot;;
    }
    public static void main (String [] args) {
-    
+
     try {
         HelloWorld hw = (HelloWorld)ProActive.newActive(&quot;HelloWorld&quot;, new Obj\
 ect []{});
         ProActive.exposeAsWebService(hw,
         &quot;helloWorld&quot;,&quot;http://localhost:8080&quot;, new String [] { &quot;helloWorld&quot; }); 
-   
+
     } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
     } catch (NodeException e) {
@@ -233,7 +233,7 @@ ect []{});
         <para>
  Now that the server-side Web service is deployed, we can create a new client application in
  Visual Studio .NET.</para>
-        
+
       </sect2>
       <sect2 remap="h3">
         <title>Access with Visual Studio</title>
@@ -315,7 +315,30 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
  is waiting for callback requests that come from dispatcher. When receiving a request, the service
  sends it to the client via a .Net Remoting shared objet. Thus, when the .Net web service receives
  a callback request, the C# client is updated thanks to propagated events.</para>
-        <para>Here are screenshots of the user application :</para>
+        <para>Here are screenshots of the user application :
+        
+        <figure>
+         <title>The first screenshot is a classic ProActive application</title>
+         
+         <mediaobject>
+          <imageobject>
+           <imagedata width="5in" fileref="webservices/scc3djava.png" format="PNG"/>      
+          </imageobject>
+         </mediaobject>
+        </figure>
+        
+        <figure>
+         <title>This is the C# application that communicates via SOAP with the     same dispatcher as the  ProActive user uses.</title>
+         
+         <mediaobject>
+          <imageobject>
+           <imagedata width="5in" fileref="webservices/scC3dcs.png" format="PNG"/>
+          </imageobject>
+         </mediaobject>
+        </figure>
+       </para>
+        
+        <!-- REMOVED because pdf generation was refusing table
         <informaltable frame="none">
           <tgroup cols="2">
             <tbody>
@@ -345,15 +368,16 @@ ProActive.exposeAsWebService (dispatcher, &quot;C3DDispatcher&quot;,
             </tbody>
           </tgroup>
         </informaltable>
+ -->
       </sect2>
       <sect2 remap="h3">
         <title>Download the C# example</title>
         <para>You can find <ulink url="http://www-sop.inria.fr/oasis/proactive/C3DCSharp.zip">here</ulink> the whole C# Visual Studio .Net
  project. N.B : In order to run this project, you must install the Microsoft IIS server.</para>
-        
+
         <para>
   </para>
       </sect2>
     </sect1>
-  
+
 </chapter>

@@ -43,66 +43,64 @@
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
 
-<!-- <!ENTITY FAQ SYSTEM "FAQ.xml"> -->
+<!--  XXX <!ENTITY FAQ SYSTEM "FAQ.xml">  -->
 ]>
 <book>
   <title>ProActive v3.0.1 Documentation</title>
 
- <part id="ProActiveIntroduction"> <title> Introduction</title>
-  &Principles;
-  &Installation;
- </part><part id="ProActiveProgramming"> <title> Programming
-		 <anchor id="Descriptor"/>      <!--    TO REMOVE! -->
-	 </title>
-	 
-  &ProActiveBasis;
-  &AOCreation;
-  &TypedGroupCommunication;
-  &OOSPMD;
-  &Migration;
-  &exceptions;
-  &bnb;
- </part><part id="ProActiveDeployment"> <title> Deploying</title>
-  &PAConfiguration;
-  &Descriptor;
-  &VariableContract;
-  &FileTransfer;
-  &SSHTunneling;
-  &faultTolerance; 
- </part><part id="ProActiveComponents"> <title> Composing</title>
-  &intro;
-  &implementation;
-  &conformance;
-  &Compconfiguration;
-  &adl;
-  &examples;
-  &perspectives;
- </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title>
-  &p2p;
-  &Security;
-  &WSDoc;
-  &OSGi;
-  &mpi;
- </part><part id="ProActiveTools"> <title> User Interface and tools</title>
-  &IC2D;
-  &plugin;
- </part><part id="ProActiveGuidedTour"> <title> Guided Tour</title>
-  &guidedindex;
-  &capabilities-intro;
-  &hands_on_programming;
-  &OOSPMDJacobiexample;
-  &nbody;
-  &conclusion;
- </part><part id="extensionsPart"> <title> Extending ProActive</title>
-  &DescriptorProcess;
-  &devFileTransfer;
-  &devFaultTolerance;
-  &MOP;
+ <part id="ProActiveIntroduction"> <title>Introduction</title>
+   &Principles; 
+   &Installation; 
+  </part><part id="ProActiveProgramming"> <title>Programming</title> 
+
+   &ProActiveBasis; 
+    &AOCreation;   
+   &TypedGroupCommunication; 
+   &OOSPMD; 
+   &Migration; 
+   &exceptions; 
+   &bnb; 
+   </part><part id="ProActiveDeployment"> <title> Deploying</title> 
+   &PAConfiguration; 
+   &Descriptor;  
+  &VariableContract;  
+   &FileTransfer; 
+   &SSHTunneling; 
+   &faultTolerance; 
+  </part><part id="ProActiveComponents"> <title> Composing</title> 
+   &intro; 
+   &implementation; 
+   &conformance; 
+   &Compconfiguration;  
+   &adl; 
+   &examples; 
+   &perspectives; 
+  </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title> 
+    &p2p;  
+ &Security;   
+  &WSDoc;  
+   &OSGi; 
+   &mpi; 
+  </part><part id="ProActiveTools"> <title> User Interface and tools</title> 
+     &IC2D;  
+   &plugin; 
+   </part><part id="ProActiveGuidedTour"> <title> Guided Tour</title>  
+    &guidedindex;  
+    &capabilities-intro;   
+   &hands_on_programming;   
+   &OOSPMDJacobiexample;   
+  &nbody;  
+  &conclusion;  
+  </part><part id="extensionsPart"> <title> Extending ProActive</title> 
+   &DescriptorProcess; 
+   &devFileTransfer; 
+   &devFaultTolerance; 
+   &MOP; 
 
  </part>
- <!--<part id="backMattersPart"> <title> Back matters</title>  Should be called appendix, anyway -->
- <!-- &FAQ; -->
- <!-- &WordIndex; -->
- <!-- &References; -->
-<!--  </part> -->
+ <!--<part id="backMattersPart"> <title> Back matters</title>  Should be called appendix, anyway 
+   XXX &FAQ; 
+   XXX &WordIndex; 
+   XXX &References; 
+  </part> -->
 </book>

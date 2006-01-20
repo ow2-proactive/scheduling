@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="configuration"><title>Configuration </title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/configuration.html  -->
-  
-    <para> <anchor id="configuration_html_Configuration"/></para>
-    <sect1 remap="h2">
-      <title><anchor id="configuration_html_Controllers_and_interceptors"/>Controllers and interceptors</title>
-      <para>This section explains how to customize the membranes of component through the configuration,
- composition and creation of controllers and interceptors.</para>
-      <sect2 remap="h3">
-        <title>Configuration of controllers</title>
-        <para>It is possible to customize controllers, by specifying a control interface and an
- implementation.</para>
-        <para>Controllers are configured in a simple XML configuration file, which has the following
- structure :</para>
-<screen>
+<chapter id="configuration">
+  <title>Configuration</title>
+
+  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/configuration.html  -->
+
+  <para><anchor id="configuration_html_Configuration" /></para>
+
+  <sect1 remap="h2">
+    <title><anchor
+    id="configuration_html_Controllers_and_interceptors" />Controllers and
+    interceptors</title>
+
+    <para>This section explains how to customize the membranes of component
+    through the configuration, composition and creation of controllers and
+    interceptors.</para>
+
+    <sect2 remap="h3">
+      <title>Configuration of controllers</title>
+
+      <para>It is possible to customize controllers, by specifying a control
+      interface and an implementation.</para>
+
+      <para>Controllers are configured in a simple XML configuration file,
+      which has the following structure :</para>
+
+      <screen>
 &lt;componentConfiguration&gt;
  &lt;controllers&gt;
    &lt;controller&gt;
@@ -21,102 +32,142 @@
       &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
    &lt;/controller&gt;
 ... </screen>
-        <para>Unless they some controllers are also interceptors (see later on), the controllers do not have
- to be ordered.</para>
-        <para>A default configuration file is provided,&#160;it defines the default controllers available
- for every ProActive component (super, binding, content, naming, lifecycle and component
- parameters controllers).</para>
-        <para>A custom configuration file can be specified (in this example with
- &quot;thePathToMyConfigFile&quot;) for any component in the controller description parameter of
- the newFcInstance method from the Fractal API :</para>
-<screen>
+
+      <para>Unless they some controllers are also interceptors (see later on),
+      the controllers do not have to be ordered.</para>
+
+      <para>A default configuration file is provided,&nbsp;it defines the
+      default controllers available for every ProActive component (super,
+      binding, content, naming, lifecycle and component parameters
+      controllers).</para>
+
+      <para>A custom configuration file can be specified (in this example with
+      "thePathToMyConfigFile") for any component in the controller description
+      parameter of the newFcInstance method from the Fractal API :</para>
+
+      <screen>
  componentInstance = componentFactory.newFcInstance(
    myComponentType,
    new ControllerDescription(
-     &quot;name&quot;,
+     "name",
      myHierarchicalType,
      thePathToMyControllerConfigFile),
    myContentDescription); </screen>
-      </sect2>
-      <sect2 remap="h3">
-        <title>Writing a custom controller</title>
-        <para>The controller interface is a standard interface which defines which methods are
- available.</para>
-        <para>When a new implementation is defined for a given controller interface, it has to conform to
- the following rules :</para>
-        <orderedlist>
-          <listitem>
-            <para> The controller implementation must extend the AbstractProActiveController class, which is
- the base class for component controllers in ProActive, and which defines the constructor AbstractProActiveController(Component owner).</para>
-          </listitem>
-          <listitem>
-            <para> The controller implementation must override this constructor&#160;:</para>
-          </listitem>
-</orderedlist>
-<screen>
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>Writing a custom controller</title>
+
+      <para>The controller interface is a standard interface which defines
+      which methods are available.</para>
+
+      <para>When a new implementation is defined for a given controller
+      interface, it has to conform to the following rules :</para>
+
+      <orderedlist>
+        <listitem>
+          <para>The controller implementation must extend the
+          AbstractProActiveController class, which is the base class for
+          component controllers in ProActive, and which defines the
+          constructor AbstractProActiveController(Component owner).</para>
+        </listitem>
+
+        <listitem>
+          <para>The controller implementation must override this
+          constructor&nbsp;:</para>
+        </listitem>
+      </orderedlist>
+
+      <screen>
 public ControllerImplementation(Component owner) {
     super(owner);
 } </screen>
-        <orderedlist>
-          <listitem>
-            <para> The controller implementation must also override the abstract method setControllerItfType(), which sets the type of the controller
- interface :</para>
-          </listitem>
-</orderedlist>
-<screen>
+
+      <orderedlist>
+        <listitem>
+          <para>The controller implementation must also override the abstract
+          method setControllerItfType(), which sets the type of the controller
+          interface :</para>
+        </listitem>
+      </orderedlist>
+
+      <screen>
 protected void setControllerItfType() {
  try {
    setItfType(ProActiveTypeFactory.instance().createFcItfType(
-     &quot;Name of the controller&quot;,
+     "Name of the controller",
      TypeFactory.SINGLE));
    } catch (InstantiationException e) {
-     throw new ProActiveRuntimeException(&quot;cannot create controller type : &quot; +
+     throw new ProActiveRuntimeException("cannot create controller type : " +
        this.getClass().getName());
    }
  } </screen>
-        <orderedlist>
-          <listitem>
-            <para> The controller interface and its implementation have to be declared in the component
- configuration file.</para>
-          </listitem>
-</orderedlist>
-      </sect2>
-      <sect2 remap="h3">
-        <title>Configuration of interceptors</title>
-        <para>Controllers can also act as interceptors : they can intercept incoming invocations and
- outgoing invocations. For each invocation, pre and post processings are defined in the methods beforeInputMethodInvocation, afterInputMethodInvocation, beforeOutputMethodInvocation, and afterOutputMethodInvocation. These methods are defined in the
- interfaces InputInterceptor and OutputInterceptor, and take a MethodCall object as an argument.
- MethodCall objects are reified representations of method invocations, and they contain Method
- objects, along with the parameters of the invocation.</para>
-        <para>Interceptors are configured in the controllers XML configuration file, by simply adding input-interceptor=&quot;true&quot; or/and output-interceptor=&quot;true&quot; as&#160;attributes of the
- controller element in the definition of a controller (provided of course the specified
- interceptor is an input or/and output interceptor). For example a controller that would be an
- input interceptor and an output interceptor would be defined as follows :</para>
-<screen>
+
+      <orderedlist>
+        <listitem>
+          <para>The controller interface and its implementation have to be
+          declared in the component configuration file.</para>
+        </listitem>
+      </orderedlist>
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>Configuration of interceptors</title>
+
+      <para>Controllers can also act as interceptors : they can intercept
+      incoming invocations and outgoing invocations. For each invocation, pre
+      and post processings are defined in the methods
+      beforeInputMethodInvocation, afterInputMethodInvocation,
+      beforeOutputMethodInvocation, and afterOutputMethodInvocation. These
+      methods are defined in the interfaces InputInterceptor and
+      OutputInterceptor, and take a MethodCall object as an argument.
+      MethodCall objects are reified representations of method invocations,
+      and they contain Method objects, along with the parameters of the
+      invocation.</para>
+
+      <para>Interceptors are configured in the controllers XML configuration
+      file, by simply adding input-interceptor="true" or/and
+      output-interceptor="true" as&nbsp;attributes of the controller element
+      in the definition of a controller (provided of course the specified
+      interceptor is an input or/and output interceptor). For example a
+      controller that would be an input interceptor and an output interceptor
+      would be defined as follows :</para>
+
+      <screen>
 &lt;componentConfiguration&gt;
  &lt;controllers&gt;
  ....
    &lt;controller 
-input-interceptor=&quot;true&quot; output-interceptor=&quot;true&quot;
+input-interceptor="true" output-interceptor="true"
 &gt;
      &lt;interface&gt;InterceptorControllerInterface&lt;/interface&gt;
      &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
    &lt;/controller&gt;
 ... </screen>
-        <para>Interceptors can be composed in a basic manner : sequentially.&#160;</para>
-        <para>For input interceptors, the beforeInputMethodInvocation&#160; method is called sequentially for
- each controller in the order they are defined in the controllers configuration file. The afterInputMethodInvocation method is called
- sequentially&#160;for each controller in the reverse
- order they are defined in the controllers configuration file.</para>
-        <para>If in the controller config file, the list of input interceptors is in this order (the order
- in the controller config file is from top to bottom) :</para>
-<screen>
+
+      <para>Interceptors can be composed in a basic manner :
+      sequentially.&nbsp;</para>
+
+      <para>For input interceptors, the beforeInputMethodInvocation&nbsp;
+      method is called sequentially for each controller in the order they are
+      defined in the controllers configuration file. The
+      afterInputMethodInvocation method is called sequentially&nbsp;for each
+      controller in the reverse order they are defined in the controllers
+      configuration file.</para>
+
+      <para>If in the controller config file, the list of input interceptors
+      is in this order (the order in the controller config file is from top to
+      bottom) :</para>
+
+      <screen>
 InputInterceptor1
 InputInterceptor2
 </screen>
-        <para>This means that an invocation on a server interface will follow this path :</para>
-        
-<screen>
+
+      <para>This means that an invocation on a server interface will follow
+      this path :</para>
+
+      <screen>
 --&gt; caller
 --&gt; InputInterceptor1.beforeInputMethodInvocation
 --&gt; InputInterceptor2.beforeInputMethodInvocation
@@ -124,20 +175,28 @@ InputInterceptor2
 --&gt; InputInterceptor2.afterInputMethodInvocation
 --&gt; InputInterceptor1.afterInputMethodInvocation
 </screen>
-        <para>For output interceptors, the&#160;beforeOutputMethodInvocation method is called sequentially
- for each controller in the order they are defined in the controllers configuration file.
- The&#160;afterOutputMethodInvocationmethod is called sequentially for each controller in the reverse order they are defined in the</para>
-        <para>
- controllers configuration file.</para>
-        <para>If in the controller config file, the list of input interceptors is in this order (the order
- in the controller config file is from top to bottom) :</para>
-<screen>
+
+      <para>For output interceptors, the&nbsp;beforeOutputMethodInvocation
+      method is called sequentially for each controller in the order they are
+      defined in the controllers configuration file.
+      The&nbsp;afterOutputMethodInvocationmethod is called sequentially for
+      each controller in the reverse order they are defined in the</para>
+
+      <para>controllers configuration file.</para>
+
+      <para>If in the controller config file, the list of input interceptors
+      is in this order (the order in the controller config file is from top to
+      bottom) :</para>
+
+      <screen>
 OutputInterceptor1
 OutputInterceptor2 
 </screen>
-        <para>This means that an invocation on a server interface will follow this path&#160;</para>
-        
-<screen>
+
+      <para>This means that an invocation on a server interface will follow
+      this path&nbsp;</para>
+
+      <screen>
 --&gt; currentComponent 
 --&gt; OutputInterceptor1.beforeOutputMethodInvocation 
 --&gt; OutputInterceptor2.beforeOutputMethodInvocation 
@@ -145,29 +204,36 @@ OutputInterceptor2
 --&gt; OutputInterceptor2.afterOutputMethodInvocation
 --&gt; OutputInterceptor1.afterOutputMethodInvocation
 </screen>
-      </sect2>
-      <sect2 remap="h3">
-        <title>Writing a custom interceptor</title>
-        <para>An interceptor being a controller, it must follow the rules explained above for the creation
- of a custom controller.</para>
-        <para>Input interceptors and output interceptors must implement respectively the interfaces InputInterceptor and OutputInterceptor, which declare interception methods (pre/post
- interception) that have to be implemented.</para>
-        <para>Here is a simple example of an input interceptor :</para>
-<screen>
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>Writing a custom interceptor</title>
+
+      <para>An interceptor being a controller, it must follow the rules
+      explained above for the creation of a custom controller.</para>
+
+      <para>Input interceptors and output interceptors must implement
+      respectively the interfaces InputInterceptor and OutputInterceptor,
+      which declare interception methods (pre/post interception) that have to
+      be implemented.</para>
+
+      <para>Here is a simple example of an input interceptor :</para>
+
+      <screen>
 public class MyInputInterceptor extends AbstractProActiveController
  implements InputInterceptor, MyController {
   public MyInputInterceptor(Component owner) {
     super(owner);
   }
-  
+
   protected void setControllerItfType() {
     try {
-      setItfType(ProActiveTypeFactory.instance().createFcItfType(&quot;my control\
-ler&quot;,
+      setItfType(ProActiveTypeFactory.instance().createFcItfType("my control\
+ler",
         MyController.class.getName(), TypeFactory.SERVER,
         TypeFactory.MANDATORY, TypeFactory.SINGLE));
     } catch (InstantiationException e) {
-      throw new ProActiveRuntimeException(&quot;cannot create controller &quot; +
+      throw new ProActiveRuntimeException("cannot create controller " +
         this.getClass().getName());
     }
   }
@@ -176,24 +242,26 @@ ler&quot;,
     // foo implementation
   }
   public void afterInputMethodInvocation(MethodCall methodCall) {
-    System.out.println(&quot;post processing an intercepted an incoming functiona\
-l invocation&quot;);
+    System.out.println("post processing an intercepted an incoming functiona\
+l invocation");
     // interception code
   }
   public void beforeInputMethodInvocation(MethodCall methodCall) {
-    System.out.println(&quot;pre processing an intercepted an incoming functional\
- invocation&quot;);
+    System.out.println("pre processing an intercepted an incoming functional\
+ invocation");
     // interception code
  }
 }
 </screen>
-        <para>The configuration file would state :</para>
-<screen>
+
+      <para>The configuration file would state :</para>
+
+      <screen>
 &lt;componentConfiguration&gt;
  &lt;controllers&gt;
  ....
    &lt;controller 
-input-interceptor=&quot;true&quot;
+input-interceptor="true"
 &gt;
      &lt;interface&gt;
 MyController
@@ -204,62 +272,111 @@ MyInputInterceptor
    &lt;/controller&gt;
    ...
 </screen>
-      </sect2>
-    </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle"/>Lifecycle :
- encapsulation of functional activity in component lifecycle</title>
-      <para>In this implementation of the Fractal component model, Fractal components are active
- objects.&#160;Therefore it is possible to redefine their&#160;activity. In this context of
- component based programming, we call an activity&#160;redefined by a user a functional
- activity.&#160;</para>
-      <para>When a component is instantiated, its lifecycle is in the STOPPED state, and the functional
- activity that a user may have redefined is not started yet. Internally, there is a default
- activity which handles controller requests in a FIFO order.</para>
-      <para>When the component is started, its lifecycle goes to the STARTED state, and then the
- functional activity is started : this activity is initialized (as defined in InitActive), and run
- (as defined in RunActive).</para>
-      <para>2 conditions are required for a smooth integration between custom management of functional
- activities and lifecycle of the component :</para>
-      <orderedlist>
-        <listitem>
-          <para> the control of the request queue must use the org.objectweb.proactive.Service class</para>
-        </listitem>
-        <listitem>
-          <para> the functional activity must loop on the body.isActive() condition (this is not compulsory,
- but it allows to automatically end the functional activity when the lifecycle of the component
- is stopped. It may also be managed with a custom filter).</para>
-        </listitem>
-</orderedlist>
-      <para>Control invocations to stop the component will automatically set the isActive() return value
- to false, which implies that when the functional activity loops on the body.isActive() condition,
- it will end when the lifecycle of the component is set to STOPPED.</para>
-    </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="configuration_html_Shortcuts"/>Shortcuts</title>
-      <sect2 remap="h3">
-        <title>Principles</title>
-        <para>Communications between&#160;components in a hierarchical model may involve the crossing of
- several membranes, and therefore paying the cost of several indirections. If the invocations are
- not intercepted in the membranes, then it is possible to optimize the communication path by
- shortcutting : communicating directly from a caller component to a callee component by avoiding
- indirections in the membranes.&#160;</para>
-        <para>In the Julia implementation, a shortcut mechanism is provided for components in the same JVM,
- and the implementation of this mechanism relies on code generation techniques.</para>
-        <para>We provide a shortcut mechanism for distributed components, and the implementation of this
- mechanism relies on a &quot;tensioning&quot; technique : the first invocation determines the
- shortcut path, then the following invocations will use this shortcut path.&#160;</para>
-        <para>For example, in the following pictures, the first invocation from the only client interface of
- component in node2&#160;follows the standard communication path, as defined during the binding
- process, and the invocation eventually reaches the server interface of the component in node 3.
- If no interception takes place during the transfer of the invocation, then a shortcut is
- possible, and further invocations from the client interface of component in node2 will go
- directly to the server interface of the component in node 3.</para>
-        <informaltable frame="none">
+    </sect2>
+  </sect1>
+
+  <sect1 remap="h2">
+    <title><anchor
+    id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle" />Lifecycle
+    : encapsulation of functional activity in component lifecycle</title>
+
+    <para>In this implementation of the Fractal component model, Fractal
+    components are active objects.&nbsp;Therefore it is possible to redefine
+    their&nbsp;activity. In this context of component based programming, we
+    call an activity&nbsp;redefined by a user a functional
+    activity.&nbsp;</para>
+
+    <para>When a component is instantiated, its lifecycle is in the STOPPED
+    state, and the functional activity that a user may have redefined is not
+    started yet. Internally, there is a default activity which handles
+    controller requests in a FIFO order.</para>
+
+    <para>When the component is started, its lifecycle goes to the STARTED
+    state, and then the functional activity is started : this activity is
+    initialized (as defined in InitActive), and run (as defined in
+    RunActive).</para>
+
+    <para>2 conditions are required for a smooth integration between custom
+    management of functional activities and lifecycle of the component
+    :</para>
+
+    <orderedlist>
+      <listitem>
+        <para>the control of the request queue must use the
+        org.objectweb.proactive.Service class</para>
+      </listitem>
+
+      <listitem>
+        <para>the functional activity must loop on the body.isActive()
+        condition (this is not compulsory, but it allows to automatically end
+        the functional activity when the lifecycle of the component is
+        stopped. It may also be managed with a custom filter).</para>
+      </listitem>
+    </orderedlist>
+
+    <para>Control invocations to stop the component will automatically set the
+    isActive() return value to false, which implies that when the functional
+    activity loops on the body.isActive() condition, it will end when the
+    lifecycle of the component is set to STOPPED.</para>
+  </sect1>
+
+  <sect1 remap="h2">
+    <title><anchor id="configuration_html_Shortcuts" />Shortcuts</title>
+
+    <sect2 remap="h3">
+      <title>Principles</title>
+
+      <para>Communications between&nbsp;components in a hierarchical model may
+      involve the crossing of several membranes, and therefore paying the cost
+      of several indirections. If the invocations are not intercepted in the
+      membranes, then it is possible to optimize the communication path by
+      shortcutting : communicating directly from a caller component to a
+      callee component by avoiding indirections in the membranes.&nbsp;</para>
+
+      <para>In the Julia implementation, a shortcut mechanism is provided for
+      components in the same JVM, and the implementation of this mechanism
+      relies on code generation techniques.</para>
+
+      <para>We provide a shortcut mechanism for distributed components, and
+      the implementation of this mechanism relies on a "tensioning" technique
+      : the first invocation determines the shortcut path, then the following
+      invocations will use this shortcut path.&nbsp;</para>
+
+      <para>For example, in the following pictures, the first invocation from
+      the only client interface of component in node2&nbsp;follows the
+      standard communication path, as defined during the binding process, and
+      the invocation eventually reaches the server interface of the component
+      in node 3. If no interception takes place during the transfer of the
+      invocation, then a shortcut is possible, and further invocations from
+      the client interface of component in node2 will go directly to the
+      server interface of the component in node 3.</para>
+
+     <figure>
+      <title>a configuration without shorctut </title>
+
+      <mediaobject>
+       <imageobject>
+        <imagedata width="5in" fileref="components/pics/remote-components-no-shortcuts.png" format="PNG"/>
+       </imageobject>
+      </mediaobject>
+     </figure>
+
+     <figure>
+      <title> a configuration with shorctut between the components in node2 and node3 </title>
+
+      <mediaobject>
+       <imageobject>
+        <imagedata width="5in" fileref="components/pics/remote-components-with-shortcuts.png" format="PNG"/>              
+       </imageobject>
+      </mediaobject>
+     </figure>
+
+      <!-- REMOVED because pdf generation was refusing table
+<informaltable frame="none">
           <tgroup cols="2">
             <tbody>
               <row>
-                
+
                <entry> 
                     <informalfigure>
                       <mediaobject>
@@ -269,7 +386,7 @@ MyInputInterceptor
                       </mediaobject>
                     </informalfigure>
                 </entry>
-                
+
                 <entry> 
                     <informalfigure>
                       <mediaobject>
@@ -280,29 +397,35 @@ MyInputInterceptor
                     </informalfigure>
                 </entry>
               </row>
-              
+
               <row>
                 <entry> a configuration without shorctut </entry>
                 <entry> a configuration with shorctut between the components in node2 and node3 </entry>
               </row>
-              
+
             </tbody>
           </tgroup>
         </informaltable>
-      </sect2>
-      <sect2 remap="h3">
-        <title>Configuration</title>
-        <para>Shortcuts are available when composite components are synchronous components (this does not
- break the ProActive&#160;model, as composite components are structural components). Components
- can be specified as synchronous in the ControllerDescription object that is passed to the
- component factory :</para>
-<screen>
+          -->
+    </sect2>
+
+    <sect2 remap="h3">
+      <title>Configuration</title>
+
+      <para>Shortcuts are available when composite components are synchronous
+      components (this does not break the ProActive&nbsp;model, as composite
+      components are structural components). Components can be specified as
+      synchronous in the ControllerDescription object that is passed to the
+      component factory :</para>
+
+      <screen>
 ControllerDescription controllerDescription = 
-&#160;&#160;&#160; &#160;&#160;&#160; &#160;&#160;&#160; new ControllerDescription(&quot;name&quot;, Constants.COMPOSITE, Constants.SYNCHRONOUS);
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; new ControllerDescription("name", Constants.COMPOSITE, Constants.SYNCHRONOUS);
 </screen>
-        <para>When the system property proactive.components.use_shortcuts is set to true, the component system will automatically establish shortcuts
- between components whenever possible.</para>
-      </sect2>
-    </sect1>
-  
+
+      <para>When the system property proactive.components.use_shortcuts is set
+      to true, the component system will automatically establish shortcuts
+      between components whenever possible.</para>
+    </sect2>
+  </sect1>
 </chapter>
