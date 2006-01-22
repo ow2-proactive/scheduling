@@ -31,8 +31,12 @@
 
 package org.objectweb.proactive.core.runtime;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -46,7 +50,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 public class LocalNode {
 
 	private String name;
-	private ArrayList activeObjects;
+	private ArrayList activeObjectsId;
 	private String jobId;
 	private ProActiveSecurityManager securityManager;
 	private String virtualNodeName;
@@ -56,7 +60,7 @@ public class LocalNode {
 		this.jobId = jobId;
 		this.securityManager = securityManager;
 		this.virtualNodeName = virtualNodeName;
-		this.activeObjects = new ArrayList();
+		this.activeObjectsId = new ArrayList();
 	
 		if (this.securityManager != null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug("Local Node : " +
@@ -75,8 +79,8 @@ public class LocalNode {
 	/**
 	 * @return Returns the active objects located inside the node.
 	 */
-	public ArrayList getActiveObjects() {
-		return activeObjects;
+	public ArrayList getActiveObjectsId() {
+		return activeObjectsId;
 	}
 	
 	/**
@@ -84,7 +88,7 @@ public class LocalNode {
 	 * @param activeObjects active objects to set.
 	 */
 	public void setActiveObjects(ArrayList activeObjects) {
-		this.activeObjects = activeObjects;
+		this.activeObjectsId = activeObjects;
 	}
 	
 	
@@ -146,6 +150,86 @@ public class LocalNode {
 	public void setVirtualNodeName(String virtualNodeName) {
 		this.virtualNodeName = virtualNodeName;
 	}
+
+	public void terminateActiveObjects() {
+		
+		
+	}
 	
 	
+	public ArrayList	 getActiveObjects() {
+	  ArrayList localBodies = new ArrayList();
+	  LocalBodyStore localBodystore = LocalBodyStore.getInstance();
+	  
+		if (activeObjectsId == null) {
+            // Probably the node is killed
+            return localBodies;
+        }
+
+        synchronized (activeObjectsId) {
+            for (int i = 0; i < activeObjectsId.size(); i++) {
+                UniqueID bodyID = (UniqueID) activeObjectsId.get(i);
+
+                //check if the body is still on this vm
+                Body body = localBodystore.getLocalBody(bodyID);
+
+                if (body == null) {
+                    //runtimeLogger.warn("body null");
+                    // the body with the given ID is not any more on this ProActiveRuntime
+                    // unregister it from this ProActiveRuntime
+                    activeObjectsId.remove(bodyID);
+                } else {
+                    //the body is on this runtime then return adapter and class name of the reified
+                    //object to enable the construction of stub-proxy couple.
+                    ArrayList bodyAndObjectClass = new ArrayList(2);
+
+                    //adapter
+                    bodyAndObjectClass.add(0, body.getRemoteAdapter());
+
+                    //className
+                    bodyAndObjectClass.add(1,
+                        body.getReifiedObject().getClass().getName());
+                    localBodies.add(bodyAndObjectClass);
+                }
+            }
+        }
+            return localBodies;
+	}
+        
+        /**
+         * Unregisters the specified <code>UniqueID</code> from the node 
+         * @param bodyID. The <code>UniqueID</code> to remove
+         */
+        public  void unregisterBody(UniqueID bodyID) {
+    	  	activeObjectsId.remove(bodyID);
+      }
+      
+        /**
+         * Registers the specified body in the node. In fact it is the <code>UniqueID</code> 
+         * of the body that is attached to the node.
+         * @param body. The body to register
+         */
+      public  void registerBody(UniqueID bodyID) {
+  	  	activeObjectsId.add(bodyID);
+    }
+      
+      public void terminate() {
+    	  	ArrayList activeObjects  = this.getActiveObjectsId();
+    	  	
+    	  	 for (int i = 0; i < activeObjects.size(); i++) {
+    	         UniqueID bodyID = (UniqueID) activeObjects.get(i);
+
+             //check if the body is still on this vm
+             Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
+             
+             if (body != null) {
+            	 	try {
+            	 		ProActiveLogger.getLogger("proactive.runtime.node").info("node + " + this.name + "is being killed, terminating body + " + bodyID);
+					body.terminate();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+             }
+    	  	 }
+      }
 }

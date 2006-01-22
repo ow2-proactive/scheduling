@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PublicKey;
@@ -39,6 +40,13 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -304,8 +312,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         
     		LocalNode newNode = new LocalNode(nodeName,jobId,nodeSecurityManager,vnName);
     		
-        if (replacePreviousBinding) {
-        	    newNode.setActiveObjects(((LocalNode) nodeMap.get(nodeName)).getActiveObjects());
+        if (replacePreviousBinding && (nodeMap.get(nodeName) != null)) {
+        	    newNode.setActiveObjects(((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId());
             nodeMap.remove(nodeName);
         }
 
@@ -329,6 +337,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killNode(String)
      */
     public void killNode(String nodeName) {
+    	    LocalNode localNode = (LocalNode) nodeMap.get(nodeName);
+    	    localNode.terminate();
         nodeMap.remove(nodeName);
      
     }
@@ -472,7 +482,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjects();
+        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -545,7 +555,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjects();
+        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -684,7 +694,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjects();
+        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
 
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
@@ -703,7 +713,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void unregisterBody(String nodeName, UniqueID bodyID) {
         //System.out.println("in remove id= "+ bodyID.toString());
         //System.out.println("array size "+((ArrayList)nodeMap.get(nodeName)).size());
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjects();
+        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
 
         synchronized (bodyList) {
             bodyList.remove(bodyID);
