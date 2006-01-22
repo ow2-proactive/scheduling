@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PublicKey;
@@ -40,13 +39,6 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
-
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
-import javax.management.ObjectName;
 
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -210,6 +202,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         } catch (IOException e) {
             e.printStackTrace();
         } 
+        
+        
         
         // logging info
         MDC.remove("runtime");

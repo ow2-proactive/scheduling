@@ -42,6 +42,7 @@ public interface Loggers {
     static final public String CLASSLOADING = "proactive.classloading";
     static final public String EVENTS = "proactive.events";
     static final public String RUNTIME = "proactive.runtime";
+    static final public String NODE = RUNTIME + ".node";
     static final public String BODY = "proactive.body";
     static final public String MOP = "proactive.mop";
     static final public String GROUPS = "proactive.groups";

@@ -224,7 +224,7 @@ public class LocalNode {
              
              if (body != null) {
             	 	try {
-            	 		ProActiveLogger.getLogger("proactive.runtime.node").info("node + " + this.name + "is being killed, terminating body + " + bodyID);
+            	 		ProActiveLogger.getLogger(Loggers.NODE).info("node " + this.name + " is being killed, terminating body " + bodyID);
 					body.terminate();
 				} catch (IOException e) {
 					e.printStackTrace();
