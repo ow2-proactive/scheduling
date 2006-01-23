@@ -3,14 +3,14 @@
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/hands_on_programming.html  -->
   
     <para> Here is an introduction to programming with ProActive. It should give you a first flavor, and
- you will be able to see some more advanced examples in the section &quot;introduction to some
- functionalities of the library&quot;.</para>
-    <para>The program that we will develop is a kind of &quot;helloworld&quot; example. We will increase
+ you will be able to see some more advanced examples in the section 'introduction to some
+ functionalities of the library'.</para>
+    <para>The program that we will develop is a kind of 'helloworld' example. We will increase
  the complexity of the example, so that you familiarize yourself with different features of
  ProActive.</para>
     <itemizedlist>
       <listitem>
-        <para> First, we will code a &quot;client-server&quot; application, the server being an active
+        <para> First, we will code a 'client-server' application, the server being an active
  object.</para>
       </listitem>
       <listitem>
@@ -28,16 +28,12 @@
       <title>The client - server example</title>
       <para>This example implements a very simple client-server application. You will find it <ulink url="../HelloWorld.xml">here</ulink>, as it is the HelloWorld example earlier mentionned in this manual.
  A client object displays a <literal>String</literal> gotten from a remote server.</para>
-      <para>The corresponding class diagram is the following :</para>
+      <para>The corresponding class diagram is the following:</para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-            <!--  <imagedata fileref="guided_tour/pics/hello/clientserver.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="guided_tour/pics/hello/clientserver.svg" format="SVG"/>            </imageobject>
-            <imageobject>-->
-              <imagedata width="6in" fileref="guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
+              <imagedata  fileref="guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -65,38 +61,36 @@
         <para>
           <informalfigure>
             <mediaobject>
-              <!--<imageobject>
-                <imagedata fileref="guided_tour/pics/hello/initializedhello.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/initializedhello.svg" format="SVG"/>              </imageobject>-->
-              <imageobject>
-               <imagedata width="6in" fileref="guided_tour/pics/hello/initializedhello.png" format="PNG"/>              </imageobject>
+               <imagedata  fileref="guided_tour/pics/hello/initializedhello.png" format="PNG"/>
+              </imageobject>
             </mediaobject>
           </informalfigure>
-</para>-->
+</para>
       </sect2>
       <sect2 remap="h3">
         <title>Programming</title>
         <sect3 remap="h4">
           <title>InitializedHello</title>
-          <para>The source code of the InitializedHello class is <ulink url="hands_on_programming/code/InitializedHello.java.xml">here</ulink>.</para>
+          <para>The source code of the InitializedHello class is 
+           <ulink url="hands_on_programming/code/InitializedHello.java.xml">here</ulink>.</para>
           <para>initActivity and endActivity here just log messages onto the console, so you can see when they
  are called.</para>
           <para>initActivity is called at the creation of the active object, while endActive is called after
  the activity has terminated (thanks to the method terminate).</para>
-          <para>Here is the initActivity method :</para>
+          <para>Here is the initActivity method:</para>
           <screen>
 public void initActivity(Body body) {
-        System.out.println(&quot;I am about to start my activity&quot;);
+        System.out.println('I am about to start my activity');
 }
           </screen>
-          <para>Here is the endActivity method :</para>
+          <para>Here is the endActivity method:</para>
           <screen>
 public void endActivity(Body body) {
-        System.out.println(&quot;I have finished my activity&quot;);
+        System.out.println('I have finished my activity');
 }
           </screen>
-          <para>The following code shows how to terminate the activity of the active object :</para>
+          <para>The following code shows how to terminate the activity of the active object:</para>
           <screen>
 public void terminate() {
         // the termination of the activity is done through a call on the
@@ -119,7 +113,7 @@ windows&gt;build.bat examples
 linux&gt;build examples
 cd ..
           </screen>
-          <para>Add &quot;./classes&quot; directory to CLASSPATH to use these two new source files</para>
+          <para>Add './classes' directory to CLASSPATH to use these two new source files</para>
           <para><literal>windows&gt;set
  CLASSPATH=.;.\classes;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;.\lib\fractal.jar;.\lib\bouncycastle.jar</literal><literal>linux&gt;export
  CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:./lib/fractal.jar:./lib/bouncycastle.jar</literal></para>
@@ -129,7 +123,7 @@ cd ..
         <title>Execution</title>
         <para>Execution is similar to the previous example; just use the InitializedHelloClient client class
  and InitializedHello server class.</para>
-        <para></para>
+        
         <sect3 remap="h4">
           <title>Starting the server</title>
           <para><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
@@ -152,14 +146,14 @@ cd ..
     </sect1>
     <sect1 remap="h2">
       <title>A simple migration example</title>
-      <para>This program is a very simple one : it creates an active object that migrates between virtual
+      <para>This program is a very simple one: it creates an active object that migrates between virtual
  machines. It is a extension of the previous client-server example, the server now being
  mobile.</para>
       <sect2 remap="h3">
         <title>Required conditions</title>
-        <para>The conditions for MigratableHello to be a migratable active object are :</para>
-        <para>- it must have a constructor without parameters : this is a result of a ProActive restriction
- : the active object having to implement a no-arg constructor. &lt;/ p&gt;</para>
+        <para>The conditions for MigratableHello to be a migratable active object are:</para>
+        <para>- it must have a constructor without parameters: this is a result of a ProActive restriction
+: the active object having to implement a no-arg constructor. &lt;/ p&gt;</para>
         <para>- implement the Serializable interface (as it will be transferred through the
  network).&lt;/&gt;</para>
         <para>Hello, the superclass, must be able to be serialized, in order to be transferred remotely. It
@@ -169,7 +163,7 @@ cd ..
       </sect2>
       <sect2 remap="h3">
         <title>Design</title>
-        <para>We want to further enhance InitializedHello it by making migratable : we&#39;d like to be able
+        <para>We want to further enhance InitializedHello it by making migratable: we'd like to be able
  to move it across virtual machines.</para>
         <para>Thus, we create a MigratableHello class, that derives from InitializedHello. This class will
  implement all the non-functionnal behavior concerning the migration, for which this example is
@@ -179,17 +173,14 @@ cd ..
  that contains an explicit call to the migration primitive. (cf <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.xml">
  migration documentation</ulink>)</emphasis></para>
         <para>MigratableHello also implements a factory method for instanciating itself as an active object
- : <literal>static MigratableHello createMigratableHello(String : name)</literal></para>
-        <para>The class diagram for the application is the following :</para>
+: <literal>static MigratableHello createMigratableHello(String: name)</literal></para>
+        <para>The class diagram for the application is the following:</para>
         <para>
           <informalfigure>
             <mediaobject>
-<!--              <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/migratablehello.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/migratablehello.svg" format="SVG"/>              </imageobject>-->
-              <imageobject>
-               <imagedata width="6in" fileref="guided_tour/pics/hello/migratablehello.png" format="PNG"/>              </imageobject>
+               <imagedata  fileref="guided_tour/pics/hello/migratablehello.png" format="PNG"/>
+              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -200,28 +191,28 @@ cd ..
           <title>a) the MigratableHello class</title>
           <para>The code of the MigratableHello class is <ulink url="hands_on_programming/code/MigratableHello.java.xml">here</ulink>.</para>
           <para>MigratableHello derives from the Hello class from the previous example</para>
-          <para>MigratableHello being the active object itself, it has to :</para>
+          <para>MigratableHello being the active object itself, it has to:</para>
           <para>- implement the Serializable interface</para>
           <para>- provide a no-arg constructor</para>
-          <para>- provide an implementation for using ProActive&#39;s migration mechanism.</para>
+          <para>- provide an implementation for using ProActive's migration mechanism.</para>
           <para>A new method getCurrentNodeLocation is added for the object to tell the node where it
  resides..</para>
           <para>A factory static method is added for ease of creation.</para>
-          <para>The migration is initiated by the moveTo method :</para>
+          <para>The migration is initiated by the moveTo method:</para>
           <screen>
 /** method for migrating
 * @param destination_node destination node
 */
 public void moveTo(String destination_node) {
-        System.out.println(&quot;\n-----------------------------&quot;);
-        System.out.println(&quot;starting migration to node : &quot; + destination_node\
+        System.out.println('\n-----------------------------');
+        System.out.println('starting migration to node: ' + destination_node\
 );
-        System.out.println(&quot;...&quot;);
+        System.out.println('...');
         try {
                 // THIS MUST BE THE LAST CALL OF THE METHOD
                 ProActive.migrateTo(destination_node);
         } catch (MigrationException me) {
-                System.out.println(&quot;migration failed : &quot; + me.toString());
+                System.out.println('migration failed: ' + me.toString());
         }
 }
           </screen>
@@ -230,7 +221,7 @@ public void moveTo(String destination_node) {
 </sect3>
         <sect3 remap="h4">
           <title>c) the client class</title>
-          <para>The entry point of the program is written in a separate class : <ulink url="hands_on_programming/code/MigratableHelloClient.java.xml">MigratableHelloClient</ulink></para>
+          <para>The entry point of the program is written in a separate class: <ulink url="hands_on_programming/code/MigratableHelloClient.java.xml">MigratableHelloClient</ulink></para>
           <para>It takes as arguments the locations of the nodes the object will be migrated to.</para>
           <para>The program calls the factory method of MigratableHello to create an instance of an active
  object. It then moves it from node to node, pausing for a while between the transfers.</para>
@@ -248,7 +239,7 @@ linux&gt;cd scripts/linux
                 ./startNode.sh //localhost/n2
         </screen>
         <para>- compile and run the program (run MigratableHelloClient), passing in parameter the urls of
- the nodes you&#39;d like the agent to migrate to.</para>
+ the nodes you'd like the agent to migrate to.</para>
         <screen>
 cd compile
 windows&gt;build.bat examples
@@ -259,29 +250,26 @@ cd ..
  -Dlog4j.configuration=file:scripts/proactive-log4j
  org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1
  //localhost/n2</literal></para>
-        <para></para>
+        
         <para><literal>windows&gt;java -Djava.security.policy=scripts\proactive.java.policy
  -Dlog4j.configuration=file:scripts\proactive-log4j
  org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1
  //localhost/n2</literal></para>
-        <para>- observe the instance of MigratableHello migrating :</para>
-        <para>&#160;</para>
+        <para>- observe the instance of MigratableHello migrating:</para>
+        
         <para>
           <informalfigure>
             <mediaobject>
-<!--              <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/agent_execution.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/agent_execution.svg" format="SVG"/>              </imageobject>-->
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/agent_execution.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/hello/agent_execution.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>During the execution, a default node is first created. It then hosts the created active
  object. Then the active object is migrated from node to node, each time returning
- &quot;hello&quot; and telling the client program where it is located.</para>
-        <para></para>
+ 'hello' and telling the client program where it is located.</para>
+        
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -301,12 +289,9 @@ cd ..
         <para>
           <informalfigure>
             <mediaobject>
-<!--              <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/hellogui.gif" format="GIF"/>              </imageobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/hellogui.svg" format="SVG"/>              </imageobject>-->
-              <imageobject>
-               <imagedata width="6in" fileref="guided_tour/pics/hello/hellogui.png" format="PNG"/>              </imageobject>
+               <imagedata  fileref="guided_tour/pics/hello/hellogui.png" format="PNG"/>
+              </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
@@ -325,7 +310,7 @@ cd ..
  example though, we wait for a call to sayHello). The migration of the frame is actually
  controlled by a MigrationStrategyManager, that will be attached to the body of the active
  object.. An ideal location for this operation is the initActivity method (from InitActive
- interface), that we override :</para>
+ interface), that we override:</para>
           <screen>
 /**
  * This method attaches a migration strategy manager to the current active \
@@ -340,18 +325,18 @@ public void initActivity(Body body) {
 able) ProActive.getBodyOnThis());
         // specify what to do when the active object is about to migrate
         // the specified method is then invoked by reflection
-        migrationStrategyManager.onDeparture(&quot;clean&quot;);
+        migrationStrategyManager.onDeparture('clean');
 }
           </screen>
-          <para>The MigrationStrategyManager defines methods such as &quot;onDeparture&quot;, that can be
- configured in the application. For example here, the method &quot;clean&quot; will be called
- before the migration, conveniently killing the frame :</para>
+          <para>The MigrationStrategyManager defines methods such as 'onDeparture', that can be
+ configured in the application. For example here, the method 'clean' will be called
+ before the migration, conveniently killing the frame:</para>
           <screen>
 public void clean() {
-        System.out.println(&quot;killing frame&quot;);
+        System.out.println('killing frame');
         helloFrame.dispose();
         helloFrame = null;
-        System.out.println(&quot;frame is killed&quot;);
+        System.out.println('frame is killed');
 }
           </screen>
 </sect3>
@@ -367,54 +352,53 @@ public void clean() {
             <para> Create a new class HelloFrameControllerClient: take the code of MigratableHelloClient used
  in the previous part, change the class declaration to HelloFrameControllerClient and replace
  the line</para>
-            <para></para>
+            
           </listitem>
 </itemizedlist>
         <para><literal>MigratableHello migratable_hello =
- MigratableHello.createMigratableHello(&quot;agent1&quot;);</literal></para>
+ MigratableHello.createMigratableHello('agent1');</literal></para>
         <para>with</para>
         <para><literal>MigratableHello migratable_hello =
- HelloFrameController.createHelloFrameController(&quot;agent1&quot;);</literal></para>
+ HelloFrameController.createHelloFrameController('agent1');</literal></para>
         <itemizedlist>
           <listitem>
             <para> Similarly to the simple migration example (use the HelloFrameControllerClient class), you
  will start remote nodes and specify a migration path.</para>
           </listitem>
           <listitem>
-            <para> you have 2 ways for handling the display of the graphical objects :</para>
+            <para> you have 2 ways for handling the display of the graphical objects:</para>
           </listitem>
 </itemizedlist>
         <para>
           <itemizedlist>
             <listitem>
               <para> look on the display screens of the machines</para>
-              <para></para>
+              
             </listitem>
 </itemizedlist>
 </para>
         <para>
           <itemizedlist>
             <listitem>
-              <para> export the displays : in startNode.sh, you should add the following lines before the java
- command : </para>
+              <para> export the displays: in startNode.sh, you should add the following lines before the java
+ command: </para>
               <para><literal>DISPLAY=myhost:0
  export DISPLAY</literal></para>
-              <para>&#160;</para>
+              
             </listitem>
 </itemizedlist>
 </para>
-        <para></para>
+        
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.png" format="PNG"/>              </imageobject>
-<!--               <imageobject>  
- <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.svg" format="SVG"/>              </imageobject> -->
+                <imagedata fileref="guided_tour/pics/hello/hellogui-snapshot.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
-        <para>The displayed window : it just contains a text label with the location of
+        <para>The displayed window: it just contains a text label with the location of
  the active object.</para>
       </sect2>
     </sect1>

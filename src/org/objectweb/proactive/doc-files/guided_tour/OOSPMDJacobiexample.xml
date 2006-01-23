@@ -4,7 +4,7 @@
   
     <sect1 remap="h2">
       <title>OO SPMD on a Jacobi example</title>
-      <para>&nbsp;</para>
+      
       <sect2 remap="h3">
         <title><anchor id="OOSPMDJacobiexample_html_firstglance"/>1.
  Execution and first glance at the Jacobi code</title>
@@ -16,8 +16,8 @@
           <para>- SubMatrix.java: the class implementing the SPMD code</para>
           <para>Have a first quick look at the code, especially the Jacobi class, looking
  for the strings "ProActive", "Nodes", "newSPMDGroup".</para>
-          <para></para>
-          <para></para>
+          
+          
           <para>The last instruction of the class:</para>
           <para><literal>matrix.compute();</literal></para>
           <para>is an asynchronous group call. It sends a request to all active objects in
@@ -35,16 +35,16 @@
           <para>The computation stops after minimal difference is reached between two
  iterations (constant MINDIFF in class Jacobi.java), or after a fixed number of iteration
  (constant ITERATIONS in class Jacobi.java).</para>
-          <para></para>
-          <para></para>
+          
+          
           <para>The provided script, using an XML descriptor, creates 4 JVMs on the current
  machine. The Jacobi class creates an SPMD group of 9 Active Objects; 2 or 3 AOs per JVM.</para>
-          <para></para>
-          <para></para>
+          
+          
           <para>Look at the traces on the console upon starting the script; in the current
  case, remember that all JVMs and AOs send output to the same console. More specifically,
  understand the following:</para>
-          <para></para>
+          
           <para><literal>- "Created a new registry on port 1099"</literal></para>
           <para><literal>- "Reading deployment descriptor ... Matrix.xml
  "</literal></para>
@@ -54,20 +54,20 @@
  classpath"</literal></para>
           <para><literal>- "Detected an existing RMI Registry on port
  1099""</literal></para>
-          <para><literal>- "Generating class : ... jacobi.Stub_SubMatrix
+          <para><literal>- "Generating class: ... jacobi.Stub_SubMatrix
  "</literal></para>
           <para><literal>- "ClassServer sent class ... jacobi.Stub_SubMatrix
  successfully"</literal></para>
-          <para></para>
-          <para></para>
+          
+          
           <para>You can start IC2D (script ic2d.sh or ic2d.bat) in order to visualize the
  JVMs and the Active Objects. Just activate the "Monitoring a new host" in the
  "Monitoring" menu at the top left.</para>
-          <para></para>
-          <para></para>
+          
+          
           <para>To stop the Jacobi computation and all the associated AOs, and JVMs, just
  ^C in the window where you started the Jacobi script.</para>
-          <para></para>
+          
 </sect3>
       </sect2>
       <sect2 remap="h3">
@@ -201,15 +201,14 @@
  Topology" button to clear communication arcs. The green and red dots indicate the pending
  requests.</para>
           <para>You can imagine and test other modifications to the Jacobi code.</para>
-          <para>&nbsp;</para>
-          <informalfigure>
+          <figure>
+           <title>Running the Jacobi application, and viewing with IC2D</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d.svg" format="SVG"/>              </imageobject>
+                <imagedata   fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG"/>  
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </sect3>
         <sect3 remap="h4">
           <title>3.4 Undestanding various different kind of barriers</title>
@@ -227,24 +226,22 @@
  this.iterationsToStop);</literal></para>
           <para>Then recompile and execute again. Using IC2D observe that many more
  communications are necessary.</para>
-          <para>&nbsp;</para>
-          <informalfigure>
+          <figure>
+           <title>With all communications</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-allcoms.svg" format="SVG"/>              </imageobject>
+                <imagedata   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG"/>              </imageobject>
+              
             </mediaobject>
-          </informalfigure>
-          <para>&nbsp;</para>
-          <informalfigure>
+          </figure>
+          <figure>
+           <title>With a barrier, there are many less comunications</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.svg" format="SVG"/>              </imageobject>
+                <imagedata   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG"/>              </imageobject>
+              
             </mediaobject>
-          </informalfigure>
+          </figure>
           <para>In order to get details and documentation on Groups and OO SPMD, have a
  look at:</para>
           <para><literal>ProActive/src/org/objectweb/proactive/</literal></para>
@@ -278,15 +275,14 @@
           <para>Edit the file Matrix.xml in order to change the number of JVMs being used.
  For instance, if your machine is powerful enough, start 9 JVMs, in order to have a single
  SubMatrix per JVM.</para>
-          <para>&nbsp;</para>
-          <informalfigure>
-            <mediaobject>
+          
+          <figure>
+           <title>IC2D viewing the Jacobi application with 9 JVMS on the same machine</title>
+           <mediaobject>
               <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata width="6in"  fileref="guided_tour/pics/screenshots/jacobiic2d9vm.svg" format="SVG"/>              </imageobject>
+                <imagedata   fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG"/>              </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
           <para>You do not need to recompile, just restart the execution. Use IC2D to
  visualize the differences in the configuration.</para>
 </sect3>
@@ -314,55 +310,55 @@
  to specify different jvm configurations (e.g classpath, java path,...).</para>
 <screen> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;                          
- &nbsp;&lt;componentDefinition&gt;
- &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+  &lt;componentDefinition&gt;
+   &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
  property="<emphasis role="bold">multiple</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;
- &nbsp;&lt;/componentDefinition&gt;
- &nbsp;&lt;deployment&gt;
- &nbsp;&nbsp;&lt;mapping&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&lt;/mapping&gt;
- &nbsp;&nbsp;&lt;jvms&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&lt;/jvms&gt;
- &nbsp;&lt;/deployment&gt;
- &nbsp;&lt;infrastructure&gt;
- &nbsp;&nbsp;&lt;processes&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+   &lt;/virtualNodesDefinition&gt;
+  &lt;/componentDefinition&gt;
+  &lt;deployment&gt;
+   &lt;mapping&gt;
+    &lt;/map&gt;
+    &lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
+     &lt;jvmSet&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;
+     &lt;/jvmSet&gt;
+    &lt;/map&gt;
+   &lt;/mapping&gt;
+   &lt;jvms&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+   &lt;/jvms&gt;
+  &lt;/deployment&gt;
+  &lt;infrastructure&gt;
+   &lt;processes&gt;
+    &lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;
+     &lt;<emphasis role="bold">jvmProcess</emphasis>
       class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&lt;/processes&gt;
- &nbsp;&lt;/infrastructure&gt;
+    &lt;/processDefinition&gt;
+   &lt;/processes&gt;
+  &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
 </screen>
           <para>Modify your XML deployment file to use the current jvm (i.e the jvm reading
@@ -370,159 +366,159 @@
           <para>Use IC2D to visualize the machines and the JVMs being launched on them.</para>
 <screen> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;                          
- &nbsp;&lt;componentDefinition&gt;
- &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+  &lt;componentDefinition&gt;
+   &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
  property="<emphasis role="bold">multiple</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;
- &nbsp;&lt;/componentDefinition&gt;
- &nbsp;&lt;deployment&gt;
- &nbsp;&nbsp;&lt;mapping&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&lt;/mapping&gt;
- &nbsp;&nbsp;&lt;jvms&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference  refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_toto</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+   &lt;/virtualNodesDefinition&gt;
+  &lt;/componentDefinition&gt;
+  &lt;deployment&gt;
+   &lt;mapping&gt;
+    &lt;/map&gt;
+    &lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
+     &lt;jvmSet&gt;
+      &lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm2</emphasis>"/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm3</emphasis>"/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm4</emphasis>"/&gt;
+     &lt;/jvmSet&gt;
+    &lt;/map&gt;
+   &lt;/mapping&gt;
+   &lt;jvms&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference  refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference refid="<emphasis role="bold">rsh_toto</emphasis>"/&gt;
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference
  refid="<emphasis role="bold">rsh_tata</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference
  refid="<emphasis role="bold">rsh_tutu</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&lt;/jvms&gt;
- &nbsp;&lt;/deployment&gt;
- &nbsp;&lt;infrastructure&gt;
- &nbsp;&nbsp;&lt;processes&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+   &lt;/jvms&gt;
+  &lt;/deployment&gt;
+  &lt;infrastructure&gt;
+   &lt;processes&gt;
+    &lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;
+     &lt;<emphasis role="bold">jvmProcess</emphasis>
  class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+    &lt;/processDefinition&gt;
+    &lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;
+     &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="titi"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+      &lt;processReference
  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_toto</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+     /rshProcess&gt;
+    &lt;/processDefinition&gt;
+    &lt;processDefinition id="<emphasis role="bold">rsh_toto</emphasis>"&gt;
+     &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="toto"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+      &lt;processReference
  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_tata</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+     /rshProcess&gt;
+    &lt;/processDefinition&gt;
+    &lt;processDefinition id="<emphasis role="bold">rsh_tata</emphasis>"&gt;
+     &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="tata"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+      &lt;processReference
  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<emphasis role="bold">rsh_tutu</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+     /rshProcess&gt;
+    &lt;/processDefinition&gt;
+    &lt;processDefinition id="<emphasis role="bold">rsh_tutu</emphasis>"&gt;
+     &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="tutu"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;/rshProcess&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&lt;/processes&gt;
- &nbsp;&lt;/infrastructure&gt;
+      &lt;processReference  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+     /rshProcess&gt;
+    &lt;/processDefinition&gt;
+   &lt;/processes&gt;
+  &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
 </screen>
           <para>Pay attention of what happened to your previous XML deployment file. First
  of all to use the current jvm the following line was added just under the <emphasis role="bold">jvmSet</emphasis> tag</para>
 <screen> 
  &lt;jvmSet&gt;
- &nbsp;&lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
- &nbsp;...
+  &lt;<emphasis role="bold">currentJvm</emphasis> /&gt;
+  ...
  &lt;jvmSet&gt;
 </screen>
           <para>Then the jvms are not created directly using the localProcess, but instead
  using other processes named <emphasis role="bold">rsh_titi, rsh_toto, rsh_tata, rsh_tutu</emphasis></para>
           <screen> 
  &lt;jvms&gt;                          
- &nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
- &nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&lt;/jvm&gt;
- &nbsp;&lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;
- &nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_toto</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&lt;/jvm&gt;
- &nbsp;&lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;
- &nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_tata</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&lt;/jvm&gt;
- &nbsp;&lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;
- &nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">rsh_tutu</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&lt;/jvm&gt;
+  &lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
+   &lt;creation&gt;
+    &lt;processReference refid="<emphasis role="bold">rsh_titi</emphasis>"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+  &lt;jvm name="<emphasis role="bold">Jvm2</emphasis>"&gt;
+   &lt;creation&gt;
+    &lt;processReference refid="<emphasis role="bold">rsh_toto</emphasis>"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+  &lt;jvm name="<emphasis role="bold">Jvm3</emphasis>"&gt;
+   &lt;creation&gt;
+    &lt;processReference refid="<emphasis role="bold">rsh_tata</emphasis>"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+  &lt;jvm name="<emphasis role="bold">Jvm4</emphasis>"&gt;
+   &lt;creation&gt;
+    &lt;processReference refid="<emphasis role="bold">rsh_tutu</emphasis>"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
  &lt;/jvms&gt;</screen>
           <para>Those processes as shown below are rsh processes. Note that it is <emphasis role="bold">mandatory</emphasis> for such processes to reference a <emphasis role="bold">jvmProcess</emphasis>, in this case named with the
  id <emphasis role="bold">localProcess</emphasis>, to create, at deployment time, a jvm on machines titi, toto, tata, tutu,
  once connected to those machines with rsh.</para>
           <screen> 
  &lt;processDefinition id="<emphasis role="bold">localProcess</emphasis>"&gt;                          
- &nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+  &lt;<emphasis role="bold">jvmProcess</emphasis>
  class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
  &lt;/processDefinition&gt;
  &lt;processDefinition id="<emphasis role="bold">rsh_titi</emphasis>"&gt;
- &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+  &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="titi"&gt;
- &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;/rshProcess&gt;
+   &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+  /rshProcess&gt;
  &lt;/processDefinition&gt;
  &lt;processDefinition id="<emphasis role="bold">rsh_toto</emphasis>"&gt;
- &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+  &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="toto"&gt;
- &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;/rshProcess&gt;
+   &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+  /rshProcess&gt;
  &lt;/processDefinition&gt;
  &lt;processDefinition id="<emphasis role="bold">rsh_tata</emphasis>"&gt;
- &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+  &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="tata"&gt;
- &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;/rshProcess&gt;
+   &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+  /rshProcess&gt;
  &lt;/processDefinition&gt;
  &lt;processDefinition id="<emphasis role="bold">rsh_tutu</emphasis>"&gt;
- &nbsp;&lt;<emphasis role="bold">rshProcess</emphasis>
+  &lt;<emphasis role="bold">rshProcess</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcess"
  hostname="tutu"&gt;
- &nbsp;&nbsp;&lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;/rshProcess&gt;
+   &lt;processReference refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
+  /rshProcess&gt;
  &lt;/processDefinition&gt;
 </screen>
           <itemizedlist>
@@ -541,49 +537,49 @@
 <screen> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;                              
- &nbsp;&lt;componentDefinition&gt;
- &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+  &lt;componentDefinition&gt;
+   &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
  property="<emphasis role="bold">multiple</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;
- &nbsp;&lt;/componentDefinition&gt;
- &nbsp;&lt;deployment&gt;
- &nbsp;&nbsp;&lt;mapping&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;currentJvm/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&lt;/mapping&gt;
- &nbsp;&nbsp;&lt;jvms&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+   &lt;/virtualNodesDefinition&gt;
+  &lt;/componentDefinition&gt;
+  &lt;deployment&gt;
+   &lt;mapping&gt;
+    &lt;/map&gt;
+    &lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
+     &lt;jvmSet&gt;
+      &lt;currentJvm/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
+     &lt;/jvmSet&gt;
+    &lt;/map&gt;
+   &lt;/mapping&gt;
+   &lt;jvms&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference
  refid="<emphasis role="bold">rsh_list_titi_toto_tutu_tata</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&lt;/jvms&gt;
- &nbsp;&lt;/deployment&gt;
- &nbsp;&lt;infrastructure&gt;
- &nbsp;&nbsp;&lt;processes&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+   &lt;/jvms&gt;
+  &lt;/deployment&gt;
+  &lt;infrastructure&gt;
+   &lt;processes&gt;
+    &lt;processDefinition
  id="<emphasis role="bold">localProcess</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+     &lt;<emphasis role="bold">jvmProcess</emphasis>
  class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition
+    &lt;/processDefinition&gt;
+    &lt;processDefinition
  id="<emphasis role="bold">rsh_list_titi_toto_tutu_tata</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">processListbyHost</emphasis>
+     &lt;<emphasis role="bold">processListbyHost</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
  hostlist="<emphasis role="bold">titi toto tata tutu</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+      &lt;processReference
  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/processListbyHost&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&lt;/processes&gt;
- &nbsp;&lt;/infrastructure&gt;
+     &lt;/processListbyHost&gt;
+    &lt;/processDefinition&gt;
+   &lt;/processes&gt;
+  &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
 </screen>
               <itemizedlist>
@@ -596,50 +592,50 @@
                 &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;                              
- &nbsp;&lt;componentDefinition&gt;
- &nbsp;&nbsp;&lt;virtualNodesDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
+  &lt;componentDefinition&gt;
+   &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
  property="<emphasis role="bold">multiple</emphasis>"/&gt;
- &nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;
- &nbsp;&lt;/componentDefinition&gt;
- &nbsp;&lt;deployment&gt;
- &nbsp;&nbsp;&lt;mapping&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&nbsp;&lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;currentJvm/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&lt;/map&gt;
- &nbsp;&nbsp;&lt;/mapping&gt;
- &nbsp;&nbsp;&lt;jvms&gt;
- &nbsp;&nbsp;&nbsp;&lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+   &lt;/virtualNodesDefinition&gt;
+  &lt;/componentDefinition&gt;
+  &lt;deployment&gt;
+   &lt;mapping&gt;
+    &lt;/map&gt;
+    &lt;map virtualNode="<emphasis role="bold">matrixNode</emphasis>"&gt;
+     &lt;jvmSet&gt;
+      &lt;currentJvm/&gt;
+      &lt;vmName value="<emphasis role="bold">Jvm1</emphasis>"/&gt;
+     &lt;/jvmSet&gt;
+    &lt;/map&gt;
+   &lt;/mapping&gt;
+   &lt;jvms&gt;
+    &lt;jvm name="<emphasis role="bold">Jvm1</emphasis>"&gt;
+     &lt;creation&gt;
+      &lt;processReference
  refid="<emphasis role="bold">rsh_list_titi1_to_100</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;
- &nbsp;&nbsp;&nbsp;&lt;/jvm&gt;
- &nbsp;&nbsp;&lt;/jvms&gt;
- &nbsp;&lt;/deployment&gt;
- &nbsp;&lt;infrastructure&gt;
- &nbsp;&nbsp;&lt;processes&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition
+     &lt;/creation&gt;
+    &lt;/jvm&gt;
+   &lt;/jvms&gt;
+  &lt;/deployment&gt;
+  &lt;infrastructure&gt;
+   &lt;processes&gt;
+    &lt;processDefinition
  id="<emphasis role="bold">localProcess</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">jvmProcess</emphasis>
+     &lt;<emphasis role="bold">jvmProcess</emphasis>
  class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt;processDefinition
+    &lt;/processDefinition&gt;
+    &lt;processDefinition
  id="<emphasis role="bold">rsh_list_titi1_to_100</emphasis>"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;<emphasis role="bold">processList</emphasis>
+     &lt;<emphasis role="bold">processList</emphasis>
  class="org.objectweb.proactive.core.process.rsh.RSHProcessList"
  fixedName="titi" list="[1-100]"
  domain="titi_domain"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference
+      &lt;processReference
  refid="<emphasis role="bold">localProcess</emphasis>"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt;/processList&gt;
- &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;
- &nbsp;&nbsp;&lt;/processes&gt;
- &nbsp;&lt;/infrastructure&gt;
+     &lt;/processList&gt;
+    &lt;/processDefinition&gt;
+   &lt;/processes&gt;
+  &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
 </screen>
             </listitem>
@@ -653,7 +649,7 @@
           <para>Have a look at <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/Descriptor.xml">
  XML Descriptors documentation</ulink> to get the format of the XML descriptor for each of the
  supported protocols.</para>
-          <para>&nbsp;</para>
+          
 </sect3>
       </sect2>
     </sect1>

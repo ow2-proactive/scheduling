@@ -18,49 +18,54 @@
   role="bold">ProActive</emphasis> that provides asynchronous calls and
   migration.</para>
 
-  <para><emphasis role="bold">The basic features of IC2D
-  are:</emphasis></para>
+  <table>
+    <title>IC2D basic features</title>
 
-  <table frame="box" rules="all">
-    <caption></caption>
+    <tgroup cols="3">
+      <thead>
+        <row>
+          <entry align="center">Graphical Visualisation</entry>
 
-    <thead>
-      <tr align="center">
-        <th>Graphical Visualisation</th>
-        <th>Textual Visualisation</th>
-        <th>Control and Monitoring</th>
-      </tr>
-    </thead>
+          <entry align="center">Textual Visualisation</entry>
 
-    <tbody>
-      <tr>
-       <td>Hosts, Java Virtual Machines, Active Objects</td>
-       <td>Ordered list of messages</td>
-       <td>Interactive control of mapping upon
-          creation</td>
-      </tr>
+          <entry align="center">Control and Monitoring</entry>
+        </row>
+      </thead>
 
-      <tr>
-       <td>Topology: reference and communications</td>
-       <td>Status: waiting for a request or for a
-          data</td>
-         <td>Interactive control of destination upon
-          migration</td>
-      </tr>
-      <tr>
-       <td>Status of active objects (executing, waiting,
-          etc.)</td>
-         <td>Causal dependencies between messages</td>
-         <td>Dynamic change of deployment</td>
-      </tr>
-      <tr>
-       <td>Migration of activities</td>
-       <td>Related events (corresponding send and receive,
-          etc.)</td>
-         <td>>Drag and Drop migration of executing
-          tasks</td>
-      </tr>
-    </tbody>
+      <tbody>
+        <row>
+          <entry>Hosts, Java Virtual Machines, Active Objects</entry>
+
+          <entry>Ordered list of messages</entry>
+
+          <entry>Interactive control of mapping upon creation</entry>
+        </row>
+
+        <row>
+          <entry>Topology: reference and communications</entry>
+
+          <entry>Status: waiting for a request or for a data</entry>
+
+          <entry>Interactive control of destination upon migration</entry>
+        </row>
+
+        <row>
+          <entry>Status of active objects (executing, waiting, etc.)</entry>
+
+          <entry>Causal dependencies between messages</entry>
+
+          <entry>Dynamic change of deployment</entry>
+        </row>
+
+        <row>
+          <entry>Migration of activities</entry>
+
+          <entry>Related events (corresponding send and receive, etc.)</entry>
+
+          <entry>Drag and Drop migration of executing tasks</entry>
+        </row>
+      </tbody>
+    </tgroup>
   </table>
 
   <para>The full source of IC2D is included in the distribution and is also
@@ -77,17 +82,15 @@
     hosts, Java Virtual Machines, and active objects, including the topology
     and volume of communications.</emphasis></para>
 
-    <para>&nbsp;</para>
+    <para><figure>
+        <title>IC2D visualizing the C3D application</title>
 
-    <para><informalfigure>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/ic2d_c3d.png" format="PNG" width="6in" />
+            <imagedata fileref="images/ic2d_c3d.png" format="PNG" />
           </imageobject>
         </mediaobject>
-
-        <ulink url="ic2d_c3d.jpg"></ulink>
-      </informalfigure></para>
+      </figure></para>
   </sect1>
 
   <sect1 remap="h2">
@@ -96,32 +99,26 @@
     <para><emphasis role="bold">IC2D permits to interactively and dynamically
     create new Jvms and Nodes.</emphasis></para>
 
-    <para><informalfigure>
+    <para><figure>
+        <title>A 'drag-and-drop' migration allows to graphically move running
+        active objects between machines.</title>
+
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/RemoteControl.png" format="PNG"
-                       width="6in" />
+            <imagedata fileref="images/RemoteControl.png" format="PNG" />
           </imageobject>
         </mediaobject>
+      </figure></para>
 
-        <ulink url="RemoteControl.jpg"></ulink>
-      </informalfigure></para>
+    <figure>
+      <title>IC2D permits to visualize related events and AOs state</title>
 
-    <para><emphasis role="bold">A 'drag-and-drop' migration allows to
-    graphically move running active objects between
-    machines.</emphasis></para>
-
-    <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG"
-                     width="6in" />
+          <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" />
         </imageobject>
       </mediaobject>
-    </informalfigure>
-
-    <para><emphasis role="bold">IC2D permits to visualize related events and
-    AOs state</emphasis></para>
+    </figure>
   </sect1>
 
   <sect1 remap="h2">
@@ -138,8 +135,7 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/jobmonitor2_logo.png" format="PNG"
-                     width="6in" />
+          <imagedata fileref="images/jobmonitor2_logo.png" format="PNG" />
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -147,8 +143,7 @@
     <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/jobmonitor1_logo.png" format="PNG"
-                     width="6in" />
+          <imagedata fileref="images/jobmonitor1_logo.png" format="PNG" />
         </imageobject>
       </mediaobject>
     </informalfigure>
@@ -174,16 +169,13 @@
       <title>MainDefinition tag</title>
 
       <para>A new tag has been introduced, just before the component
-      definition tag. This tag is named "mainDefinition" and its syntax is
-      :</para>
+      definition tag. This tag is named "mainDefinition" and its syntax is:</para>
 
-      <screen> 
- &nbsp;&lt;mainDefinition id="mainID" class="theClassToLaunchContainingAMainMethod"&gt;
- &nbsp;&nbsp;&lt;arg value="param1"&gt; 
- &nbsp;&nbsp;&lt;arg value="param2"&gt;
- &nbsp;&nbsp;&lt;mapToVirtualNode value="main-Node"/&gt;
- &nbsp;&lt;/mainDefinition&gt;
-</screen>
+      <screen>   &lt;mainDefinition id="mainID" class="theClassToLaunchContainingAMainMethod"&gt;
+   &lt;arg value="param1"&gt; 
+   &lt;arg value="param2"&gt;
+   &lt;mapToVirtualNode value="main-Node"/&gt;
+  &lt;/mainDefinition&gt;</screen>
 
       <para>Eventually, several mains might be defined so the <emphasis
       role="bold">id</emphasis> allows to identify all mainDefinitions.</para>
@@ -202,69 +194,67 @@
       tag will link the main info to virtual node, declared with the same name
       in the virtualNodeDefinitions tag (in componentDefinition).</para>
 
-      <screen>
- &nbsp;&lt;?xml version="1.0" encoding="UTF-8"?&gt;
- &nbsp;&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      <screen>  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+  &lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;
- &nbsp;&nbsp;&lt;!-- &lt;security file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt; --&gt; 
- &nbsp;&nbsp;&lt; componentDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt; virtualNodesDefinition&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; virtualNode name="Dispatcher"
+   &lt;!-- &lt;security file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt; --&gt; 
+   &lt; componentDefinition&gt;
+    &lt; virtualNodesDefinition&gt;
+     &lt; virtualNode name="Dispatcher"
  property="unique_singleAO"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; virtualNode name="Renderer"/&gt;
- &nbsp;&nbsp;&nbsp;&lt; /virtualNodesDefinition&gt;
- &nbsp;&nbsp;&lt; /componentDefinition&gt;
- &nbsp;&nbsp;&lt; deployment&gt;
- &nbsp;&nbsp;&nbsp;&lt; register virtualNode="Dispatcher"/&gt;
- &nbsp;&nbsp;&nbsp;&lt; mapping&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; map virtualNode="Dispatcher"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; currentJVM/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; /jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /map&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; map virtualNode="Renderer"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; vmName value="Jvm1"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; vmName value="Jvm2"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; vmName value="Jvm3"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; vmName value="Jvm4"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; /jvmSet&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /map&gt;
- &nbsp;&nbsp;&nbsp;&lt; /mapping&gt;
- &nbsp;&nbsp;&nbsp;&lt; jvms&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; jvm name="Jvm1"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; processReference
+     &lt; virtualNode name="Renderer"/&gt;
+    &lt; /virtualNodesDefinition&gt;
+   &lt; /componentDefinition&gt;
+   &lt; deployment&gt;
+    &lt; register virtualNode="Dispatcher"/&gt;
+    &lt; mapping&gt;
+     &lt; map virtualNode="Dispatcher"&gt;
+      &lt; jvmSet&gt;
+       &lt; currentJVM/&gt;
+      &lt; /jvmSet&gt;
+     &lt; /map&gt;
+     &lt; map virtualNode="Renderer"&gt;
+      &lt; jvmSet&gt;
+      &lt; vmName value="Jvm1"/&gt;
+      &lt; vmName value="Jvm2"/&gt;
+      &lt; vmName value="Jvm3"/&gt;
+      &lt; vmName value="Jvm4"/&gt;
+      &lt; /jvmSet&gt;
+     &lt; /map&gt;
+    &lt; /mapping&gt;
+    &lt; jvms&gt;
+     &lt; jvm name="Jvm1"&gt;
+      &lt; creation&gt;
+       &lt; processReference
  refid="localJVM"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; /creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /jvm&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; jvm name="Jvm2"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; processReference
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+     &lt; jvm name="Jvm2"&gt;
+      &lt; creation&gt;
+       &lt; processReference
  refid="localJVM"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; /creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /jvm&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; jvm name="Jvm3"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; processReference refid="localJVM"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; /creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /jvm&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; jvm name="Jvm4"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; processReference refid="localJVM"/&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; /creation&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /jvm&gt;
- &nbsp;&nbsp;&nbsp;&lt; /jvms&gt;
- &nbsp;&nbsp;&lt; /deployment&gt;
- &nbsp;&nbsp;&lt; infrastructure&gt;
- &nbsp;&nbsp;&nbsp;&lt; processes&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; processDefinition id="localJVM"&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt; jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;&lt;/jvmProcess&gt;
- &nbsp;&nbsp;&nbsp;&nbsp;&lt; /processDefinition&gt;
- &nbsp;&nbsp;&nbsp;&lt; /processes&gt;
- &nbsp;&nbsp;&lt; /infrastructure&gt;
- &nbsp;&lt;/ProActiveDescriptor&gt;
-</screen>
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+      &lt; jvm name="Jvm3"&gt;
+      &lt; creation&gt;
+        &lt; processReference refid="localJVM"/&gt;
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+     &lt; jvm name="Jvm4"&gt;
+      &lt; creation&gt;
+       &lt; processReference refid="localJVM"/&gt;
+      &lt; /creation&gt;
+     &lt; /jvm&gt;
+    &lt; /jvms&gt;
+   &lt; /deployment&gt;
+   &lt; infrastructure&gt;
+    &lt; processes&gt;
+     &lt; processDefinition id="localJVM"&gt;
+      &lt; jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;&lt;/jvmProcess&gt;
+     &lt; /processDefinition&gt;
+    &lt; /processes&gt;
+   &lt; /infrastructure&gt;
+  &lt;/ProActiveDescriptor&gt;</screen>
     </sect2>
 
     <sect2 remap="h3">
@@ -299,14 +289,15 @@
       menu</emphasis>, in the menu bar. Click then on <emphasis
       role="bold">launch a new application</emphasis>.</para>
 
-      <para><informalfigure>
+      <para><figure>
+          <title>The launcher menu</title>
+
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/launcher_menu.png" format="PNG"
-                         width="6in" />
+              <imagedata fileref="images/launcher_menu.png" format="PNG" />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
+        </figure></para>
 
       <para>Now it opens a new window proposing you to browse your file system
       for a XML descriptor and load it into a descriptors list. A right click
@@ -314,14 +305,15 @@
       checkbox control the graphical monitoring and textual job monitoring
       your application.</para>
 
-      <para><informalfigure>
+      <para><figure>
+          <title>Loading a descriptor in the launcher</title>
+
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/launcher_frame.png" format="PNG"
-                         width="6in" />
+              <imagedata fileref="images/launcher_frame.png" format="PNG" />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
+        </figure></para>
 
       <para>You can kill the applications launched with from a popupmenu in
       the "activated applications" table.</para>
@@ -338,22 +330,23 @@
     application deployed with JINI and RMI protocol between Baltimore US and
     Nice France on a globus cluster and LSF cluster</para>
 
-    <para>&nbsp;</para>
+    <figure>
+      <title>C3D, deployed with JINI and RMI, between Baltimore US and Nice
+      France, on a globus cluster and LSF cluster</title>
 
-    <informalfigure>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/clusterLogo.png" format="PNG" width="6in" />
+          <imagedata fileref="images/clusterLogo.png" format="PNG" />
         </imageobject>
       </mediaobject>
-    </informalfigure>
+    </figure>
 
-    <para>This experiment was partly sponsored by &nbsp;&nbsp; <informalfigure>
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="images/logoSun.png" format="PNG" width="1in" />
-          </imageobject>
-        </mediaobject>
-      </informalfigure></para>
+    <para>This experiment was partly sponsored by 
+     <inlinemediaobject>
+      <imageobject>
+       <imagedata fileref="images/logoSun.png" format="PNG" />
+      </imageobject>
+     </inlinemediaobject> .
+    </para>
   </sect1>
 </chapter>

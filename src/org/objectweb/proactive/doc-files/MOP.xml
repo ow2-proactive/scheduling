@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="MOP"><title>MOP : Metaobject Protocol</title>
+<chapter id="MOP"><title>MOP: Metaobject Protocol</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/MOP.html  -->
   
     <sect1 remap="h2">
@@ -45,7 +45,7 @@
     <sect1 remap="h2">
       <title><anchor id="MOP_html_echoproxy"/>Example of a different metabehavior:
  EchoProxy</title>
-      <para>Here&#39;s the implementation of a very simple yet useful metabehavior :
+      <para>Here's the implementation of a very simple yet useful metabehavior:
  for each reified call, the name of the invoked method is printed out on the standard output
  stream and the call is then executed. This may be a starting point for building debugging or
  profiling environments.</para>
@@ -61,7 +61,7 @@ class EchoProxy extends Object implements Proxy {
   }
 }
 interface Echo extends Reflect {
-  public String PROXY_CLASS= &quot;EchoProxy&quot;;
+  public String PROXY_CLASS= 'EchoProxy';
 }
 </screen>
 </para>
@@ -69,35 +69,35 @@ interface Echo extends Reflect {
       <sect2 remap="h3">
         <title>Instantiating with the metabehavior</title>
         <para>Instantiating an object of any class with this metabehavior can be done in
- three different ways: instantiation-based, class-based or object-based. Let&#39;s say we want to
+ three different ways: instantiation-based, class-based or object-based. Let's say we want to
  instantiate a <literal>Vector</literal> object with an <literal>Echo</literal> behavior.</para>
         <itemizedlist>
           <listitem>
-            <para> Standard Java code would be : </para>
+            <para> Standard Java code would be: </para>
 <screen> Vector v = new Vector(3); </screen>
           </listitem>
           <listitem>
             <para> ProActive code, with instantiation-based declaration of the metabehavior
  (the last parameter is <literal>null</literal> because we do not have any additional parameter to
- pass to the proxy) : </para>
+ pass to the proxy): </para>
 <screen>
   Object[] params = {new Integer (3)};
-  Vector v = (Vector) MOP.newInstance(&quot;Vector&quot;, params, &quot;EchoProxy&quot;, null);
+  Vector v = (Vector) MOP.newInstance('Vector', params, 'EchoProxy', null);
 </screen>
           </listitem>
           <listitem>
-            <para> with class-based declaration : </para>
+            <para> with class-based declaration: </para>
 <screen>
   public class MyVector extends Vector implements Echo {}
   Object[] params = {new Integer (3)} ;
-  Vector v = (Vector) MOP.newInstance(&quot;Vector&quot;, params, null);
+  Vector v = (Vector) MOP.newInstance('Vector', params, null);
 </screen>
           </listitem>
           <listitem>
-            <para> with object-based declaration : </para>
+            <para> with object-based declaration: </para>
 <screen>
   Vector v = new Vector (3);
-  v=(Vector) MOP.newWrapper(&quot;EchoProxy&quot;,v);
+  v=(Vector) MOP.newWrapper('EchoProxy',v);
 </screen>
             <para>This is the only way to give a metabehavior to an object that is created in a place where we
 cannot edit source code. A typical example could be an object returned by a method that is part of
@@ -110,21 +110,19 @@ reified. </para>
     <sect1 remap="h2">
       <title><anchor id="MOP_html_reflect"/>The Reflect interface</title>
       <para>All the interfaces used for declaring <emphasis>metabehaviors</emphasis> inherit directly
- or indirectly from <literal>Reflect</literal>. This leads to a hierarchy of metabehaviors such as shown
- in the figure below.</para>
+ or indirectly from <literal>Reflect</literal>. This leads to a hierarchy of metabehaviors
+ such as shown  in the figure below.</para>
       
       
       <para>
-        <informalfigure>
+        <figure>
+         <title>Metabehavior hierarchy</title>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
-            <imageobject>
-              <imagedata width="6in" fileref="images/reflectInterfaceDiagram.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata width="6in" fileref="images/reflectInterfaceDiagram.png" format="PNG"/>            </imageobject>
+              <imagedata  fileref="images/reflectInterfaceDiagram.png" format="PNG"/>
+             </imageobject>
           </mediaobject>
-        </informalfigure>
+        </figure>
 </para>
       <para><emphasis role="bold">Reflect Interface and sub-interfaces diagram</emphasis></para>
       

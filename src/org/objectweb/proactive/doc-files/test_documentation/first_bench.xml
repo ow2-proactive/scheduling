@@ -9,10 +9,10 @@
  an other local JVM and on a remote JVM.</para>
     </sect1>
     <sect1 remap="h2">
-      <title>First step : write the Benchmark</title>
+      <title>First step: write the Benchmark</title>
       <para>Create new class who extends <emphasis role="bold">testsuite.test.ProActiveBenchmark</emphasis>, it is an abstract
  class.</para>
-      <para>See this template code :</para>
+      <para>See this template code:</para>
 <screen>
 <literal>
 import org.objectweb.proactive.ProActive;
@@ -20,12 +20,12 @@ import org.objectweb.proactive.core.node.Node;
 import testsuite.test.ProActiveBenchmark;
 public class BenchNewActive extends ProActiveBenchmark {
     public BenchNewActive() {
-        super(null, &quot;Object Creation with newActive&quot;,
-            &quot;Measure time to create an active object with newActive.&quot;);
+        super(null, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
     }
     public BenchNewActive(Node node) {
-        super(node, &quot;Object Creation with newActive&quot;,
-            &quot;Measure time to create an active object with newActive.&quot;);
+        super(node, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
     }
     public long action() throws Exception {
     }
@@ -36,8 +36,8 @@ public class BenchNewActive extends ProActiveBenchmark {
 }
         </literal>
 </screen>
-      <para>We also override two methods from the super-class : <emphasis role="bold">testsuite.test.Benchmark</emphasis>, to check
- if post and pre-conditions are verified :</para>
+      <para>We also override two methods from the super-class: <emphasis role="bold">testsuite.test.Benchmark</emphasis>, to check
+ if post and pre-conditions are verified:</para>
 <screen> 
 	      public boolean postConditions() throws Exception { }
               public boolean preConditions() throws Exception { }
@@ -49,7 +49,7 @@ public class BenchNewActive extends ProActiveBenchmark {
       </sect2>
       <sect2 remap="h3">
         <title>Implementing preConditions()</title>
-        <para>We will simply verify if the node is created :</para>
+        <para>We will simply verify if the node is created:</para>
 <screen>
 <literal>
    public boolean preConditions() throws Exception {
@@ -61,7 +61,7 @@ public class BenchNewActive extends ProActiveBenchmark {
       <sect2 remap="h3">
         <title>Implementing action()</title>
         <para>This method measures the time of a creation of an Object with ProActive.newActive() on a
- specified node :</para>
+ specified node:</para>
 <screen>
 <literal>
     private ReifiableObject object = null;
@@ -76,14 +76,14 @@ public class BenchNewActive extends ProActiveBenchmark {
     }
           </literal>
 </screen>
-        <para><emphasis role="bold">Remark :</emphasis>It is the benchmark&#39;s programmer who measure the time of the action with a
+        <para><emphasis role="bold">Remark:</emphasis>It is the benchmark's programmer who measure the time of the action with a
  configurable timer, see the <ulink url="timer.xml">timer part</ulink> for more details.</para>
-        <para><emphasis role="bold">Remark :</emphasis> The <emphasis role="bold">ReifiableObject</emphasis> class is a simple class who just extends <emphasis role="bold">java.lang.Object</emphasis>, implements <emphasis role="bold">java.io.Serilizable</emphasis> and has an empty constructor with
+        <para><emphasis role="bold">Remark:</emphasis> The <emphasis role="bold">ReifiableObject</emphasis> class is a simple class who just extends <emphasis role="bold">java.lang.Object</emphasis>, implements <emphasis role="bold">java.io.Serilizable</emphasis> and has an empty constructor with
  no argument.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Implementing postConditions()</title>
-        <para>We will check if object is different of null and if the node contains object :</para>
+        <para>We will check if object is different of null and if the node contains object:</para>
 <screen>
 <literal>
    public boolean postConditions() throws Exception {
@@ -93,20 +93,20 @@ public class BenchNewActive extends ProActiveBenchmark {
    }
           </literal>
 </screen>
-        <para><emphasis role="bold">Tips :</emphasis> if you want to make a trace in your benchmark , you have access to a log4j
- logger by : <emphasis role="bold">getLogger()</emphasis> or by the variable <emphasis role="bold">logger</emphasis></para>
+        <para><emphasis role="bold">Tips:</emphasis> if you want to make a trace in your benchmark , you have access to a log4j
+ logger by: <emphasis role="bold">getLogger()</emphasis> or by the variable <emphasis role="bold">logger</emphasis></para>
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title>Second step : write a manager</title>
+      <title>Second step: write a manager</title>
       <para>Now, we will write a <emphasis role="bold">Manager</emphasis> to execute ou test.</para>
-      <para>For this example it is very simple, you have just to extends <emphasis role="bold">testsuite.manager.ProActiveBenchManager</emphasis> :</para>
+      <para>For this example it is very simple, you have just to extends <emphasis role="bold">testsuite.manager.ProActiveBenchManager</emphasis>:</para>
 <screen>
 <literal>
 import testsuite.manager.ProActiveBenchManager;
 public class Manager extends ProActiveBenchManager {
         public Manager() {
-          super(&quot;Manager&quot;,&quot;To manage ProActive Benchmarks.&quot;);
+          super('Manager','To manage ProActive Benchmarks.');
         }
 }
         </literal>
@@ -116,12 +116,12 @@ public class Manager extends ProActiveBenchManager {
         <para>Normaly, you have nothing to do to initialize the manager. In this example, we choose to
  create benchmarks and group in this method , but you can do this in the same place where you
  create the manager.</para>
-        <para>Create group by <emphasis role="bold">initManager()</emphasis> :</para>
+        <para>Create group by <emphasis role="bold">initManager()</emphasis>:</para>
 <screen>
 <literal>
 import testsuite.group.Group;
   public void initManager() throwsException {
-    Group benchGroup = new Group(&quot;Bnechmark Group&quot;,&quot;no description.&quot;);
+    Group benchGroup = new Group('Bnechmark Group','no description.');
     // adding bench in same VM
     benchGroup.add(new BenchNewActive(getSameVMNode()));
     // adding bench in local VM
@@ -133,12 +133,12 @@ import testsuite.group.Group;
   }
           </literal>
 </screen>
-        <para>Create group int the <emphasis role="bold">same place</emphasis> of the manager :</para>
+        <para>Create group int the <emphasis role="bold">same place</emphasis> of the manager:</para>
 <screen>
 <literal>
   // ...
   Manager manager  = new Manager();
-  Group  benchGroup = new Group(&quot;Bnechmark Group&quot;,&quot;no description.&quot;);
+  Group  benchGroup = new Group('Bnechmark Group','no description.');
   // adding bench in same VM
   benchGroup.add(new BenchNewActive(getSameVMNode()));
   // adding bench in local VM
@@ -149,8 +149,8 @@ import testsuite.group.Group;
   // ...
           </literal>
 </screen>
-        <para><emphasis role="bold">Warning :</emphasis> if you override <emphasis role="bold">endManager()</emphasis> method in a <emphasis role="bold">ProActiveManager</emphasis> you
- must to add in this code :</para>
+        <para><emphasis role="bold">Warning:</emphasis> if you override <emphasis role="bold">endManager()</emphasis> method in a <emphasis role="bold">ProActiveManager</emphasis> you
+ must to add in this code:</para>
 <screen> super.endManager() </screen>
         <para>The reason is to delete the ProActive nodes create at the beginning.</para>
       </sect2>
@@ -158,17 +158,17 @@ import testsuite.group.Group;
         <title>The attribute file</title>
         <para>Our manager is a <emphasis role="bold">ProActiveManager</emphasis>, so an attibutes file is mandatory.</para>
         <para>Create a file <emphasis role="bold">Manager.prop</emphasis> in the same directory of the manager. This file must
- contains the name (or URL) of the remote host, like this :</para>
+ contains the name (or URL) of the remote host, like this:</para>
 <screen> RemoteHostname=owenii </screen>
-        <para><emphasis role="bold">Warning :</emphasis> respect the upper an lower cases.</para>
-        <para><emphasis role="bold">Tips :</emphasis> you can use this file to specify attributes for your tests classes. You can also
+        <para><emphasis role="bold">Warning:</emphasis> respect the upper an lower cases.</para>
+        <para><emphasis role="bold">Tips:</emphasis> you can use this file to specify attributes for your tests classes. You can also
  use a different file, in this case you must specify its path in the <literal>execute()</literal> method
  of the manager.</para>
       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title>Now launch the benchmark ...</title>
-      <para>Add this code in your <literal>main</literal> method :</para>
+      <para>Add this code in your <literal>main</literal> method:</para>
 <screen>
 <literal>
 Manager manager = new Manager();
@@ -177,43 +177,34 @@ Manager manager = new Manager();
 manager.execute(true);
         </literal>
 </screen>
-      <para><emphasis role="bold">Warning :</emphasis> when you use a <emphasis role="bold">ProActiveManager</emphasis> you must to had <emphasis role="bold">System.exit(0)</emphasis>
- at the end of the main method. If don&#39;t do that, the manager can&#39;t properly.</para>
+      <para><emphasis role="bold">Warning:</emphasis> when you use a <emphasis role="bold">ProActiveManager</emphasis> you must to had <emphasis role="bold">System.exit(0)</emphasis>
+ at the end of the main method. If don't do that, the manager can't properly.</para>
       <sect2 remap="h3">
         <title>Get the results</title>
-        <para>Results in your console :</para>
+        <para>Results in your console:</para>
 <screen> System.out.println(manager); </screen>
-        <para>If you want all details :</para>
+        <para>If you want all details:</para>
 <screen> manager.setVerbatim(true); </screen>
         <para>For benchmarks it is more interesting to export results in a HTML file. Indeed, you have
  average, min, max, STDEV and charts to help you to analyse all results</para>
-        <informaltable frame="all">
-          <tgroup cols="1">
-            <colspec colname="c1" colwidth="100*"/>
-            <tbody>
-              <row>
-                <entry align="center" valign="middle"><para><emphasis role="bold">Example of HTML results</emphasis></para></entry>
-              </row>
-              <row>
-                <entry><para><emphasis remap="h3" role="bold">Object Creation</emphasis></para><para>Object Creation with newActive and turnActive.</para>                  <para><emphasis remap="h4" role="bold">Messages of Object Creation :</emphasis></para>
+        <screen>
+                <title>Example of HTML results</title>
+<para><emphasis remap="h3" role="bold">Object Creation</emphasis></para><para>Object Creation with newActive and turnActive.</para>                  <para><emphasis remap="h4" role="bold">Messages of Object Creation:</emphasis></para>
 <para>9/18/2003 at 13:0:32.527 <emphasis role="bold">[RESULT]</emphasis>
- Object Creation with newActive -- Same VM : no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench.png">See the chart</ulink>
+ Object Creation with newActive -- Same VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench.png">See the chart</ulink>
  Max=113ms Moy=24.0ms STDEV=24.64ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">1</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:36.693 <emphasis role="bold">[RESULT]</emphasis>
- Object Creation with turnActive -- Same VM : no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench1.png">See the chart</ulink>
+ Object Creation with turnActive -- Same VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench1.png">See the chart</ulink>
  Max=98ms Moy=41.0ms STDEV=32.20ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">1</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:43.425 <emphasis role="bold">[RESULT]</emphasis>
- Object Creation with newActive -- Local VM : no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench2.png">See the chart</ulink>
+ Object Creation with newActive -- Local VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench2.png">See the chart</ulink>
  Max=376ms Moy=67.03ms STDEV=83.73ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">6</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:50.434 <emphasis role="bold">[RESULT]</emphasis>
- Object Creation with turnActive -- Local VM : no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench3.png">See the chart</ulink>
+ Object Creation with turnActive -- Local VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench3.png">See the chart</ulink>
  Max=326ms Moy=69.82ms STDEV=86.15ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">6</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:53.297 <emphasis role="bold">[RESULT]</emphasis>
- Object Creation with newActive -- Remote VM : no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench4.png">See the chart</ulink>
+ Object Creation with newActive -- Remote VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench4.png">See the chart</ulink>
  Max=290ms Moy=28.03ms STDEV=50.79ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">5</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:55.980 <emphasis role="bold">[RESULT]</emphasis>
- Object Creation with turnActive -- Remote VM : no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench5.png">See the chart</ulink>
- Max=250ms Moy=26.32ms STDEV=53.46ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">5</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:55.982 <emphasis role="bold">[RESULT]</emphasis> :
- Group : Object Creation, Moy in 42.7ms Runs : 600 Errors : 0</para><para>To see all results of this group in a <ulink url="Group1.png">BarChart</ulink>.</para></entry>
-              </row>
-            </tbody>
-          </tgroup>
-        </informaltable>
+ Object Creation with turnActive -- Remote VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink url="Bench5.png">See the chart</ulink>
+ Max=250ms Moy=26.32ms STDEV=53.46ms --&gt; <emphasis>Min</emphasis><emphasis role="bold">5</emphasis><emphasis>ms</emphasis></para><para>9/18/2003 at 13:0:55.982 <emphasis role="bold">[RESULT]</emphasis>:
+ Group: Object Creation, Moy in 42.7ms Runs: 600 Errors: 0</para><para>To see all results of this group in a <ulink url="Group1.png">BarChart</ulink>.</para>
+</screen>
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -236,12 +227,12 @@ import util.ReifiableObject;
 public class BenchNewActive extends ProActiveBenchmark {
     private ReifiableObject object = null;
     public BenchNewActive() {
-        super(null, &quot;Object Creation with newActive&quot;,
-            &quot;Measure time to create an active object with newActive.&quot;);
+        super(null, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
     }
     public BenchNewActive(Node node) {
-        super(node, &quot;Object Creation with newActive&quot;,
-            &quot;Measure time to create an active object with newActive.&quot;);
+        super(node, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
     }
     public long action() throws Exception {
         String className = ReifiableObject.class.getName();
@@ -334,13 +325,13 @@ import java.io.File;
 public class Manager extends ProActiveBenchManager {
     private Logger logger = Logger.getLogger(Test1.class);
     public Manager() {
-        super(&quot;Manager&quot;,&quot;To manage ProActive Benchmarks.&quot;);
+        super('Manager','To manage ProActive Benchmarks.');
         // Log in a HTML file
         HTMLLayout layout = new HTMLLayout();
         WriterAppender appender = null;
         try {
             FileOutputStream output = new FileOutputStream(
-                    &quot;/net/home/adicosta/output2.html&quot;);
+                    '/net/home/adicosta/output2.html');
             appender = new WriterAppender(layout, output);
         } catch (Exception e) {
         }
@@ -349,7 +340,7 @@ public class Manager extends ProActiveBenchManager {
         logger.setLevel(Level.DEBUG);
     }
     public void initManager() throws Exception {
-        Group benchGroup = new Group(&quot;Bnechmark Group&quot;,&quot;no description.&quot;);
+        Group benchGroup = new Group('Bnechmark Group','no description.');
         // adding bench in same VM
         benchGroup.add(new BenchNewActive(getSameVMNode()));
         // adding bench in local VM
@@ -367,8 +358,8 @@ public class Manager extends ProActiveBenchManager {
         manager.execute(true);
         //Write results in a HTML file
         try {
-            File file = new File(System.getProperty(&quot;user.home&quot;) +
-                    File.separatorChar + &quot;results.html&quot;);
+            File file = new File(System.getProperty('user.home') +
+                    File.separatorChar + 'results.html');
             manager.toHTML(file);
         } catch (Exception e) {
             e.printStackTrace();

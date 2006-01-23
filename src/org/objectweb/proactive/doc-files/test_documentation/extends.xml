@@ -4,7 +4,7 @@
   
     <para> Thanks to the structure of the API, with many <emphasis role="bold">Interfaces</emphasis> and <emphasis role="bold">Abstracts</emphasis> classes,
  you can easily extends the API for you needs.</para>
-    <para>For more details about this, you can the class : ProActiveManager, ProActiveFuncTest or
+    <para>For more details about this, you can the class: ProActiveManager, ProActiveFuncTest or
  ProActiveBenchmark which they are extends the API.</para>
     <para>The choice of XML to export results can to help you with XSLT to export and format results for
  you needs.</para>

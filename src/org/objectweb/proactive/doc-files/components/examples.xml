@@ -3,8 +3,8 @@
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/examples.html  -->
   
     <para> <anchor id="examples_html_examples"/></para>
-    <para>3 examples are presented : code snippets for visualizing the transition between active objects
- and components, the &quot;hello world&quot;, from the Fractal tutorial, and C3D component
+    <para>3 examples are presented: code snippets for visualizing the transition between active objects
+ and components, the 'hello world', from the Fractal tutorial, and C3D component
  version. The programming model is Fractal, and one should refer to the Fractal documentation for
  detailed examples.</para>
     <sect1 remap="h2">
@@ -12,12 +12,12 @@
  distributed components</title>
       <para>In Java, objects are created by instantiation of classes. With ProActive, one can create
  active objects from Java classes, while components are created from component definitions. Let us
- first consider the &quot;A&quot; interface :</para>
+ first consider the 'A' interface:</para>
 <screen>
 public interface A {
   public String foo(); // dummy method
 } </screen>
-      <para>&quot;AImpl&quot; is the class implementing this interface :</para>
+      <para>'AImpl' is the class implementing this interface:</para>
 <screen>
 public class AImpl implements A {
  public AImpl() {}
@@ -25,7 +25,7 @@ public class AImpl implements A {
  // do something
  }
 }  </screen>
-      <para>The class is then instantiated in a standard way :</para>
+      <para>The class is then instantiated in a standard way:</para>
 <screen> A object = new AImpl(); </screen>
       <para>Active objects are instantiated using factory methods from the ProActive class (see the <ulink url="../HelloWorld.xml">ProActive Hello World example</ulink> ). It is also possible to specify
  the activity of the active object, the location (node or virtual node), or a factory for
@@ -40,31 +40,31 @@ A active_object = (A)ProActive.newActive(
       <para>As components are also active objects in this implementation, they benefit from the same
  features, and are configurable in a similar way. Constructor parameters, nodes, activity, or
  factories, that can be specified for active objects, are also specifiable for components. The
- definition of a component requires 3 sub-definitions : the type, the description of the content,
+ definition of a component requires 3 sub-definitions: the type, the description of the content,
  and the description of the controller.</para>
       <sect2 remap="h3">
         <title>Type</title>
         <para>The type of the component (i.e. the functional interfaces provided and required) is specified
- in a standard way : (as taken from the Fractal tutorial)</para>
+ in a standard way: (as taken from the Fractal tutorial)</para>
         <para>We begin by creating objects that represent the types of the components of the application. In
  order to do this, we must first get a bootstrap component. The standard way to do this is the
  following one (this method creates an instance of the class specified in the fractal.provider
  system property, and uses this instance to get the bootstrap component):</para>
 <screen> Component boot = Fractal.getBootstrapComponent(); </screen>
         <para>We then get the TypeFactory interface provided by this bootstrap component:</para>
-<screen> TypeFactory tf = (TypeFactory)boot.getFcInterface(&quot;type-factory&quot;); </screen>
+<screen> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </screen>
         <para>We can then create the type of the first component, which only provides a A server interface
- named &quot;a&quot;:</para>
+ named 'a':</para>
 <screen>
 // type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
- tf.createFcItfType(&quot;a&quot;, &quot;A&quot;, false, false, false)
+ tf.createFcItfType('a', 'A', false, false, false)
 }); </screen>
       </sect2>
       <sect2 remap="h3">
         <title>Description of the content</title>
         <para>The second step in the definition of a component is the definition of its content. In this
- implementation, this is done through the ContentDescription class :</para>
+ implementation, this is done through the ContentDescription class:</para>
 <screen>
 ContentDescription contentDesc = new ContentDescription(
  AImpl, // signature of the base class
@@ -74,10 +74,10 @@ ContentDescription contentDesc = new ContentDescription(
       </sect2>
       <sect2 remap="h3">
         <title>Description of the controller</title>
-        <para>Properties relative to the controller can be specified in the ControllerDescription :</para>
+        <para>Properties relative to the controller can be specified in the ControllerDescription:</para>
 <screen>
 ControllerDescription controllerDesc = new ControllerDescription(
- &quot;myName&quot;, // name of the component
+ 'myName', // name of the component
  Constants.PRIMITIVE // the hierarchical type of the component
  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
 ); </screen>
@@ -93,31 +93,31 @@ terfaces)
       </sect2>
       <sect2 remap="h3">
         <title>From attributes to client interfaces</title>
-        <para>There are 2 kinds of interfaces for a component : those that offer services, and those that
+        <para>There are 2 kinds of interfaces for a component: those that offer services, and those that
  require services. They are named respectively server and client interfaces.</para>
-        <para>From a Java class, it is fairly natural to identify server interfaces : they (can) correspond
- to the Java interfaces implemented by the class. In the above example, &quot;a&quot; is the name
- of an interface provided by the component, corresponding to the &quot;A&quot; Java interface.</para>
+        <para>From a Java class, it is fairly natural to identify server interfaces: they (can) correspond
+ to the Java interfaces implemented by the class. In the above example, 'a' is the name
+ of an interface provided by the component, corresponding to the 'A' Java interface.</para>
         <para>On the other hand, client interfaces usually correspond to attributes of the class, in the
  case of a primitive component. If the component defined above requires a service from another
- component, say the one corresponding to the &quot;Service&quot; Java interface, the AImpl class
+ component, say the one corresponding to the 'Service' Java interface, the AImpl class
  should be modified. As we use the <emphasis>inversion of control</emphasis> pattern, a BindingController is
- provided, and a binding operation on the &quot;requiredService&quot; interface will actually set
- the value of the &quot;service&quot; attribute, of type &quot;Service&quot;.</para>
-        <para>First, the type of the component is changed :</para>
+ provided, and a binding operation on the 'requiredService' interface will actually set
+ the value of the 'service' attribute, of type 'Service'.</para>
+        <para>First, the type of the component is changed:</para>
 <screen>
 // type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
- tf.createFcItfType(&quot;a&quot;, &quot;A&quot;, false, false, false),
- tf.createFcItfType(&quot;requiredService&quot;, &quot;A&quot;, true, false, false)
+ tf.createFcItfType('a', 'A', false, false, false),
+ tf.createFcItfType('requiredService', 'A', true, false, false)
 }); </screen>
-        <para>The Service interface is the following :</para>
+        <para>The Service interface is the following:</para>
 <screen>
 // The Service interface
 public interface Service {
  public String bar();
 } </screen>
-        <para>And the AImpl class is :</para>
+        <para>And the AImpl class is:</para>
 <screen>
 // The modified AImpl class
 public class AImpl implements A, BindingController {
@@ -129,20 +129,20 @@ public class AImpl implements A, BindingController {
  }
  // implementation of BindingController
  public Object lookupFc (final String cItf) {
-   if (cItf.equals(&quot;requiredService&quot;)) {
+   if (cItf.equals('requiredService')) {
      return service;
    }
    return null;
  }
  // implementation of BindingController
  public void bindFc (final String cItf, final Object sItf) {
-   if (cItf.equals(&quot;requiredService&quot;)) {
+   if (cItf.equals('requiredService')) {
      service = (Service)sItf;
    }
  }
  // implementation of BindingController
  public void unbindFc (final String cItf) {
-   if (cItf.equals(&quot;requiredService&quot;)) {
+   if (cItf.equals('requiredService')) {
      service = null;
    }
  }
@@ -161,11 +161,11 @@ public class AImpl implements A, BindingController {
         <para> The code is almost identical to the 
  <ulink url="http://fractal.objectweb.org/tutorials/fractal/index.xml">Fractal tutorial's example</ulink>.
 </para>
-        <para>The differences are the following :</para>
+        <para>The differences are the following:</para>
         <itemizedlist>
           <listitem>
             <para> The reference example is provided for level 3.3. implementation, whereas
- this current implementation is compliant up to level 3.2 : templates are not provided. Thus you
+ this current implementation is compliant up to level 3.2: templates are not provided. Thus you
  will have to skip the specific code for templates.</para>
           </listitem>
           <listitem>
@@ -179,7 +179,7 @@ public class AImpl implements A, BindingController {
           <listitem>
             <para> Collective interfaces could be implemented the same way than suggested,
  but using the <literal>Fractive.createCollectiveClientInterface</literal> method will prove useful
- with this implementation : you are then able to use the functionalities provided by the typed
+ with this implementation: you are then able to use the functionalities provided by the typed
  groups API.</para>
           </listitem>
           <listitem>
@@ -201,12 +201,14 @@ public class AImpl implements A, BindingController {
  different components can be distributed, and all invocations are intercepted. The exercise is
  still of interest, as it involves composite components.</para>
         <para>
-          <informalfigure>
+          <figure>
+           <title>Client and Server wrapped in composite components (C and S)</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="components/pics/model.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="components/pics/model.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
       </sect2>
       <sect2 remap="h3">
@@ -214,42 +216,41 @@ public class AImpl implements A, BindingController {
         <para>This section is specific to the ProActive implementation, as it uses the
  deployment framework of this library.</para>
         <para>If the application is started with (only) the parameter
- &quot;distributed&quot;, the ADL used is &quot;helloworld-distributed.fractal&quot;, where
+ 'distributed', the ADL used is 'helloworld-distributed.fractal', where
  virtualNode of the client and server components are exported as VN1 and VN2. Exported virtual
  node names from the ADL match those defined in the deployment descriptor
- &quot;deployment.xml&quot;.</para>
+ 'deployment.xml'.</para>
         <para>One can of course customize the deployment descriptor and deploy components
  onto virtually any computer, provided it is connectable by supported protocols. Supported
  protocols include LAN, clusters and Grid protocols (see <ulink url="../Descriptor.xml">deployment
  descriptors documentation</ulink>).</para>
-        <para>Have a look at the ADL files &quot;helloworld-distributed.fractal&quot; and
- &quot;helloworld-distributed-wrappers.fractal&quot;. In a nutshell, they say : &quot;the
+        <para>Have a look at the ADL files 'helloworld-distributed.fractal' and
+ 'helloworld-distributed-wrappers.fractal'. In a nutshell, they say: 'the
  primitive components of the application (client and server) will run on given exported virtual
  nodes, whereas the other components (wrappers, root component) will run on the current JVM.</para>
-        <para>&#160;</para>
-        <para>Therefore, we have the two following configurations :</para>
-        <para>1. The one without wrappers, where the primitive components are
- distributed.</para>
+        <para>Therefore, we have the two following configurations:</para>
+        
         <para>
-          <informalfigure>
+          <figure>
+           <title>Without wrappers, the primitive components are distributed.</title>    
+           <mediaobject>
+              <imageobject>
+                <imagedata  fileref="components/pics/distributed-components-no-wrappers.png" format="PNG"/>
+               </imageobject>
+            </mediaobject>
+          </figure>
+</para>
+        
+        <para>
+          <figure>
+           <title>2. With wrappers, where again, only the primitive components are distributed.</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="components/pics/distributed-components-no-wrappers.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="components/pics/distributed-components-wrappers.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
-        <para>&#160;</para>
-        <para>2. The one with wrappers, where again, only the primitive components are
- distributed.</para>
-        <para>
-          <informalfigure>
-            <mediaobject>
-              <imageobject>
-                <imagedata width="6in" fileref="components/pics/distributed-components-wrappers.png" format="PNG"/>              </imageobject>
-            </mediaobject>
-          </informalfigure>
-</para>
-        <para>&#160;</para>
         <para>Currently, bindings are not optimized. For example, in the configuration
  with wrappers, there is an indirection that can be costly, between the client and the server. We
  are currently working on optimizations that would allow to shortcut communications, while still
@@ -271,31 +272,31 @@ public class AImpl implements A, BindingController {
 04 Created a new registry on port 1099
 05 //crusoe.inria.fr/Node363257273 successfully bound in registry at //crus\
 oe.inria.fr/Node363257273
-06 Generating class : pa.stub.org.objectweb.proactive.core.component.type.S\
+06 Generating class: pa.stub.org.objectweb.proactive.core.component.type.S\
 tub_Composite
-07 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
+07 Generating class: pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ClientImpl
-08 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
+08 Generating class: pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ServerImpl </screen>
-        <para>You can see :</para>
+        <para>You can see:</para>
         <itemizedlist>
           <listitem>
-            <para> line 01 : the creation of the class file server which handles the on-the-fly generation and
+            <para> line 01: the creation of the class file server which handles the on-the-fly generation and
  distribution of ProActive stubs and component functional interfaces</para>
           </listitem>
           <listitem>
-            <para> line 04 : the creation of a rmi registry</para>
+            <para> line 04: the creation of a rmi registry</para>
           </listitem>
           <listitem>
-            <para> line 05 : the registration of the default runtime node</para>
+            <para> line 05: the registration of the default runtime node</para>
           </listitem>
           <listitem>
-            <para> line 06 to 08 : the on-the-fly generation of ProActive stubs (the generation of component
+            <para> line 06 to 08: the on-the-fly generation of ProActive stubs (the generation of component
  functional interfaces is silent)</para>
           </listitem>
 </itemizedlist>
         <para>Then you have (the exception that pops out is actually the expected result, and is intended to
- show the execution path) :</para>
+ show the execution path):</para>
 <screen>
 01 Server: print method called
 02 at org.objectweb.proactive.examples.components.helloworld.ServerImpl.pri\
@@ -328,24 +329,24 @@ y(ActiveBody.java:230)
  implementation. Here is what happens (from bottom to top of the stack):</para>
         <itemizedlist>
           <listitem>
-            <para> line 14 : The active object runs its activity in its own Thread</para>
+            <para> line 14: The active object runs its activity in its own Thread</para>
           </listitem>
           <listitem>
-            <para> line 12 : The default activity is to serve incoming request in a FIFO order</para>
+            <para> line 12: The default activity is to serve incoming request in a FIFO order</para>
           </listitem>
           <listitem>
-            <para> line 08 : Requests (reified method calls) are encapsulated in ComponentRequestImpl
+            <para> line 08: Requests (reified method calls) are encapsulated in ComponentRequestImpl
  objects</para>
           </listitem>
           <listitem>
-            <para> line 06 : A request is served using reflection</para>
+            <para> line 06: A request is served using reflection</para>
           </listitem>
           <listitem>
-            <para> line 02 : The method invoked is the print method of an instance of ServerImpl</para>
+            <para> line 02: The method invoked is the print method of an instance of ServerImpl</para>
           </listitem>
 </itemizedlist>
-        <para>Now let us have a look at the distributed deployment : execute the program with the parameters
- &quot;distributed parser&quot;. You should get something similar to the following :</para>
+        <para>Now let us have a look at the distributed deployment: execute the program with the parameters
+ 'distributed parser'. You should get something similar to the following:</para>
 <screen>
 01 --&gt; This ClassFileServer is reading resources from classpath
 02 Jini enabled
@@ -366,7 +367,7 @@ ve/classes/org/objectweb/proactive/examplescomponents/helloworld/deployment\
 e.inria.fr/VN1462549848
 15 **** Mapping VirtualNode VN1 with Node: //crusoe.inria.fr/VN1462549848 d\
 one
-16 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
+16 Generating class: pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ClientImpl
 17 **** Starting jvm on crusoe.inria.fr
 18 --&gt; This ClassFileServer is reading resources from classpath
@@ -377,11 +378,11 @@ elloworld.Stub_ClientImpl
 oe.inria.fr/VN21334775605
 23 **** Mapping VirtualNode VN2 with Node: //crusoe.inria.fr/VN21334775605 \
 done
-24 Generating class : pa.stub.org.objectweb.proactive.examples.components.h\
+24 Generating class: pa.stub.org.objectweb.proactive.examples.components.h\
 elloworld.Stub_ServerImpl
 25 //crusoe.inria.fr/Node1145479146 successfully bound in registry at //cru\
 soe.inria.fr/Node1145479146
-26 Generating class : pa.stub.org.objectweb.proactive.core.component.type.S\
+26 Generating class: pa.stub.org.objectweb.proactive.core.component.type.S\
 tub_Composite
 27 MOPClassLoader: class not found, trying to generate it
 28 ClassServer sent class Generated_java_lang_Runnable_r_representative suc\
@@ -399,26 +400,26 @@ ssfully
 35 ClassServer sent class pa.stub.org.objectweb.proactive.examples.componen\
 ts.helloworld.Stub_ServerImpl successfully
 </screen>
-        <para>What is new is :</para>
+        <para>What is new is:</para>
         <itemizedlist>
           <listitem>
             <para> line 05 the parsing of the deployment descriptor</para>
           </listitem>
           <listitem>
-            <para> line 09 and 17 : the creation of 2 virtual machines on the host
- &quot;crusoe.inria.fr&quot;</para>
+            <para> line 09 and 17: the creation of 2 virtual machines on the host
+ 'crusoe.inria.fr'</para>
           </listitem>
           <listitem>
-            <para> line 15 and 24 : the mapping of virtual nodes VN1 and VN2 to the nodes specified in the
+            <para> line 15 and 24: the mapping of virtual nodes VN1 and VN2 to the nodes specified in the
  deployment descriptor</para>
           </listitem>
           <listitem>
-            <para> line 35 : the dynamic downloading of the stub class for ServerImpl: the stub class loader
+            <para> line 35: the dynamic downloading of the stub class for ServerImpl: the stub class loader
  does not find the classes of the stubs in the current VM, and fetches the classes from the
  ClassServer</para>
           </listitem>
           <listitem>
-            <para> line 28, 30, 32, 34 : the dynamic downloading of the classes corresponding to the
+            <para> line 28, 30, 32, 34: the dynamic downloading of the classes corresponding to the
  components functional interfaces (they were silently generated)</para>
           </listitem>
 </itemizedlist>
@@ -461,7 +462,7 @@ y(ActiveBody.java:230)
 org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal
 </para>
 <screen>
- 1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+ 1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
  2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
  3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
  4:
@@ -504,7 +505,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  org.objectweb.proactive.examples.components.helloworld.ClientType.fractal
 </para>
 <screen>
- 1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+ 1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
  2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
  3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
  4:
@@ -521,7 +522,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
   org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal
  </para>
 <screen>
-  1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+  1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
   2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
   3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
   4:
@@ -544,7 +545,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  org.objectweb.proactive.examples.components.ServerType
 </para>
 <screen> 
-1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
 2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
 3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 4:
@@ -560,7 +561,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  org.objectweb.proactive.examples.components.helloworld.ServerImpl
 </para>
 <screen>
-1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
 2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
 3:        "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 4:
@@ -617,16 +618,16 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
       <sect2 remap="h3">
         <title>Using working C3D code with components</title>
         <para>
-          <informalfigure>
+          <figure>
+           <title>Informal description of the C3D Components hierarchy</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="components/pics/C3D-Components-UML.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata width="6in" fileref="components/pics/C3D-Components-UML.svg" format="SVG"/>              </imageobject>
+                <imagedata  fileref="components/pics/C3D-Components-UML.png" format="PNG"/> 
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
-        <para>We consider the working C3D application. It&#39;s nice, and has a sleak GUI, but we now want
+        <para>We consider the working C3D application. It's nice, and has a sleak GUI, but we now want
  to add component power to it! What we do is shown on the image to the right: add wrappers around
  the original object classes (C3D*) and instead of linking the classes together by setting fields
  through the initial methods, do that in the binding methods. In other words, we have to spot
@@ -650,13 +651,13 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  objects. For this, <emphasis role="bold">you have to know in detail which classes are going to be turned into
  component</emphasis>. We have done that, and those exposed methods are put in the interfaces User,
  Engine and Dispatcher.</para>
-          <para><emphasis role="bold">Tricky part:</emphasis> whatever way you look at components, you&#39;ll have to modify the initial
+          <para><emphasis role="bold">Tricky part:</emphasis> whatever way you look at components, you'll have to modify the initial
  code if these interfaces were not created at first go. You have to replace all the classes by
  their interface, when you use them in other files. If we had not already used interfaces in the
  C3D Objecct code, we would have had to replace all occurrences of C3DDispatcher by occurrences of
  Dispatcher.</para>
-          <para>Why do we have to do that, replacing classes by interfaces? That&#39;s due to the way
- components work. When the components are going to be bound, you&#39;re not binding the class
+          <para>Why do we have to do that, replacing classes by interfaces? That's due to the way
+ components work. When the components are going to be bound, you're not binding the class
  themselves, but proxies to these classes. And these proxies implement the interfaces, and do not
  extend the classes.</para>
 </sect3>
@@ -670,18 +671,18 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  methods.</para>
           <para>This has been done in the *Impl files. Have a peek, for example, at <ulink url="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.UserImpl.xml">UserImpl.java</ulink>.
  What you have here are those component methods. Be even more careful with this <literal>bindFc</literal> method. In fact, it really binds the protected Dispatcher variable <literal>c3ddispatcher</literal>. This way, the C3DUser code can now use this varaible as if it was
- addressing the real Active Object. Just to be precise, we have to point out that you&#39;re going
+ addressing the real Active Object. Just to be precise, we have to point out that you're going
  through proxies before reaching the Component, then the Active Object. But this is hidden by the
- ProActive layer, all you should know is you&#39;re addressing a Dispatcher, and you&#39;re
+ ProActive layer, all you should know is you're addressing a Dispatcher, and you're
  fine!</para>
 </sect3>
         <sect3 remap="h4">
           <title>Discarding direct reference acknowledgment</title>
-          <para>If you&#39;re out of luck, the code contains instructions to retain references to objects that
+          <para>If you're out of luck, the code contains instructions to retain references to objects that
  call methods on the current Object. These methods have a signature ressembling <literal>method(...,
- ActiveObject ao, ...)</literal>. This is called, in ProActive, with a <literal>ProActive.getStubOnThis()</literal> (if you don&#39;t, and instead use &#39;this&#39;, the
- code won&#39;t work correctly on remote hosts!). If the local object uses this <literal>ProActive.getStubOnThis()</literal>, you&#39;re going to have trouble with components. The
- problem is that this design does not fit the component paradigm : you should be using declared
+ ActiveObject ao, ...)</literal>. This is called, in ProActive, with a <literal>ProActive.getStubOnThis()</literal> (if you don't, and instead use 'this', the
+ code won't work correctly on remote hosts!). If the local object uses this <literal>ProActive.getStubOnThis()</literal>, you're going to have trouble with components. The
+ problem is that this design does not fit the component paradigm: you should be using declared
  interfaces bound with the bind methods, not be passing along references to self. So you have to
  remove these from the code, and make it component-oriented. But remember, <emphasis role="bold">you should be using
  bind methods to attach other components</emphasis>.</para>
@@ -693,62 +694,62 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  pretty simple, there is not much to it. We have used the fractal ADL, to avoid hard-coding
  bindings. So all of the information here is in the <literal>components/c3d/fractal/</literal>
  directory. There are the components (which interfaces they propose), and a
- &quot;distributed.fractal&quot; file, which is where the bindings are made. It includes the
+ 'distributed.fractal' file, which is where the bindings are made. It includes the
  creation of a Composite component, just for the fun. You may want to explore it with the Fractal
- GUI provided with IC2D, it&#39;s easier to understand graphically. Here&#39;s the code,
- nevertheless, for you curiosity :</para>
+ GUI provided with IC2D, it's easier to understand graphically. Here's the code,
+ nevertheless, for you curiosity:</para>
 <screen>
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;ISO-8859-1&quot; ?&gt;
-&lt;!DOCTYPE definition PUBLIC &quot;-//objectweb.org//DTD Fractal ADL 2.0//EN&quot; 
-     &quot;classpath://org/objectweb/proactive/core/component/adl/xml/proactive.d\
-td&quot;&gt;
-&lt;definition name=&quot;org.objectweb.proactive.examples.components.c3d.fractal.dis\
-tributed&quot;&gt;
-  &lt;interface signature=&quot;java.lang.Runnable&quot; role=&quot;server&quot; name=&quot;r&quot;/&gt;
-  &lt;component definition=&quot;org.objectweb.proactive.examples.components.c3d.frac\
-tal.UserImpl&quot; name=&quot;user&quot; /&gt;
-  &lt;component name=&quot;Composite&quot;&gt;
-    &lt;interface signature=&quot;org.objectweb.proactive.examples.c3d.Dispatcher&quot; rol\
-e=&quot;server&quot; name=&quot;dispatch&quot;/&gt;
-    &lt;component definition=&quot;org.objectweb.proactive.examples.components.c3d.fr\
-actal.EngineImpl&quot; name=&quot;engine2&quot;/&gt;
-    &lt;component definition=&quot;org.objectweb.proactive.examples.components.c3d.fr\
-actal.EngineImpl&quot; name=&quot;engine1&quot;/&gt;
-    &lt;component definition=&quot;org.objectweb.proactive.examples.components.c3d.fr\
-actal.DispatcherImpl&quot; name=&quot;disp&quot;/&gt;
-    &lt;binding client=&quot;this.dispatch&quot; server=&quot;disp.user2dispatcher&quot;/&gt;
-    &lt;binding client=&quot;disp.dispatcher2engine00&quot; server=&quot;engine1.dispatcher2engin\
-e&quot;/&gt;
-    &lt;binding client=&quot;disp.dispatcher2engine01&quot; server=&quot;engine2.dispatcher2engin\
-e&quot;/&gt;
+&lt;?xml version='1.0' encoding='ISO-8859-1'?&gt;
+&lt;!DOCTYPE definition PUBLIC '-//objectweb.org//DTD Fractal ADL 2.0//EN' 
+     'classpath://org/objectweb/proactive/core/component/adl/xml/proactive.d\
+td'&gt;
+&lt;definition name='org.objectweb.proactive.examples.components.c3d.fractal.dis\
+tributed'&gt;
+  &lt;interface signature='java.lang.Runnable' role='server' name='r'/&gt;
+  &lt;component definition='org.objectweb.proactive.examples.components.c3d.frac\
+tal.UserImpl' name='user' /&gt;
+  &lt;component name='Composite'&gt;
+    &lt;interface signature='org.objectweb.proactive.examples.c3d.Dispatcher' rol\
+e='server' name='dispatch'/&gt;
+    &lt;component definition='org.objectweb.proactive.examples.components.c3d.fr\
+actal.EngineImpl' name='engine2'/&gt;
+    &lt;component definition='org.objectweb.proactive.examples.components.c3d.fr\
+actal.EngineImpl' name='engine1'/&gt;
+    &lt;component definition='org.objectweb.proactive.examples.components.c3d.fr\
+actal.DispatcherImpl' name='disp'/&gt;
+    &lt;binding client='this.dispatch' server='disp.user2dispatcher'/&gt;
+    &lt;binding client='disp.dispatcher2engine00' server='engine1.dispatcher2engin\
+e'/&gt;
+    &lt;binding client='disp.dispatcher2engine01' server='engine2.dispatcher2engin\
+e'/&gt;
   &lt;/component&gt;
-  &lt;binding client=&quot;this.r&quot; server=&quot;user.r&quot;/&gt;
-  &lt;binding client=&quot;user.user2dispatcher&quot; server=&quot;Composite.dispatch&quot;/&gt;
-  &lt;controller desc=&quot;composite&quot;/&gt;
-  &lt;coordinates color=&quot;-73&quot; y0=&quot;0.11&quot; x1=&quot;0.30&quot; y1=&quot;0.33&quot; name=&quot;user&quot; x0=&quot;0.03&quot;/&gt;
-  &lt;coordinates color=&quot;-73&quot; y0=&quot;0.18&quot; x1=&quot;0.99&quot; y1=&quot;0.98&quot; name=&quot;Composite&quot; x0=&quot;0.32&quot;&gt;
-    &lt;coordinates color=&quot;-73&quot; y0=&quot;0.60&quot; x1=&quot;0.84&quot; y1=&quot;0.89&quot; name=&quot;engine2&quot; x0=&quot;0.23&quot;/&gt;
-    &lt;coordinates color=&quot;-73&quot; y0=&quot;0.15&quot; x1=&quot;0.99&quot; y1=&quot;0.53&quot; name=&quot;engine1&quot; x0=&quot;0.72&quot;/&gt;
-    &lt;coordinates color=&quot;-73&quot; y0=&quot;0.12&quot; x1=&quot;0.67&quot; y1=&quot;0.42&quot; name=&quot;disp&quot; x0=&quot;0.09&quot;/&gt;
+  &lt;binding client='this.r' server='user.r'/&gt;
+  &lt;binding client='user.user2dispatcher' server='Composite.dispatch'/&gt;
+  &lt;controller desc='composite'/&gt;
+  &lt;coordinates color='-73' y0='0.11' x1='0.30' y1='0.33' name='user' x0='0.03'/&gt;
+  &lt;coordinates color='-73' y0='0.18' x1='0.99' y1='0.98' name='Composite' x0='0.32'&gt;
+    &lt;coordinates color='-73' y0='0.60' x1='0.84' y1='0.89' name='engine2' x0='0.23'/&gt;
+    &lt;coordinates color='-73' y0='0.15' x1='0.99' y1='0.53' name='engine1' x0='0.72'/&gt;
+    &lt;coordinates color='-73' y0='0.12' x1='0.67' y1='0.42' name='disp' x0='0.09'/&gt;
   &lt;/coordinates&gt;
 &lt;/definition&gt;
 </screen>
-        <para>Here&#39;s what it looks like when you explore it through the IC2D Component
+        <para>Here's what it looks like when you explore it through the IC2D Component
  explorer 
-          <informalfigure>
+          <figure>
+           <title>IC2D component explorer with the C3D example</title>
             <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="components/pics/c3d_components.png" format="PNG"/>              </imageobject>
-              <imageobject>
-                <imagedata width="6in" fileref="components/pics/c3d_components.svg" format="SVG"/>              </imageobject>
+                <imagedata  fileref="components/pics/c3d_components.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
       </sect2>
       <sect2 remap="h3">
         <title>Source Code</title>
         <para>You may find the source code of this application at the following locations
- :</para>
+:</para>
         <itemizedlist>
           <listitem>
             <para><ulink url="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.index.xml">Active

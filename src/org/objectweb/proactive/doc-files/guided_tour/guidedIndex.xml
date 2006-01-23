@@ -18,11 +18,11 @@
     <sect1 remap="h2">
       <title>Installation and setup</title>
       <para>Follow the <ulink url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/Installation.xml">instructions</ulink> for downloading and installing ProActive.</para>
-      <para>&#160;</para>
-      <para>The programming exercises in the first part imply that you :</para>
+      
+      <para>The programming exercises in the first part imply that you:</para>
       <itemizedlist>
         <listitem>
-          <para> Don&#39;t forget to add the required libraries to your classpath (i.e. the libraries
+          <para> Don't forget to add the required libraries to your classpath (i.e. the libraries
  contained in the ProActive/lib directory, as well as either the proactive.jar archive, or the
  compiled classes of proactive (better if you modify the source code)</para>
         </listitem>
@@ -31,14 +31,14 @@
  -Djava.security.policy=/filelocation/proactive.java.policy</para>
         </listitem>
 </itemizedlist>
-      <para>Set the CLASSPATH as follow :</para>
-      <para>Under linux :</para>
+      <para>Set the CLASSPATH as follow:</para>
+      <para>Under linux:</para>
       <para>export
  CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:./lib/components/fractal.jar:./lib/bouncycastle.jar</para>
-      <para>Under windows :</para>
+      <para>Under windows:</para>
       <para>set
  CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;.\lib\components\fractal.jar;.\lib\bouncycastle.jar</para>
-      <para>&#160;</para>
+      
       <para>Concerning <emphasis role="underline">the second part</emphasis> of the tutorial (examples of some functionalities):</para>
       <itemizedlist>
         <listitem>
@@ -50,7 +50,7 @@
           <para> The examples used in the second part of this tutorial are provided in the /scripts
  directory of the distribution.</para>
           <para>
- The scripts are platform dependant : .sh files on linux are equivalent to the .bat files on
+ The scripts are platform dependant: .sh files on linux are equivalent to the .bat files on
  windows</para>
         </listitem>
 </itemizedlist>
@@ -58,11 +58,11 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.jpg" format="JPG"/>            </imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.jpg" format="JPG"/>
+             </imageobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.png" format="PNG"/>            </imageobject>
+              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.png" format="PNG"/>
+             </imageobject>
           </mediaobject>
         </informalfigure>
 </para>

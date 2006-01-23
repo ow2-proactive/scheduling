@@ -3,7 +3,7 @@
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/OOSPMD.html  -->
   
     <sect1 remap="h2">
-      <title><anchor id="OOSPMD_html_intro"/>OOSPMD : Introduction</title>
+      <title><anchor id="OOSPMD_html_intro"/>OOSPMD: Introduction</title>
       <para>SPMD stands for Single Program Multiple Data. Merged into an
  object-oriented framework, an SPMD programming model becomes an OOSPMD programming model.</para>
       <para>
@@ -56,7 +56,7 @@ class A {
 <screen>
   Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
-  A agroup = (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params[], nodes); 
+  A agroup = (A) ProSPMD.newSPMDGroup('A', params[], nodes); 
 </screen>
 </para>
       </blockquote>
@@ -69,7 +69,7 @@ class A {
       
     </sect1>
     <sect1 remap="h2">
-      <title><anchor id="OOSPMD_html_introBarrier"/>Barrier : Introduction</title>
+      <title><anchor id="OOSPMD_html_introBarrier"/>Barrier: Introduction</title>
       <para>ProActive provides three kinds of barrier to synchronize activities. The
  feature is specially useful in a SPMD programming style. A barrier stops the activity of the
  active object that invokes it until a special condition is satisfied. Notice that, as the
@@ -115,7 +115,7 @@ class A {
   public A() {}
   public void foo (...) {
     ...
-    ProSPMD.barrier(&quot;MyBarrier&quot;);
+    ProSPMD.barrier('MyBarrier');
   }
   public void bar (...) {...}
   ...
@@ -131,7 +131,7 @@ class A {
 <screen>
   Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
-  A agroup = (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params[], nodes); 
+  A agroup = (A) ProSPMD.newSPMDGroup('A', params[], nodes); 
 </screen>
 </para>
       </blockquote>
@@ -177,7 +177,7 @@ class A {
  example:</para>
       <blockquote>
         <para>
-<screen> ProSPMD.barrier(&quot;MyString&quot;, neighborGroup); </screen>
+<screen> ProSPMD.barrier('MyString', neighborGroup); </screen>
 </para>
       </blockquote>
       <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use of the Neighbor barrier.
@@ -197,10 +197,10 @@ class A {
       <para>
  The method <emphasis role="bold">barrier(String[])</emphasis> stops the active object that calls it, and wait for a request
  on the specified methods to resume. The array of string contains the name of the awaited methods.
- The order of the methods does not matter. For example :</para>
+ The order of the methods does not matter. For example:</para>
       <blockquote>
         <para>
-<screen> ProSPMD.barrier({&quot;foo&quot;, &quot;bar&quot;, &quot;gee&quot;}); </screen>
+<screen> ProSPMD.barrier({'foo', 'bar', 'gee'}); </screen>
 </para>
       </blockquote>
       <para>The caller will stop and wait for the three methods. bar or gee can came
@@ -209,9 +209,9 @@ class A {
       <blockquote>
         <para>
 <screen>
-   ProSPMD.barrier({&quot;foo&quot;});
-   ProSPMD.barrier({&quot;bar&quot;});
-   ProSPMD.barrier({&quot;gee&quot;}); </screen>
+   ProSPMD.barrier({'foo'});
+   ProSPMD.barrier({'bar'});
+   ProSPMD.barrier({'gee'}); </screen>
 </para>
       </blockquote>
       <para>A method barrier is used without any group (spmd or not). To learn more,

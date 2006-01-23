@@ -41,22 +41,25 @@ descriptor file and get back the result of the application without worrying abou
 selection, resource location and type, or mapping process on resources.
 	</para>
 
-		<para>
-			<informalfigure>
-				<mediaobject>
-					<imageobject>
-						<imagedata fileref="mpi_files/deployment.png" format="PNG" />
-					</imageobject>
-				</mediaobject>
-			</informalfigure>
-			<emphasis role="bold">File transfer and asking for resources</emphasis>
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>
-					<emphasis role="bold">(1) File Transfer</emphasis>
-				</para>
-				<para>As we said before, the primary objective is to provide user an automatic deployment of his application 
+        <para>
+         <figure>
+          <title>File transfer and asking for resources</title>
+          <mediaobject>
+           <imageobject>
+            <imagedata fileref="mpi_files/deployment.png" format="PNG" />
+           </imageobject>
+          </mediaobject>
+         </figure>
+        </para>
+		
+        <itemizedlist>
+         
+         <listitem>
+          <para>
+           <emphasis role="bold">(1) File Transfer</emphasis>
+          </para>
+				
+          <para>As we said before, the primary objective is to provide user an automatic deployment of his application 
 through a file deployment descriptor. In fact, ProActive provides support for File Transfer. In this way, user can
 transfer MPI application <emphasis role="bold">input data</emphasis> and/or MPI <emphasis role="bold">application code</emphasis> to the remote host. The File Transfer happens before the user launches his application.
 For more details about File Transfer click <link linkend="FileTransfer_html_intro">here</link>.
@@ -72,14 +75,15 @@ Each MPI job is as embedded in a Virtual Node containing resources specification
 			</listitem>
 		</itemizedlist>
 		<para>
-			<informalfigure>
-				<mediaobject>
-					<imageobject>
-						<imagedata fileref="mpi_files/launch.png" format="PNG" />
-					</imageobject>
-				</mediaobject>
-			</informalfigure>
-			<emphasis role="bold">start MPI process and get returned value</emphasis>
+                <figure>
+                 <title>start MPI process and get returned value</title> 
+                 <mediaobject>
+                  <imageobject>
+                   <imagedata fileref="mpi_files/launch.png" format="PNG" />
+                  </imageobject>
+                 </mediaobject>
+                </figure>
+			
 		</para>
 		<itemizedlist>
 			<listitem>
@@ -118,14 +122,15 @@ This functionality is currently under development.
 			<anchor id="dbdoclet.id.dbdoclet.id.MPI_html_Infrastructure_Implementation" />Simple Wrapping - Infrastructure Implementation</title>
 		<para>The section aims at having a look at the infrastructure implemented around MPI.</para>
 		<para>
-			<informalfigure>
+			<figure>
+                         <title> Process Package Architecture</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata fileref="mpi_files/architecture.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
-			</informalfigure>
-			<emphasis role="bold"> Process Package Architecture</emphasis>
+			</figure>
+			
 		</para>
 
 		<itemizedlist>
@@ -171,15 +176,15 @@ In the following example, "cpi" is the mpi progam name.
 				</para>
 				<screen>&lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
-    &lt;virtualNode name=&quot;CPI&quot; /&gt;
+    &lt;virtualNode name='CPI' /&gt;
    &lt;/virtualNodesDefinition&gt;
   &lt;/componentDefinition&gt;
   &lt;deployment&gt;
    ...
   &lt;/deployment&gt;
   &lt;FileTransferDefinitions&gt;
-   &lt;FileTransfer id=&quot;<emphasis role="bold">mpiCodeTransfer</emphasis>&quot;&gt;
-    &lt;file src=&quot;cpi&quot; dest=&quot;cpi&quot; /&gt;
+   &lt;FileTransfer id='<emphasis role="bold">mpiCodeTransfer</emphasis>'&gt;
+    &lt;file src='cpi' dest='cpi' /&gt;
    &lt;/FileTransfer&gt;
   &lt;/FileTransferDefinitions&gt;
 </screen>
@@ -198,13 +203,13 @@ first define the process to connect the remote host. Make point the reference id
  of the file transfer with the FileTransfer previously defined and make point the
  reference id to the DependentProcessSequence process defined below.</para>
 
-							<screen>&lt;processDefinition id=&quot;sshProcess&quot;&gt;
-   &lt;sshProcess class=&quot;org.objectweb.proactive.core.process.ssh.SSHProcess&quot; hostname=&quot;nef.inria.fr&quot; username=&quot;smariani&quot;&gt;
-    &lt;processReference refid=&quot;<emphasis role="bold">dependentProcessCPI</emphasis>&quot;  /&gt;
-	&lt;FileTransferDeploy refid=&quot;<emphasis role="bold">mpiCodeTransfer</emphasis>&quot;&gt;
+							<screen>&lt;processDefinition id='sshProcess'&gt;
+   &lt;sshProcess class='org.objectweb.proactive.core.process.ssh.SSHProcess' hostname='nef.inria.fr' username='smariani'&gt;
+    &lt;processReference refid='<emphasis role="bold">dependentProcessCPI</emphasis>'  /&gt;
+	&lt;FileTransferDeploy refid='<emphasis role="bold">mpiCodeTransfer</emphasis>'&gt;
 	  &lt;copyProtocol&gt;scp&lt;/copyProtocol&gt;
-	   &lt;sourceInfo prefix=<emphasis role="bold">&quot;/user/smariani/home/ProActive/src/org/objectweb/proactive/examples/mpi&quot;</emphasis> /&gt;
-	   &lt;destinationInfo prefix=<emphasis role="bold">&quot;/home/smariani/MyApp&quot;</emphasis> /&gt;
+	   &lt;sourceInfo prefix=<emphasis role="bold">'/user/smariani/home/ProActive/src/org/objectweb/proactive/examples/mpi'</emphasis> /&gt;
+	   &lt;destinationInfo prefix=<emphasis role="bold">'/home/smariani/MyApp'</emphasis> /&gt;
 	&lt;/FileTransferDeploy&gt;
    &lt;/sshProcess&gt;
   &lt;/processDefinition&gt;
@@ -216,10 +221,10 @@ first define the process to connect the remote host. Make point the reference id
  define the process to express the MPI process dependency towards PBS process. 
 				</para>
 							<screen>
-&lt;processDefinition id=<emphasis role="bold">&quot;dependentProcessCPI&quot;</emphasis>&gt;
-   &lt;dependentProcessSequence class=&quot;org.objectweb.proactive.core.process.DependentListProcessDecorator&quot;&gt;
-	&lt;processReference refid=<emphasis role="bold">&quot;pbsProcess&quot;</emphasis> /&gt;
-	&lt;processReference refid=<emphasis role="bold">&quot;mpiProcess&quot;</emphasis> /&gt;
+&lt;processDefinition id=<emphasis role="bold">'dependentProcessCPI'</emphasis>&gt;
+   &lt;dependentProcessSequence class='org.objectweb.proactive.core.process.DependentListProcessDecorator'&gt;
+	&lt;processReference refid=<emphasis role="bold">'pbsProcess'</emphasis> /&gt;
+	&lt;processReference refid=<emphasis role="bold">'mpiProcess'</emphasis> /&gt;
    &lt;/dependentProcessSequence&gt;
   &lt;/processDefinition&gt;
 </screen>
@@ -230,16 +235,16 @@ first define the process to connect the remote host. Make point the reference id
  you can use any process/protocol defined in ProActive to allocate resources instead of the PBS one.
 				</para>
 							<screen>
-&lt;processDefinition id=<emphasis role="bold">&quot;pbsProcess&quot;</emphasis>&gt;
-  &lt;pbsProcess class=&quot;org.objectweb.proactive.core.process.pbs.PBSSubProcess&quot;&gt;
-	&lt;processReference refid=jvmProcess&quot; /&gt;
-	&lt;commandPath value=&quot;/opt/torque/bin/qsub&quot; /&gt;
+&lt;processDefinition id=<emphasis role="bold">'pbsProcess'</emphasis>&gt;
+  &lt;pbsProcess class='org.objectweb.proactive.core.process.pbs.PBSSubProcess'&gt;
+	&lt;processReference refid=jvmProcess' /&gt;
+	&lt;commandPath value='/opt/torque/bin/qsub' /&gt;
 	&lt;pbsOption&gt;
 	 &lt;hostsNumber&gt;16&lt;/hostsNumber&gt;
 	 &lt;processorPerNode&gt;1&lt;/processorPerNode&gt;
 	 &lt;bookingDuration&gt;00:02:00&lt;/bookingDuration&gt;
 	 &lt;scriptPath&gt;
-	  &lt;absolutePath value=&quot;/home/smariani/pbsStartRuntime.sh&quot; /&gt;
+	  &lt;absolutePath value='/home/smariani/pbsStartRuntime.sh' /&gt;
 	 &lt;/scriptPath&gt;
 	&lt;/pbsOption&gt;
   &lt;/pbsProcess&gt;
@@ -259,16 +264,16 @@ In the case of remote application, if the remote path field is not set, the host
 and MPI process will raise an error.
 
 				</para>
-				<screen>&lt;processDefinition id=<emphasis role="bold">&quot;mpiProcess&quot;</emphasis>&gt;
- &lt;mpiProcess class=&quot;org.objectweb.proactive.core.process.mpi.MPIDependentProcess&quot; mpiFileName=&quot;cpi&quot;&gt;
-  &lt;commandPath value=&quot;/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun&quot; /&gt;
+				<screen>&lt;processDefinition id=<emphasis role="bold">'mpiProcess'</emphasis>&gt;
+ &lt;mpiProcess class='org.objectweb.proactive.core.process.mpi.MPIDependentProcess' mpiFileName='cpi'&gt;
+  &lt;commandPath value='/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun' /&gt;
   &lt;mpiOptions&gt;
    &lt;hostsNumber&gt;<emphasis role="bold">16</emphasis>&lt;/hostsNumber&gt;
    &lt;localRelativePath&gt;
-    &lt;relativePath origin=&quot;user.home&quot; value=<emphasis role="bold">&quot;/ProActive/scripts/unix&quot;</emphasis> /&gt;
+    &lt;relativePath origin='user.home' value=<emphasis role="bold">'/ProActive/scripts/unix'</emphasis> /&gt;
    &lt;/localRelativePath&gt;
    &lt;remoteAbsolutePath&gt;
-    &lt;absolutePath value=<emphasis role="bold">&quot;/home/smariani/MyApp&quot;</emphasis> /&gt;
+    &lt;absolutePath value=<emphasis role="bold">'/home/smariani/MyApp'</emphasis> /&gt;
    &lt;/remoteAbsolutePath&gt;
   &lt;/mpiOptions&gt;
  &lt;/mpiProcess&gt;
@@ -288,10 +293,10 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 ...
 // load the file desciptor 
-ProActiveDescriptor pad = ProActive.getProactiveDescriptor(&quot;file:descriptor.xml&quot;);
+ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
 
 // get the Virtual Node attached with the MPI code you want to execute
-VirtualNode vn = pad.getVirtualNode(&quot;CPI&quot;);
+VirtualNode vn = pad.getVirtualNode('CPI');
 
 // activate Virtual Node
 vn.activate();
@@ -413,14 +418,15 @@ codes or they may be parallel codes that make use of <emphasis role="bold">nativ
 
 
 		<para>
-			<informalfigure>
+			<figure>
+                         <title> Vibro-Acoustic Numerical Simulation</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata fileref="mpi_files/MPI_Component.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
-			</informalfigure>
-			<emphasis role="bold"> Vibro-Acoustic Numerical Simulation</emphasis>
+			</figure>
+			
 		</para>
 
 		<para>

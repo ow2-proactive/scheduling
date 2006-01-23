@@ -25,7 +25,7 @@
         </listitem>
 </itemizedlist>
       <para><emphasis role="bold">Note</emphasis>: Choosing the correct name for the protocol is simple, but must be done carefully.
- All names already in the array ALLOWED_COPY_PROTOCOLS are forbidden. This includes the name <emphasis role="bold">&quot;processDefault&quot;</emphasis>, which is also forbidden. In some cases <emphasis role="bold">&quot;processDefault&quot;</emphasis> will correspond to an external FileTransfer protocol (ex: ssh
+ All names already in the array ALLOWED_COPY_PROTOCOLS are forbidden. This includes the name <emphasis role="bold">'processDefault'</emphasis>, which is also forbidden. In some cases <emphasis role="bold">'processDefault'</emphasis> will correspond to an external FileTransfer protocol (ex: ssh
  with scp), and in some cases to an internal protocol (ex: unicore with unicore)</para>
     </sect1>
     <sect1 remap="h2">

@@ -8,7 +8,7 @@
  100,000 nodes interconnected to execute a single application is rather appealing, especially for
  Grid computing. Mimicking data P2P, one could start a computation that no failure would ever be
  able to stop (and maybe nobody).</para>
-      <para>The ProActive P2P aims to use spare CPU cycles from organization&#39;s or institution&#39;s
+      <para>The ProActive P2P aims to use spare CPU cycles from organization's or institution's
  desktop workstations.</para>
       <para>This short document explains how to create a simple computational P2P network. This network is
  a <emphasis role="bold">dynamic JVMs network</emphasis> which works like computational nodes.</para>
@@ -17,12 +17,14 @@
  JVM and few Active Objects. The next figure shows an example of a network of hosts where some
  JVMs are running and several of them are running the P2P Service.</para>
       <para>
-        <informalfigure>
+        <figure>
+         <title>A network of hosts with some running the P2P Service</title>
           <mediaobject>
             <imageobject>
-              <imagedata  fileref="p2p_files/overlaynetwork.png" format="PNG"/>            </imageobject>
+              <imagedata  fileref="p2p_files/overlaynetwork.png" format="PNG"/>           
+             </imageobject>
           </mediaobject>
-        </informalfigure>
+        </figure>
  <emphasis role="bold">Example of a ProActive P2P infrastructure.</emphasis></para>
       <para>When the P2P infrastructure is running, it is very easy to obtain some nodes (JVMs). The next
  section describes how to use it.</para>
@@ -30,10 +32,10 @@
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="mozTocId1224"/><anchor id="p2p_html_infrastructure_model"/>The P2P Infrastructure Model</title>
-      <para>The goals of this work are to use sparse CPU cycles from institutions&#39; desktop
+      <para>The goals of this work are to use sparse CPU cycles from institutions' desktop
  workstations combined with grids and clusters. Desktop workstations are not available all the
  time for sharing computation times with different users other than the workstation owner. Grids
- and clusters have the same problem as normal users don&#39;t want to share their usage
+ and clusters have the same problem as normal users don't want to share their usage
  time.</para>
       <para>Managing different sorts of resources (grids, clusters, desktop workstations) as a single
  network of resources with a high instability between them needs a fully decentralized and dynamic
@@ -41,7 +43,7 @@
       <para>Therefore, P2P is a good solution for sharing a dynamic JVM network, where JVMs are the shared
  resources. Thereby, the P2P Infrastructure is a P2P network which shares JVMs for computation.
  This infrastructure is completely self-organized and fully configurable.</para>
-      <para>Before going on to consider the P2P infrastructure, it&#39;s important to define what
+      <para>Before going on to consider the P2P infrastructure, it's important to define what
  Peer-to-Peer is.</para>
        
       <sect2 remap="h3">
@@ -51,22 +53,22 @@
  describe really P2P well:</para>
         <itemizedlist>
           <listitem>
-            <para> From&#160; Peer-to-Peer Harnessing&#160; the Power of
+            <para> From  Peer-to-Peer Harnessing  the Power of
  Disruptive Technologies (edited by Andy Oram):</para>
           </listitem>
 </itemizedlist>
-        <para>&quot;[...] P2P is a class of applications that take advantage of <emphasis role="bold">resources</emphasis> - available
- at the edges of the Internet [...]&quot;</para>
+        <para>'[...] P2P is a class of applications that take advantage of <emphasis role="bold">resources</emphasis> - available
+ at the edges of the Internet [...]'</para>
         <itemizedlist>
           <listitem>
             <para> And from A Definition of Peer-to-Peer Networking for the
  Classification of Peer-to-Peer Architectures and Applications (Rdiger Schollmeier -
- P2P&#39;01):</para>
+ P2P'01):</para>
           </listitem>
 </itemizedlist>
-        <para>&quot;[...] Peers are <emphasis role="bold">accessible</emphasis> by other peers directly [...] Any arbitrary chosen
- peer can be <emphasis role="bold">removed</emphasis> from the network <emphasis role="bold">without fault</emphasis> [...]&quot;</para>
-        <para><emphasis role="bold">P2P&#39;s focus on sharing, decentralization, instability and fault tolerance.</emphasis></para>
+        <para>'[...] Peers are <emphasis role="bold">accessible</emphasis> by other peers directly [...] Any arbitrary chosen
+ peer can be <emphasis role="bold">removed</emphasis> from the network <emphasis role="bold">without fault</emphasis> [...]'</para>
+        <para><emphasis role="bold">P2P's focus on sharing, decentralization, instability and fault tolerance.</emphasis></para>
       </sect2>
       <sect2 remap="h3">
         <title><anchor id="mozTocId928306"/>The P2P Infrastructure in
@@ -75,16 +77,16 @@
           <title><anchor id="mozTocId101413"/>Bootstrapping: First
  Contact</title>
           <para>A fresh (or new) peer which would like to join the P2P network, will encounter a serious
- bootstrapping problem or first contact problem: &quot;How can it connect to the P2P
- network?&quot;</para>
+ bootstrapping problem or first contact problem: 'How can it connect to the P2P
+ network?'</para>
           <para>A solution for that is to use a specific protocol. ProActive provides an interface for a
  network-centric services protocol which is named JINI. JINI can be used for discovering services
  in a dynamic computing environment, such as a fresh peer which would like to join a P2P network.
  This protocol is perfectly adapted to solve the bootstrapping problem. However, there is a
- serious drawback&#160; for using a protocol&#160; such as JINI&#160; as peer discovering
- protocol. JINI is limited to working only in the same sub-network. That means JINI doesn&#39;t
- pass through firewalls or NAT and can&#39;t be considered to be used for Internet.</para>
-          <para>Therefore,&#160; a different solution for the bootstrapping problem was chosen. The solution
+ serious drawback  for using a protocol  such as JINI  as peer discovering
+ protocol. JINI is limited to working only in the same sub-network. That means JINI doesn't
+ pass through firewalls or NAT and can't be considered to be used for Internet.</para>
+          <para>Therefore,  a different solution for the bootstrapping problem was chosen. The solution
  for ProActive first contact P2P is inspired from Data P2P Networks. This solution is based on
  real life , i.e. when a person wants to join a community, this person has to first know another
  person who is already a member of the community. After the first person has contacted the
@@ -93,13 +95,13 @@
           <para>The ProActive P2P bootstrapping protocol works as follows:</para>
           <itemizedlist>
             <listitem>
-              <para> A fresh peer has a list of &quot;server&quot; addresses. These are peers&#160; which have a
+              <para> A fresh peer has a list of 'server' addresses. These are peers  which have a
  high potential to be available and to be in the P2P network, they are in a certain way the P2P
  network core.</para>
             </listitem>
             <listitem>
               <para> With this list the fresh peer tries to contact each server. When a server is reached the
- server is added to ithe fresh peer&#39;s list of known peers (acquaintances).</para>
+ server is added to ithe fresh peer's list of known peers (acquaintances).</para>
                
             </listitem>
             <listitem>
@@ -116,18 +118,19 @@
  The new peer has 2 servers to contact in order to join the existing P2P infrastructure.</para>
            
           <para>
-            <informalfigure>
+            <figure>
+             <title>New peer trying to join a P2P network </title>
               <mediaobject>
                 <imageobject>
                   <imagedata  fileref="p2p_files/firstContact.png" format="PNG"/>                </imageobject>
               </mediaobject>
-            </informalfigure>
+            </figure>
  <emphasis role="bold">Example of first contact (Bootstrapping).</emphasis></para>
 </sect3>
         <sect3 remap="h4">
           <title><anchor id="mozTocId470123"/>Discovering and
  Self-Organizing in Continue</title>
-          <para>The main particularity of a P2P network is the peers high volatility.&#160; This results from
+          <para>The main particularity of a P2P network is the peers high volatility.  This results from
  various attributes which compose P2P:</para>
            
           <itemizedlist>
@@ -146,7 +149,7 @@
               <para> Peers are not available all the time and not all at the same moment.</para>
             </listitem>
             <listitem>
-              <para> Peer latency is not&#160; equal for all.</para>
+              <para> Peer latency is not  equal for all.</para>
             </listitem>
             <listitem>
               <para> etc.</para>
@@ -156,11 +159,11 @@
  with these problems with transparency.</para>
           <para>ProActive P2P infrastructure aims to maintain a created P2P network alive while there are
  available peers in the network, this is called self-organizing of the P2P network. Because P2P
- doesn&#39;t have exterior entities, such as&#160; centralized servers which maintain peer data
+ doesn't have exterior entities, such as  centralized servers which maintain peer data
  bases, the P2P network has to be self-organized. That means all peers should be enabled to stay
  in the P2P network by their own means.</para>
           <para>There is a solution which is widely used in data P2P networks; this consists of each peer
- keeping a list of their neighbors, a peer&#39;s neighbor is typically a peer close to it (IP
+ keeping a list of their neighbors, a peer's neighbor is typically a peer close to it (IP
  address or geographically).</para>
           <para>In the same way, this idea was selected to keep the ProActive P2P infrastructure up. All peers
  have to maintain a list of <emphasis role="bold">acquaintances</emphasis>. At the beginning, when a fresh peer has just
@@ -171,13 +174,13 @@
  P2P infrastructure.</para>
           <para>Therefore, the ProActive P2P infrastructure uses a specific parameter called: <emphasis role="bold">Number Of
  Acquaintances (NOA)</emphasis>. This is a minimum size of the list of acquaintances of all peers. The
- more the peers are highly dynamic, the&#160; more NOA should be high. Thereby, a peer must
+ more the peers are highly dynamic, the  more NOA should be high. Thereby, a peer must
  discover new acquaintances through the P2P infrastructure.</para>
            
           <para>In the next <link linkend="mozTocId299524">section</link>, we will see in detail how the message
  protocol works. For the moment we will just explain briefly the discovering acquaintances process
  without going into detail about the message protocol.</para>
-          <para>The peer called &quot;Alice&quot; has 2 acquaintances resulting from its first contact with
+          <para>The peer called 'Alice' has 2 acquaintances resulting from its first contact with
  the P2P infrastructure and by default NOA is 10 peers. Alice must find at least 8 peers to be
  able to stay with a certain guarantee inside the infrastructure.</para>
           <para>The acquaintance discovering works as follows:</para>
@@ -202,32 +205,34 @@
             </listitem>
 </itemizedlist>
           <para>In order to not have isolated peers in the infrastructure, all peers registration are
- symmetric. That means if Alice knows the peer &quot;Bob&quot;, Bod also knows Alice. Hence, when
+ symmetric. That means if Alice knows the peer 'Bob', Bod also knows Alice. Hence, when
  a peer chooses whether to be an acquaintance or not, the peer has to check previously in its own
- acquaintance list if it doesn&#39;t already know the asking peer. Next, if it&#39;s an unknown
+ acquaintance list if it doesn't already know the asking peer. Next, if it's an unknown
  peer, the peer decides with a random function to be an acquaintance or not. With the parameter of <emphasis role="bold">agree responses</emphasis>, it is possible to configure the percentage of positive responses to an
  exploring message. The random function is a temporary solution to solve the flooding problem due
  to the message protocol (see next <link linkend="mozTocId299524">section</link>), we are thinking of
  using a new parameter Maximum Number of Acquaintances and improving the message protocol. For the
- moment, we don&#39;t consider peers IP addresses or geographical location of the peers as an
+ moment, we don't consider peers IP addresses or geographical location of the peers as an
  acquaintances criteria.</para>
            
           <para>As the P2P infrastructure is a dynamic environment, the list of acquaintances must also be
  dynamic. Many acquaintances could be unavailable and must be removed of the list. When the size
  of the list is less than the NOA, the peer has to discover new peers. Therefore, all peers keep
- their lists up-to-date. That&#39;s why a new parameter must be introduced: <emphasis role="bold">Time To Update
- (TTU)</emphasis>. The peer must frequency check its own acquaintances&#39; list to remove unavailable
+ their lists up-to-date. That's why a new parameter must be introduced: <emphasis role="bold">Time To Update
+ (TTU)</emphasis>. The peer must frequency check its own acquaintances' list to remove unavailable
  peers and discover new peers. To verify the acquaintances availability, the peer send a <emphasis role="bold">Heart
  Beat</emphasis> to all of its acquaintances. The heart beat is sent every TTU.</para>
           <para>The next figure shows a peer which is sending a heart beat to all of its acquaintances.</para>
           <para>
-            <informalfigure>
+            <figure>
+             <title>Heart beat sent every TTU</title>
               <mediaobject>
                 <imageobject>
-                  <imagedata  fileref="p2p_files/heartbeat.png" format="PNG"/>                </imageobject>
+                  <imagedata   fileref="p2p_files/heartbeat.png" format="PNG"/>
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
- <emphasis role="bold">Heart beat sent every TTU.</emphasis></para>
+            </figure>
+           </para>
 </sect3>
         <sect3 remap="h4">
           <title><anchor id="mozTocId299524"/>Asking Computational Nodes </title>
@@ -242,7 +247,7 @@
               <para> Asking free computational nodes to deploy distributed applications.</para>
             </listitem>
 </itemizedlist>
-          <para>The mechanism is similar to Gnutella&#39;s communication system: <emphasis role="bold">Breadth-First Search</emphasis>
+          <para>The mechanism is similar to Gnutella's communication system: <emphasis role="bold">Breadth-First Search</emphasis>
  algorithm (BFS). The system is message-based with application-level routing.</para>
            
           <para>All BFS messages must contain this information:</para>
@@ -274,7 +279,7 @@
                       <para> Yes, it is: continue;</para>
                     </listitem>
                     <listitem>
-                      <para> No, it&#39;s not: </para>
+                      <para> No, it's not: </para>
                       <itemizedlist>
                         <listitem>
                           <para><emphasis role="bold">Keep</emphasis>  the <emphasis role="bold">UUID</emphasis>;</para>
@@ -326,19 +331,21 @@
 </itemizedlist>
             </listitem>
 </itemizedlist>
-          <para>Gnutella&#39;s BFS got a lot of justified critics for scaling, bandwidth, etc. It is true this
- protocol is not good enough but we&#39;re working to improve it. We are inquiring into solutions
+          <para>Gnutella's BFS got a lot of justified critics for scaling, bandwidth, etc. It is true this
+ protocol is not good enough but we're working to improve it. We are inquiring into solutions
  with a not fixed TTL to avoid network flooding.</para>
           <para>The next Figure shows briefly the execution of the inspired BFS algorithm:</para>
            
           <para>
-            <informalfigure>
-              <mediaobject>
+            <figure>
+             <title>Asking nodes to acquaintances and getting a node</title> 
+             <mediaobject>
                 <imageobject>
-                  <imagedata  fileref="p2p_files/sendingNode.png" format="PNG"/>                </imageobject>
+                  <imagedata  fileref="p2p_files/sendingNode.png" format="PNG"/> 
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
- <emphasis role="bold">Asking nodes to acquaintances and getting a node.</emphasis></para>
+            </figure>
+ </para>
 </sect3>
       </sect2>
     </sect1>
@@ -359,44 +366,45 @@
         <para>The list of P2P active objects:</para>
         <itemizedlist>
           <listitem>
-            <para><emphasis role="bold">P2PService</emphasis> : is the main active object. It serves all register requests or resource
+            <para><emphasis role="bold">P2PService</emphasis>: is the main active object. It serves all register requests or resource
  queries, such as nodes or acquaintances.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">P2PNodeManager</emphasis> : works together with the P2PService, this active object manages one
+            <para><emphasis role="bold">P2PNodeManager</emphasis>: works together with the P2PService, this active object manages one
  or several shared nodes. It handles the booking node system, see <link linkend="mozTocId690451">here</link> for more details.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">P2PAcquaintanceManager</emphasis> : manages the list of acquaintances and provides group
+            <para><emphasis role="bold">P2PAcquaintanceManager</emphasis>: manages the list of acquaintances and provides group
  communication, see next <link linkend="mozTocId587594">section</link>.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">P2PNodeLookup</emphasis> : works as a broker when the P2PService asks nodes. All the asking node
+            <para><emphasis role="bold">P2PNodeLookup</emphasis>: works as a broker when the P2PService asks nodes. All the asking node
  protocol is inside it. This broker can migrate to a different node to be closer to the deployed
  application.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">FirstContact</emphasis> : it&#39;s the <link linkend="mozTocId101413">bootstrapping</link> object.</para>
+            <para><emphasis role="bold">FirstContact</emphasis>: it's the <link linkend="mozTocId101413">bootstrapping</link> object.</para>
           </listitem>
 </itemizedlist>
         <para> The Figure below shows the connection between all active objects:</para>
         <para>
-          <informalfigure>
+          <figure>
+           <title>Nodes and Active Objects which make up a P2P Service.</title>
             <mediaobject>
               <imageobject>
-                <imagedata  fileref="p2p_files/implementation.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/implementation.png" format="PNG"/> 
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
-        <para><emphasis role="bold">Nodes and Active Objects which make up a P2P
- Service.</emphasis></para>
+        
         <para>All communications between peers use Group communication but for sending a response to a
- request message, it&#39;s a point-to-point communication. Though ProActive communications are
- asynchronous, it&#39;s not really messages which are sent between peers. Nevertheless, it&#39;s
+ request message, it's a point-to-point communication. Though ProActive communications are
+ asynchronous, it's not really messages which are sent between peers. Nevertheless, it's
  not a real problem; ProActive is implemented above Java RMI which is RPC and RPC is synchronous.
  However, ProActive uses future mechanism and Rendez-vous method to turn RPC methods to
  asynchronous. That means ProActive is asynchronous RPC. Rendez-vous is interesting in your case
- because it&#160; guarantees the method is successfully received by the receiver. With the Heart
+ because it  guarantees the method is successfully received by the receiver. With the Heart
  beat message which is sent a Java exception when an acquaintance is down.</para>
         <para>The P2PAcquaintanceManager manages the list of acquaintances, this list is represented by a
  ProActive typed group of P2PService. This is the point of the next section.</para>
@@ -407,7 +415,7 @@
         <para>ProActive typed group does not allow access to group elements and make calls from different
  active objects to the same group is not possible, i.e. a group can not be shared. However, the
  point of the P2P infrastructure is to broadcast messages to all members on the acquaintance list,
- ProActive typed group is&#160; perfect for doing that. A typed group of P2PService is a good
+ ProActive typed group is  perfect for doing that. A typed group of P2PService is a good
  implementation of the acquaintance list design.</para>
         <para>But a typed group does not support to be shared by many active objects, especially for making
  group method calls from different objects, adding / removing / etc. members in the group. For the
@@ -419,20 +427,22 @@
         <para>That solves the problem of group members accessing but not how other active objects can call
  methods on the group. The ProActive group API provides a method to active a group that is made
  possible to get ProActive reference on the group. The PAM actives the group after its creation.
- P2PService, P2PNodeLookup and all get the group reference from a PAM&#39;s getter.</para>
+ P2PService, P2PNodeLookup and all get the group reference from a PAM's getter.</para>
         <para>The PAM, during its activity, frequently sends heart beats to remove unavailable peers. The
  P2PService adds, via the PAM, new discovered acquaintances (P2PService) and the P2PNodeLookup
  calls group methods to ask nodes to the group reference. The P2PService does also group method
  calls.</para>
         <para>In short, this can be seen in the next Figure:</para>
         <para>
-          <informalfigure>
-            <mediaobject>
+          <figure>
+           <title>Dynamic Shared ProActive Typed Group.</title>           
+           <mediaobject>
               <imageobject>
-                <imagedata  fileref="p2p_files/dynamicGroup.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/dynamicGroup.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
-          </informalfigure>
- <emphasis role="bold">Dynamic Shared ProActive Typed Group.</emphasis></para>
+          </figure>
+ </para>
         <para>We just explained how to share a typed group between active objects but that is not solve all
  the problems. For the moment, the BFS implementation with broadcasting to all acquaintances each
  time is not perfect due to the message which is always send back to the previous sender. We are
@@ -444,8 +454,8 @@
  sharing resource of this P2P network. This activity is handled by the P2PNodeManager active
  object.</para>
         <para>At the initialization of the P2PNodeManager (PNM), it has to instantiate the shared resource.
- By default, it&#39;s 1 ProActive nodes by CPUs, for example on a single processor machine the PNM
- starts 1 node and on a bi-processors machine it starts 2 nodes. It&#39;s possible to choose to
+ By default, it's 1 ProActive nodes by CPUs, for example on a single processor machine the PNM
+ starts 1 node and on a bi-processors machine it starts 2 nodes. It's possible to choose to
  share only a single node. An another way is to share nodes from an XML deployment descriptor file
  by specifing the descriptor to the PNM which actives the deployment and gets nodes ready to
  share.</para>
@@ -456,21 +466,21 @@
  configurable timeout. The PNM knows if the node is used or not by testing the active object
  presence inside the node. Consequently, at the end of the booking time, the PNM kills the node,
  the node is no longer usable. Though, some applications need empty nodes for a long time before
- using them, thereby there is a pseudo expand booking time system: creating &quot;Dummy&quot;
+ using them, thereby there is a pseudo expand booking time system: creating 'Dummy'
  active objects in booked nodes for later use. This system is allowed by the P2PNodeLookup.</para>
         <para>The P2PNodeLookup could receive more nodes than it needs, for all additional nodes, the
- P2PNodeLookup sends a message to all PNMs&#39; nodes to cancel its booking on the node.</para>
+ P2PNodeLookup sends a message to all PNMs' nodes to cancel its booking on the node.</para>
         <para>The deployed applications have to leave nodes after use. Therefore, the PNM offers a leaving
  node mechanism that is the application sent a leaving message for a specified node to the PNM
- which kills all node&#39;s active objects by terminating their bodies and kills the node. After
+ which kills all node's active objects by terminating their bodies and kills the node. After
  that, the PNM creates a new node which is ready for sharing. However, if nodes are deployed by an
- XML descriptor the PNM does&#39;t kill the node, it just terminates all its active objects and
+ XML descriptor the PNM does't kill the node, it just terminates all its active objects and
  re-shares the same node.</para>
         <para>The asking node mechanism is allowed by the P2PNodeLookup, this object is active by the
  P2PService when it receives an asking node request from an application. The P2PNodeLookup (PNL)
  works as a broker, it could migrate to another place (node, machine, etc.) to be near the
  application.</para>
-        <para>The PNL aims to find the number of nodes requested by&#160; the application. It uses the BFS
+        <para>The PNL aims to find the number of nodes requested by  the application. It uses the BFS
  to frequently flood the network until it gets all nodes or until the timeout is reached. However,
  the application can ask to the maximum number of nodes, in that case the PNL asks to nodes until
  the end of the application. The PNL provides a listener / producer event mechanism which is great
@@ -487,14 +497,16 @@
  (bi-processors machines). Inside the nodes there are some active Domain objects from the nBody
  application which is deployed on this small P2P infrastructure.</para>
         <para>
-          <informalfigure>
-            <mediaobject>
+          <figure>
+           <title>nBody application deployed on P2P Infrastructure.</title>
+           <mediaobject>
               <imageobject>
-                <imagedata width="6in" fileref="p2p_files/screenshot.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/screenshot.png" format="PNG"/>  
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
-        <para> <emphasis role="bold">nBody application deployed on P2P Infrastructure.</emphasis></para>
+        
       </sect2>
     </sect1>
     <sect1 remap="h2">
@@ -506,15 +518,15 @@
  you have nothing to do to keep it up. There are 3 main parameters to configure:</para>
         <itemizedlist>
           <listitem>
-            <para><emphasis role="bold">Time To Update (TTU)</emphasis> : each peer checks if its known peers are available when TTU
+            <para><emphasis role="bold">Time To Update (TTU)</emphasis>: each peer checks if its known peers are available when TTU
  expires. By default, its value is 1 minute.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">Number Of Acquaintances (NOA)</emphasis> : is the minimal number of peers one peer needs to know
+            <para><emphasis role="bold">Number Of Acquaintances (NOA)</emphasis>: is the minimal number of peers one peer needs to know
  to keep up the infrastructure. By default, its value is 10 peers.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">Time To Live (TTL)</emphasis> : in hops for JVMs (node) depth search (acquisition). By default,
+            <para><emphasis role="bold">Time To Live (TTL)</emphasis>: in hops for JVMs (node) depth search (acquisition). By default,
  its value is 5 hops.</para>
           </listitem>
 </itemizedlist>
@@ -565,7 +577,7 @@
  know to keep up the infrastructure. By default, its value is 10 peers.</para>
             </listitem>
             <listitem>
-              <para><emphasis role="bold">-ttu TTU</emphasis>  is in minutes.&#160; Each peer sends a heart beat to its acquaintances. By
+              <para><emphasis role="bold">-ttu TTU</emphasis>  is in minutes.  Each peer sends a heart beat to its acquaintances. By
  default, its value is 1 minute.</para>
             </listitem>
             <listitem>
@@ -581,7 +593,7 @@
  acquaintances. By default, its value is 66%.</para>
             </listitem>
             <listitem>
-              <para><emphasis role="bold">-booking Time</emphasis>  in ms it takes while booking a shared node. It&#39;s the maximum time
+              <para><emphasis role="bold">-booking Time</emphasis>  in ms it takes while booking a shared node. It's the maximum time
  in milliseconds to create at least an active object in the shared node. After this time, and if
  no active objects are created, the shared node will leave and the peer which gets this shared
  node will be no longer be able to use it. Default is 3 minutes.</para>
@@ -592,7 +604,7 @@
             </listitem>
             <listitem>
               <para><emphasis role="bold">-lookup Time</emphasis>  is the lookup frequency in milliseconds for re-asking nodes. By
- default, it&#39;s value is 30 seconds.</para>
+ default, it's value is 30 seconds.</para>
             </listitem>
             <listitem>
               <para><emphasis role="bold">-no_multi_proc_nodes</emphasis>  to share only a node. Otherwise, 1 node by CPU that means the
@@ -632,13 +644,15 @@
           <para>Lastly, a new peer joins the P2P network:</para>
 <screen> last.peer.host$startP2PService.sh -acq rmi -port 6666 -s rmi://third.peer.host:2410 </screen>
           <para>
-            <informalfigure>
-              <mediaobject>
+            <figure>
+             <title>Usage example P2P network (after firsts connections)</title>
+             <mediaobject>
                 <imageobject>
-                  <imagedata  fileref="p2p_files/example.png" format="PNG"/>                </imageobject>
+                  <imagedata  fileref="p2p_files/example.png" format="PNG"/> 
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
- <emphasis role="bold">Usage example P2P network (after firsts connections).</emphasis></para>
+            </figure>
+ </para>
 </sect3>
         <sect3 remap="h4">
           <title><anchor id="mozTocId690540"/>The P2P Daemon</title>
@@ -658,9 +672,9 @@
  located here:</para>
 <screen> ProActive/p2p/build/proactivep2p </screen>
             <para><emphasis role="bold">Microsoft Windows</emphasis></para>
-            <para>To compile daemon source (in c++), we don&#39;t provide any automatic script, you have to do
+            <para>To compile daemon source (in c++), we don't provide any automatic script, you have to do
  it yourself. All sources for Windows are in the directory: <emphasis role="bold">ProActive/p2p/src/windows</emphasis>. If
- you use Microsoft Visual Studio, you can find&#160; in the src directory the Microsoft VS project
+ you use Microsoft Visual Studio, you can find  in the src directory the Microsoft VS project
  files.</para>
             <para>After that you are ready to install the daemon with Windows, you just have to run this
  script:</para>
@@ -680,9 +694,9 @@
             <para>The reference is the XML Schema in <ulink url="p2p_files/proactivep2p.xsd">proactivep2p.xsd</ulink>.
  For those not fluent in XML Schema, here is a description of all markup tags--</para>
             <para>The root element in <emphasis role="bold">&lt;configFile&gt;</emphasis> it contains one or many <emphasis role="bold">&lt;p2pconfig&gt;</emphasis>
- . This latter element can start with a <emphasis role="bold">&lt;loadconfig path=&quot;path/to/xml&quot;/&gt;</emphasis> it
+ . This latter element can start with a <emphasis role="bold">&lt;loadconfig path='path/to/xml'/&gt;</emphasis> it
  will include the designated XML file. After these file inclusions, you can with <emphasis role="bold">&lt;host
- name=&quot;name.domain&quot;&gt;</emphasis> specify which hosts are concerned by the configuration. Then
+ name='name.domain'&gt;</emphasis> specify which hosts are concerned by the configuration. Then
  there can be a <emphasis role="bold">&lt;configForHost&gt;</emphasis> element containing a configuration for the selected
  hosts and/or a <emphasis role="bold">&lt;default&gt;</emphasis> element if no suitable configuration was already found.</para>
             <para>Bear in mind that the XML parser sees a lot of configuration and the first that matches is
@@ -694,24 +708,24 @@
  we register ourselves. Here is an example:</para>
 <screen>
  &lt;periods&gt; 
- &#160;&lt;period&gt;
- &#160; &lt;start day=&quot;monday&quot; hour=&quot;18&quot;
- minute=&quot;0&quot;/&gt;
- &#160; &lt;end day=&quot;tuesday&quot; hour=&quot;6&quot;
- minute=&quot;0&quot;/&gt;
- &#160; &lt;/period&gt;
- &#160; &lt;period&gt;
- &#160;&#160; &lt;start day=&quot;saturday&quot; hour=&quot;0&quot;
- minute=&quot;0&quot;/&gt;
- &#160;&#160; &lt;end day=&quot;monday&quot; hour=&quot;6&quot;
- minute=&quot;0&quot;/&gt;
- &#160; &lt;/period&gt;
+  &lt;period&gt;
+   &lt;start day='monday' hour='18'
+ minute='0'/&gt;
+   &lt;end day='tuesday' hour='6'
+ minute='0'/&gt;
+   &lt;/period&gt;
+   &lt;period&gt;
+    &lt;start day='saturday' hour='0'
+ minute='0'/&gt;
+    &lt;end day='monday' hour='6'
+ minute='0'/&gt;
+   &lt;/period&gt;
  &lt;/periods&gt;
  &lt;register&gt;
- &#160;&lt;registry url=&quot;trinidad.inria.fr&quot;/&gt;
- &#160;&lt;registry url=&quot;amda.inria.fr&quot;/&gt;
- &#160;&lt;registry url=&quot;tranquility.inria.fr&quot;/&gt;
- &#160;&lt;registry url=&quot;psychoquack.inria.fr&quot;/&gt;
+  &lt;registry url='trinidad.inria.fr'/&gt;
+  &lt;registry url='amda.inria.fr'/&gt;
+  &lt;registry url='tranquility.inria.fr'/&gt;
+  &lt;registry url='psychoquack.inria.fr'/&gt;
  &lt;/register&gt;
 </screen> 
 
@@ -724,24 +738,24 @@
             <para>The following commands only work with UNIX friendly systems.</para>
             <itemizedlist>
               <listitem>
-                <para><emphasis role="bold">Stop the JVM</emphasis> : This command will stop the JVM and will restart it at the next scheduled
+                <para><emphasis role="bold">Stop the JVM</emphasis>: This command will stop the JVM and will restart it at the next scheduled
  time, which is the day after:</para>
 <screen> $ProActive/p2p/build/p2pctl stop [hostname] </screen>
               </listitem>
               <listitem>
-                <para><emphasis role="bold">Kill the daemon</emphasis> :</para>
+                <para><emphasis role="bold">Kill the daemon</emphasis>:</para>
 <screen> $ProActive/p2p/build/p2pctl killdaemon [hostname] </screen>
               </listitem>
               <listitem>
-                <para><emphasis role="bold">Restart the daemon</emphasis> : </para>
+                <para><emphasis role="bold">Restart the daemon</emphasis>: </para>
 <screen> $ProActive/p2p/build/p2pctl restart [hostname] </screen>
               </listitem>
               <listitem>
-                <para><emphasis role="bold">Test the daemon</emphasis> : </para>
+                <para><emphasis role="bold">Test the daemon</emphasis>: </para>
 <screen> $ProActive/p2p/build/p2pctl alive [hostname] </screen>
               </listitem>
               <listitem>
-                <para><emphasis role="bold">Flush the daemon logs</emphasis> : </para>
+                <para><emphasis role="bold">Flush the daemon logs</emphasis>: </para>
 <screen> $ProActive/p2p/build/p2pctl flush [hostname] </screen>
               </listitem>
 </itemizedlist>
@@ -764,7 +778,7 @@
  required.</para>
           </listitem>
           <listitem>
-            <para><emphasis role="bold">acq</emphasis>  is the communication protocol that&#39;s used to communicate with this P2P
+            <para><emphasis role="bold">acq</emphasis>  is the communication protocol that's used to communicate with this P2P
  Service. All ProActive communication protocols are supported: rmi, http, etc. Default is
  rmi.</para>
           </listitem>
@@ -795,13 +809,13 @@
           </listitem>
           <listitem>
             <para><emphasis role="bold">booking_nodes</emphasis>  is a boolean value (true or false). During asking nodes processs there
- is a timeout, booking timeout is used for&#160; obtaining nodes. That means if no active
+ is a timeout, booking timeout is used for  obtaining nodes. That means if no active
  objects are created before the end of the timeout, the node will be free and no longer shared.
  To avoid the booking timeout, put this attribute at true, obtained nodes will be permanently booked for you. By default, its value is false. See below, for
  more information about the booking timeout.</para>
           </listitem>
 </itemizedlist>
-        <para>With elements <emphasis role="bold">acq</emphasis> and <emphasis role="bold">port</emphasis>,&#160; if a P2P Service is already running with this
+        <para>With elements <emphasis role="bold">acq</emphasis> and <emphasis role="bold">port</emphasis>,  if a P2P Service is already running with this
  configuration the descriptor will use this one, if not a new one is started.</para>
         <para>In order to get nodes, the <emphasis role="bold">peerSet</emphasis> tag will allow you to specify entry point of your
  P2P Infrastructure.</para>
@@ -809,13 +823,13 @@
  described above.</para>
         <para>
  In fact you will ask for a certain number of nodes and ProActive will notify a
- &quot;listener&quot; (one of your class), every time a new node is available.</para>
+ 'listener' (one of your class), every time a new node is available.</para>
 <screen>
- ProActiveDescriptor pad = ProActive.getProactiveDescriptor(&quot;myP2PXmlDescriptor.xml&quot;);
- // getting virtual node &quot;p2pvn&quot; defined in the ProActive Deployement Descriptor
- VirtualNode vn = pad.getVirtualNode(&quot;p2pvn&quot;);
+ ProActiveDescriptor pad = ProActive.getProactiveDescriptor('myP2PXmlDescriptor.xml');
+ // getting virtual node 'p2pvn' defined in the ProActive Deployement Descriptor
+ VirtualNode vn = pad.getVirtualNode('p2pvn');
  
- // adding &quot;this&quot; or anyother class has a listener of the &quot;NodeCreationEvent&quot;
+ // adding 'this' or anyother class has a listener of the 'NodeCreationEvent'
  ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
  //activate that virtual node
  vn.activate();
@@ -840,10 +854,10 @@
         <para>A short preview of a XML descriptor:</para>
 <screen> &lt;infrastructure&gt;                        
   &lt;services&gt;
-   &lt;serviceDefinition id=&quot;p2pservice&quot;&gt;
-    &lt;P2PService nodesAsked=&quot;2&quot; acq=&quot;rmi&quot; 
-             port=&quot;2410&quot; NOA=&quot;10&quot; TTU=&quot;60000&quot;
-             TTL=&quot;10&quot;&gt;
+   &lt;serviceDefinition id='p2pservice'&gt;
+    &lt;P2PService nodesAsked='2' acq='rmi' 
+             port='2410' NOA='10' TTU='60000'
+             TTL='10'&gt;
      &lt;peerSet&gt;
       &lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;
      &lt;/peerSet&gt;
@@ -856,13 +870,15 @@
         <para>The next figure shows a P2P Service started with a XML deployment descriptor (xml_path
  attribute). Six nodes are shared on different hosts:</para>
         <para>
-          <informalfigure>
-            <mediaobject>
+          <figure>
+           <title>A P2P Service which is sharing nodes deployed by a descriptor</title>   
+           <mediaobject>
               <imageobject>
-                <imagedata  fileref="p2p_files/descriptor.png" format="PNG"/>              </imageobject>
+                <imagedata  fileref="p2p_files/descriptor.png" format="PNG"/>             
+              </imageobject>
             </mediaobject>
-          </informalfigure>
- <emphasis role="bold">A P2P Service which is sharing nodes deployed by a descriptor.</emphasis></para>
+          </figure>
+ </para>
         <para>For more information about ProActive XML Deployment Descriptor see this <ulink url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Descriptor.xml">
  page</ulink>.</para>
       </sect2>
@@ -891,13 +907,13 @@ StartP2PService startServiceP2P = new StartP2PService(p2pFile)
 startServiceP2P.start();
 // Get the reference on the P2P Service
 P2PService serviceP2P = startServiceP2P.getP2PService();
-// By the application&#39;s P2P Service ask to the P2P infrastructure
+// By the application's P2P Service ask to the P2P infrastructure
 // for getting nodes.
 P2PNodeLookup p2pNodeLookup = p2pService.getNodes(nNodes,
  virtualNodeName, JobID);
 // You can migrate the P2P node lookup from the p2p service
 // to an another node:
-p2pNodeLookup.moveTo(&quot;//localhost/localNode&quot;);
+p2pNodeLookup.moveTo('//localhost/localNode');
 // Use method from p2pNodeLookup to get nodes
 // such as
 while (! p2pNodeLookup.allArrived()) {

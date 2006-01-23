@@ -14,7 +14,7 @@
  thread) and its location (local or remote) are perfectly transparent. As a matter of fact, any
  active object can be manipulated just like if it were a passive instance of the same class.</para>
       <para>ProActive is a library designed for developing applications in a model
- introduced by the Eiffel// language. Its main features are :</para>
+ introduced by the Eiffel// language. Its main features are:</para>
       <itemizedlist>
         <listitem>
           <para> The application is structured in subsystems. There is one active object
@@ -30,14 +30,16 @@
       
       
       <para>
-        <informalfigure>
+        <figure>
+         <title>The Model</title>
           <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="images/proActiveModel.png" format="PNG"/>            </imageobject>
+              <imagedata  fileref="images/proActiveModel.png" format="PNG"/> 
+             </imageobject>
           </mediaobject>
-        </informalfigure>
+        </figure>
 </para>
-      <para><emphasis role="bold">The Model</emphasis></para>
+      
       
       <para>These two main features have a lot of important consequences on the
  topology of the application:</para>
@@ -80,21 +82,19 @@
         </listitem>
 </itemizedlist>
       <para>
-        <informalfigure>
-          <mediaobject>
+        <figure>
+         <title>A call onto an active object as opposed to a call onto passive one</title>    
+        <mediaobject>
             <imageobject>
-              <imagedata width="6in" fileref="images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
-            <imageobject>
-              <imagedata width="6in" fileref="images/activeObjectMethodCall.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata width="6in" fileref="images/activeObjectMethodCall.png" format="PNG"/>            </imageobject>
+              <imagedata  fileref="images/activeObjectMethodCall.png" format="PNG"/>
+             </imageobject>
           </mediaobject>
-        </informalfigure>
+        </figure>
 </para>
-      <para><emphasis role="bold">A call onto an active object as opposed to a call onto passive one</emphasis></para>
-      <para><anchor id="ProActiveBasis_html_def"/></para>
+      
+      
     </sect1>
-    <sect1 remap="h2">
+    <sect1 remap="h2" id="ProActiveBasis_html_def">
       <title>What is an active object</title>
       <para>The active object is actually the composition of two objects: a <emphasis>body</emphasis>
  and a standard Java object. The body is not visible from the outside of the active object, then

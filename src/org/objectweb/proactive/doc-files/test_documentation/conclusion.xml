@@ -3,8 +3,8 @@
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/conclusion.html  -->
   
     <para> This tour was intented to guide you through an overview of ProActive TestSuite API.</para>
-    <para>You can now easily use it for testing and benchmarking your ProActive&#39;s applications.</para>
-    <para>Thanks to its extending mechanism, you can also use it for non-ProActive&#39;s applications.
+    <para>You can now easily use it for testing and benchmarking your ProActive's applications.</para>
+    <para>Thanks to its extending mechanism, you can also use it for non-ProActive's applications.
  Which means that use it for all Java programs.</para>
     <para>Your <ulink url="mailto:proactive-support@inria.fr">suggestions</ulink> are welcome.</para>
   

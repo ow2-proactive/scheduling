@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <chapter id="ActiveObjectCreation">
-  <title>Active Objects : creation and advanced concepts</title>
+  <title>Active Objects: creation and advanced concepts</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ActiveObjectCreation.html  -->
 
@@ -24,7 +24,7 @@
   <emphasis>a</emphasis> by the active thread.</para>
 
   <para>The code for creating a passive instance of <literal>A</literal> could
-  be :</para>
+  be:</para>
 
   <blockquote>
     <para><screen> A a = new A(26, "astring"); </screen></para>
@@ -84,8 +84,8 @@
       the constructor have to be passed as an array of Object. Then, according
       to the type of the elements of this array, the ProActive runtime
       determines which constructor of class A to call. Nevertheless, there is
-      still room for some ambiguity in resolving the constructor because
-      :</para>
+      still room for some ambiguity in resolving the constructor because:
+    </para>
 
       <itemizedlist>
         <listitem>
@@ -142,7 +142,7 @@
       lookup nodes. The method <literal>newActive</literal> can take in
       parameter a nodeURL as a <literal>String</literal> or a
       <literal>Node</literal> object that points to an existing node. Here an
-      example :</para>
+      example:</para>
 
       <screen>
       a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/a\
@@ -184,7 +184,7 @@ Node");
     turnActive. A direct call to a method of the originating object without
     passing by a ProActive stub on this object will break the model.</para>
 
-    <para>Code for object-based creation looks like this :</para>
+    <para>Code for object-based creation looks like this:</para>
 
     <screen>
     A a = new A (26, "astring");
@@ -217,8 +217,8 @@ Node");
     ProActive.</para>
 
     <para>It is possible to specify what to do before the activity starts,
-    what the activity is and what to do after it ends. The three steps are
-    :</para>
+    what the activity is and what to do after it ends. The three steps are:
+ </para>
 
     <itemizedlist>
       <listitem>
@@ -234,7 +234,7 @@ Node");
       </listitem>
     </itemizedlist>
 
-    <para>Three interfaces are used to define and implement each step :</para>
+    <para>Three interfaces are used to define and implement each step:</para>
 
     <itemizedlist>
       <listitem>
@@ -280,7 +280,7 @@ Node");
       <para>The algorithms that decide for each phase what to do are the
       following (<literal>activity</literal> is the eventual object passed as
       a parameter to <literal>newActive</literal> or
-      <literal>turnActive</literal>) :</para>
+      <literal>turnActive</literal>):</para>
 
       <para><emphasis role="bold">InitActive</emphasis></para>
 
@@ -449,7 +449,7 @@ public void terminate (){ hasToTerminate=true;}
       activity.</para>
 
       <para>Comparing to the solution above where interfaces are directly
-      implemented in the reified class, there is one restriction here : you
+      implemented in the reified class, there is one restriction here: you
       cannot access the internal state of the reified object. Using an
       external object should therefore be used when the implementation of the
       activity is generic enough not to have to access the member variables of
@@ -497,7 +497,7 @@ efault)
     restrictions, most of them caused by the 100% Java compliance, which
     forbids modifying the Java Virtual Machine or the compiler.</para>
 
-    <para>Some of these restrictions work at class-level :</para>
+    <para>Some of these restrictions work at class-level:</para>
 
     <itemizedlist>
       <listitem>
@@ -541,7 +541,7 @@ efault)
     <emphasis role="bold">factory</emphasis> pattern. This mainly applies to
     class-based creation. It consists in adding a static method to class
     <literal>pA</literal> that takes care of instantiating the active object
-    and returns it. The code is :</para>
+    and returns it. The code is:</para>
 
     <screen>
   public class AA extends A {
@@ -567,7 +567,7 @@ an exception: "+e);
   </sect1>
 
   <sect1 remap="h2">
-    <title><anchor id="ActiveObjectCreation_html_customize" />Advanced :
+    <title><anchor id="ActiveObjectCreation_html_customize" />Advanced:
     Customizing the Body of an Active Object</title>
 
     <sect2 remap="h3">
@@ -609,7 +609,7 @@ an exception: "+e);
       order to redefine everything. Inheriting from <ulink
       url="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</ulink>
       is a great time saver as you only redefine what you really need to. Here
-      is an example :</para>
+      is an example:</para>
 
       <blockquote>
         <para><screen>
@@ -653,7 +653,7 @@ rver);
       can be found in the javadoc of that class. The use of that new factory
       is fairly simple. All you have to do is to pass an instance of the
       factory when creating a new active object. If we take the same example
-      as before we have :</para>
+      as before we have:</para>
 
       <screen>
   Object[] params = new Object[] {new Integer (26), "astring"};
@@ -665,8 +665,8 @@ ectFactory.newInstance());
   }
 </screen>
 
-      <para>In the case of a <literal>turnActive</literal> we would have
-      :</para>
+      <para>In the case of a <literal>turnActive</literal> we would have:
+    </para>
 
       <screen>
   A a = new A(26, "astring");
@@ -676,9 +676,8 @@ ce());
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="ActiveObjectCreation_html_elementRole" />Advanced :
-    Role of the elements of an active object</title>
+  <sect1 remap="h2" id="ActiveObjectCreation_html_elementRole" >
+    <title>Advanced: Role of the elements of an active object</title>
 
     <para>In this section, we'll have a very close look at what happens when
     an active object is created. This section aims at providing a better
@@ -687,7 +686,7 @@ ce());
 
     <para>Consider that some code in an instance of class <literal>A</literal>
     creates an active object of class <literal>B</literal> using a piece of
-    code like this :</para>
+    code like this:</para>
 
     <blockquote>
       <para><screen>
@@ -706,29 +705,18 @@ ce());
     of objects is as described in figure below (with arrows denoting
     references).</para>
 
-    <para><informalfigure>
+    <para><figure>
+        <title>The components of an active object</title>
+
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/activeObjectComponents.png"
-                       format="PNG" width="6in" />
-          </imageobject>
-
-          <imageobject>
-            <imagedata fileref="images/activeObjectComponents.svg"
-                       format="SVG" width="6in" />
-          </imageobject>
-
-          <imageobject>
-            <imagedata fileref="images/activeObjectComponents.png"
-                       format="PNG" width="6in" />
+                       format="PNG"  />
           </imageobject>
         </mediaobject>
-      </informalfigure></para>
+      </figure></para>
 
-    <para><emphasis role="bold">The components of an active
-    object</emphasis></para>
-
-    <para>The active instance of B is actually composed of 4 objects :</para>
+    <para>The active instance of B is actually composed of 4 objects:</para>
 
     <itemizedlist>
       <listitem>
@@ -789,7 +777,7 @@ ce());
       had been performed on an instance of <literal>B</literal>.</para>
 
       <para>Now that we know how stubs work, we can understand some of the
-      limitations of ProActive :</para>
+      limitations of ProActive:</para>
 
       <itemizedlist>
         <listitem>
@@ -896,22 +884,24 @@ ce());
       yet available. Below are shown the different cases that can lead to an
       asynchronous call.</para>
 
-
       <table>
-        <title></title>
-        <?dbfo table-width="100%" ?>
-        <?dbpdf table-width="100%" ?>
+        <title>Future creation, and asynchronous calls depending on return
+        type</title>
 
         <tgroup cols="4">
           <tbody>
             <row>
-              <entry><para><emphasis role="bold">Return type</emphasis></para></entry>
+              <entry><para><emphasis role="bold">Return
+              type</emphasis></para></entry>
 
-              <entry><para><emphasis role="bold">Can throw checked exception</emphasis></para></entry>
+              <entry><para><emphasis role="bold">Can throw checked
+              exception</emphasis></para></entry>
 
-              <entry><para><emphasis role="bold">Creation of a future</emphasis></para></entry>
+              <entry><para><emphasis role="bold">Creation of a
+              future</emphasis></para></entry>
 
-              <entry><para><emphasis role="bold">Asynchronous</emphasis></para></entry>
+              <entry><para><emphasis
+              role="bold">Asynchronous</emphasis></para></entry>
             </row>
 
             <row>
@@ -961,28 +951,18 @@ ce());
       caller type, but also on the return object type. Creating a future is
       only possible if the object is reifiable. Note although having a quite
       similar structure as an active object, a future object is not active. It
-      only has a Stub and a Proxy as shown in figure below :</para>
+      only has a Stub and a Proxy as shown in figure below:</para>
 
-      <para><informalfigure>
+      <para><figure>
+          <title>A future object</title>
+
           <mediaobject>
             <imageobject>
               <imagedata fileref="images/futureObject.png" format="PNG"
-                         width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/futureObject.svg" format="SVG"
-                         width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/futureObject.png" format="PNG"
-                         width="6in" />
+                          />
             </imageobject>
           </mediaobject>
-        </informalfigure></para>
-
-      <para><emphasis role="bold">A future object</emphasis></para>
+        </figure></para>
 
       <para>During its lifetime, an active object can create many future
       objects. There are all automatically kept in a FuturePool.</para>
@@ -1078,27 +1058,17 @@ ce());
         the single thread successively executes code of different methods in
         different classes.</para>
 
-        <para><informalfigure>
+        <para><figure>
+            <title>Sequence Diagram - single-threaded version of the
+            program</title>
+
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/sequentialCallUMLDiagram.png"
-                           format="PNG" width="6in" />
-              </imageobject>
-
-              <imageobject>
-                <imagedata fileref="images/sequentialCallUMLDiagram.svg"
-                           format="SVG" width="6in" />
-              </imageobject>
-
-              <imageobject>
-                <imagedata fileref="images/sequentialCallUMLDiagram.png"
-                           format="PNG" width="6in" />
+                           format="PNG"  />
               </imageobject>
             </mediaobject>
-          </informalfigure></para>
-
-        <para><emphasis role="bold">Sequence Diagram - single-threaded version
-        of the program</emphasis></para>
+          </figure></para>
       </sect3>
 
       <sect3 remap="h4">
@@ -1112,7 +1082,7 @@ ce());
           <listitem>
             <para>Before calling <literal>foo</literal>, we have exactly the
             same setup as after the creation of the active instance of
-            <literal>B</literal> and summarized in the figure below : an
+            <literal>B</literal> and summarized in the figure below: an
             instance of class <literal>A</literal> and an active instance of
             class <literal>B</literal>. As all active objects, the instance of
             class <literal>B</literal> is composed of a stub (an instance of
@@ -1121,27 +1091,16 @@ ce());
             <literal>Body</literal> and the actual instance of
             <literal>B</literal>.</para>
 
-            <para><informalfigure>
+            <para><figure>
+                <title>The components of an active object</title>
+
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/activeObjectComponents.png"
-                               format="PNG" width="6in" />
-                  </imageobject>
-
-                  <imageobject>
-                    <imagedata fileref="images/activeObjectComponents.svg"
-                               format="SVG" width="6in" />
-                  </imageobject>
-
-                  <imageobject>
-                    <imagedata fileref="images/activeObjectComponents.png"
-                               format="PNG" width="6in" />
+                               format="PNG"  />
                   </imageobject>
                 </mediaobject>
-              </informalfigure></para>
-
-            <para><emphasis role="bold">The components of an active
-            object</emphasis></para>
+              </figure></para>
           </listitem>
 
           <listitem>
@@ -1152,27 +1111,17 @@ ce());
             <literal>FutureProxy</literal> as shown on the figure
             below.</para>
 
-            <para><informalfigure>
+            <para><figure>
+                <title>The components of a future object before the result is
+                set</title>
+
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectComponents.png"
-                               format="PNG" width="6in" />
-                  </imageobject>
-
-                  <imageobject>
-                    <imagedata fileref="images/futureObjectComponents.svg"
-                               format="SVG" width="6in" />
-                  </imageobject>
-
-                  <imageobject>
-                    <imagedata fileref="images/futureObjectComponents.png"
-                               format="PNG" width="6in" />
+                               format="PNG"  />
                   </imageobject>
                 </mediaobject>
-              </informalfigure></para>
-
-            <para><emphasis role="bold">The components of a future object
-            before the result is set</emphasis></para>
+              </figure></para>
           </listitem>
 
           <listitem>
@@ -1182,27 +1131,16 @@ ce());
             results in the <literal>FutureProxy</literal> having a reference
             onto a <literal>V</literal> (see figure below).</para>
 
-            <para><informalfigure>
+            <para><figure>
+                <title>All components of a future object</title>
+
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectAllComponents.png"
-                               format="PNG" width="6in" />
-                  </imageobject>
-
-                  <imageobject>
-                    <imagedata fileref="images/futureObjectAllComponents.svg"
-                               format="SVG" width="6in" />
-                  </imageobject>
-
-                  <imageobject>
-                    <imagedata fileref="images/futureObjectAllComponents.png"
-                               format="PNG" width="6in" />
+                               format="PNG"  />
                   </imageobject>
                 </mediaobject>
-              </informalfigure></para>
-
-            <para><emphasis role="bold">All components of a future
-            object</emphasis></para>
+              </figure></para>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -1263,51 +1201,31 @@ ce());
         executed on it and returns a value to the calling code in
         <literal>A</literal>.</para>
 
-        <para><informalfigure>
+        <para><figure>
+            <title>Sequence Diagram</title>
+
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG" width="6in" />
-              </imageobject>
-
-              <imageobject>
-                <imagedata fileref="images/usingFutureAfterGettingResultDiagram.svg"
-                           format="SVG" width="6in" />
-              </imageobject>
-
-              <imageobject>
-                <imagedata fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG" width="6in" />
+                           format="PNG"  />
               </imageobject>
             </mediaobject>
-          </informalfigure></para>
-
-        <para><emphasis role="bold">Sequence Diagram</emphasis></para>
+          </figure></para>
 
         <para>If it is not yet available, the first thread is suspended in
         <literal>FutureProxy</literal> until the second thread sets the result
         in the future object (see figure below).</para>
 
-        <para><informalfigure>
+        <para><figure>
+            <title>Sequence Diagram</title>
+
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureBeforeGettingResultDiagram.png"
-                           format="PNG" width="6in" />
-              </imageobject>
-
-              <imageobject>
-                <imagedata fileref="images/usingFutureBeforeGettingResultDiagram.svg"
-                           format="SVG" width="6in" />
-              </imageobject>
-
-              <imageobject>
-                <imagedata fileref="images/usingFutureBeforeGettingResultDiagram.png"
-                           format="PNG" width="6in" />
+                           format="PNG"  />
               </imageobject>
             </mediaobject>
-          </informalfigure></para>
-
-        <para><emphasis role="bold">Sequence Diagram</emphasis></para>
+          </figure></para>
       </sect3>
     </sect2>
 
@@ -1557,15 +1475,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e1.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e1.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e1.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e1.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1577,34 +1487,18 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e2.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e2.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e2.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e2.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
 
-      <para>This calll is asynhronous and returns a future object <emphasis
+      <para>This call is asynhronous and returns a future object <emphasis
       role="bold">Future_r1</emphasis> of class Result.</para>
 
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e3.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e3.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e3.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e3.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1616,20 +1510,12 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e4.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e4.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e4.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e4.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
 
-      <para>This calll is asynhronous and returns a future object <emphasis
+      <para>This call is asynhronous and returns a future object <emphasis
       role="bold">Future_r2</emphasis> of class Result. B needs the value of
       <emphasis role="bold">Future_r1</emphasis> which is not yet available in
       order to return the result of method <emphasis
@@ -1638,15 +1524,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e5.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e5.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e5.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e5.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1658,15 +1536,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e6.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e6.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e6.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e6.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1677,15 +1547,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e7.png" format="PNG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e7.svg" format="SVG" width="6in" />
-            </imageobject>
-
-            <imageobject>
-              <imagedata fileref="images/e7.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e7.png" format="PNG"  />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1752,7 +1614,7 @@ dd/MM/yyyy HH:mm:ss");
   }
   public String sayHello() {
     return hi + " at " + dateFormat.format(new java.util.Date())+
-        " from node : " + org.objectweb.proactive.ProActive.getBodyOnThis().g\
+        " from node: " + org.objectweb.proactive.ProActive.getBodyOnThis().g\
 etNodeURL();
   }
   public static void main(String[] args) {
@@ -1801,7 +1663,7 @@ ostName() + "/Hello");
         </sect4>
 
         <sect4>
-          <title>Why an empty no-arg constructor ?</title>
+          <title>Why an empty no-arg constructor?</title>
 
           <para>You may have noticed that class <literal>Hello</literal> has a
           constructor with no parameters and an empty implementation. The
@@ -1871,7 +1733,7 @@ llo.class.getName(),
       // Invokes a remote method on this object to get the message
       message = myServer.sayHello();
       // Prints out the message
-      System.out.println("The message is : " + message);
+      System.out.println("The message is: " + message);
     } catch (Exception e) {
       System.err.println("Could not reach/create server object");
       e.printStackTrace();

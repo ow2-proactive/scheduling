@@ -2,7 +2,7 @@
 <chapter id="intro"><title>Components introduction</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/intro.html  -->
     <para>Computing Grids and Peer-to-Peer networks are inherently heterogeneous and
- distributed, and for this reason they drive new technological challenges : complexity in the
+ distributed, and for this reason they drive new technological challenges: complexity in the
  design of applications, complexity of deployment, reusability and performance issues. The
  objective of our work is to provide an answer to these problems through the implementation for
  ProActive of an extensible, dynamical and hierarchical component model, 

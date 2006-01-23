@@ -27,14 +27,14 @@
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
-A ag1 = (A) ProActiveGroup.newGroup( &quot;A&quot;, params, [nodes]);
+A ag1 = (A) ProActiveGroup.newGroup( 'A', params, [nodes]);
    // A general group communication without result
    // A request to foo is sent in parallel to all active objects 
    // in the target group (ag1)
 ag1.foo(...);
    // A general group communication with a result
 V vg = ag1.bar(...);
-   // vg is a typed group of &quot;V&quot;: operation 
+   // vg is a typed group of 'V': operation 
    // below is also a collective operation
    // triggered on results
 vg.f1();
@@ -73,20 +73,20 @@ Object[][] params = {{...} , {...} , ... };
    //   Nodes to identify JVMs to map objects
 Node[] nodes  = { ... , ..., ... };
    // Solution 1: 
-   // create an empty group of type &quot;A&quot;
-A ag1 = (A) ProActiveGroup.newGroup(&quot;A&quot;);
+   // create an empty group of type 'A'
+A ag1 = (A) ProActiveGroup.newGroup('A');
    // Solution 2: 
-   // a group of type &quot;A&quot; and its members are 
+   // a group of type 'A' and its members are 
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
-A ag2 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params, nodes);
+A ag2 = (A) ProActiveGroup.newGroup('A', params, nodes);
    // Solution 3: 
-   // a group of type &quot;A&quot;  and its members are 
+   // a group of type 'A'  and its members are 
    // created at once, 
    // with parameters specified in params,
    // and on the nodes directly specified 
-A ag3 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params[], 
+A ag3 = (A) ProActiveGroup.newGroup('A', params[], 
                    {rmi://globus1.inria.fr/Node1,
                     rmi://globus2.inria.fr/Node2});
 </screen>
@@ -104,13 +104,13 @@ A ag3 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params[],
  functional view of groups of objects. In order to provide a dynamic management of groups, a
  second and complementary representation of a group has been designed. In order to manage a group,
  this second representation must be used instead. This second representation, <emphasis role="bold">the management
- representation</emphasis>, follows a more standard pattern for grouping objects : the <literal>Group</literal> interface.</para>
+ representation</emphasis>, follows a more standard pattern for grouping objects: the <literal>Group</literal> interface.</para>
       
       <para>
  We are careful to have a strong coherence between both representations of the same group, which
  implies that modifications executed through one representation are immediately reported on the
  other one. In order to switch from one representation to the other, two methods have been defined
- : the static method named <literal>ProActiveGroup.getGroup</literal>,
+: the static method named <literal>ProActiveGroup.getGroup</literal>,
  returns the Group form associated to the given group object; the method <literal>getGroupBytype</literal> defined in the <literal>Group</literal> interface does the opposite.</para>
       
       <para>
@@ -121,8 +121,8 @@ A ag3 = (A) ProActiveGroup.newGroup(&quot;A&quot;, params[],
    // definition of one standard Java object
    // and two active objects
 A a1 = new A();
-A a2 = (A) ProActive.newActive(&quot;A&quot;, paramsA[], node);
-B b  = (B) ProActive.newActive(&quot;B&quot;, paramsB[], node);
+A a2 = (A) ProActive.newActive('A', paramsA[], node);
+B b  = (B) ProActive.newActive('B', paramsB[], node);
    // Note that B extends A
    // For management purposes, get the representation
    // as a group given a typed group, created with
@@ -160,7 +160,7 @@ A ag1new = (A) gA.getGroupByType();
 <screen>
    // A method call on a group, returning a result
 V vg = ag1.bar();
-   // vg is a typed group of &quot;V&quot;: operation 
+   // vg is a typed group of 'V': operation 
    // below is also a collective operation
    // triggered on results
 vg.f1();
@@ -170,7 +170,7 @@ vg.f1();
       <para>As said in the Group creation section, groups whose type is based on final
  classes or primitive types cannot be built. So, the construction of a dynamic group as a result
  of a group method call is also limited. Consequently, only methods whose return type is either
- void or is a &#39;reifiable type&#39;, in the sense of the Meta Object Protocol of ProActive, may
+ void or is a 'reifiable type', in the sense of the Meta Object Protocol of ProActive, may
  be called on a group of objects; otherwise, they will raise an exception at run-time, because the
  transparent construction of a group of futures of non-reifiable types fails.</para>
       
@@ -178,7 +178,7 @@ vg.f1();
  To take advantage with the asynchronous remote method call model of ProActive, some new
  synchronization mechanisms have been added. Static methods defined in the <literal>ProActiveGroup</literal> class enable to execute various
  forms of synchronisation. For instance: <literal>waitOne</literal>, <literal>waitN</literal>, <literal>waitAll</literal>, <literal>waitTheNth</literal>, <literal>waitAndGet</literal>. Here is
- an exemple :</para>
+ an exemple:</para>
       <blockquote>
         <para>
 <screen>

@@ -2,27 +2,27 @@
 <chapter id="capabilities-intro"><title> Introduction to some of the functionalities of ProActive</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/capabilities-intro.html  -->
   
-    <para> This chapter will present some of the facilities offered by ProActive, namely :</para>
+    <para> This chapter will present some of the facilities offered by ProActive, namely:</para>
     <itemizedlist>
       <listitem>
-        <para> parallel processing : how you can run several tasks in parallel.</para>
+        <para> parallel processing: how you can run several tasks in parallel.</para>
       </listitem>
       <listitem>
-        <para> synchronization : how you can synchronize tasks.</para>
+        <para> synchronization: how you can synchronize tasks.</para>
       </listitem>
       <listitem>
-        <para> migration : how you can migrate Active Objects.</para>
+        <para> migration: how you can migrate Active Objects.</para>
       </listitem>
 </itemizedlist>
     <sect1 remap="h2">
       <title>Parallel processing and collaborative application with ProActive</title>
       <para>Distribution is often used for CPU-intensive applications, where parallelism is a key for
  performance.</para>
-      <para>A typical application is C3D.&#160;</para>
+      <para>A typical application is C3D. </para>
       <para>Note that parallelisation of programs can be facilitated with ProActive, thanks to <ulink url="../FutureObjectCreation.xml">asynchronism method calls</ulink>, as well as <ulink url="../TypedGroupCommunication.xml">group communications</ulink>.</para>
     </sect1>
     <sect1 remap="h2">
-      <title>C3D : a parallel, distributed and collaborative 3D renderer</title>
+      <title>C3D: a parallel, distributed and collaborative 3D renderer</title>
       <para><ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.xml">C3D</ulink> is
  a Java benchmark application that measures the performance of a 3D raytracer renderer distributed
  over several Java virtual machines using Java RMI. It showcases some of the benefits of
@@ -31,95 +31,82 @@
       <para>Several users can collaboratively view and manipulate a 3D scene. The image
  of the scene is calculated by a dynamic set of rendering engines using a raytracing algorithm,
  everything being controlled by a central dispatcher.</para>
-      <para>
-       <informalfigure>
+       <figure>
+        <title>the active objects in the c3d application</title>
         <mediaobject>
          <imageobject>
-          <imagedata width="6in" fileref="guided_tour/pics/hello/c3d.png" format="PNG"/>            </imageobject>
+          <imagedata  fileref="guided_tour/pics/hello/c3d.png" format="PNG"/>            </imageobject>
         </mediaobject>
-       </informalfigure>
-</para>
- <para>the active objects in the c3d application</para>
+       </figure>
+ 
        <sect2 remap="h3">
-        <title>1. start C3D</title>
+        <title>start C3D</title>
         <para>using the script c3d_no_user</para>
-        <para>A &quot;Dispatcher&quot; object is launched (ie a centralized server) as
- well as 4 &quot;Renderer&quot; objects, that are active objects to be used for parallel
+        <para>A 'Dispatcher' object is launched (ie a centralized server) as
+ well as 4 'Renderer' objects, that are active objects to be used for parallel
  rendering.</para>
         <para>
-          <informalfigure>
+          <figure>
+           <title>the 4 renderers are launched</title>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.png" format="PNG"/>              
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
-        <para>the 4 renderers are launched</para>
         <para>
-          <informalfigure>
+          <figure>
+           <title>the dispatcher GUI is launched</title>
             <mediaobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.svg" format="SVG"/>              </imageobject>
               <imageobject>
                 <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png" format="PNG"/>              </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
-        <para>the dispatcher GUI is launched</para>
+        
         <para>The bottom part of the window allows the addition and removal of
  renderers.</para>
-        <para>&#160;</para>
       </sect2>
       <sect2 remap="h3">
-        <title>2. start a user</title>
+        <title>start a user</title>
         <para>using c3d_add_user</para>
         <para>- connect on the current host (proposed by default) by just giving your
  name</para>
         <para>
           <informalfigure>
             <mediaobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG"/>              </imageobject>
+               <imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png" format="PNG"/>              
+               </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
-        <para>for example the user &quot;alice&quot;</para>
+        <para>for example the user 'alice'</para>
         <para>- spin the scene, add a random sphere, and observe how the action takes
  place immediately</para>
-        <para>- add and remove renderers, and observe the effect on the &quot;speed
- up&quot; indication from the user window.</para>
+        <para>- add and remove renderers, and observe the effect on the 'speed
+ up' indication from the user window.</para>
         <para>Which configuration is the fastest for the rendering?</para>
         <para>Are you on a multi-processor machine?</para>
         <para><emphasis>* you might not perceive the difference of the performance. The
  difference is better seen with more distributed nodes and objects (for example on a cluster with
  30+ renderers).</emphasis></para>
-        <para>&#160;</para>
+        
       </sect2>
       <sect2 remap="h3">
-        <title>3. start a user from another machine</title>
-        <para>using the c3d_add_user script, and <emphasis role="underline">specifying the host</emphasis> (NOT set by
- default)</para>
+        <title>start a user from another machine</title>
+        <para>using the c3d_add_user script, and <emphasis role="underline">specifying 
+          the host</emphasis> (NOT set by   default)</para>
         <para>
-          <informalfigure>
+          <figure>
+           <title>Specifying the host</title>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/c3d_specify_host.png" format="PNG"/>              
+               </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
         <para>If you use rlogin, make sure the DISPLAY is properly set.</para>
         <para>You must use the same version of ProActive on both machines!</para>
@@ -127,43 +114,38 @@
  connected.</para>
         <para>Notice that a collaborative consensus must be reached before starting some
  actions (or that a timeout occured).</para>
-        <para>&#160;</para>
+        
       </sect2>
       <sect2 remap="h3">
-        <title>4. start IC2D to visualize the topology</title>
+        <title>start IC2D to visualize the topology</title>
         <para>- to visualize all Active objects, you need to acquire
- (&quot;monitoring&quot; menu) :</para>
-        <blockquote>
-          <para>
-            <blockquote>
-              <para> - the machine on which you started the &quot;Dispatcher&quot;</para>
+ ('monitoring' menu):</para>
+              <para> - the machine on which you started the 'Dispatcher'</para>
               <para>- the machine on which you started the second user</para>
-            </blockquote>
-</para>
-        </blockquote>
         <para>
-          <informalfigure>
+          <figure>
+           <title>The C3D application when a new user joins in</title>
             <mediaobject>
               <imageobject>
-               <imagedata width="6in" fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.jpg" format="JPG"/>              </imageobject>
-              <imageobject>
-               <imagedata width="6in" fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-               <imagedata width="6in" fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png" format="PNG"/>              </imageobject>
+               <imagedata 
+                            
+                           fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png" 
+                           format="PNG"/>              
+              </imageobject>
             </mediaobject>
-          </informalfigure>
+          </figure>
 </para>
         <para>- add random spheres for instance, and observe messages (Requests) between
  Active Objects.</para>
         <para>- add and remove renderers, and check graphically whether the corresponding
  Active Objects are contacted or not, in order to achieve the rendering.</para>
-        <para>- you can textually visualize this information by activating &quot;add
- event timeline for this WorldObject&quot; on the World panel with the right mouse button, and
- then &quot;show the event list window&quot; on the top menu window</para>
-        <para>&#160;</para>
+        <para>- you can textually visualize this information by activating 'add
+ event timeline for this WorldObject' on the World panel with the right mouse button, and
+ then 'show the event list window' on the top menu window</para>
+        
       </sect2>
       <sect2 remap="h3">
-        <title>5. drag-and-drop migration</title>
+        <title>drag-and-drop migration</title>
         <para>- from IC2D, you can drag-and-drop active objects from one JVM to another.
  Click the right button on a C3DRenderingEngine, and drag and drop it in another JVM. Observe the
  migration taking place.</para>
@@ -174,61 +156,47 @@
  when a rendering action is in progress). Give it a try!</para>
         <para><emphasis role="bold">Since version 1.0.1 of the C3D example, you can also migrate the client
  windows!</emphasis></para>
-        <para>&#160;</para>
+        
       </sect2>
       <sect2 remap="h3">
-        <title>6. start a new JVM in a computation</title>
-        <para>manually you can start a new JVM - a &quot;Node&quot; in the ProActive
+        <title>start a new JVM in a computation</title>
+        <para>manually you can start a new JVM - a 'Node' in the ProActive
  terminology - that will be used in a running system.</para>
         <para>- on a different machine, or by remote login on another host, start another
- Node, named for instance NodeZ :</para>
-        <blockquote>
-          <para>
-            <blockquote>
-              <para> under linux :<literal>startNode.sh rmi://mymachine/NodeZ
- &amp; (or startNode.bat rmi://mymachine/NodeZ)</literal></para>
-            </blockquote>
-</para>
-        </blockquote>
+ Node, named for instance NodeZ:</para>
+<para> under linux:<literal>startNode.sh rmi://mymachine/NodeZ &amp; </literal></para>
+<para> under windows:<literal>startNode.bat rmi://mymachine/NodeZ </literal></para>
         <para>The node should appear in IC2D when you request the monitoring of the new
- machine involved (Monitoring menu, then &quot;monitor new RMI host&quot;.</para>
+ machine involved (Monitoring menu, then 'monitor new RMI host'.</para>
         <para>- the node just started has no active object running in it. Drag and drop
- one of the renderers, and check that the node is now taking place in the computation :</para>
-        <blockquote>
-          <para>
-            <blockquote>
+ one of the renderers, and check that the node is now taking place in the computation:</para>
               <para> - spin the scene to trigger a new rendering</para>
               <para>- see the topology</para>
-            </blockquote>
-</para>
-        </blockquote>
         <para><emphasis>* if you feel uncomfortable with the automatic layout, switch to manual
- using the &quot;manual layout&quot; option (right click on the World panel). You can then
+ using the 'manual layout' option (right click on the World panel). You can then
  reorganize the layout of the machines.</emphasis></para>
         <para>- to fully distribute the computation, start several nodes (you need 2
  more) and drag-and drop renderers in them.</para>
         <para>Depending on the machines you have, the complexity of the image, look for
  the most efficient configuration.</para>
-        <para>&#160;</para>
+        
       </sect2>
       <sect2 remap="h3">
-        <title>7. have a look at the source code for the main classes of this application
- :</title>
+        <title>have a look at the source code for the main classes of this application
+:</title>
         <para><literal>org.objectweb.proactive.examples.c3d.C3DUser.java</literal></para>
         <para><literal>org.objectweb.proactive.examples.c3d.C3DRenderingEngine.java</literal></para>
         <para><literal>org.objectweb.proactive.examples.c3d.C3DDispatcher.java</literal></para>
-        <blockquote>
           <para> look at the method public void processRotate(org.objectweb.proactive.Body
  body, String methodName, Request r) that handles election of the next action to undertake.</para>
-        </blockquote>
-        <para>&#160;</para>
+        
       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title>Synchronization with ProActive</title>
       <para>ProActive provides an advanced synchronization mechanism that allows an easy and safe
  implementation of potentially complex synchronization policies.</para>
-      <para>This is illustrated by two examples :</para>
+      <para>This is illustrated by two examples:</para>
       <itemizedlist>
         <listitem>
           <para> The readers and the writers</para>
@@ -244,110 +212,100 @@
  specified policy. Thanks to ProActive, the accesses are guaranteed to be allowed
  sequentially.</para>
         <para>The <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/readers.xml">implementation with
- ProActive</ulink> uses 3 active objects : Reader, Writer, and the controller class
+ ProActive</ulink> uses 3 active objects: Reader, Writer, and the controller class
  (ReaderWriter).</para>
-        <para>&#160;</para>
         <sect3 remap="h4">
-          <title>1. start the application</title>
-          <para>using the readers script</para>
+          <title>start the application</title>
+          
           <para>
-            <informalfigure>
-              <mediaobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.png" format="PNG"/>                </imageobject>
+            <figure>
+             <title>using the readers script</title>
+             <mediaobject>
+                 <imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_console.png" format="PNG"/>                
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
+            </figure>
 </para>
           <para>ProActive starts a node (i.e. a JVM) on the current machine, and creates
- 3 Writer, 3 Reader, a ReaderWriter (the controller of the application) and a ReaderDisplay, that
- are active objects.</para>
+ 3 Writer, 3 Reader, a ReaderWriter (the controller of the application) and a ReaderDisplay,
+ that  are active objects.</para>
           <para>
-            <informalfigure>
-              <mediaobject>
+            <figure>
+             <title>a GUI is started that illustrates the activities of the Reader and Writer  objects.</title>
+             <mediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/readers_app.png" format="PNG"/>                
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
+            </figure>
 </para>
-          <para>a GUI is started that illustrates the activities of the Reader and Writer
- objects.</para>
+          
 </sect3>
         <sect3 remap="h4">
-          <title>2. look and check the effect of different policies : even, writer priority, reader
+          <title>look and check the effect of different policies: even, writer priority, reader
  priority</title>
-          <para>What happens when priority is set to &quot;reader priority&quot; ?</para>
-          <para>&#160;</para>
+          <para>What happens when priority is set to 'reader priority'?</para>
+          
 </sect3>
         <sect3 remap="h4">
-          <title>3. look at the code for programming such policies</title>
+          <title>look at the code for programming such policies</title>
           <para>in <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal></para>
-          <para>More specifically, look at the routines in :</para>
+          <para>More specifically, look at the routines in:</para>
           <para>public void evenPolicy(org.objectweb.proactive.Service service)</para>
           <para>public void readerPolicy(org.objectweb.proactive.Service service)</para>
           <para>public void writerPolicy(org.objectweb.proactive.Service service)</para>
           <para>Look at the inner class <literal>MyRequestFilterm</literal> that implements <literal>org.objectweb.proactive.core.body.request.RequestFilter</literal></para>
           <para>How does it work?</para>
-          <para>&#160;</para>
+          
 </sect3>
         <sect3 remap="h4">
-          <title>4. Introduce a bug in the Writer Priority policy</title>
+          <title> Introduce a bug in the Writer Priority policy</title>
           <para>For instance, let several writers go through at the same time.</para>
           <para>- observe the Writer Policy policy before recompiling</para>
           <para>- recompile (using compile.sh readers or compile.bat readers)</para>
           <para>- observe that stub classes are regenerated and recompiled</para>
-          <para>- observe the difference due to the new synchronization policy : what happens now?</para>
-          <para>- correct the bug and recompile again ; check that everything is back to normal&#160;</para>
+          <para>- observe the difference due to the new synchronization policy: what happens now?</para>
+          <para>- correct the bug and recompile again ; check that everything is back to normal </para>
 </sect3>
       </sect2>
       <sect2 remap="h3">
         <title>The dining philosophers</title>
-        <para>The &quot;dining philosophers&quot; problem is a classical exercise in the
+        <para>The 'dining philosophers' problem is a classical exercise in the
  teaching of concurrent programming. The goal is to avoid deadlocks.</para>
         <para>We have provided <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/phil.xml">an illustration of the solution</ulink>
  using ProActive, where all the philosophers are active objects, as well as the table (controller)
  and the dinner frame (user interface).</para>
-        <para>&#160;</para>
+        
         <sect3 remap="h4">
-          <title>1. start the philosophers application</title>
-          <para>with philosophers.sh or philosophers.bat</para>
+          <title> start the philosophers application</title>
+          
           <para>
-            <informalfigure>
-              <mediaobject>
+            <figure>
+             <title>with philosophers.sh or philosophers.bat</title>
+             <mediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_console.png" format="PNG"/>                
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
+            </figure>
 </para>
           <para>ProActive creates a new node and instantiates the active objects of the
- application : DinnerLayout, Table, and Philosopher</para>
+ application: DinnerLayout, Table, and Philosopher</para>
           <para>
-            <informalfigure>
-              <mediaobject>
+            <figure>
+             <title>the GUI is started.</title> 
+             <mediaobject>
                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>                </imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/philosophers_app.png" format="PNG"/>                
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
+            </figure>
 </para>
-          <para>the GUI is started.</para>
+          
 </sect3>
         <sect3 remap="h4">
-          <title>2. understand the color codes</title>
+          <title> understand the color codes</title>
           <informaltable frame="none">
             <tgroup cols="3">
              <!-- 
@@ -384,46 +342,39 @@
  
 </sect3>
         <sect3 remap="h4">
-          <title>3. test the autopilot mode</title>
+          <title> test the autopilot mode</title>
           <para>The application runs by itself without encountering a deadlock.</para>
-          <para>&#160;</para>
+          
 </sect3>
         <sect3 remap="h4">
-          <title>4. test the manual mode</title>
-          <para>Click on the philosophers&#39; heads to switch their modes</para>
+          <title> test the manual mode</title>
+          <para>Click on the philosophers' heads to switch their modes</para>
           <para>Test that there are no deadlocks!</para>
           <para>Test that you can starve one of the philosophers (i.e. the others alternate
  eating and thinking while one never eats!)</para>
-          <para>&#160;</para>
+          
 </sect3>
         <sect3 remap="h4">
-          <title>5. start the IC2D application</title>
+          <title> start the IC2D application</title>
           <para><ulink url="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.xml">IC2D</ulink> is a graphical
  environment for monitoring and steering of distributed and metacomputing applications.</para>
           <para>- being in the autopilot mode, start the IC2D visualization application
  (using ic2d.sh or ic2d.bat)</para>
           <para>
-            <informalfigure>
+           <informalfigure>
               <mediaobject>
-                <imageobject>
-                 <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_console.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                  <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.png" format="PNG"/>                </imageobject>
+                 <imageobject>
+                  <imagedata fileref="guided_tour/pics/screenshots/ic2d_console.png" format="PNG"/>
+                 </imageobject>
               </mediaobject>
-            </informalfigure>
+             </informalfigure>
 </para>
-          <para>&#160;</para>
           <para>
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/jc2d_main_panel.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/jc2d_main_panel.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/jc2d_main_panel.png" format="PNG"/>                </imageobject>
+                 <imagedata  fileref="guided_tour/pics/screenshots/jc2d_main_panel.png" format="PNG"/>
+                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
@@ -431,68 +382,51 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.jpg" format="JPG"/>                </imageobject>
-                <imageobject>
-                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.svg" format="SVG"/>                </imageobject>
-                <imageobject>
-                 <imagedata width="6in" fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png" format="PNG"/>                </imageobject>
+                 <imagedata  fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png" format="PNG"/>
+                </imageobject>
               </mediaobject>
             </informalfigure>
 </para>
-          <para>the ic2d GUI is started. It is composed of 2 panels :
+          <para>the ic2d GUI is started. It is composed of 2 panels:
  the main panel and the events list panel</para>
-          <para>- acquire you current machine</para>
-          <blockquote>
-            <para>
-              <blockquote>
+          <para>- acquire your current machine</para>
                 <para> <emphasis>menu monitoring - monitor new RMI host</emphasis></para>
                 <para><emphasis><inlinemediaobject>
                       <imageobject>
-                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.jpg" format="JPG"/>                      </imageobject>
+                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.jpg" format="JPG"/>
+                      </imageobject>
                       <imageobject>
-                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.svg" format="SVG"/>                      </imageobject>
-                      <imageobject>
-                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png" format="PNG"/>                      </imageobject>
-</inlinemediaobject></emphasis></para>
-              </blockquote>
+                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png" format="PNG"/>
+                      </imageobject>
+</inlinemediaobject></emphasis>
  It is possible to visualize the status of each active object (processing,
  waiting etc...), the communications between active objects, and the topology of the system
- (here all active objects are in the same node) :</para>
-            <informaltable frame="none">
-              <tgroup cols="2">
-                <!--<colspec colname="c1" colwidth="50*"/>
-                <colspec colname="c2" colwidth="50*"/>-->
-                <tbody>
-                  <row>
-                    <entry><para>
-                        <informalfigure>
-                          <mediaobject>
-                            <imageobject>
-                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.jpg" format="JPG"/>                            </imageobject>
-                            <imageobject>
-                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.svg" format="SVG"/>                            </imageobject>
-                            <imageobject>
-                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png" format="PNG"/>                            </imageobject>
-                          </mediaobject>
-                        </informalfigure>
-</para></entry>
-                    <entry><para>
-                        <informalfigure>
-                          <mediaobject>
-                            <imageobject>
-                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_legend.jpg" format="JPG"/>                            </imageobject>
-                            <imageobject>
-                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_legend.svg" format="SVG"/>                            </imageobject>
-                            <imageobject>
-                             <imagedata width="3in" fileref="guided_tour/pics/screenshots/ic2d_legend.png" format="PNG"/>                            </imageobject>
-                          </mediaobject>
-                        </informalfigure>
-</para></entry>
-                  </row>
-                </tbody>
-              </tgroup>
-            </informaltable>
-          </blockquote>
+ (here all active objects are in the same node):</para>
+<para>
+<informalfigure>
+<mediaobject>
+ <imageobject>
+  <imagedata  fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.jpg" format="JPG"/>
+ </imageobject>
+  <imageobject>
+   <imagedata  fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png" format="PNG"/>
+  </imageobject>
+ </mediaobject>
+</informalfigure>
+</para>
+
+<para>
+ <informalfigure>
+  <mediaobject>
+   <imageobject>
+    <imagedata  fileref="guided_tour/pics/screenshots/ic2d_legend.jpg" format="JPG"/>                 
+   </imageobject>
+   <imageobject>
+    <imagedata  fileref="guided_tour/pics/screenshots/ic2d_legend.png" format="PNG"/>                 
+   </imageobject>
+  </mediaobject>
+ </informalfigure>
+</para>
            
 </sect3>
       </sect2>
@@ -500,58 +434,55 @@
     <sect1 remap="h2">
       <title>Migration of active objects</title>
       <para>ProActive allows the transparent migration of objects between virtual machines.</para>
-      <para>A nice visual example is the penguin&#39;s one.</para>
+      <para>A nice visual example is the penguin's one.</para>
       <para>This example shows a set of <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.xml">mobile agents</ulink> moving around while
  still communicating with their base and with each other. It also features the capability to move
  a swing window between screens while moving an agent from one JVM to the other.</para>
       <sect2 remap="h3">
-        <title>1. start the penguin application</title>
+        <title> start the penguin application</title>
         <para>using the <literal>penguin</literal> script.</para>
       </sect2>
       <sect2 remap="h3">
-        <title>2. start IC2D to see what is going on</title>
+        <title> start IC2D to see what is going on</title>
         <para>using the <literal>ic2d</literal> script</para>
         <para>acquire the machines you have started nodes on</para>
       </sect2>
       <sect2 remap="h3">
-        <title>3. add an agent</title>
-        <para>- on the Advanced Penguin Controller window : button &quot;add
- agent&quot;</para>
+        <title> add an agent</title>
+        <para>- on the Advanced Penguin Controller window: button 'add agent'</para>
         <para>
           <informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/penguin.jpg" format="JPG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/penguin.jpg" format="JPG"/>
+               </imageobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/penguin.svg" format="SVG"/>              </imageobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>              </imageobject>
+                <imagedata fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>
+               </imageobject>
             </mediaobject>
           </informalfigure>
 </para>
         <para>an agent is materialized by a picture in a java
  window.</para>
-        <para>- select it, and press button &quot;start&quot;</para>
+        <para>- select it, and press button 'start'</para>
         <para>- observe that the active object is moving between the machines, and that
  the penguin window disappears and reappears on the screen associated with the new JVM.</para>
       </sect2>
       <sect2 remap="h3">
-        <title>4. add several agents</title>
-        <para>after selecting them, use the buttons to :</para>
-        <blockquote>
-          <para> - communicate with them (&quot;chained calls&quot;)</para>
+        <title> add several agents</title>
+        <para>after selecting them, use the buttons to:</para>
+          <para> - communicate with them ('chained calls')</para>
           <para>- start, stop, resume them</para>
-          <para>- trigger a communication between them (&quot;call another
- agent&quot;)</para>
-        </blockquote>
+          <para>- trigger a communication between them ('call another
+ agent')</para>
       </sect2>
       <sect2 remap="h3">
-        <title>5. move the control window to another user</title>
+        <title> move the control window to another user</title>
         <para>- start a node on a different computer, using another screen and
  keyboard</para>
         <para>- monitor the corresponding JVM with IC2D</para>
-        <para>- drag-and-drop the active object &quot;AdvancedPenguinController&quot;
- with IC2D into the newly created JVM : the control window will appear on the other computer and
+        <para>- drag-and-drop the active object 'AdvancedPenguinController'
+ with IC2D into the newly created JVM: the control window will appear on the other computer and
  its user can now control the penguins application.</para>
         <para>- still with IC2D, doing a drag-and-drop back to the original JVM, you will
  be able to get back the window, and control yourself the application.</para>

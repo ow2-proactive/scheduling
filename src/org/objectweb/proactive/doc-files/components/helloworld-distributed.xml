@@ -3,7 +3,7 @@
 org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal
 </para>
 <screen>
- 1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+ 1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
  2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
  3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
  4:
@@ -46,7 +46,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  org.objectweb.proactive.examples.components.helloworld.ClientType.fractal
 </para>
 <screen>
- 1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+ 1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
  2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
  3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
  4:
@@ -63,7 +63,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
   org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal
  </para>
 <screen>
-  1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+  1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
   2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
   3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
   4:
@@ -86,7 +86,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  org.objectweb.proactive.examples.components.ServerType
 </para>
 <screen> 
-1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
 2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
 3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 4:
@@ -102,7 +102,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
  org.objectweb.proactive.examples.components.helloworld.ServerImpl
 </para>
 <screen>
-1:&lt;?xml version="1.0" encoding="ISO-8859-1" ?>
+1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
 2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
 3:        "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 4:

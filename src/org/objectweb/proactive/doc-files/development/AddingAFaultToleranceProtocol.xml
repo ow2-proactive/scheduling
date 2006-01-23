@@ -108,7 +108,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
 ;
             this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
         } catch (RemoteException e) {
-            logger.error(&quot;Unable to connect with location server&quot;);
+            logger.error('Unable to connect with location server');
             e.printStackTrace();
         }
         return 0;

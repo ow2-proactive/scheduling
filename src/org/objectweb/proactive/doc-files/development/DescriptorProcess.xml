@@ -58,14 +58,15 @@
       <para>Most implementations extend the class <emphasis
       role="bold">AbstractExternalProcessDecorator</emphasis>.</para>
 
-      <informalfigure>
-        <mediaobject>
+      <figure>
+       <title> core.process structure</title>
+       <mediaobject>
           <imageobject>
             <imagedata fileref="development/imgs/descriptorProcessClassDiagram.png"
                        format="PNG" />
           </imageobject>
         </mediaobject>
-      </informalfigure>
+      </figure>
 
       <para>In this figure, <emphasis role="bold">OARSubProcess</emphasis> and
       <emphasis role="bold">SSHProcess</emphasis> both extend from <emphasis

@@ -23,7 +23,7 @@
       <title>Functional Tests &amp; Benchmarks</title>
       <sect2 remap="h3">
         <title>Test definition</title>
-        <para>A Test runs successfully of :</para>
+        <para>A Test runs successfully of:</para>
         <itemizedlist>
           <listitem>
             <para> Its <emphasis role="bold">Pre-Conditions</emphasis> are verified</para>
@@ -47,27 +47,27 @@
  reflection mechanism we found the first good Action method to execute the Test.</para>
         <sect3 remap="h4">
           <title>Mechanism in details</title>
-          <para>In standalone mode the test runs with this method :</para>
+          <para>In standalone mode the test runs with this method:</para>
 <screen> void action() throws Exception;  </screen>
-          <para>In interlinked mode, the developer must to add a similar method in his code Test :</para>
+          <para>In interlinked mode, the developer must to add a similar method in his code Test:</para>
 <screen>  A action(B toto, C tutu, &#8230;) throws Exception; </screen>
           <para>Where <emphasis>toto</emphasis> is the result output of the first parent of this test and <emphasis>tutu</emphasis> the
  result output of second parent, &#8230; <emphasis>A</emphasis> is the type of result output of this Test.</para>
           <sect4 remap="h5">
             <title>Reflection code</title>
-            <para>Find the first action method :</para>
+            <para>Find the first action method:</para>
 <screen>
  Method[] methods = getClass().getMethods();
             Method actionWithParams = null;
             for (int i = 0; i &lt; methods.length; i++) {
-                if ((methods[i].getName().compareTo(&quot;action&quot;) == 0) &amp;&amp;
-                        (methods[i].getReturnType().getName().compareTo(&quot;void&quot;) != 0)) {
+                if ((methods[i].getName().compareTo('action') == 0) &amp;&amp;
+                        (methods[i].getReturnType().getName().compareTo('void') != 0)) {
                     actionWithParams = methods[i];
                     break;
                 }
             }
 </screen>
-            <para>Array of params type :</para>
+            <para>Array of params type:</para>
 <screen>
 
             if (actionWithParams != null) {
@@ -82,7 +82,7 @@
                 }
               
 </screen>
-            <para>Call the method :</para>
+            <para>Call the method:</para>
 <screen> out = actionWithParams.invoke(this, args); </screen>
 </sect4>
 </sect3>
@@ -90,7 +90,7 @@
     </sect1>
     <sect1 remap="h2">
       <title>Group</title>
-      <para>What is a Group of Tests ?</para>
+      <para>What is a Group of Tests?</para>
       <itemizedlist>
         <listitem>
           <para> Collection of Tests</para>
@@ -111,7 +111,7 @@
     </sect1>
     <sect1 remap="h2">
       <title>Manager</title>
-      <para>What is a Manager in Testsuite API ?</para>
+      <para>What is a Manager in Testsuite API?</para>
       <itemizedlist>
         <listitem>
           <para> Collection of Groups</para>
@@ -126,7 +126,7 @@
           <para> Collect and format Results</para>
         </listitem>
 </itemizedlist>
-      <para>We have different types of Manager to better manage of specialised Tests or Benchmarks :</para>
+      <para>We have different types of Manager to better manage of specialised Tests or Benchmarks:</para>
       <itemizedlist>
         <listitem>
           <para> BenchmarkManager</para>
@@ -144,53 +144,43 @@
     </sect1>
     <sect1 remap="h2">
       <title>Diagram of classes</title>
-      <para>The follow image presents the main structure of the API :</para>
+      <para>The follow image presents the main structure of the API:</para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="test_documentation/Files/general.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="test_documentation/Files/general.svg" format="SVG"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="test_documentation/Files/general.png" format="PNG"/>            </imageobject>
-          </mediaobject>
+              <imagedata fileref="test_documentation/Files/general.gif" format="GIF"/>   
+             </imageobject>
         </informalfigure>
 </para>
-      <para>Classes details :</para>
+      <para>Classes details:</para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
               <imagedata fileref="test_documentation/Files/details.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="test_documentation/Files/details.svg" format="SVG"/>            </imageobject>
-            <imageobject>
               <imagedata fileref="test_documentation/Files/details.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
-      <para>General structure at runtime :</para>
+      <para>General structure at runtime:</para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
               <imagedata fileref="test_documentation/Files/execution.gif" format="GIF"/>            </imageobject>
             <imageobject>
-              <imagedata fileref="test_documentation/Files/execution.svg" format="SVG"/>            </imageobject>
-            <imageobject>
               <imagedata fileref="test_documentation/Files/execution.png" format="PNG"/>            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
-      <para>Test classes diagram :</para>
+      <para>Test classes diagram:</para>
       <para>
         <informalfigure>
           <mediaobject>
             <imageobject>
               <imagedata fileref="test_documentation/Files/test.gif" format="GIF"/>            </imageobject>
-            <imageobject>
-              <imagedata fileref="test_documentation/Files/test.svg" format="SVG"/>            </imageobject>
             <imageobject>
               <imagedata fileref="test_documentation/Files/test.png" format="PNG"/>            </imageobject>
           </mediaobject>

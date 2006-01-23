@@ -405,14 +405,15 @@ File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>()
     <sect2 remap="h3">
       <title>How Deployment File Transfer Works</title>
 
-      <informalfigure>
+      <figure>
+       <title>File Transfer Design</title>
         <mediaobject>
           <imageobject>
             <imagedata fileref="development/imgs/fileTransferDesign.png"
                        format="PNG" />
           </imageobject>
         </mediaobject>
-      </informalfigure>
+      </figure>
 
       <para>When a FileTransfer starts, both abstract and concrete information
       are merged using the FileTransfer Workshop. The result of this process

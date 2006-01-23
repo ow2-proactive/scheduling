@@ -9,10 +9,10 @@
  local JVM and on a remote JVM.</para>
     </sect1>
     <sect1 remap="h2">
-      <title>First step : write the Test</title>
+      <title>First step: write the Test</title>
       <para>Create a new class who extends <emphasis role="bold">testsuite.test.ProActiveFunctionalTest</emphasis>, it is an
  abstract class.</para>
-      <para>See this template code :</para>
+      <para>See this template code:</para>
 <screen>
 <literal>
 import testsuite.test.ProActiveFunctionalTest;
@@ -20,12 +20,12 @@ import org.objectweb.proactive.core.node.Node;
 public class TestNewActive extends ProActiveFunctionalTest {
  public TestNewActive() {
             super();
-            setName(&quot;newActive&quot;);
-               setDescription(&quot;Test object creation with newActive in a node.&quot;);
+            setName('newActive');
+               setDescription('Test object creation with newActive in a node.');
    }
        public TestNewActive(Node node, String name) {
               super(node,name,
-                    &quot;Test object creation with newActive in a node.&quot;);
+                    'Test object creation with newActive in a node.');
   }
        public void initTest() throws Exception {
        }
@@ -36,7 +36,7 @@ public class TestNewActive extends ProActiveFunctionalTest {
 }
         </literal>
 </screen>
-      <para>We also override two methods from the super-super class : <emphasis role="bold">testsuite.test.FunctionalTest</emphasis>, to check if post and pre-conditions are verified :</para>
+      <para>We also override two methods from the super-super class: <emphasis role="bold">testsuite.test.FunctionalTest</emphasis>, to check if post and pre-conditions are verified:</para>
 <screen>
   public boolean postConditions() throws Exception { }
   public boolean preConditions() throws Exception { }
@@ -48,7 +48,7 @@ public class TestNewActive extends ProActiveFunctionalTest {
       </sect2>
       <sect2 remap="h3">
         <title>Implementing preConditions()</title>
-        <para>We will simply verify if the node is created :</para>
+        <para>We will simply verify if the node is created:</para>
 <screen>
 <literal>
     public boolean preConditions() throws Exception {
@@ -58,7 +58,7 @@ public class TestNewActive extends ProActiveFunctionalTest {
       </sect2>
       <sect2 remap="h3">
         <title>Implementing action()</title>
-        <para>This method is the test, we will create an active object :</para>
+        <para>This method is the test, we will create an active object:</para>
 <screen>
 <literal>
  private ReifiableObject active = null;
@@ -67,12 +67,12 @@ public class TestNewActive extends ProActiveFunctionalTest {
                 null, getNode());
     }</literal>
 </screen>
-        <para><emphasis role="bold">Remarks :</emphasis> The <emphasis role="bold">ReifiableObject</emphasis> class is a simple class who just extends <emphasis role="bold">java.lang.Object</emphasis>, implements <emphasis role="bold">java.io.Serilizable</emphasis> and has an empty constructor with
+        <para><emphasis role="bold">Remarks:</emphasis> The <emphasis role="bold">ReifiableObject</emphasis> class is a simple class who just extends <emphasis role="bold">java.lang.Object</emphasis>, implements <emphasis role="bold">java.io.Serilizable</emphasis> and has an empty constructor with
  no argument.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Implementing postConditions()</title>
-        <para>We will check if active is different of null and if the node contains active :</para>
+        <para>We will check if active is different of null and if the node contains active:</para>
 <screen>
 <literal>
     public boolean postConditions() throws Exception {
@@ -93,12 +93,12 @@ public class TestNewActive extends ProActiveFunctionalTest {
     private ReifiableObject active = null;
     public TestNewActive() {
         super();
-        setName(&quot;newActive&quot;);
-        setDescription(&quot;Test object creation with newActive in a node.&quot;);
+        setName('newActive');
+        setDescription('Test object creation with newActive in a node.');
     }
     public TestNewActive(Node node, String name) {
         super(node, name,
-            &quot;Test object creation with newActive in a node.&quot;);
+            'Test object creation with newActive in a node.');
     }
     public void initTest() throws Exception {
         // nothing to do
@@ -120,20 +120,20 @@ public class TestNewActive extends ProActiveFunctionalTest {
     }
 }</literal>
 </screen>
-        <para><emphasis role="bold">Tips :</emphasis> if you want to make a trace in your test or in all classes who extends a
- testsuite class, you have access to a log4j logger by : <emphasis role="bold">getLogger()</emphasis></para>
+        <para><emphasis role="bold">Tips:</emphasis> if you want to make a trace in your test or in all classes who extends a
+ testsuite class, you have access to a log4j logger by: <emphasis role="bold">getLogger()</emphasis></para>
       </sect2>
     </sect1>
     <sect1 remap="h2">
-      <title>Second step : write a manager</title>
+      <title>Second step: write a manager</title>
       <para>Now, we will write a <emphasis role="bold">Manager</emphasis> to execute our test.</para>
-      <para>For this example it is very simple, you have just to extends <emphasis role="bold">testsuite.manager.ProActiveFuncTestManager</emphasis> :</para>
+      <para>For this example it is very simple, you have just to extends <emphasis role="bold">testsuite.manager.ProActiveFuncTestManager</emphasis>:</para>
 <screen>
 <literal>
 import testsuite.manager.ProActiveFuncTestManager;
 public class ObjectCreationManager extends ProActiveFuncTestManager {
   public ObjectCreationManager() {
-            super(&quot;Object Creation&quot;,&quot;Manage objects creation tests.&quot;);
+            super('Object Creation','Manage objects creation tests.');
   }
 }</literal>
 </screen>
@@ -142,38 +142,38 @@ public class ObjectCreationManager extends ProActiveFuncTestManager {
         <para>Normaly, you have nothing to do to initialize the manager. In this example, we choose to
  create tests and group in this method , but you can do this in the same place where you create
  the manager.</para>
-        <para>Create group by the <emphasis role="bold">initManager()</emphasis> :</para>
+        <para>Create group by the <emphasis role="bold">initManager()</emphasis>:</para>
 <screen>
 <literal>
 import testsuite.group.Group;
     public void initManager() throws Exception {
-        Group testGroup = new Group(&quot;Test Group&quot;, &quot;no description.&quot;);
+        Group testGroup = new Group('Test Group', 'no description.');
         // adding a test in same VM
-        testGroup.add(new TestNewActive(getSameVMNode(),&quot;NewActive same VM&quot;));
+        testGroup.add(new TestNewActive(getSameVMNode(),'NewActive same VM'));
         // adding a test in local VM
-        testGroup.add(new TestNewActive(getLocalVMNode(),&quot;NewActive local VM&quot;));
+        testGroup.add(new TestNewActive(getLocalVMNode(),'NewActive local VM'));
         // adding a test in remote VM
-        testGroup.add(new TestNewActive(getRemoteVMNode(),&quot;NewActive remote VM&quot;));
+        testGroup.add(new TestNewActive(getRemoteVMNode(),'NewActive remote VM'));
         // adding the group
         add(testGroup);
     }</literal>
 </screen>
-        <para>Create group in the <emphasis role="bold">same place</emphasis> of the manager :</para>
+        <para>Create group in the <emphasis role="bold">same place</emphasis> of the manager:</para>
 <screen>
 <literal>
 ObjectCreationManager manager = new ObjectCreationManager();
-Group testGroup = new Group(&quot;Test Group&quot;, &quot;no description.&quot;);
+Group testGroup = new Group('Test Group', 'no description.');
 // adding a test in same VM
-testGroup.add(new TestNewActive(getSameVMNode(),&quot;NewActive same VM&quot;));
+testGroup.add(new TestNewActive(getSameVMNode(),'NewActive same VM'));
 // adding a test in local VM
-testGroup.add(new TestNewActive(getLocalVMNode(),&quot;NewActive local VM&quot;));
+testGroup.add(new TestNewActive(getLocalVMNode(),'NewActive local VM'));
 // adding a test in remote VM
-testGroup.add(new TestNewActive(getRemoteVMNode(),&quot;NewActive remote VM&quot;));
+testGroup.add(new TestNewActive(getRemoteVMNode(),'NewActive remote VM'));
 // adding the group
 manager.add(testGroup);</literal>
 </screen>
-        <para><emphasis role="bold">Warning :</emphasis> if you override <emphasis role="bold">endManager()</emphasis> method in a <emphasis role="bold">ProActiveManager</emphasis> you
- must to add in this code :</para>
+        <para><emphasis role="bold">Warning:</emphasis> if you override <emphasis role="bold">endManager()</emphasis> method in a <emphasis role="bold">ProActiveManager</emphasis> you
+ must to add in this code:</para>
 <screen> super.endManager() </screen>
         <para>The reason is to delete the ProActive nodes create at the beginning.</para>
       </sect2>
@@ -181,17 +181,17 @@ manager.add(testGroup);</literal>
         <title>The attribute file</title>
         <para>Our manager is a <emphasis role="bold">ProActiveManager</emphasis>, so an attibutes file is mandatory.</para>
         <para>Create a file <emphasis role="bold">ObjectCreationManager.prop</emphasis> in the same directory of the manager. This
- file must contains the name (or URL) of the remote host, like this :</para>
+ file must contains the name (or URL) of the remote host, like this:</para>
 <screen> RemoteHostname=owenii  </screen>
-        <para><emphasis role="bold">Warning :</emphasis> respect the upper an lower cases.</para>
-        <para><emphasis role="bold">Tips :</emphasis> you can use this file to specify attributes for your tests classes. You can also
+        <para><emphasis role="bold">Warning:</emphasis> respect the upper an lower cases.</para>
+        <para><emphasis role="bold">Tips:</emphasis> you can use this file to specify attributes for your tests classes. You can also
  use a different file, in this case you must specify its path in the <literal>execute()</literal> method
  of the manager.</para>
       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title>Now launch the test ...</title>
-      <para>Add this code in your main method :</para>
+      <para>Add this code in your main method:</para>
 <screen>
 <literal>
 ObjectCreationManager manager = new ObjectCreationManager();
@@ -199,27 +199,27 @@ ObjectCreationManager manager = new ObjectCreationManager();
 // and the attributes file is obligatory
 manager.execute(true);</literal>
 </screen>
-      <para><emphasis role="bold">Warning :</emphasis> when you use a ProActiveManager you must had <emphasis role="bold">System.exit(0)</emphasis> at the end
- of the <emphasis role="bold">main</emphasis> method. If you don&#39;t do that, the manager can&#39;t stop properly.</para>
+      <para><emphasis role="bold">Warning:</emphasis> when you use a ProActiveManager you must had <emphasis role="bold">System.exit(0)</emphasis> at the end
+ of the <emphasis role="bold">main</emphasis> method. If you don't do that, the manager can't stop properly.</para>
     </sect1>
     <sect1 remap="h2">
       <title>Get the results</title>
 <screen> System.out.println(manager.getResults()); </screen>
-      <para>If you want all details :</para>
+      <para>If you want all details:</para>
 <screen> manager.setVerbatim(true); </screen>
-      <para>You can also have the results in a HTML or XML file or in a stream, for more details see the <ulink url="format.xml">results section</ulink> for : testssuite.result.ResultsExporter</para>
+      <para>You can also have the results in a HTML or XML file or in a stream, for more details see the <ulink url="format.xml">results section</ulink> for: testssuite.result.ResultsExporter</para>
       <sect2 remap="h3">
         <title>An example of results for this test with verbatim option</title>
 <screen>
 <literal>
-8/22/03 13:48:10.450 [MESSAGE] Local hostname : amda.inria.fr
-8/22/03 13:48:10.450 [MESSAGE] Remote hostname : owenii
+8/22/03 13:48:10.450 [MESSAGE] Local hostname: amda.inria.fr
+8/22/03 13:48:10.450 [MESSAGE] Remote hostname: owenii
 8/22/03 13:48:10.452 [MESSAGE] Starting ...
 8/22/03 13:48:10.458 [MESSAGE] Init Manager with success
-8/22/03 13:48:10.749 [RESULT] NewActive same VM : Test run with success [SUCCESS]
-8/22/03 13:48:11.141 [RESULT] NewActive local VM : Test run with success [SUCCESS]
-8/22/03 13:48:12.195 [RESULT] NewActive remote VM : Test run with success [SUCCESS]
-8/22/03 13:48:12.195 [RESULT] Group : Test Group Runs : 3 Errors : 0 [SUCCESS]
+8/22/03 13:48:10.749 [RESULT] NewActive same VM: Test run with success [SUCCESS]
+8/22/03 13:48:11.141 [RESULT] NewActive local VM: Test run with success [SUCCESS]
+8/22/03 13:48:12.195 [RESULT] NewActive remote VM: Test run with success [SUCCESS]
+8/22/03 13:48:12.195 [RESULT] Group: Test Group Runs: 3 Errors: 0 [SUCCESS]
 8/22/03 13:48:12.195 [MESSAGE] ... Finish</literal>
 </screen>
       </sect2>
@@ -245,12 +245,12 @@ public class TestNewActive extends ProActiveFunctionalTest {
     private ReifiableObject active = null;
     public TestNewActive() {
         super();
-        setName(&quot;newActive&quot;);
-        setDescription(&quot;Test object creation with newActive in a node.&quot;);
+        setName('newActive');
+        setDescription('Test object creation with newActive in a node.');
     }
     public TestNewActive(Node node, String name) {
         super(node, name,
-            &quot;Test object creation with newActive in a node.&quot;);
+            'Test object creation with newActive in a node.');
     }
     public void initTest() throws Exception {
      // nothing to do
@@ -331,16 +331,16 @@ import testsuite.group.Group;
 import testsuite.manager.ProActiveFuncTestManager;
 public class ObjectCreationManager extends ProActiveFuncTestManager {
     public ObjectCreationManager() {
-        super(&quot;Object Creation&quot;, &quot;Manage objects creation tests.&quot;);
+        super('Object Creation', 'Manage objects creation tests.');
     }
     public void initManager() throws Exception {
-        Group testGroup = new Group(&quot;Test Group&quot;, &quot;no description.&quot;);
+        Group testGroup = new Group('Test Group', 'no description.');
         // adding a test in same VM
-        testGroup.add(new TestNewActive(getSameVMNode(),&quot;NewActive same VM&quot;));
+        testGroup.add(new TestNewActive(getSameVMNode(),'NewActive same VM'));
         // adding a test in local VM
-        testGroup.add(new TestNewActive(getLocalVMNode(),&quot;NewActive local VM&quot;));
+        testGroup.add(new TestNewActive(getLocalVMNode(),'NewActive local VM'));
         // adding a test in remote VM
-        testGroup.add(new TestNewActive(getRemoteVMNode(),&quot;NewActive remote VM&quot;));
+        testGroup.add(new TestNewActive(getRemoteVMNode(),'NewActive remote VM'));
         // adding the group
         add(testGroup);
     }
@@ -351,7 +351,7 @@ public class ObjectCreationManager extends ProActiveFuncTestManager {
         manager.execute(true);
           manager.setVerbatim(true);
         System.out.println(manager.getResults());
-         // for exit, also ProActive don&#39;t stop the application
+         // for exit, also ProActive don't stop the application
         System.exit(0);
         
     }

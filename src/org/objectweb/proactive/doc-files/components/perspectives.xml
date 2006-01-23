@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="perspectives"><title>Component perspectives : a support for our research work</title>
+<chapter id="perspectives"><title>Component perspectives: a support for our research work</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/perspectives.html  -->
   
     <para> <anchor id="perspectives_html_perspectives"/></para>
@@ -27,7 +27,7 @@
  monitoring distributed component systems.</para>
       <para>Because component based programming is somewhat analogous to the assembly
  of building blocks into a functional product, graphical tools are well suited for the design and
- monitoring of component based systems. The Fractal community actually proposes such a tool : the
+ monitoring of component based systems. The Fractal community actually proposes such a tool: the
  Fractal GUI. We have extended this tool to evaluate the feasibility of a full-fledge graphical
  interface for the design and monitoring of distributed components. The result is available within
  the IC2D GUI, you can try it out, but consider it as a product in alpha state. Development is
@@ -35,14 +35,14 @@
  features are only partially implemented (runtime monitoring, composition of virtual nodes).</para>
       <para>The GUI allows the creation of ADL files representing component systems, and - the other way
  around - also allows to load ADL files and get a visual representation of systems described in
- the ADL files. We have worked on the manipulation of virtual nodes - a deployment abstraction - :
+ the ADL files. We have worked on the manipulation of virtual nodes - a deployment abstraction -:
  components display the virtual nodes where they are deployed, and it is also possible to compose virtual nodes</para>
       <para>Ultimately, we would like to couple the visualization of components at runtime (currently
- unavailable here) with the standard monitoring capabilities of IC2D : we would get a structural
+ unavailable here) with the standard monitoring capabilities of IC2D: we would get a structural
  view of the application in the Fractal GUI, and a topological view in the standard IC2D frame</para>
       <sect2 remap="h3">
         <title>Usage</title>
-        <para>If you want to try out the extended Fractal GUI for ProActive :</para>
+        <para>If you want to try out the extended Fractal GUI for ProActive:</para>
         <itemizedlist>
           <listitem>
             <para> start IC2D</para>
@@ -51,16 +51,16 @@
             <para> Components --&gt; start components GUI</para>
           </listitem>
           <listitem>
-            <para> to load an ADL file : </para>
+            <para> to load an ADL file: </para>
             <orderedlist>
               <listitem>
                 <para> File --&gt; Storage --&gt; select the storage repository which is the root repository
- of your ADL files. <emphasis>For example you can select the &quot;src&quot; directory of the
+ of your ADL files. <emphasis>For example you can select the 'src' directory of the
  ProActive distribution</emphasis></para>
               </listitem>
               <listitem>
                 <para> File --&gt; Open --&gt; select an ADL file in the storage repository. <emphasis>For example
- you can select the &quot;helloworld-distributed-wrappers.fractal&quot; file in the
+ you can select the 'helloworld-distributed-wrappers.fractal' file in the
  src/org/objectweb/proactive/examples/components/helloworld directory of the ProActive
  distribution.</emphasis></para>
               </listitem>
@@ -72,14 +72,14 @@
  virtual ndoes.</para>
           </listitem>
           <listitem>
-            <para> to save an ADL file : File --&gt; Save</para>
+            <para> to save an ADL file: File --&gt; Save</para>
           </listitem>
 </itemizedlist>
       </sect2>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="perspectives_html_Other"/>Other</title>
-      <para>Other areas of research that we are opening around this work include :</para>
+      <para>Other areas of research that we are opening around this work include:</para>
       <itemizedlist>
         <listitem>
           <para> wrapping legacy codes (MPI for instance) for interoperability with
@@ -97,14 +97,14 @@
  systems</para>
         </listitem>
         <listitem>
-          <para> MxN data redistribution : automatic redistribution of data from M
+          <para> MxN data redistribution: automatic redistribution of data from M
  components to N components</para>
         </listitem>
 </itemizedlist>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="perspectives_html_limitations"/>Limitations</title>
-      <para>Some features of the Fractal model are not implemented :</para>
+      <para>Some features of the Fractal model are not implemented:</para>
       <itemizedlist>
         <listitem>
           <para> Shared components</para>

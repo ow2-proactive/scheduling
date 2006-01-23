@@ -5,7 +5,7 @@
     <sect1 remap="h2">
       <title><anchor id="plugin_html_external"/>Overview</title>
       <para>The main objective of this plugin is to facilitate the use of ProActive in
- the Eclipse environment. The plugin has three main purposes :</para>
+ the Eclipse environment. The plugin has three main purposes:</para>
       <itemizedlist>
         <listitem>
           <para><emphasis><emphasis role="bold">A ProActive guided Tour</emphasis></emphasis></para>
@@ -25,13 +25,14 @@
       <title><anchor id="plugin_html_external.1"/>The Guided Tour</title>
       <para>The aim of the guided tour is to provide a step by step explanation to the
  ProActive beginners.</para>
-      <informalfigure>
+      <figure>
+       <title>The plugin's interface</title>
         <mediaobject>
           <imageobject>
-           <imagedata width="6in" fileref="development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
+           <imagedata  fileref="development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
-      </informalfigure>
-      <para>This guided tour (that is actually eclipse cheat sheet) purposes :</para>
+      </figure>
+      <para>This guided tour (that is actually eclipse cheat sheet) purposes:</para>
       <itemizedlist>
         <listitem>
           <para> To Explain ProActive to beginners</para>
@@ -48,7 +49,7 @@
       <title><anchor id="plugin_html_external.2"/>Wizards</title>
       <para>These wizards will guide developpers to make complex operations with
  ProActive, such as installation, integration , configuration or execution. We have created 4
- wizards :</para>
+ wizards:</para>
       <orderedlist>
         <listitem>
           <para> a ProActive installation wizard</para>
@@ -63,23 +64,25 @@
           <para> a configuration and execution wizard</para>
         </listitem>
 </orderedlist>
-      <informalfigure>
+      <figure>
+       <title>One wizard popup</title>
         <mediaobject>
           <imageobject>
-           <imagedata width="6in" fileref="development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
+           <imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
-      </informalfigure>
+      </figure>
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="plugin_html_external.3"/>The ProActive Editor</title>
       <para>This editor checks coding rules. It informs the developper of error
  concerning ProActive in his classes and can resolve some of these errors.</para>
-      <informalfigure>
+      <figure>
+       <title>The editor error highlighting</title>
         <mediaobject>
           <imageobject>
-           <imagedata width="6in" fileref="development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
+           <imagedata  fileref="development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
         </mediaobject>
-      </informalfigure>
+      </figure>
     </sect1>
   
 </chapter>

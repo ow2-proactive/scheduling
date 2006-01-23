@@ -11,19 +11,19 @@
       <para>In order to ease the use of the migration, we provide 2 sets of static
  methods on the <literal>ProActive</literal> class. The first set is
  aimed at the migration triggered from the active object that wants to migrate. The methods rely
- on the fact that the calling thread <emphasis role="bold">is</emphasis> the active thread of the active object :</para>
+ on the fact that the calling thread <emphasis role="bold">is</emphasis> the active thread of the active object:</para>
       <itemizedlist>
         <listitem>
-          <para><literal>migrateTo(Object o)</literal>  : migrate to the
+          <para><literal>migrateTo(Object o)</literal>: migrate to the
  same location as an existing active object</para>
         </listitem>
         <listitem>
-          <para><literal>migrateTo(String nodeURL)</literal>  : migrate
+          <para><literal>migrateTo(String nodeURL)</literal>: migrate
  to the location given by the URL of the node</para>
         </listitem>
         <listitem>
           <para><literal>migrateTo(Node
- node)</literal>  : migrate to the location of the given node</para>
+ node)</literal>: migrate to the location of the given node</para>
         </listitem>
 </itemizedlist>
       <para>The second set is aimed at the migration triggered from another agent than
@@ -32,17 +32,17 @@
       <itemizedlist>
         <listitem>
           <para><literal>migrateTo(Body
- body, Object o, boolean priority)</literal>  : migrate to the same location as an existing
+ body, Object o, boolean priority)</literal>: migrate to the same location as an existing
  active object</para>
         </listitem>
         <listitem>
           <para><literal>migrateTo(Body
- body, String nodeURL, boolean priority)</literal>  : migrate to the location given by the URL
+ body, String nodeURL, boolean priority)</literal>: migrate to the location given by the URL
  of the node</para>
         </listitem>
         <listitem>
           <para><literal>
- migrateTo(Body body, Node node, boolean priority)</literal>  : migrate to the location of the
+ migrateTo(Body body, Node node, boolean priority)</literal>: migrate to the location of the
  given node</para>
         </listitem>
 </itemizedlist>
@@ -54,7 +54,7 @@
  the object on the network, <emphasis role="bold">the active object must implement the serializable interface</emphasis>. To
  migrate, an active object must have a method which contains a call to the migration primitive.
  This call must be the last one in the method, i.e the method must return immediately after. Here
- is an example of a method in an active object :</para>
+ is an example of a method in an active object:</para>
       <blockquote>
         <para>
 <screen>
@@ -68,7 +68,7 @@
 </screen>
 </para>
       </blockquote>
-      <para>We don&#39;t provide any test to check if the call to migrateTo is the last
+      <para>We don't provide any test to check if the call to migrateTo is the last
  one in the method, hence if this rule is not enforced, it can lead to unexpected behavior. Now to
  make this object move, you just have to call its <literal>moveTo()</literal> method.</para>
     </sect1>
@@ -92,19 +92,19 @@
       try {
         return InetAddress.getLocalHost().getHostName();
       } catch (Exception e) {
-        return &quot;Localhost lookup failed&quot;;
+        return 'Localhost lookup failed';
       }
     }
     public static void main (String[] args) {
       if (!(args.length&gt;0)) {
-        System.out.println(&quot;Usage: java migration.test.TestSimple hostname/N\
-odeName &quot;);
+        System.out.println('Usage: java migration.test.TestSimple hostname/N\
+odeName ');
         System.exit(-1);
       }
       SimpleAgent t = null;
       try {
         // create the SimpleAgent in this JVM
-        t = (SimpleAgent) ProActive.newActive(&quot;migration.test.SimpleAgent&quot;,nu\
+        t = (SimpleAgent) ProActive.newActive('migration.test.SimpleAgent',nu\
 ll);
       } catch (Exception e) {
         e.printStackTrace();
@@ -113,7 +113,7 @@ ll);
 de URL
       // we assume here that the node does already exist
       t.moveTo(args[0]);
-      System.out.println(&quot;The Active Object is now on host &quot; + t.whereAreYou(\
+      System.out.println('The Active Object is now on host ' + t.whereAreYou(\
 ));
     }
   }

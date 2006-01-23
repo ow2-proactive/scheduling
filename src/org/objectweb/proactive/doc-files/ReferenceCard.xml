@@ -175,7 +175,7 @@
           <row>
             <entry><para>
 <screen>
-A a = (A) ProActive.newActive(&quot;A&quot;, params, node);
+A a = (A) ProActive.newActive('A', params, node);
    // Create an active Object of type A in the JVM specified by Node
 a.foo (param); 
    // A one way typed asynchronous communication towards the (remote) AO a
@@ -252,7 +252,7 @@ while ( terminate ) {
         ...
         ...    // Do some services, e.g. a FIFO service on method named foo
         ...
-        service.serveOldest(&quot;foo&quot;);
+        service.serveOldest('foo');
         ... 
       }
     }
@@ -295,7 +295,7 @@ while ( ! hasToTerminate ) {
         ...
         ...    // Non blocking service
         ...
-        service.serveOldest(&quot;changeParameters&quot;, &quot;terminate&quot;);   ... 
+        service.serveOldest('changeParameters', 'terminate');   ... 
       }
     }
 <emphasis role="bold">public void </emphasis> changeParameters () {......    // change computation parameters}
@@ -412,9 +412,9 @@ Object turnActive(Object, Node node);
           <row>
             <entry><para>
 <screen>
-A ga = (A) ProActiveGroup.newGroup( &quot;A&quot;, params, nodes);
-   // Created at once a group of AO of type &quot;A&quot; in the JVMs specified 
-   // by nodes. ga is a Typed Group of type &quot;A&quot;. 
+A ga = (A) ProActiveGroup.newGroup( 'A', params, nodes);
+   // Created at once a group of AO of type 'A' in the JVMs specified 
+   // by nodes. ga is a Typed Group of type 'A'. 
    // The number of AO being created matches the number of param arrays.
    // Nodes can be a Virtual Node defined in an XML descriptor */
 ga.foo(...);
@@ -422,7 +422,7 @@ ga.foo(...);
    // A request to foo is sent in parallel to AO in group ga  */
 V gv = ga.bar(...);
    // A general group communication with a result.
-   // gv is a typed group of &quot;V&quot;, which is first a group
+   // gv is a typed group of 'V', which is first a group
    // of awaited Futures, to be filled up asynchronously 
 gv.gee (...);
    // Use of the result of an asynchronous group call. It is also a  
@@ -494,7 +494,7 @@ A ga2 = (A) ag.getGroupByType();
           <row>
             <entry><para>
 <screen>
-A spmdGroup  =  (A) ProSPMD.newSPMDGroup(&quot;A&quot;, params, nodes);
+A spmdGroup  =  (A) ProSPMD.newSPMDGroup('A', params, nodes);
    // Creates an SPMD group and creates all members with params on the node\
 s.
    // An SPMD group is a typed group in which every member has a reference \
@@ -504,10 +504,10 @@ A mySpmdGroup = (A) ProSPMD.getSPMDGroup();
    // Returns the SPMD group of the activity.
 int rank = ProSPMD.getMyRank();
    // Returns the rank of the activity in its SPMD group.
-ProSPMD.barrier(&quot;barrierID&quot;);
+ProSPMD.barrier('barrierID');
    // Blocks the activity (after the end of the current service) until all
    // other members of the SPMD group invoke the same barrier. 
-   // Three barriers are available : total barrier, neighbors based barrier
+   // Three barriers are available: total barrier, neighbors based barrier
    // and method based barrier. 
 </screen>
 </para></entry>
@@ -541,7 +541,7 @@ ProSPMD.barrier(&quot;barrierID&quot;);
        ProActive.migrateTo(t);
      } <emphasis role="bold">catch</emphasis> (Exception e) {
        e.printStackTrace();
-       logger.info(&quot;Cannot migrate.&quot;);
+       logger.info('Cannot migrate.');
      }
    }
    
@@ -581,14 +581,14 @@ ProSPMD.barrier(&quot;barrierID&quot;);
  http://fractal.objectweb.org</para>
               <para>
  The following methods are specific to ProActive.</para>
-<para>In the class org.objectweb.proactive.ProActive :</para><literal>
-Component newActiveComponent(&quot;A&quot;, params, VirtualNode, ComponentParameters);
+<para>In the class org.objectweb.proactive.ProActive:</para><literal>
+Component newActiveComponent('A', params, VirtualNode, ComponentParameters);
    // Creates a new ProActive component from the specified class A.
    // The component is distributed on JVMs specified by the Virtual Node
    // The ComponentParameters defines the configuration of a component: 
    // name of component, interfaces (server and client), etc.
    // Returns a reference to a component, as defined in the Fractal API 
-              </literal><para>In the class org.objectweb.proactive.core.component.Fractive :</para><literal>
+              </literal><para>In the class org.objectweb.proactive.core.component.Fractive:</para><literal>
 ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature);
    // This method is used in primitive components.
    // It generates a client collective interface named itfName, and typed as itfSignature.
@@ -618,20 +618,20 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
               <para><emphasis role="bold">Example of specification:</emphasis></para>
 <literal>
 &lt;Rule&gt;
-   &lt;From&gt;&lt;Entity type=&quot;VN&quot; name=&quot;VN1&quot;/&gt; &lt;/From&gt;
-   &lt;To&gt; &lt;Entity type=&quot;VN&quot; name=&quot;VN2&quot;/&gt; &lt;/To&gt;
+   &lt;From&gt;&lt;Entity type='VN' name='VN1'/&gt; &lt;/From&gt;
+   &lt;To&gt; &lt;Entity type='VN' name='VN2'/&gt; &lt;/To&gt;
    &lt;Communication&gt;
-  &lt;Request value=&quot;authorized&quot;&gt;
-      &lt;Attributes authentication=&quot;required&quot; 
-                  integrity=&quot;required&quot; 
-                  confidentiality=&quot;optional&quot;/&gt;
+  &lt;Request value='authorized'&gt;
+      &lt;Attributes authentication='required' 
+                  integrity='required' 
+                  confidentiality='optional'/&gt;
    &lt;/Request&gt; 
   &lt;/Communication&gt;
   &lt;Migration&gt;denied&lt;/Migration&gt;
   &lt;AOCreation&gt;denied&lt;/AOCreation&gt;
 &lt;/Rule&gt;
-              </literal><para>This rule specifies that: from Virual Node &quot;VN1&quot; to the
- VN &quot;VN2&quot;, the communications (requests) are authorized, provided authentication
+              </literal><para>This rule specifies that: from Virual Node 'VN1' to the
+ VN 'VN2', the communications (requests) are authorized, provided authentication
  and integrity are being used, while confidentiality is optional. Migration and AO
  creation are not authorized.</para></entry>
           </row>
@@ -660,88 +660,88 @@ ProActiveInterface createCollectiveClientInterface(String itfName, String itfSig
               <para><emphasis role="bold">Descriptor example: creates one jvm on the local machine</emphasis></para>
               
               <para>
- &lt;ProActiveDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
- xsi:noNamespaceSchemaLocation=&quot;DescriptorSchema.xsd&quot;&gt;</para>
+ &lt;ProActiveDescriptor xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;</para>
               <para>
- &#160;&lt;componentDefinition&gt;</para>
+  &lt;componentDefinition&gt;</para>
               <para>
- &#160;&#160;&lt;virtualNodesDefinition&gt;</para>
+   &lt;virtualNodesDefinition&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;virtualNode name=&quot;<emphasis role="bold">Dispatcher</emphasis>&quot;/&gt;</para>
+    &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>'/&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;!-- Name of the Virtual Node that will be
+    &lt;!-- Name of the Virtual Node that will be
  used in program source --&gt;</para>
               <para>
- &#160;&#160;&lt;/virtualNodesDefinition&gt;</para>
+   &lt;/virtualNodesDefinition&gt;</para>
               <para>
- &#160;&lt;componentDefinition/&gt;</para>
+  &lt;componentDefinition/&gt;</para>
               <para>
- &#160;&lt;deployment&gt;</para>
+  &lt;deployment&gt;</para>
               <para>
- &#160;&#160;&lt;mapping&gt;</para>
+   &lt;mapping&gt;</para>
               <para>
- &#160;&#160;&lt;!-- This part contains the mapping VNs -- JVMs
+   &lt;!-- This part contains the mapping VNs -- JVMs
  --&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;map virtualNode=&quot;<emphasis role="bold">Dispatcher</emphasis>&quot;&gt;</para>
+    &lt;map virtualNode='<emphasis role="bold">Dispatcher</emphasis>'&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&lt;jvmSet&gt;</para>
+     &lt;jvmSet&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&#160;&lt;vmName value=&quot;<emphasis role="bold">Jvm1</emphasis>&quot;/&gt;</para>
+      &lt;vmName value='<emphasis role="bold">Jvm1</emphasis>'/&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&#160;&lt;!-- Virtual Node Dispatcher is
+      &lt;!-- Virtual Node Dispatcher is
  mapped onto Jvm1 --&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&lt;/jvmSet&gt;</para>
+     &lt;/jvmSet&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;/map&gt;</para>
+    &lt;/map&gt;</para>
               <para>
- &#160;&#160;&lt;/mapping&gt;</para>
+   &lt;/mapping&gt;</para>
               <para>
- &#160;&#160;&lt;jvms&gt;</para>
+   &lt;jvms&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;jvm name=&quot;<emphasis role="bold">Jvm1</emphasis>&quot;&gt;</para>
+    &lt;jvm name='<emphasis role="bold">Jvm1</emphasis>'&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;!-- This part defines how the jvm will be
+    &lt;!-- This part defines how the jvm will be
  obtained: creation or acquisition: creation in this example --&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&lt;creation&gt;</para>
+     &lt;creation&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&#160;&lt;processReference
- refid=&quot;<emphasis role="bold">creationProcess</emphasis>&quot;/&gt;</para>
+      &lt;processReference
+ refid='<emphasis role="bold">creationProcess</emphasis>'/&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&#160;&lt;!-- Jvm1 will be created using
+      &lt;!-- Jvm1 will be created using
  creationProcess defined below --&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&lt;/creation&gt;</para>
+     &lt;/creation&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;/jvm&gt;</para>
+    &lt;/jvm&gt;</para>
               <para>
- &#160;&#160;&lt;/jvms&gt;</para>
+   &lt;/jvms&gt;</para>
               <para>
- &#160;&lt;/deployment&gt;</para>
+  &lt;/deployment&gt;</para>
               <para>
- &#160;&lt;infrastructure&gt;</para>
+  &lt;infrastructure&gt;</para>
               <para>
- &#160;&#160;&lt;processes&gt;</para>
+   &lt;processes&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;processDefinition id=&quot;<emphasis role="bold">creationProcess</emphasis>&quot;&gt;</para>
+    &lt;processDefinition id='<emphasis role="bold">creationProcess</emphasis>'&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;!-- Definition of creationProcess referenced
+    &lt;!-- Definition of creationProcess referenced
  above --&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&lt;jvmProcess
- class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;</para>
+     &lt;jvmProcess
+ class='org.objectweb.proactive.core.process.JVMNodeProcess'/&gt;</para>
               <para>
- &#160;&#160;&#160;&#160;&#160;&lt;!-- creationProcess is a
+      &lt;!-- creationProcess is a
  jvmProcess. The jvm will be created on the local machine using default settings
  (classpath, java path,...) --&gt;</para>
               <para>
- &#160;&#160;&#160;&lt;/processDefinition&gt;</para>
+    &lt;/processDefinition&gt;</para>
               <para>
- &#160;&#160;&lt;/processes&gt;</para>
+   &lt;/processes&gt;</para>
               <para>
- &#160;&lt;/infrastructure&gt;</para>
+  &lt;/infrastructure&gt;</para>
               <para>
  &lt;/ProActiveDescriptor&gt;</para>
               
@@ -760,7 +760,7 @@ pad.activateMapping(String VN);
 pad.activateMappings();
    // Activates all VNs defined in the ProActiveDescriptor 
 VirtualNode vn = pad.getVirtualNode(String)
-   // Created at once a group of AO of type &quot;A&quot; in the JVMs specified
+   // Created at once a group of AO of type 'A' in the JVMs specified
    // by the given vn. The Virtual Node is automatically activated if not
    // explicitly done before 
 Node[] n = vn.getNodes();
@@ -820,7 +820,7 @@ ProActive.addNFEListenerOnJVM(handler)
 ProActive.removeNFEListenerOnAO(ao, handler),
 ProActive.removeNFEListenerOnProxy(ao, handler),
 ProActive.removeNFEListenerOnJVM(handler)
-              </literal><para>It&#39;s possible to define an handler only for some exception
+              </literal><para>It's possible to define an handler only for some exception
  types, for example:</para><literal>
 ProActive.addNFEListenerOnJVM(<emphasis role="bold">new</emphasis> TypedNFEListener(
     SendRequestCommunicationException.<emphasis role="bold">class</emphasis>,
@@ -832,7 +832,7 @@ ProActive.addNFEListenerOnJVM(<emphasis role="bold">new</emphasis> TypedNFEListe
     }
 }));
               </literal><para>The behaviour of the default handler (if none could handle the
- exception) is to throw the exception if it&#39;s on the proxy side, or log it if it&#39;s
+ exception) is to throw the exception if it's on the proxy side, or log it if it's
  on the body side.</para></entry>
           </row>
         </tbody>
@@ -854,17 +854,17 @@ ProActive.addNFEListenerOnJVM(<emphasis role="bold">new</emphasis> TypedNFEListe
  by its urn, an unique id of the service. It is also possible to choose the exported
  methods of the object.</para>              <para>
  The WSDL file matching the service will be accesible at
- http://localhost:8080/servlet/wsdl?id=a for a service which name is &quot;a&quot; and
+ http://localhost:8080/servlet/wsdl?id=a for a service which name is 'a' and
  which id deployed on a web server which location is http://localhost:8080.</para>
 <literal>
-A a = (A) ProActive.newActive(&quot;A&quot;, new Object []{});
+A a = (A) ProActive.newActive('A', new Object []{});
    // Constructs an active object 
-String [] methods = new String [] {&quot;foo&quot;, &quot;bar&quot;};
+String [] methods = new String [] {'foo', 'bar'};
  //A String array containing the exported methods 
-ProActive.exposeAsWebService(a,&quot;http://localhost:8080&quot;,&quot;a&quot;,methods);
+ProActive.exposeAsWebService(a,'http://localhost:8080','a',methods);
  //Export the active object as a web service 
-ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;); 
- //Undeploy the service &quot;a&quot; on the web server located at http://localhost:8080 
+ProActive.unExposeAsWebService('a', 'http://localhost:8080'); 
+ //Undeploy the service 'a' on the web server located at http://localhost:8080 
               </literal></entry>
           </row>
         </tbody>
@@ -890,37 +890,37 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
  environment.</para>              
               <para><emphasis role="bold">A Fault-tolerant deployment descriptor</emphasis></para>
               
-              <para><literal>&lt;ProActiveDescriptor&gt; &#160;&#160;...
- &#160;&#160;&lt;virtualNodesDefinition&gt;
- &#160;&#160;&#160;&lt;virtualNode name=&quot;NonFT-Workers&quot;
- property=&quot;multiple&quot;/&gt;
- &#160;&#160;&#160;&lt;virtualNode name=&quot;FT-Workers&quot;
- property=&quot;multiple&quot; ftServiceId=&quot;appli&quot;/&gt;
- &#160;&#160;&lt;/virtualNodesDefinition&gt;
- &#160;&#160;...
- &#160;&#160;&#160;&lt;serviceDefinition id=&quot;appli&quot;&gt;
- &#160;&#160;&#160;&#160;&lt;faultTolerance&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;!-- Protocol selection : cic or
+              <para><literal>&lt;ProActiveDescriptor&gt;   ...
+   &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name='NonFT-Workers'
+ property='multiple'/&gt;
+    &lt;virtualNode name='FT-Workers'
+ property='multiple' ftServiceId='appli'/&gt;
+   &lt;/virtualNodesDefinition&gt;
+   ...
+    &lt;serviceDefinition id='appli'&gt;
+     &lt;faultTolerance&gt;
+      &lt;!-- Protocol selection: cic or
  pml --&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;protocol
- type=&quot;cic&quot;&gt;&lt;/protocol&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;!-- URL of the fault-tolerance
+      &lt;protocol
+ type='cic'&gt;&lt;/protocol&gt;
+      &lt;!-- URL of the fault-tolerance
  server --&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;globalServer
- url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/globalServer&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;!-- URL of the resource server;
+      &lt;globalServer
+ url='rmi://localhost:1100/FTServer'&gt;&lt;/globalServer&gt;
+      &lt;!-- URL of the resource server;
  all the nodes mapped on this virtual node
- &#160;&#160;&#160;&#160;&#160;will be registred in as resource nodes for recovery
+      will be registred in as resource nodes for recovery
  --&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;resourceServer
- url=&quot;rmi://localhost:1100/FTServer&quot;&gt;&lt;/resourceServer&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;!-- Average time between two
+      &lt;resourceServer
+ url='rmi://localhost:1100/FTServer'&gt;&lt;/resourceServer&gt;
+      &lt;!-- Average time between two
  consecutive checkpoints for each object --&gt;
- &#160;&#160;&#160;&#160;&#160;&lt;ttc value=&quot;5&quot;&gt;&lt;/ttc&gt;&lt;!-- in seconds --&gt;
- &#160;&#160;&#160;&#160;&lt;/faultTolerance&gt;
- &#160;&#160;&#160;&lt;/serviceDefinition&gt;
- &#160;&#160;&lt;/services&gt;
- &#160;&#160;...
+      &lt;ttc value='5'&gt;&lt;/ttc&gt;&lt;!-- in seconds --&gt;
+     &lt;/faultTolerance&gt;
+    &lt;/serviceDefinition&gt;
+   &lt;/services&gt;
+   ...
  &lt;/ProActiveDescriptor&gt;</literal></para>
               <para><emphasis role="bold">Starting the fault-tolerance server</emphasis></para>
               
@@ -962,11 +962,11 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
           <row>
             <entry><para> This aims to help you to create a P2P infrastructure over your
  desktop workstations network. It is self-organized and configurable. The infrastructure
- maintains a dynamic JVMs network for deploying computational applications.</para><para>&#160;</para>              <para><emphasis remap="h3" role="bold">Deploying the Infrastructure:</emphasis></para>
+ maintains a dynamic JVMs network for deploying computational applications.</para>              <para><emphasis remap="h3" role="bold">Deploying the Infrastructure:</emphasis></para>
 <para>Firstly, you have to start P2P Services on each shared machine:</para><para>$ cd ProActive/scripts/unix/p2p</para><para>$ ./startP2PService [-acq acquisitionMethod] [-port
  portNumber] [-s Peer ...]</para><para>With that parameters (all are optionals):</para>              <itemizedlist>
                 <listitem>
-                  <para> -acq is the ProActive Runtime communication protocol used &#160;by the peer.
+                  <para> -acq is the ProActive Runtime communication protocol used  by the peer.
  Examples: rmi, http, ibis,... By default it is rmi.</para>
                 </listitem>
                 <listitem>
@@ -977,17 +977,17 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
  Example: rmi://applepie.proactive.org:8080</para>
                 </listitem>
 </itemizedlist>
-<para><emphasis role="bold">A simple example:</emphasis></para><para>&#160;&#160;&#160; first.peer.host$
- ./startP2PService.sh</para><para>&#160;&#160;&#160; second.peer.host$ ./startP2PService.sh -s
- //first.peer.host</para><para>&#160;&#160;&#160; third.peer.host$
+<para><emphasis role="bold">A simple example:</emphasis></para><para>    first.peer.host$
+ ./startP2PService.sh</para><para>    second.peer.host$ ./startP2PService.sh -s
+ //first.peer.host</para><para>    third.peer.host$
  ./startP2PService.sh -s //second.peer.host</para>              <para><emphasis remap="h3" role="bold">Acquiring Nodes:</emphasis></para>
 <para>Now you have a P2P Infrastructure running, you might want to deploy your ProActive
  application on it. That is simple, just modify the XML deployment descriptor:</para><literal>
         ...
         &lt;jvms&gt;
-          &lt;jvm name=&quot;Jvm1&quot;&gt;
+          &lt;jvm name='Jvm1'&gt;
             &lt;acquisition&gt;
-              &lt;serviceReference refid=&quot;p2plookup&quot;/&gt;
+              &lt;serviceReference refid='p2plookup'/&gt;
             &lt;/acquisition&gt;
           &lt;/jvm&gt;
           ...
@@ -996,8 +996,8 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
         &lt;infrastructure&gt;
           ...
           &lt;services&gt;
-            &lt;serviceDefinition id=&quot;p2plookup&quot;&gt;
-              &lt;P2PService nodesAsked=&quot;2&quot; acq=&quot;rmi&quot; port=&quot;6666&quot;&gt;
+            &lt;serviceDefinition id='p2plookup'&gt;
+              &lt;P2PService nodesAsked='2' acq='rmi' port='6666'&gt;
                 &lt;peerSet&gt;
                   &lt;peer&gt;//second.peer.host&lt;/peer&gt;
                 &lt;/peerSet&gt;
@@ -1015,13 +1015,13 @@ ProActive.unExposeAsWebService(&quot;a&quot;, &quot;http://localhost:8080&quot;)
  benefit of that feature, you might add a nodes creation event listener to your
  application.</para><para><emphasis role="bold">Usage Example:</emphasis></para><literal>
     // getting the p2p virtual node
-    VirtualNode vn = pad.getVirtualNode(&quot;p2pvn&quot;);
-    // adding &quot;this&quot; as a listener
+    VirtualNode vn = pad.getVirtualNode('p2pvn');
+    // adding 'this' as a listener
     ((VirtualNodeImpl) vn).addNodeCreationEventListener(<emphasis role="bold">this</emphasis>);
     // then activate the virtual node
     vn.activate();
     
-              </literal><para>&quot;this&quot; has to implement the NodeCreationEventListener interface:</para><literal>
+              </literal><para>'this' has to implement the NodeCreationEventListener interface:</para><literal>
         <emphasis role="bold">public void</emphasis> nodeCreated(NodeCreationEvent event) {
                 // get the node
                 Node newNode = event.getNode();
@@ -1111,9 +1111,9 @@ Manager manager =  ProActiveBranchNBound.newBnB(task,
                         LargerQueueImpl.class.getName());
 Result futureResult = manager.start(); // this call is asynchronous
 ...
-              </literal><para>Keep in mind that is only &quot;initLower/UpperBound&quot; and
- &quot;split&quot; methods are called on the root task. The &quot;execute&quot; method is
- called on the root task&#39;s splitted task. Here the methods order execution:</para>              <orderedlist>
+              </literal><para>Keep in mind that is only 'initLower/UpperBound' and
+ 'split' methods are called on the root task. The 'execute' method is
+ called on the root task's splitted task. Here the methods order execution:</para>              <orderedlist>
                 <listitem>
                   <para> rootTask.initLowerBound(); // compute a first
  lower bound</para>
@@ -1158,20 +1158,20 @@ Result ri = splitted.execute();
  File Transfer Deployment is a tool for transfering files at deployment tim\
 e. This files are specified using the ProActive XML Deployment Descriptor i\
 n the following way:
-&lt;VirtualNode name=&quot;exampleVNode&quot; 
-<emphasis role="bold">FileTransferDeploy</emphasis>=&quot;
-<emphasis role="bold">example</emphasis>&quot;/&gt;
+&lt;VirtualNode name='exampleVNode' 
+<emphasis role="bold">FileTransferDeploy</emphasis>='
+<emphasis role="bold">example</emphasis>'/&gt;
 ....
 &lt;/deployment&gt;
 &lt;
 <emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
    &lt;
-<emphasis role="bold">FileTransfer</emphasis> id=&quot;
-<emphasis role="bold">example</emphasis>&quot;&gt;
+<emphasis role="bold">FileTransfer</emphasis> id='
+<emphasis role="bold">example</emphasis>'&gt;
       &lt;
-<emphasis role="bold">file</emphasis> src=&quot;hello.dat&quot; dest=&quot;world.dat&quot;/&gt;
+<emphasis role="bold">file</emphasis> src='hello.dat' dest='world.dat'/&gt;
       &lt;
-<emphasis role="bold">dir</emphasis> src=&quot;exampledir&quot; dest=&quot;exampledir&quot;/&gt;
+<emphasis role="bold">dir</emphasis> src='exampledir' dest='exampledir'/&gt;
   &lt;/
 <emphasis role="bold">FileTransfer</emphasis>&gt;
   ...
@@ -1179,19 +1179,19 @@ n the following way:
 <emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
 &lt;infrastructure&gt;
 ....
-&lt;processDefinition id=&quot;xyz&quot;&gt;
+&lt;processDefinition id='xyz'&gt;
   &lt;sshProcess&gt;...
     &lt;
-<emphasis role="bold">FileTransferDeploy</emphasis>=&quot;
-<emphasis role="bold">implicit</emphasis>&quot;&gt; 
-&lt;!-- referenceID or keyword &quot;implicit&quot; (inherit)--&gt;
+<emphasis role="bold">FileTransferDeploy</emphasis>='
+<emphasis role="bold">implicit</emphasis>'&gt; 
+&lt;!-- referenceID or keyword 'implicit' (inherit)--&gt;
       &lt;
 <emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, scp, rcp&lt;/
 <emphasis role="bold">copyProtocol</emphasis>&gt;
       &lt;
-<emphasis role="bold">sourceInfo</emphasis> prefix=&quot;/home/user&quot;/&gt;
+<emphasis role="bold">sourceInfo</emphasis> prefix='/home/user'/&gt;
       &lt;
-<emphasis role="bold">destinationInfo</emphasis> prefix=&quot;/tmp&quot; hostname=&quot;foo.org&quot; username=&quot;smith&quot; /&gt;
+<emphasis role="bold">destinationInfo</emphasis> prefix='/tmp' hostname='foo.org' username='smith' /&gt;
     &lt;/
 <emphasis role="bold">FileTransferDeploy</emphasis>&gt;
   &lt;/sshProcess&gt;

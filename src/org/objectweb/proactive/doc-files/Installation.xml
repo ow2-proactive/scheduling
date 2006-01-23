@@ -38,7 +38,7 @@
       ProActive/lib/bouncycastle.jar</literal></para>
    </listitem>
    <listitem>
-    <para> Don&#39;t forget to launch the JVM with a <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.xml">security policy file</ulink>.
+    <para> Don't forget to launch the JVM with a <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.xml">security policy file</ulink>.
      You can also specify a <ulink url="http://logging.apache.org/log4j/docs/manual.xml">log4j
       configuration file</ulink> with the property <emphasis role="bold">-Dlog4j.configuration=file:pathToFile</emphasis>. If not
      specified a default logger that logs on the console will be created</para>

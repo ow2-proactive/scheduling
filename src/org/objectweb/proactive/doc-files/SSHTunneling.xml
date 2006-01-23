@@ -44,16 +44,16 @@
  are all different. Usually, what you must look for is:</para>
       <itemizedlist>
         <listitem>
-          <para> is A <emphasis role="bold">allowed</emphasis> to open a connection to B ?</para>
+          <para> is A <emphasis role="bold">allowed</emphasis> to open a connection to B?</para>
         </listitem>
         <listitem>
-          <para> is B <emphasis role="bold">allowed</emphasis> to open a connection to A ? (networks are rarely
+          <para> is B <emphasis role="bold">allowed</emphasis> to open a connection to A? (networks are rarely
  symetric)</para>
         </listitem>
 </itemizedlist>
       <para>If you use a TCP or a UDP-based communication protocol (ie: RMI is based on
- TCP), these questions can be translated into &quot;what <emphasis role="bold">ports</emphasis> on B is A <emphasis role="bold">allowed</emphasis> to
- open a connection to ?&quot;. Once you have answered this question for all the hosts used by your
+ TCP), these questions can be translated into 'what <emphasis role="bold">ports</emphasis> on B is A <emphasis role="bold">allowed</emphasis> to
+ open a connection to?'. Once you have answered this question for all the hosts used by your
  application, write down a small diagram which outlines what kind of connection is possible. For
  example:</para>
 <screen>
@@ -70,7 +70,7 @@ A    | &lt;----                    ----&gt;  |    B
     <sect1 remap="h2">
       <title><anchor id="SSHTunneling_html_runtimecom"/>ProActive runtime communication
  patterns</title>
-      <para>To execute a ProActive application, you need to <emphasis role="bold">&quot;deploy&quot;</emphasis>
+      <para>To execute a ProActive application, you need to <emphasis role="bold">'deploy'</emphasis>
  it. Deployment is performed by the ProActive runtime and is configured by the ProActive
  deployment descriptor of the initial host. During deployment, each newly- created ProActive
  runtime performs a request to the initial ProActive runtime. The initial runtime also performs at
@@ -119,28 +119,28 @@ A    | &lt;----                    ----&gt;  |    B
           <para> one is to edit the <emphasis role="bold">ProActive deployment descriptors</emphasis> and to pass
  the property as a command-line option to the JVM:</para>
         </listitem>
-        <listitem>
-          <para>
-<screen>
-<emphasis role="bold">&lt;jvmProcess class=&quot;org.objectweb.proactive.core.process.JVMNodeProcess&quot;/&gt;
+<listitem>
+ <para>
+  <screen>
+   <emphasis role="bold">&lt;jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcess'/&gt;
 ....
 &lt;jvmParameters&gt;
-    &lt;parameter value=&quot;-Dproactive.communication.protocol=rmissh&quot;/&gt;
+    &lt;parameter value='-Dproactive.communication.protocol=rmissh'/&gt;
 &lt;/jvmParameters&gt;
 ...
 &lt;/jvmProcess&gt;
-              </emphasis>
+</emphasis>
 </screen>
 </para>
-        </listitem>
-        <listitem>
-          <para> the other one is to set in the <emphasis role="bold">ProActive Configuration
- file</emphasis>(introduced in a previous chapter) on the remote host the property
- proactive.communication.protocol to the desired protocol </para>
-<emphasis role="bold">
-<screen>
-&lt;prop key=&quot;proactive.communication.protocol&quot; value=&quot;rmissh&quot;/&gt; </screen>
-  </emphasis>
+</listitem>
+<listitem>
+ <para> 
+   the other one is to set in the <emphasis role="bold">ProActive Configuration
+   file</emphasis>(introduced in a previous chapter) on the remote host the property
+   proactive.communication.protocol to the desired protocol </para>
+ 
+  <screen><emphasis role="bold">&lt;prop key='proactive.communication.protocol' value='rmissh'/&gt; </emphasis></screen>
+  
         </listitem>
 </itemizedlist>
       <para>Finally, if you want to set this property on the <emphasis role="bold">initial</emphasis> deployment
@@ -150,7 +150,7 @@ A    | &lt;----                    ----&gt;  |    B
     <sect1 remap="h2">
       <title><anchor id="SSHTunneling_html_rmissh"/>The rmissh communication protocol.</title>
       <para>This protocol is a bit special because it keeps a lot of compatibility with
- the rmi protocol and a lot of options are available to <emphasis role="bold">&quot;optimize&quot;</emphasis> it.</para>
+ the rmi protocol and a lot of options are available to <emphasis role="bold">'optimize'</emphasis> it.</para>
       <para>This protocol can be used to automatically <emphasis role="bold">tunnel</emphasis> all RMI
  communications through SSH tunnels. Whenever a client wishes to access a distant rmissh server,
  rather than connecting directly to the distant server, it first creates a SSH tunnel (so-called
@@ -166,39 +166,39 @@ A    | &lt;----                    ----&gt;  |    B
  code are listed below. All these properties are client-side properties:</para>
       <itemizedlist>
         <listitem>
-          <para><emphasis role="bold">proactive.ssh.port</emphasis> : the port number on which all the ssh daemons
+          <para><emphasis role="bold">proactive.ssh.port</emphasis>: the port number on which all the ssh daemons
  to which this JVM must connect to are expected to listen. If this property is not set, the
  default is 22.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.ssh.username</emphasis> : Two possible syntaxes: username alone
+          <para><emphasis role="bold">proactive.ssh.username</emphasis>: Two possible syntaxes: username alone
  .e.g. <emphasis role="bold">proactive.ssh.username=jsmith</emphasis>, it represents the username which will be used
  during authentication with all the ssh daemons to which this JVM will need to connect to.</para>
           <para>
  Or you can use the form <emphasis role="bold">proactive.ssh.username=username1@machine1;username2@machine2;...;usernameN@machineN</emphasis>.
- Note that several usernames without machine&#39;s names is not allowed and won&#39;t be parsed
+ Note that several usernames without machine's names is not allowed and won't be parsed
  properly.</para>
           <para>
  If this property is not set, the default is the user.name java property.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.ssh.known_hosts</emphasis> : a filename which identifies the file
+          <para><emphasis role="bold">proactive.ssh.known_hosts</emphasis>: a filename which identifies the file
  which contains the traditional ssh known_hosts list. This list of hosts is used during
  authentication with each ssh daemon to which this JVM will need to connect to. If the host key
  does not match the one stored in this file, the authentication will fail. If this property is
- not set, the default is System.getProperty (&quot;user.home&quot;) +
- &quot;/.ssh/known_hosts&quot;</para>
+ not set, the default is System.getProperty ('user.home') +
+ '/.ssh/known_hosts'</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.ssh.key_directory</emphasis> : a directory which is expected to
+          <para><emphasis role="bold">proactive.ssh.key_directory</emphasis>: a directory which is expected to
  contain the pairs of public/private keys used during authentication. the private keys must not
- be encrypted. The public keys filenames must match &quot;*.pub&quot;. Private keys are ignored
+ be encrypted. The public keys filenames must match '*.pub'. Private keys are ignored
  if their associated public key is not present. If this property is not set, the default is
- System.getProperty (&quot;user.home&quot;) + &quot;/.ssh/&quot;</para>
+ System.getProperty ('user.home') + '/.ssh/'</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.tunneling.try_normal_first</emphasis> : if this property is set to
- &quot;yes&quot;, the tunneling code always attempts to make a direct rmi connection to the
+          <para><emphasis role="bold">proactive.tunneling.try_normal_first</emphasis>: if this property is set to
+ 'yes', the tunneling code always attempts to make a direct rmi connection to the
  remote object before tunneling. If this property is not set, the default is not to make these
  direct-connection attempts. This property is especially useful if you want to deploy a number
  of objects on a LAN where only one of the hosts needs to run with the rmissh protocol to allow
@@ -207,20 +207,20 @@ A    | &lt;----                    ----&gt;  |    B
  frontend.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.tunneling.connect_timeout</emphasis> : this property specifies how
+          <para><emphasis role="bold">proactive.tunneling.connect_timeout</emphasis>: this property specifies how
  long the tunneling code will wait while trying to establish a connection to a remote host
  before declaring that the connection failed. If this property is not set, the default value is
  2000ms.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.tunneling.use_gc</emphasis> : if this property is set to
- &quot;yes&quot;, the client JVM does not destroy the ssh tunnels as soon as they are not used
+          <para><emphasis role="bold">proactive.tunneling.use_gc</emphasis>: if this property is set to
+ 'yes', the client JVM does not destroy the ssh tunnels as soon as they are not used
  anymore. They are queued into a list of unused tunnels which can be reused. If this property is
  not set or is set to another value, the tunnels are destroyed as soon as they are not needed
  anymore by the JVM.</para>
         </listitem>
         <listitem>
-          <para><emphasis role="bold">proactive.tunneling.gc_period</emphasis> : this property specifies how long
+          <para><emphasis role="bold">proactive.tunneling.gc_period</emphasis>: this property specifies how long
  the tunnel garbage collector will wait before destroying a unused tunnel. If a tunnel is older
  than this value, it is automatically destroyed. If this property is not set, the default value
  is 10000ms.</para>

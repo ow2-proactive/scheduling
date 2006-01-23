@@ -200,8 +200,8 @@
             role="bold">10</emphasis>", <emphasis role="bold">VariableContractType.DescriptorDefaultVariable</emphasis>);
          ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
 </screen>
-        <para></para>
-        <para></para>
+        
+        
       </sect3>
     </sect2>
     <sect2 remap="h3">
@@ -209,7 +209,7 @@
       <sect3 remap="h4">
         <title>XML Files</title>
         <para>Is built using XML property tags.</para>
-        <para><emphasis role="bold">File : file.xml</emphasis></para>
+        <para><emphasis role="bold">File: file.xml</emphasis></para>
         <screen>&lt;!-- Definition of the specific context --&gt;
 &lt;variables&gt;
   &lt; <emphasis role="bold">DescriptorVariable</emphasis> name="<emphasis
@@ -229,11 +229,11 @@
         with one definition per line in the format <emphasis
         role="bold">variable = value</emphasis>, as shown in the following
         example:</para>
-        <para><emphasis role="bold">File : file.properties</emphasis></para>
+        <para><emphasis role="bold">File: file.properties</emphasis></para>
         <screen># Definition of the specific context
 USER_HOME = /usr/home/team
 PROACTIVE_HOME = ProActive/dist/ProActive
-NUM_NODES : 45                 </screen>
+NUM_NODES: 45                 </screen>
         <para>Variables defined in this format will be declared as <emphasis
         role="bold">DescriptorVariable</emphasis> type. Note that colon (:)
         can be used instead of equal (=).</para>

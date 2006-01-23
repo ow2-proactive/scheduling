@@ -4,13 +4,13 @@
 <!--     <para> <anchor id="implementation_html_implementation_of_fractal_with_proactive"/></para> -->
     <para>Fractal defines a general conceptual model, along with a programming
  application interface (API) in Java. According to the official documentation, the Fractal
- component model is &quot;<emphasis>a modular and extensible component model that can be used with
+ component model is '<emphasis>a modular and extensible component model that can be used with
  various programming languages to design, implement, deploy and reconfigure various systems and
  applications, from operating systems to middleware platforms and to graphical user
- interfaces</emphasis>&quot;.</para>
+ interfaces</emphasis>'.</para>
     <para>There is a reference implementation, called Julia.</para>
     <para>We first tried to use Julia to manipulate active objects (the fundamental
- entities in ProActive), but we wouldn&#39;t have been able to reuse the features of the Proactive
+ entities in ProActive), but we wouldn't have been able to reuse the features of the Proactive
  library, because of the architectures of the libraries.</para>
     <para>
  Julia manipulates a base class by modifying the bytecode or adding interception objects to it. On
@@ -21,7 +21,7 @@
  both ProActive and Julia.</para>
     <para>
  Eventually, re-implementing ProActive using Julia could be a solution (a starting point could be
- the &quot;protoactive&quot; example of Julia), but this would imply a full refactoring of the
+ the 'protoactive' example of Julia), but this would imply a full refactoring of the
  library, and therefore quite a few resources...</para>
     <para>
  More generally speaking, Julia is designed to work with standard objects, but not with the active
@@ -46,7 +46,7 @@
       <sect2 remap="h3">
         <title>Deployment framework</title>
         <para>ProActive provides a deployment framework for creating a distributed component system. Using a
- configuration file and the concept of virtual nodes, this framework :</para>
+ configuration file and the concept of virtual nodes, this framework:</para>
         <orderedlist>
           <listitem>
             <para> connects to remote hosts using supported protocols, such as rsh, rlogin, ssh, globus, lsf
