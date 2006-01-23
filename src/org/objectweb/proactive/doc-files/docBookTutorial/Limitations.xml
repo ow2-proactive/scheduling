@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="Limitations">
+  <title>DocBok limitations imposed</title>
+
+  <para>Here is described what is allowed in our docbook style. We restrict
+  ourselves to a subset of docbook, because we want a uniform doc style, and
+  want maintainable doc. To achieve this goal, we require minimum learning
+  investment from our PA developers, who are meant to be coding, not spend
+  there time writing doc. So you still want to add a fancy feature? Well, you
+  can, as long as you describe how to use this new tag in this howto, and be
+  extra careful with the pdf output.</para>
+
+  <para>There will be a schema specifying which are the allowed tags. For now,
+  all is legal, as this list is not written down yet.</para>
+</sect1>

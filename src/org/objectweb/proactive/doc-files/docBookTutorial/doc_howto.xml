@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article
+          PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+          "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
+          [
+          <!ENTITY Reason SYSTEM "Reason.xml">
+          <!ENTITY QuickStart SYSTEM "QuickStart.xml">
+          <!ENTITY Examples SYSTEM "DocBookExamples.xml">
+          <!ENTITY Limitations SYSTEM "Limitations.xml">
+          ]>
+
+<article>
+ <articleinfo>
+  
+  <title>How to use DocBook for ProActive documentation</title>
+  
+  <copyright>
+   <year>2006</year>
+   <holder>Copyright INRIA</holder>
+  </copyright>
+  
+ </articleinfo>
+ 
+  &Reason;  
+  &QuickStart;  
+  &Examples;  
+  &Limitations;
+<!--  You might add other files here, just don't forget to add the ENTITY  -->
+
+</article>
