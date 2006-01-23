@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book
           PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
           "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
@@ -43,7 +43,7 @@
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
 
-<!--  XXX <!ENTITY FAQ SYSTEM "FAQ.xml">  -->
+ <!ENTITY FAQ SYSTEM "FAQ.xml"> 
 ]>
 <book>
   <title>ProActive v3.0.1 Documentation</title>
@@ -91,16 +91,16 @@
    &OOSPMDJacobiexample;   
   &nbody;  
   &conclusion;  
-  </part><part id="extensionsPart"> <title> Extending ProActive</title> 
+ </part><part id="ProActiveExtensions"> <title> Extending ProActive</title> 
    &DescriptorProcess; 
    &devFileTransfer; 
    &devFaultTolerance; 
    &MOP; 
 
- </part>
- <!--<part id="backMattersPart"> <title> Back matters</title>  Should be called appendix, anyway 
-   XXX &FAQ; 
-   XXX &WordIndex; 
-   XXX &References; 
-  </part> -->
+ </part> <part id="backMattersPart"> <title> Back matters</title>  
+<!--   Should be called appendix, anyway  -->
+   &FAQ; 
+<!--    XXX &WordIndex;  -->
+<!--    XXX &References;  -->
+  </part> 
 </book>
