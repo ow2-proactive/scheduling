@@ -31,5 +31,5 @@ echo "    IF YOU WANT TO GENERATE THE pdf (real slow)), UNCOMMENT ABOVE LINE"
 echo "    GENERATING howto in $howto_dir"
 # just a hack to copy the image needed in the figures section
 mkdir $howto_dir/images  && cp $xml_src_dir/images/e1.png $howto_dir/images/
-xmlto xhtml -o $howto_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/doc_howto.xml
-xmlto pdf -o $howto_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/doc_howto.xml   --searchpath $(pwd)/$base/src/org/objectweb/proactive/
+xmlto xhtml -o $howto_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/docBookTutorial/doc_howto.xml
+xmlto pdf -o $howto_dir -m $xml_src_dir/PA_config.xsl $xml_src_dir/docBookTutorial/doc_howto.xml   --searchpath $(pwd)/$base/src/org/objectweb/proactive/
