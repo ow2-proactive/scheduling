@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
+import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -55,11 +56,10 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
-import org.objectweb.proactive.core.filetransfer.FileTransferService;
-import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
-import org.objectweb.proactive.core.process.mpi.MPIProcess;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
+import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -341,22 +341,23 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         return vm;
     }
-    
+
     /**
      * Gets the VirtualMachine object that represents the one defined
      * in the XML Descriptor.
      * @param name The name of the searched VM.
-     * @return A VirtualMachine associated with the name parameter. If no VM is found then null is returned. 
+     * @return A VirtualMachine associated with the name parameter. If no VM is found then null is returned.
      */
-    public VirtualMachine getVirtualMachine(String name){
-    	
-    	Iterator it = virtualMachines.iterator();
-    	while(it.hasNext()){
-    		VirtualMachine vm =(VirtualMachine)it.next();
-    		if(vm.getName().equals(name)) return vm;
-    	}
-    	
-    	return null;
+    public VirtualMachine getVirtualMachine(String name) {
+        Iterator it = virtualMachines.iterator();
+        while (it.hasNext()) {
+            VirtualMachine vm = (VirtualMachine) it.next();
+            if (vm.getName().equals(name)) {
+                return vm;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -374,29 +375,26 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 if (vm.hasProcess()) {
                     boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
                     ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
-                                      
-                    // get the rank of sequential process - return -1 if it does not exist
+
+                    /*   //check if it's a gLiteProcess. If it's a gLiteProcess, get the cpu number and run the glite submission command "cpuNumber" times.
+                       int cpuNumber = checkGLiteProcess(process);
+                       if (cpuNumber > -1) {
+                           while (cpuNumber > 0) {
+                               try {
+                                   setParameters(process, vm);
+                                   process.startProcess();
+                                   process.setStarted(false);
+                               } catch (IOException e) {
+                                   e.printStackTrace();
+                               }
+                               cpuNumber--;
+                           }
+                       }
+                     */
+
+                    //  get the rank of sequential process - return -1 if it does not exist
                     int rankOfSequentialProcess = checkForSequentialProcess(process);
-                    
-                    
-                    
-                    //check if it's a gLiteProcess. If it's a gLiteProcess, get the cpu number and run the glite submission command "cpuNumber" times.
-                    int cpuNumber = checkGLiteProcess(process);
-                    if ( cpuNumber > -1) {
-                    	
-                    	while (cpuNumber > 0) {
-                    		try {
-                    			setParameters(process, vm);
-								process.startProcess();
-								process.setStarted(false);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}		
-							cpuNumber --;
-                    	}                   	
-                    }
-                    
-                    
+
                     // there's a sequential process in the hierarchical process
                     if (rankOfSequentialProcess > -1) {
                         ExternalProcess deepCopy = (ExternalProcess) makeDeepCopy(process);
@@ -519,32 +517,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * start the MPI process attached with this virtual node
      * @return int, the termination status of the mpi process
      */
+    public ExternalProcess getMPIProcess() {
+        return mpiProcess;
+    }
 
-    // start the MPI process attached with this virtual node
-    // returns the termination status of process
-    public int startMPI() {
-        int exitValue = -1;
-        if (mpiProcess != null) {
-            try {
-                MPI_LOGGER.debug(" Start MPI Process: " +
-                    mpiProcess.toString());
-                mpiProcess.startProcess();
-                MPI_LOGGER.debug(" Wait for MPI Process to finish...");
-                mpiProcess.waitFor();
-                exitValue = mpiProcess.exitValue();
-                mpiProcess.setStarted(false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (IllegalThreadStateException e) {
-                e.printStackTrace();
-            }
-            return exitValue;
-        } else {
-            throw new RuntimeException(
-                " ERROR: No MPI process attached with the virtual node !");
-        }
+    public boolean hasMPIProcess() {
+        return !(mpiProcess == null);
     }
 
     //returns the sequential process in the process hierarchie
@@ -584,26 +562,24 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
         return -1;
     }
+
     /**
-    *Check if the ExternalProcess is a gLiteProcess
-    *return boolean true if it's a gLiteProcess
-    **/
+     *Check if the ExternalProcess is a gLiteProcess
+     *return boolean true if it's a gLiteProcess
+     **/
     private int checkGLiteProcess(ExternalProcess process) {
-    	
-    	int res = 0;
+        int res = 0;
         while (!(process instanceof JVMProcess)) {
-        	
             if (process instanceof GLiteProcess) {
-            	
-                return ((GLiteProcess)process).getCpuNumber();
+                return ((GLiteProcess) process).getCpuNumber();
             } else {
                 res++;
                 process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
             }
         }
         return -1;
-    	
-    	//return ((process.getClass().getName()).equals(GLiteProcess.class.getName()));
+
+        //return ((process.getClass().getName()).equals(GLiteProcess.class.getName()));
     }
 
     /**
@@ -638,9 +614,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.padURL = XMLpadURL;
     }
 
-    
     /*
-     * 
+     *
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNbMappedNodes()
      */
     public int getNbMappedNodes() {
@@ -650,6 +625,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             int nbMappedNodesTmp = 0;
             for (int i = 0; i < virtualMachines.size(); i++) {
                 VirtualMachine vm = getVirtualMachine();
+
                 // first check if it is a process that is attached to the vm
                 if (vm.hasProcess()) {
                     ExternalProcess process = vm.getProcess();
@@ -657,7 +633,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     if (process.getNodeNumber() == UniversalProcess.UNKNOWN_NODE_NUMBER) {
                         return UniversalProcess.UNKNOWN_NODE_NUMBER;
                     } else {
-                        nbMappedNodesTmp = nbMappedNodesTmp + process.getNodeNumber()*nbNodesPerCreatedVM;
+                        nbMappedNodesTmp = nbMappedNodesTmp +
+                            (process.getNodeNumber() * nbNodesPerCreatedVM);
                     }
                 }
             }
@@ -1014,7 +991,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
             }
         }
-        
+
         //Check if it this virtualNode that originates the process
         if ((event.getCreatorID().equals(this.name)) &&
                 (virtualMachine != null)) {
@@ -1072,7 +1049,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         }
                     }
 
-                    performOperations(proActiveRuntimeRegistered, url, protocol, event.getVmName());
+                    performOperations(proActiveRuntimeRegistered, url,
+                        protocol, event.getVmName());
                 }
             } catch (ProActiveException e) {
                 e.printStackTrace();
@@ -1122,7 +1100,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         }
                     }
 
-                    performOperations(proActiveRuntimeRegistered, url, protocol, event.getVmName());
+                    performOperations(proActiveRuntimeRegistered, url,
+                        protocol, event.getVmName());
                 } catch (ProActiveException e) {
                     e.printStackTrace();
                 }
@@ -1218,7 +1197,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
                         protocol));
 
-            
             //create the node
             ProActiveSecurityManager siblingPSM = null;
 
@@ -1242,7 +1220,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             //add this node to this virtualNode
-            performOperations(defaultRuntime, url, protocol, defaultRuntime.getVMInformation().getDescriptorVMName());
+            performOperations(defaultRuntime, url, protocol,
+                defaultRuntime.getVMInformation().getDescriptorVMName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1445,7 +1424,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         /* Setting the file transfer definitions associated with the current process,
          * and defined at the process level.
          */
-        
         FileTransferWorkShop ftsDeploy = process.getFileTransferWorkShopDeploy();
         FileTransferWorkShop ftsRetrieve = process.getFileTransferWorkShopRetrieve();
 
@@ -1528,7 +1506,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private synchronized void performOperations(ProActiveRuntime part,
         String url, String protocol, String vmName) {
-        Node node = new NodeImpl(part, url, checkProtocol(protocol), this.jobID, vmName);
+        Node node = new NodeImpl(part, url, checkProtocol(protocol),
+                this.jobID, vmName);
         createdNodes.add(node);
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
@@ -1537,15 +1516,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         //Performe FileTransferDeploy (if needed)
         try {
-			fileTransferDeploy(node);
-		} catch (ProActiveException e) {
-			FILETRANSFER_LOGGER.error("Error when performing FileTransferDeploy:"+e.getCause());
-			FILETRANSFER_LOGGER.error("Activate file transfer logger debug for further error details.");
-			if(FILETRANSFER_LOGGER.isDebugEnabled()){
-				e.printStackTrace();
-			}
-		}
-        
+            fileTransferDeploy(node);
+        } catch (ProActiveException e) {
+            FILETRANSFER_LOGGER.error(
+                "Error when performing FileTransferDeploy:" + e.getCause());
+            FILETRANSFER_LOGGER.error(
+                "Activate file transfer logger debug for further error details.");
+            if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+        }
+
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
 
@@ -1653,121 +1634,129 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.p2pNodeslookupList.add(nodesLookup);
         P2P_LOGGER.debug("A P2P nodes lookup added to the vn: " + this.name);
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
      */
-    public File[] fileTransferRetrieve() throws ProActiveException{
+    public File[] fileTransferRetrieve() throws ProActiveException {
+        Node[] nodes;
+        ArrayList arrayFiles = new ArrayList();
 
-    	Node nodes[];
-    	ArrayList arrayFiles = new ArrayList();
-    	
-		try {
-			nodes = getNodes();
-		} catch (NodeException e) {
-			throw new ProActiveException("Can not Retrieve Files, since no nodes where created for Virtual Node"+this.getName());
-		}
-		
-		if(FILETRANSFER_LOGGER.isDebugEnabled())
-			FILETRANSFER_LOGGER.debug("Retrieving files for "+nodes.length+" node(s).");
-		
-		/* For all the nodes we get the VirtualMachine that spawned it, and
-		 * then the process linked with this VirtualMachine. We then obtain 
-		 * the FileTransfer Retrieve Workshop from the process and using
-		 * the FileTransfer API we retrieve the Files.
-		 */
-    	for(int i=0;i<nodes.length;i++){
-    		String vmName=nodes[i].getNodeInformation().getDescriptorVMName();
-    		VirtualMachine vm= getVirtualMachine(vmName);
-    		
-    		if(vm == null){
-    			if(FILETRANSFER_LOGGER.isDebugEnabled())
-    				FILETRANSFER_LOGGER.info("No VM found with name: "+vmName+
-    						" for node: "+nodes[i].getNodeInformation().getName() );
-    			continue;
-    		}
-    		
-    		//TODO We only get the VN for the first process in the chain. We should check if it is a SSH RSH,etc...
-    		ExternalProcess eProcess= vm.getProcess();
-    		if(eProcess == null){
-    			if(FILETRANSFER_LOGGER.isDebugEnabled())
-    				FILETRANSFER_LOGGER.info("No Process linked with VM: "+vmName+
-						" for node: "+nodes[i].getNodeInformation().getName() );
-    				continue;
-    		}
-    		
-    		FileTransferWorkShop ftwRetrieve=eProcess.getFileTransferWorkShopRetrieve();
-    		FileDescription fd[] = ftwRetrieve.getAllFileDescriptions();
-    		for(int j=0; j < fd.length;j++){
-    				File srcFile = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
-    				File dstFile = new File(ftwRetrieve.getAbsoluteDstPath(fd[j]));
-    				
-    				try {
-    					File f= FileTransferService.pullFile(nodes[i], srcFile, dstFile);
-    					arrayFiles.add(f);
-					} catch (Exception e) {
-						FILETRANSFER_LOGGER.error("Unable to retrieve file:"+
-						 		srcFile.getAbsolutePath()+" from node"+
-								nodes[i].getNodeInformation().getName());
-					}
-    				
-    		}
-    	}
-    	
-    	return (File[]) arrayFiles.toArray(new File[0]);
+        try {
+            nodes = getNodes();
+        } catch (NodeException e) {
+            throw new ProActiveException(
+                "Can not Retrieve Files, since no nodes where created for Virtual Node" +
+                this.getName());
+        }
+
+        if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+            FILETRANSFER_LOGGER.debug("Retrieving files for " + nodes.length +
+                " node(s).");
+        }
+
+        /* For all the nodes we get the VirtualMachine that spawned it, and
+         * then the process linked with this VirtualMachine. We then obtain
+         * the FileTransfer Retrieve Workshop from the process and using
+         * the FileTransfer API we retrieve the Files.
+         */
+        for (int i = 0; i < nodes.length; i++) {
+            String vmName = nodes[i].getNodeInformation().getDescriptorVMName();
+            VirtualMachine vm = getVirtualMachine(vmName);
+
+            if (vm == null) {
+                if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+                    FILETRANSFER_LOGGER.info("No VM found with name: " +
+                        vmName + " for node: " +
+                        nodes[i].getNodeInformation().getName());
+                }
+                continue;
+            }
+
+            //TODO We only get the VN for the first process in the chain. We should check if it is a SSH RSH,etc...
+            ExternalProcess eProcess = vm.getProcess();
+            if (eProcess == null) {
+                if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+                    FILETRANSFER_LOGGER.info("No Process linked with VM: " +
+                        vmName + " for node: " +
+                        nodes[i].getNodeInformation().getName());
+                }
+                continue;
+            }
+
+            FileTransferWorkShop ftwRetrieve = eProcess.getFileTransferWorkShopRetrieve();
+            FileDescription[] fd = ftwRetrieve.getAllFileDescriptions();
+            for (int j = 0; j < fd.length; j++) {
+                File srcFile = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
+                File dstFile = new File(ftwRetrieve.getAbsoluteDstPath(fd[j]));
+
+                try {
+                    File f = FileTransferService.pullFile(nodes[i], srcFile,
+                            dstFile);
+                    arrayFiles.add(f);
+                } catch (Exception e) {
+                    FILETRANSFER_LOGGER.error("Unable to retrieve file:" +
+                        srcFile.getAbsolutePath() + " from node" +
+                        nodes[i].getNodeInformation().getName());
+                }
+            }
+        }
+
+        return (File[]) arrayFiles.toArray(new File[0]);
     }
-    
+
     /**
-     * This method transfers the deployment files specified in the descriptor. 
-     * To achieve this the VirtualMachine that spawned the node is obtained, 
-     * and then the process linked with this VirtualMachine. 
+     * This method transfers the deployment files specified in the descriptor.
+     * To achieve this the VirtualMachine that spawned the node is obtained,
+     * and then the process linked with this VirtualMachine.
      * From the process the FileTransfer Deploy Workshop is extracted, and the file
      * is transfered using the FileTransfer API.
      * @param node The node that the files will be transfered to.
      */
-    private void fileTransferDeploy(Node node) throws ProActiveException{
-    	
-    	if(FILETRANSFER_LOGGER.isDebugEnabled())
-			FILETRANSFER_LOGGER.debug("File Transfer Deploy files for node"+node.getNodeInformation().getName());
-    	
-		String vmName=node.getNodeInformation().getDescriptorVMName();
-		VirtualMachine vm= getVirtualMachine(vmName);
-		
-		if(vm == null){
-			throw new ProActiveException("No VM found with name: "+vmName+
-						" for node: "+node.getNodeInformation().getName() );
-		}
-		
-		//TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
-		ExternalProcess eProcess= vm.getProcess();
-		if(eProcess == null){
-				throw new ProActiveException("No Process linked with VM: "+vmName+
-					" for node: "+node.getNodeInformation().getName() );
-		}
-		
-		//if the process handled the FileTransfer we have nothing to do
-		if(!eProcess.isRequiredFileTransferDeployOnNodeCreation()){
-			if(FILETRANSFER_LOGGER.isDebugEnabled())
-				FILETRANSFER_LOGGER.debug("No ProActive FileTransfer API is required for this node.");
-			return;
-		}
-			
-		FileTransferWorkShop ftwDeploy=eProcess.getFileTransferWorkShopDeploy();
-		FileDescription fd[] = ftwDeploy.getAllFileDescriptions();
-	 	if(FILETRANSFER_LOGGER.isDebugEnabled()){
-			FILETRANSFER_LOGGER.debug("Transfering "+fd.length+" file(s)");
-	 	}
-		for(int j=0; j < fd.length;j++){
-				File srcFile = new File(ftwDeploy.getAbsoluteSrcPath(fd[j]));
-				File dstFile = new File(ftwDeploy.getAbsoluteDstPath(fd[j]));
-				
-				try {
-					FileTransferService.pushFile(node, srcFile, dstFile);
-				} catch (IOException e) {
-					throw new ProActiveException(e.getCause());
-				}
-		}
-    	
+    private void fileTransferDeploy(Node node) throws ProActiveException {
+        if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+            FILETRANSFER_LOGGER.debug("File Transfer Deploy files for node" +
+                node.getNodeInformation().getName());
+        }
+
+        String vmName = node.getNodeInformation().getDescriptorVMName();
+        VirtualMachine vm = getVirtualMachine(vmName);
+
+        if (vm == null) {
+            throw new ProActiveException("No VM found with name: " + vmName +
+                " for node: " + node.getNodeInformation().getName());
+        }
+
+        //TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
+        ExternalProcess eProcess = vm.getProcess();
+        if (eProcess == null) {
+            throw new ProActiveException("No Process linked with VM: " +
+                vmName + " for node: " + node.getNodeInformation().getName());
+        }
+
+        //if the process handled the FileTransfer we have nothing to do
+        if (!eProcess.isRequiredFileTransferDeployOnNodeCreation()) {
+            if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+                FILETRANSFER_LOGGER.debug(
+                    "No ProActive FileTransfer API is required for this node.");
+            }
+            return;
+        }
+
+        FileTransferWorkShop ftwDeploy = eProcess.getFileTransferWorkShopDeploy();
+        FileDescription[] fd = ftwDeploy.getAllFileDescriptions();
+        if (FILETRANSFER_LOGGER.isDebugEnabled()) {
+            FILETRANSFER_LOGGER.debug("Transfering " + fd.length + " file(s)");
+        }
+        for (int j = 0; j < fd.length; j++) {
+            File srcFile = new File(ftwDeploy.getAbsoluteSrcPath(fd[j]));
+            File dstFile = new File(ftwDeploy.getAbsoluteDstPath(fd[j]));
+
+            try {
+                FileTransferService.pushFile(node, srcFile, dstFile);
+            } catch (IOException e) {
+                throw new ProActiveException(e.getCause());
+            }
+        }
     }
 }
-
