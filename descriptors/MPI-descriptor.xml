@@ -38,7 +38,7 @@
 				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi" >
 					<commandPath value="/usr/bin/mpirun" />
 					<mpiOptions>
-						<hostsNumber>5</hostsNumber>
+						<processNumber>5</processNumber>
 						<localRelativePath>
 							<relativePath origin="user.home" value="/ProActive/src/org/objectweb/proactive/examples/mpi" />
 						</localRelativePath>
