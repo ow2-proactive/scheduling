@@ -59,12 +59,13 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     private FileTransferWorkShop ftsDeploy = null;
     private FileTransferWorkShop ftsRetrieve = null;
     protected String FILE_TRANSFER_DEFAULT_PROTOCOL = "dummy";
-    
+    private Thread threadERR;
+
     //Used to determine if a File Transfer is required to the Nodes deployed from
     //the VirtualNode. @see VirtualNodeImpl
-    private boolean requiresFileTransferDeployOnNodeCreation=false; 
+    private boolean requiresFileTransferDeployOnNodeCreation = false;
 
-	//
+    //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     protected AbstractExternalProcess() {
@@ -210,6 +211,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected void internalStopProcess() {
+        threadERR.stop();
+
         if (externalProcess != null) {
             externalProcess.destroy();
         }
@@ -237,11 +240,11 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         long end = beginning;
 
         /*
-        if (fileTransferLogger.isDebugEnabled()) {
-            fileTransferLogger.debug(
-                "Using the following FileTransferWorkShop:\n" + fts);
-        }
-        */
+           if (fileTransferLogger.isDebugEnabled()) {
+               fileTransferLogger.debug(
+                   "Using the following FileTransferWorkShop:\n" + fts);
+           }
+         */
         if (!fts.check()) {
             return; //No files to transfer or some error.
         }
@@ -259,11 +262,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             //If ProActive File Transfer will be used then we stop trying
             //more protocols. The file transfer will take place when
             //the nodes register back to this runtime, in the VirtualNodeImpl class.
-            if(copyProtocol[i].getProtocolName().equalsIgnoreCase("pftp")){
+            if (copyProtocol[i].getProtocolName().equalsIgnoreCase("pftp")) {
                 if (fileTransferLogger.isDebugEnabled()) {
                     fileTransferLogger.debug(
                         "ProActive File Transfer will be used later on.");
                 }
+
                 //TODO transfer this info to the virtual node level
                 success = true;
                 requiresFileTransferDeployOnNodeCreation = true;
@@ -292,7 +296,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         }
 
         if (!success) {
-        	fileTransferLogger.info("FileTransfer faild");
+            fileTransferLogger.info("FileTransfer faild");
         }
     }
 
@@ -305,13 +309,13 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         //The default is false, to keep on trying the protocols
         return false;
     }
-    
+
     /**
      * @see ExternalProcess.isRequiredFileTransferDeployOnNodeCreation()
-	 */
-	public boolean isRequiredFileTransferDeployOnNodeCreation() {
-		return requiresFileTransferDeployOnNodeCreation;
-	}
+     */
+    public boolean isRequiredFileTransferDeployOnNodeCreation() {
+        return requiresFileTransferDeployOnNodeCreation;
+    }
 
     protected void handleProcess(java.io.BufferedReader in,
         java.io.BufferedWriter out, java.io.BufferedReader err) {
@@ -355,8 +359,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         errThreadMonitor = new ThreadActivityMonitor();
         Runnable r = new ProcessInputHandler(err, errorMessageLogger,
                 errThreadMonitor);
-        Thread t = new Thread(r, "ERR -> " + getShortName(getCommand(), 20));
-        t.start();
+        threadERR = new Thread(r, "ERR -> " + getShortName(getCommand(), 20));
+        threadERR.start();
     }
 
     protected void handleOutput(java.io.BufferedWriter out) {
@@ -525,6 +529,16 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             this.threadMonitor = threadMonitor;
         }
 
+        public void destroy() {
+            isFinished = true;
+            threadMonitor.setActive(false);
+            try {
+                in.close();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         public void run() {
             if (AbstractExternalProcess.clogger.isDebugEnabled()) {
                 AbstractExternalProcess.clogger.debug("Process started Thread=" +
@@ -584,6 +598,16 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             MessageSink messageSink) {
             this.out = out;
             this.messageSink = messageSink;
+        }
+
+        public void destroy() {
+            isFinished = true;
+            waitForMonitoredThread();
+            try {
+                out.close();
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public void run() {
