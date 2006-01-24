@@ -1680,7 +1680,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 bch.addHandler(REL_PATH_TAG, pathHandler);
                 this.addHandler(MPI_LOCAL_PATH_TAG, bch);
                 this.addHandler(MPI_REMOTE_PATH_TAG, bch);
-                this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESS_NUMBER_TAG, new SingleValueUnmarshaller());
             }
 
             public void startContextElement(String name, Attributes attributes)
@@ -1695,7 +1695,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                         ((MPIProcess) targetProcess).setLocalPath((String) activeHandler.getResultObject());
                     } else if (name.equals(MPI_REMOTE_PATH_TAG)) {
                         ((MPIProcess) targetProcess).setRemotePath((String) activeHandler.getResultObject());
-                    } else if (name.equals(HOSTS_NUMBER_TAG)) {
+                    } else if (name.equals(PROCESS_NUMBER_TAG)) {
                         ((MPIProcess) targetProcess).setHostsNumber((String) activeHandler.getResultObject());
                     } else {
                         super.notifyEndActiveHandler(name, activeHandler);
