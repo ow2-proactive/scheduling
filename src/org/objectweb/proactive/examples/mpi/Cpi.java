@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.mpi.*;
+//import org.objectweb.proactive.mpi.*;
 
 
 /**

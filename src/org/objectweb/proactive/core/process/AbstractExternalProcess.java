@@ -59,7 +59,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     private FileTransferWorkShop ftsDeploy = null;
     private FileTransferWorkShop ftsRetrieve = null;
     protected String FILE_TRANSFER_DEFAULT_PROTOCOL = "dummy";
-    private Thread threadERR;
+    
 
     //Used to determine if a File Transfer is required to the Nodes deployed from
     //the VirtualNode. @see VirtualNodeImpl
@@ -359,8 +359,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         errThreadMonitor = new ThreadActivityMonitor();
         Runnable r = new ProcessInputHandler(err, errorMessageLogger,
                 errThreadMonitor);
-        threadERR = new Thread(r, "ERR -> " + getShortName(getCommand(), 20));
-        threadERR.start();
+        Thread t = new Thread(r, "ERR -> " + getShortName(getCommand(), 20));
+        t.start();
     }
 
     protected void handleOutput(java.io.BufferedWriter out) {
