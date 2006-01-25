@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.mpi.*;
 
 
 /**
@@ -48,15 +49,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *  this program just by calling the startMPI() method on the virtualnode
  *  which with the MPI program is associated.
  *  It permitts to manage as many MPI program as the user define some virtual nodes.
- *  
+ *
  */
 public class Cpi {
     static public void main(String[] args) {
         Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-        if (args.length != 2) {
+        if (args.length != 1) {
             logger.error("Usage: java " + Cpi.class.getName() +
-                " <number of iterations> <deployment file>");
+                " <deployment file>");
             System.exit(0);
         }
 
@@ -64,27 +65,15 @@ public class Cpi {
 
         VirtualNode vnCpi;
         ProActiveDescriptor pad = null;
-        int count;
-        int exitValue;
+        int exitValue=0;
         try {
-            pad = ProActive.getProactiveDescriptor("file:" + args[1]);
-            count = new Integer(args[0]).intValue();
-            int initValue = count-1;
+            pad = ProActive.getProactiveDescriptor("file:" + args[0]);
+
             // gets virtual node 
             vnCpi = pad.getVirtualNode("CPI");
-            // activates VN
-            vnCpi.activate();
             
-            while ((count--) > 0) {
-                logger.info(" -> Iteration [" + (initValue-count) + "]");
-                exitValue = vnCpi.startMPI();
-                if (exitValue != 0){
-                	logger.error("ERROR : try to run \"lamboot\" command");
-                	break;
-                }else{
-                	logger.info(" MPI code returned value  "+exitValue );
-                }
-            }
+            // nothing at the moment
+        
             vnCpi.killAll(false);
             System.exit(0);
         } catch (ProActiveException e) {
