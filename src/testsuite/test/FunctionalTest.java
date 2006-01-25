@@ -68,8 +68,8 @@ public abstract class FunctionalTest extends AbstractTest
      */
     public FunctionalTest() {
         super();
-        setName("A test with no name");
-        setDescription("A test with no description.");
+        setName("Unnamed test defined in class : " + getClass().getName());
+        setDescription("Undescribed test defined in class : " + getClass().getName());
     }
 
     /**
