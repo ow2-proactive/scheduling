@@ -211,7 +211,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected void internalStopProcess() {
-        threadERR.stop();
+        
 
         if (externalProcess != null) {
             externalProcess.destroy();
@@ -529,16 +529,6 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             this.threadMonitor = threadMonitor;
         }
 
-        public void destroy() {
-            isFinished = true;
-            threadMonitor.setActive(false);
-            try {
-                in.close();
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         public void run() {
             if (AbstractExternalProcess.clogger.isDebugEnabled()) {
                 AbstractExternalProcess.clogger.debug("Process started Thread=" +
@@ -598,16 +588,6 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             MessageSink messageSink) {
             this.out = out;
             this.messageSink = messageSink;
-        }
-
-        public void destroy() {
-            isFinished = true;
-            waitForMonitoredThread();
-            try {
-                out.close();
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-            }
         }
 
         public void run() {

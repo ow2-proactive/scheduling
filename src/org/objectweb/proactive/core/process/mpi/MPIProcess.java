@@ -128,8 +128,8 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         if (remotePath != null) {
             ft.addFile(localPath + "/" + hostsFileName,
                 remotePath + "/" + hostsFileName);
-            System.out.println(localPath + "/" + hostsFileName + " --> " +
-                                remotePath + "/" + hostsFileName);
+            // System.out.println(localPath + "/" + hostsFileName + " --> " +
+            //                     remotePath + "/" + hostsFileName);
         }
 
         //        System.out.println(localPath + "/" + hostsFileName + " --> " +

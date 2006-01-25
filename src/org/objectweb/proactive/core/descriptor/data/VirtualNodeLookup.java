@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
@@ -406,4 +407,16 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
 			throw new ProActiveException("No File Transfer Retrieve support from VirtualNodeLookup");
 		
 	}
+
+	public ExternalProcess getMPIProcess() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean hasMPIProcess() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	
 }
