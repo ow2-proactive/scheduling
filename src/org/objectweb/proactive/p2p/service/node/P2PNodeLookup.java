@@ -81,13 +81,14 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private HashMap nodeManagerMap = new HashMap();
     private boolean killAllFlag = false;
     private boolean onlyUnderloadedAnswer = false;
+	private String nodeFamilyRegexp = null;
 
     public P2PNodeLookup() {
         // the empty constructor
     }
 
     public P2PNodeLookup(Integer numberOfAskedNodes,
-        P2PService localP2pService, String vnName, String jobId) {
+        P2PService localP2pService, String vnName, String jobId, String nodeFamilyRegexp) {
         this.waitingNodesList = new Vector();
         this.nodesToKillList = new Vector();
         this.expirationTime = System.currentTimeMillis() + TIMEOUT;
@@ -101,13 +102,14 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         this.localP2pService = localP2pService;
         this.vnName = vnName;
         this.jobId = jobId;
+        this.nodeFamilyRegexp  = nodeFamilyRegexp;
     }
 
     // new constructor, for a load balanced environment
     public P2PNodeLookup(Integer numberOfAskedNodes,
         P2PService localP2pService, String vnName, String jobId,
-        String onlyUnderloadedAnswer) {
-        this.onlyUnderloadedAnswer = Boolean.getBoolean(onlyUnderloadedAnswer);
+        Boolean onlyUnderloadedAnswer) {
+        this.onlyUnderloadedAnswer = onlyUnderloadedAnswer.booleanValue();
         this.waitingNodesList = new Vector();
         this.nodesToKillList = new Vector();
         this.expirationTime = System.currentTimeMillis() + TIMEOUT;
@@ -290,7 +292,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         while (!this.allArrived()) {
             this.localP2pService.askingNode(TTL, null, this.localP2pService,
                 this.numberOfAskedNodes - this.acquiredNodes, stub,
-                this.vnName, this.jobId);
+                this.vnName, this.jobId, this.nodeFamilyRegexp);
 
             // Serving request
             service.blockingServeOldest(LOOKUP_FREQ);
@@ -312,7 +314,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         while (!this.allArrived() && (System.currentTimeMillis() < endTime)) {
             this.localP2pService.askingNode(TTL, null, this.localP2pService,
                 this.numberOfAskedNodes - this.acquiredNodes, stub,
-                this.vnName, this.jobId);
+                this.vnName, this.jobId, this.nodeFamilyRegexp);
             // Serving request
             if (timeout < LOOKUP_FREQ) {
                 service.blockingServeOldest(500);
@@ -379,7 +381,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 this.localP2pService.askingNode(TTL, null,
                     this.localP2pService,
                     this.numberOfAskedNodes - this.acquiredNodes, stub,
-                    this.vnName, this.jobId);
+                    this.vnName, this.jobId, this.nodeFamilyRegexp);
             }
 
             // Serving request

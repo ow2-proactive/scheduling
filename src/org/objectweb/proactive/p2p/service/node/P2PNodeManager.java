@@ -95,18 +95,23 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      * @return a <code>P2PNode</code> which contains a node or <code>null</code>
      * if no shared nodes are available.
      */
-    public P2PNode askingNode() {
+    public P2PNode askingNode(String nodeFamilyRegexp) {
         logger.debug("Asking a node to the nodes manager");
-        if ((this.availbaleNodes.size() == 0) &&
-                (this.bookedNodes.size() == 0) &&
-                (this.usingNodes.size() == 0)) {
-            this.deployingDefaultSharedNodes();
-        }
-        if (this.availbaleNodes.size() > 0) {
-            Node node = (Node) this.availbaleNodes.remove(0);
-            this.bookedNodes.add(new Booking(node));
-            logger.debug("Yes the manager has a node");
-            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+        if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
+                System.getProperty("os.name").matches(nodeFamilyRegexp)) {
+            logger.debug("Family Match");
+            if ((this.availbaleNodes.size() == 0) &&
+                    (this.bookedNodes.size() == 0) &&
+                    (this.usingNodes.size() == 0)) {
+                this.deployingDefaultSharedNodes();
+            }
+            if (this.availbaleNodes.size() > 0) {
+                Node node = (Node) this.availbaleNodes.remove(0);
+                this.bookedNodes.add(new Booking(node));
+                logger.debug("Yes the manager has a node");
+                return new P2PNode(node,
+                    (P2PNodeManager) ProActive.getStubOnThis());
+            }
         }
 
         // All nodes is already assigned
@@ -114,19 +119,23 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         return new P2PNode(null, null);
     }
 
-    public Vector askingAllNodes() {
+    public Vector askingAllNodes(String nodeFamilyRegexp) {
         logger.debug("Asking all nodes to the nodes manager");
-        if ((this.availbaleNodes.size() == 0) &&
-                (this.bookedNodes.size() == 0) &&
-                (this.usingNodes.size() == 0)) {
-            this.deployingDefaultSharedNodes();
-        }
-        if (this.availbaleNodes.size() > 0) {
-            Vector allNodes = new Vector(this.availbaleNodes);
-            this.availbaleNodes.removeAllElements();
-            this.bookedNodes.addAll(allNodes);
-            logger.debug("Yes the manager has some nodes");
-            return allNodes;
+        if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
+                System.getProperty("os.name").matches(nodeFamilyRegexp)) {
+            logger.debug("Family Match");
+            if ((this.availbaleNodes.size() == 0) &&
+                    (this.bookedNodes.size() == 0) &&
+                    (this.usingNodes.size() == 0)) {
+                this.deployingDefaultSharedNodes();
+            }
+            if (this.availbaleNodes.size() > 0) {
+                Vector allNodes = new Vector(this.availbaleNodes);
+                this.availbaleNodes.removeAllElements();
+                this.bookedNodes.addAll(allNodes);
+                logger.debug("Yes the manager has some nodes");
+                return allNodes;
+            }
         }
 
         // All nodes is already assigned
@@ -136,7 +145,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
 
     public P2PNode askingNode(boolean evenIfItIsShared) {
         if (!evenIfItIsShared) {
-            return askingNode();
+            return askingNode(null);
         }
         logger.debug("Asking a node to the nodes manager");
         if ((this.availbaleNodes.size() == 0) &&

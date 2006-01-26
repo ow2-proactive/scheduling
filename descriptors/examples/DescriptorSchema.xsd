@@ -9,8 +9,8 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:documentation>Deployment Descriptor Schema</xs:documentation>
 		</xs:annotation>
 		<xs:unique name="mainId">
-			<xs:selector xpath="mainDefinition"/>
-			<xs:field xpath="id"/>
+			<xs:selector xpath="mainDefinition" />
+			<xs:field xpath="id" />
 		</xs:unique>
 		<xs:unique name="processDefid">
 			<xs:selector xpath="infrastructure/processes/processDefinition"/>
@@ -39,10 +39,13 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
-		<xs:keyref name="VirtNodeFileTransfer" refer="filetransferid">
+		<xs:keyref name="VirtNodeDeployFileTransfer" refer="filetransferid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@FileTransferDeploy"/>
-			<!--xs:field xpath="@FileTransferRetrieve"/-->
+		</xs:keyref>
+		<xs:keyref name="VirtNodeRetrieveFileTransfer" refer="filetransferid">
+			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:field xpath="@FileTransferRetrieve"/>
 		</xs:keyref>
 		<xs:keyref name="vnFtServiceId" refer="serviceid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
@@ -600,7 +603,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="port" type="xs:positiveInteger" use="optional"/>
 		<xs:attribute name="multi_proc_nodes" type="xs:boolean" use="optional"/>
 		<xs:attribute name="xml_path" type="xs:string" use="optional"/>
-		<xs:attribute name="booking_nodes" type="xs:boolean" use="optional"/>
+		<xs:attribute name="node_family_regexp" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:simpleType name="MaxType">
 		<xs:restriction base="xs:string">
@@ -640,6 +643,9 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="unicoreProcess" type="unicoreProcessType"/>
 			<xs:element name="ngProcess" type="NGProcessType"/>
 			<xs:element name="hierarchicalProcess" type="hierarchicalProcessType"/>
+			<xs:element name="mpiProcess" type="mpiProcessType"/>
+			<xs:element name="dependentProcessSequence" type="dependentProcessSequenceType"/>
+			<xs:element name="independentProcessSequence" type="independentProcessSequenceType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -727,6 +733,16 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="hostname" type="xs:string" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="password" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="FileTransferRetrieveStructureType">
+		<xs:sequence>
+			<xs:element name="sourceInfo" type="FileTransferRetrieveStructureInfoType" minOccurs="0"/>
+			<xs:element name="destinationInfo" type="FileTransferRetrieveStructureInfoType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="refid" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="FileTransferRetrieveStructureInfoType">
+		<xs:attribute name="prefix" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
 	<xs:complexType name="RshProcessType">
@@ -817,8 +833,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -931,7 +947,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="gLiteOptions" type="gLiteOptionsType" minOccurs="0"/>
-			<xs:element name="JdlTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="JdlTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.glite.GLiteProcess"/>
 		<xs:attribute name="hostname" type="xs:string"/>
@@ -939,8 +955,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="JDLFileName" type="xs:string" use="required"/>
 		<xs:attribute name="Type" type="xs:string" default="Job"/>
 		<xs:attribute name="executable" type="xs:string" default="/bin/sh"/>
-		<xs:attribute name="stdOutput" type="xs:string" default="job.log"/>
-		<xs:attribute name="stdInput" type="xs:string"/>
+		<xs:attribute name="stdOutput" type="xs:string" default="output.log"/>
+		<xs:attribute name="stdInput" type="xs:string" default="input.log"/>
 		<xs:attribute name="stdError" type="xs:string" default="error.log"/>
 		<xs:attribute name="outputse" type="xs:string"/>
 		<xs:attribute name="retryCount" type="xs:string"/>
@@ -1132,7 +1148,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="unicoreDirPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="keyFilePath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="unicoreOption" type="unicoreOptionType" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.unicore.UnicoreProcess"/>
 		<xs:attribute name="keypassword" type="xs:string" use="optional"/>
@@ -1184,8 +1201,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="processReference"/>
 			<xs:element name="hierarchicalReference" type="ProcessReferenceType"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
@@ -1205,8 +1222,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferStructureType" minOccurs="0"/>
+			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ngOption" type="NGOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.nordugrid.NGProcess"/>
@@ -1224,4 +1241,41 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="errorFile" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+	<!-- mpiProcessType -->
+	<xs:complexType name="mpiProcessType">
+		<xs:sequence>
+			<xs:element minOccurs="1" ref="commandPath"/>
+			<xs:element minOccurs="1" name="mpiOptions" type="mpiOptionsType"/>
+		</xs:sequence>
+		<xs:attribute fixed="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" name="class" type="xs:string" use="required"/>
+		<xs:attribute name="mpiFileName" type="xs:string" use="required"/>
+		<xs:attribute name="hostsFileName" type="xs:string" use="optional"/>
+		<xs:attribute name="mpiCommandOptions" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<!--mpiOptions-->
+	<xs:complexType name="mpiOptionsType">
+		<xs:sequence>
+			<xs:element minOccurs="1" name="hostsNumber" type="xs:string"/>
+			<xs:element minOccurs="1" name="localRelativePath" type="FilePathType"/>
+			<xs:element minOccurs="0" name="remoteAbsolutePath" type="FilePathType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- end mpiOptions-->
+	<!-- end of mpiProcessType -->
+	<!-- dependentProcessSequenceType -->
+	<xs:complexType name="dependentProcessSequenceType">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" ref="processReference"/>
+		</xs:sequence>
+		<xs:attribute fixed="org.objectweb.proactive.core.process.DependentListProcessDecorator" name="class" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!-- end of dependentProcessSequenceType -->
+	<!-- independentProcessSequenceType -->
+	<xs:complexType name="independentProcessSequenceType">
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" ref="processReference"/>
+		</xs:sequence>
+		<xs:attribute fixed="org.objectweb.proactive.core.process.IndependentListProcessDecorator" name="class" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!-- end of independentProcessSequenceType -->
 </xs:schema>

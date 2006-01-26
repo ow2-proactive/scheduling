@@ -92,8 +92,10 @@ public class ServiceThread extends Thread {
             if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
                 // Start asking nodes
                 P2PService p2pService = ((P2PDescriptorService) service).getP2PService();
+                String nodeFamilyRegexp = ((P2PDescriptorService) service).getNodeFamilyRegexp();
+                nodeFamilyRegexp = (nodeFamilyRegexp != null)?nodeFamilyRegexp:"";
                 P2PNodeLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
-                        this.vn.getName(), this.vn.getJobID());
+                        nodeFamilyRegexp, this.vn.getName(), this.vn.getJobID());
                 ((VirtualNodeImpl) vn).addP2PNodesLookup(p2pNodesLookup);
                 this.nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
                 // Timeout

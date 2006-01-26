@@ -257,7 +257,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public void askingNode(int ttl, UniversalUniqueID uuid,
         P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
-        String vnName, String jobId) {
+        String vnName, String jobId, String nodeFamilyRegexp) {
         boolean broadcast;
         if (uuid != null) {
             logger.debug("AskingNode message received with #" + uuid);
@@ -275,7 +275,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if ((uuid != null) || (numberOfNodes == MAX_NODE)) {
             // Asking a node to the node manager
             if (numberOfNodes == MAX_NODE) {
-                Vector nodes = this.nodeManager.askingAllNodes();
+                Vector nodes = this.nodeManager.askingAllNodes(nodeFamilyRegexp);
                 for (int i = 0; i < nodes.size(); i++) {
                     Node current = (Node) nodes.get(i);
                     if (vnName != null) {
@@ -295,7 +295,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     lookup.giveNodeForMax(nodes, this.nodeManager);
                 }
             } else {
-                P2PNode askedNode = this.nodeManager.askingNode();
+                P2PNode askedNode = this.nodeManager.askingNode(nodeFamilyRegexp);
 
                 // Asking node available?
                 Node nodeAvailable = askedNode.getNode();
@@ -381,7 +381,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 uuid = generateUuid();
             }
             this.acquaintances.askingNode(ttl, uuid, remoteService,
-                numberOfNodes, lookup, vnName, jobId);
+                numberOfNodes, lookup, vnName, jobId, nodeFamilyRegexp);
             logger.debug("Broadcast askingNode message with #" + uuid);
         }
     }
@@ -406,21 +406,24 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         }
 
         this.askingNode(ttl, uuid, remoteService, numberOfNodes, lookup,
-            vnName, jobId);
+            vnName, jobId, null);
     }
 
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
+     * @param nodeFamilyRegexp the regexp for the famili, null or empty String for all.
      * @param vnName Virtual node name.
      * @param jobId of the vn.
      * @return the number of asked nodes.
      */
-    public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
-        Object[] params = new Object[4];
+    public P2PNodeLookup getNodes(int numberOfNodes, String nodeFamilyRegexp,
+        String vnName, String jobId) {
+        Object[] params = new Object[5];
         params[0] = new Integer(numberOfNodes);
         params[1] = this.stubOnThis;
         params[2] = vnName;
         params[3] = jobId;
+        params[4] = nodeFamilyRegexp;
 
         P2PNodeLookup lookup = null;
         try {
@@ -454,6 +457,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         return lookup;
     }
 
+    /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
+     * @param numberOfNodes the number of asked nodes.
+     * @param vnName Virtual node name.
+     * @param jobId of the vn.
+     * @return the number of asked nodes.
+     */
+    public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
+        return this.getNodes(numberOfNodes, null, vnName, jobId);
+    }
+
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName,
         String jobId, boolean onlyUnderloaded) {
         Object[] params = new Object[5];
@@ -461,7 +474,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         params[1] = this.stubOnThis;
         params[2] = vnName;
         params[3] = jobId;
-        params[4] = String.valueOf(onlyUnderloaded);
+        params[4] = new Boolean(onlyUnderloaded);
 
         P2PNodeLookup lookup = null;
         try {
@@ -514,7 +527,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             return this.acquaintanceManager.randomPeer().getANode(vnName,
                 jobId, service);
         }
-        P2PNode askedNode = this.nodeManager.askingNode();
+        P2PNode askedNode = this.nodeManager.askingNode(null);
         Node nodeAvailable = askedNode.getNode();
 
         if (nodeAvailable != null) {

@@ -57,6 +57,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     protected int askedNodes = 0;
     protected P2PService serviceP2P;
     private Vector peerList;
+    protected String nodeFamilyRegexp = null;
 
     public P2PDescriptorService() {
     }
@@ -224,4 +225,19 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     public P2PService getP2PService() {
         return this.serviceP2P;
     }
+
+	/** 
+	 * Set the regexp for the node family. 
+	 * @param nodeFamilyRegexp the regexp in Java Regexp String format.
+	 */
+	public void setNodeFamilyRegexp(String nodeFamilyRegexp) {
+		this.nodeFamilyRegexp = nodeFamilyRegexp;
+	}
+	
+	/**
+	 * @return thr node family regexp specified inside the XML descriptor.
+	 */
+	public String getNodeFamilyRegexp() {
+		return this.nodeFamilyRegexp;
+	}
 }

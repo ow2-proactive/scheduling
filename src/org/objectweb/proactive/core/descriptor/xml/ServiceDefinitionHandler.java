@@ -143,6 +143,12 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             if (checkNonEmpty(xml_path)) {
                 p2pDescriptorService.setXmlPath(xml_path);
             }
+
+            String node_family_regexp = attributes.getValue(
+                    "node_family_regexp");
+            if (checkNonEmpty(node_family_regexp)) {
+                p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
+            }
         }
 
         protected void notifyEndActiveHandler(String name,
