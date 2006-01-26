@@ -82,9 +82,8 @@ public class SshRmiBodyAdapter extends RmiBodyAdapter {
                 construct(bodyStub);
             } catch (ProActiveException e1) {
                 throw new java.io.IOException(
-                    "The remote object with the given url is not accessible ");
+                		"The remote object at " + url + " is not accessible ");
             }
-            ;
             return this;
         } catch (java.rmi.NotBoundException e) {
             throw new java.io.IOException("The url " + url +

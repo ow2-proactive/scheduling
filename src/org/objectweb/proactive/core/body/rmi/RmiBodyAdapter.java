@@ -150,7 +150,7 @@ public class RmiBodyAdapter extends BodyAdapterImpl {
                 construct((RmiRemoteBody) o);
             } catch (ProActiveException e1) {
                 throw new java.io.IOException(
-                    "The remote object with the given url is not accessible ");
+                		"The remote object at " + url + " is not accessible ");
             }
             return this;
         } else {
