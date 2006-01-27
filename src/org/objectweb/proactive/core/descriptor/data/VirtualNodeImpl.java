@@ -100,6 +100,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger MPI_LOGGER = ProActiveLogger.getLogger(Loggers.MPI_DEPLOY);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+    private final static Logger DEPLOYMENT_FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     public static int counter = 0;
 
     //
@@ -1736,8 +1737,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         //if the process handled the FileTransfer we have nothing to do
         if (!eProcess.isRequiredFileTransferDeployOnNodeCreation()) {
-            if (FILETRANSFER_LOGGER.isDebugEnabled()) {
-                FILETRANSFER_LOGGER.debug(
+            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+                DEPLOYMENT_FILETRANSFER_LOGGER.debug(
                     "No ProActive FileTransfer API is required for this node.");
             }
             return;
