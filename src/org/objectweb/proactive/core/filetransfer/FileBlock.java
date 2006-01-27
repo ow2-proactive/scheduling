@@ -30,16 +30,23 @@ package org.objectweb.proactive.core.filetransfer;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 //import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 /**
  * @author ProActive Team 09/2005
  */
 public class FileBlock implements Serializable{
-
+    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+	protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+	 
 	public static int DEFAULT_BLOCK_SIZE=256*1024; //Bytes
 	
 	private String srcFilename;
@@ -49,6 +56,7 @@ public class FileBlock implements Serializable{
 	private long offset;
 	private int blockSize;
 	private boolean hasNextBlock;
+	private long numberOfBlocks;
 	
 	public FileBlock(){
 	}
@@ -70,6 +78,7 @@ public class FileBlock implements Serializable{
 		this.offset=offset;
 		this.blockSize=blockSize;
 		this.buffer=new byte[blockSize];
+		this.numberOfBlocks=0;
 		
 		this.usage=0;
 		this.hasNextBlock=true;
@@ -89,16 +98,15 @@ public class FileBlock implements Serializable{
 	
 	public long getNumberOfBlocks(){
 		
-		File F = new File(this.srcFilename);
-		return (long) Math.ceil((double)F.length()/this.blockSize);
+		return numberOfBlocks;
 	}
 	
-	public void loadNexBlock(){
+	public void loadNexBlock() throws IOException{
 
 		try {
 			InputStream is = new FileInputStream(srcFilename);
 			long skipped=is.skip(offset);
-			if(skipped!=offset) throw new Exception();
+			if(skipped!=offset) throw new IOException("Erro while skipping file offset");
 			
 			usage=is.read(buffer, 0, blockSize);
 			offset+=usage;
@@ -106,11 +114,14 @@ public class FileBlock implements Serializable{
 			
 			if(usage<blockSize)
 				hasNextBlock=false;
+			
+			File F = new File(this.srcFilename);
+			numberOfBlocks=Math.round(Math.ceil((double)F.length()/this.blockSize));
 
-		} catch (Exception e) {
+		} catch (IOException e) {
 			hasNextBlock=false;
 			usage=0;
-			e.printStackTrace();
+			throw e;
 		}
 	}
 	
@@ -119,6 +130,7 @@ public class FileBlock implements Serializable{
 	}
 	
 	public void saveCurrentBlock(){
+		
 		if(usage<0) usage=0;
 		
 		try {

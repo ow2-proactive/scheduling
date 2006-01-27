@@ -52,7 +52,8 @@ public class FileTransferService implements Serializable,
     ProActiveInternalObject {
 	protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     protected static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = 5;
-
+    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+    
     public FileTransferService() {
     }
 
@@ -60,7 +61,7 @@ public class FileTransferService implements Serializable,
      * This method will save the specified FileBlock.
      * @param fileblock
      */
-    private Boolean saveFileBlock(FileBlock fileblock)
+    public void saveFileBlock(FileBlock fileblock)
         throws IOException {
         //remote verification
         File f = new File(fileblock.getDstFilename());
@@ -69,9 +70,10 @@ public class FileTransferService implements Serializable,
             throw new IOException("Can't write to: " +
                 fileblock.getDstFilename());
         }
+    	//logger.debug("saveFileBlock:"+sayHello());
+    	//logger.debug(fileblock.getClass());
+    	
         fileblock.saveCurrentBlock();
-
-        return new Boolean(true);
     }
 
     /**
@@ -81,7 +83,7 @@ public class FileTransferService implements Serializable,
      * @return
      * @throws IOException
      */
-    private FileBlock getFileBlock(String filename, long offset)
+    public FileBlock getFileBlock(String filename, long offset)
         throws IOException {
         //remote verification
         File f = new File(filename);
@@ -92,7 +94,7 @@ public class FileTransferService implements Serializable,
 
         FileBlock newBlock = new FileBlock(filename, offset);
         newBlock.loadNexBlock();
-
+        
         return newBlock;
     }
 
@@ -108,25 +110,15 @@ public class FileTransferService implements Serializable,
         Boolean[] sent_blocks = new Boolean[DEFAULT_MAX_SIMULTANEOUS_BLOCKS];
         while (fileBlock.hasNextBlock()) {
             int i;
+            
+            //Exceptions can happen here
             for (i = 0; (i < sent_blocks.length) && fileBlock.hasNextBlock();
                     i++) {
                 fileBlock.loadNexBlock();
                 numBlocks++;
-                sent_blocks[i] = ftsRemote.saveFileBlock(fileBlock); //remote (async) invocation
+                ftsRemote.saveFileBlock(fileBlock); //remote (async) invocation (not yet since it's void an throws Exception)
             }
-
-            //Wait for future values
-            for (int j = 0; j < i; j++) {
-                //A block failed aborting
-                if (sent_blocks[j].booleanValue() == false) { //Rendez vous
-                    logger.error(
-                        "Remote saving of file block was unsuccessful." +
-                        dstFile.getAbsolutePath());
-                    throw new IOException(
-                        "Remote saving of file block was unsuccessful." +
-                        dstFile.getAbsolutePath());
-                }
-            }
+            //Wait for exceptions here
         }
 
         if(logger.isDebugEnabled()){
@@ -151,8 +143,7 @@ public class FileTransferService implements Serializable,
         	fileBlock.saveCurrentBlock();
         	long totalNumBlocks=fileBlock.getNumberOfBlocks();
         	long blockSize=fileBlock.getBlockSize();
-        	
-    
+
         	FileBlock[] flyingBlocks = new FileBlock[DEFAULT_MAX_SIMULTANEOUS_BLOCKS];
             while (numBlocks < totalNumBlocks) {
                 int i;
@@ -184,7 +175,7 @@ public class FileTransferService implements Serializable,
     public static File pullFile(Node node, File srcFile, File dstFile)
         throws IOException, ProActiveException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Pulling file: remote@" + srcFile.getAbsolutePath() +
+            logger.debug("Pulling file: "+node.getNodeInformation().getHostName()+"@" + srcFile.getAbsolutePath() +
                 " -> local@" + dstFile.getAbsolutePath());
         }
 
@@ -204,9 +195,14 @@ public class FileTransferService implements Serializable,
             FileTransferService ftsLocal = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
                     null);
 
+            if(logger.isDebugEnabled()){
+            	logger.debug("Local FTS: "+ftsLocal.sayHello());
+            	logger.debug("Remote FTS: "+ftsRemote.sayHello());
+            }
+            
             //We ask the remote AO to send the file to us
-            futureFile = ftsRemote.sendFile(ftsLocal, srcFile, dstFile); //this call is asynchronous
-            //futureFile = ftsLocal.receiveFile(ftsRemote, srcFile, dstFile); //alternative
+            //futureFile = ftsRemote.sendFile(ftsLocal, srcFile, dstFile); //this call is asynchronous
+            futureFile = ftsLocal.receiveFile(ftsRemote, srcFile, dstFile); //alternative
         } catch (Exception e) {
             e.printStackTrace();
             throw new ProActiveException(
@@ -220,7 +216,7 @@ public class FileTransferService implements Serializable,
         throws IOException, ProActiveException {
         if (logger.isDebugEnabled()) {
             logger.debug("Pushing file: local@" + srcFile.getAbsolutePath() +
-                " -> remote@" + dstFile.getAbsolutePath());
+                " -> "+node.getNodeInformation().getHostName()+"@" + dstFile.getAbsolutePath());
         }
 
         //local verification
@@ -239,6 +235,10 @@ public class FileTransferService implements Serializable,
             FileTransferService ftsLocal = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
                     null);
 
+            if(logger.isDebugEnabled()){
+            	logger.debug("Local FTS: "+ftsLocal.sayHello());
+            	logger.debug("Remote FTS: "+ftsRemote.sayHello());
+            }
             //We ask the local AO to send the file to the remote AO
             ftsLocal.sendFile(ftsRemote, srcFile, dstFile); //this call is asynchronous
         } catch (Exception e) {
@@ -247,7 +247,23 @@ public class FileTransferService implements Serializable,
                 "Unable to connect or use ProActive Node: " + node);
         }
     }
+    
+    /** The Active Object creates and returns information on its location
+     * @return a StringWrapper which is a Serialized version, for asynchrony */
+    public String sayHello() {
+        return "Hello World from " + getHostName() + " at " +
+            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
+    }
 
+    /** finds the name of the local machine */
+    static String getHostName() {
+        try {
+            return java.net.InetAddress.getLocalHost().toString();
+        } catch (Exception e) {
+            return "unknown";
+        }
+    }
+    
     public static void main(String[] args) throws IOException {
         String filenameSrcA = "/home/mleyton/test/Test";
         String filenameSrcB = "/home/mleyton/test/Test-out";
