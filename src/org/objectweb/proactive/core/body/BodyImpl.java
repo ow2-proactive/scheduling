@@ -350,7 +350,13 @@ public abstract class BodyImpl extends AbstractBody
                         timer.setTimer("serve." + request.getMethodName());
                         timer.start();
                     }
-                    reply = request.serve(BodyImpl.this);
+                    
+                    //If the request is not a "terminate Active Object" request, 
+                    //it is served normally.
+                    if(!isTerminateAORequest(request)) {
+                    	reply = request.serve(BodyImpl.this);
+                    }
+                    
                     if (Profiling.SERVICE) {
                         //timer.setTimer("serve."+this.getMethodName());
                         timer.stop();
@@ -476,6 +482,20 @@ public abstract class BodyImpl extends AbstractBody
          */
         private synchronized long getNextSequenceID() {
             return ++absoluteSequenceID;
+        }
+        
+        /**
+         * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediatly".
+         * If true, AbstractBody.terminate() is called
+         * @param request The request to serve 
+         * @return true if the name of the method is "terminateAO" or "terminateAOImmediatly".
+         */
+        private boolean isTerminateAORequest(Request request) {
+        	boolean terminateRequest = (request.getMethodName()).startsWith("terminateAO");
+        	if (terminateRequest) {
+        		terminate();
+        	}
+        	return terminateRequest;
         }
     }
 
