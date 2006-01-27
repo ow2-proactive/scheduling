@@ -47,6 +47,7 @@
 			<unitTest exclude="no" class="nonregressiontest.descriptor.launcher.Test" />
 			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestAPI" />
 			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestDeployRetrieve" />
+			<unitTest exclude="yes" class="nonregressiontest.filetransfer.TestAPINotLocal" /> <!-- Skip since it is not really a local test -->
 			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.onewaycall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.asynchronouscall.Test" />
