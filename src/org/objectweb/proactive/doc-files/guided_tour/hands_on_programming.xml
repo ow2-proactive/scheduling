@@ -33,7 +33,8 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata  fileref="guided_tour/pics/hello/clientserver.png" format="PNG"/>            </imageobject>
+             <imagedata  fileref="guided_tour/pics/hello/clientserver.png" format="PNG"  width="6in"/>
+            </imageobject>
           </mediaobject>
         </informalfigure>
 </para>
@@ -62,7 +63,7 @@
           <informalfigure>
             <mediaobject>
               <imageobject>
-               <imagedata  fileref="guided_tour/pics/hello/initializedhello.png" format="PNG"/>
+               <imagedata  fileref="guided_tour/pics/hello/initializedhello.png" format="PNG"  width="6in"/>
               </imageobject>
             </mediaobject>
           </informalfigure>
@@ -179,7 +180,7 @@ cd ..
           <informalfigure>
             <mediaobject>
               <imageobject>
-               <imagedata  fileref="guided_tour/pics/hello/migratablehello.png" format="PNG"/>
+               <imagedata  fileref="guided_tour/pics/hello/migratablehello.png" format="PNG" width="6in"/>
               </imageobject>
             </mediaobject>
           </informalfigure>
@@ -290,7 +291,7 @@ cd ..
           <informalfigure>
             <mediaobject>
               <imageobject>
-               <imagedata  fileref="guided_tour/pics/hello/hellogui.png" format="PNG"/>
+               <imagedata  fileref="guided_tour/pics/hello/hellogui.png" format="PNG" width="6in"/>
               </imageobject>
             </mediaobject>
           </informalfigure>

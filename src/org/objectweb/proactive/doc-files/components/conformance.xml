@@ -181,8 +181,8 @@ public void bindFc(String clientItfName, Object serverItf) {
         <title>The ProActive MOP with component meta-objects and component representative</title>
         <mediaobject>
          <imageobject>
-          <imagedata  fileref="components/pics/components-mop.png" format="PNG"/>
-          </imageobject>
+            <imagedata  fileref="components/pics/components-mop.png" format="PNG"  width="6in"/>
+         </imageobject>
         </mediaobject>
        </figure>
       </para>

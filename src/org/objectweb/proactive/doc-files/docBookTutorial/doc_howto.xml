@@ -7,6 +7,7 @@
           <!ENTITY QuickStart SYSTEM "QuickStart.xml">
           <!ENTITY Examples SYSTEM "DocBookExamples.xml">
           <!ENTITY Limitations SYSTEM "Limitations.xml">
+          <!ENTITY Customization SYSTEM "Customization.xml">
           ]>
 
 <article>
@@ -25,6 +26,7 @@
   &QuickStart;  
   &Examples;  
   &Limitations;
+  &Customization;
 <!--  You might add other files here, just don't forget to add the ENTITY  -->
 
 </article>

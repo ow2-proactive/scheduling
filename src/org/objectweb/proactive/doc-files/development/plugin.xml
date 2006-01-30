@@ -29,7 +29,8 @@
        <title>The plugin's interface</title>
         <mediaobject>
           <imageobject>
-           <imagedata  fileref="development/plugin_files/guided_tour.jpg" format="JPG"/>          </imageobject>
+            <imagedata  fileref="development/plugin_files/guided_tour.jpg" format="JPG" width="6in"/>
+          </imageobject>
         </mediaobject>
       </figure>
       <para>This guided tour (that is actually eclipse cheat sheet) purposes:</para>
@@ -68,7 +69,8 @@
        <title>One wizard popup</title>
         <mediaobject>
           <imageobject>
-           <imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"/>          </imageobject>
+           <imagedata  fileref="development/plugin_files/wizard_active.jpg" format="JPG"  width="6in"/>
+          </imageobject>
         </mediaobject>
       </figure>
     </sect1>
@@ -80,7 +82,8 @@
        <title>The editor error highlighting</title>
         <mediaobject>
           <imageobject>
-           <imagedata  fileref="development/plugin_files/editor.jpg" format="JPG"/>          </imageobject>
+            <imagedata  fileref="development/plugin_files/editor.jpg" format="JPG" width="6in"/>
+          </imageobject>
         </mediaobject>
       </figure>
     </sect1>

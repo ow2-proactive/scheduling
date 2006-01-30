@@ -12,8 +12,8 @@
     </listitem>
 
     <listitem>
-      <para>If you want a new sect1 of your own, copy one of the existing
-      files. (doc-files/WSDoc for example)</para>
+      <para>If you want a new chapter of your own, copy one of the existing
+       files. (<literal>doc-files/WSDoc</literal> for example)</para>
     </listitem>
 
     <listitem>
@@ -53,7 +53,15 @@
     </listitem>
 
     <listitem>
-      <para>Commit your changes to the svn repository: </para>
+     <para>Make sure your new additions make a nice new document. 
+      Run the script called <literal>compile/generate_doc.sh</literal>,
+      this should give you an html copy of the doc, and maybe a pdf...
+      Eventually, you will only need to run an ant target (probably build docs)</para>
     </listitem>
+    
+    <listitem>
+     <para>Commit your changes to the svn repository</para>
+    </listitem>
+    
   </orderedlist>
 </sect1>

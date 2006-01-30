@@ -42,19 +42,38 @@
 <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
-
- <!ENTITY FAQ SYSTEM "FAQ.xml"> 
+<!ENTITY FAQ SYSTEM "FAQ.xml"> 
 ]>
 <book>
+ <bookinfo>
   <title>ProActive v3.0.1 Documentation</title>
+<!--   <releaseinfo role="svn">$Id$ </releaseinfo> -->
+  <corpauthor>OASIS Research Team</corpauthor>
+  <copyright>
+   <year>2001-2006</year>
+   <holder>INRIA</holder>
+  </copyright>
+  <legalnotice id="LegalNotice">
+   <para>
+    ProActive is a LGPL middleware. You may edit the sources, and diffuse your changes. 
+    TODO: please fill this legal notice in.
+   </para>
+  </legalnotice>
+  <mediaobject>
+     <imageobject>
+       <imagedata fileref="images/ProActiveLogo.png" format="PNG" width="6in" />
+     </imageobject>
+  </mediaobject>
+ </bookinfo>
+ 
+<!-- HERE SHOULD BE INCLUDED THE PREFACE!  -->
 
  <part id="ProActiveIntroduction"> <title>Introduction</title>
    &Principles; 
    &Installation; 
   </part><part id="ProActiveProgramming"> <title>Programming</title> 
-
    &ProActiveBasis; 
-    &AOCreation;   
+   &AOCreation;   
    &TypedGroupCommunication; 
    &OOSPMD; 
    &Migration; 
@@ -63,7 +82,7 @@
    </part><part id="ProActiveDeployment"> <title> Deploying</title> 
    &PAConfiguration; 
    &Descriptor;  
-  &VariableContract;  
+   &VariableContract;  
    &FileTransfer; 
    &SSHTunneling; 
    &faultTolerance; 
@@ -76,27 +95,26 @@
    &examples; 
    &perspectives; 
   </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title> 
-    &p2p;  
- &Security;   
-  &WSDoc;  
+   &p2p;  
+   &Security;   
+   &WSDoc;  
    &OSGi; 
    &mpi; 
   </part><part id="ProActiveTools"> <title> User Interface and tools</title> 
-     &IC2D;  
+   &IC2D;  
    &plugin; 
    </part><part id="ProActiveGuidedTour"> <title> Guided Tour</title>  
-    &guidedindex;  
-    &capabilities-intro;   
+   &guidedindex;  
+   &capabilities-intro;   
    &hands_on_programming;   
    &OOSPMDJacobiexample;   
-  &nbody;  
-  &conclusion;  
+   &nbody;  
+   &conclusion;  
  </part><part id="ProActiveExtensions"> <title> Extending ProActive</title> 
    &DescriptorProcess; 
    &devFileTransfer; 
    &devFaultTolerance; 
    &MOP; 
-
  </part> <part id="backMattersPart"> <title> Back matters</title>  
 <!--   Should be called appendix, anyway  -->
    &FAQ; 

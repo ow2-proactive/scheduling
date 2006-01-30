@@ -34,7 +34,7 @@
          <title>The Model</title>
           <mediaobject>
             <imageobject>
-              <imagedata  fileref="images/proActiveModel.png" format="PNG"/> 
+              <imagedata  fileref="images/proActiveModel.png" format="PNG" width="6in"/> 
              </imageobject>
           </mediaobject>
         </figure>
@@ -86,7 +86,7 @@
          <title>A call onto an active object as opposed to a call onto passive one</title>    
         <mediaobject>
             <imageobject>
-              <imagedata  fileref="images/activeObjectMethodCall.png" format="PNG"/>
+              <imagedata  fileref="images/activeObjectMethodCall.png" format="PNG" width="6in"/>
              </imageobject>
           </mediaobject>
         </figure>

@@ -81,8 +81,7 @@
       <title>The API architecture.</title>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/bnb_api_archi.png" format="PNG"
-                        />
+            <imagedata fileref="images/bnb_api_archi.png" format="PNG" width="6in" />
           </imageobject>
         </mediaobject>
 
@@ -122,8 +121,7 @@
       <title>Broadcasting a new solution.</title>
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/bnb_api_com.png" format="PNG"
-                        />
+           <imagedata fileref="images/bnb_api_com.png" format="PNG" width="6in"/>
           </imageobject>
         </mediaobject>
 

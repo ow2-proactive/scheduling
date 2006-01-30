@@ -46,7 +46,7 @@ selection, resource location and type, or mapping process on resources.
           <title>File transfer and asking for resources</title>
           <mediaobject>
            <imageobject>
-            <imagedata fileref="mpi_files/deployment.png" format="PNG" />
+             <imagedata fileref="mpi_files/deployment.png" format="PNG"  width="6in"/>
            </imageobject>
           </mediaobject>
          </figure>
@@ -79,7 +79,7 @@ Each MPI job is as embedded in a Virtual Node containing resources specification
                  <title>start MPI process and get returned value</title> 
                  <mediaobject>
                   <imageobject>
-                   <imagedata fileref="mpi_files/launch.png" format="PNG" />
+                   <imagedata fileref="mpi_files/launch.png" format="PNG"  width="6in"/>
                   </imageobject>
                  </mediaobject>
                 </figure>
@@ -123,10 +123,10 @@ This functionality is currently under development.
 		<para>The section aims at having a look at the infrastructure implemented around MPI.</para>
 		<para>
 			<figure>
-                         <title> Process Package Architecture</title>
+        <title> Process Package Architecture</title>
 				<mediaobject>
 					<imageobject>
-						<imagedata fileref="mpi_files/architecture.png" format="PNG" />
+           <imagedata fileref="mpi_files/architecture.png" format="PNG"  width="6in"/>
 					</imageobject>
 				</mediaobject>
 			</figure>

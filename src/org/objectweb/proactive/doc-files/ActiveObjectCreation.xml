@@ -711,7 +711,8 @@ ce());
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/activeObjectComponents.png"
-                       format="PNG"  />
+                       format="PNG"  
+                       width="6in"/>
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -1118,7 +1119,7 @@ ce());
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectComponents.png"
-                               format="PNG"  />
+                               format="PNG"  width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1137,7 +1138,7 @@ ce());
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectAllComponents.png"
-                               format="PNG"  />
+                               format="PNG"  width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1207,7 +1208,7 @@ ce());
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG"  />
+                           format="PNG"  width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1536,7 +1537,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e6.png" format="PNG"  />
+             <imagedata fileref="images/e6.png" format="PNG"  width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1547,7 +1548,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e7.png" format="PNG"  />
+             <imagedata fileref="images/e7.png" format="PNG"  width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>

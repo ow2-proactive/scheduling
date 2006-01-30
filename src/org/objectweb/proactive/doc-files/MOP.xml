@@ -4,6 +4,23 @@
   
     <sect1 remap="h2">
       <title><anchor id="MOP_html_impl"/>Implementation: a Meta-Object Protocol</title>
+      
+<!-- TODO : this screen is for testing! -->
+
+<example>
+ <title>My program listing</title>
+ <programlisting>
+  <xi:include  parse="text"
+               href="../examples/hello/TinyHello.java"
+               xmlns:xi="http://www.w3.org/2001/XInclude"/>
+ </programlisting>
+</example>
+
+<screen>
+Just some text
+Now this is a very very very very very very very very very very very very very   very very very very very very very very very very very very very very very very very very long line!
+</screen>
+<!-- END TODO : this screen is for testing! -->
       <para>ProActive is built on top of a metaobject protocol (MOP) that permits
  reification of method invocation and constructor call. As this MOP is not limited to the
  implementation of our transparent remote objects library, it also provides an open framework for

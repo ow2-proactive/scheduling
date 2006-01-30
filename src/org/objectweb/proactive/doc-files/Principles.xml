@@ -12,16 +12,16 @@
     beginning, and change over time. <emphasis role="bold">Seamless implies
     reuse, smooth and incremental transitions</emphasis>.</para>
 
-    <para><figure>
+<!-- TODO : PLEASE PUT THIS PICTURE BACK!
+     <para><figure>
         <title>Different computing deployment paradigms</title>
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/proActiveModelColor.png" format="PNG"
-                        />
+            <imagedata fileref="images/proActiveModelColor.png" format="PNG" width="6in"/>
           </imageobject>
         </mediaobject>
-      </figure></para>
+      </figure></para>-->
 
     <para>A huge gap yet exists between multithreaded and distributed Java
     applications which forbids code reuse in order to build distributed

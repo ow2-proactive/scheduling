@@ -205,7 +205,7 @@
            <title>Running the Jacobi application, and viewing with IC2D</title>
             <mediaobject>
               <imageobject>
-                <imagedata   fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG"/>  
+                 <imagedata   fileref="guided_tour/pics/screenshots/jacobiic2d.png" format="PNG" width="6in"/>  
                </imageobject>
             </mediaobject>
           </figure>
@@ -230,7 +230,8 @@
            <title>With all communications</title>
             <mediaobject>
               <imageobject>
-                <imagedata   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG"/>              </imageobject>
+               <imagedata   fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png" format="PNG" width="6in"/>
+              </imageobject>
               
             </mediaobject>
           </figure>
@@ -238,7 +239,8 @@
            <title>With a barrier, there are many less comunications</title>
             <mediaobject>
               <imageobject>
-                <imagedata   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG"/>              </imageobject>
+                <imagedata   fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png" format="PNG" width="6in"/>
+               </imageobject>
               
             </mediaobject>
           </figure>
@@ -280,7 +282,8 @@
            <title>IC2D viewing the Jacobi application with 9 JVMS on the same machine</title>
            <mediaobject>
               <imageobject>
-                <imagedata   fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG"/>              </imageobject>
+                <imagedata   fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png" format="PNG" width="6in"/>
+               </imageobject>
             </mediaobject>
           </figure>
           <para>You do not need to recompile, just restart the execution. Use IC2D to

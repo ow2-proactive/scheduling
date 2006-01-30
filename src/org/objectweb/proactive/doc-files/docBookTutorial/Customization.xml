@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sect1 id="Customization">
+  <title>Stylesheet Customization</title>
+
+  <para>Ok, now you're nearly a docbook guru? You want to get right down to
+  the entrails of the machinery? OK, hop on and enjoy the ride! Here are a few
+  notes on how you should go about customizing the output. That means,
+  changing how the pdf and html are written.</para>
+
+  <sect2 id="directory">
+    <title>File hierarchy</title>
+
+    <para>The files for configuration are the following:</para>
+
+    <itemizedlist>
+     <listitem><para>
+        <emphasis role="bold">html.xsl</emphasis> This is where all the
+        html specific customizations are made</para>
+      </listitem>
+
+      <listitem><para>
+        <emphasis role="bold">pdf.xsl</emphasis> This is where all the
+        pdf specific customizations are made</para>
+      </listitem>
+
+      <listitem><para>
+        <emphasis role="bold">common.xsl</emphasis> This is where all
+        the common specifications are made, ie those that go and in pdf and in
+        html.</para>
+      </listitem>
+
+      <listitem><para>
+        <emphasis role="bold">html.titlepage.templates.xml</emphasis>
+        This is the template which modifies the html titlepage layout</para>
+      </listitem>
+
+      <listitem><para>
+        <emphasis role="bold">pdf.titlepage.templates.xml</emphasis>
+        This is the template which modifies the pdf titlepage layout</para>
+      </listitem>
+    </itemizedlist>
+
+    <para><emphasis role="bold">Please mind:</emphasis> The last two files are
+    used to generate one more layer, files called html.titlepage.xsl and
+    pdf.titlepage.xsl. The latter should not be edited, as they reflect the
+    changes made in the former.</para>
+  </sect2>
+
+  <sect2>
+    <title>What you can change</title>
+
+    <para>Basically, in the customization layers, you have full control (just
+    do what you want). The only thing is that each block (template,
+    variable...) should be described by a comment. That will help later users.
+    Long template names are not sufficient. Please take the time to state when
+    each is used, and what it does. As customization can get cryptic, make a
+    special effort!</para>
+  </sect2>
+
+  <sect2>
+    <title>The Bible</title>
+
+    <para>The book you want to have with you is the following: "DocBook XSL:
+    The Complete Guide", Third Edition, by Bob Stayton, online version at
+    <ulink
+    url="http://www.sagehill.net">http://www.sagehill.net</ulink>.</para>
+
+    <para>Have a look at the index if you just want to change a little
+    something in the customization. Parse through it at least once if you
+    intend to do some heavy editing. I have found everything I needed in this
+    book, but sometimes in unexpected sections.</para>
+  </sect2>
+</sect1>

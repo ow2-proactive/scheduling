@@ -54,7 +54,7 @@
          <title>This figure shows the steps when a active object is called via SOAP.</title> 
          <mediaobject>
             <imageobject>
-              <imagedata  fileref="webservices/provider_en.png" format="PNG"/>     
+               <imagedata  fileref="webservices/provider_en.png" format="PNG"  width="6in"/>     
             </imageobject>
           </mediaobject>
         </figure>
@@ -287,7 +287,7 @@ ProActive.exposeAsWebService (dispatcher, 'C3DDispatcher',
            <title>The dispatcher handling all calls</title>
             <mediaobject>
               <imageobject>
-                <imagedata  fileref="webservices/dispatcher_en.png" format="PNG"/>  
+                 <imagedata  fileref="webservices/dispatcher_en.png" format="PNG"  width="6in"/>  
                </imageobject>
             </mediaobject>
           </figure>
@@ -312,7 +312,7 @@ ProActive.exposeAsWebService (dispatcher, 'C3DDispatcher',
          
          <mediaobject>
           <imageobject>
-           <imagedata  fileref="webservices/scc3djava.png" format="PNG"/>      
+            <imagedata  fileref="webservices/scc3djava.png" format="PNG"  width="6in"/>      
           </imageobject>
          </mediaobject>
         </figure>
@@ -322,7 +322,7 @@ ProActive.exposeAsWebService (dispatcher, 'C3DDispatcher',
          
          <mediaobject>
           <imageobject>
-           <imagedata  fileref="webservices/scC3dcs.png" format="PNG"/>
+             <imagedata  fileref="webservices/scC3dcs.png" format="PNG"  width="6in"/>
           </imageobject>
          </mediaobject>
         </figure>

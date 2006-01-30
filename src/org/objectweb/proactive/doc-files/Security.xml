@@ -53,7 +53,7 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="security_images/activeObjects.png"
-                         format="PNG" />
+                         format="PNG"  width="6in"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -816,7 +816,7 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="security_images/gui-oasis.png" format="PNG" />
+             <imagedata fileref="security_images/gui-oasis.png" format="PNG"  width="6in"/>
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -835,7 +835,7 @@
         <mediaobject>
           <imageobject>
             <imagedata fileref="security_images/gui-proactive.png"
-                       format="PNG" />
+                       format="PNG" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>

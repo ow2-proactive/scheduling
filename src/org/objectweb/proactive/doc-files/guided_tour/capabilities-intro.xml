@@ -128,7 +128,7 @@
             <mediaobject>
               <imageobject>
                <imagedata 
-                            
+                           width="6in"
                            fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png" 
                            format="PNG"/>              
               </imageobject>
@@ -373,7 +373,7 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata  fileref="guided_tour/pics/screenshots/jc2d_main_panel.png" format="PNG"/>
+                 <imagedata  fileref="guided_tour/pics/screenshots/jc2d_main_panel.png" format="PNG"  width="6in"  />
                 </imageobject>
               </mediaobject>
             </informalfigure>
@@ -382,7 +382,8 @@
             <informalfigure>
               <mediaobject>
                 <imageobject>
-                 <imagedata  fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png" format="PNG"/>
+                 <imagedata  fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png" 
+                             format="PNG"  width="6in"/>
                 </imageobject>
               </mediaobject>
             </informalfigure>
@@ -393,10 +394,8 @@
                 <para> <emphasis>menu monitoring - monitor new RMI host</emphasis></para>
                 <para><emphasis><inlinemediaobject>
                       <imageobject>
-                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.jpg" format="JPG"/>
-                      </imageobject>
-                      <imageobject>
-                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png" format="PNG"/>
+                        <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png" 
+                                   format="PNG"  width="6in"/>
                       </imageobject>
 </inlinemediaobject></emphasis>
  It is possible to visualize the status of each active object (processing,
@@ -405,9 +404,6 @@
 <para>
 <informalfigure>
 <mediaobject>
- <imageobject>
-  <imagedata  fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.jpg" format="JPG"/>
- </imageobject>
   <imageobject>
    <imagedata  fileref="guided_tour/pics/screenshots/ic2d_world_panel_philosophers.png" format="PNG"/>
   </imageobject>
@@ -418,9 +414,6 @@
 <para>
  <informalfigure>
   <mediaobject>
-   <imageobject>
-    <imagedata  fileref="guided_tour/pics/screenshots/ic2d_legend.jpg" format="JPG"/>                 
-   </imageobject>
    <imageobject>
     <imagedata  fileref="guided_tour/pics/screenshots/ic2d_legend.png" format="PNG"/>                 
    </imageobject>
@@ -453,9 +446,6 @@
         <para>
           <informalfigure>
             <mediaobject>
-              <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/penguin.jpg" format="JPG"/>
-               </imageobject>
               <imageobject>
                 <imagedata fileref="guided_tour/pics/screenshots/penguin.png" format="PNG"/>
                </imageobject>

@@ -58,9 +58,6 @@
         <informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.jpg" format="JPG"/>
-             </imageobject>
-            <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/proactive_directories.png" format="PNG"/>
              </imageobject>
           </mediaobject>

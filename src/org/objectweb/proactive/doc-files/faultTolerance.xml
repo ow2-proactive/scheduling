@@ -491,7 +491,7 @@ rvice(body);
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/nbodyft.png" format="PNG" />
+              <imagedata fileref="images/nbodyft.png" format="PNG"  width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>

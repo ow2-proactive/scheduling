@@ -11,5 +11,13 @@
   extra careful with the pdf output.</para>
 
   <para>There will be a schema specifying which are the allowed tags. For now,
-  all is legal, as this list is not written down yet.</para>
+  all is legal, as I haven't gotten down to writing this yet. Nonetheless, the
+  tags I recommend to use are the ones described in the section above, namely
+  <itemizedlist>
+    <listitem> <para> chapter, sect*, para, emphasis, link, ulink </para> </listitem>
+    <listitem> <para> figure, informalfigure, mediaobject , imagedata </para> </listitem>
+    <listitem> <para> itemizedlist and orderedlist </para> </listitem>
+    <listitem> <para> screen and literal </para> </listitem>
+  </itemizedlist>
+ </para>
 </sect1>
