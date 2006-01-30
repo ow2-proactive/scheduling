@@ -168,7 +168,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/img3.png" format="PNG" />
+             <imagedata fileref="security_images/img3.png" format="PNG" width="6in"/>
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -208,7 +208,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/img4.png" format="PNG" />
+             <imagedata fileref="security_images/img4.png" format="PNG" width="6in"/>
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -242,7 +242,7 @@
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="security_images/img6.png" format="PNG" />
+             <imagedata fileref="security_images/img6.png" format="PNG" width="6in"/>
             </imageobject>
           </mediaobject>
         </informalfigure></para>

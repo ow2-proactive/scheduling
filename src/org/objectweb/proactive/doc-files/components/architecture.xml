@@ -25,13 +25,12 @@
  When 'b' invokes a method on '<literal>stub_A</literal>', the invocation is forwarded
  through the communication layer (possibly through a network) to the body of the active object. At
  this point, the call can be intercepted by meta-objects, possibly resulting in induced actions,
- and then the call is forwarded to the base object 'a'.</para>
-        <para>
+ and then the call is forwarded to the base object 'a'.
           <figure>
            <title>ProActive's Meta-Objects Protocol.</title>
            <mediaobject>
               <imageobject>
-                 <imagedata  fileref="components/pics/standard-mop.png" format="PNG"  width="6in"/>
+                 <imagedata  fileref="components/pics/standard-mop.png" format="PNG"  width="6in" />
               </imageobject>
             </mediaobject>
           </figure>
@@ -54,8 +53,7 @@
         <para>
  Method invocations on Fractal interfaces are reified and transmitted (possibly through a network)
  to the body of the active object corresponding to the component involved. All standard operations
- of the Fractal API are now accessible.</para>
-        <para>
+ of the Fractal API are now accessible. 
           <figure>
            <title>The ProActive MOP with component meta-objects and component  representative</title>
             <mediaobject>
@@ -131,8 +129,7 @@
  These external server interfaces are connected through the ProActive groups mechanism (i.e.
  through a group proxy) to the server interfaces of the same type of the internal components. The
  requests are then processed in a parallel manner.</para>
-        <para>Next diagram illustrates where group communications are involved.</para>
-        <para>
+        <para>Next diagram illustrates where group communications are involved.
           <figure>
            <title>Group communications allowing collective bindings and parallel components.</title>
             <mediaobject>

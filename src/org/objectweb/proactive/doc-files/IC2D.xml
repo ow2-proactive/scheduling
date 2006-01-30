@@ -115,7 +115,7 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" />
+         <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" width="6in"/>
         </imageobject>
       </mediaobject>
     </figure>

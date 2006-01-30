@@ -1098,7 +1098,8 @@ ce());
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/activeObjectComponents.png"
-                               format="PNG"  />
+                               format="PNG"  
+                               width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1223,7 +1224,7 @@ ce());
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureBeforeGettingResultDiagram.png"
-                           format="PNG"  />
+                           format="PNG" width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>

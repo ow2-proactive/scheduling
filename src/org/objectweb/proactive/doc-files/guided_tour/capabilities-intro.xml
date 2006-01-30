@@ -35,7 +35,8 @@
         <title>the active objects in the c3d application</title>
         <mediaobject>
          <imageobject>
-          <imagedata  fileref="guided_tour/pics/hello/c3d.png" format="PNG"/>            </imageobject>
+          <imagedata  fileref="guided_tour/pics/hello/c3d.png" format="PNG" width="6in"/>
+         </imageobject>
         </mediaobject>
        </figure>
  
