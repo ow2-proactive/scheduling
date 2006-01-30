@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book
-          PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-          "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"
-          [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
 <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
@@ -42,83 +40,297 @@
 <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
-<!ENTITY FAQ SYSTEM "FAQ.xml"> 
+<!ENTITY FAQ SYSTEM "FAQ.xml">
 ]>
 <book>
- <bookinfo>
-  <title>ProActive v3.0.1 Documentation</title>
-<!--   <releaseinfo role="svn">$Id$ </releaseinfo> -->
-  <corpauthor>OASIS Research Team</corpauthor>
-  <copyright>
-   <year>2001-2006</year>
-   <holder>INRIA</holder>
-  </copyright>
-  <legalnotice id="LegalNotice">
-   <para>
-    ProActive is a LGPL middleware. You may edit the sources, and diffuse your changes. 
-    TODO: please fill this legal notice in.
-   </para>
-  </legalnotice>
-  <mediaobject>
-     <imageobject>
-       <imagedata fileref="images/ProActiveLogo.png" format="PNG" width="6in" />
-     </imageobject>
-  </mediaobject>
- </bookinfo>
- 
-<!-- HERE SHOULD BE INCLUDED THE PREFACE!  -->
+  <bookinfo>
+    <title>ProActive v3.0.1 Documentation</title>
 
- <part id="ProActiveIntroduction"> <title>Introduction</title>
-   &Principles; 
-   &Installation; 
-  </part><part id="ProActiveProgramming"> <title>Programming</title> 
-   &ProActiveBasis; 
-   &AOCreation;   
-   &TypedGroupCommunication; 
-   &OOSPMD; 
-   &Migration; 
-   &exceptions; 
-   &bnb; 
-   </part><part id="ProActiveDeployment"> <title> Deploying</title> 
-   &PAConfiguration; 
-   &Descriptor;  
-   &VariableContract;  
-   &FileTransfer; 
-   &SSHTunneling; 
-   &faultTolerance; 
-  </part><part id="ProActiveComponents"> <title> Composing</title> 
-   &intro; 
-   &implementation; 
-   &conformance; 
-   &Compconfiguration;  
-   &adl; 
-   &examples; 
-   &perspectives; 
-  </part><part id="ProActiveAdvancedTopics"> <title> Advanced</title> 
-   &p2p;  
-   &Security;   
-   &WSDoc;  
-   &OSGi; 
-   &mpi; 
-  </part><part id="ProActiveTools"> <title> User Interface and tools</title> 
-   &IC2D;  
-   &plugin; 
-   </part><part id="ProActiveGuidedTour"> <title> Guided Tour</title>  
-   &guidedindex;  
-   &capabilities-intro;   
-   &hands_on_programming;   
-   &OOSPMDJacobiexample;   
-   &nbody;  
-   &conclusion;  
- </part><part id="ProActiveExtensions"> <title> Extending ProActive</title> 
-   &DescriptorProcess; 
-   &devFileTransfer; 
-   &devFaultTolerance; 
-   &MOP; 
- </part> <part id="backMattersPart"> <title> Back matters</title>  
-<!--   Should be called appendix, anyway  -->
-   &FAQ; 
-<!--    XXX &WordIndex;  -->
-<!--    XXX &References;  -->
-  </part> 
+    <!--   <releaseinfo role="svn">$Id$ </releaseinfo> -->
+
+    <corpauthor>OASIS Research Team</corpauthor>
+
+    <copyright>
+      <year>2001-2006</year>
+
+      <holder>INRIA</holder>
+    </copyright>
+
+    <legalnotice id="LegalNotice">
+      <para>ProActive is a GRID Java middleware, with the source code under
+      <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL
+      license</ulink>.</para>
+    </legalnotice>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="images/ProActiveLogo.png" format="PNG" width="" />
+      </imageobject>
+    </mediaobject>
+    <abstract>
+    <para><emphasis role="bold">ProActive</emphasis> is a <emphasis
+    role="bold">GRID</emphasis> Java library for <emphasis
+    role="bold">parallel</emphasis>, <emphasis
+    role="bold">distributed</emphasis>, and <emphasis
+    role="bold">concurrent</emphasis> computing, also featuring <emphasis
+    role="bold">mobility</emphasis> and <emphasis
+    role="bold">security</emphasis> in a uniform framework. With a reduced set
+    of simple primitives, <emphasis role="bold">ProActive</emphasis> provides
+    a comprehensive API allowing to simplify the programming of applications
+    that are distributed on <emphasis role="bold">Local Area
+    Network</emphasis> (LAN), on <emphasis role="bold">cluster of
+    workstations</emphasis>, on <emphasis role="bold">P2P desktop
+    Grids</emphasis>, or on I<emphasis role="bold">nternet Grids</emphasis>.
+    The library is based on an Active Object pattern that is a uniform way to
+    encapsulate:</para>
+   <para>
+    <itemizedlist>
+      <listitem>
+        <para>a r<emphasis role="bold">emotely accessible
+        object</emphasis>,</para>
+      </listitem>
+
+      <listitem>
+        <para>a <emphasis role="bold">thread</emphasis> as an asynchronous
+        activity,</para>
+      </listitem>
+
+      <listitem>
+        <para>an <emphasis role="bold">actor</emphasis> with its own
+        script,</para>
+      </listitem>
+
+      <listitem>
+        <para>a <emphasis role="bold">server</emphasis> of incoming
+        requests,</para>
+      </listitem>
+
+      <listitem>
+        <para>a <emphasis role="bold">mobile</emphasis> and potentially secure
+        entity.</para>
+      </listitem>
+    </itemizedlist>
+   </para>
+    <para>On top of those basic features, ProActive also includes <emphasis
+    role="bold">advanced</emphasis> aspects, such as:</para>
+    <para>
+    <itemizedlist>
+      <listitem>
+        <para>Typed <emphasis role="bold">Group</emphasis>
+        Communications</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">OO SPMD</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para>Distributed and Hierarchical <emphasis
+        role="bold">Components</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Security</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">Fault Tolerance</emphasis> with
+        checkpointing</para>
+      </listitem>
+
+      <listitem>
+        <para>a <emphasis role="bold">P2P</emphasis> infrastructure</para>
+      </listitem>
+
+      <listitem>
+        <para>a Graphical User Interface <emphasis
+        role="bold">IC2D</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para>a powerful <emphasis role="bold">deployment</emphasis> model
+        based on XML descriptors</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">File transfer</emphasis> capabilities over
+        the <emphasis role="bold">Grid</emphasis></para>
+      </listitem>
+    </itemizedlist>
+   </para>
+    <para><emphasis role="bold">ProActive</emphasis> is only made of standard
+    Java classes, and requires <emphasis role="bold">no changes to the Java
+    Virtual Machine</emphasis>, no preprocessing or compiler modification;
+    programmers write standard Java code. Based on a simple Meta-Object
+    Protocol, the library is itself extensible, making the system open for
+    adaptations and optimizations. <emphasis role="bold">ProActive</emphasis>
+    currently uses the <emphasis role="bold">RMI</emphasis> Java standard
+    library as default portable transport layer.</para>
+
+    <para><emphasis role="bold">ProActive</emphasis> features several
+    optimizations improving performance. For instance, whenever two active
+    objects are located within the same virtual machine, a direct
+    communication is always achieved, without going through the network stack.
+    This optimization is ensured even when the co-location occurs after a
+    migration of one or both of the active objects.</para>
+
+    <para><emphasis role="bold">ProActive</emphasis> and the (de facto)
+    <emphasis role="bold">Standards</emphasis>: ProActive has an architecture
+    that allows the library to <emphasis role="bold">interoperate</emphasis>
+    with various official or de facto <emphasis
+    role="bold">standards</emphasis>:</para>
+   <para>
+    <itemizedlist>
+      <listitem>
+        <para>Web Service Exportation</para>
+      </listitem>
+
+      <listitem>
+        <para>HTTP Transport, RMI/SSH tunneling Transport</para>
+      </listitem>
+
+      <listitem>
+        <para>ssh, scp, rsh, rcp</para>
+      </listitem>
+
+      <listitem>
+        <para>Globus GT2, GT3 and GT4, Unicore, GLite, ARC (NorduGrid),
+        GSI-SSH</para>
+      </listitem>
+
+      <listitem>
+        <para>LSF, PBS, Sun Grid Engine, OAR</para>
+      </listitem>
+    </itemizedlist>
+   </para>
+    <para>Please send us comments, suggestions, bug reports at <ulink
+    url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> Your
+    input will be greatly appreciated. </para>
+    </abstract>
+  </bookinfo>
+
+  <!-- HERE SHOULD BE INCLUDED THE PREFACE!  -->
+
+
+  <part id="ProActiveIntroduction">
+    <title>Introduction</title>
+
+    &Principles;
+
+    &Installation;
+  </part>
+
+  <part id="ProActiveProgramming">
+    <title>Programming</title>
+
+    &ProActiveBasis;
+
+    &AOCreation;
+
+    &TypedGroupCommunication;
+
+    &OOSPMD;
+
+    &Migration;
+
+    &exceptions;
+
+    &bnb;
+  </part>
+
+  <part id="ProActiveDeployment">
+    <title>Deploying</title>
+
+    &PAConfiguration;
+
+    &Descriptor;
+
+    &VariableContract;
+
+    &FileTransfer;
+
+    &SSHTunneling;
+
+    &faultTolerance;
+  </part>
+
+  <part id="ProActiveComponents">
+    <title>Composing</title>
+
+    &intro;
+
+    &implementation;
+
+    &conformance;
+
+    &Compconfiguration;
+
+    &adl;
+
+    &examples;
+
+    &perspectives;
+  </part>
+
+  <part id="ProActiveAdvancedTopics">
+    <title>Advanced</title>
+
+    &p2p;
+
+    &Security;
+
+    &WSDoc;
+
+    &OSGi;
+
+    &mpi;
+  </part>
+
+  <part id="ProActiveTools">
+    <title>User Interface and tools</title>
+
+    &IC2D;
+
+    &plugin;
+  </part>
+
+  <part id="ProActiveGuidedTour">
+    <title>Guided Tour</title>
+
+    &guidedindex;
+
+    &capabilities-intro;
+
+    &hands_on_programming;
+
+    &OOSPMDJacobiexample;
+
+    &nbody;
+
+    &conclusion;
+  </part>
+
+  <part id="ProActiveExtensions">
+    <title>Extending ProActive</title>
+
+    &DescriptorProcess;
+
+    &devFileTransfer;
+
+    &devFaultTolerance;
+
+    &MOP;
+  </part>
+
+  <part id="backMattersPart">
+    <title>Back matters</title>
+
+    <!--   Should be called appendix, anyway  -->
+
+    &FAQ;
+
+    <!--    XXX &WordIndex;  -->
+
+    <!--    XXX &References;  -->
+  </part>
 </book>
