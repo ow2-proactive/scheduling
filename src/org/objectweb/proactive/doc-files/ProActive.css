@@ -20,6 +20,19 @@ H3 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-si
 H4 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; font-weight: bold;}
 B  { color: #00257E; }
 
+div.toc {font-size: 10pt;}
+div.list-of-figures {font-size: 10pt;}
+div.list-of-examples {font-size: 10pt;}
+div.list-of-tables {font-size: 10pt;}
+
+span.part a {font-weight: bold;font-size: 16pt;}
+span.chapter a {font-weight: bold;font-size: 13pt;}
+/*span.chapter a {
+ background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
+span.part a {
+ background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
+*/
+
 .regularLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .regularLink2 { background-color: white; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .smallLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 8pt; font-weight: bold; }

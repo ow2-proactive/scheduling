@@ -48,8 +48,9 @@
   <sect2 id="Code">
     <title>Code</title>
 
-    <para>Code sources can be written between SCREEN tags. Watch out, spaces
-    count!</para>
+    <para>Code sources can be written between SCREEN tags. You can also
+     use the EXAMPLE TAG around that, to give a title, and be referenced
+     in the table of examples. Watch out, spaces count!</para>
 
     <screen>TinyHello tiny = (TinyHello) ProActive.newActive(
      TinyHello.class.getName(), // the class to deploy
@@ -58,6 +59,18 @@
 
     <para>But you can also just use the LITERAL tag to highlight the
     <literal>main</literal> methods.</para>
+  
+   <para> You can also insert directly sources from their original files:</para>   
+   
+   <example>
+    <title>My program listing</title>
+    <screen>
+     <xi:include  parse="text"
+                  href="../../examples/hello/TinyHello.java"
+                  xmlns:xi="http://www.w3.org/2001/XInclude"/>
+    </screen>
+   </example>
+
   </sect2>
 
   <sect2 id="Links">

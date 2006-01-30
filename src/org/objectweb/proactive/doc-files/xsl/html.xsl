@@ -35,7 +35,7 @@
 
 
 <!-- Just use the image size for the html output. Width=... has no effect. -->
-<xsl:param name="ignore.image.scaling">yes</xsl:param> 
+<xsl:param name="ignore.image.scaling">1</xsl:param> 
 
 
 <!-- Replace the standard home button (bottom line, middle) by 'Table of Content' -->
@@ -153,9 +153,23 @@
 <!-- Make the legal notice appear, but only as a link - no need for everyone to see it -->
 <xsl:param name="generate.legalnotice.link">1</xsl:param >
 
-<!-- Where did this go? -->
-<xsl:template name="division.title">  
+<!-- This is the customization for the part title pages. 
+It's the line containing the title of the page -->
+<!--<xsl:template name="division.title">  
   <hr/>Hey, lost division title<hr/>
+</xsl:template>-->
+<xsl:template name="division.title">
+  <xsl:param name="node" select="."/>
+  <h1>
+    <xsl:attribute name="class">title</xsl:attribute>
+    <xsl:call-template name="anchor">
+      <xsl:with-param name="node" select="$node"/>
+      <xsl:with-param name="conditional" select="0"/>
+    </xsl:call-template>
+    <xsl:apply-templates select="$node" mode="object.title.markup">
+      <xsl:with-param name="allow-anchors" select="1"/>
+    </xsl:apply-templates>
+  </h1>
 </xsl:template>
 
 <!-- I don't know where the titlepage image got resized. So I'm rewritting this one -->
@@ -181,6 +195,10 @@ This should not be done this way. The media object should have been in the corpa
     </div>
     <br/> <!--Just adding more space after -->
 </xsl:template>
+
+
+<!-- Making the parts and chapters stick out in the toc  -->
+<!-- Hum, I don't know where the tocs are generated... -->
 
 </xsl:stylesheet>
 
