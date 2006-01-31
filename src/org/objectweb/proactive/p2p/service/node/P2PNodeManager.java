@@ -180,13 +180,9 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         logger.debug("LeaveNode message received for node @" + nodeUrl);
         this.usingNodes.remove(nodeToFree);
         try {
-            // Terminating all body
-            nodeToFree.killAllActiveObjects();
-
             // Kill the node
             if (this.descriptorPath == null) {
-                this.proactiveRuntime.killNode(nodeToFree.getNodeInformation()
-                                                         .getURL());
+                this.proactiveRuntime.killNode(nodeUrl);
                 logger.info("Node @" + nodeUrl + " left");
                 // Creating a new node
                 this.createNewNode();
