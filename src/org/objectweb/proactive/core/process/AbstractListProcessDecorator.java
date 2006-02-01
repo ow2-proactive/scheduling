@@ -162,12 +162,13 @@ public abstract class AbstractListProcessDecorator
          * implement this. Then implement it
          */
     }
-    
-    public boolean isRequiredFileTransferDeployOnNodeCreation(){
+
+    public boolean isRequiredFileTransferDeployOnNodeCreation() {
+
         /* TODO Check if this is the correct place
          * implement this. Then implement it
          */
-    	return false;
+        return false;
     }
 
     /**
@@ -465,6 +466,10 @@ public abstract class AbstractListProcessDecorator
     }
 
     public void setStarted(boolean isStarted) {
+        // TODO Auto-generated method stub
+    }
+
+    public void setFinished(boolean isFinished) {
         // TODO Auto-generated method stub
     }
 }

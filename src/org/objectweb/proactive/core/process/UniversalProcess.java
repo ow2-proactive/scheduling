@@ -198,4 +198,9 @@ public interface UniversalProcess extends java.io.Serializable {
      * Sets the state started of this process
      */
     public void setStarted(boolean isStarted);
+
+    /**
+     * Sets the state finished of this process
+     */
+    public void setFinished(boolean isFinished);
 }

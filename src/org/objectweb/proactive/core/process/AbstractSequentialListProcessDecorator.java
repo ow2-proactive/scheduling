@@ -149,13 +149,14 @@ public abstract class AbstractSequentialListProcessDecorator
          */
     }
 
-    public boolean isRequiredFileTransferDeployOnNodeCreation(){
+    public boolean isRequiredFileTransferDeployOnNodeCreation() {
+
         /* TODO Check if this is the correct place
          * implement this. Then implement it
          */
-    	return false;
+        return false;
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
      */
@@ -336,6 +337,10 @@ public abstract class AbstractSequentialListProcessDecorator
     }
 
     public void setStarted(boolean isStarted) {
+        // TODO Auto-generated method stub
+    }
+
+    public void setFinished(boolean isStarted) {
         // TODO Auto-generated method stub
     }
 }

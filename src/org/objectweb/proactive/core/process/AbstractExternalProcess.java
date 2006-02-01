@@ -48,7 +48,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty(
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
-    private boolean shouldRun;
+    private volatile boolean shouldRun = true;
     public static final int NO_COMPOSITION = 0;
     protected boolean closeStream = false;
     protected RemoteProcessMessageLogger inputMessageLogger;
@@ -59,7 +59,6 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     private FileTransferWorkShop ftsDeploy = null;
     private FileTransferWorkShop ftsRetrieve = null;
     protected String FILE_TRANSFER_DEFAULT_PROTOCOL = "dummy";
-    
 
     //Used to determine if a File Transfer is required to the Nodes deployed from
     //the VirtualNode. @see VirtualNodeImpl
@@ -196,6 +195,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
         try {
+            shouldRun = true;
             externalProcess = Runtime.getRuntime().exec(commandToExecute);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
                         externalProcess.getInputStream()));
@@ -211,7 +211,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected void internalStopProcess() {
-        
+        shouldRun = false;
 
         if (externalProcess != null) {
             externalProcess.destroy();
@@ -537,7 +537,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
             //
             try {
-                while (true) {
+                while (shouldRun) {
                     //threadMonitor.setActive(false);
                     //                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
                     //						AbstractExternalProcess.clogger.debug(
@@ -592,7 +592,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
         public void run() {
             try {
-                while (true) {
+                while (shouldRun) {
                     waitForMonitoredThread();
                     //System.out.println("ProcessOutputHandler before getMessage()");
                     String message = messageSink.getMessage();
