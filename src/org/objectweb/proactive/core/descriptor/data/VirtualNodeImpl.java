@@ -519,7 +519,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return int, the termination status of the mpi process
      */
     public ExternalProcess getMPIProcess() {
-        return mpiProcess;
+        return (ExternalProcess) makeDeepCopy(mpiProcess);
     }
 
     public boolean hasMPIProcess() {
