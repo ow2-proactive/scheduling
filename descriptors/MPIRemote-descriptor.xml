@@ -50,12 +50,13 @@
 						<absolutePath value="/home/smariani/proactive.java.policy" />
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/home/smariani/ProActive/scripts/proactive-log4j" />
+						<absolutePath value="/home/smariani/ProActive/compile/proactive-log4j" />
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter value="-Djava.library.path=/home/smariani/" />
 						<parameter value="-Dproactive.useIPaddress=true" />
 						<parameter value="-Dproactive.rmi.port=6099" />
+
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -123,6 +124,7 @@
 					</FileTransferDeploy>
 				</sshProcess>
 			</processDefinition>
+
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>
