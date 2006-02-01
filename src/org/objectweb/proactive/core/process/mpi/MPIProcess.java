@@ -119,7 +119,6 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         if (mpiCommandOptions != null) {
             mpiSubCommand.append(this.mpiCommandOptions).append(" ");
         }
-        System.out.println(mpiSubCommand.toString());
         return mpiSubCommand.toString();
     }
 
