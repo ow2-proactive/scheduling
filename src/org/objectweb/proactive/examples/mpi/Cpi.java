@@ -37,18 +37,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.AbstractExternalProcess;
-import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
-import org.objectweb.proactive.core.process.ExternalProcess;
-import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.mpi.*;
-import org.objectweb.proactive.tools.FileTransfer;
-
-import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -74,7 +65,6 @@ public class Cpi {
 
         VirtualNode vnCpi;
         ProActiveDescriptor pad = null;
-        int exitValue = 0;
 
         try {
             pad = ProActive.getProactiveDescriptor("file:" + args[0]);
@@ -83,22 +73,6 @@ public class Cpi {
             vnCpi = pad.getVirtualNode("CPI");
             vnCpi.activate();
 
-            /*
-            
-                           String filenameSrcA = "/home/smariani/test.dat";
-                           //String filenamePushed = "/home/smariani/test.dat";
-                           String filenamePushed = "/user/smariani/home/test.dat";
-                           File fileSrcA = new File(filenameSrcA);
-                           File filePushed = new File(filenamePushed);
-                           Node[] testnode = vnCpi.getNodes();
-                           System.out.println(testnode[0].getNodeInformation().getURL());
-                           try {
-                                               FileTransfer.pushFile(testnode[0], filePushed ,fileSrcA);
-                                       } catch (IOException e) {
-                                               // TODO Auto-generated catch block
-                                               e.printStackTrace();
-                                       }
-             */
             MPISpmd mpiSpmd = MPI.createMPISPMDObject(vnCpi);
             System.out.println(mpiSpmd);
 
