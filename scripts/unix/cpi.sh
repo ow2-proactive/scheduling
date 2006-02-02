@@ -22,6 +22,7 @@ then
 /usr/bin/lamboot
 else 
 echo "ERROR: you need \"lamboot\" to start a Local Area Multicomputer simulator"	
+exit 127
 fi
 
 XMLDESCRIPTOR=$PROACTIVE/descriptors/MPI-descriptor.xml
