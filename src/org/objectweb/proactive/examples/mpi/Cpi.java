@@ -85,6 +85,7 @@ public class Cpi {
             System.out.println(mpiSpmd);
 
             vnCpi.killAll(false);
+            System.exit(0);
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
