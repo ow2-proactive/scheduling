@@ -196,8 +196,8 @@ public class MigrationStrategyManagerImpl implements MigrationStrategyManager,
     private void executeMethod(Object target, String methodName)
         throws MigrationException {
         try {
-            Method m = target.getClass().getMethod(methodName, null);
-            m.invoke(target, null);
+            Method m = target.getClass().getMethod(methodName, (Class[]) null);
+            m.invoke(target, (Object[]) null);
         } catch (NoSuchMethodException e) {
             throw new MigrationException("Cannot find method " + methodName +
                 " in class " + target.getClass().getName(), e);
