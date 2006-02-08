@@ -13,9 +13,9 @@
     application fault-tolerant is <emphasis role="bold">fully
     transparent</emphasis>; active objects are turned fault-tolerant using
     Java properties that can be set in the <link
-    linkend="Descriptor">deployment descriptor</link> . The programmer can
-    select <emphasis>at deployment time</emphasis> the most adapted protocol
-    regarding the application and the execution environment.</para>
+    linkend="XML_Descriptors">deployment descriptor</link> . The programmer
+    can select <emphasis>at deployment time</emphasis> the most adapted
+    protocol regarding the application and the execution environment.</para>
 
     <para>Persistence of active objects is obtained through standard Java
     serialization; a checkpoint thus consists in an object containing a
@@ -162,14 +162,12 @@
       <literal>org.objectweb.proactive.core.process.JVMProcessImpl</literal>
       class:</para>
 
-      <blockquote>
-        <para><screen>
-GlobalFTServer server = new JVMProcessImpl(new org.objectweb.proactive.core\
-.process.AbstractExternalProcess.StandardOutputMessageLogger());
-this.server.setClassname('org.objectweb.proactive.core.body.ft.servers.Start\
-FTServer');
+      
+        <para><screen>GlobalFTServer server = new JVMProcessImpl(
+         new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
+this.server.setClassname('org.objectweb.proactive.core.body.ft.servers.StartFTServer');
 this.server.startProcess();</screen></para>
-      </blockquote>
+      
 
       <para>Note that if one of the servers is unreachable when a
       fault-tolerant application is deploying, fault-tolerance is
@@ -355,16 +353,16 @@ this.server.startProcess();</screen></para>
       minimizes the use of standard main by, for example, delegating the
       initialization and launching procedure to an active object.</para>
 
-      <blockquote>
-        <para><screen>...
+      
+        <para><programlisting language="java">...
 public static void main(String[] args){
    Initializer init = (Initializer)(ProActive.newActive('Initializer.getClas\
 s.getName()', args);
    init.launchApplication();
    System.out.println('End of main thread');
 }
-...</screen></para>
-      </blockquote>
+...</programlisting></para>
+      
 
       <para>The object <literal>init</literal> is an active object, and as
       such will be rolled back if a failure occurs: the application is kept
@@ -385,23 +383,23 @@ s.getName()', args);
       of the execution. The programmer must thus avoid infinite method such
       as</para>
 
-      <blockquote>
-        <para><screen>...
+      
+        <para><programlisting language="java">...
 public void infiniteMethod(){
    while (true){
      this.doStuff();
    }
 }
-...</screen></para>
-      </blockquote>
+...</programlisting></para>
+      
 
       <para>The second consequence concerns the definition of the
       <literal>runActivity()</literal> method (see <ulink
       url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/RunActive.xml"><literal>runActive</literal></ulink>).
       Let us consider the following example:</para>
 
-      <blockquote>
-        <para><screen>...
+      
+        <para><programlisting language="java">...
 public void runActivity(Body body) {
    org.objectweb.proactive.Service service = new org.objectweb.proactive.Se\
 rvice(body);
@@ -414,8 +412,8 @@ rvice(body);
       service.serve(r);
    }
 }
-...</screen></para>
-      </blockquote>
+...</programlisting></para>
+      
 
       <para>If a checkpoint is triggered before the service of
       <literal>r</literal>, it characterizes the state of the active object at
@@ -491,7 +489,7 @@ rvice(body);
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/nbodyft.png" format="PNG"  width="6in" />
+              <imagedata fileref="images/nbodyft.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>

@@ -18,7 +18,8 @@
   </sect1>
 
   <sect1 remap="h2">
-    <title><anchor id="Configuration_html_howItWorks" />How does it work?</title>
+    <title><anchor id="Configuration_html_howItWorks" />How does it
+    work?</title>
 
     <para>Using this file is very straightforward, since all lines must follow
     the model: &lt;prop <emphasis role="bold">key</emphasis>='somekey'
@@ -84,11 +85,10 @@
 
     <para>A specific tag: <emphasis
     role="bold">&lt;ProActiveUserPropertiesFile&gt;</emphasis> is provided in
-    <link linkend="Descriptor">Deployment Descriptor</link> to notify remote
-    jvms which configuration file to load once created:</para>
+    <link linkend="XML_Descriptors">Deployment Descriptor</link> to notify
+    remote jvms which configuration file to load once created:</para>
 
-    <screen>
-&lt;jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcesss'&gt;
+    <screen>&lt;jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcesss'&gt;
 ...
  &lt;ProActiveUserPropertiesFile&gt;
  &lt;absolutePath value='/net/home/rquilici/config.xml'/&gt;
@@ -343,10 +343,10 @@
 
         <listitem>
           <para><emphasis
-          role="bold">proactive.tunneling.try_normal_first</emphasis>: if
-          this property is set to 'yes', the tunneling code always attempts to
-          make a direct rmi connection to the remote object before tunneling.
-          If this property is not set, the default is not to make these
+          role="bold">proactive.tunneling.try_normal_first</emphasis>: if this
+          property is set to 'yes', the tunneling code always attempts to make
+          a direct rmi connection to the remote object before tunneling. If
+          this property is not set, the default is not to make these
           direct-connection attempts. This property is especially useful if
           you want to deploy a number of objects on a LAN where only one of
           the hosts needs to run with the rmissh protocol to allow hosts
@@ -374,14 +374,14 @@
         </listitem>
 
         <listitem>
-          <para><emphasis role="bold">proactive.tunneling.gc_period</emphasis>: 
-           this property specifies how long the tunnel garbage collector will
-          wait before destroying a unused tunnel. If a tunnel is older than
-          this value, it is automatically destroyed. If this property is not
-          set, the default value is 10000ms.</para>
+          <para><emphasis
+          role="bold">proactive.tunneling.gc_period</emphasis>: this property
+          specifies how long the tunnel garbage collector will wait before
+          destroying a unused tunnel. If a tunnel is older than this value, it
+          is automatically destroyed. If this property is not set, the default
+          value is 10000ms.</para>
         </listitem>
       </itemizedlist></para>
-
 
     <itemizedlist>
       <listitem>
@@ -461,29 +461,21 @@
 
     <para>Configuration file must have following structure:</para>
 
-    <screen>
-&lt;ProActiveUserProperties&gt;
+    <screen>&lt;ProActiveUserProperties&gt;
  &lt;properties&gt;
- &lt;prop 
-<emphasis role="bold">key</emphasis>='schema.validation'
-<emphasis role="bold">value</emphasis>='disable'/&gt;
- &lt;prop 
-<emphasis role="bold">key</emphasis>='proactive.future.ac' 
-<emphasis role="bold">value</emphasis>='enable'/&gt;
- &lt;prop 
-<emphasis role="bold">key</emphasis>='proactive.communication.protocol' 
-<emphasis role="bold">value</emphasis>='rmi'/&gt;
- &lt;prop 
-<emphasis role="bold">key</emphasis>='proactive.rmi.port' 
-<emphasis role="bold">value</emphasis>='2001-2005'/&gt;
+ &lt;prop <emphasis role="bold">key</emphasis>='schema.validation' <emphasis
+        role="bold">value</emphasis>='disable'/&gt;
+ &lt;prop <emphasis role="bold">key</emphasis>='proactive.future.ac' <emphasis
+        role="bold">value</emphasis>='enable'/&gt;
+ &lt;prop <emphasis role="bold">key</emphasis>='proactive.communication.protocol' <emphasis
+        role="bold">value</emphasis>='rmi'/&gt;
+ &lt;prop <emphasis role="bold">key</emphasis>='proactive.rmi.port' <emphasis
+        role="bold">value</emphasis>='2001-2005'/&gt;
  ....
- &lt;prop 
-<emphasis role="bold">key</emphasis>='myprop' 
-<emphasis role="bold">value</emphasis>='myvalue'/&gt;
+ &lt;prop <emphasis role="bold">key</emphasis>='myprop' <emphasis role="bold">value</emphasis>='myvalue'/&gt;
  ....
  &lt;/properties&gt;
-&lt;/ProActiveUserProperties&gt;
-</screen>
+&lt;/ProActiveUserProperties&gt;</screen>
 
     <para>Note that tag <emphasis
     role="bold">ProActiveUserProperties</emphasis>, tag <emphasis
@@ -491,7 +483,5 @@
     role="bold">key</emphasis>='somekey' <emphasis
     role="bold">value</emphasis>='somevalue'/&gt; are mandatory for ProActive
     to parse correctly the document</para>
-
-    <para></para>
   </sect1>
 </chapter>

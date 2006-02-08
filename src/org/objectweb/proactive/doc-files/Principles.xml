@@ -69,20 +69,20 @@
     <sect2 remap="h3">
       <title>Class-based</title>
 
-      <blockquote>
-        <para><screen>Object[] params = new Object[] { new Integer (26), 'astring' };
-A a = (A) ProActive.newActive('example.A', params, node); </screen></para>
-      </blockquote>
+      
+        <para><programlisting language="java">Object[] params = new Object[] { new Integer (26), 'astring' };
+A a = (A) ProActive.newActive('example.A', params, node); </programlisting></para>
+      
     </sect2>
 
     <sect2 remap="h3">
       <title>Instantiation-based</title>
 
-      <blockquote>
-        <para><screen>public class AA extends A implements Active {}
+      
+        <para><programlisting language="java">public class AA extends A implements Active {}
 Object[] params = new Object[] { new Integer (26), 'astring' };
-A a = (A) ProActive.newActive('example.AA', params, node); </screen></para>
-      </blockquote>
+A a = (A) ProActive.newActive('example.AA', params, node); </programlisting></para>
+      
     </sect2>
 
     <sect2 remap="h3">
@@ -92,10 +92,10 @@ A a = (A) ProActive.newActive('example.AA', params, node); </screen></para>
       the source code; a necessary feature in the context of code
       mobility.</para>
 
-      <blockquote>
-        <para><screen>A a = new A (26, 'astring');
-a = (A) ProActive.turnActive(a, node) ; </screen></para>
-      </blockquote>
+      
+        <para><programlisting language="java">A a = new A (26, 'astring');
+a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
+      
 
       <para><emphasis role="bold">Notes:</emphasis><emphasis>Node allows to
       control the mapping</emphasis></para>
@@ -232,7 +232,7 @@ a = (A) ProActive.turnActive(a, node) ; </screen></para>
       <para>Here is a possible implementation for the
       <literal>TinyHello</literal> class:</para>
 
-      <screen>package org.objectweb.proactive.examples.hello;
+      <programlisting language="java">package org.objectweb.proactive.examples.hello;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.log.*;
@@ -281,7 +281,7 @@ public class TinyHello implements java.io.Serializable {
         logger.info('On ' + getHostName() + ', a message was received: ' + received); 
         // potential wait-by-necessity 
     }
-}</screen>
+}</programlisting>
     </sect2>
 
     <sect2 remap="h3">
@@ -306,11 +306,11 @@ public class TinyHello implements java.io.Serializable {
       <literal>TinyHello</literal> in the same VM is the following (in the
       <literal>main</literal> method):</para>
 
-      <screen>        TinyHello tiny = (TinyHello) ProActive.newActive(
+      <programlisting language="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
                 TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
             ); // which jvm should be used to hold the Active Object
-</screen>
+</programlisting>
     </sect2>
 
     <sect2 remap="h3">
@@ -327,9 +327,9 @@ public class TinyHello implements java.io.Serializable {
       the way to call the <literal>sayHello</literal> method in this example
       is the following (in the <literal>main</literal> method):</para>
 
-      <screen>        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
+      <programlisting language="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
         logger.info('On ' + getHostName() + ', a message was received: ' + received); // potential wait-by-necessity 
-</screen>
+</programlisting>
     </sect2>
 
     <sect2 remap="h3">

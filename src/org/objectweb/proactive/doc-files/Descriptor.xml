@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="Descriptor">
+<chapter id="XML_Descriptors">
   <title>XML Deployment Descriptors</title>
-
-  <anchor id="XML_Descriptors" />
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Descriptor.html  -->
 
-  <para><anchor id="Descriptor_html_objectives" /></para>
-
   <sect1 remap="h2">
-    <title>Objectives</title>
+    <title id="Descriptor_html_objectives">Objectives</title>
 
     <para>Parameters tied to the deployment of an application should be
     totally described in a xml deployment descriptor. Hence within the source
@@ -24,9 +20,6 @@
     <itemizedlist>
       <listitem>
         <para><emphasis role="bold">Creation Protocols</emphasis></para>
-      </listitem>
-
-      <listitem>
         <para><itemizedlist>
             <listitem>
               <para>local</para>
@@ -46,15 +39,10 @@
             </listitem>
           </itemizedlist></para>
       </listitem>
-    </itemizedlist>
-
-    <itemizedlist>
+       
       <listitem>
         <para><emphasis role="bold">Registry/Lookup and Communications
         Protocols</emphasis></para>
-      </listitem>
-
-      <listitem>
         <para><itemizedlist>
             <listitem>
               <para>rmi</para>
@@ -77,14 +65,8 @@
             </listitem>
           </itemizedlist></para>
       </listitem>
-    </itemizedlist>
-
-    <itemizedlist>
-      <listitem>
+       <listitem>
         <para><emphasis role="bold">Files Transfers</emphasis></para>
-      </listitem>
-
-      <listitem>
         <para><itemizedlist>
             <listitem>
               <para>scp, rcp</para>
@@ -114,10 +96,7 @@
       <listitem>
         <para><emphasis role="bold">Within a ProActive program, active objects
         are still created on Nodes</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><screen> newActive(String, Object[], Node); </screen></para>
+        <para><programlisting language="java"> newActive(String, Object[], Node); </programlisting></para>
       </listitem>
     </itemizedlist>
 
@@ -132,9 +111,6 @@
       <listitem>
         <para><emphasis role="bold">Nodes are actual
         entities:</emphasis></para>
-      </listitem>
-
-      <listitem>
         <para><itemizedlist>
             <listitem>
               <para>running into a JVM, on a host</para>
@@ -158,11 +134,7 @@
 
     <itemizedlist>
       <listitem>
-        <para><emphasis role="bold">VNs have the following
-        characteristics:</emphasis></para>
-      </listitem>
-
-      <listitem>
+        <para><emphasis role="bold">VNs have the following  characteristics:</emphasis></para>
         <para><itemizedlist>
             <listitem>
               <para>a VN is uniquely identified as a String ID</para>
@@ -186,11 +158,8 @@
         groups of active objects on VirtualNodes. In that case an Active
         Object(member of the group) is created on each nodes mapped to the
         VirtualNode given as parameter</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><screen>       newActiveAsGroup(String, Object[], VirtualNode);
-       turnActiveAsGroup(Object, String, VirtualNode); </screen></para>
+        <para><programlisting language="java">       newActiveAsGroup(String, Object[], VirtualNode);
+       turnActiveAsGroup(Object, String, VirtualNode); </programlisting></para>
       </listitem>
     </itemizedlist>
 
@@ -198,9 +167,6 @@
       <listitem>
         <para><emphasis role="bold">Within a ProActiveDescriptor file, it is
         specified:</emphasis></para>
-      </listitem>
-
-      <listitem>
         <para><itemizedlist>
             <listitem>
               <para>the mapping of VN to JVMs</para>
@@ -288,29 +254,19 @@
       <listitem>
         <para><emphasis role="bold">Typical example of a program
         code:</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><literal> ProActiveDescriptor pad =
-        ProActive.getProactiveDescriptor(String xmlFile);</literal>
-        //--------- Returns a ProActiveDescriptor object from the xml
-        file</para>
-
-        <para><literal>VirtualNode dispatcher =
-        pad.getVirtualNode('Dispatcher');</literal> //-------- Returns the
-        VirtualNode Dispatcher described in the xml file as a java
-        object</para>
-
-        <para><literal>dispatcher.activate();</literal> // -------- Activates
-        the VirtualNode</para>
-
-        <para><literal>Node node = dispatcher.getNode();</literal> // --------
-        Returns the first node available among nodes mapped to the
-        VirtualNode</para>
-
-        <para><literal>C3DDispatcher c3dDispatcher =
-        newActive('org.objectweb.proactive.core.examples.c3d.C3DDispatcher',param,
-        node); ..........................</literal></para>
+      <para>
+        <screen> ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFile); 
+        //--------- Returns a ProActiveDescriptor object from the xml file 
+        VirtualNode dispatcher = pad.getVirtualNode('Dispatcher');
+        //-------- Returns the VirtualNode Dispatcher described in the xml file as a java  object
+        dispatcher.activate();
+        // -------- Activates  the VirtualNode
+        Node node = dispatcher.getNode();
+        // -------- Returns the first node available among nodes mapped to the VirtualNode
+        
+        C3DDispatcher c3dDispatcher =  newActive(
+               'org.objectweb.proactive.core.examples.c3d.C3DDispatcher',param, node); 
+        ..........................</screen></para>
       </listitem>
     </itemizedlist>
 
@@ -320,25 +276,18 @@
     in org.objectweb.proactive.core.descriptors.VirtualNode to manipulate and
     get nodes associated to VirtualNodes.</para>
 
-    <para><anchor id="Descriptor_html_vn" /></para>
+     
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 remap="h2" id="Descriptor_html_vn"  >
     <title>Different types of VirtualNodes</title>
 
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">VirtualNodes Definition</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><itemizedlist>
+    <sect2>
+        <title>VirtualNodes Definition</title>
+         <para><itemizedlist>
             <listitem>
               <para>Mapping one to one: 1 VN --&gt; 1 JVM</para>
-            </listitem>
-
-            <listitem>
-              <para><screen> &lt;virtualNodesDefinition&gt;                                  
+               <para><screen> &lt;virtualNodesDefinition&gt;                                  
   &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>'/&gt;
  &lt;virtualNodesDefinition/&gt;
  &lt;deployment&gt;
@@ -375,9 +324,6 @@
 
             <listitem>
               <para>Mapping one to n: 1 VN --&gt; N JVMs</para>
-            </listitem>
-
-            <listitem>
               <para><screen> &lt;virtualNodesDefinition&gt;                                  
   &lt;virtualNode name='<emphasis role="bold">Renderer</emphasis>' property='<emphasis
                     role="bold">multiple</emphasis>'/&gt;
@@ -456,9 +402,6 @@
 
             <listitem>
               <para>Mapping n to one: N VN --&gt; 1 JVMs</para>
-            </listitem>
-
-            <listitem>
               <para><screen> &lt;virtualNodesDefinition&gt;                                  
   &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>' property='<emphasis
                     role="bold">unique_singleAO</emphasis>'/&gt;
@@ -531,15 +474,10 @@
               ProActive.lookupVirtualNode(String).</para>
             </listitem>
           </itemizedlist></para>
-      </listitem>
-    </itemizedlist>
-
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">VirtualNodes Acquisition</emphasis></para>
-      </listitem>
-
-      <listitem>
+      </sect2> 
+      
+      <sect2>
+        <title>VirtualNodes Acquisition</title>
         <para>Descriptors provide the ability to acquire a VirtualNode already
         deployed by another application. Such VirtualNodes are defined in
         <emphasis role="bold">VirtualNodes Acquisition</emphasis> tag as it is
@@ -574,7 +512,7 @@
         org.objectweb.proactive.core.descriptor.data.VirtualNode to update the
         value and to perform the lookup. Typical example of code:</para>
 
-        <programlisting>ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
+        <programlisting language="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
 
         <para>//----------- Returns a ProActiveDescriptor object from the xml
         file</para>
@@ -602,35 +540,26 @@
         using tags in the descriptor as well as programmatically using static
         methods provided in org.objectweb.Proactive class:</para>
 
-        <programlisting>ProActive.registerVirtualNode(
+        <programlisting language="java">ProActive.registerVirtualNode(
         VirtualNode virtualNode, 
         String registrationProtocol, 
         boolean replacePreviousBinding );          </programlisting>
 
-        <programlisting>ProActive.lookupVirtualNode(String url, String protocol);          </programlisting>
+        <programlisting language="java">ProActive.lookupVirtualNode(String url, String protocol);          </programlisting>
 
-        <programlisting>ProActive.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
-      </listitem>
-    </itemizedlist>
-
-    <para><anchor id="Descriptor_html_jvms" /></para>
+        <programlisting language="java">ProActive.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
+       </sect2>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 remap="h2" id="Descriptor_html_jvms">
     <title>Different types of JVMs</title>
 
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Creation</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><itemizedlist>
+<sect2>
+        <title>Creation</title>
+        <para>
+         <itemizedlist>
             <listitem>
               <para>1 JVM --&gt; 1 Node</para>
-            </listitem>
-
-            <listitem>
               <para><screen> ...........................                                  
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
   &lt;creation&gt;
@@ -646,9 +575,6 @@
 
             <listitem>
               <para>1 JVM --&gt; N Nodes on a single JVM</para>
-            </listitem>
-
-            <listitem>
               <para><screen> ...........................                                  
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'
  askedNodes='<emphasis role="bold">3</emphasis>'&gt;
@@ -668,14 +594,11 @@
               process(LSF, PBS, GLOBUS, ....) or a <link
               linkend="Descriptor_html_processlist">process list</link></para>
             </listitem>
-          </itemizedlist></para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Acquisition</emphasis></para>
-      </listitem>
-
-      <listitem>
+          </itemizedlist>
+         </para>
+      </sect2>
+      <sect2>
+       <title>Acquisition</title>
         <para>Descriptors give the ability to acquire JVMs instead of creating
         them. To do so, it must be specified in the <emphasis
         role="bold">acquisition</emphasis> tag which service to use in oder to
@@ -699,13 +622,11 @@
         role="bold">lookup</emphasis> is totally abstract, with the condition
         that a service with the id <emphasis role="bold">lookup</emphasis> is
         defined in the infrastructure part</para>
-      </listitem>
-    </itemizedlist>
-
-    <para><anchor id="Descriptor_html_validation" /></para>
+      </sect2>
+     
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 remap="h2" id="Descriptor_html_validation">
     <title>Validation against XML Schema</title>
 
     <para>To avoid mistake when building XML descriptors, ProActive provides
@@ -742,14 +663,9 @@
     read every time a C3DUser is added. Both files contain many features
     described earlier in this document.</para>
 
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Example1:
-        C3D_Dispatcher_Render.xml</emphasis></para>
-      </listitem>
-
-      <listitem>
-        <para><screen> &lt;ProActiveDescriptor
+   <example>     
+   <title>Example1: C3D_Dispatcher_Render.xml</title>
+   <para><screen> &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;                            
   &lt;componentDefinition&gt;
@@ -814,7 +730,10 @@
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
-            </screen> This example represents xml deployment descriptor for
+</screen> </para>
+           </example>
+           <para> 
+           This example represents xml deployment descriptor for
         the C3D application. The abstract part containing VirtualNodes
         definition and deployment informations has already been explained. To
         summarize, two VirtualNodes are defined <emphasis
@@ -829,14 +748,11 @@
         activated. <emphasis role="bold">Renderer</emphasis> is mapped to a
         set of JVMs called <emphasis role="bold">Jvm1</emphasis>, ...,
         <emphasis role="bold">Jvm4</emphasis>.</para>
-      </listitem>
 
-      <listitem>
-        <para><emphasis role="bold">Example2: C3D_User.xml</emphasis></para>
-      </listitem>
 
-      <listitem>
-        <para><screen> &lt;ProActiveDescriptor
+      <example>
+        <title>Example2: C3D_User.xml</title>
+         <para><screen> &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;                            
   &lt;componentDefinition&gt;
@@ -868,7 +784,9 @@
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;
-</screen> This file is read when addind a C3DUser. Two VirtualNodes are
+</screen> </para></example>
+<para>
+        This file is read when addind a C3DUser. Two VirtualNodes are
         defined <emphasis role="bold">User</emphasis> which is mapped to the
         jvm running the main(), whose acquisition method is performed by
         looking up the RMIRegistry and <emphasis
@@ -876,13 +794,10 @@
         role="bold">virtualNodesAcquisition</emphasis> part which will be the
         result of a lookup in the RMIRegistry of a host to be specified at
         runtime.</para>
-      </listitem>
-    </itemizedlist>
 
-    <para><anchor id="Descriptor_html_infrastructure" /></para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 remap="h2" id="Descriptor_html_infrastructure">
     <title>Infrastructure and processes</title>
 
     <para>In the previous example, all defined JVMs will be created using
@@ -897,13 +812,9 @@
     role="bold">infrastructure</emphasis> with the id <emphasis
     role="bold">localJVM</emphasis></para>
 
-    <itemizedlist>
-      <listitem>
-        <para>Local JVMs</para>
-      </listitem>
-
-      <listitem>
-        <para>As said before, all processes are defined in the <emphasis
+    <sect2>
+       <title>Local JVMs</title>
+         <para>As said before, all processes are defined in the <emphasis
         role="bold">infrastructure</emphasis> part, under the <emphasis
         role="bold">processes</emphasis> tag. In the previous example, the
         defined process <emphasis role="bold">jvmProcess</emphasis> will
@@ -1014,14 +925,11 @@
  value='/IOFAb/classlibs/jdk'/&gt;
  &lt;/bootclasspath&gt;
 </screen>
-      </listitem>
+</sect2>
 
-      <listitem>
-        <para>Remote JVMs</para>
-      </listitem>
-
-      <listitem>
-        <para>With XML Deployment Descriptor, <emphasis
+<sect2>
+        <title>Remote JVMs</title>
+         <para>With XML Deployment Descriptor, <emphasis
         role="bold">ProActive</emphasis> provides the ability to create remote
         Nodes (remote JVMs). You can specify in the descriptor if you want to
         access the remote host with <emphasis role="bold">rsh</emphasis>,
@@ -1057,10 +965,7 @@
         <itemizedlist>
           <listitem>
             <para>RSH</para>
-          </listitem>
-
-          <listitem>
-            <para><screen>  ...........................                                
+             <para><screen>  ...........................                                
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
   &lt;creation&gt;
    &lt;processReference
@@ -1110,10 +1015,7 @@
 
           <listitem>
             <para>RLOGIN</para>
-          </listitem>
-
-          <listitem>
-            <para><screen> ...........................                                
+             <para><screen> ...........................                                
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
   &lt;creation&gt;
    &lt;processReference
@@ -1141,10 +1043,7 @@
 
           <listitem>
             <para>SSH</para>
-          </listitem>
-
-          <listitem>
-            <para><screen> ...........................                                
+             <para><screen> ...........................                                
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
   &lt;creation&gt;
    &lt;processReference
@@ -1204,10 +1103,7 @@
           <listitem>
             <para><anchor id="Descriptor_html_processlist"
             xreflabel="Process  list" />Process list</para>
-          </listitem>
-
-          <listitem>
-            <para>ProActive provides a way to define a list of processes for
+             <para>ProActive provides a way to define a list of processes for
             <emphasis role="bold">RSH, SSH, RLOGIN</emphasis> protocols. Using
             <emphasis role="bold">processList</emphasis> or <emphasis
             role="bold">processListbyHost</emphasis> elements avoids having a
@@ -1314,10 +1210,7 @@
 
           <listitem>
             <para>LSF</para>
-          </listitem>
-
-          <listitem>
-            <para>This protocol is used to create Nodes(JVMs) on a cluster.
+             <para>This protocol is used to create Nodes(JVMs) on a cluster.
             <emphasis role="bold">ProActive</emphasis> provides
             <literal>org.objectweb.proactive.core.process.lsf.LSFBSubProcess</literal>
             to create <emphasis role="bold">bsub</emphasis> process.</para>
@@ -1449,10 +1342,7 @@
 
           <listitem>
             <para>PBS</para>
-          </listitem>
-
-          <listitem>
-            <para>This protocol is used to create jobs on cluster managed by
+             <para>This protocol is used to create jobs on cluster managed by
             PBS, PBSPro or Torque. ProActive provides
             <literal>org.objectweb.proactive.core.process.pbs.PBSBSubProcess</literal>
             to create <emphasis role="bold">pbs</emphasis> processes. As
@@ -1518,10 +1408,7 @@
 
           <listitem>
             <para>Sun Grid Engine</para>
-          </listitem>
-
-          <listitem>
-            <para>This protocol is used to create jobs on cluster managed by
+             <para>This protocol is used to create jobs on cluster managed by
             Sun Grid Engine. ProActive provides
             <literal>org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess</literal>
             to create <emphasis role="bold">grid engine</emphasis> processes.
@@ -1579,10 +1466,7 @@
 
           <listitem>
             <para>OAR:</para>
-          </listitem>
-
-          <listitem>
-            <para>OAR is a cluster protocol developed at INRIA Alpes and used
+             <para>OAR is a cluster protocol developed at INRIA Alpes and used
             on <ulink url="http://www.grid5000.fr">Grid5000</ulink>. ProActive
             provides
             <literal>org.objectweb.proactive.core.process.oar.OARSubProcess</literal>
@@ -1643,10 +1527,7 @@
 
           <listitem>
             <para>PRUN:</para>
-          </listitem>
-
-          <listitem>
-            <para>PRUN is a cluster protocol develloped at Amsterdam to manage
+             <para>PRUN is a cluster protocol develloped at Amsterdam to manage
             their <ulink
             url="http://www.cs.vu.nl/das/prun/prun.1.xml">cluster</ulink>.
             ProActive provides
@@ -1659,10 +1540,7 @@
 
           <listitem>
             <para>GLOBUS</para>
-          </listitem>
-
-          <listitem>
-            <para>Like <emphasis role="bold">ssh</emphasis>, using <emphasis
+             <para>Like <emphasis role="bold">ssh</emphasis>, using <emphasis
             role="bold">globus</emphasis> requires some steps to be performed.
             In particular the <emphasis role="bold">java COG Kit</emphasis>
             (no need for the whole GT) must be installed on the machine that
@@ -1729,10 +1607,7 @@
 
           <listitem>
             <para>UNICORE:</para>
-          </listitem>
-
-          <listitem>
-            <para>ProActive provides
+             <para>ProActive provides
             <literal>org.objectweb.proactive.core.process.unicore.UnicoreProcess</literal>
             to use such protocol.</para>
 
@@ -1742,10 +1617,7 @@
 
           <listitem>
             <para>ARC (NorduGrid):</para>
-          </listitem>
-
-          <listitem>
-            <para>ProActive provides
+             <para>ProActive provides
             <literal>org.objectweb.proactive.core.process.nordugrid.NGProcess</literal>
             to use such protocol.</para>
 
@@ -1759,10 +1631,7 @@
 
           <listitem>
             <para>GLITE</para>
-          </listitem>
-
-          <listitem>
-            <para>ProActive provides
+           <para>ProActive provides
             <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
             to use such protocol.</para>
 
@@ -1770,16 +1639,10 @@
             url="../../../../../xml_examples/SSH_GLite_Example.xml">SSH_GLite_Example.xml</ulink>.</para>
           </listitem>
 
-          <listitem>
-            <para>Complete example of XML Deployment Descriptor</para>
-          </listitem>
-
+           
           <listitem>
             <para>MPI</para>
-          </listitem>
-
-          <listitem>
-            <para>ProActive provides
+             <para>ProActive provides
             <literal>org.objectweb.proactive.core.process.mpi.MPIDependentProcess</literal>
             to use such protocol. You have to couple this process with the
             DependentListProcessDecorator explained below.</para>
@@ -1814,10 +1677,7 @@
     &lt;/sshProcess&gt;
    &lt;/processDefinition&gt;
 </screen></para>
-          </listitem>
-
-          <listitem>
-            <para><screen> &lt;?xml version='1.0'
+             <para><screen> &lt;?xml version='1.0'
  encoding='UTF-8'?&gt;                                
  &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -1992,17 +1852,18 @@
         create under ~/.ssh a file called environment where you define the
         DISPLAY variable. If you are not familiar with ssh, see <ulink
         url="http://www.openssh.org">openSSH</ulink></para>
-      </listitem>
+      </sect2>
 
-      <listitem>
-        <para><emphasis role="bold">DependentListProcessDecorator</emphasis>:
+      <sect2>
+        <title>DependentListProcessDecorator</title>
+        <para>
         This process is used when a process is dependent on an another
         process. The first process of the list can be any process but the
         second one must be a DependentProcess thus has to implement the
         org.objectweb.proactive.core.process.DependentProcess
         interface.</para>
 
-        <para>Check also <ulink
+       <para>Check also <ulink
         url="../../../../../xml_examples/SSH_MPI_Example.xml">SSH_MPI_Example.xml</ulink>.</para>
 
         <para><screen>   &lt;processDefinition id='<emphasis role="bold">dependentProcessSequence</emphasis>'&gt;
@@ -2016,13 +1877,12 @@
      &lt;processReference refid='<emphasis role="bold">dependentProcessSequence</emphasis>' /&gt;
     &lt;/sshProcess&gt;
    &lt;/processDefinition&gt;</screen></para>
-      </listitem>
-    </itemizedlist>
+      </sect2>
 
-    <para><anchor id="Descriptor_html_services" /></para>
+     
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 remap="h2" id="Descriptor_html_services" >
     <title>Infrastructure and services</title>
 
     <para>As mentionned previously, instead of creating jvms, ProActive gives

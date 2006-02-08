@@ -6,10 +6,9 @@ BODY {
 td {font-size: 9pt;}
 p {margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
 
-code {	font-size: 3px;}
+/* Make the items of a list dense  */
 li {	font-size: 9pt;}
-
-.codeexample {	font-family: "Courier New", Courier, mono;}
+li p {padding:0; margin:0;} 
 
 
 /* P  { margin-left:  8px; padding-left: 8px; } */
@@ -25,7 +24,7 @@ div.list-of-figures {font-size: 10pt;}
 div.list-of-examples {font-size: 10pt;}
 div.list-of-tables {font-size: 10pt;}
 
-span.part a {font-weight: bold;font-size: 16pt;}
+span.part a {font-weight: bold; font-size: 16pt; background-color: #00257E; color: white}
 span.chapter a {font-weight: bold;font-size: 13pt;}
 /*span.chapter a {
  background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
@@ -120,7 +119,7 @@ span.part a {
         display: block;
         padding: 10px;
         border: 1px solid #bbb;
-        background-color: #eee;
+        background-color: #a8d5ff;
         color: #000;
         overflow: auto;
         border-radius: 2.5px;
@@ -134,10 +133,12 @@ span.part a {
         display: block;
         padding: 10px;
         border: 1px solid #bbb;
-        background-color: #ddd;
+        background-color: #a8d5ff;
         color: #000;
         overflow: auto;
         border-radius: 2.5px;
         -moz-border-radius: 2.5px;
         margin: 0.5em 2em;
 }
+
+code {  font-family: monospace;}

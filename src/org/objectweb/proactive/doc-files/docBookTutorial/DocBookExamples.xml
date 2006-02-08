@@ -17,9 +17,9 @@
       <title>A Drawing using the FIGURE tag</title>
 
       <mediaobject>
-        <imageobject>
-          <imagedata fileref="images/e1.png" format="PNG"  />
-        </imageobject>
+       <imageobject>
+        <imagedata fileref="images/e1.png" format="PNG" align="center"  />
+       </imageobject>
       </mediaobject>
     </figure>
   </sect2>

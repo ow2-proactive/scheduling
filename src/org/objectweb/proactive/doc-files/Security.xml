@@ -231,9 +231,9 @@
       <para>The Grid user can specify additional rules directly in his
       deployment descriptor for the domains he deploys onto. Note that those
       domains are actually dynamic as they can be obtained through external
-      allocators, or even Web Services in an OGSA infrastructure [<ulink
-      url="security_images/node18.xml#foster98security">5</ulink>]. Joker
-      rules might be important in that case to cover all cases, and to provide
+      allocators, or even Web Services in an OGSA infrastructure .
+      <!--[<ulink url="security_images/node18.xml#foster98security">5</ulink>]. -->
+      Joker rules might be important in that case to cover all cases, and to provide
       a conservative security strategy for un-forecasted deployments.</para>
 
       <para>Finally, as active objects are active and mobile entities, there
@@ -371,8 +371,9 @@
           <imageobject>
             <imagedata fileref="security_images/img9.png" format="PNG" />
           </imageobject>
-        </inlinemediaobject> ). Figure <ulink
-      url="security_images/node11.xml#hierarchicalsecurityrule">6</ulink>
+        </inlinemediaobject> ). 
+      Figure 6 
+      <!--<ulink url="security_images/node11.xml#hierarchicalsecurityrule">6</ulink>-->
       hierarchically represents the security rules that can be activated at
       execution: from the top, hierarchical domains ( <inlinemediaobject>
           <imageobject>
@@ -429,7 +430,8 @@
       ...), will want to apply a security policy based on the resolution
       presented in the previous section. Before starting an interaction, a
       <emphasis>negotiation</emphasis> occurs between the two entities
-      involved. Figure <ulink url="security_images/node12.xml#sac">7</ulink>
+      involved. Figure 7 
+      <!--<ulink url="security_images/node12.xml#sac">7</ulink>-->
       shows the result of such negotiation. For example, if for a given
       interaction, entity A's policy is [+A,?I,?C], and B's policy is
       [+A,?I,-C], the negotiated policy will be [A,?I,-C]. If, for a result
@@ -846,7 +848,6 @@
     <para>Certificates are saved under a PKCS12 format (extension .p12). This
     format is natively supported by the ProActive Security mechanism.</para>
 
-    <para>To learn more, see the <ulink
-    url="../../../../index.xml">JavaDoc</ulink>.</para>
+    <para>To learn more, see the <ulink url="../api/index.html">JavaDoc</ulink>.</para>
   </sect1>
 </chapter>

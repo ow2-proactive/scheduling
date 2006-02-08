@@ -26,9 +26,7 @@
   <para>The code for creating a passive instance of <literal>A</literal> could
   be:</para>
 
-  <blockquote>
-    <para><screen> A a = new A(26, "astring"); </screen></para>
-  </blockquote>
+  <para><programlisting language="java"> A a = new A(26, "astring"); </programlisting></para>
 
   <para>In <emphasis role="bold">ProActive</emphasis> there are two ways to
   create active objects. One way is to use
@@ -56,7 +54,7 @@
     be created properly, the reified object must have a declared empty no-args
     constructor.</para>
 
-    <screen>    A a;
+    <programlisting language="java">    A a;
     Object[] params = new Object[] { new Integer (26), "astring" };
     try {
       a = (A) ProActive.newActive("example.A", params);
@@ -66,8 +64,7 @@
     }
     catch(NodeException ex){
         ex.printStackTrace();
-    }
-</screen>
+    }</programlisting>
 
     <para>This code creates an active object of class <literal>A</literal> in
     the local JVM. If the invocation of the constructor of class
@@ -84,8 +81,8 @@
       the constructor have to be passed as an array of Object. Then, according
       to the type of the elements of this array, the ProActive runtime
       determines which constructor of class A to call. Nevertheless, there is
-      still room for some ambiguity in resolving the constructor because:
-    </para>
+      still room for some ambiguity in resolving the constructor
+      because:</para>
 
       <itemizedlist>
         <listitem>
@@ -109,8 +106,7 @@
         </listitem>
       </itemizedlist>
 
-      <screen>
-    public A (int i) {
+      <programlisting language="java">    public A (int i) {
         //
     }
     public A (Integer i) {
@@ -121,8 +117,7 @@
     }
     public A (int i, Vector v) {
         //
-    }
-</screen>
+    }</programlisting>
     </sect2>
 
     <sect2 remap="h3">
@@ -144,13 +139,10 @@
       <literal>Node</literal> object that points to an existing node. Here an
       example:</para>
 
-      <screen>
-      a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/a\
-Node");
+      <programlisting language="java">      a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/aNode");
   or
       Node node = NodeFactory.getNode("rmi://pluto.inria.fr/aNode");
-      a = (A) ProActive.newActive("example.A", params, node);
-</screen>
+      a = (A) ProActive.newActive("example.A", params, node);</programlisting>
     </sect2>
   </sect1>
 
@@ -186,10 +178,8 @@ Node");
 
     <para>Code for object-based creation looks like this:</para>
 
-    <screen>
-    A a = new A (26, "astring");
-    a = (A) ProActive.turnActive(a);
-</screen>
+    <programlisting language="java">    A a = new A (26, "astring");
+    a = (A) ProActive.turnActive(a);</programlisting>
 
     <para>As for <literal>newActive</literal>, the second parameter of
     <literal>turnActive</literal> if given is the location of the active
@@ -217,8 +207,8 @@ Node");
     ProActive.</para>
 
     <para>It is possible to specify what to do before the activity starts,
-    what the activity is and what to do after it ends. The three steps are:
- </para>
+    what the activity is and what to do after it ends. The three steps
+    are:</para>
 
     <itemizedlist>
       <listitem>
@@ -284,36 +274,30 @@ Node");
 
       <para><emphasis role="bold">InitActive</emphasis></para>
 
-      <screen>
-if activity is non null and implements InitActive
+      <screen>if activity is non null and implements InitActive
   we invoke the method initActivity defined in the object activity
 else if the class of the reified object implements InitActive
   we invoke the method initActivity of the reified object
 else
-  we don't do any initialization
-</screen>
+  we don't do any initialization</screen>
 
       <para><emphasis role="bold">RunActive</emphasis></para>
 
-      <screen>
-if activity is non null and implements RunActive
+      <screen>if activity is non null and implements RunActive
   we invoke the method runActivity defined in the object activity
 else if the class of the reified object implements RunActive
   we invoke the method runActivity of the reified object
 else
-  we run the standard FIFO activity
-</screen>
+  we run the standard FIFO activity</screen>
 
       <para><emphasis role="bold">EndActive</emphasis></para>
 
-      <screen>
-if activity is non null and implements EndActive
+      <screen>if activity is non null and implements EndActive
   we invoke the method endActivity defined in the object activity
 else if the class of the reified object implements EndActive
   we invoke the method endActivity of the reified object
 else
-  we don't do any cleanup
-</screen>
+  we don't do any cleanup</screen>
     </sect2>
 
     <sect2 remap="h3">
@@ -327,10 +311,10 @@ else
       <literal>RunActive</literal> and <literal>EndActive</literal>. Here is
       an example that has a custom initialization and activity.</para>
 
-      <para><emphasis role="bold">Example1:</emphasis></para>
+      <example>
+        <title>Example 1:Custom Init and Run</title>
 
-      <screen>
-  import org.objectweb.proactive.*;
+        <para><programlisting language="java">  import org.objectweb.proactive.*;
   public class A implements InitActive, RunActive {
         private String myName;
          public String getName() {
@@ -351,70 +335,62 @@ else
         A a = (A) ProActive.newActive("A",null);
         System.out.println("Name = "+a.getName());
         }
-  }
-</screen>
+  }</programlisting></para>
+      </example>
 
-      <para><emphasis role="bold">Example2:</emphasis><emphasis
-      role="bold">start, stop, suspend, restart</emphasis> a simulation
-      algorithm in runActivity method</para>
+      <para><example>
+          <title><emphasis role="bold">Example2:</emphasis><emphasis
+          role="bold">start, stop, suspend, restart</emphasis> a simulation
+          algorithm in runActivity method</title>
 
-      <screen>
-import org.objectweb.proactive.*;
+          <para><programlisting language="java">import org.objectweb.proactive.*;
 public class Simulation implements RunActive {
       private boolean stoppedSimulation=false;
         private boolean startedSimulation=false
         private boolean suspendedSimulation=false;
         private boolean notStarted = true;
         public void startSimulation(){
-        //
-<emphasis role="bold">Simulation starts</emphasis>
+        //<emphasis role="bold">Simulation starts</emphasis>
         notStarted = false;
         startedSimulation=true;
         }
         public void restartSimulation(){
-        //
-<emphasis role="bold">Simulation is restarted</emphasis>
+        //<emphasis role="bold">Simulation is restarted</emphasis>
         startedSimulation=true;
         suspendedSimulation=false;
         }
         public void suspendSimulation(){
-        //
-<emphasis role="bold">Simulation is suspended</emphasis>
+        //<emphasis role="bold">Simulation is suspended</emphasis>
         suspendedSimulation=true;
         startedSimulation = false;
         }
         public void stoppedSimulation(){
-        //
-<emphasis role="bold">Simulation is stopped</emphasis>
+        //<emphasis role="bold">Simulation is stopped</emphasis>
         stoppedSimulation=true;
         }
         public void runActivity(Body body) {
          Service service = new Service(Body);
         while (body.isActive()) {
-        //If the simulation is not yet started wait until startSimulation m\
-ethod
-
-<emphasis role="bold">if(notStarted) service.blockingServeOldest(startSimulation());</emphasis>
+        //If the simulation is not yet started wait until startSimulation method
+        <emphasis role="bold">if(notStarted) service.blockingServeOldest(startSimulation());</emphasis>
        // If the simulation is started serve request with FIFO
-
-<emphasis role="bold"> if(startedSimulation) service.blockingServeOldest();</emphasis>
+<emphasis role="bold">        if(startedSimulation) service.blockingServeOldest();</emphasis>
         // If simulation is suspended wait until restartSimulation method
-
-<emphasis role="bold">       if(suspendedSimulation) service.blockingServeOldest(restartSimulation());</emphasis>
-        // If simulation is stopped, exit
-
-<emphasis role="bold">       if(stoppedSimulation) exit();</emphasis>
+<emphasis role="bold">        if(suspendedSimulation) service.blockingServeOldest(restartSimulation());</emphasis>
+        // If simulation is stopped, exit<emphasis role="bold">
+        if(stoppedSimulation) exit();</emphasis>
         }
-}
-</screen>
+}</programlisting></para>
+        </example></para>
 
-      <para><emphasis role="bold">Example3: Reactive Active Object</emphasis>.
-      Even when an AO is busy doing its own work, it can remain reactive to
-      external events (method calls). One just has to program non-blocking
-      services to take into account external inputs.</para>
+      <example>
+        <title><emphasis role="bold">Example3: Reactive Active
+        Object</emphasis>.</title>
 
-      <screen>
-public class BusyButReactive implements RunActive {
+        <para>Even when an AO is busy doing its own work, it can remain
+        reactive to external events (method calls). One just has to program
+        non-blocking services to take into account external
+        inputs.<programlisting language="java">public class BusyButReactive implements RunActive {
 public void  runActivity(Body body) {
 Service service = new Service(body);
 while ( ! hasToTerminate ) {
@@ -427,8 +403,8 @@ while ( ! hasToTerminate ) {
     }
 public void changeParameters () {...   // change computation parameters}
 public void terminate (){ hasToTerminate=true;}
-}
-</screen>
+}</programlisting></para>
+      </example>
 
       <para>It also allows one to specify explicit termination of AOs (there
       is currently no Distributed Garbage Collector). Of course, the
@@ -455,8 +431,7 @@ public void terminate (){ hasToTerminate=true;}
       activity is generic enough not to have to access the member variables of
       the reified object.</para>
 
-      <screen>
-  import org.objectweb.proactive.*;
+      <programlisting language="java">  import org.objectweb.proactive.*;
   public class LIFOActivity implements RunActive {
     // -- implements RunActive for serving request in a LIFO fashion
     public void runActivity(Body body) {
@@ -478,14 +453,11 @@ public void terminate (){ hasToTerminate=true;}
     }
     public static void main(String[] args) throws Exception {
       // newActive(classname, constructor parameter (null = none), 
-      //           node (null = local), active, MetaObjectFactory (null = d\
-efault)
-      A a = (A) ProActive.newActive("A", null, null, new LIFOActivity(), null\
-);
+      //           node (null = local), active, MetaObjectFactory (null = default)
+      A a = (A) ProActive.newActive("A", null, null, new LIFOActivity(), null);
       System.out.println("Name = "+a.getName());
     }
-  }
-</screen>
+  }</programlisting>
     </sect2>
   </sect1>
 
@@ -543,20 +515,17 @@ efault)
     <literal>pA</literal> that takes care of instantiating the active object
     and returns it. The code is:</para>
 
-    <screen>
-  public class AA extends A {
+    <programlisting language="java">  public class AA extends A {
     public static A createActiveA (int i, String s, Node node) {
       Object[] params = new Object[] {new Integer (i), s};
       try {
         return (A) ProActive.newActive("A", params, node);
       } catch (Exception e) {
-        System.err.println ("The creation of an active instance of A raised \
-an exception: "+e);
+        System.err.println ("The creation of an active instance of A raised an exception: "+e);
         return null;
       }
     }
-  }
-</screen>
+  }</programlisting>
 
     <para>It is up to the programmer to decide whether this method has to
     throw exceptions or not. We recommend that this method only throws
@@ -592,10 +561,10 @@ an exception: "+e);
       specify which <literal>MetaObjectFactory</literal> to use for that
       particular instance of active object being created. The class <ulink
       url="../ProActive.html">ProActive</ulink> provides extra <ulink
-      url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">
-      newActive</ulink> and <ulink
-      url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">
-      turnActive</ulink> methods for that.</para>
+      url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">newActive</ulink>
+      and <ulink
+      url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">turnActive</ulink>
+      methods for that.</para>
     </sect2>
 
     <sect2 remap="h3">
@@ -611,11 +580,8 @@ an exception: "+e);
       is a great time saver as you only redefine what you really need to. Here
       is an example:</para>
 
-      <blockquote>
-        <para><screen>
-public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
-  private static final MetaObjectFactory instance = new MyMetaObjectFactory\
-();
+      <para><programlisting language="java">public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
+  private static final MetaObjectFactory instance = new MyMetaObjectFactory();
   protected MyMetaObjectFactory() {
     super();
   }
@@ -631,17 +597,13 @@ public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
   //
   // -- INNER CLASSES -----------------------------------------------
   //
-  protected class MyRequestFactory implements RequestFactory, java.io.Seria\
-lizable {
-    public Request newRequest(MethodCall methodCall, UniversalBody sourceBo\
-dy, boolean isOneWay, long sequenceID) {
-      return new MyRequest(methodCall, sourceBody, isOneWay, sequenceID, se\
-rver);
+  protected class MyRequestFactory implements RequestFactory, java.io.Serializable {
+    public Request newRequest(MethodCall methodCall, 
+                      UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+      return new MyRequest(methodCall, sourceBody, isOneWay, sequenceID, server);
     }
   } // end inner class MyRequestFactory
-}
-</screen></para>
-      </blockquote>
+}</programlisting></para>
 
       <para>The factory above simply redefines the
       <literal>RequestFactory</literal> in order to make the body use a new
@@ -655,28 +617,23 @@ rver);
       factory when creating a new active object. If we take the same example
       as before we have:</para>
 
-      <screen>
-  Object[] params = new Object[] {new Integer (26), "astring"};
+      <programlisting language="java">  Object[] params = new Object[] {new Integer (26), "astring"};
   try {
-    A a = (A) ProActive.newActive("example.AA", params, null, null, MyMetaObj\
-ectFactory.newInstance());
+    A a = (A) ProActive.newActive("example.AA", params, null, null, 
+                                    MyMetaObjectFactory.newInstance());
   } catch (Exception e) {
     e.printStackTrace() ;
-  }
-</screen>
+  }</programlisting>
 
-      <para>In the case of a <literal>turnActive</literal> we would have:
-    </para>
+      <para>In the case of a <literal>turnActive</literal> we would
+      have:</para>
 
-      <screen>
-  A a = new A(26, "astring");
-  a = (A) ProActive.turnActive(a, null, null, MyMetaObjectFactory.newInstan\
-ce());
-</screen>
+      <programlisting language="java">  A a = new A(26, "astring");
+  a = (A) ProActive.turnActive(a, null, null, MyMetaObjectFactory.newInstance());</programlisting>
     </sect2>
   </sect1>
 
-  <sect1 remap="h2" id="ActiveObjectCreation_html_elementRole" >
+  <sect1 id="ActiveObjectCreation_html_elementRole" remap="h2">
     <title>Advanced: Role of the elements of an active object</title>
 
     <para>In this section, we'll have a very close look at what happens when
@@ -688,18 +645,14 @@ ce());
     creates an active object of class <literal>B</literal> using a piece of
     code like this:</para>
 
-    <blockquote>
-      <para><screen>
-    B b;
+    <para><programlisting language="java">    B b;
     Object[] params = {&lt;some parameters for the constructor&gt;};
     try {
       // We create an active instance of B on the current node
       b = (B) ProActive.newActive("B", params);
     } catch (Exception e) {
       e.printStackTrace () ;
-    }
-</screen></para>
-    </blockquote>
+    }</programlisting></para>
 
     <para>If the creation of the active instance of B is successful, the graph
     of objects is as described in figure below (with arrows denoting
@@ -711,8 +664,7 @@ ce());
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/activeObjectComponents.png"
-                       format="PNG"  
-                       width="6in"/>
+                       format="PNG" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -959,8 +911,7 @@ ce());
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/futureObject.png" format="PNG"
-                          />
+              <imagedata fileref="images/futureObject.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -1066,7 +1017,7 @@ ce());
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/sequentialCallUMLDiagram.png"
-                           format="PNG"  />
+                           format="PNG" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1098,8 +1049,7 @@ ce());
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/activeObjectComponents.png"
-                               format="PNG"  
-                               width="6in" />
+                               format="PNG" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1120,7 +1070,7 @@ ce());
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectComponents.png"
-                               format="PNG"  width="6in" />
+                               format="PNG" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1139,7 +1089,7 @@ ce());
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectAllComponents.png"
-                               format="PNG"  width="6in" />
+                               format="PNG" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1209,7 +1159,7 @@ ce());
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG"  width="6in" />
+                           format="PNG" width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1261,12 +1211,12 @@ ce());
           otherwise you will loose the asynchronism capabilities. For instance
           if one of your object has a method</para>
 
-          <screen> <emphasis role="bold"> int</emphasis> giveSolution(parameter) </screen>
+          <programlisting language="java"> <emphasis role="bold"> int</emphasis> giveSolution(parameter) </programlisting>
 
           <para>calling this method with ProActive is sychronous. So to keep
           the asynchronism it is advised to use</para>
 
-          <screen> <emphasis role="bold">InWrapper </emphasis>giveSolution(parameter) </screen>
+          <programlisting language="java"> <emphasis role="bold">InWrapper </emphasis>giveSolution(parameter) </programlisting>
 
           <para>In that case call to this method is asynchronous.</para>
 
@@ -1291,8 +1241,7 @@ ce());
           above, so even if the method returns null, result_from_method cannot
           be null:</para>
 
-          <screen>
-public class MyObject{
+          <programlisting language="java">public class MyObject{
  public MyObject(){
  //empty constructor with no-args
  }
@@ -1306,16 +1255,15 @@ public class MyObject{
   }
  }
 
-} </screen>
+} </programlisting>
 
           <para>On the caller side:</para>
 
-          <screen>
-MyObject o = new MyObject();
+          <programlisting language="java">MyObject o = new MyObject();
 Object result_from_method = o.getObject();
 if(result_from_method == null){
 ......
-}</screen>
+}</programlisting>
 
           <para>This test is never true, indeed, result_from_method is
           <emphasis role="bold">Stub--&gt;Proxy--&gt;null</emphasis> if the
@@ -1424,9 +1372,7 @@ if(result_from_method == null){
       <para>The following piece of code shows both cases: passing a future as
       parameter or as a result.</para>
 
-      <blockquote>
-        <para><screen>
-class C{
+      <para><programlisting language="java">class C {
 ....
         public static void main(String[] args){
         ......
@@ -1434,27 +1380,21 @@ class C{
         A b = newActive(B);
         Result r1 = a.foo();   //r1 is a future
         Result r2 = b.bar(r1); //r1 is passed as parameter
-        Result r3 = b.bar2();  // see 
-<emphasis role="bold">**</emphasis>
+        Result r3 = b.bar2();  // see <emphasis role="bold">**</emphasis>
         ........
         }       //end of main
 ...
-}       //end of class C
-</screen></para>
-      </blockquote>
+}       //end of class C</programlisting></para>
 
       <para>where</para>
 
-      <blockquote>
-        <para><screen>
-class A {
+      <para><programlisting language="java">class A {
   ...
         public Result foo(){
         ...
         }
   ...
-} //end of class A
-class B{
+} //end of class A</programlisting><parameter>and</parameter><programlisting language="java">class B {
 ...
          public Result bar (Result r) {
         ...
@@ -1465,9 +1405,7 @@ class B{
         return a.foo();     // 
 <emphasis role="bold">**</emphasis> future is sent as a result
          }
-} //end of class B
-</screen></para>
-      </blockquote>
+} //end of class B</programlisting></para>
     </sect2>
 
     <sect2 remap="h3">
@@ -1477,7 +1415,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e1.png" format="PNG"  />
+              <imagedata fileref="images/e1.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1489,7 +1427,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e2.png" format="PNG"  />
+              <imagedata fileref="images/e2.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1500,7 +1438,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e3.png" format="PNG"  />
+              <imagedata fileref="images/e3.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1512,7 +1450,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e4.png" format="PNG"  />
+              <imagedata fileref="images/e4.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1526,7 +1464,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e5.png" format="PNG"  />
+              <imagedata fileref="images/e5.png" format="PNG" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1538,7 +1476,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-             <imagedata fileref="images/e6.png" format="PNG"  width="6in" />
+              <imagedata fileref="images/e6.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1549,7 +1487,7 @@ class B{
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-             <imagedata fileref="images/e7.png" format="PNG"  width="6in" />
+              <imagedata fileref="images/e7.png" format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1562,8 +1500,6 @@ class B{
 
   <sect1 id="HelloWorld">
     <title>The Hello world ! example</title>
-
-    <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/HelloWorld.html  -->
 
     <para>This example implements a very simple client-server application. A
     client object display a <literal>String</literal> received from a remote
@@ -1600,15 +1536,14 @@ class B{
           </listitem>
         </itemizedlist>
 
-        <para>Here is a possible implementation for the
-        <literal>Hello</literal> class:</para>
+        <example>
+          <title>A possible implementation for the <literal>Hello</literal>
+          class:</title>
 
-        <screen>
-public class Hello {
+          <para><programlisting language="java">public class Hello {
   private String name;
   private String hi = "Hello world";
-  private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("\
-dd/MM/yyyy HH:mm:ss");
+  private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
   public Hello() {
   }
   public Hello(String name) {
@@ -1616,26 +1551,23 @@ dd/MM/yyyy HH:mm:ss");
   }
   public String sayHello() {
     return hi + " at " + dateFormat.format(new java.util.Date())+
-        " from node: " + org.objectweb.proactive.ProActive.getBodyOnThis().g\
-etNodeURL();
+        " from node: " + org.objectweb.proactive.ProActive.getBodyOnThis().getNodeURL();
   }
   public static void main(String[] args) {
     // Registers it with an URL
     try {
       // Creates an active instance of class HelloServer on the local node
-      Hello hello = (Hello)org.objectweb.proactive.ProActive.newActive(Hell\
-o.class.getName(), 
+      Hello hello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), 
                              new Object[]{"remote"});
       java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
-      org.objectweb.proactive.ProActive.register(hello, "//" + localhost.getH\
-ostName() + "/Hello");
+      org.objectweb.proactive.ProActive.register(hello, "//" + localhost.getHostName() + "/Hello");
     } catch (Exception e) {
       System.err.println("Error: " + e.getMessage());
       e.printStackTrace();
     }
   }
-}
-</screen>
+}</programlisting></para>
+        </example>
 
         <sect4>
           <title>Implement the required functionalities</title>
@@ -1708,28 +1640,23 @@ ostName() + "/Hello");
         server object, then to invoke a method on it in order to retrieve a
         message, and finally display that message.</para>
 
-        <para>HelloClient.java</para>
+        <example>
+          <title>HelloClient.java</title>
 
-        <!-- <title>HelloClient.java</title>   -->
-
-        <screen>
-public class HelloClient {
+          <programlisting language="java">public class HelloClient {
   public static void main(String[] args) {
     Hello myServer;
     String message;
     try {
       // checks for the server's URL
       if (args.length == 0) {
-        // There is no url to the server, so create an active server within\
- this VM
-        myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello\
-.class.getName(), 
+        // There is no url to the server, so create an active server within this VM
+        myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), 
                           new Object[]{"local"});
       } else {
         // Lookups the server object
         System.out.println("Using server located on " + args[0]);
-        myServer = (Hello)org.objectweb.proactive.ProActive.lookupActive(He\
-llo.class.getName(), 
+        myServer = (Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(), 
                           args[0]);
       }
       // Invokes a remote method on this object to get the message
@@ -1742,8 +1669,8 @@ llo.class.getName(),
       System.exit(1);
     }
   }
-}
-</screen>
+}</programlisting>
+        </example>
 
         <sect4>
           <title>Looking up a remote object</title>
@@ -1793,14 +1720,11 @@ llo.class.getName(),
       server's URL. The code snippet which instantiates the Server in the same
       VM is the following:</para>
 
-      <screen>
-if (args.length == 0) {
-  // There is no url to the server, so create an active server within this \
-VM
-  myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class\
-.getName(), new Object[]{"local"});
-}
-</screen>
+      <programlisting language="java">if (args.length == 0) {
+  // There is no url to the server, so create an active server within this VM
+  myServer = (Hello)org.objectweb.proactive.ProActive.newActive(
+        Hello.class.getName(), new Object[]{"local"});
+}</programlisting>
 
       <para>To launch the Client and the Server, just type:</para>
 
@@ -1824,11 +1748,11 @@ VM
 
         <screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.Hello</screen>
+ org.objectweb.proactive.examples.hello.Hello &amp;</screen>
 
         <screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
- -Dlog4j.configuration=file:scripts\proactive-log4j org.objectweb.proactive.examples.hello.Hello
- &amp;</screen>
+   -Dlog4j.configuration=file:scripts\proactive-log4j 
+   org.objectweb.proactive.examples.hello.Hello </screen>
       </sect3>
 
       <sect3>
@@ -1836,11 +1760,11 @@ VM
 
         <screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</screen>
+ org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello &amp;</screen>
 
         <screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
- -Dlog4j.configuration=file:scripts\proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</screen>
+   -Dlog4j.configuration=file:scripts\proactive-log4j
+   org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</screen>
       </sect3>
     </sect2>
 
@@ -1855,11 +1779,11 @@ VM
 
         <screen>linux remoteHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
  -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.Hello</screen>
+ org.objectweb.proactive.examples.hello.Hello &amp;</screen>
 
         <screen>windows remoteHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
- -Dlog4j.configuration=file:scripts\proactive-log4j org.objectweb.proactive.examples.hello.Hello
- &amp;</screen>
+  -Dlog4j.configuration=file:scripts\proactive-log4j 
+  org.objectweb.proactive.examples.hello.Hello</screen>
       </sect3>
 
       <sect3>
@@ -1868,12 +1792,12 @@ VM
         <para>Log on to the client Host, and launch the client</para>
 
         <screen>linux clientHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
- -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
+   -Dlog4j.configuration=file:scripts/proactive-log4j
+   org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello &amp;</screen>
 
         <screen>windows clientHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
- -Dlog4j.configuration=file:scripts\proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
+  -Dlog4j.configuration=file:scripts\proactive-log4j
+  org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
       </sect3>
     </sect2>
   </sect1>

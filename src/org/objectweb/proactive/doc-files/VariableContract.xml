@@ -20,8 +20,6 @@
       <title><anchor id="dbdoclet.id.VariableContract_html_variableTypes"
       xreflabel="Variable Types" />Variable Types</title>
       
-      <para> HERE WAS REMOVED THE TABLE GIVEN THE DIFFERENT POSSIBILITIES (due to pdf generation)</para>
-<!--        
       <table>
         <title>Variable Types</title>
         <tgroup cols="4">
@@ -72,7 +70,7 @@
           </tbody>
         </tgroup>
       </table>
-      -->
+      
       <para>Variables can be set in more than one place. When the value is set
       on multiple places, then the definition specified in the priority column
       will take precedence.</para>
@@ -87,8 +85,7 @@
       corresponds to the responsible of writing the deployment descriptor. The
       variables represent rights and responsabilities between the two parties
       (contract) as specified in the following table:</para>
-     <para>HERE WAS REMOVED ANOTHER TABLE (due to pdf generation)</para> 
-<!--       
+     
      <para><informaltable frame="none">
           <tgroup cols="3">
             <tbody>
@@ -156,8 +153,8 @@
             </tbody>
           </tgroup>
         </informaltable></para>
-       -->
-    </sect2>
+    
+      </sect2>
     <sect2 remap="h3">
       <title>Variables Example</title>
       <sect3 remap="h4">
@@ -224,7 +221,7 @@
       <sect3 remap="h4">
         <title>Properties Files</title>
         <para>This approach uses <ulink
-        url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.xml#load(java.io.InputStream)">Sun
+        url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Properties.html#load(java.io.InputStream)">Sun
         microsystems properties file format</ulink>. The format is plain text
         with one definition per line in the format <emphasis
         role="bold">variable = value</emphasis>, as shown in the following

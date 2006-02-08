@@ -60,10 +60,10 @@
     <sect2 remap="h3">
       <title>API Definition</title>
 
-      <screen>import org.objectweb.proactive.tools;
+      <programlisting language="java">import org.objectweb.proactive.tools;
 
 static public void <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
-static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);</screen>
+static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);</programlisting>
 
       <para>These methods can be used to put and get files on a remote Node
       while the user's application is running. Note that these methods behave
@@ -90,7 +90,7 @@ static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n
       <emphasis>localhost</emphasis>@<emphasis
       role="bold">localDest</emphasis>, in the same fashion.</para>
 
-      <screen>import org.objectweb.proactive.tools;
+      <programlisting language="java">import org.objectweb.proactive.tools;
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
 VirtualNode testVNode = pad.getVirtualNode("example");
@@ -103,7 +103,7 @@ File remoteDest = new File("/remote/destination/path/file");
 
 File remoteSource = new File("/remote/source/path/file");
 File localDest = new File("/local/destination/path/file");
-<emphasis role="bold">File filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></screen>
+<emphasis role="bold">File filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></programlisting>
     </sect2>
   </sect1>
 
@@ -313,16 +313,16 @@ and implicitly inferred from the process information. --&gt;
         trigger the retrieval of all files associated with a
         VirtualNode.</para>
 
-        <para><screen>import org.objectweb.proactive.core.descriptor.data;
+        <para><programlisting language="java">import org.objectweb.proactive.core.descriptor.data;
 
-public File[] <emphasis role="bold">VirtualNode.fileTransferRetrieve</emphasis>();</screen></para>
+public File[] <emphasis role="bold">VirtualNode.fileTransferRetrieve</emphasis>();</programlisting></para>
 
         <para>This will trigger the retrieval of all the files specified in
         the descriptor, from all the nodes that were deployed using this
         virtual node using the <emphasis role="bold">pftp</emphasis>. The
         following shows an example:</para>
 
-        <screen>import org.objectweb.proactive.core.descriptor.data;
+        <programlisting language="java">import org.objectweb.proactive.core.descriptor.data;
 
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
@@ -332,7 +332,7 @@ Node[] examplenode = testVNode.getNodes();
 
 ...
 
-File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>();</screen>
+File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>();</programlisting>
 
         <para>As a result of calling this method an array of type File[] will
         be created, representing all the retrieved files.</para>
@@ -406,7 +406,8 @@ File files[] = testVNode.<emphasis role="bold">fileTransferRetrieve</emphasis>()
       <title>How Deployment File Transfer Works</title>
 
       <figure>
-       <title>File Transfer Design</title>
+        <title>File Transfer Design</title>
+
         <mediaobject>
           <imageobject>
             <imagedata fileref="development/imgs/fileTransferDesign.png"
