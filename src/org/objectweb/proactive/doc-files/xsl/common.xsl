@@ -3,22 +3,14 @@
                 version="1.0">
 
 
-<!--  Changing font sizes -->
-<xsl:param name="body.font.family">Times New Roman</xsl:param> 
-<!-- <xsl:param name="body.font.master">11</xsl:param> -->
-<!--<xsl:param name="title.font.family">Times New Roman</xsl:param> 
-<xsl:param name="footnote.font.size">9</xsl:param>-->
-<xsl:param name="monospace.font.family">Helvetica</xsl:param> 
-<!-- <xsl:param name="monospace.font.size">5</xsl:param> -->
-
 <!-- Where should the titles of formal objects be placed? -->
-<!--<xsl:param name="formal.title.placement">
-figure before
-example before
-equation before
-table before
-procedure before
-</xsl:param>-->
+<xsl:param name="formal.title.placement">
+figure after
+example after
+equation after
+table after
+procedure after
+</xsl:param>
 
 
 
@@ -34,10 +26,10 @@ procedure before
 <!--  TODO : make nice graphics for the next/prev buttons-->
 
 
+<!--  TODO : are we going to use these callout graphics ? We're not using images here!-->
 <xsl:param name="callout.graphics">1</xsl:param>
 <xsl:param name="callout.graphics.path"></xsl:param>
 <xsl:param name="callout.list.table">1</xsl:param>
-<!--  TODO : are we going to use these callout graphics ? We're not using images here!-->
 
 <!-- force all sections to have a number assigned, like "1. First section"-->
 <xsl:param name="section.autolabel">1</xsl:param>
@@ -51,12 +43,13 @@ procedure before
 
 <xsl:param name="generate.index">0</xsl:param>
 
+<!--  Which levels should be having a toc? I say : book, parts, appendixes and q&a only -->
 <xsl:param name="generate.toc">
     appendix  toc,title
     book      toc,title,figure,table,example,equation
     article   nop
-    chapter   title
     part      toc,title
+    chapter   title
     qandadiv  toc
     qandaset  nop
 </xsl:param>

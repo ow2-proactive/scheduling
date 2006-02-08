@@ -2,4 +2,4 @@ currentDir=`dirname $0`
 
 #build file for Unix system
 
-$JAVA_HOME/bin/java -classpath $JAVA_HOME/lib/tools.jar:$currentDir/ant.jar:$currentDir/ant-launcher.jar:$currentDir/xercesImpl.jar:$currentDir/xml-apis.jar:$CLASSPATH org.apache.tools.ant.Main -emacs -buildfile $currentDir/proactive.xml $@
+$JAVA_HOME/bin/java -Xmx256000000 -classpath $JAVA_HOME/lib/tools.jar:$currentDir/ant.jar:$currentDir/ant-launcher.jar:$currentDir/xercesImpl.jar:$currentDir/xml-apis.jar:$CLASSPATH org.apache.tools.ant.Main -emacs -buildfile $currentDir/proactive.xml $@

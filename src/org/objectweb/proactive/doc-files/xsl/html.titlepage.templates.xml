@@ -24,8 +24,8 @@
 <t:titlepage t:element="book" t:wrapper="div" class="titlepage">
   <t:titlepage-content t:side="recto">
    <title />
-    <subtitle/>
     <mediaobject/>
+    <subtitle/>
     <corpauthor/>
     <authorgroup/>
     <author/>

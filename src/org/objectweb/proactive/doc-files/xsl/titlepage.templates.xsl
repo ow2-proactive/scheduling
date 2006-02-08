@@ -4,8 +4,7 @@
                 xmlns:param="http://nwalsh.com/docbook/xsl/template/1.0/param"
                 xmlns:doc="http://nwalsh.com/xsl/documentation/1.0"
                 xmlns:fo="http://www.w3.org/1999/XSL/Format"
-                xmlns:exsl="http://exslt.org/common"
-                exclude-result-prefixes="doc t param exsl"
+                exclude-result-prefixes="doc t param"
                 version='1.0'>
 
 <!-- ********************************************************************
@@ -75,9 +74,7 @@ set of templates. This template creates an appropriate
 
 <xsl:template match="t:templates">
   <xsl:element name="xsl:stylesheet">
-    <xsl:copy-of select="document('')/xsl:stylesheet/namespace::exsl"/>
     <xsl:attribute name="version">1.0</xsl:attribute>
-    <xsl:attribute name="exclude-result-prefixes">exsl</xsl:attribute>
 
     <xsl:text>&#xA;&#xA;</xsl:text>
     <xsl:comment>
@@ -209,12 +206,6 @@ and <quote>verso</quote> sides of the title page.</para>
 	<xsl:text>&#xA;      </xsl:text>
 	<xsl:element name="xsl:choose">
 	  <xsl:text>&#xA;        </xsl:text>
-	  <xsl:element name="xsl:when">
-	    <xsl:attribute name="test">function-available('exsl:node-set')</xsl:attribute>
-	    <xsl:element name="xsl:value-of">
-	      <xsl:attribute name="select">count(exsl:node-set($recto.content)/*)</xsl:attribute>
-	    </xsl:element>
-	  </xsl:element>
 	  <xsl:text>&#xA;        </xsl:text>
 	  <xsl:element name="xsl:otherwise">
 	    <xsl:text>1</xsl:text>
@@ -261,12 +252,6 @@ and <quote>verso</quote> sides of the title page.</para>
 	<xsl:text>&#xA;      </xsl:text>
 	<xsl:element name="xsl:choose">
 	  <xsl:text>&#xA;        </xsl:text>
-	  <xsl:element name="xsl:when">
-	    <xsl:attribute name="test">function-available('exsl:node-set')</xsl:attribute>
-	    <xsl:element name="xsl:value-of">
-	      <xsl:attribute name="select">count(exsl:node-set($verso.content)/*)</xsl:attribute>
-	    </xsl:element>
-	  </xsl:element>
 	  <xsl:text>&#xA;        </xsl:text>
 	  <xsl:element name="xsl:otherwise">
 	    <xsl:text>1</xsl:text>
