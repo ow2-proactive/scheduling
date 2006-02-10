@@ -59,6 +59,7 @@ public class Test extends FunctionalTest {
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
         ProActive.setImmediateService(a, "getObject");
         dum = a.getObject();
+        ProActive.terminateActiveObject(a, true);
     }
 
     /**
