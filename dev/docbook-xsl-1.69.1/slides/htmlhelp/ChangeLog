@@ -1,0 +1,12 @@
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: New file.
+
+2004-09-20  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* htmlhelp.xsl: Pretty print source code
+
+2004-05-04  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* htmlhelp.xsl: New file.
+

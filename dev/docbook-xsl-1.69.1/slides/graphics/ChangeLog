@@ -1,0 +1,32 @@
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: New file.
+
+2002-06-25  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* blank.png, bleft.png, bright.png, bullet.gif, but-fforward.png, but-info.png, but-next.png, but-prev.png, but-rewind.png, but-xfforward.png, but-xnext.png, but-xprev.png, but-xrewind.png, left.gif, left.png, minus.gif, plus.gif, pointer.png, right.gif, right.png, toc.png: 
+	Nearly complete rewrite; this will become V3.0
+
+2002-05-30  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* but-fforward.png, but-info.png, but-next.png, but-prev.png, but-rewind.png, but-xfforward.png, but-xnext.png, but-xprev.png, but-xrewind.png: 
+	New file.
+
+2002-05-23  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* blank.png, bleft.png, bright.png, left.png, right.png, toc.png: 
+	New file.
+
+2001-07-17  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* hidetoc.gif, showtoc.gif: New file.
+
+2001-04-09  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* arrow.gif, blank.gif: New file.
+
+2001-04-05  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* bullet.gif, left.gif, minus.gif, plus.gif, right.gif: 
+	New file.
+

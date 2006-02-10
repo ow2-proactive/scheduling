@@ -998,7 +998,7 @@
 			<!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
 			<pathelement location="/usr/share/docbook-xsl-1.69.1"/>
 			<pathelement location="/usr/local/docbook-xsl-1.69.1"/>
- 		  <pathelement location="/usr/local/xxe-std-30p1/addon/config/docbook/xsl/"/> 
+			<pathelement location="${proactive.dir}/dev/docbook-xsl-1.69.1/"/>
  		  <pathelement location="/usr/share/sgml/docbook/xml-dtd-4.2-1.0-25/"/> <!-- For the dtd -->
     </classpath>
 

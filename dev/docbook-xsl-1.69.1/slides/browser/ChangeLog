@@ -1,0 +1,107 @@
+2005-06-21  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* slides.js: Added support for keyboard navigation in Opera. It was not very hard given fact that Opera tries to be as compatible with IE as possible ;-)
+
+2005-05-09  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* slides.js: 
+	::Problem:
+	  PAGE UP, PAGE DOWN, and HOME keyboard shortcuts not longer work
+	  as expected
+	
+	::Cause:
+	  Shortcuts were replaced with letter-key shortcuts (N, P, H).
+	
+	::Fix:
+	  Restored PAGE UP, PAGE DOWN, and HOME shortcuts by appending
+	  those keys to the list of valid shortcuts. Now, both those and
+	  the letter-key shortcuts are available. Also, added RIGHT ARROW,
+	  LEFT ARROW, and UP ARROW shortcuts. The complete list of
+	  shortcuts is now:
+	
+	     * forward = n, N, SPACE, ENTER, RETURN, PAGE UP, RIGHT ARROW
+	     * backward = p, P, BACKSPACE, PAGE DOWN, LEFT ARROW
+	     * up = u, U, UP ARROW
+	     * home = h, H, HOME
+	     * toc = t, T
+	
+	  (Closes bug #1196429; thanks to Roland Huss for reporting the
+	  problem)
+
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: New file.
+
+2004-11-05  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides.js: Bug #879749: fix keyboard navigation in slides in Mozilla; I tested with firefox and ie and both seemed fine so, ok
+
+2004-09-20  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* slides.css: Visual tweak
+
+2003-12-19  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* CTOCWidget.js, ua.js, xbDOM.js, xbDebug.js, xbLibrary.js, xbStyle-css.js, xbStyle-nn4.js, xbStyle-not-supported.js, xbStyle.js: 
+	Updated from devedge.netscape.com
+
+	* overlay.js, slides.js: Slides #698807: fix keyboard navigation
+
+2003-06-23  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* slides.css: Added small appearance improvements
+
+2003-06-22  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides-frames.css: Bug #702043: use visibility property instead of display property
+
+	* slides.css: Bug #702039: fixed missing semi-colon
+
+2003-01-25  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides.js: Use pgup/pgdn; letters don't work in Mozilla
+
+2002-06-25  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* overlay.js, slides-default.css, slides-frames.css, slides-plain.css, slides-table.css, slides-w3c.css, slides.css: 
+	Nearly complete rewrite; this will become V3.0
+
+2002-05-30  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* overlay.js: Code cleanup
+
+	* overlay.js: Hide the overlay if content overlaps
+
+	* slides.css: Make the tabular navigation toc a little bigger
+
+	* slides.css: Make sections have the same default font information as foils
+
+	* slides.css: Slides with 'vertical' navigation. Just another simple style.
+
+2002-05-29  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* list.js, overlay.js, resize.js, slides.css, slides.js, ua.js, xbCollapsibleLists.js, xbDOM.js, xbDebug.js, xbStyle.js: 
+	This is a significant rewrite. The JavaScript is much improved (including some code borrowed from developer.netscape.com) and the whole thing should be cleaner and less idiosyncratic now.
+
+	* slides.js: Implement toc.hide.show in a cross-platform manner
+
+2001-09-10  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* list.js, overlay.js, slides.js: More hacking, mostly. Added support for absolutely positioned footers
+	that works in most browsers and should be harmless in others. This should
+	make it possible to avoid multiframe. Also added "support" for NS6 and
+	IE6. I hope.
+
+2001-07-17  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* slides.css: New parameters multiframe.top.bgcolor, multiframe.bottom.bgcolor for setting background color of navigational frames.
+	New parameter toc.hide.show adds icon for dynamic hiding/showing toc for IE5.
+
+2001-04-09  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides.css: New rules for the tabular version
+
+2001-04-05  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* list.js, resize.js, slides.css, slides.js: New file.
+

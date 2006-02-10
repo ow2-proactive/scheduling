@@ -1,0 +1,3326 @@
+Changes since version 1.69.0 (2005-07-18)
+
+Changes to xsl/*
+
+  | 2005-08-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* RELEASE-NOTES.xml: Updated for 1.69.1 release.
+  | 
+  | 	* VERSION: Version 1.69.1 released.
+  | 
+  | 2005-07-19  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: New file.
+  | 
+
+Changes to xsl/fo/*
+
+  | 2005-08-09  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* autoidx.xsl: Fix bug 1247565: missing attribute set on
+  | 	  symbol entries.
+  | 
+  | 	* block.xsl, ebnf.xsl, table.xsl, titlepage.xsl: fo:table-body
+  | 	  and fo:table-header now set start-indent and end-indent to
+  | 	  zero to reset the table reference areas.
+  | 
+  | 2005-08-05  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* autoidx.xsl: Fixed bug #1244478. Indexterms in informal
+  | 	  objects are now getting correct page reference.
+  | 
+  | 2005-07-27  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* pagesetup.xsl: Fixed starting page number for first part
+  | 	  element in single-sided output.
+  | 
+
+Changes to xsl/html/*
+
+  | 2005-08-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* annotations.xsl: Set default value of annotation.support
+  | 	  param to 0 (off). Also, wrapped contents of the
+  | 	  apply-annotations template in a "if" statement, so that
+  | 	  those contents get evaluated only if annotation.support is
+  | 	  non-zero. The reason for these changes was a report from
+  | 	  Doug du Boulay (on the docbook-apps list) that processing of
+  | 	  the apply-annotations template was consuming 75% of the
+  | 	  total processing time for a 2.5Mb file. Anatoly Techtonik
+  | 	  followed with a comment that with 1.69.0, "Compiling took
+  | 	  about full working day on 12Mb file while earlier it was
+  | 	  about 2-4 hours".
+  | 
+  | 2005-08-04  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* chunk-code.xsl, chunkfast.xsl: Add cf to
+  | 	  exclude-result-prefixes because it is for internal use only.
+  | 
+
+Changes to xsl/manpages/*
+
+  | 2005-08-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lists.xsl: Fixed check for first following siblings in
+  | 	  lists.
+  | 
+  | 2005-08-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* block.xsl, lists.xsl, utility.xsl: Output .sp macro in mixed
+  | 	  blocks where we were outputting completely blank line
+  | 	  before. Thanks (again) to Costin Stroie for pointing out the
+  | 	  problems and providing a test case. Also, corrected the test
+  | 	  for checking first preceding siblings of text nodes in mixed
+  | 	  blocks (the test is used for determining whether or not we
+  | 	  need to insert a line break before those nodes.)
+  | 
+  | 2005-08-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* utility.xsl: Fixed bug that caused literal .sp to show up in
+  | 	  output. (Thanks to Costin Stroie for reporting). WARNING:
+  | 	  One of the consequences of this change is that the
+  | 	  stylesheet no longer generates spaces at the end of certain
+  | 	  lines. I had it doing that as a sort of hack to prevent
+  | 	  certain kinds of problems in output. It seems like the hack
+  | 	  my no longer be necessary. But if I am wrong, this change
+  | 	  may cause spaces to show up at the beginning of some lines
+  | 	  in "mixed content". If you see those, then this change has
+  | 	  introduced a regression, and I will need to go back and
+  | 	  figure out the right way to fix it (instead of the kludgy
+  | 	  way I was doing it before. Also, instances like the
+  | 	  following were showing up in some cases. .PP .sp That is, a
+  | 	  .PP macro immediately followed by a .sp macro. I can think
+  | 	  of no good read to ever generate that, and I am not sure why
+  | 	  it is getting generated. So I have taked the lazy way out
+  | 	  and caused the stylesheet to now strip out the .sp from all
+  | 	  such instances, leaving just the .PP
+  | 
+  | 2005-07-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* block.xsl, lists.xsl, utility.xsl: New file.
+  | 
+  | 	* block.xsl, lists.xsl, utility.xsl: Fixed handling of lists
+  | 	  with titles. Also reworked handling of space around lists.
+  | 	  (Closes #1243003 and 1241371). Among other things, this
+  | 	  change "normalizes" line space before and after verbatims.
+  | 	  For most cases, the stylesheet now attempts to ensure each
+  | 	  verbatim is preceded and followed by exactly one line of
+  | 	  space.
+  | 
+
+Changes to xsl/params/*
+
+  | 2005-08-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* annotation.support.xml: Set default value of
+  | 	  annotation.support param to 0 (off). Also, wrapped contents
+  | 	  of the apply-annotations template in a "if" statement, so
+  | 	  that those contents get evaluated only if annotation.support
+  | 	  is non-zero. The reason for these changes was a report from
+  | 	  Doug du Boulay (on the docbook-apps list) that processing of
+  | 	  the apply-annotations template was consuming 75% of the
+  | 	  total processing time for a 2.5Mb file. Anatoly Techtonik
+  | 	  followed with a comment that with 1.69.0, "Compiling took
+  | 	  about full working day on 12Mb file while earlier it was
+  | 	  about 2-4 hours".
+  | 
+  | 2005-08-06  <balls@users.sourceforge.net>
+  | 
+  | 	* pages.template.xml: New file.
+  | 
+  | 2005-08-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.string.subst.map.xml: Kruft removal.
+  | 
+  | 	* man.string.subst.map.xml: Fixed bug that caused literal .sp
+  | 	  to show up in output. (Thanks to Costin Stroie for
+  | 	  reporting). WARNING: One of the consequences of this change
+  | 	  is that the stylesheet no longer generates spaces at the end
+  | 	  of certain lines. I had it doing that as a sort of hack to
+  | 	  prevent certain kinds of problems in output. It seems like
+  | 	  the hack my no longer be necessary. But if I am wrong, this
+  | 	  change may cause spaces to show up at the beginning of some
+  | 	  lines in "mixed content". If you see those, then this change
+  | 	  has introduced a regression, and I will need to go back and
+  | 	  figure out the right way to fix it (instead of the kludgy
+  | 	  way I was doing it before. Also, instances like the
+  | 	  following were showing up in some cases. .PP .sp That is, a
+  | 	  .PP macro immediately followed by a .sp macro. I can think
+  | 	  of no good read to ever generate that, and I am not sure why
+  | 	  it is getting generated. So I have taked the lazy way out
+  | 	  and caused the stylesheet to now strip out the .sp from all
+  | 	  such instances, leaving just the .PP
+  | 
+  | 2005-07-28  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* part.autolabel.xml: Changed default part numbering format
+  | 	  back to 'I'.
+  | 
+  | 2005-07-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.string.subst.map.xml: New file.
+  | 
+  | 	* man.string.subst.map.xml: Fixed handling of lists with
+  | 	  titles. Also reworked handling of space around lists.
+  | 	  (Closes #1243003 and 1241371). Among other things, this
+  | 	  change "normalizes" line space before and after verbatims.
+  | 	  For most cases, the stylesheet now attempts to ensure each
+  | 	  verbatim is preceded and followed by exactly one line of
+  | 	  space.
+  | 
+  | 2005-07-20  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* appendix.autolabel.xml: New file.
+  | 
+  | 2005-07-20  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* appendix.autolabel.xml: Make appendixes use upperalpha
+  | 	  numeration
+  | 
+
+Changes to xsl/wordml/*
+
+  | 2005-08-06  <balls@users.sourceforge.net>
+  | 
+  | 	* docbook-pages.xsl, pages-normalise.xsl, param.ent,
+  | 	  param.xweb, template-pages.xml: Added support for Apple
+  | 	  Pages application
+  | 
+
+Changes since version 1.68.1 (2005-02-14)
+
+Changes to xsl/*
+
+  | 2005-07-18  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* RELEASE-NOTES.xml: Final changes for 1.69.0 release.
+  | 
+  | 	* VERSION: Version 1.69.0 released.
+  | 
+  | 2005-07-14  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* RELEASE-NOTES.xml: Checkpointing. Still need to add FO
+  | 	  section.
+  | 
+  | 2005-06-30  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* RELEASE-NOTES.xml: Added "General" stuff.
+  | 
+  | 	* RELEASE-NOTES.xml: First updates for 1.69.0 release. So far,
+  | 	  only includes descriptions of the manpages changes. Sorry,
+  | 	  that is all I could managed to get done so far. If anybody
+  | 	  else has time to add descriptions for the HTML and FO
+  | 	  stylesheets, please do. Otherwise, I will get back to work
+  | 	  on them later tonight my time.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: ignore RELEASE-NOTES.pdf and RELEASE-NOTES.fo
+  | 
+  | 	* README: Update to include Slides and Website info, and also
+  | 	  some other clarifications.
+  | 
+  | 2005-06-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: Ignore slides and website subdirs
+  | 
+  | 	* Makefile: Always make NEWS and install.sh
+  | 
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-05-28  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* Makefile: Added lib directory to the list of directories for
+  | 	  which separate Makefile is called
+  | 
+  | 2005-05-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* INSTALL: Replaced leftover instances of "Website"
+  | 
+  | 	* README: minor formatting change
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* MANIFEST.build: no longer needed
+  | 
+  | 	* Makefile: Minor changes to packaging/release-related stuff
+  | 
+  | 2005-05-12  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* MANIFEST.build: removed common/Makefile
+  | 
+  | 	* Makefile: fixed realclean target (build branch)
+  | 
+  | 2005-05-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: changed to match latest releasetools/Targets.mk
+  | 	  updates
+  | 
+  | 2005-04-22  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, .urilist, Makefile: .urilist is made by "make
+  | 	  install.sh" (duh)
+  | 
+  | 	* Makefile: remove leading tab from pathname in URILIST value
+  | 
+  | 2005-04-21  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: don't ignore catalog.xml (now under version
+  | 	  control)
+  | 
+  | 	* .urilist: corrected path
+  | 
+  | 	* catalog.xml: New file.
+  | 
+  | 2005-04-20  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, AUTHORS, COPYING, INSTALL, LICENSE, README:
+  | 	  normalize release meta-info/readme files
+  | 
+  | 	* .urilist: New file.
+  | 
+  | 2005-04-15  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: added EXECUTABLES variable, and added scripts to
+  | 	  its value
+  | 
+  | 2005-04-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: revert change; put MANIFEST.build exclude in
+  | 	  global excludes
+  | 
+  | 	* Makefile: don't package
+  | 
+  | 2005-04-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: (build branch): updated to rely on new modular
+  | 	  makefile structure
+  | 
+  | 2005-03-31  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: zip target, don't write dummy stamp
+  | 
+  | 2005-03-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: debian package build tweaks
+  | 
+  | 2005-03-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* LICENSE: branches: 1.1.2; file LICENSE was initially added
+  | 	  on branch build.
+  | 
+  | 	* LICENSE: New file.
+  | 
+  | 2005-03-25  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: .deb build and upload automation added
+  | 
+  | 2005-03-19  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* INSTALL: typo fixed. (Thanks for Mike Castle)
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: changes needed for generating manpages ref doc,
+  | 	  ported from build branch
+  | 
+  | 	* Makefile: Added litprog reference documentation
+  | 	  infrastructure for manpages. Note that changes to the
+  | 	  existing Makefile doc/Makefile docsrc/Makefile files are on
+  | 	  the build branch only, so will need to be back-ported to
+  | 	  head in order for head builds of the docs to include doc for
+  | 	  manpage params
+  | 
+  | 2005-02-21  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* RELEASE-NOTES.xml: dbtimestamp PI, use instead of RCS Date
+  | 	  keyword
+  | 
+  | 	* RELEASE-NOTES.xml: RCS Date keyword, use instead of
+  | 	  hard-coded date
+  | 
+
+Changes to xsl/common/*
+
+  | 2005-07-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* gentext.xsl: Added template to process part element in mode
+  | 	  object.title.template so it can properly choose gentext
+  | 	  template for numbered or unnumbered parts.
+  | 
+  | 	* gentext.xsl, labels.xsl: Added support for specifying number
+  | 	  format for auto labels for chapter, appendix, part, preface
+  | 	  from patch #1234737 to satsify feature request #1178038.
+  | 
+  | 2005-07-08  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* refentry.xsl: Add "date" namespace.
+  | 
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* common.xsl: Added evaluate.info.profile template.
+  | 
+  | 	* refentry.xsl: Update header comment.
+  | 
+  | 2005-07-04  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* refentry.xsl: New file.
+  | 
+  | 	* refentry.xsl: Changed title.
+  | 
+  | 2005-06-30  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* labels.xsl: Gave procedure its own label.markup template
+  | 	  because it should not count procedures without title.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: "clean" target now deletes $(SOURCES) xml files
+  | 	  instead of doing a blanket "rm -f *.xml", which was causing
+  | 	  hte l10n.xml file to be deleted. That file is under version
+  | 	  control, so deleting it was forcing you to do a "cvs update"
+  | 	  after you run "make clean". if you forget, it screws up the
+  | 	  build.
+  | 
+  | 2005-06-28  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* olink.xsl: Don't add docname to olink when pointing to root
+  | 	  element.
+  | 
+  | 2005-06-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile, l10n.xml: Added Amharic locale file
+  | 	  contributed by the The Ge'ez Frontier Foundation.
+  | 
+  | 	* l10n.xml: Added tl.xml
+  | 
+  | 2005-05-28  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* pi.xsl: Context node must be stored/restored in order to get
+  | 	  correct language code. (Note that for-each changes current
+  | 	  node.)
+  | 
+  | 2005-05-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* l10n.xsl: Make language codes RFC compliant (closes
+  | 	  #1208931; thanks to Bernd Groh for reporting). ::PROBLEM:
+  | 	  Stylesheets output two-part language codes in the form
+  | 	  "zh_CN". But underscores in language codes are actually
+  | 	  neither RFC compliant nor compliant with the HTML 4.0 rec.
+  | 	  The separator should be a hyphen. To quote the specs:
+  | 	  Section 8.1.1, "Language Codes"[1], in the HTML 4.0 Rec.
+  | 	  states that: [RFC1766] defines and explains the language
+  | 	  codes that MUST be used in HTML documents. Briefly, language
+  | 	  codes consist of a primary code and a possibly empty series
+  | 	  of subcodes: language-code = primary-code ( "-" subcode )*
+  | 	  And in RFC 1766, "Tags for the Identification of
+  | 	  Languages"[2], the EBNF for "language tag" is given as:
+  | 	  Language-Tag = Primary-tag *( "-" Subtag ) Primary-tag =
+  | 	  1*8ALPHA Subtag = 1*8ALPHA [1]
+  | 	  http://www.w3.org/TR/REC-html40/struct/dirlang.html#h-8.1.1
+  | 	  [2] http://www.ietf.org/rfc/rfc1766.txt ::CAUSE: Stylesheets
+  | 	  simply pass through language codes unaltered. So if users
+  | 	  put "zh_CN" in their source, they will get "zh_CN" in their
+  | 	  HTML output. ::FIX: Added a new boolean config parameter,
+  | 	  "l10n.lang.value.rfc.compliant", set to 1 by default. If it
+  | 	  is non-zero, any underscore in a language code will be
+  | 	  converted to a hyphen in HTML output. If it is zero, the
+  | 	  language code will be left as-is. ::AFFECTS: This change
+  | 	  affects any HTML output that contains two-part language
+  | 	  codes.
+  | 
+  | 2005-05-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* common.xsl: Support generation of choice separator in inline
+  | 	  simplelist (closes #1207532) This ehancement enables
+  | 	  auto-generation of an appropriate localized "choice
+  | 	  separator" (for example, "and" or "or") before the final
+  | 	  item in an inline simplelist. To indicate that you want a
+  | 	  choice separator generated for a particular list, you need
+  | 	  to put a processing instruction (PI) of the form <?dbchoice
+  | 	  choice="foo"?> as a child a of the list. For example:
+  | 	  <para>This release adds localiation support for the
+  | 	  following Indic languages: <simplelist type="inline">
+  | 	  <?dbchoice choice="and" ?> <member>Hindi</member>
+  | 	  <member>Punjabi</member> <member>Tamil</member>
+  | 	  <member>Oriya</member> <member>Gujarati</member>
+  | 	  </simplelist>. </para> Output (for English): This release
+  | 	  adds localiation support for the following Indic languages:
+  | 	  Hindi, Punjabi, Tamil, Oriya, and Gujarati. Or if the
+  | 	  logical relationship between the items in the list is an
+  | 	  "or" relationship, then use choice="or": <para>Choose from
+  | 	  ONE and ONLY ONE of the following: <simplelist
+  | 	  type="inline"> <?dbchoice choice="or" ?> <member>A</member>
+  | 	  <member>B</member> <member>C</member>. </simplelist> </para>
+  | 	  Output (for English): Choose from ONE and only ONE of the
+  | 	  following choices: A, B, or C. As a temporary workaround for
+  | 	  the fact that most of the DocBook non-English locale files
+  | 	  don't have a localization for the word "or", you can put in
+  | 	  a literal string to be used; example for French:
+  | 	  <para>Choose from ONE and ONLY ONE of the following:
+  | 	  <simplelist type="inline"> <?dbchoice choice="ou" ?>
+  | 	  <member>A</member> <member>B</member> <member>C</member>.
+  | 	  </simplelist> </para> That is, use "ou" instead of "or".
+  | 
+  | 2005-05-23  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* pi.xsl: Minor update to date/time handling.
+  | 
+  | 	* pi.xsl: Make handling of date format strings more robust
+  | 	  (closes #1206837). ::Problem: If the "dbtimestamp" PI has
+  | 	  words in it that contain any of the single-letter characters
+  | 	  used as date/time formatting instructions, the output is not
+  | 	  what would be expected. For example, Spanish "long" dates
+  | 	  look like this: 23 de mayo de 2005 So you would expect that
+  | 	  you could generate a date of that form using the dbtimestamp
+  | 	  PI with a format string like the following: <?dbtimestamp
+  | 	  format="d de B de Y"?> But if you try that, you get the
+  | 	  following output: 23 23e mayo 23e 2005 That is, the "d" in
+  | 	  "de" is replaced with the day of the month. ::Cause:: The
+  | 	  format-string parsing logic works by walking through the
+  | 	  format string character-by-character. So when it gets to the
+  | 	  "d" in "de", it has no way of discerning that it is not the
+  | 	  "d" formatting instruction but is instead part of a word
+  | 	  intended to be included in the output as a literal string.
+  | 	  ::Fix:: The format-string parsing logic now splits format
+  | 	  strings into tokens and delimiters and evaluates them
+  | 	  token-by-token instead of character-by-character. For
+  | 	  example, it splits the Spanish "long" date format like this:
+  | 	  <token>d</token> <token>de</token> <token>B</token> ...
+  | 	  Thus, in looking for the "d" formatting instruction, the "d"
+  | 	  token matches but the "de" token does not. As delimiters, it
+  | 	  recognizes the following characters: <space> <tab> <CR> <LF>
+  | 	  , . / - ( ) [ ] ::Affects: This change affects output of the
+  | 	  "dbtimestamp" PI as well as output from any customization
+  | 	  layers that call the "datetime.format" template. It affect
+  | 	  all formats (HTML, FO, etc.).
+  | 
+  | 2005-05-21  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile, l10n.xml: Added Kannada localization
+  | 	  (from Siddharudh P T)
+  | 
+  | 	* l10n.xml: Fixed typo.
+  | 
+  | 2005-05-16  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: Added Welsh localization (from Kevin
+  | 	  Donnelly)
+  | 
+  | 	* .cvsignore, Makefile, l10n.xml: Added Mongolian localization
+  | 	  from Sanlig Badral.
+  | 
+  | 	* l10n.xml: Added missing entity ref for hi.xml
+  | 
+  | 	* l10n.xml: Added all recently added locales.
+  | 
+  | 2005-05-14  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: Added Azerbaijani translation (from
+  | 	  Metin Amiroff)
+  | 
+  | 	* .cvsignore, Makefile: Added Irish (Gaelic) localization
+  | 	  (from Kevin Patrick Scannell)
+  | 
+  | 	* .cvsignore, Makefile: Added Oriya localization (from Gora
+  | 	  Mohanty)
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: Incorporated Albanian locale file
+  | 	  contributed by Laurent Dhima.
+  | 
+  | 	* .cvsignore, Makefile: Added hi.xml file contributed by Bernd
+  | 	  Groh. Removed "letters" element from locale files that don't
+  | 	  need it.
+  | 
+  | 2005-05-12  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: Added Tamil, Punjabi, and Gujarati
+  | 	  locale files contributed by Bernd Groh
+  | 
+  | 	* Makefile: removed build-branch version of Makefile
+  | 
+  | 	* Makefile: Added support for Punjabi, Gujarati, and Tamil
+  | 	  (via locale files contributed by Bernd Groh) (ported from
+  | 	  build branch)
+  | 
+  | 2005-05-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* common.xsl: Code -> Literal (because jrefentry DTD imports
+  | 	  on DocBook 4.1.2, which lacks Code)
+  | 
+  | 	* common.xsl: Fixed typo.
+  | 
+  | 2005-05-10  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* common.xsl: Strip whitespace in Manvolnum; closes bug
+  | 	  #959805 (thanks to Jens Elkner for reporting the problem)
+  | 	  ::PROBLEM: Whitespace is preserved in output for Manvolnum.
+  | 	  Among other things, this results in garbled filenames for
+  | 	  man pages generated from the manpages stylesheets. ::CAUSE
+  | 	  Manvolnum was not included in the master list of "strip
+  | 	  space" elements. ::FIX Added Manvolnum to master list of
+  | 	  "strip space" elements. ::AFFECTS This change affects all
+  | 	  output formats.
+  | 
+  | 	* common.xsl: Strip whitespace in Refsection; closes bug
+  | 	  #1198766 and #1170315 (thanks to Denis Bradford for
+  | 	  reporting the problem) ::PROBLEM: Whitespace is preserved in
+  | 	  output for Refsection. Among other things, this results in
+  | 	  malformed groff output from the manpages stylesheets.
+  | 	  ::CAUSE Refsection was not included in the master list of
+  | 	  "strip space" elements. ::FIX Added Refsection to master
+  | 	  list of "strip space" elements. ::AFFECTS This change
+  | 	  affects all output formats.
+  | 
+  | 	* common.xsl: Added template to uppercase strings (closes
+  | 	  #1199123) Given a string, this template does a
+  | 	  language-aware conversion of that string to all uppercase
+  | 	  letters, based on the values of the lowercase.alpha and
+  | 	  uppercase.alpha gentext keys for the current locale. It
+  | 	  affects only those characters found in the values of
+  | 	  lowercase.alpha and uppercase.alpha. All other characters
+  | 	  are left unchanged.
+  | 
+  | 2005-05-06  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* olink.xsl: Fix bug in use.local.olink.style.
+  | 
+  | 2005-04-08  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* table.xsl: Applied patches submitted for bug # 1175423.
+  | 
+  | 2005-04-04  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* common.xsl: Support xml:id in object.id
+  | 
+  | 2005-03-29  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* targetdatabase.dtd: Added @dir to document, to support
+  | 	  Website.
+  | 
+  | 2005-02-21  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* l10n.xsl: Quick hack improving support for dir attribute.
+  | 	  However problem is much more complex, support must be added
+  | 	  into indexes and headers/footers also.
+  | 
+
+Changes to xsl/website/*
+
+  | 2005-06-20  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile, param.xsl, param.xweb: Switch to "real" params
+  | 	  build (i.e., same as docbook-xsl params).
+  | 
+  | 	* param.xweb: New file.
+  | 
+  | 2005-04-15  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* website-common.xsl: Explicitly cast summary to a string
+  | 
+  | 	* website-common.xsl: Support @href on tocentry
+  | 
+  | 2005-04-08  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* makefile-dep.xsl: added depends-file param, to help make
+  | 	  distclean behave as expected when building non-tabular
+  | 	  version of website
+  | 
+  | 2005-04-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* VERSION, website-common.xsl: VERSION scheme switched to same
+  | 	  as that used by "xsl" module; this enables auto-submitting
+  | 	  info to Freshmeat as part of the build
+  | 
+  | 	* makefile-dep.xsl: clean also now removes depends.nontabular
+  | 	  & website.database.xml
+  | 
+  | 2005-03-30  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* toc-tabular.xsl: Fixed logic for @tocskip attribute.
+  | 
+  | 2005-03-29  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* autolayout.xsl: Updated public and system identifiers in
+  | 	  xsl:output element.
+  | 
+  | 	* toc-tabular.xsl: Fixed bug 1163939: toc-tabular depends on
+  | 	  DTD validation.
+  | 
+  | 	* website-common.xsl: Added sample gentext strings for de and
+  | 	  fr.
+  | 
+  | 	* website.xsl: Fixed bug 1019573 body tag, accessibility
+  | 	  issue.
+  | 
+  | 2005-03-28  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* olink.xsl: Fixed olink-entity to work with new olink setup.
+  | 
+  | 	* olink.xsl: Updated to work with revisions to olink in main
+  | 	  DocBook stylesheet starting with version 1.66.
+  | 
+  | 	* website-common.xsl: Fixed bug 1120883 Irrelevant mode
+  | 	  attribute.
+  | 
+  | 	* website-common.xsl: Fixed bug 1120877 regarding duplicate
+  | 	  match on website in title.markup mode.
+  | 
+
+Changes to xsl/slides/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: ignore ChangeLog so that I can do "cvstrim"
+  | 	  without it getting deleted
+  | 
+  | 2005-04-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: switch to DIRS var / base target setup
+  | 
+
+Changes to xsl/doc/*
+
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Added refentry metadata-gathering documentation.
+  | 
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Refined doc build. - Changed makefiles in
+  | 	  docsrc/fo, docsrc/html, and docsrc/manpages dirs to depend
+  | 	  on corresponding params.xsl instead of on param.xweb.
+  | 	  Rationale is that param.xsl gets rebuilt any time param.xweb
+  | 	  changes. In addition, param.xsl gets rebuild any time any
+  | 	  included params/*.xml file is changed. So making docsrc/*
+  | 	  builds depend on param.xsl effectively makes them depend on
+  | 	  both the param.xweb changes on on the actual param changes.
+  | 	  - Changed doc/Makefile so that reference.html is rebuilt
+  | 	  only when docsrc/reference.xml changes, not when any of its
+  | 	  included files change. Rationale is that, because we chunk
+  | 	  output for the doc build, reference.html is simply a sort of
+  | 	  TOC page that doesn't need to get remade if the included
+  | 	  files change. Because output of those included files goes to
+  | 	  separate fo, html, and manpages subdirs, and that output
+  | 	  gets generated by seperate make targets.
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Revert to Makefile from MAIN
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: changes needed for generating manpages ref doc,
+  | 	  ported from build branch
+  | 
+  | 	* Makefile: Added litprog reference documentation
+  | 	  infrastructure for manpages. Note that changes to the
+  | 	  existing Makefile doc/Makefile docsrc/Makefile files are on
+  | 	  the build branch only, so will need to be back-ported to
+  | 	  head in order for head builds of the docs to include doc for
+  | 	  manpage params
+  | 
+
+Changes to xsl/docsrc/*
+
+  | 2005-07-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* clrefentry.xsl, tdg-link.xsl: (internal) Added support for
+  | 	  TDG hyperlinking with <tag> (instead of just <sgmltag>. Also
+  | 	  added support for ignoring <tag>s and <sgmltag>s that have a
+  | 	  "namespace" attribute whose value contains
+  | 	  "http://docbook.sf.net/" or
+  | 	  "http://docbook.sourceforge.net/" (that is, those don't get
+  | 	  turned into TDG hyperlinks). (Note: This change has no
+  | 	  effect on the behavior of the DocBook XSL stylesheets; it
+  | 	  only affects the build used to create the actual) DocBook
+  | 	  XSL releases.)
+  | 
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile, reference.xml: Added refentry metadata-gathering
+  | 	  documentation.
+  | 
+  | 2005-06-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* reference.xml: Made doc source compliant with expectations
+  | 	  of doc build.
+  | 
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Refined doc build. - Changed makefiles in
+  | 	  docsrc/fo, docsrc/html, and docsrc/manpages dirs to depend
+  | 	  on corresponding params.xsl instead of on param.xweb.
+  | 	  Rationale is that param.xsl gets rebuilt any time param.xweb
+  | 	  changes. In addition, param.xsl gets rebuild any time any
+  | 	  included params/*.xml file is changed. So making docsrc/*
+  | 	  builds depend on param.xsl effectively makes them depend on
+  | 	  both the param.xweb changes on on the actual param changes.
+  | 	  - Changed doc/Makefile so that reference.html is rebuilt
+  | 	  only when docsrc/reference.xml changes, not when any of its
+  | 	  included files change. Rationale is that, because we chunk
+  | 	  output for the doc build, reference.html is simply a sort of
+  | 	  TOC page that doesn't need to get remade if the included
+  | 	  files change. Because output of those included files goes to
+  | 	  separate fo, html, and manpages subdirs, and that output
+  | 	  gets generated by seperate make targets.
+  | 
+  | 	* Makefile, documentation.xml, reference.xml: Incorporated
+  | 	  slides and website stylesheets into the build. Note: This
+  | 	  currently only affects the "distrib" (doc) build. So if you
+  | 	  don't need to build distrib/doc, you won't be affected by
+  | 	  this change. If you DO need to build distrib/doc, it will
+  | 	  break unless you use the xsl/Makefile from the "build"
+  | 	  branch instead of from the head. This build alters the
+  | 	  distrib build such that: - an xsl/slides directory is
+  | 	  created by copying over the contents of the slides/xsl - an
+  | 	  xsl/website directory is created by copying over the
+  | 	  contents of the website/xsl directory - the reference.html
+  | 	  part of the doc build now adds the slides and website param
+  | 	  reference doc This is an experiment. If we decide to go
+  | 	  ahead with it in the release build, and everything is found
+  | 	  to be OK when it gets out to users and they test it, then
+  | 	  the next step would be to ask SF admin to move the
+  | 	  website/xsl and slides/xsl CVS directory into xsl/ to create
+  | 	  xsl/slides and xsl/website, and they would be maintained in
+  | 	  the xsl/ CVS going forward.
+  | 
+  | 2005-05-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: make docsrc build depend on params/*.xml files
+  | 
+  | 2005-04-22  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: re-make docsrc if any params files change
+  | 
+  | 2005-03-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* make-xsl-params.pl: xsl-manages-param name corrected
+  | 
+  | 2005-03-07  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* templates.xml: Removed the xsl:import from the example since
+  | 	  it doesn't work that way.
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: changes needed for generating manpages ref doc,
+  | 	  ported from build branch
+  | 
+  | 	* Makefile, make-xsl-params.pl, reference.xml,
+  | 	  xsl-param-link.xsl: Added litprog reference documentation
+  | 	  infrastructure for manpages. Note that changes to the
+  | 	  existing Makefile doc/Makefile docsrc/Makefile files are on
+  | 	  the build branch only, so will need to be back-ported to
+  | 	  head in order for head builds of the docs to include doc for
+  | 	  manpage params
+  | 
+
+Changes to xsl/eclipse/*
+
+  | 2005-04-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* eclipse.xsl: Added support for generating olink database.
+  | 
+
+Changes to xsl/extensions/*
+
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: ignore build dir
+  | 
+  | 	* Makefile: switched to ant-based build
+  | 
+  | 	* Makefile: revert to MAIN
+  | 
+
+Changes to xsl/fo/*
+
+  | 2005-07-09  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Applied patch #850001 to add content-type
+  | 	  property to external-graphic element based on imagedata
+  | 	  format attribute.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* xep.xsl: Added support for generating <rx:meta-field
+  | 	  creator="foo"/> field for XEP. Also, added support for
+  | 	  picking up and using contents of <corpauthor> for XEP
+  | 	  <rx:meta-field author="foo"/> field.
+  | 
+  | 2005-06-28  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* xref.xsl: Moved the fo:basic-link for page refs to the
+  | 	  page.citation template so it can be more easily customized.
+  | 	  Fixed bug in using page keyword in role used as xrefstyle.
+  | 
+  | 2005-06-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* param.xweb: Doc tweak to match user/developer distinction.
+  | 
+  | 2005-06-27  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* qandaset.xsl: Removed the start-indent on qandadiv because
+  | 	  it conflicts with other indents, and that style should be
+  | 	  implemented with a property set.
+  | 
+  | 2005-06-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* inline.xsl: Trademark symbol handling made consistent with
+  | 	  handling of same in HTML stylesheets. (closes #1218286;
+  | 	  thanks to Mauritz Jeanson for reporting the problem) Prior
+  | 	  to this change, if you processed a doc that contained no
+  | 	  value for the Class attribute on the Trademark element, the
+  | 	  HTML stylesheets would default to rendering a superscript TM
+  | 	  symbol after the Trademark contents, but the FO stylesheets
+  | 	  would render nothing. This change alters the FO handing of
+  | 	  Trademark such that it is now identical to the HTML
+  | 	  handling.
+  | 
+  | 2005-06-01  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* refentry.xsl, titlepage.xsl: Corrected formatting of
+  | 	  generated "Name" title in refentry output (closes #1212396;
+  | 	  thanks to Andreas Lalloo for reporting the problem).
+  | 	  :Problem:: The "Name" title generated for FO output of
+  | 	  Refnamediv in Refentry is not aligned flush left, as all the
+  | 	  other subheadings of Refentry are, and as the generated Name
+  | 	  subheading for Refentry is in HTML output. Also, the Name
+  | 	  title is in a larger font size than the titles of the other
+  | 	  first-level children of Refentry. :Fix:: The "Name" title
+  | 	  generated for FO output of Refnamediv in Refentry is now
+  | 	  handled using the same formatting as that used for all other
+  | 	  first-level children of Refentry. ::Affects: Along with
+  | 	  affecting processing for generated titles for Refnamediv in
+  | 	  FO output, it is possible that this change may have
+  | 	  unanticipated side effects on processing of titles for
+  | 	  Refsynopsisdiv, Refsection, and Refsect1 to Refsect3. The
+  | 	  reason is that part of this change takes the template
+  | 	  contents formerly used only for processing Refsynopsisdiv,
+  | 	  Refsection, and Refsect1 to Refsect3, and "repurposes" those
+  | 	  template contents for use in processing the generated title
+  | 	  for Refnamediv.
+  | 
+  | 	* xep.xsl: Generate XEP bookmarks for Refentry children.
+  | 	  (closes #1212491) Titled child sections of Refentry
+  | 	  (Refsynosisdiv, Refsection, and Refsect1 to Refsect3) were
+  | 	  not included in the match statement used for generating XEP
+  | 	  bookmarks. Don't know whether that was intentional for some
+  | 	  reason or whether it was just an oversight. But given that
+  | 	  both AXF and Passivetex bookmarks are generated for those
+  | 	  same Refentry children, it seems like XEP ones ought to also
+  | 	  be generated, for the sake of consistency if for no other
+  | 	  reason.
+  | 
+  | 2005-05-31  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* table.xsl: Add support for HTML markup table border
+  | 	  attribute, applied to each table cell.
+  | 
+  | 	* table.xsl: The table.width template can now sum column specs
+  | 	  if none use % or *.
+  | 
+  | 2005-05-27  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* param.ent, param.xweb: Added references to newly added
+  | 	  parameter l10n.gentext.use.xref.language
+  | 
+  | 2005-05-25  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* lists.xsl: Set start-indent and end-indent for fo:table-body
+  | 	  used to format lists to zero so that they do not inherit any
+  | 	  start-indent from their container, which would indent
+  | 	  relative to the cell boundary.
+  | 
+  | 2005-05-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lists.xsl: Support generation of choice separator in inline
+  | 	  simplelist (closes #1207532) This ehancement enables
+  | 	  auto-generation of an appropriate localized "choice
+  | 	  separator" (for example, "and" or "or") before the final
+  | 	  item in an inline simplelist. To indicate that you want a
+  | 	  choice separator generated for a particular list, you need
+  | 	  to put a processing instruction (PI) of the form <?dbchoice
+  | 	  choice="foo"?> as a child a of the list. For example:
+  | 	  <para>This release adds localiation support for the
+  | 	  following Indic languages: <simplelist type="inline">
+  | 	  <?dbchoice choice="and" ?> <member>Hindi</member>
+  | 	  <member>Punjabi</member> <member>Tamil</member>
+  | 	  <member>Oriya</member> <member>Gujarati</member>
+  | 	  </simplelist>. </para> Output (for English): This release
+  | 	  adds localiation support for the following Indic languages:
+  | 	  Hindi, Punjabi, Tamil, Oriya, and Gujarati. Or if the
+  | 	  logical relationship between the items in the list is an
+  | 	  "or" relationship, then use choice="or": <para>Choose from
+  | 	  ONE and ONLY ONE of the following: <simplelist
+  | 	  type="inline"> <?dbchoice choice="or" ?> <member>A</member>
+  | 	  <member>B</member> <member>C</member>. </simplelist> </para>
+  | 	  Output (for English): Choose from ONE and only ONE of the
+  | 	  following choices: A, B, or C. As a temporary workaround for
+  | 	  the fact that most of the DocBook non-English locale files
+  | 	  don't have a localization for the word "or", you can put in
+  | 	  a literal string to be used; example for French:
+  | 	  <para>Choose from ONE and ONLY ONE of the following:
+  | 	  <simplelist type="inline"> <?dbchoice choice="ou" ?>
+  | 	  <member>A</member> <member>B</member> <member>C</member>.
+  | 	  </simplelist> </para> That is, use "ou" instead of "or".
+  | 
+  | 2005-05-16  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* formal.xsl, graphics.xsl, lists.xsl: fixed bug 1201333
+  | 	  mediaobjectco images not aligned.
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: revert to MAIN
+  | 
+  | 2005-05-13  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* glossary.xsl: Make glosssee and glossseealso into full
+  | 	  gentext templates with substitution.
+  | 
+  | 	* lists.xsl: Changed longest.term template to measure width
+  | 	  after apply-templates to term.
+  | 
+  | 2005-05-07  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* xref.xsl: Add basic support for biblioref cross referencing
+  | 	  element.
+  | 
+  | 2005-05-06  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Added support for @align on caption in
+  | 	  mediaobject.
+  | 
+  | 2005-05-05  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Fixed scalefit to work when
+  | 	  contentdepth="100%".
+  | 
+  | 2005-04-29  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl: 'Support' DocBook V5 namespace
+  | 
+  | 2005-04-24  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* autoidx.xsl: Partial fix for bug #1180510
+  | 
+  | 2005-04-22  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* inline.xsl: Fix menuchoice.menu.separator for FOP.
+  | 
+  | 2005-04-20  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* fop.xsl: Added fox:destination extension inside fox:outline
+  | 	  to support linking to internal destinations.
+  | 
+  | 2005-04-16  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* inline.xsl: The application of the menuchoice separator
+  | 	  parameters now uses xsl:copy-of instead of xsl:value-of so
+  | 	  something more complex than a string can be used.
+  | 
+  | 2005-04-15  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* block.xsl, param.ent, param.xweb: Add support for
+  | 	  customizing abstract with property sets.
+  | 
+  | 	* titlepage.templates.xml: Set start indent for article title
+  | 	  page to zero.
+  | 
+  | 2005-04-12  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* division.xsl: Don't start a part toc page sequence unless it
+  | 	  has entries.
+  | 
+  | 2005-04-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* refentry.xsl: Fixed bug 1180078 where $refentry.pagebreak
+  | 	  did not work when refentries were in a reference.
+  | 
+  | 2005-04-08  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* component.xsl, division.xsl, refentry.xsl, sections.xsl:
+  | 	  Fixed bug in PDF bookmarks for axf output by adding
+  | 	  normalize-space.
+  | 
+  | 	* index.xsl: Fixed indexterm id target for axf.extensions to
+  | 	  use fo:block or fo:inline. Remove it if AH decides to
+  | 	  support fo:wrapper as the link target.
+  | 
+  | 2005-04-07  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* admon.xsl, formal.xsl, htmltbl.xsl, titlepage.templates.xml,
+  | 	  titlepage.xsl: Make sure all keep-together and keep-with-*
+  | 	  have either .within-column or .within-line so no
+  | 	  unintentional keeps.
+  | 
+  | 2005-04-04  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* footnote.xsl: Fixed typo in XPath expression
+  | 
+  | 	* inline.xsl: Support termdef
+  | 
+  | 	* math.xsl: Support mathphrase
+  | 
+  | 2005-04-03  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* footnote.xsl, formal.xsl, htmltbl.xsl: Add footnotes in
+  | 	  table title to table footnote set, and add support for table
+  | 	  footnotes to HTML table markup.
+  | 
+  | 2005-03-31  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* refentry.xsl: Fixed bug where id not output if partintro
+  | 	  present in reference element.
+  | 
+  | 2005-03-08  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* autotoc.xsl, pagesetup.xsl, titlepage.templates.xml: Fix
+  | 	  problems introduced with $body.start.indent. FOP reverts
+  | 	  back to using $title.margin.left.
+  | 
+  | 	* block.xsl, titlepage.xsl: Add support for mulitple
+  | 	  authorinitial elements in a revhistory/revision.
+  | 
+  | 	* pi.xsl: Fix bug in dbfo-need: can't use space-before in
+  | 	  list.
+  | 
+  | 2005-03-06  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* glossary.xsl: Added support for title in glosslist.
+  | 
+  | 2005-02-28  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* xref.xsl: Fixed missing xref-to-prefix and xref-to-suffix
+  | 	  modes that were added to html xref.xsl and used in
+  | 	  common/titles.xsl.
+  | 
+  | 2005-02-27  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* lists.xsl: Added support for itemizedlist symbol 'none'.
+  | 
+  | 2005-02-23  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* admon.xsl: Implemented the new
+  | 	  graphical.admonition.properties and
+  | 	  nongraphical.admonition.properties attribute sets.
+  | 
+  | 2005-02-22  <dcramer@users.sourceforge.net>
+  | 
+  | 	* verbatim.xsl: hyphenate.verbatim code no longer inserts zero
+  | 	  width space after hyphenate.verbatim.characters if it is the
+  | 	  last character in the line. This extra zero width space was
+  | 	  causing problems in an old version of XEP.
+  | 
+  | 2005-02-21  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* block.xsl: Added @id to formalpara and some other blocks
+  | 	  that were missing it.
+  | 
+  | 2005-02-21  <dcramer@users.sourceforge.net>
+  | 
+  | 	* verbatim.xsl: Fixed bug in hyphenate.verbatim.characters
+  | 	  that kept the param from being honored if you specified more
+  | 	  than one character
+  | 
+  | 2005-02-16  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* formal.xsl: Align attribute from imagedata is not propagated
+  | 	  to surrounding figure because it wrongly affected title
+  | 	  alignment.
+  | 
+  | 2005-02-16  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* glossary.xsl: Fixed bug where glossary in part not getting a
+  | 	  page-sequence.
+  | 
+  | 	* graphics.xsl: Fixed bug where depth now gets scale-to-fit
+  | 	  when scalefit used.
+  | 
+  | 2005-02-15  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl, param.ent, param.xweb: Added support for
+  | 	  img.src.path parameter into FO stylesheet.
+  | 
+  | 2005-02-15  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* xref.xsl: Change the anchor template to output fo:inline
+  | 	  instead of fo:wrapper.
+  | 
+
+Changes to xsl/html/*
+
+  | 2005-07-14  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* annotations.xsl, chunk-code.xsl, docbook.xsl, footnote.xsl,
+  | 	  inline.xsl, param.ent, param.xweb: Added a first cut at
+  | 	  support for DocBook 5 style annotations
+  | 
+  | 	* docbook.xsl, param.ent, param.xweb: Added parameter for the
+  | 	  annotation CSS
+  | 
+  | 2005-07-11  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* component.xsl: Removed obsolete templates using
+  | 	  mode="component.number".
+  | 
+  | 2005-07-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* division.xsl, titlepage.templates.xml: Fixed missing "Part
+  | 	  n." label for part titles.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: "clean" target no longer deletes
+  | 	  html/profile-chunk.xsl or html/profile-onechunk.xsl Those
+  | 	  files are under version control, not made. So they should
+  | 	  not be deleted by the build.
+  | 
+  | 2005-06-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* html.xsl, inline.xsl: Added initial, EXPERIMENTAL support
+  | 	  for generating content for HTML "title" attributes from
+  | 	  content of the Alt element. This change adds support for
+  | 	  generating HTML "title" attributes for the following inline
+  | 	  elements only (all inlines -- support for block elements
+  | 	  will need to wait for later). abbrev accel acronym action
+  | 	  application authorinitials beginpage citation citerefentry
+  | 	  citetitle city classname code command comment computeroutput
+  | 	  constant country database email envar errorcode errorname
+  | 	  errortext errortype exceptionname fax filename firstname
+  | 	  firstterm foreignphrase function glossterm guibutton guiicon
+  | 	  guilabel guimenu guimenuitem guisubmenu hardware honorific
+  | 	  interface interfacedefinition interfacename keycap keycode
+  | 	  keysym lineage lineannotation literal markup medialabel
+  | 	  methodname mousebutton option optional otheraddr othername
+  | 	  package parameter personname phone pob postcode productname
+  | 	  productnumber prompt property quote refentrytitle remark
+  | 	  replaceable returnvalue sgmltag shortcut state street
+  | 	  structfield structname subscript superscript surname symbol
+  | 	  systemitem tag termdef token trademark type uri userinput
+  | 	  varname wordasword Implemented by creating a new named
+  | 	  template, generate.html.title. That is is currently called
+  | 	  in eleven places only, in the inline.xsl file. But it's
+  | 	  called by all the inline.* templates (e.g., inline.boldseq),
+  | 	  which in turn are called by other (element) templates, so it
+  | 	  results, currently, in supporting generation of the HTML
+  | 	  "title" attribute for a total of about 93 elements (the list
+  | 	  above).
+  | 
+  | 	* param.ent, param.xweb, titlepage.xsl: Added support for
+  | 	  chunking revhistory into separate file (similar to the
+  | 	  support for doing same with legalnotice). Patch from Thomas
+  | 	  Schraitle (closes #1096574). Controlled through new
+  | 	  generate.revhistory.link parameter.
+  | 
+  | 	* refentry.xsl: Applied patch from Anatoly Techtonik to
+  | 	  correct problem of multiple name attributes generated for
+  | 	  output of Reference element (closes #1226390)
+  | 
+  | 2005-06-03  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* chunk-code.xsl, chunkfast.xsl: Fixed bug [ 1212159 ] Missing
+  | 	  navigational links with XHTML chunking which was caused by
+  | 	  the following: 1. When chunk.hierarchy is created, it is a
+  | 	  collection of div elements in a variable, and then that is
+  | 	  converted to a node-set by exlt. 2. In HTML, there is no
+  | 	  namespace, so the div elements are in no namespace and they
+  | 	  work. 3. In XHTML, the div elements are in the xhtml
+  | 	  namespace because it is the default namespace. So they
+  | 	  cannot be addressed as just "div", they must have a
+  | 	  namespace prefix. 4. I added an explicit chunkfast namespace
+  | 	  to avoid conflict with the default namespace.
+  | 
+  | 2005-06-02  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* table.xsl: Backed out patch for #1211477 because it breaks
+  | 	  table processing in Saxon.
+  | 
+  | 2005-06-01  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* table.xsl: Applied patch from David Green for #1211477, to
+  | 	  prevent StackOverflowError encountered when processing
+  | 	  tables with ~700 rows with Xalan. Smoke-tested and didn't
+  | 	  see any obvious problems with the fix, so going ahead and
+  | 	  committing it so others can test with snapshot.
+  | 
+  | 2005-05-31  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* chunktoc.xsl: Fixed bug #1202971, chunktoc doesn't handle
+  | 	  the chunk.tocs.and.lots=1 parameter.
+  | 
+  | 2005-05-26  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* chunk-common.xsl, manifest.xsl: Fixed bug #851598 links to
+  | 	  legalnotice in html are broken.
+  | 
+  | 2005-05-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* param.ent, param.xweb: Make language codes RFC compliant
+  | 	  (closes #1208931; thanks to Bernd Groh for reporting).
+  | 	  ::PROBLEM: Stylesheets output two-part language codes in the
+  | 	  form "zh_CN". But underscores in language codes are actually
+  | 	  neither RFC compliant nor compliant with the HTML 4.0 rec.
+  | 	  The separator should be a hyphen. To quote the specs:
+  | 	  Section 8.1.1, "Language Codes"[1], in the HTML 4.0 Rec.
+  | 	  states that: [RFC1766] defines and explains the language
+  | 	  codes that MUST be used in HTML documents. Briefly, language
+  | 	  codes consist of a primary code and a possibly empty series
+  | 	  of subcodes: language-code = primary-code ( "-" subcode )*
+  | 	  And in RFC 1766, "Tags for the Identification of
+  | 	  Languages"[2], the EBNF for "language tag" is given as:
+  | 	  Language-Tag = Primary-tag *( "-" Subtag ) Primary-tag =
+  | 	  1*8ALPHA Subtag = 1*8ALPHA [1]
+  | 	  http://www.w3.org/TR/REC-html40/struct/dirlang.html#h-8.1.1
+  | 	  [2] http://www.ietf.org/rfc/rfc1766.txt ::CAUSE: Stylesheets
+  | 	  simply pass through language codes unaltered. So if users
+  | 	  put "zh_CN" in their source, they will get "zh_CN" in their
+  | 	  HTML output. ::FIX: Added a new boolean config parameter,
+  | 	  "l10n.lang.value.rfc.compliant", set to 1 by default. If it
+  | 	  is non-zero, any underscore in a language code will be
+  | 	  converted to a hyphen in HTML output. If it is zero, the
+  | 	  language code will be left as-is. ::AFFECTS: This change
+  | 	  affects any HTML output that contains two-part language
+  | 	  codes.
+  | 
+  | 2005-05-26  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* titlepage.xsl: Fixed bug #851598 links to legalnotice in
+  | 	  html are broken.
+  | 
+  | 2005-05-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lists.xsl: Support generation of choice separator in inline
+  | 	  simplelist (closes #1207532) This ehancement enables
+  | 	  auto-generation of an appropriate localized "choice
+  | 	  separator" (for example, "and" or "or") before the final
+  | 	  item in an inline simplelist. To indicate that you want a
+  | 	  choice separator generated for a particular list, you need
+  | 	  to put a processing instruction (PI) of the form <?dbchoice
+  | 	  choice="foo"?> as a child a of the list. For example:
+  | 	  <para>This release adds localiation support for the
+  | 	  following Indic languages: <simplelist type="inline">
+  | 	  <?dbchoice choice="and" ?> <member>Hindi</member>
+  | 	  <member>Punjabi</member> <member>Tamil</member>
+  | 	  <member>Oriya</member> <member>Gujarati</member>
+  | 	  </simplelist>. </para> Output (for English): This release
+  | 	  adds localiation support for the following Indic languages:
+  | 	  Hindi, Punjabi, Tamil, Oriya, and Gujarati. Or if the
+  | 	  logical relationship between the items in the list is an
+  | 	  "or" relationship, then use choice="or": <para>Choose from
+  | 	  ONE and ONLY ONE of the following: <simplelist
+  | 	  type="inline"> <?dbchoice choice="or" ?> <member>A</member>
+  | 	  <member>B</member> <member>C</member>. </simplelist> </para>
+  | 	  Output (for English): Choose from ONE and only ONE of the
+  | 	  following choices: A, B, or C. As a temporary workaround for
+  | 	  the fact that most of the DocBook non-English locale files
+  | 	  don't have a localization for the word "or", you can put in
+  | 	  a literal string to be used; example for French:
+  | 	  <para>Choose from ONE and ONLY ONE of the following:
+  | 	  <simplelist type="inline"> <?dbchoice choice="ou" ?>
+  | 	  <member>A</member> <member>B</member> <member>C</member>.
+  | 	  </simplelist> </para> That is, use "ou" instead of "or".
+  | 
+  | 2005-05-16  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Fixed bug 1201333 mediaobjectco images not
+  | 	  aligned.
+  | 
+  | 	* table.xsl: Fixed bug [ 1173576 ] rowsep lines after last row
+  | 	  of a table
+  | 
+  | 2005-05-13  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* glossary.xsl: Now glosssee and glossseealso use full gentext
+  | 	  template with substitution.
+  | 
+  | 2005-05-10  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* synop.xsl: Partially support having multiple parameters in
+  | 	  one paramdef. DocBook says it is valid, but it's not clear
+  | 	  why anybody would ever want to do it. Prior to this fix,
+  | 	  each parameter would get rendered twice. There is still a
+  | 	  problem with whitespace between parameters getting dropped,
+  | 	  but it's not worth fixing unless somebody can actually show
+  | 	  a use case for having multiple parameters in one paramdef.
+  | 
+  | 	* synop.xsl: make funcsynopsis.decoration=1 have effect for
+  | 	  nontabular K&R output (closes bug # 1198960) ::PROBLEM If
+  | 	  you set the funcsynopsis.decoration param to 1 and generate
+  | 	  notablular K&R output for a functionsynopsis, the parameters
+  | 	  in the function argument synopsis are not styled
+  | 	  (italicized) as they are for K&R tabular output. ::FIX
+  | 	  Changed K&R nontabular logic to base styling for function
+  | 	  argument synopsis on value of funcsynopsis.decoration.
+  | 
+  | 2005-05-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* index.xsl: Problem: Invalid HTML generated for manually
+  | 	  created Indexes that lack Indexdivs. Cause: The indexentry
+  | 	  template assumes a dl wrapper has been generated, but the dl
+  | 	  wrapper gets generated only if an Indexdiv exists. Fix: For
+  | 	  Indexes that lack Indexdiv, generate a dl wrapper before
+  | 	  processing Indexentries (closes bug ##1196670; thanks to
+  | 	  Petr Pajas for reporting the problem). Affects: HTML output
+  | 	  for manually created Indexes; has no effect on processing of
+  | 	  automatically generated Indexes.
+  | 
+  | 2005-05-07  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* xref.xsl: Added basic support for biblioref cross
+  | 	  referencing.
+  | 
+  | 2005-05-06  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Bug fix if caption align.
+  | 
+  | 	* graphics.xsl: Added support for @align on caption in
+  | 	  mediaobject.
+  | 
+  | 2005-04-29  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl: 'Support' DocBook V5 namespace
+  | 
+  | 2005-04-28  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Support img.src.path PI (is this a good
+  | 	  idea?); support (not currently valid) xlink:href on area and
+  | 	  (not currently valid) alt in area
+  | 
+  | 2005-04-21  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Generate client-side image map for
+  | 	  imageobjectco with areas using calspair units
+  | 
+  | 2005-04-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* chunk-common.xsl: Fix link to ToC when chunk.toc.and.lots is
+  | 	  1.
+  | 
+  | 2005-04-04  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* html.xsl: Support xml:id in anchor
+  | 
+  | 	* inline.xsl: Support termdef
+  | 
+  | 	* math.xsl: Support mathphrase
+  | 
+  | 2005-03-09  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* component.xsl: Fixed colophon/subtitle per bug #1156450
+  | 
+  | 	* footnote.xsl: Fixed bug 1156645: footnote para doesn't
+  | 	  propagate role.
+  | 
+  | 2005-03-08  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* block.xsl, titlepage.xsl: Fixed bug 1123291: more than one
+  | 	  authorinitials in revhistory.
+  | 
+  | 2005-03-02  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* graphics.xsl: Pass $img.src.path to Java image extensions
+  | 	  when appropriate
+  | 
+  | 	* graphics.xsl, param.ent, param.xweb: Passing of
+  | 	  $img.src.path to Java image extensions is conditional and it
+  | 	  is controlled by newly added graphicsize.use.img.src.path
+  | 	  parameter.
+  | 
+  | 2005-02-17  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* chunk-code.xsl: Parameter is passed explicitly to allow
+  | 	  auto-generating of profiling stylesheet.
+  | 
+  | 	* param.ent, param.xweb, table.xsl: Added new parameter
+  | 	  default.table.frame that controls table framing if there is
+  | 	  no frame attribute on the table.
+  | 
+  | 2005-02-16  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* param.xweb: Moved use.id.as.filename to chunking section.
+  | 
+
+Changes to xsl/htmlhelp/*
+
+  | 2005-06-21  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* htmlhelp-common.xsl: Fixed bug #1223236. Mode attribute was
+  | 	  removed from named templates.
+  | 
+  | 2005-05-24  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* htmlhelp-common.xsl: Classical HTML index is suppressed in a
+  | 	  cleaner way as suggested by David Cramer
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: clean target added
+  | 
+  | 	* Makefile: revert to MAIN
+  | 
+
+Changes to xsl/javahelp/*
+
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: clean target added
+  | 
+  | 	* Makefile: revert to MAIN
+  | 
+
+Changes to xsl/lib/*
+
+  | 2005-07-08  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lib.xweb: Added prepend-pad function for right-padding
+  | 	  strings to a specific length.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lib.xweb: Fixed typo.
+  | 
+  | 2005-06-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lib.xweb: Added an "apply-string-subst-map" function
+  | 	  (template). Only difference is that in the map that it
+  | 	  expects, "oldstring" and "newstring" attributes are used
+  | 	  instead of "character" and "string" attributes.
+  | 
+  | 2005-06-22  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lib.xweb: Finalized read-character-map() and
+  | 	  apply-character-map() functions.
+  | 
+  | 2005-06-18  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lib.xweb: Added initial versions of
+  | 	  replace-chars-with-strings() and apply-character-map()
+  | 	  functions. These are intended mainly for use in the manpages
+  | 	  stylesheets but may be useful elsewhere too. I need to fix
+  | 	  the logic in the manpages stylesheet so that the
+  | 	  character-map file is read only once per document. The way
+  | 	  it is now, the character map is read each time a refentry is
+  | 	  found, which is a big waste.
+  | 
+  | 2005-05-23  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lib.xweb: Make handling of date format strings more robust
+  | 	  (closes #1206837). ::Problem: If the "dbtimestamp" PI has
+  | 	  words in it that contain any of the single-letter characters
+  | 	  used as date/time formatting instructions, the output is not
+  | 	  what would be expected. For example, Spanish "long" dates
+  | 	  look like this: 23 de mayo de 2005 So you would expect that
+  | 	  you could generate a date of that form using the dbtimestamp
+  | 	  PI with a format string like the following: <?dbtimestamp
+  | 	  format="d de B de Y"?> But if you try that, you get the
+  | 	  following output: 23 23e mayo 23e 2005 That is, the "d" in
+  | 	  "de" is replaced with the day of the month. ::Cause:: The
+  | 	  format-string parsing logic works by walking through the
+  | 	  format string character-by-character. So when it gets to the
+  | 	  "d" in "de", it has no way of discerning that it is not the
+  | 	  "d" formatting instruction but is instead part of a word
+  | 	  intended to be included in the output as a literal string.
+  | 	  ::Fix:: The format-string parsing logic now splits format
+  | 	  strings into tokens and delimiters and evaluates them
+  | 	  token-by-token instead of character-by-character. For
+  | 	  example, it splits the Spanish "long" date format like this:
+  | 	  <token>d</token> <token>de</token> <token>B</token> ...
+  | 	  Thus, in looking for the "d" formatting instruction, the "d"
+  | 	  token matches but the "de" token does not. As delimiters, it
+  | 	  recognizes the following characters: <space> <tab> <CR> <LF>
+  | 	  , . / - ( ) [ ] ::Affects: This change affects output of the
+  | 	  "dbtimestamp" PI as well as output from any customization
+  | 	  layers that call the "datetime.format" template. It affect
+  | 	  all formats (HTML, FO, etc.).
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Added clean target
+  | 
+  | 	* Makefile: revert to MAIN
+  | 
+
+Changes to xsl/manpages/*
+
+  | 2005-07-14  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* links.xsl: Removed unnecessary .br requests.
+  | 
+  | 	* links.xsl: Use string value of link contents in link list so
+  | 	  character formatting is "normalized" (no bold or ital).
+  | 
+  | 2005-07-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* inline.xsl, param.ent, param.xweb: Prevent hyphenation of
+  | 	  computer inlines, filenames, and URLs. (Closes #1124391;
+  | 	  thanks to Ryan Hofschneider for reporting). By default, even
+  | 	  when hyphenation is enabled (globally), hyphenation is now
+  | 	  suppressed for "computer inlines" (currently, just
+  | 	  classname, constant, envar, errorcode, option, replaceable,
+  | 	  userinput, type, varname -- but probably need to add more)
+  | 	  and for filenames, and for URLs from Ulink. It can be
+  | 	  (re)enabled using the man.hyphenate.computer.inlines,
+  | 	  man.hyphenate.filenames, and man.hyphenate.urls params.
+  | 
+  | 	* lists.xsl: Removed unnecessary .LP requests that were being
+  | 	  generated after lists. I don't know why those were there,
+  | 	  but they have apparently been in since the code was first
+  | 	  added to the repository.
+  | 
+  | 	* synop.xsl: Made Funcsynopsisinfo bold, and made it a proper
+  | 	  .PP block, and removed the extra space (.sp) that was being
+  | 	  added after it.
+  | 
+  | 2005-07-12  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* inline.xsl, links.xsl, synop.xsl, utility.xsl: Added support
+  | 	  for suppressing hyphenation of "computer inlines" and
+  | 	  filenames and URLs. More details to follow with param
+  | 	  checkins.
+  | 
+  | 	* synop.xsl: Boldface everything in Funcsynopsis output except
+  | 	  params. Closes #1236641. The man(7) man page says: For
+  | 	  functions, the arguments are always specified using italics,
+  | 	  even in the SYNOPSIS section, where the rest of the function
+  | 	  is specified in bold: A look through the contents of the
+  | 	  man/man2 directory shows that most (all) existing pages do
+  | 	  follow this "everything in bold" rule. That means the <type>
+  | 	  content and any punctuation (parens, semicolons, varargs)
+  | 	  also must be bolded.
+  | 
+  | 2005-07-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, inline.xsl, links.xsl, param.ent, param.xweb:
+  | 	  Implemented out-of-line handling of URLs for links (Ulinks).
+  | 	  (Closes #1234711 and #1233909) For display of links, this
+  | 	  implementation gives users three choices: 1. Number & list
+  | 	  links. Each link is numbered and a numbered list of all
+  | 	  links is added to the end of the document. or 2. Only list
+  | 	  links. Links are not numbered, but an (unnumbered) list of
+  | 	  links is added to the end of the document. or 3. Suppress
+  | 	  links. Don't number links and don't add any list of links to
+  | 	  the end of the document Users can also choose whether links
+  | 	  should be underlined. Default is "the works" -- list,
+  | 	  number, and underline links. The man.links.* parameters can
+  | 	  be used to change the defaults. The default heading for the
+  | 	  link list is REFERENCES. That can be changed using the
+  | 	  man.links.list.heading param. There is a performance hit for
+  | 	  listing and numbering links. But it is not an unreasonable
+  | 	  one. The code currently only checks for Ulinks. It can be
+  | 	  updated later (possibly) to deal with DocBook NG linking.
+  | 	  But come to think of it, DocBook NG links get converted by
+  | 	  the strip-ns template. So DocBook NG users will just need to
+  | 	  run that first. Or, if I can ever manage to get the
+  | 	  single-pass conversion process to work with manpages, it
+  | 	  will get done automatically.
+  | 
+  | 	* other.xsl: New file.
+  | 
+  | 2005-07-10  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* inline.xsl: ulink handling now working as expected; but
+  | 	  performance is poor for docs that have a lot of ulinks; that
+  | 	  needs to be fixed
+  | 
+  | 	* inline.xsl: Ulink handling -- fixed performance issue
+  | 	  (per-Refentry sets of Ulinks are now assembled once per
+  | 	  document and stored in a global variable). It now takes
+  | 	  roughly on the order of 15 to 20 percent longer to process a
+  | 	  doc with links numbered than it does to process it with
+  | 	  links unnumbered. Which may sound like a lot, but with a doc
+  | 	  that has 100+ links, on my machine, that still amounts to
+  | 	  less than a one-second difference (only about 0.7 seconds).
+  | 
+  | 	* inline.xsl: Checkpointing further ulink changes.
+  | 
+  | 2005-07-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, info.xsl, inline.xsl: ulink fixes. (initial
+  | 	  implementation of out-of-line handling of ulinks)
+  | 
+  | 	* inline.xsl: Checkpointing further ulink changes. All visible
+  | 	  links are now displayed in the link list, and numbered. But
+  | 	  it performance leaves something to be desired. And not
+  | 	  working properly for case where document contains multiple
+  | 	  Refentry.
+  | 
+  | 	* inline.xsl: Checkpointing. Now link list contains unique
+  | 	  URLs (removes dupes), but needs more work -- some URLs are
+  | 	  getting suppressed that shouldn't be; one symptom of that is
+  | 	  that numbering is thrown off.
+  | 
+  | 	* other.xsl: branches: 1.11.2; ulink fixes. (initial
+  | 	  implementation of out-of-line handling of ulinks)
+  | 
+  | 2005-07-08  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* lists.xsl: Removed redundant template.
+  | 
+  | 	* param.ent, param.xweb: Added new params for controlling link
+  | 	  handling.
+  | 
+  | 2005-07-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* param.xweb: Replaced duplicated "charmap" IDs with good
+  | 	  ones.
+  | 
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* block.xsl: suppress Abstract
+  | 
+  | 	* docbook.xsl: Use utility.xsl
+  | 
+  | 	* docbook.xsl: Implemented output-independent mechanism for
+  | 	  gathering refentry metadata, along with a customization
+  | 	  parameters for tuning it. (Closes #1232541)
+  | 
+  | 	* general.xsl, info.xsl, other.xsl: Did some reorganizing. -
+  | 	  Moved prepare.manpage.contents template out of general.xsl
+  | 	  file and into other.xsl; general.xsl templates are now all
+  | 	  templates that are called multiple times for each refentry,
+  | 	  while templates in other.xsl are called only once per each
+  | 	  refentry. - Removed get.metadata template; refentry metadata
+  | 	  gathering is now done by common/refentry.xsl in a way that
+  | 	  is independent of the final output format; so the
+  | 	  common/refentry.xsl templates can be called not just by
+  | 	  manpages stylesheets, but by stylesheets for any other
+  | 	  output format - Added a write.man.file template. This is
+  | 	  basically just a wrapper around the write.text.chunk
+  | 	  template; it takes "name" and "section" params, assembles
+  | 	  those into a filename, then passes that filename to
+  | 	  write.text.chunk
+  | 
+  | 	* general.xsl, utility.xsl: Renamed general.xsl to
+  | 	  utility.xsl.
+  | 
+  | 	* inline.xsl: Added trademark/productname template. This
+  | 	  template causes true Unicode characters to be output for the
+  | 	  "copyright" and "registered" symbols (which be default then
+  | 	  get replaced by the apply-string-subst-map template). It
+  | 	  outputs the string "(TM)" for trademark (because roff "\(tm"
+  | 	  output is not good) and "(SM)" for servicemark.
+  | 
+  | 	* other.xsl: Removed leftover debugging variables.
+  | 
+  | 	* other.xsl, param.ent, param.xweb: Added support for enabling
+  | 	  users to control what appears and does not appear in the
+  | 	  content of the .TH title-line header/footer. (Closes
+  | 	  #1210492)
+  | 
+  | 	* param.ent, param.xweb: Implemented capability for users to
+  | 	  customize "refentry metadata gathering" by specifying XPath
+  | 	  expressions to use as "info profiles" for gathering the
+  | 	  data, and, in some cases, to suppress parts of the data
+  | 	  collected.
+  | 
+  | 	* param.ent, param.xweb: Added man.subheading.divider.enabled
+  | 	  flag and tweaked doc for man.subheading.divider
+  | 
+  | 	* param.ent, param.xweb: Added params to support makin
+  | 	  "metadata gathering" independent of output format (initial
+  | 	  change for #1232541, more to follow shortly).
+  | 
+  | 	* refentry.xsl: Cleaned up redundancies in refnamediv and
+  | 	  refsynopsisdiv title handling.
+  | 
+  | 2005-07-01  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, general.xsl, info.xsl: Checkpointing. In the
+  | 	  middle of tinkering with composition of the .TH title line.
+  | 	  Started pulling at thread and unwound things. This works
+  | 	  as-is now (not broken) but is not finished.
+  | 
+  | 	* other.xsl, refentry.xsl: Put quotes around section in .TH
+  | 	  title line & normalize space in title and section in .TH
+  | 	  title line (as we do with all other fields in it). Also,
+  | 	  added and refined comments, in part based on reading of
+  | 	  man(7) man page.
+  | 
+  | 2005-06-29  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* block.xsl, general.xsl, other.xsl, param.ent, param.xweb,
+  | 	  refentry.xsl: Added support for man.subheading.divider
+  | 	  parameter.
+  | 
+  | 	* docbook.xsl, other.xsl, param.ent, param.xweb: Added support
+  | 	  for man.justify, man.hyphenate, man.break.after.slash, and
+  | 	  an.th.title.max.length parameters. Also switch to using
+  | 	  locale-safe "string-upper" function to uppercase the TH
+  | 	  title. So manpages output is now
+  | 	  internationalized/localizable in all respects where is can
+  | 	  be made so at this point.
+  | 
+  | 	* general.xsl, info.xsl: Deal with *info correctly & remove
+  | 	  some kruft.
+  | 
+  | 	* lists.xsl, other.xsl, refentry.xsl: Removed unnecessary
+  | 	  additional linebreak that was getting added after each
+  | 	  varlistentry. Also, in a couple places that needed it, added
+  | 	  check for *info/title (instead of just title). Also, added
+  | 	  support of processing title or *info/title on Refsynopsisdiv
+  | 	  (still falls back to gentext SYNOPSIS title if no hard-coded
+  | 	  title found.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* charmap.groff.xsl: Render servicemark and trademark as (SM)
+  | 	  and (TM). Because console output for groff "\(tm" is not
+  | 	  acceptable.
+  | 
+  | 	* charmap.groff.xsl: Output "\-" for non-breaking hyphen.
+  | 
+  | 	* docbook.xsl, param.ent, param.xweb, synop.xsl: Support
+  | 	  man.justify and man.hyphenate params. (closes #1229225).
+  | 	  Note that default for the both of those is zero (off),
+  | 	  because justified text looks good only when it is also
+  | 	  hyphenated; to quote the "Hypenation" node from the groff
+  | 	  info page: Since the odds are not great for finding a set of
+  | 	  words, for every output line, which fit nicely on a line
+  | 	  without inserting excessive amounts of space between words,
+  | 	  `gtroff' hyphenates words so that it can justify lines
+  | 	  without inserting too much space between words. The problem
+  | 	  is that groff is not particularly smart about how it does
+  | 	  hyphenation; it can end up hyphenating a lot of things that
+  | 	  you don't want hyphenated (names of symbols, for example),
+  | 	  and it is difficult and tiresome work to prevent it from
+  | 	  doing that. So, disabling both justification and hyphenation
+  | 	  ensures that hyphens won't get inserted where you don't want
+  | 	  to them, and you don't end up with lines containing
+  | 	  excessive amounts of space between words. Yes, these default
+  | 	  settings run counter to how most existing man pages are
+  | 	  formatted. But there are some notable exceptions, such as
+  | 	  the perl man pages.
+  | 
+  | 	* other.xsl: Added support for man.output.quietly for writing
+  | 	  of stubs. Also, added comments regarding display of .TH
+  | 	  contents across platforms.
+  | 
+  | 2005-06-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, general.xsl, param.ent: Implemented "character
+  | 	  map" system for replacing Unicode characters. (closes
+  | 	  #1226009). ::PROBLEM: The existing manpages mechanism for
+  | 	  replacing Unicode symbols and special characters with roff
+  | 	  equivalents is not scalable and not anywhere near as
+  | 	  complete as it should be. For example, the mechanism
+  | 	  currently only handles a (somewhat arbitrary) selection of
+  | 	  less than 20 or so Unicode characters. But there are
+  | 	  potentially more than _800_ Unicode special characters that
+  | 	  have some groff equivalent they can be mapped to. And there
+  | 	  are about 34 symbols in the Latin-1 (ISO-8859-1) block
+  | 	  alone. Users might reasonably expect that if they include
+  | 	  any of those Latin-1 characters in their DocBook source
+  | 	  documents, they will get correctly convered to known roff
+  | 	  equivalents in output. In addition to those common symbols,
+  | 	  certain users may have a need to use symbols from other
+  | 	  Unicode blocks. Say, somebody who is documenting an
+  | 	  application related to math might need to use a bunch of
+  | 	  symbols from the "Mathematical Operators" Unicode block
+  | 	  (there are about 65 characters in that block that have
+  | 	  reasonable roff equivalents). Or somebody else might really
+  | 	  like Dingbats -- such as the checkmark character (I like
+  | 	  that one myself) and so might use a bunch of things from the
+  | 	  "Dingbat" block (141 characters in that that have roff
+  | 	  equivalents or that can at least be "degraded" somewhat
+  | 	  gracefully into roff). So we need a mechanism that is
+  | 	  capable of handling all those 800 Unicode characters that
+  | 	  have roff equivalents -- and/or of allowing users to choose
+  | 	  which Unicode blocks to use (through tuning the value of a
+  | 	  parameter or something). ::FIX: Replaced the current Unicode
+  | 	  character-substitution mechanism (replace-entities template)
+  | 	  with a completely different character-substitution mechanism
+  | 	  that is based on use of a "character map" (in a format
+  | 	  compliant with the XSLT 2.0 spec and therefore completely
+  | 	  "forward compatible" with XSLT 2.0). By default, the new
+  | 	  "character map" mechanism does replacement of all Latin-1
+  | 	  symbols, along with most special spaces, dashes, and quotes
+  | 	  (about 75 characters by default, compared to the less than
+  | 	  20 special characters that were handled previously). And the
+  | 	  "full" character map provides support for converting about
+  | 	  800 characters. The mechanism is controlled through the
+  | 	  following parameters: - man.charmap.enabled: turns
+  | 	  character-map support on/off - man.charmap.use.subset.xml
+  | 	  specifies that a subset of the character map is used instead
+  | 	  of the full character map - man.charmap.subset.profile.xml
+  | 	  specifies profile of character-map subset -
+  | 	  man.charmap.uri.xml specifies an alternate character map to
+  | 	  use instead of the "standard" character map provided in the
+  | 	  distribution For more details, see the current documention
+  | 	  at:
+  | 	  http://docbook.sf.net/snapshot/xsl/doc/manpages/charmap.html
+  | 
+  | 	* param.xweb: Added IDs for sub-references, so that "human
+  | 	  readable" filenames are generated based on those (instead
+  | 	  of, e.g., "rn.html")
+  | 
+  | 	* param.xweb: Made doc source compliant with expectations of
+  | 	  doc build.
+  | 
+  | 2005-06-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, general.xsl, info.xsl, inline.xsl, lists.xsl,
+  | 	  other.xsl, param.ent, param.xweb, refentry.xsl, synop.xsl:
+  | 	  Checkpointing before coding and committing final
+  | 	  character-map changes. This change fully implements
+  | 	  character-map support. I'll write up a longer description of
+  | 	  that in a later commit. But the brief description is: The
+  | 	  old Unicode character replacement mechanism
+  | 	  (replace-entities template) has been removed; a completely
+  | 	  different character-replacement mechanism is now used
+  | 	  instead. By default, it does replacement of all Latin-1
+  | 	  symbols, along with most special spaces, dashes, and quotes
+  | 	  (about 75 characters by default, compared to the less than
+  | 	  20 special characters that were handled previously). And the
+  | 	  "full" character map provides support for converting about
+  | 	  800 characters. The mechanism use a "character map" (in a
+  | 	  format compliant with the XSLT 2.0 spec and therefore
+  | 	  completely "forward compatible" with XSLT 2.0. Other changes
+  | 	  made for this commit: - Changed default output encoding to
+  | 	  UTF-8. THIS DOES NOT MEAN THAT MAN PAGES ARE OUTPUT IN RAW
+  | 	  UTF-8, because the character-map is applied before final
+  | 	  output, causing all UTF-8 characters covered in the map to
+  | 	  be converted to roff equivalents. - Removed code for adding
+  | 	  backslashes before periods/dots and before hyphens (&#45;);
+  | 	  here's why: * Backslashes in front of periods/dots are
+  | 	  needed only in the very rare case where a period is the very
+  | 	  first character in a line, without any space in front of it.
+  | 	  A better way to deal with that rare case is for authors to
+  | 	  add a zero-width space in front of the offending dot(s) in
+  | 	  their source * Backslashes in front of (&#45;/&#x2D;) are
+  | 	  needed... when? Myself, I don't know, so the current
+  | 	  stylesheet does not add backslashes in front of them, ever.
+  | 	  If there is a specific case where they are necessary or
+  | 	  desirable, then we need to add code for that case, not just
+  | 	  do a blanket conversion. And, anyway, my understanding from
+  | 	  reading the groff docs is that \- is, specifically, a _minus
+  | 	  sign_. So if you have a place where you want a minus sign to
+  | 	  be output instead of (&#45;), then you should use
+  | 	  (&#8722;/&#x2212;) in your source instead. And if you have a
+  | 	  place where you want an en dash, (&#8211;/&#x2013;). Or if
+  | 	  there are places where the stylesheets are internally
+  | 	  generating (&#45;) where they should be generating &#8722;
+  | 	  or &#8211;, then we need to fix those, not just do blanket
+  | 	  conversion. - Consolidated all bold and italic formatting so
+  | 	  that it is done by applying the mode="bold" and
+  | 	  mode="italic" templates. - Consolidated handling of all
+  | 	  instances where we want to prevent line breaking; they are
+  | 	  all now processed using the prevent.line.breaking template.
+  | 	  - Removed "quote" template. In output, this was causing
+  | 	  anything marked up with the <quote> element to be preceded
+  | 	  by two backticks and followed by two apostrophes -- that is,
+  | 	  that old-school hack for generating "curly" quotes in Emacs
+  | 	  and in X-Windows fonts. While Emacs still seems to support
+  | 	  that, I don't think X-Windows has for a long time now. And,
+  | 	  anyway, it looks (and has always looked) like complete crap
+  | 	  when viewed on a normal tty/console
+  | 
+  | 2005-06-25  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* charmap.groff.xsl: Switched to "block" and "class"
+  | 	  attributes and back to using real backslashes instead of
+  | 	  @esc@ hack.
+  | 
+  | 2005-06-20  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* charmap.groff.xsl: Added "class" attribute on all
+  | 	  characters, value of which is the name of the Unicode block
+  | 	  the character is from. This replaces the use of the ad-hoc
+  | 	  "class='default'" scheme.
+  | 
+  | 2005-06-14  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* charmap.groff.xml, charmap.groff.xsl, charmap.roff.min.xml,
+  | 	  unicodetrans.xsl: More charmap reorganization. - Removed
+  | 	  unicodetrans.xsl file (function moved to lib/lib.xsl). -
+  | 	  Removed charmap.groff.xml & charmap.roff.min.xml and created
+  | 	  a single charmap.groff.xsl file that incorporates both
+  | 	  (using a class="default" attribute/value to mark those
+  | 	  mappings that are in the default/minimal set). - Made
+  | 	  charmap.groff.xsl into a "real" (valid) XSLT 2.0 character
+  | 	  map so it can be used as-is for XSLT 2.0-aware processing
+  | 	  (e.g., it can imported or included into another XSLT 2.0
+  | 	  stylesheet).
+  | 
+  | 	* docbook.xsl, other.xsl: Created an other.xsl file and moved
+  | 	  some templates into it.
+  | 
+  | 	* textify.xsl: Removed. No longer used by build. html/xref.xsl
+  | 	  is used "as is"
+  | 
+  | 2005-06-10  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Reverted some recent build changes. Reverted build
+  | 	  of xref.xsl. Will no longer need it after Unicode char
+  | 	  handling change is made. Reverted build of single-pass
+  | 	  profiling stylesheet (for now). It doesn't appear to work
+  | 	  with manpages, and figuring if and how I can get it work is
+  | 	  a very low priority, especially given that single-pass
+  | 	  profiling doesn't work with documents that contain xref
+  | 	  instances. If you want to profile content before converting
+  | 	  to man-page output, please just do a separate profiling pass
+  | 	  first.
+  | 
+  | 	* charmap.groff.xml, charmap.roff.min.xml, roff.charmap.xml,
+  | 	  unicodetrans.xsl: Made further changes for Unicode character
+  | 	  translation. Renamed roff.charmap.xml to charmap.groff.xml.
+  | 	  Added charmap.roff.min.xml (minimal subset of around 40
+  | 	  "safe" mappings appropriate for nroff as opposed to groff).
+  | 	  Removed $charmap.file param from unicodetrans.xsl in
+  | 	  preparation for adding it as a real param to param.xweb
+  | 
+  | 2005-06-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* general.xsl, info.xsl, synop.xsl: (devel-only issue)
+  | 	  replace-string() -> string.subst() Removed the
+  | 	  used-in-manpages-stylesheet-only replace-string() function
+  | 	  and replaced all instances where it had been called with
+  | 	  calls to the same string-substitution function used by the
+  | 	  HTML and FO stylesheets: string.subst() from ../lib/lib.xsl
+  | 
+  | 	* roff.charmap.xml: Corrected stray comment.
+  | 
+  | 	* roff.charmap.xml, unicodetrans.xsl: New file.
+  | 
+  | 2005-06-08  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, info.xsl: Reworked *info gathering and
+  | 	  rethought Refclass handling. For each Refentry found, we now
+  | 	  cache its *info and its parent's *info as node-sets; we then
+  | 	  do all further matches against those node-sets (rather than
+  | 	  re-selecting the original *info nodes each time we need to
+  | 	  check them). Also, reverted the special handling of Refclass
+  | 	  that was added recently. We eventually need to make Refclass
+  | 	  handling consistent with that of the HTML and FO
+  | 	  stylesheets.
+  | 
+  | 2005-06-07  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* ChangeLog.20020917: New file.
+  | 
+  | 	* README: Added some Notes section with info contributed by
+  | 	  Barry Rountree.
+  | 
+  | 	* README: Fixed typo.
+  | 
+  | 	* lists.xsl: Removed unnecessary trailing comma after final
+  | 	  term/glossterm (closes #1215890; thanks to Sam Steingold for
+  | 	  reporting the problem). ::PROBLEM:: If a varlistentry or
+  | 	  glossentry contains multiple term or glossterm elements, a
+  | 	  comma is rendered after the final term or glossterm. A comma
+  | 	  should instead be rendered only after every term or
+  | 	  glossterm _except_ the last. ::FIX:: Reworked template logic
+  | 	  for term/glossterm. They are now handled with an
+  | 	  xsl:for-each in the varlistentry/glossentry template, rather
+  | 	  than as separate templates. HTML and FO stylesheets appear
+  | 	  to have the same problem, so we probably need to port this
+  | 	  change to those as well.
+  | 
+  | 	* refentry.xsl: Don't render NAME heading for secondary
+  | 	  Refnamedivs (closes #1216292) If a document has multiple
+  | 	  Refnamedivs, a NAME heading was getting rendered for each.
+  | 	  But we only need one NAME heading. This change causes it to
+  | 	  be rendered just once. This makes behavior in this respect
+  | 	  consistent with how the HTML and FO stylesheets handle the
+  | 	  generated NAME heading for Refnamediv.
+  | 
+  | 2005-06-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* refentry.xsl: Uppercase titles in x-ref to Refentry children
+  | 	  (closes #1215547; thanks to Jens Granseuer for reporting the
+  | 	  problem). ::PROBLEM:: Titles of all first-level sections in
+  | 	  man pages are always rendered in uppercase. But
+  | 	  cross-references to those titles are not uppercase. ::FIX::
+  | 	  Cross-references to titles of all first-level sections of
+  | 	  Refentry output are now rendered in uppercase; that is,
+  | 	  titles in x-refs to Refnamediv, Refsynopsisdiv, Refsect1,
+  | 	  and any Refsection that is a direct child of Refentry. Also,
+  | 	  x-ref to Refnamediv now uses the localized "NAME" title
+  | 	  instead of the using the first Refname child. This makes the
+  | 	  output inconsistent with HTML and FO output, but for
+  | 	  man-page output, it seems to make better sense to have the
+  | 	  "NAME". (It may actually make better sense to do it that way
+  | 	  in HTML and FO output as well.) That said, I guess it's not
+  | 	  likely that most people would put in an x-ref to a
+  | 	  Refnamediv section, so maybe it's kind of a moot point...
+  | 
+  | 2005-06-02  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* general.xsl, synop.xsl: Added support for processing
+  | 	  funcparams (closes #1213166; thanks to Barry Rountree for
+  | 	  reporting). ::PROBLEM:: The funcparams element was not being
+  | 	  processed as expected. ::CAUSE:: No logic existed in
+  | 	  manpages stylesheets for handling funcparams. ::FIX:: Fixed
+  | 	  by taking old code for handling of funcprototype and
+  | 	  children, and replacing it with code ported over from HTML
+  | 	  templates for ANSI-style output. ::AFFECTS:: This change
+  | 	  affects handling of all funcprototype output. Along with
+  | 	  adding support for funcparams, the following changes were
+  | 	  also made: - removed the space that was being output between
+  | 	  funcdef and paramdef; example: was: float rand (void); now:
+  | 	  float rand(void); - turned off bold formatting for the
+  | 	  <type> element when it occurs within a funcdef or paramdef -
+  | 	  moved space -> nobreak-space replacement logic into a
+  | 	  separate template (for potential re-use elsewhere if we need
+  | 	  it) ::TODO:: We need to add an option for K&R style
+  | 	  funcprototypes. See #1213277.
+  | 	  http://sourceforge.net/tracker/index.php?func=detail&aid=1213277&group_id=21935&atid=516914
+  | 
+  | 2005-05-30  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, info.xsl: Re-worked construction of .TH title
+  | 	  line (closes #1210488). Also, made comment generated at top
+  | 	  of page include version info (closes #1211254). Here are the
+  | 	  details about the refinements made to the construction of
+  | 	  the .TH title line: - "extra1" (which shows up in the center
+  | 	  footer of each page): If a date cannot be found in the
+  | 	  source, we now automatically generate a localized "long
+  | 	  format" date - "extra2" (which shows up in the left footer):
+  | 	  We now first search for "product version" info; then, if we
+  | 	  can't find that, a "product name"; if we can't find that, we
+  | 	  look for "other" info to use. And we can't find that, we
+  | 	  leave it empty. The exact sequence of elements checked is
+  | 	  this: 1. productnumber in info or refentryinfo 2.
+  | 	  productnumber in info or referenceinfo of parent reference
+  | 	  3. any refmeta/refmiscinfo that has class = 'version' 4.
+  | 	  productname in info or refentryinfo 5. productname in info
+  | 	  or referenceinfo of parent reference 6. refmeta/refmiscinfo
+  | 	  (first one) 7. refnamediv/refclass (first one) - "extra3"
+  | 	  (which shows up in the center header): The exact sequence of
+  | 	  elements checked is now this: 1. title in info or
+  | 	  referenceinfo of parent reference 2. refnamediv/refclass
+  | 	  (first one) 3. refmeta/refmiscinfo (first one)
+  | 
+  | 2005-05-29  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* general.xsl, refentry.xsl: Added support for processing
+  | 	  refsection down to any arbitrary level of nesting (closes
+  | 	  #1210482).
+  | 
+  | 	* stripns.xsl: New file.
+  | 
+  | 	* stripns.xsl: Fixed typo in comment.
+  | 
+  | 2005-05-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* block.xsl, docbook.xsl, general.xsl, refentry.xsl: Added
+  | 	  support for refsect3 and formalpara processing (closes
+  | 	  #1210478 and #1210479). Also did some further templates
+  | 	  re-organizing, including to the logic for gathering and
+  | 	  processing metadata.
+  | 
+  | 2005-05-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* block.xsl, docbook.xsl, general.xsl, inline.xsl: Modularized
+  | 	  a bit further.
+  | 
+  | 	* block.xsl, lists.xsl, synop.xsl, textify.xsl: Added header
+  | 	  (with RCS keywords and copyright info) to all files that
+  | 	  lacked it.
+  | 
+  | 	* docbook.xsl: Modularized main "refentry" template a bit.
+  | 
+  | 	* sect23.xsl: Removed. This file has never been included by
+  | 	  docbook.xsl, so it serves no purpose at all...
+  | 
+  | 2005-05-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile, textify.xsl, xref.xsl: Make xrefs and
+  | 	  olinks work, and prevent instances of &#8220; and &#8221;
+  | 	  entities in output (closes #741578 and #956072; thanks to
+  | 	  Jens Granseuer and Sam Steingold for reporting the problems)
+  | 	  ::Problem: If you include an xref in a source document,
+  | 	  instead of getting the xref text you would expect in the
+  | 	  output, you just get "[xref to refsect1]", where "refsect"
+  | 	  is the name of the target element for the xref. If you
+  | 	  include an olink, it works as expected -- except that the
+  | 	  output text has &#8220; and &#8221; entities (double "curly"
+  | 	  quotation marks). ::Cause: The manpages/docbook.xsl driver
+  | 	  imports the html/docbook.xsl stylesheet, which in turn
+  | 	  imports the html/xref.xsl file. The manpages/docbook.xsl
+  | 	  file then imports the manpages/xref.xsl file. That file
+  | 	  contains a "xref" template that overrides the the one in
+  | 	  html/xref.xsl and that, by design, does nothing except to
+  | 	  generate the "[xref to refsect1]" text instead of the
+  | 	  expected xref output. On the other hand, the manpages
+  | 	  stylesheets don't override the "olink" template; therefore,
+  | 	  the "olink" template from the html/xref.xsl file is used "as
+  | 	  is". And being that it is intended for HTML output, that
+  | 	  template uses the &#8220; and &#8221; to wrap titles in xref
+  | 	  output. ::Fix: The original manpages/xref.xsl file has now
+  | 	  been removed. The build for the manpages distribution now
+  | 	  makes that file, using the textify.xsl stylesheet to
+  | 	  automatically generate it from the html/xref.xsl file. It is
+  | 	  built in such a away that it basically just contains special
+  | 	  copies of the "xref" and "olink" templates that cause
+  | 	  &#8220; and &#8221; instances to be transformed into "\(lq"
+  | 	  and "\(rq" (groff "left quote" and "right quote"). It might
+  | 	  seem odd that templates from the html/xref.xsl are used,
+  | 	  since those templates a designed to generate hyperlinks of
+  | 	  the form <a href="#foo">the section called "Bar"</a>. But it
+  | 	  works because the manpages stylesheets end up using the text
+  | 	  value of the output of the above. Thus, the <a href="#foo">
+  | 	  and </a> parts are stripped out, leaving just the text
+  | 	  between ('the section called "Bar"'). ::Affects Only affects
+  | 	  output of xref and olink elements. The fix may not be
+  | 	  complete and/or may cause other problems. Please test. In
+  | 	  particular, while it may fix the &#8220; and &#8221; problem
+  | 	  that English lang/locales users have run into, it doesn't
+  | 	  fix the corresponding problem for output of xrefs and olinks
+  | 	  in many non-English locales, which use quoting characters
+  | 	  other than &#8220; and &#8221; To give just one example of
+  | 	  many: in Japanese, the quoting characters are &#12300; and
+  | 	  &#12301; ("left corner bracket" and "right corner bracket").
+  | 	  It is possible to "fix" the problem for all locales; but it
+  | 	  is just a question of whether there is enough of a demand
+  | 	  for it that it is worth doing.
+  | 
+  | 	* Makefile: Cause "clean" target to remove xref.xsl
+  | 
+  | 	* docbook.xsl: Whitespace-only change. Expanded all tabs
+  | 
+  | 	* docbook.xsl: Added replace-ldqou and replace-rdquo
+  | 	  templates, for translating &#8220; to \(lq and &#8221; to
+  | 	  \(rq
+  | 
+  | 	* docbook.xsl, sect23.xsl, synop.xsl: Prevent "sticky" fonts
+  | 	  changes. (closes #956070; thanks to Sam Steingold for
+  | 	  reporting the problem, and for his patience...) ::Problem:
+  | 	  Sometimes a bold or italic font change inadvertently ends up
+  | 	  becoming "sticky" such that a following chunk of text that
+  | 	  should just be rendered as plain text instead gets
+  | 	  boldfaced/italicized. ::Cause: Font changes were simply
+  | 	  being nested, as they are in HTML. While that works for
+  | 	  HTML, it doesn't work for roff, where font-change
+  | 	  instructions aren't actually intended to nest. ::Fix:
+  | 	  Attempted to un-nest bold/italic font changes. When the
+  | 	  manpages stylesheets encounter node sets that need to be
+  | 	  boldfaced or italicized, they now put the \fBfoo\fR
+  | 	  \fIbar\fR groff bold/italic instructions separately around
+  | 	  each node in the set. This may not be a complete fix for the
+  | 	  problem. In fact, it may cause other problems. Please test
+  | 	  :^)
+  | 
+  | 	* lists.xsl: Support generation of choice separator in inline
+  | 	  simplelist (closes #1207532) This ehancement enables
+  | 	  auto-generation of an appropriate localized "choice
+  | 	  separator" (for example, "and" or "or") before the final
+  | 	  item in an inline simplelist. To indicate that you want a
+  | 	  choice separator generated for a particular list, you need
+  | 	  to put a processing instruction (PI) of the form <?dbchoice
+  | 	  choice="foo"?> as a child a of the list. For example:
+  | 	  <para>This release adds localiation support for the
+  | 	  following Indic languages: <simplelist type="inline">
+  | 	  <?dbchoice choice="and" ?> <member>Hindi</member>
+  | 	  <member>Punjabi</member> <member>Tamil</member>
+  | 	  <member>Oriya</member> <member>Gujarati</member>
+  | 	  </simplelist>. </para> Output (for English): This release
+  | 	  adds localiation support for the following Indic languages:
+  | 	  Hindi, Punjabi, Tamil, Oriya, and Gujarati. Or if the
+  | 	  logical relationship between the items in the list is an
+  | 	  "or" relationship, then use choice="or": <para>Choose from
+  | 	  ONE and ONLY ONE of the following: <simplelist
+  | 	  type="inline"> <?dbchoice choice="or" ?> <member>A</member>
+  | 	  <member>B</member> <member>C</member>. </simplelist> </para>
+  | 	  Output (for English): Choose from ONE and only ONE of the
+  | 	  following choices: A, B, or C. As a temporary workaround for
+  | 	  the fact that most of the DocBook non-English locale files
+  | 	  don't have a localization for the word "or", you can put in
+  | 	  a literal string to be used; example for French:
+  | 	  <para>Choose from ONE and ONLY ONE of the following:
+  | 	  <simplelist type="inline"> <?dbchoice choice="ou" ?>
+  | 	  <member>A</member> <member>B</member> <member>C</member>.
+  | 	  </simplelist> </para> That is, use "ou" instead of "or".
+  | 
+  | 2005-05-23  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* synop.xsl: Rolled back some over-aggressive line-break
+  | 	  cleanup, and removed space-normalizing call in group|arg
+  | 	  template because it causes <sbr/> to be handled incorrectly.
+  | 
+  | 2005-05-22  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl: Grand Unification: Epilogue (2): If
+  | 	  "neighboring" text nodes in mixed content are
+  | 	  whitespace-only, apply the special sauce just before
+  | 	  serving; that is, at the end, not both at the beginning and
+  | 	  at the end.
+  | 
+  | 	* lists.xsl: Repaired line-breaking in list output. Thanks to
+  | 	  Hendrik Sattler for reporting the problem. The cause of this
+  | 	  is was a change that was made a while back to reduce
+  | 	  excessive blank lines in output. Looks like in this case it
+  | 	  cut it back a bit too aggressively. There may yet be some
+  | 	  other cases that will need more fine-tuning.
+  | 
+  | 2005-05-21  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl: Whitespace Grand Unification: Epilogue (1): If
+  | 	  "neighboring" text nodes in mixed content are
+  | 	  whitespace-only, leave them unseasoned; that is, don't add
+  | 	  the special sauce.
+  | 
+  | 2005-05-20  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, lists.xsl, synop.xsl: Verbatim environment
+  | 	  "Grand Unification" fix. Attempte to fix handling of
+  | 	  verbatim environments (literallayout, programlisting,
+  | 	  screen) and, in a related way, text nodes. Particularly in
+  | 	  mixed-content blocks. I think I got it working... Closes
+  | 	  #1167995, #975243, #935833, #763861, #728932, #628393,
+  | 	  #595213. Thanks to Hendrik Sattler, Tobias Reif, Tommi
+  | 	  Virtanen, Dennis Grace, and Matthias Andree for reporting
+  | 	  the problems. Sorry it took so long for the fix.
+  | 
+  | 2005-05-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl: remove some unnecessary generated line breaks
+  | 	  (relates to issue #607270)
+  | 
+  | 	* docbook.xsl: Handle email in info section apprpropriately.
+  | 	  Replace "Man page edited by Foo." with "Foo. (man page)"
+  | 
+  | 	* lists.xsl: Simplified and corrected rendering of simplelist.
+  | 	  (closes #1154750 and #699081; thanks to Matthias Andree and
+  | 	  Bert Vermeulen for reporting the problem) - Any simplelist
+  | 	  type="inline" instance is now rendered as a comma-separated
+  | 	  list, with a comma and also a localized "and" before the
+  | 	  last item. - Any simplelist instance whose type is not
+  | 	  inline is rendered as a one-column vertical list (ignoring
+  | 	  the values of the type and columns attributes if present)
+  | 
+  | 	* lists.xsl, sect23.xsl, synop.xsl: removed some more
+  | 	  unnecessary line breaks (closes #607270)
+  | 
+  | 2005-05-10  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl: Support localization of gentext for various
+  | 	  things (issue #1199352, #1199153, #1199033, and #1167995;
+  | 	  thanks to Hendrik Sattler for reporting the issue). Gentext
+  | 	  is now localized for the following - Heading generated for
+  | 	  refsynopsis section - Heading generated for refname section
+  | 	  - Heading generated for author attribution - Headings
+  | 	  generated for admontions There are some other bits of
+  | 	  gentext that still need to be localized.
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: ignore stuff
+  | 
+  | 	* .cvsignore: New file.
+  | 
+  | 	* Makefile, param.ent, param.xweb: New file.
+  | 
+  | 	* docbook.xsl: revert misguided dependence on
+  | 	  emphasis.propagates.style in manpages output; manpages are
+  | 	  now just hard-coded (not configurable) to turn emphasis into
+  | 	  groff italic and emphasis role=bold|strong into groff bold;
+  | 	  this is equivalent to what is done for HTML output; should
+  | 	  it be configurable?
+  | 
+
+Changes to xsl/params/*
+
+  | 2005-07-14  Norman Walsh <nwalsh@users.sourceforge.net>
+  | 
+  | 	* annotation.css.xml: New file.
+  | 
+  | 	* annotation.graphic.close.xml, annotation.graphic.open.xml,
+  | 	  annotation.js.xml, annotation.support.xml: New file.
+  | 
+  | 2005-07-14  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.string.subst.map.xml: Added bullet to set of
+  | 	  string-substitution chars.
+  | 
+  | 2005-07-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.hyphenate.computer.inlines.xml,
+  | 	  man.hyphenate.filenames.xml, man.hyphenate.urls.xml,
+  | 	  man.hyphenate.xml: Prevent hyphenation of computer inlines,
+  | 	  filenames, and URLs. (Closes #1124391; thanks to Ryan
+  | 	  Hofschneider for reporting). By default, even when
+  | 	  hyphenation is enabled (globally), hyphenation is now
+  | 	  suppressed for "computer inlines" (currently, just
+  | 	  classname, constant, envar, errorcode, option, replaceable,
+  | 	  userinput, type, varname -- but probably need to add more)
+  | 	  and for filenames, and for URLs from Ulink. It can be
+  | 	  (re)enabled using the man.hyphenate.computer.inlines,
+  | 	  man.hyphenate.filenames, and man.hyphenate.urls params.
+  | 
+  | 2005-07-12  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.string.subst.map.xml: Added substitutions for \& and \%
+  | 
+  | 2005-07-11  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.links.are.numbered.xml, man.links.are.underlined.xml,
+  | 	  man.links.list.heading.xml, man.links.section.heading.xml:
+  | 	  Updated doc for link-related params. Renamed
+  | 	  man.links.section.heading to man.links.list.heading.
+  | 
+  | 	* man.links.list.enabled.xml: New file.
+  | 
+  | 	* man.string.subst.map.xml: Added comment about non-breaking
+  | 	  space.
+  | 
+  | 2005-07-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* appendix.autolabel.xml, chapter.autolabel.xml,
+  | 	  part.autolabel.xml, preface.autolabel.xml: Updated reference
+  | 	  pages to support number format options.
+  | 
+  | 2005-07-08  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* component.title.properties.xml: Bibliography in article
+  | 	  shouldn't be centered. This stuff really must be refactored
+  | 	  better way!
+  | 
+  | 2005-07-08  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.charmap.uri.xml: Set type value for man.charmap.uri to
+  | 	  "uri"
+  | 
+  | 	* man.links.are.numbered.xml, man.links.are.underlined.xml,
+  | 	  man.links.section.heading.xml: New file.
+  | 
+  | 	* man.string.subst.map.xml: Added trademark and servicemark
+  | 	  mappings.
+  | 
+  | 2005-07-06  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.charmap.subset.profile.xml, man.string.subst.map.xml:
+  | 	  Added "namespace" attributes to non-DocBook <tag>s, to
+  | 	  prevent them from being converted to TDG hyperlinks.
+  | 
+  | 	* man.hyphenate.xml, man.justify.xml: Typos and wording tweaks
+  | 	  (to sync up with language in the release notes)
+  | 
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.output.quietly.xml: Added not about setting
+  | 	  man.output.quietly to speed up processing time.
+  | 
+  | 	* man.output.quietly.xml: Fixed typo.
+  | 
+  | 	* man.string.subst.map.xml: Added the following substitutions:
+  | 	  <!-- * non-breaking space <substitution oldstring="&#x00a0;"
+  | 	  newstring="\ "/> <!-- * copyright sign <substitution
+  | 	  oldstring="&#x00a9;" newstring="\(co"/> <!-- * registered
+  | 	  sign <substitution oldstring="&#x00ae;" newstring="\(rg"/>
+  | 	  <!-- * left double quote <substitution oldstring="&#x201c;"
+  | 	  newstring="\(lq"/> <!-- * right double quote <substitution
+  | 	  oldstring="&#x201d;" newstring="\(rq"/> <!-- * left single
+  | 	  quote <substitution oldstring="&#x2018;" newstring="\(oq"/>
+  | 	  <!-- * right single quote <substitution oldstring="&#x2019;"
+  | 	  newstring="\(cq"/> The reason is that those are all
+  | 	  characters that the DocBook XSL stylesheets themselves
+  | 	  generate under certain circumstances; so dealing with them
+  | 	  in man.string.subst.map ensures they will always be
+  | 	  replaced, even if man.charmap.enabled is zero.
+  | 
+  | 	* man.subheading.divider.enabled.xml,
+  | 	  man.subheading.divider.xml: Added
+  | 	  man.subheading.divider.enabled flag and tweaked doc for
+  | 	  man.subheading.divider
+  | 
+  | 	* man.th.extra1.suppress.xml, man.th.extra2.max.length.xml,
+  | 	  man.th.extra2.suppress.xml, man.th.extra3.max.length.xml,
+  | 	  man.th.extra3.suppress.xml, man.th.title.max.length.xml:
+  | 	  Added support for enabling users to control what appears and
+  | 	  does not appear in the content of the .TH title-line
+  | 	  header/footer. (Closes #1210492)
+  | 
+  | 	* refentry.date.profile.enabled.xml,
+  | 	  refentry.manual.profile.enabled.xml,
+  | 	  refentry.source.name.profile.enabled.xml,
+  | 	  refentry.source.name.suppress.xml,
+  | 	  refentry.version.profile.enabled.xml,
+  | 	  refentry.version.suppress.xml: New file.
+  | 
+  | 	* refentry.date.profile.xml,
+  | 	  refentry.manual.fallback.profile.xml,
+  | 	  refentry.manual.profile.xml,
+  | 	  refentry.source.fallback.profile.xml,
+  | 	  refentry.source.name.profile.xml,
+  | 	  refentry.source.name.suppress.xml,
+  | 	  refentry.version.profile.xml, refentry.version.suppress.xml:
+  | 	  Implemented capability for users to customize "refentry
+  | 	  metadata gathering" by specifying XPath expressions to use
+  | 	  as "info profiles" for gathering the data, and, in some
+  | 	  cases, to suppress parts of the data collected.
+  | 
+  | 2005-07-04  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* index.div.title.properties.xml, index.entry.properties.xml:
+  | 	  Add start-indent="0pt" to counteract any body.start.indent
+  | 	  on an index that is in an article.
+  | 
+  | 2005-06-29  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.break.after.slash.xml: New file.
+  | 
+  | 	* man.subheading.divider.xml: New file.
+  | 
+  | 	* man.th.title.max.length.xml: New file.
+  | 
+  | 2005-06-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.alignment.xml, man.hyphenate.xml, man.justify.xml:
+  | 	  Support man.justify and man.hyphenate params. (closes
+  | 	  #1229225). Note that default for the both of those is zero
+  | 	  (off), because justified text looks good only when it is
+  | 	  also hyphenated; to quote the "Hypenation" node from the
+  | 	  groff info page: Since the odds are not great for finding a
+  | 	  set of words, for every output line, which fit nicely on a
+  | 	  line without inserting excessive amounts of space between
+  | 	  words, `gtroff' hyphenates words so that it can justify
+  | 	  lines without inserting too much space between words. The
+  | 	  problem is that groff is not particularly smart about how it
+  | 	  does hyphenation; it can end up hyphenating a lot of things
+  | 	  that you don't want hyphenated (names of symbols, for
+  | 	  example), and it is difficult and tiresome work to prevent
+  | 	  it from doing that. So, disabling both justification and
+  | 	  hyphenation ensures that hyphens won't get inserted where
+  | 	  you don't want to them, and you don't end up with lines
+  | 	  containing excessive amounts of space between words. Yes,
+  | 	  these default settings run counter to how most existing man
+  | 	  pages are formatted. But there are some notable exceptions,
+  | 	  such as the perl man pages.
+  | 
+  | 	* man.charmap.enabled.xml: New file.
+  | 
+  | 	* man.charmap.use.subset.xml: Doc tweak.
+  | 
+  | 	* man.string.subst.map.xml: Replace hyphens with "\-". <sigh/>
+  | 	  Although the old-school gnomes who maintain groff apparently
+  | 	  don't figure it's necessary to document this anywhere, there
+  | 	  is apparently only one reliable way to make a non-breaking
+  | 	  hyphen in groff: with "\-". At least that it what testing in
+  | 	  my environment seems to indicate. And because groff is not
+  | 	  at all smart in the way it breaks things at hyphens (it
+  | 	  will, for example, break command arguments across lines if
+  | 	  they contain hyphens), we must globally replace all hyphens
+  | 	  with "\-". God in heaven, please let me live to see a day
+  | 	  when roff and all is (r)offspring have disappeared from the
+  | 	  face of the earth.
+  | 
+  | 2005-06-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.charmap.use.subset.xml, man.string.subst.map.xml: Doc
+  | 	  tweak.
+  | 
+  | 	* man.string.subst.map.xml: New file.
+  | 
+  | 2005-06-25  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.charmap.subset.profile.xml: Reworked default value to
+  | 	  make reworked character map.
+  | 
+  | 2005-06-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* generate.legalnotice.link.xml: Added doc.
+  | 
+  | 	* generate.revhistory.link.xml: New file.
+  | 
+  | 2005-06-23  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* man.alignment.xml, man.charmap.subset.profile.xml,
+  | 	  man.charmap.uri.xml, man.charmap.use.subset.xml,
+  | 	  man.hyphenate.xml, man.output.encoding.xml,
+  | 	  man.output.quietly.xml: New file.
+  | 
+  | 	* man.charmap.subset.profile.xml: Fixed markup error.
+  | 
+  | 	* man.charmap.subset.profile.xml: Added links to Zvon
+  | 	  character search form.
+  | 
+  | 	* man.charmap.subset.profile.xml, man.output.encoding.xml: Doc
+  | 	  tweaks
+  | 
+  | 	* man.output.encoding.xml: Changed default for
+  | 	  man.output.encoding to UTF-8. Because character-map
+  | 	  processing depends on it. Also added note saying that
+  | 	  changing the value to another encoding my break
+  | 	  character-map processing, so set man.charmap.enabled to 0 in
+  | 	  that case.
+  | 
+  | 2005-06-20  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* component.title.properties.xml: Slides title should also be
+  | 	  centered to maintain compatibility with previous versions.
+  | 
+  | 2005-06-14  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* body.start.indent.xml: Clarified the use of this parameter
+  | 	  with FOP.
+  | 
+  | 2005-06-01  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* refentry.title.properties.xml: Align refnamediv title
+  | 	  correctly when refentry.generate.title is non-zero (closes
+  | 	  #1212641). ::Problem: When refentry.generate.title is
+  | 	  non-zero, the title output for Refnamediv is not aligned
+  | 	  flush left. ::Cause: No code for setting start-indent="" was
+  | 	  included in refentry.title.properties. It should be in order
+  | 	  to make the Refnamediv title output be flush left, as are
+  | 	  titles for all other sectioning children of Refentry ::Fix:
+  | 	  Added code for setting start-indent="" in
+  | 	  refentry.title.properties.
+  | 
+  | 2005-05-28  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* component.title.properties.xml: Previous change (adding
+  | 	  text-align="left") caused article titles to be displayed
+  | 	  left aligned instead centered. This was backward
+  | 	  incompatible change in presentation. Now attribute set is
+  | 	  conditional and outputs text-align="center" for titles of
+  | 	  standalone articles. Probably in the future more general fix
+  | 	  should be done -- either creating separate
+  | 	  article.title.properties, or refactoring FO properties
+  | 	  settings between titlepage templates and attribute sets.
+  | 
+  | 2005-05-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* l10n.lang.value.rfc.compliant.xml: New file.
+  | 
+  | 	* variablelist.as.table.xml: Fixed typo.
+  | 
+  | 2005-04-26  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* component.title.properties.xml,
+  | 	  section.title.properties.xml: Set text-align to left for
+  | 	  chapter and section titles.
+  | 
+  | 2005-04-22  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* menuchoice.menu.separator.xml: Remove fo namespace since no
+  | 	  longer needed.
+  | 
+  | 	* menuchoice.menu.separator.xml: Removed conditional that
+  | 	  broke the build process.
+  | 
+  | 2005-04-16  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* menuchoice.menu.separator.xml: Changed to use true arrow
+  | 	  character from Symbol font.
+  | 
+  | 2005-04-15  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* abstract.properties.xml, abstract.title.properties.xml: New
+  | 	  file.
+  | 
+  | 2005-04-10  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* refentry.pagebreak.xml: Clarified where this parameter
+  | 	  applies.
+  | 
+  | 2005-03-08  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* blockquote.properties.xml, component.title.properties.xml,
+  | 	  section.title.properties.xml, title.margin.left.xml: Fixed
+  | 	  indent problems introduced with $body.start.indent. FOP
+  | 	  reverts back to using $title.margin.left.
+  | 
+  | 2005-03-02  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* graphicsize.use.img.src.path.xml: New file.
+  | 
+  | 2005-02-23  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* default.table.frame.xml: New file.
+  | 
+  | 2005-02-23  Robert Stayton <bobstayton@users.sourceforge.net>
+  | 
+  | 	* graphical.admonition.properties.xml: Added the properties to
+  | 	  the attribute-set.
+  | 
+  | 2005-02-15  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* img.src.path.xml: Added support for img.src.path parameter
+  | 	  into FO stylesheet.
+  | 
+
+Changes to xsl/template/*
+
+  | 2005-04-29  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* titlepage.xsl: Fixed bug #1189965. Titlepages with element
+  | 	  content only (no text interleaved) are not discarded
+  | 	  anymore.
+  | 
+
+Changes to xsl/wordml/*
+
+  | 2005-07-12  <balls@users.sourceforge.net>
+  | 
+  | 	* docbook.xsl, specifications.xml, template.xml,
+  | 	  wordml-final.xsl, wordml.xsl: added subtitles, fixed
+  | 	  itemizedlist
+  | 
+
+Changes to xsl/xhtml/*
+
+  | 2005-07-18  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: Ignore annotations.xsl
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: clean target added
+  | 
+  | 	* Makefile: revert to MAIN
+  | 
+
+Changes to xsl/debian/*
+
+  | 2005-03-28  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: README.Debian and copyright file, added some steps
+  | 	  for prepending disclaimer about this not being the official
+  | 	  package
+  | 
+  | 	* Makefile: EMAIL variable instead of PACKAGEREMAIL
+  | 
+  | 2005-03-25  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: DEBVER, pick up from master Makefile; changelog
+  | 	  entry, wording tweaked
+  | 
+  | 2005-03-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: New file.
+  | 
+  | 	* Makefile: branches: 1.1.2; file Makefile was initially added
+  | 	  on branch build.
+  | 
+
+Changes to xsl/slides/fo/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: added ChangLog to .cvsignore files, so that I
+  | 	  can do a "cvstrim" without them getting deleted
+  | 
+
+Changes to xsl/slides/html/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* param.xweb: Added clarification that current params are for
+  | 	  HTML output only.
+  | 
+  | 	* param.xweb: And yet more clarifications...
+  | 
+  | 	* param.xweb: Further clarifications.
+  | 
+  | 2005-05-04  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* frames.xsl: escape single quotation marks in ToC for titles
+  | 	  and titleabbrev in foilgroup and foil (closes bug #1194308;
+  | 	  thanks to Tomas Hajek for reporting the bug)
+  | 
+  | 	* frames.xsl, slides-common.xsl: remove/replace generation of
+  | 	  <a name="{$id}"> instances; some were removed because they
+  | 	  were redundant and were causing invalid duplicate ID values
+  | 	  to be generated; others were replaced by moving the ID and
+  | 	  value to the parent (closes bug #1069140; thanks to Emma
+  | 	  Jane Hogbin for reporting the problem)
+  | 
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: added ChangLog to .cvsignore files, so that I
+  | 	  can do a "cvstrim" without them getting deleted
+  | 
+  | 	* frames.xsl, slides-common.xsl: add meta generator stamp
+  | 
+  | 2005-04-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: added "clean" targets
+  | 
+  | 2005-04-22  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* frames.xsl: "foilgroup" in filenames instead of "foilgrp"
+  | 	  (for clarity and because of report that "filegrp" caused
+  | 	  some kind of linking problem
+  | 
+  | 	* slides-common.xsl: Added support for dbhtml dir PI (Tracker
+  | 	  #1179044). Thanks to Mauritz Jeanson for the patch. And to
+  | 	  M. Sean Gilligan for submitting the original request (on
+  | 	  docbook-apps).
+  | 
+
+Changes to xsl/slides/htmlhelp/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/slides/keynote/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+  | 2005-04-22  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* ChangeLog: ChangeLog should not be under version control
+  | 
+
+Changes to xsl/slides/svg/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/slides/xhtml/*
+
+  | 2005-05-04  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: ignore html2xhtml.xsl
+  | 
+  | 	* Makefile, html2xhtml.xsl: remove html2xhtml.xsl from version
+  | 	  control and instead make by copying from docbook-xsl
+  | 	  html2xhtml.xsl
+  | 
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: added ChangLog to .cvsignore files, so that I
+  | 	  can do a "cvstrim" without them getting deleted
+  | 
+  | 	* Makefile: add meta generator stamp
+  | 
+  | 2005-04-26  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: added "clean" targets
+  | 
+
+Changes to xsl/slides/graphics/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/slides/browser/*
+
+  | 2005-06-21  Jirka Kosek <kosek@users.sourceforge.net>
+  | 
+  | 	* slides.js: Added support for keyboard navigation in Opera.
+  | 	  It was not very hard given fact that Opera tries to be as
+  | 	  compatible with IE as possible ;-)
+  | 
+  | 2005-05-09  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* slides.js: ::Problem: PAGE UP, PAGE DOWN, and HOME keyboard
+  | 	  shortcuts not longer work as expected ::Cause: Shortcuts
+  | 	  were replaced with letter-key shortcuts (N, P, H). ::Fix:
+  | 	  Restored PAGE UP, PAGE DOWN, and HOME shortcuts by appending
+  | 	  those keys to the list of valid shortcuts. Now, both those
+  | 	  and the letter-key shortcuts are available. Also, added
+  | 	  RIGHT ARROW, LEFT ARROW, and UP ARROW shortcuts. The
+  | 	  complete list of shortcuts is now: * forward = n, N, SPACE,
+  | 	  ENTER, RETURN, PAGE UP, RIGHT ARROW * backward = p, P,
+  | 	  BACKSPACE, PAGE DOWN, LEFT ARROW * up = u, U, UP ARROW *
+  | 	  home = h, H, HOME * toc = t, T (Closes bug #1196429; thanks
+  | 	  to Roland Huss for reporting the problem)
+  | 
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/doc/common/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+
+Changes to xsl/doc/fo/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: clean target now removes generated *.html param
+  | 	  files
+  | 
+  | 	* Makefile: revert to Makefile from MAIN
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: make clean now does rm -f *.html to clean out all
+  | 	  html files; also *.png
+  | 
+  | 	* Makefile: *.png -- don't remove on clean (file is under
+  | 	  version control)
+  | 
+
+Changes to xsl/doc/html/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: create param.html stamp so that it doesn't get
+  | 	  remade if nothing changes
+  | 
+  | 	* Makefile: revert to Makefile from MAIN
+  | 
+
+Changes to xsl/doc/lib/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+
+Changes to xsl/doc/manpages/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+  | 	* Makefile: New file.
+  | 
+
+Changes to xsl/doc/pi/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: revert to version from MAIN
+  | 
+  | 	* Makefile: touch pi.html so that nothing gets unnecessarily
+  | 	  remade
+  | 
+
+Changes to xsl/doc/template/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+
+Changes to xsl/doc/tools/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: use Makefile from MAIN instead
+  | 
+  | 	* Makefile: Changed order of build
+  | 
+
+Changes to xsl/doc/refentry/*
+
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: New file.
+  | 
+
+Changes to xsl/doc/website/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: New file.
+  | 
+
+Changes to xsl/docsrc/fo/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Refined doc build. - Changed makefiles in
+  | 	  docsrc/fo, docsrc/html, and docsrc/manpages dirs to depend
+  | 	  on corresponding params.xsl instead of on param.xweb.
+  | 	  Rationale is that param.xsl gets rebuilt any time param.xweb
+  | 	  changes. In addition, param.xsl gets rebuild any time any
+  | 	  included params/*.xml file is changed. So making docsrc/*
+  | 	  builds depend on param.xsl effectively makes them depend on
+  | 	  both the param.xweb changes on on the actual param changes.
+  | 	  - Changed doc/Makefile so that reference.html is rebuilt
+  | 	  only when docsrc/reference.xml changes, not when any of its
+  | 	  included files change. Rationale is that, because we chunk
+  | 	  output for the doc build, reference.html is simply a sort of
+  | 	  TOC page that doesn't need to get remade if the included
+  | 	  files change. Because output of those included files goes to
+  | 	  separate fo, html, and manpages subdirs, and that output
+  | 	  gets generated by seperate make targets.
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+
+Changes to xsl/docsrc/html/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Refined doc build. - Changed makefiles in
+  | 	  docsrc/fo, docsrc/html, and docsrc/manpages dirs to depend
+  | 	  on corresponding params.xsl instead of on param.xweb.
+  | 	  Rationale is that param.xsl gets rebuilt any time param.xweb
+  | 	  changes. In addition, param.xsl gets rebuild any time any
+  | 	  included params/*.xml file is changed. So making docsrc/*
+  | 	  builds depend on param.xsl effectively makes them depend on
+  | 	  both the param.xweb changes on on the actual param changes.
+  | 	  - Changed doc/Makefile so that reference.html is rebuilt
+  | 	  only when docsrc/reference.xml changes, not when any of its
+  | 	  included files change. Rationale is that, because we chunk
+  | 	  output for the doc build, reference.html is simply a sort of
+  | 	  TOC page that doesn't need to get remade if the included
+  | 	  files change. Because output of those included files goes to
+  | 	  separate fo, html, and manpages subdirs, and that output
+  | 	  gets generated by seperate make targets.
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+
+Changes to xsl/docsrc/manpages/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile: Refined doc build. - Changed makefiles in
+  | 	  docsrc/fo, docsrc/html, and docsrc/manpages dirs to depend
+  | 	  on corresponding params.xsl instead of on param.xweb.
+  | 	  Rationale is that param.xsl gets rebuilt any time param.xweb
+  | 	  changes. In addition, param.xsl gets rebuild any time any
+  | 	  included params/*.xml file is changed. So making docsrc/*
+  | 	  builds depend on param.xsl effectively makes them depend on
+  | 	  both the param.xweb changes on on the actual param changes.
+  | 	  - Changed doc/Makefile so that reference.html is rebuilt
+  | 	  only when docsrc/reference.xml changes, not when any of its
+  | 	  included files change. Rationale is that, because we chunk
+  | 	  output for the doc build, reference.html is simply a sort of
+  | 	  TOC page that doesn't need to get remade if the included
+  | 	  files change. Because output of those included files goes to
+  | 	  separate fo, html, and manpages subdirs, and that output
+  | 	  gets generated by seperate make targets.
+  | 
+  | 	* Makefile: Incorporated slides and website stylesheets into
+  | 	  the build. Note: This currently only affects the "distrib"
+  | 	  (doc) build. So if you don't need to build distrib/doc, you
+  | 	  won't be affected by this change. If you DO need to build
+  | 	  distrib/doc, it will break unless you use the xsl/Makefile
+  | 	  from the "build" branch instead of from the head. This build
+  | 	  alters the distrib build such that: - an xsl/slides
+  | 	  directory is created by copying over the contents of the
+  | 	  slides/xsl - an xsl/website directory is created by copying
+  | 	  over the contents of the website/xsl directory - the
+  | 	  reference.html part of the doc build now adds the slides and
+  | 	  website param reference doc This is an experiment. If we
+  | 	  decide to go ahead with it in the release build, and
+  | 	  everything is found to be OK when it gets out to users and
+  | 	  they test it, then the next step would be to ask SF admin to
+  | 	  move the website/xsl and slides/xsl CVS directory into xsl/
+  | 	  to create xsl/slides and xsl/website, and they would be
+  | 	  maintained in the xsl/ CVS going forward.
+  | 
+  | 2005-02-24  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+  | 	* Makefile: New file.
+  | 
+
+Changes to xsl/docsrc/website/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: New file.
+  | 
+
+Changes to xsl/docsrc/refentry/*
+
+  | 2005-07-05  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: New file.
+  | 
+
+Changes to xsl/slides/keynote/xsltsl/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/slides/graphics/active/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/slides/graphics/inactive/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/slides/graphics/toc/*
+
+  | 2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore: New file.
+  | 
+
+Changes to xsl/doc/slides/html/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: New file.
+  | 
+
+Changes to xsl/docsrc/slides/html/*
+
+  | 2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* .cvsignore, Makefile: New file.
+  | 
+
+Changes to xsl/extensions/saxon643/.classes/*
+
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile.common: revert to MAIN
+  | 
+
+Changes to xsl/extensions/xalan2/.classes/*
+
+  | 2005-05-13  Michael Smith <xmldoc@users.sourceforge.net>
+  | 
+  | 	* Makefile.common: revert to MAIN
+  | 
+

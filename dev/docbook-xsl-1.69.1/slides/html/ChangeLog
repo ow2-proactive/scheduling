@@ -1,0 +1,157 @@
+2005-06-17  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* param.xweb: Added clarification that current params are for HTML output only.
+
+	* param.xweb: And yet more clarifications...
+
+	* param.xweb: Further clarifications.
+
+2005-05-04  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* frames.xsl: escape single quotation marks in ToC for titles and titleabbrev in
+	foilgroup and foil (closes bug #1194308; thanks to Tomas Hajek for
+	reporting the bug)
+
+	* frames.xsl, slides-common.xsl: remove/replace generation of <a name="{$id}"> instances; some were
+	removed because they were redundant and were causing invalid
+	duplicate ID values to be generated; others were replaced by
+	moving the ID and value to the parent (closes bug #1069140; thanks
+	to Emma Jane Hogbin for reporting the problem)
+
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: added ChangLog to .cvsignore files, so that I can do a "cvstrim"
+	without them getting deleted
+
+	* frames.xsl, slides-common.xsl: add meta generator stamp
+
+2005-04-26  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* Makefile: added "clean" targets
+
+2005-04-22  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* frames.xsl: "foilgroup" in filenames instead of "foilgrp" (for clarity and
+	because of report that "filegrp" caused some kind of linking problem
+
+	* slides-common.xsl: Added support for dbhtml dir PI (Tracker #1179044). Thanks to
+	Mauritz Jeanson for the patch. And to M. Sean Gilligan for
+	submitting the original request (on docbook-apps).
+
+2004-09-20  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* slides-common.xsl: Fixed bug #988055. Xrefs are now supported to foil and foilgroup. (You must have the DocBook stylesheets 1.66.2+ to use xrefs.)
+
+2004-03-04  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* frames.xsl, param.xweb, slides-common.xsl: Added new parameter show.foil.number which can enable numbering of slides. Currently works only with frames.xsl and multiframe=0.
+
+	* slides-common.xsl: Added missing class on which CSS stylesheet depends.
+
+2004-01-30  Robert Stayton <bobstayton@users.sourceforge.net>
+
+	* default.xsl: Fixed slides.footer.mode typo.
+
+2003-12-22  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides-common.xsl: Include the VERSION file
+
+2003-12-19  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl, jscript.xsl: Slides #702026: lots of patches to frames.xsl
+
+	* frames.xsl, vslides.xsl: Slides #692247: xhtml fixes. I applied most of them.
+
+	* slides-common.xsl: Parameterized TOC generation a little bit
+
+	* slides-common.xsl: Slides #701973: patches to slides-common.xsl
+
+	* slides-common.xsl: Slides #862918: improve formatting of multiple othercredits in slideinfo
+
+	* slides-common.xsl, tables.xsl, w3c.xsl: Slides #813038: make sure foilgroup toc is inside foilgroup-body
+
+	* tables.xsl, vslides.xsl: Slides #862846: Make toc.bg.color and body.bg.color conditional
+
+	* w3c.xsl: Slides #701941: patches to w3c.xsl
+
+2003-07-11  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* css.xsl: Allow stylesheet name to be passed in
+
+	* flat.xsl: New file.
+
+	* jscript.xsl: Added xbLibrary.js template; use 'javascript' as the language name instead of 'JavaScript1.2'.
+
+	* param.xweb: Added xbLibrary.js variable
+
+	* param.xweb: Add fragref for xbLibrary.js
+
+	* param.xweb: Added foilgroup.toc parameter
+
+	* slides-common.xsl: Don't generate a stylesheet link if there's no stylesheet PI
+
+	* slides-common.xsl: Added links to first and last in navigation; support foilgroup.toc; fixed css.stylesheet bug (calls css-file now, correctly)
+
+	* vslides.xsl: Cleanup running headers and footers
+
+2003-06-23  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* css.xsl: Fixed parameter name
+
+2003-06-22  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* vslides.xsl: Bug #701958: patches for vslides.xsl
+
+2003-06-21  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* css.xsl: Fixed typo -- missing $ before variable name
+
+2003-03-26  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* Makefile: wdocbook.xsl obsoleted by w2docbook.xsl, updated globally
+
+2003-01-25  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* css.xsl: New file.
+
+	* frames.xsl: Make sure there's at least one space in the content of script tags. Some browsers seem to choke on empty-element syntax script tags in XHTML
+
+	* frames.xsl: Bug #671056: Calculate next slide from titlepage correctly
+
+	* graphics.xsl: Make the web the default graphics location
+
+	* jscript.xsl: Make the web the default script location; make sure there's a space in all script elements
+
+	* param.xweb: Added css.stylesheet.dir
+
+	* plain.xsl: Fix graphic paths now that we have a default location
+
+	* slides-common.xsl: Make CSS processing consistent with graphic and script processing; make sure there's a space in script elements
+
+	* vslides.xsl: Fix graphic paths; add spaces in script tags; make CSS consistent with graphics
+
+2002-12-29  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl: Fix bug #655245; make div and a lowercase; add /img (necessary for XHTML and harmless for HTML)
+
+	* frames.xsl: Added support for user and system head content
+
+	* plain.xsl: Point to the web for graphics by default
+
+	* slides-common.xsl: Added system.head template; support stylesheet PIs; use role attribute to get body class
+
+	* slides-common.xsl: Support subtitle
+
+	* w3c.xsl: Use graphics-file template to get graphic name
+
+2002-10-19  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl: Make sure single quotes are escaped in the JavaScript dynamic toc
+
+2002-10-13  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore, Makefile: New file.
+
+	* default.xsl, frames.xsl, graphics.xsl, jscript.xsl, param.xweb, plain.xsl, slides-common.xsl, tables.xsl, vslides.xsl, w3c.xsl: 
+	New file.
+

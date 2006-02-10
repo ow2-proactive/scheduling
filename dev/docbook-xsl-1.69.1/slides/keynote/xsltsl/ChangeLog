@@ -1,0 +1,9 @@
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: New file.
+
+2004-11-10  <balls@users.sourceforge.net>
+
+	* cmp.xsl, date-time.xsl, example.xsl, markup.xsl, math.xsl, node.xsl, stdlib.xsl, string.xsl, svg.xsl, uri.xsl: 
+	New file.
+

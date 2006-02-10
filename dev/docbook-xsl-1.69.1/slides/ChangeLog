@@ -1,0 +1,169 @@
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: ignore ChangeLog so that I can do "cvstrim" without it getting
+	deleted
+
+2005-04-26  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* Makefile: switch to DIRS var / base target setup
+
+2003-07-11  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* Makefile: Make xhtml
+
+2002-10-13  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore, Makefile, fo-plain.xsl, titlepage-fo-plain.xml: 
+	Updated
+
+	* default.xsl, frames.xsl, graphics.xsl, jscript.xsl, param.xweb, plain.xsl, slides-common.xsl, tables.xsl, vslides.xsl, w3c.xsl: 
+	Moved
+
+2002-09-17  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* default.xsl, frames.xsl, param.xweb, plain.xsl, vslides.xsl: 
+	Use html.ext parameter instead of .html for filename extensions
+
+	* slides-common.xsl: Make sure foilgroup gets an html wrapper
+
+	* vslides.xsl: Update graphic references
+
+2002-09-16  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* fo-plain.xsl: Support new page masters; section becomes foilgroup
+
+	* titlepage-fo-plain.xml: Section is now called foilgroup
+
+2002-09-11  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl, slides-common.xsl: Handle footnotes.
+
+2002-06-25  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* default.xsl, frames.xsl, graphics.xsl, param.xweb, plain.xsl, slides-common.xsl, slides.xsl, tables.xsl, vslides.xsl, w3c.xsl: 
+	Nearly complete rewrite; this will become V3.0
+
+2002-06-01  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* graphics.xsl: Remove duplicate parameters; they're now in param.xsl
+
+2002-05-30  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore: Updated
+
+	* frames.xsl: Add visibility to logo overlay style
+
+	* frames.xsl: Add overlay.logo to ToC frame
+
+	* graphics.xsl: Added templates for W3C stylesheet graphics
+
+	* jscript.xsl: Added type attribute to script tags
+
+	* jscript.xsl: Parameters come from param.xsl
+
+	* param.xweb: Added body.bg.color
+
+	* param.xweb: Updated documentation; added overlay.logo parameter
+
+	* slides.xsl: Cleanup
+
+	* tables.xsl: Fix parameters and graphic links
+
+	* vslides.xsl: New file.
+
+	* w3c.xsl: Inherit parameters from slides.xsl; use templates to get graphic filenames
+
+2002-05-29  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore, Makefile, frames.xsl, graphics.xsl, jscript.xsl, param.xweb, slides.xsl: 
+	This is a significant rewrite. The JavaScript is much improved (including some code borrowed from developer.netscape.com) and the whole thing should be cleaner and less idiosyncratic now.
+
+	* slides.xsl: Implement toc.hide.show in a cross-platform manner
+
+2002-05-27  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* tables.xsl: Fix body attributes
+
+2002-05-24  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides.xsl: Generate spaces in the navfooter (for overlay); improve the site navigation links
+
+2002-05-23  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* fo-plain.xsl: Fix master-name/master-reference attributes
+
+	* slides.xsl: Reworked a bunch of code; added (at least the beginnings of) support for overlays; added links for site navigation
+
+	* w3c.xsl: New file.
+
+2002-01-07  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides.xsl: Use gentext to localize 'Table of Contents' in output
+
+2002-01-06  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl: Removed inline CSS stylesheet
+
+	* slides.xsl: Removed unnecessary redefinition of emphasis; added template for link to supply anchor targets
+
+2001-11-09  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* fo-plain.xsl, titlepage-fo-plain.xml: Improved formatting
+
+2001-09-10  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl, slides.xsl: More hacking, mostly. Added support for absolutely positioned footers
+	that works in most browsers and should be harmless in others. This should
+	make it possible to avoid multiframe. Also added "support" for NS6 and
+	IE6. I hope.
+
+2001-07-17  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* frames.xsl, slides.xsl: New parameters multiframe.top.bgcolor, multiframe.bottom.bgcolor for setting background color of navigational frames.
+	New parameter toc.hide.show adds icon for dynamic hiding/showing toc for IE5.
+
+2001-07-10  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl, slides.xsl, tables.xsl: Support base.dir parameter
+
+	* slides.xsl: Bug fix: build NS dynamic TOC correctly even when there are no sections
+
+2001-06-14  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* fo-plain.xsl: Updated include reference
+
+2001-05-11  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl, slides.xsl: Pass prev/next around as parameters so that different navigation strategies can be employed by customizations
+
+2001-04-15  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* frames.xsl: Turn off the NS4, IE5, and multiframe options by default
+
+2001-04-09  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore, Makefile: New file.
+
+	* fo-plain.xsl, titlepage-fo-plain.xml: New file.
+
+	* frames.xsl: Fixed typo
+
+	* frames.xsl: New file.
+
+	* slidechunk.xsl, slidenav.xsl, slidesfo.xsl: Obsolete files
+
+	* slides.xsl: Complete rewrite; this is now the simple, linear, non-framed version
+
+	* tables.xsl: New file.
+
+2001-04-06  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slides.xsl: Support blue Pub PI and fix attribute for the default case
+
+	* slides.xsl: Improve support for titleabbrev in the TOC; suppress speakernotes in the TOC
+
+2001-04-05  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* slidechunk.xsl, slidenav.xsl, slides.xsl, slidesfo.xsl: 
+	New file.
+

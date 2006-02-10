@@ -1,0 +1,51 @@
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: added ChangLog to .cvsignore files, so that I can do a "cvstrim"
+	without them getting deleted
+
+2004-11-05  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* plain.xsl: Use foil properties
+
+2004-09-30  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* plain.xsl: Added attribute-set to easy control appearance of footer
+
+2004-09-24  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* plain.xsl: Added support for foil/subtitle. Bookmarks in XEP can contain i18n characters.
+
+2004-09-20  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* plain-titlepage.xml: Visual tweak
+
+2004-04-25  Jirka Kosek <kosek@users.sourceforge.net>
+
+	* Makefile, plain-titlepage.xml: Changed attribute namespaces accordingly to new schema used for titlepage templates.
+
+2003-12-22  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* plain.xsl: Include the VERSION file
+
+2003-12-19  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* plain.xsl: Make alignment 'start' by default; call foilgroup.titlepage
+
+2003-09-07  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* plain.xsl: Override root.elements for FO publication
+
+2003-01-16  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* plain-titlepage.xml, plain.xsl: Reworked so that it's actually reasonably decent
+
+2002-12-29  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* plain.xsl: Point to base stylesheet via the web
+
+2002-10-13  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore, Makefile: New file.
+
+	* plain-titlepage.xml, plain.xsl: New file.
+

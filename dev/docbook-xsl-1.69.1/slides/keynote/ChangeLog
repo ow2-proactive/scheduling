@@ -1,0 +1,12 @@
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: New file.
+
+2005-04-22  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* ChangeLog: ChangeLog should not be under version control
+
+2004-11-10  <balls@users.sourceforge.net>
+
+	* ChangeLog, default.xsl: New file.
+

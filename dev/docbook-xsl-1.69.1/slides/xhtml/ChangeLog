@@ -1,0 +1,32 @@
+2005-05-04  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: ignore html2xhtml.xsl
+
+	* Makefile, html2xhtml.xsl: remove html2xhtml.xsl from version control and instead make by
+	copying from docbook-xsl html2xhtml.xsl
+
+2005-04-27  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* .cvsignore: added ChangLog to .cvsignore files, so that I can do a "cvstrim"
+	without them getting deleted
+
+	* Makefile: add meta generator stamp
+
+2005-04-26  Michael Smith <xmldoc@users.sourceforge.net>
+
+	* Makefile: added "clean" targets
+
+2003-07-11  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore: Ignore flat.xsl
+
+2003-01-25  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore: Updated
+
+2002-10-13  Norman Walsh <nwalsh@users.sourceforge.net>
+
+	* .cvsignore, Makefile, html2xhtml.xsl: New file.
+
+	* html2xhtml.xsl: Fix typo in rewritten href
+
