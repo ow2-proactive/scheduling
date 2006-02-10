@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 public class ExceptionMaskLevel {
 
     /* Exception types in the catch blocks */
-    private Collection caughtExceptions;
+    private Collection caughtExceptionTypes;
 
     /* Pending futures */
     private int nbFutures;
@@ -73,18 +73,18 @@ public class ExceptionMaskLevel {
                 "At least one exception must be catched");
         }
 
-        caughtExceptions = Arrays.asList(exceptions);
+        caughtExceptionTypes = Arrays.asList(exceptions);
         nbFutures = 0;
         this.parent = parent;
     }
 
     /* Empty constructor for ExceptionHandler */
     ExceptionMaskLevel() {
-        caughtExceptions = new LinkedList();
+        caughtExceptionTypes = new LinkedList();
     }
 
-    boolean isCaught(Class c) {
-        Iterator iter = caughtExceptions.iterator();
+    boolean isExceptionTypeCaught(Class c) {
+        Iterator iter = caughtExceptionTypes.iterator();
         while (iter.hasNext()) {
             Class cc = (Class) iter.next();
             if (cc.isAssignableFrom(c) || c.isAssignableFrom(cc)) {
@@ -96,13 +96,13 @@ public class ExceptionMaskLevel {
     }
 
     /* We do an OR */
-    boolean isCaught(Class[] exceptions) {
-        if (caughtExceptions.isEmpty()) {
+    boolean areExceptionTypesCaught(Class[] exceptions) {
+        if (caughtExceptionTypes.isEmpty()) {
             return false;
         }
 
         for (int i = 0; i < exceptions.length; i++) {
-            if (isCaught(exceptions[i])) {
+            if (isExceptionTypeCaught(exceptions[i])) {
                 return true;
             }
         }
@@ -110,12 +110,12 @@ public class ExceptionMaskLevel {
         return false;
     }
 
-    void addExceptions(ExceptionMaskLevel level) {
-        Iterator iter = level.caughtExceptions.iterator();
+    void addExceptionTypes(ExceptionMaskLevel level) {
+        Iterator iter = level.caughtExceptionTypes.iterator();
         while (iter.hasNext()) {
             Class c = (Class) iter.next();
-            if (!isCaught(c)) {
-                caughtExceptions.add(c);
+            if (!isExceptionTypeCaught(c)) {
+                caughtExceptionTypes.add(c);
             }
         }
 
@@ -154,7 +154,7 @@ public class ExceptionMaskLevel {
         FutureResult res = f.getFutureResult();
 
         NonFunctionalException nfe = res.getNFE();
-        if ((nfe != null) && parent.isCaught(nfe.getClass())) {
+        if ((nfe != null) && parent.isExceptionTypeCaught(nfe.getClass())) {
             parent.setException(nfe);
         }
 

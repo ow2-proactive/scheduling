@@ -102,7 +102,7 @@ public class ExceptionHandler {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             boolean runtime = stack.isRuntimeExceptionHandled();
-            boolean async = stack.isCaught(m.getExceptionTypes());
+            boolean async = stack.areExceptionTypesCaught(m.getExceptionTypes());
             MethodCallMetadata res = new MethodCallMetadata(runtime, async);
 
             //            System.out.println(m + " => " + res);
@@ -123,7 +123,7 @@ public class ExceptionHandler {
 
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
-            if (!stack.isCaught(exception.getClass())) {
+            if (!stack.isExceptionTypeCaught(exception.getClass())) {
                 RuntimeException re = new IllegalStateException(
                         "Invalid Future Usage");
                 re.initCause(exception);

@@ -75,7 +75,7 @@ public class ExceptionMaskStack {
     void push(Class[] exceptions) {
         ExceptionMaskLevel level = new ExceptionMaskLevel(this, exceptions);
         stack.add(0, level);
-        currentExceptionMask.addExceptions(level);
+        currentExceptionMask.addExceptionTypes(level);
         state = STATE_AFTER_PUSH;
     }
 
@@ -101,7 +101,7 @@ public class ExceptionMaskStack {
         Iterator iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-            currentExceptionMask.addExceptions(level);
+            currentExceptionMask.addExceptionTypes(level);
         }
     }
 
@@ -134,7 +134,7 @@ public class ExceptionMaskStack {
         Iterator iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-            if (level.catchRuntimeException() || level.isCaught(c)) {
+            if (level.catchRuntimeException() || level.areExceptionTypesCaught(c)) {
                 return level;
             }
         }
@@ -143,11 +143,11 @@ public class ExceptionMaskStack {
     }
 
     void waitForIntersection(Class[] exceptions) {
-        if (currentExceptionMask.isCaught(exceptions)) {
+        if (currentExceptionMask.areExceptionTypesCaught(exceptions)) {
             Iterator iter = stack.iterator();
             while (iter.hasNext()) {
                 ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-                if (level.isCaught(exceptions)) {
+                if (level.areExceptionTypesCaught(exceptions)) {
                     level.waitForPotentialException();
                 }
             }
@@ -161,12 +161,12 @@ public class ExceptionMaskStack {
         }
     }
 
-    boolean isCaught(Class[] c) {
-        return currentExceptionMask.isCaught(c);
+    boolean areExceptionTypesCaught(Class[] c) {
+        return currentExceptionMask.areExceptionTypesCaught(c);
     }
 
-    boolean isCaught(Class c) {
-        return currentExceptionMask.isCaught(c);
+    boolean isExceptionTypeCaught(Class c) {
+        return currentExceptionMask.isExceptionTypeCaught(c);
     }
 
     boolean isRuntimeExceptionHandled() {
