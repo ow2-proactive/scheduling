@@ -994,11 +994,11 @@
 		<!-- If a needed file doesn't exist, it will be fetched on the web -->
 
 		<classpath>			
-      <!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
-			<!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
-			<pathelement location="/usr/share/docbook-xsl-1.69.1"/>
+                 <!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
+                 <!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
+                        <pathelement location="/usr/share/docbook-xsl-1.69.1"/>
 			<pathelement location="/usr/local/docbook-xsl-1.69.1"/>
-			<pathelement location="${proactive.dir}/dev/docbook-xsl-1.69.1/"/>
+			<pathelement location="${base}/dev/docbook-xsl-1.69.1.zip"/>
  		  <pathelement location="/usr/share/sgml/docbook/xml-dtd-4.2-1.0-25/"/> <!-- For the dtd -->
     </classpath>
 
