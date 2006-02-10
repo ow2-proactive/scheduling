@@ -1,25 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <sect1 id="DocBookExamples">
- 
- <title>Example use of tags </title>
- 
- <para>These are the basic rules to follow to use docbook tags. 
- This document is called DocBookExamples.xml, you may find it 
- with the other files in the 'doc-files' directory</para>
+  <title>Example use of tags</title>
+
+  <para>These are the basic rules to follow to use docbook tags. This document
+  is called DocBookExamples.xml, you may find it with the other files in the
+  'doc-files' directory</para>
+
+  <sect2>
+    <title>Summary of the useful tags</title>
+
+    <para>The main tags/structures you should be using are: </para>
+
+    <itemizedlist>
+      <listitem>
+        <para>&lt;figure&gt; When you want an image</para>
+      </listitem>
+
+      <listitem>
+        <para>&lt;example&gt; when you want an example with a title (should
+        contain a &lt;screen&gt; or &lt;programlisting&gt;)</para>
+      </listitem>
+
+      <listitem>
+        <para>&lt;screen&gt; or &lt;programlisting&gt; for the
+        code/text/descriptor examples</para>
+      </listitem>
+
+      <listitem>
+        <para>&lt;itemizedlist&gt; fooloowed by several &lt;listitem&gt; when
+        you want bullets</para>
+      </listitem>
+
+      <listitem>
+        <para>&lt;link&gt; when you want to refernce another
+        section/chapter/part</para>
+      </listitem>
+
+      <listitem>
+        <para>&lt;ulink&gt; when you want to reference a web url</para>
+      </listitem>
+
+      <listitem>
+        <para>&lt;table&gt; when you want a table</para>
+      </listitem>
+    </itemizedlist>
+
+    <para><emphasis role="bold">BUT, you should always be using the XXE icons.
+    They have all you need (except for EXAMPLE/SCREEN)! You can also cut n
+    paste!</emphasis></para>
+  </sect2>
 
   <sect2 id="Figures">
     <title>Figures</title>
 
-    <para>This is the figure example. Please use the TITLE tag </para>
+    <para>This is the figure example. Please use the TITLE tag</para>
 
     <figure>
       <title>A Drawing using the FIGURE tag</title>
 
       <mediaobject>
-       <imageobject>
-        <imagedata fileref="images/e1.png" format="PNG" align="center"  />
-       </imageobject>
+        <imageobject>
+          <imagedata align="center" fileref="images/e1.png" format="PNG" />
+        </imageobject>
       </mediaobject>
     </figure>
   </sect2>
@@ -48,9 +90,9 @@
   <sect2 id="Code">
     <title>Code</title>
 
-    <para>Code sources can be written between SCREEN tags. You can also
-     use the EXAMPLE TAG around that, to give a title, and be referenced
-     in the table of examples. Watch out, spaces count!</para>
+    <para>Code sources can be written between SCREEN tags. You can also use
+    the EXAMPLE TAG around that, to give a title, and be referenced in the
+    table of examples. Watch out, spaces count!</para>
 
     <screen>TinyHello tiny = (TinyHello) ProActive.newActive(
      TinyHello.class.getName(), // the class to deploy
@@ -87,8 +129,7 @@
   <sect2 id="Tables">
     <title>Tables</title>
 
-    <para>The tables are ugly in pdf output. It should be fixed though, some
-    time soon. The tag to use is TABLE.</para>
+    <para>The tag to use is TABLE.</para>
 
     <table>
       <title>This is an example table</title>
@@ -123,4 +164,3 @@
     </table>
   </sect2>
 </sect1>
-
