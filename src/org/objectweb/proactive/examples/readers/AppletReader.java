@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.examples.readers;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
@@ -37,14 +42,15 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
     public ReadCanvas readerPanel;
     private ReaderDisplay display;
     private javax.swing.JComboBox policy;
-
+    public boolean isActive = true; //By default when the application is launched, R/W activities start.
+    
     public AppletReader(String name, int width, int height) {
         super(name, width, height);
     }
 
     public static void main(String[] arg) {
         ProActiveConfiguration.load();
-        new AppletReader("Reader/Writer", 350, 300);
+        new AppletReader("Reader/Writer", 400, 300);
     }
 
     public void start() {
@@ -68,7 +74,9 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
 
         // Controls
         javax.swing.JPanel pControls = new javax.swing.JPanel(new java.awt.BorderLayout());
-        pControls.add(new javax.swing.JLabel("Synchronization Policy"),
+        javax.swing.JPanel pPolicy = new javax.swing.JPanel(new java.awt.BorderLayout());
+               
+        pPolicy.add(new javax.swing.JLabel("Synchronization Policy"),
             java.awt.BorderLayout.WEST);
         policy = new javax.swing.JComboBox(new String[] {
                     "Even Policy", "Priority to Writers", "Priority to Readers"
@@ -78,8 +86,9 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
                     display.setPolicy(policy.getSelectedIndex());
                 }
             });
-        pControls.add(policy, java.awt.BorderLayout.CENTER);
-
+        pPolicy.add(policy, java.awt.BorderLayout.CENTER);
+    
+        pControls.add(pPolicy, java.awt.BorderLayout.CENTER);
         panel.add(pControls, java.awt.BorderLayout.SOUTH);
         return panel;
     }

@@ -100,8 +100,8 @@ public class ReadCanvas extends javax.swing.JPanel {
         g.fillRect(160, 160, 10, 10); // rouge
 
         g.setColor(Color.black);
-        g.drawString(" : Inactive", 170, 128);
-        g.drawString(" : Waiting", 170, 148);
-        g.drawString(" : Active", 170, 168);
+        g.drawString(" : Available", 170, 128);
+        g.drawString(" : Waiting for Read or Write lock", 170, 148);
+        g.drawString(" : Reading or Writing", 170, 168);
     }
 }
