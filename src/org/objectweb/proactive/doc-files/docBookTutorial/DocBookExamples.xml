@@ -124,7 +124,13 @@
     <para>Use ULINK tags to point to <ulink
     url="http://www-sop.inria.fr/oasis/proactive/">ProActive on the
     web</ulink>, it's good for you!</para>
-  </sect2>
+  
+  <para>Use CITATION followed by an XREF for citations. For example, see 
+   <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation> to learn on groups.
+   <!-- TODO : there should really only be one reference written in the tags, and 
+   xslt parsing should work out the rest --> . 
+     </para>
+ </sect2>
 
   <sect2 id="Tables">
     <title>Tables</title>
@@ -138,29 +144,26 @@
         <tbody>
           <row>
             <entry><para><emphasis role="bold">Name</emphasis></para></entry>
-
             <entry><para><emphasis role="bold">Hits</emphasis></para></entry>
           </row>
 
           <row>
             <entry><para>Bob</para></entry>
-
             <entry><para>5</para></entry>
           </row>
 
           <row>
             <entry><para>Mike</para></entry>
-
             <entry><para>8</para></entry>
           </row>
 
           <row>
             <entry><para>Jude</para></entry>
-
             <entry><para>3</para></entry>
           </row>
         </tbody>
       </tgroup>
     </table>
   </sect2>
-</sect1>
+  
+ </sect1>

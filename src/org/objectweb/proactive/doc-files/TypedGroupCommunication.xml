@@ -4,9 +4,8 @@
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/TypedGroupCommunication.html  -->
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="TypedGroupCommunication_html_overview" />Overview</title>
+  <sect1 remap="h2" id="TypedGroupCommunication_html_overview">
+    <title>Overview</title>
 
     <para>Group communication is a crucial feature for high-performance and
     Grid computing. While previous works and libraries proposed such a
@@ -44,9 +43,8 @@ vg.f1();</programlisting></para>
     
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="TypedGroupCommunication_html_Creation" />Creation of a
-    Group</title>
+  <sect1 remap="h2" id="TypedGroupCommunication_html_Creation" >
+    <title>Creation of a Group</title>
 
     <para>Any object that is reifiable has the ability to be included in a
     group. Groups are created using the static method
@@ -99,9 +97,8 @@ A ag3 = (A) ProActiveGroup.newGroup('A', params[],
     be invoked on the group.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="TypedGroupCommunication_html_repr" />Group
-    representation and manipulation</title>
+  <sect1 remap="h2" id="TypedGroupCommunication_html_repr" >
+    <title>Group representation and manipulation</title>
 
     <para>The <emphasis role="bold">typed group representation</emphasis> we
     have presented corresponds to the functional view of groups of objects. In
@@ -153,9 +150,8 @@ A ag1new = (A) gA.getGroupByType();</programlisting></para>
     
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="TypedGroupCommunication_html_result" />Group as result
-    of group communications</title>
+  <sect1 remap="h2" id="TypedGroupCommunication_html_result">
+    <title>Group as result of group communications</title>
 
     <para>The particularity of our group communication mechanism is that the
     <emphasis role="bold">result</emphasis> of a typed group communication
@@ -205,9 +201,8 @@ ProActiveGroup.waitAll(vg);
     
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="TypedGroupCommunication_html_comms" />Broadcast vs
-    Dispatching</title>
+  <sect1 remap="h2" id="TypedGroupCommunication_html_comms" >
+    <title>Broadcast vs Dispatching</title>
 
     <para>Regarding the parameters of a method call towards a group of
     objects, the default behaviour is to broadcast them to all members. But
@@ -245,11 +240,8 @@ ProActiveGroup.setScatterGroup(gb);
 ag1.foo(gb);</programlisting></para>
     
 
-    <para>To learn more, see the <ulink
-    url="../../../../index.html">JavaDoc</ulink> and the paper <emphasis
-    role="bold">Efficient, Flexible and Typed Group Communications for
-    Java</emphasis> located in the <ulink
-    url="http://www-sop.inria.fr/oasis/ProActive/doc/index.html">Documentation
-    page</ulink>.</para>
+    <para>To learn more, see the <ulink url="../api/index.html">JavaDoc</ulink> and the paper 
+      <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation>.
+     </para>
   </sect1>
 </chapter>

@@ -433,12 +433,10 @@ rvice(body);
     <sect2 remap="h3">
       <title>Activity Determinism</title>
 
-      <para>All the activities of a fault-tolerant application must be
-      deterministic (see <ulink
-      url="http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf">the
-      technical report</ulink> for more details). The programmer must then
-      avoid the use of non-deterministic methods such as
-      <literal>Math.random()</literal>.</para>
+      <para>All the activities of a fault-tolerant application must be deterministic 
+       (see <citation><xref linkend="BCDH04" endterm="BCDH04.abbrev"/></citation> 
+       for more details). The programmer must then avoid the use of non-deterministic 
+       methods such as <literal>Math.random()</literal>.</para>
     </sect2>
 
     <sect2 remap="h3">

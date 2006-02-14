@@ -8,6 +8,7 @@
           <!ENTITY Examples SYSTEM "DocBookExamples.xml">
           <!ENTITY Limitations SYSTEM "Limitations.xml">
           <!ENTITY Customization SYSTEM "Customization.xml">
+          <!ENTITY biblio SYSTEM "../biblio.xml">
           ]>
 
 <article>
@@ -27,6 +28,7 @@
   &Examples;  
   &Limitations;
   &Customization;
+  &biblio;
 <!--  You might add other files here, just don't forget to add the ENTITY  -->
 
 </article>
