@@ -301,10 +301,10 @@ else
     </sect2>
 
     <sect2 remap="h3">
-      <title>Implementing the interfaces directly in the class used to create
-      the active object</title>
+     <title>Implementing the interfaces directly in the class</title>
 
-      <para>This is the easiest solution when you do control the class that
+      <para> Implementing the interfaces directly in the class used to create
+      the active object is the easiest solution when you control the class that
       you make active. Depending on which phase in the life of the active
       object you want to customize, you implement the corresponding interface
       (one or more) amongst <literal>InitActive</literal>,
@@ -312,7 +312,7 @@ else
       an example that has a custom initialization and activity.</para>
 
       <example>
-        <title>Example 1:Custom Init and Run</title>
+        <title>Example 1: Custom Init and Run</title>
 
         <para><programlisting language="java">  import org.objectweb.proactive.*;
   public class A implements InitActive, RunActive {
@@ -339,9 +339,7 @@ else
       </example>
 
       <para><example>
-          <title><emphasis role="bold">Example2:</emphasis><emphasis
-          role="bold">start, stop, suspend, restart</emphasis> a simulation
-          algorithm in runActivity method</title>
+          <title>Example2: start, stop, suspend, restart a simulation algorithm in runActivity method</title>
 
           <para><programlisting language="java">import org.objectweb.proactive.*;
 public class Simulation implements RunActive {
@@ -384,8 +382,7 @@ public class Simulation implements RunActive {
         </example></para>
 
       <example>
-        <title><emphasis role="bold">Example3: Reactive Active
-        Object</emphasis>.</title>
+        <title>Example3: Reactive Active Object.</title>
 
         <para>Even when an AO is busy doing its own work, it can remain
         reactive to external events (method calls). One just has to program
@@ -412,16 +409,16 @@ public void terminate (){ hasToTerminate=true;}
     </sect2>
 
     <sect2 remap="h3">
-      <title>Passing an object implementing the interfaces when creating the
-      active object</title>
+      <title>Passing an object implementing the interfaces at creation-time</title>
 
-      <para>This is the solution to use when you do not control the class that
+      <para>Passing an object implementing the interfaces when creating the
+      active object is the solution to use when you do not control the class that
       you make active or when you want to write generic activities policy and
       reused them with several active objects. Depending on which phase in the
       life of the active object you want to customize, you implement the
       corresponding interface (one or more) amongst
       <literal>InitActive</literal>, <literal>RunActive</literal> and
-      <literal>EndActive</literal>. Here an example that has a custom
+      <literal>EndActive</literal>. Following is an example that has a custom
       activity.</para>
 
       <para>Comparing to the solution above where interfaces are directly
@@ -461,9 +458,8 @@ public void terminate (){ hasToTerminate=true;}
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="ActiveObjectCreation_html_restrictions" />Restrictions
-    on reifiable objects</title>
+  <sect1 remap="h2" id="ActiveObjectCreation_html_restrictions">
+    <title>Restrictions on reifiable objects</title>
 
     <para>Not all classes can give birth to active objects. There exist some
     restrictions, most of them caused by the 100% Java compliance, which
@@ -1409,9 +1405,11 @@ if(result_from_method == null){
     </sect2>
 
     <sect2 remap="h3">
-      <title>Illustration of an Automatic Continuation with a future passed as
-      parameter</title>
-
+      <title>Illustration of an Automatic Continuation </title>
+      
+      <para>We will illustrate here how a future is first created, 
+       then passed as parameter to a method later on.</para>
+      
       <para><informalfigure>
           <mediaobject>
             <imageobject>

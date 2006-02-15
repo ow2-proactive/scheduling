@@ -4,16 +4,17 @@
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/p2p.html  -->
 
-  <sect1 remap="h2">
+  <sect1 remap="h2" >
     <title><anchor id="mozTocId121981" />Overview</title>
-
+    
     <para>Computational Peer-To-Peer (P2P) is becoming a key execution
     environment. The potential of 100,000 nodes interconnected to execute a
     single application is rather appealing, especially for Grid computing.
     Mimicking data P2P, one could start a computation that no failure would
     ever be able to stop (and maybe nobody).</para>
 
-    <para>The ProActive P2P aims to use spare CPU cycles from organization's
+    <para>
+     The ProActive P2P aims to use spare CPU cycles from organization's
     or institution's desktop workstations.</para>
 
     <para>This short document explains how to create a simple computational
@@ -29,14 +30,15 @@
 
     <para><figure>
         <title>A network of hosts with some running the P2P Service</title>
+        <caption> Example of a ProActive P2P infrastructure.</caption>
 
         <mediaobject>
           <imageobject>
             <imagedata fileref="p2p_files/overlaynetwork.png" format="PNG" />
           </imageobject>
         </mediaobject>
-      </figure> <emphasis role="bold">Example of a ProActive P2P
-    infrastructure.</emphasis></para>
+      </figure> 
+     </para>
 
     <para>When the P2P infrastructure is running, it is very easy to obtain
     some nodes (JVMs). The next section describes how to use it.</para>

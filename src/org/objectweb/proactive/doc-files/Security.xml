@@ -82,8 +82,10 @@
     </sect2>
 
     <sect2 remap="h3">
-      <title>Security is expressed at different level according to who wants
-      to set policy:</title>
+     <title>Security is expressed at different levels</title>
+     
+     <para>Security is expressed at different levels, according to who wants
+      to set policy:</para>
 
       <itemizedlist>
         <listitem>

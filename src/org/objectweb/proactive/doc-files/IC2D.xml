@@ -101,7 +101,7 @@
 
     <para><figure>
         <title>A 'drag-and-drop' migration allows to graphically move running
-        active objects between machines.</title>
+        active objects</title>
 
         <mediaobject>
           <imageobject>
@@ -331,9 +331,8 @@
     Nice France on a globus cluster and LSF cluster</para>
 
     <figure>
-      <title>C3D, deployed with JINI and RMI, between Baltimore US and Nice
-      France, on a globus cluster and LSF cluster</title>
-
+      <title>C3D, deployed with JINI and RMI, between Baltimore (USA) and Nice (France)</title>
+      <caption>This is between a globus cluster and an LSF cluster</caption>
       <mediaobject>
         <imageobject>
           <imagedata fileref="images/clusterLogo.png" format="PNG" />

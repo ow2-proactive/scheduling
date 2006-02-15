@@ -26,14 +26,13 @@
  parallel component. As we use the typed groups API of ProActive, coupled with the concept of
  internal collective interfaces of Fractal, the communications to the enclosed components are
  either <emphasis>scattered</emphasis> or <emphasis>broadcasted</emphasis>. The following figure sums up the
- different kinds of components available.</para>
+ different kinds of components available. </para>
         </listitem>
 </itemizedlist>
       <para>
         <figure>
-         <title>The different kinds of components with the ProActive
-          implementation. Primitive components have customizable activities 
-          (primitive components are also active objects)</title>
+         <title>The different kinds of components with the ProActive implementation. </title>
+         <caption>Primitive components have customizable activities (primitive components are also active objects)</caption>
           <mediaobject>
             <imageobject>
               <imagedata  fileref="components/pics/kinds-of-components.png" format="PNG"/>           
