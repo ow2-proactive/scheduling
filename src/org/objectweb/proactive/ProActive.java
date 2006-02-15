@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.util.Collection;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -1648,29 +1649,24 @@ public class ProActive {
     /**
      * Kill an Active Object while calling terminate() method on its body.
      * @param ao the active object to kill
-     * @param immediate if this boolean is true, this method is served as an immediate service. 
-     * The active object dies immediatly. Else, the kill request is served as a normal request, it 
-     * is put on the request queue. 
-     * @throws  
+     * @param immediate if this boolean is true, this method is served as an immediate service.
+     * The active object dies immediatly. Else, the kill request is served as a normal request, it
+     * is put on the request queue.
+     * @throws
      */
     public static void terminateActiveObject(Object ao, boolean immediate) {
-    	
-    	Proxy proxy = ((StubObject)ao).getProxy(); 
-    	try {
-    		if(immediate) { 
-    			NonFunctionalServices.terminateAOImmediatly(proxy);
-    		}else {
-    			NonFunctionalServices.terminateAO(proxy);
-    		}   
-    	} catch (Throwable e) {
-    		e.printStackTrace();
-    	}			
-    	
+        Proxy proxy = ((StubObject) ao).getProxy();
+        try {
+            if (immediate) {
+                NonFunctionalServices.terminateAOImmediatly(proxy);
+            } else {
+                NonFunctionalServices.terminateAO(proxy);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
-    
-    
-    
-    
+
     /**
      * Set an immediate execution for the target active object obj of the method String,
      * ie request of name methodName will be executed right away upon arrival at the target
@@ -2042,5 +2038,16 @@ public class ProActive {
     public static void removeNFEListenerOnGroup(Object group,
         NFEListener listener) {
         getGroupProxy(group).removeNFEListener(listener);
+    }
+
+    /**
+     * Get the exceptions that have been caught in the current
+     * ProActive.tryWithCatch()/ProActive.removeTryWithCatch()
+     * block.
+     * 
+     * @return a collection of these exceptions
+     */
+    public static Collection getCaughtExceptions() {
+        return ExceptionHandler.getCaughtExceptions();
     }
 }

@@ -45,6 +45,9 @@ public class ExceptionMaskLevel {
     /* Exception types in the catch blocks */
     private Collection caughtExceptionTypes;
 
+    /* Actual caught exceptions in this level */
+    private Collection caughtExceptions;
+
     /* Pending futures */
     private int nbFutures;
 
@@ -74,6 +77,7 @@ public class ExceptionMaskLevel {
         }
 
         caughtExceptionTypes = Arrays.asList(exceptions);
+        caughtExceptions = new LinkedList();
         nbFutures = 0;
         this.parent = parent;
     }
@@ -154,15 +158,21 @@ public class ExceptionMaskLevel {
         FutureResult res = f.getFutureResult();
 
         NonFunctionalException nfe = res.getNFE();
-        if ((nfe != null) && parent.isExceptionTypeCaught(nfe.getClass())) {
+        if ((nfe != null) && isExceptionTypeCaught(nfe.getClass())) {
             parent.setException(nfe);
+            caughtExceptions.add(nfe);
         }
 
         Throwable exception = f.getFutureResult().getExceptionToRaise();
         if (exception != null) {
             parent.setException(exception);
+            caughtExceptions.add(exception);
         }
 
         notifyAll();
+    }
+
+    public Collection getCaughtExceptions() {
+        return caughtExceptions;
     }
 }

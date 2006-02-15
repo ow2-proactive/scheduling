@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.exceptions.manager;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -66,14 +67,20 @@ public class ExceptionHandler {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             stack.waitForPotentialException(false);
-            stack.pop();
         }
     }
 
     public static void removeTryWithCatch() {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
-            stack.fixupPop();
+            stack.pop();
+        }
+    }
+
+    public static Collection getCaughtExceptions() {
+        ExceptionMaskStack stack = ExceptionMaskStack.get();
+        synchronized (stack) {
+            return stack.getCaughtExceptions();
         }
     }
 

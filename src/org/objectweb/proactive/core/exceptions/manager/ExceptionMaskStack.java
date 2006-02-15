@@ -30,16 +30,13 @@
  */
 package org.objectweb.proactive.core.exceptions.manager;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 
 
 public class ExceptionMaskStack {
-
-    /* This state is used to know if the fix in the finally block is needed */
-    private static final int STATE_AFTER_PUSH = 0;
-    private static final int STATE_AFTER_POP = 1;
-    private int state;
 
     /* List of ExceptionMaskLevel, starts with the top */
     private LinkedList stack;
@@ -50,8 +47,10 @@ public class ExceptionMaskStack {
     /* The potential pending exception */
     private Throwable currentException;
 
+    /* Exceptions caught in the current or previous level */
+    private Collection caughtExceptions;
+
     private ExceptionMaskStack() {
-        state = STATE_AFTER_POP;
         stack = new LinkedList();
         currentExceptionMask = new ExceptionMaskLevel();
     }
@@ -76,7 +75,7 @@ public class ExceptionMaskStack {
         ExceptionMaskLevel level = new ExceptionMaskLevel(this, exceptions);
         stack.add(0, level);
         currentExceptionMask.addExceptionTypes(level);
-        state = STATE_AFTER_PUSH;
+        caughtExceptions = level.getCaughtExceptions();
     }
 
     void pop() {
@@ -84,15 +83,8 @@ public class ExceptionMaskStack {
             throw new IllegalStateException("The stack has nothing to pop");
         }
 
-        stack.removeFirst();
+        caughtExceptions = ((ExceptionMaskLevel) stack.removeFirst()).getCaughtExceptions();
         updateExceptionMask();
-        state = STATE_AFTER_POP;
-    }
-
-    void fixupPop() {
-        if (state == STATE_AFTER_PUSH) {
-            pop();
-        }
     }
 
     /* Recompute the full mask */
@@ -114,7 +106,11 @@ public class ExceptionMaskStack {
     }
 
     private ExceptionMaskLevel getTopLevel() {
-        return (ExceptionMaskLevel) stack.getFirst();
+        try {
+            return (ExceptionMaskLevel) stack.getFirst();
+        } catch (NoSuchElementException nsee) {
+            throw new IllegalStateException("Exception stack is empty");
+        }
     }
 
     void waitForPotentialException(boolean allLevels) {
@@ -134,7 +130,8 @@ public class ExceptionMaskStack {
         Iterator iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
-            if (level.catchRuntimeException() || level.areExceptionTypesCaught(c)) {
+            if (level.catchRuntimeException() ||
+                    level.areExceptionTypesCaught(c)) {
                 return level;
             }
         }
@@ -171,5 +168,9 @@ public class ExceptionMaskStack {
 
     boolean isRuntimeExceptionHandled() {
         return currentExceptionMask.catchRuntimeException();
+    }
+
+    Collection getCaughtExceptions() {
+        return getTopLevel().getCaughtExceptions();
     }
 }
