@@ -83,7 +83,7 @@ public class Ring extends TopologyGroup { // implements Topology1D {
         if (position != 0) {
             return this.get(position - 1);
         } else {
-            return this.get(this.getWidth());
+            return this.get(this.getWidth() - 1);
         }
     }
 
@@ -94,7 +94,7 @@ public class Ring extends TopologyGroup { // implements Topology1D {
      */
     public Object right(Object o) {
         int position = this.indexOf(o);
-        if (position != this.getWidth()) {
+        if (position != this.getWidth() - 1) {
             return this.get(position + 1);
         } else {
             return this.get(0);
