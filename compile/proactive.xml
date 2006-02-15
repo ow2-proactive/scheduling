@@ -445,6 +445,7 @@
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
+				<exclude name="${proactive.dir}/doc-files/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
 			</fileset>
 		</jar>
@@ -518,6 +519,7 @@
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
+				<exclude name="${proactive.dir}/doc-files/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
 			</fileset>
 		</jar>
@@ -540,6 +542,7 @@
 				<include name="descriptors/**"/>
 				<include name="p2p/**" />
 				<exclude name="p2p/config/inria/**" />
+				<exclude name="${proactive.dir}/doc-files/**"/>
                 <exclude name="**/.svn" />
 			</fileset>
 		</copy>
@@ -552,7 +555,7 @@
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**"/>
 				<exclude name="compile/**"/>
-        <exclude name="docs/howto/**"/>
+    <exclude name="docs/howto/**"/>
 			</zipfileset>
 		</zip>
 		<!-- 
@@ -566,7 +569,7 @@
 		-->
 		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs">
-         <exclude name="docs/howto/**"/>
+      <exclude name="docs/howto/**"/>
 		  </zipfileset>
 		</zip>
 		<!--
@@ -998,7 +1001,7 @@
                  <!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
                         <pathelement location="/usr/share/docbook-xsl-1.69.1"/>
 			<pathelement location="/usr/local/docbook-xsl-1.69.1"/>
-			<pathelement location="${base}/dev/docbook-xsl-1.69.1.zip"/>
+			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip"/>
  		  <pathelement location="/usr/share/sgml/docbook/xml-dtd-4.2-1.0-25/"/> <!-- For the dtd -->
     </classpath>
 
@@ -1030,6 +1033,9 @@
         <fileset dir="${lib}">
             <include name="**/*.jar"/>
          </fileset>
+        <fileset dir="${base}/dev/lib">
+            <include name="**/*.jar"/>
+         </fileset>
 				</classpath>
 			</xslt>
 		</target>
@@ -1037,12 +1043,11 @@
 	  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop"  
 		  description="Official way to translate .fo (result of xml docbook translation) into .pdf">
 	         <classpath>
-	            <pathelement location="${lib}/fop.jar"/>
-              <pathelement location="${lib}/jimi.zip"/>
-	            <pathelement location="${lib}/avalon.jar"/>
-              <pathelement location="${lib}/batik.jar"/>
+	            <pathelement location="${base}/dev/lib/docbook/fop.jar"/>
+              <pathelement location="${base}/dev/lib/docbook/jimi.zip"/>
+	            <pathelement location="${base}/dev/lib/docbook/avalon.jar"/>
+              <pathelement location="${base}/dev/lib/docbook/batik.jar"/>
               <pathelement location="${lib}/ws/commons-logging.jar"/>
-              <pathelement location="${lib}/commons-io.jar"/>
 	         </classpath>
 	  </taskdef>
 
