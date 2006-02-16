@@ -18,7 +18,7 @@
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/proActiveModelColor.png" format="PNG"
-                       width="6in" />
+                       contentwidth="100" width="6in"/>
           </imageobject>
         </mediaobject>
       </figure></para>

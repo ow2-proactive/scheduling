@@ -72,7 +72,7 @@
         <mediaobject>
           <imageobject>
             <imagedata fileref="webservices/provider_en.png" format="PNG"
-                       width="6in" />
+                       contentwidth="100" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -388,7 +388,7 @@ string s = hw.helloWorld ();
           <mediaobject>
             <imageobject>
               <imagedata fileref="webservices/dispatcher_en.png" format="PNG"
-                         width="6in" />
+                         contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -419,7 +419,7 @@ string s = hw.helloWorld ();
           <mediaobject>
             <imageobject>
               <imagedata fileref="webservices/scc3djava.png" format="PNG"
-                         width="6in" />
+                         contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure> <figure>
@@ -429,7 +429,7 @@ string s = hw.helloWorld ();
           <mediaobject>
             <imageobject>
               <imagedata fileref="webservices/scC3dcs.png" format="PNG"
-                         width="6in" />
+                         contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>

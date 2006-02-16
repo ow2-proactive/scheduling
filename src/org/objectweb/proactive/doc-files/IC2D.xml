@@ -115,7 +115,7 @@
 
       <mediaobject>
         <imageobject>
-         <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" width="6in"/>
+         <imagedata fileref="images/ic2d_migrate_witharrow.png" format="PNG" contentwidth="100" width="6in"/>
         </imageobject>
       </mediaobject>
     </figure>
@@ -294,7 +294,7 @@
 
           <mediaobject>
             <imageobject>
-               <imagedata fileref="images/launcher_menu.png" format="PNG"  width="6in"/>
+               <imagedata fileref="images/launcher_menu.png" format="PNG"  contentwidth="100" width="6in"/>
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -310,7 +310,7 @@
 
           <mediaobject>
             <imageobject>
-               <imagedata fileref="images/launcher_frame.png" format="PNG"  width="6in"/>
+               <imagedata fileref="images/launcher_frame.png" format="PNG"  contentwidth="100" width="6in"/>
             </imageobject>
           </mediaobject>
         </figure></para>

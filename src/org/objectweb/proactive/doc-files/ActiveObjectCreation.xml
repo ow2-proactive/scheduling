@@ -660,7 +660,7 @@ public void terminate (){ hasToTerminate=true;}
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/activeObjectComponents.png"
-                       format="PNG" width="6in" />
+                       format="PNG" contentwidth="100" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -1045,7 +1045,7 @@ public void terminate (){ hasToTerminate=true;}
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/activeObjectComponents.png"
-                               format="PNG" width="6in" />
+                               format="PNG" contentwidth="100" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1066,7 +1066,7 @@ public void terminate (){ hasToTerminate=true;}
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectComponents.png"
-                               format="PNG" width="6in" />
+                               format="PNG" contentwidth="100" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1085,7 +1085,7 @@ public void terminate (){ hasToTerminate=true;}
                 <mediaobject>
                   <imageobject>
                     <imagedata fileref="images/futureObjectAllComponents.png"
-                               format="PNG" width="6in" />
+                               format="PNG" contentwidth="100" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1155,7 +1155,7 @@ public void terminate (){ hasToTerminate=true;}
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG" width="6in" />
+                           format="PNG" contentwidth="100" width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1170,7 +1170,7 @@ public void terminate (){ hasToTerminate=true;}
             <mediaobject>
               <imageobject>
                 <imagedata fileref="images/usingFutureBeforeGettingResultDiagram.png"
-                           format="PNG" width="6in" />
+                           format="PNG" contentwidth="100" width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1474,7 +1474,7 @@ if(result_from_method == null){
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e6.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e6.png" format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1485,7 +1485,7 @@ if(result_from_method == null){
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e7.png" format="PNG" width="6in" />
+              <imagedata fileref="images/e7.png" format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>

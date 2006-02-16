@@ -83,7 +83,7 @@
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/bnb_api_archi.png" format="PNG"
-                       width="6in" />
+                       contentwidth="100" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -124,7 +124,7 @@
         <mediaobject>
           <imageobject>
             <imagedata fileref="images/bnb_api_com.png" format="PNG"
-                       width="6in" />
+                       contentwidth="100" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
