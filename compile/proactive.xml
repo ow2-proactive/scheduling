@@ -1085,7 +1085,6 @@
 	    <param name="docbookOutputFile" value="${bigHtmlFileName}"/>
 	    <param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl"/>
 	   </antcall> 
-	 
 	</target>
 
 		<target name="manual" description="Build the manual, through the docbook processing stages">
@@ -1100,21 +1099,10 @@
       <copy toDir="${docs.dir}/html/">
 		      <fileset dir="${doc.src}">
 		       <include name="**/*.png"/>
+		       <include name="**/*.jpg"/>
 		       <include name="ProActive.css"/>
 		      </fileset>
 		  </copy>
- 
-      <!--  Build the titlepage specs - but is the output dir correct ? -->
-			<antcall target="transformDocbook">
-        <param name="docbookInputFile" value="${doc.src}/xsl/html.titlepage.templates.xml"   />
-        <param name="docbookOutputFile" value="${doc.src}/xsl/html.titlepage.xsl"   />
-        <param name="docbookStyle" value="${doc.src}/xsl/titlepage.templates.xsl"   />
-      </antcall>
-			<antcall target="transformDocbook">
-        <param name="docbookInputFile" value="${doc.src}/xsl/pdf.titlepage.templates.xml"   />
-        <param name="docbookOutputFile" value="${doc.src}/xsl/pdf.titlepage.xsl"   />
-        <param name="docbookStyle" value="${doc.src}/xsl/titlepage.templates.xsl"   />
-      </antcall>
  
 			<!-- Second do the real ProActive docs -->
       <antcall target="docbook-chain">

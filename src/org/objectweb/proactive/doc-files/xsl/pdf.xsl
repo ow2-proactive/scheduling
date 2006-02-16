@@ -7,7 +7,6 @@
 
 <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl"/>
 <xsl:import href="common.xsl"/>
-<xsl:import href="pdf.titlepage.xsl"/>
 
 <!--  Changing font sizes -->
 <!-- <xsl:param name="body.font.family">Times New Roman</xsl:param>  -->
@@ -236,7 +235,7 @@
    <!-- <xsl:attribute name="padding">4mm</xsl:attribute> -->
 </xsl:attribute-set>
 
-<!-- Oups, cheating for the titlepage templates -->
+<!-- Changing the first page appearance -->
 <xsl:template name="book.titlepage.recto">
   <fo:block>
     <fo:table inline-progression-dimension="100%" table-layout="fixed">

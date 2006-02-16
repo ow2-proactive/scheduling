@@ -8,7 +8,6 @@
 <!-- Load the "several html chunks" style sheet -->
 <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl"/>
 <xsl:import href="html.xsl"/>
-<xsl:import href="html.titlepage.xsl"/>
 
 <!-- Use chapter ids for html filenames -->
 <xsl:param name="use.id.as.filename">1</xsl:param>
@@ -166,6 +165,7 @@ It's the line containing the title of the page -->
 <xsl:template name="datetime.format"> </xsl:template>
 <xsl:template name="anchor"> </xsl:template>
 <xsl:template name="component.title"> </xsl:template>-->
+
  
 </xsl:stylesheet>
 

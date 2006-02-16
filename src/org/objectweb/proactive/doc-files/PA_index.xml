@@ -74,12 +74,10 @@
     </mediaobject>
 
     
-    <revhistory>
       <revision>
         <revnumber>3.01</revnumber>
         <date>2005-12-16</date>
       </revision>
-    </revhistory>
 
     <abstract>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis

@@ -8,9 +8,6 @@
 <!-- Say we need the "one single html file" style -->
 <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl"/>  
 <xsl:import href="html.xsl"/>
-<xsl:import href="html.titlepage.xsl"/>
-
-
 
 <!--  Changing font sizes -->
 <xsl:param name="body.font.family">Times New Roman</xsl:param> 
@@ -33,22 +30,6 @@
 
 <!-- Just use the image size for the html output. Width=... has no effect. -->
 <xsl:param name="ignore.image.scaling">1</xsl:param> 
-
-<!-- Redefining the corporate authors, by adding a picture just after the string. 
-This should not be done this way. The media object should have been in the corpauthor block. -->
-<xsl:template match="corpauthor" mode="book.titlepage.recto.mode">
-    <br/>  
-    <xsl:apply-templates mode="titlepage.mode"/>
-    <br/>
-    <div style="margin-left: 40px;">
-    <img> 
-        <xsl:attribute name="src">  <xsl:copy-of select="$threeinstitutes.image.filename"/> </xsl:attribute>
-        <xsl:attribute name="alt">A CNRS-INRIA-UNSA Research team</xsl:attribute>
-        <xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
-    </img>
-    </div>
-    <br/>  
-</xsl:template>
 
 <xsl:template match="legalnotice" mode="titlepage.mode">
   <xsl:variable name="id"><xsl:call-template name="object.id"/></xsl:variable>
