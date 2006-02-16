@@ -57,7 +57,7 @@ This should not be done this way. The media object should have been in the corpa
            <img> 
              <xsl:attribute name="src"> <xsl:copy-of select="$objectweb.image.filename"/> </xsl:attribute>
              <xsl:attribute name="alt">ObjectWeb</xsl:attribute>
-             <xsl:attribute name="title">ObjectWeb</xsl:attribute>
+             <xsl:attribute name="title">A project of the ObjectWeb Consortium</xsl:attribute>
            </img>
           </a>
         </td>
@@ -71,7 +71,9 @@ This should not be done this way. The media object should have been in the corpa
   <!-- The Main Title -->
     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/mediaobject"/>
   <!-- The Subtitle -->
+    <table><tbody><tr><td>
     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/subtitle"/>
+    </td></tr></tbody></table>
   <!-- The authors -->
     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/author"/>
   <!-- TODO: The Logos -->
@@ -91,5 +93,52 @@ This should not be done this way. The media object should have been in the corpa
   <!-- The abstract -->
     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/abstract"/>
 </xsl:template>
+
+<!-- Customizing a little more the TOC PART appearance -->
+<xsl:template name="toc.line">
+  <xsl:param name="toc-context" select="."/>
+  <xsl:param name="depth" select="1"/>
+  <xsl:param name="depth.from.context" select="8"/>
+
+  <xsl:variable name="localname" select="local-name(.)"/>
+
+  <xsl:variable name="thelink" >
+ <span>
+  <xsl:attribute name="class">
+           <xsl:copy-of select="$localname"/>
+  </xsl:attribute>
+  <a>
+    <xsl:attribute name="href">
+      <xsl:call-template name="href.target">
+        <xsl:with-param name="context" select="$toc-context"/>
+      </xsl:call-template>
+    </xsl:attribute>
+    
+    <xsl:variable name="label">
+      <xsl:apply-templates select="." mode="label.markup"/>
+    </xsl:variable>
+    <xsl:copy-of select="$label"/>
+    <xsl:if test="$label != ''">
+      <xsl:value-of select="$autotoc.label.separator"/>
+    </xsl:if>
+
+    <xsl:apply-templates select="." mode="titleabbrev.markup"/>
+  </a>
+  </span>
+</xsl:variable >
+
+   <xsl:choose>
+     <xsl:when test="$localname = 'part'">
+          <h2>
+          <xsl:copy-of select="$thelink"/>
+          </h2>
+     </xsl:when>
+     <xsl:otherwise>
+     <xsl:copy-of select="$thelink"/>
+     </xsl:otherwise> 
+   </xsl:choose>
+
+</xsl:template>
+
 
 </xsl:stylesheet>
