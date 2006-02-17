@@ -48,6 +48,7 @@
 			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestAPI" />
 			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestDeployRetrieve" />
 			<unitTest exclude="yes" class="nonregressiontest.filetransfer.TestAPINotLocal" /> <!-- Skip since it is not really a local test -->
+			<unitTest exclude="no" class="nonregressiontest.mpi.TestMPISpmd"/>
 			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.onewaycall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.asynchronouscall.Test" />
@@ -87,7 +88,7 @@
 			<unitTest exclude="yes" class="nonregressiontest.security.keygeneration.SecurityTestKeyGen"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
-		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>		
+		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>
 	</packageGroup>
 	
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
