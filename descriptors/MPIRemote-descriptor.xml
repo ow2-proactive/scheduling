@@ -3,10 +3,9 @@
 	<variables>
 		<DescriptorVariable name="PROACTIVE_HOME" value="ProActive"/>
 		<DescriptorVariable name="REMOTE_HOME" value="/home/smariani"/>
-		<DescriptorVariable name="HOSTS_NUMBER" value="3"/>
 		<DescriptorVariable name="MPIRUN_PATH" value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun"/>
 		<DescriptorVariable name="QSUB_PATH" value="/opt/torque/bin/qsub"/>
-		<JavaPropertyVariable name="USER_HOME" value="java.home"/>
+		<DescriptorVariable name="USER_HOME" value="/user/smariani/home"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -81,9 +80,9 @@
 			<processDefinition id="pbsProcess">
 				<pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess">
 					<processReference refid="localJVM1" />
-					<commandPath value=${QSUB_PATH} />
+					<commandPath value="${QSUB_PATH}" />
 					<pbsOption>
-						<hostsNumber>${HOSTS_NUMBER}</hostsNumber>
+						<hostsNumber>3</hostsNumber>
 						<processorPerNode>1</processorPerNode>
 						<bookingDuration>00:02:00</bookingDuration>
 						<scriptPath>
@@ -96,9 +95,9 @@
 			<!-- mpi Process -->
 			<processDefinition id="mpiCPI">
 				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi">
-					<commandPath value=${MPIRUN_PATH} />
+					<commandPath value="${MPIRUN_PATH}" />
 					<mpiOptions>
-						<processNumber>${HOSTS_NUMBER}</processNumber>
+						<processNumber>3</processNumber>
 						<localRelativePath>
 							<relativePath origin="user.home" value="${PROACTIVE_HOME}/scripts/unix" />
 						</localRelativePath>
@@ -111,7 +110,7 @@
 
 			<!-- dependent process -->
 			<processDefinition id="dpsCPI">
-				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcessDecorator">
+				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="pbsProcess" />
 					<processReference refid="mpiCPI" />
 				</dependentProcessSequence>
@@ -121,13 +120,7 @@
 			<processDefinition id="sshProcess">
 				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="nef.inria.fr" username="smariani">
 					<processReference refid="dpsCPI" />
-					<FileTransferDeploy refid="transfer">
-						<copyProtocol>scp</copyProtocol>
-						<!-- local host path -->
-						<sourceInfo prefix="${USER_HOME}/${PROACTIVE_HOME}/src/org/objectweb/proactive/examples/mpi" />
-						<!-- remote host path -->
-						<destinationInfo prefix="${REMOTE_HOME}/MyApp" />
-					</FileTransferDeploy>
+				
 				</sshProcess>
 			</processDefinition>
 		</processes>

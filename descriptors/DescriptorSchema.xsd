@@ -1267,7 +1267,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" ref="processReference"/>
 		</xs:sequence>
-		<xs:attribute fixed="org.objectweb.proactive.core.process.DependentListProcessDecorator" name="class" type="xs:string" use="required"/>
+		<xs:attribute fixed="org.objectweb.proactive.core.process.DependentListProcess" name="class" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!-- end of dependentProcessSequenceType -->
 	<!-- independentProcessSequenceType -->
@@ -1275,7 +1275,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" ref="processReference"/>
 		</xs:sequence>
-		<xs:attribute fixed="org.objectweb.proactive.core.process.IndependentListProcessDecorator" name="class" type="xs:string" use="required"/>
+		<xs:attribute fixed="org.objectweb.proactive.core.process.IndependentListProcess" name="class" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!-- end of independentProcessSequenceType -->
 </xs:schema>

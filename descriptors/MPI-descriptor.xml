@@ -48,7 +48,7 @@
 				
 			<!-- DEPENDENT PROCESSES -->
 			<processDefinition id="dpsLocalProcess">
-				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcessDecorator">
+				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="localJVM" />
 					<processReference refid="mpiCPI" />
 				</dependentProcessSequence>
