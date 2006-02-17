@@ -111,7 +111,7 @@
 
 			<!-- dependent process -->
 			<processDefinition id="dpsCPI">
-				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcessDecorator">
+				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="pbsProcess" />
 					<processReference refid="mpiCPI" />
 				</dependentProcessSequence>
