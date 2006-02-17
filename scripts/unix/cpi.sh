@@ -26,7 +26,7 @@ fi
 
 XMLDESCRIPTOR=$PROACTIVE/descriptors/MPI-descriptor.xml
 
-$JAVACMD -classpath $CLASSPATH -Dproactive.rmi.port=6099 org.objectweb.proactive.examples.mpi.Cpi  $XMLDESCRIPTOR 
+$JAVACMD -classpath $CLASSPATH -Dlog4j.configuration=file:$PROACTIVE/compile/proactive-log4j -Dproactive.rmi.port=6099 org.objectweb.proactive.examples.mpi.Cpi  $XMLDESCRIPTOR 
 
 echo "Killing lam daemon..."
 killall lamd

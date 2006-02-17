@@ -45,9 +45,6 @@ import org.objectweb.proactive.mpi.*;
 /**
  *  This example uses a simple mpi program (cpi) which calculates
  *  an approximation of PI number on localhost.
- *  One purpose is the possibility to launch several times consecutively
- *  this program just by calling the startMPI() method on the virtualnode
- *  which with the MPI program is associated.
  *  It permitts to manage as many MPI program as the user define some virtual nodes.
  *
  */
@@ -73,19 +70,10 @@ public class Cpi {
             vnCpi = pad.getVirtualNode("CPI");
             vnCpi.activate();
 
-            MPISpmd mpiSpmd = MPI.createMPISPMDObject(vnCpi);
-            System.out.println(mpiSpmd);
-
-            mpiSpmd.startMPI();
-
-            mpiSpmd.waitFor();
-
-            System.out.println(" Return Value : " + mpiSpmd.getReturnValue());
-
-            System.out.println(mpiSpmd);
-
+            MPISpmd mpiSpmd_01 = MPI.newMPISpmd(vnCpi);
+            MPIResult res = mpiSpmd_01.startMPI();
+            logger.info("Result value: " + res.getReturnValue());
             vnCpi.killAll(false);
-            System.exit(0);
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
