@@ -30,23 +30,12 @@
  */
 package org.objectweb.proactive.mpi;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+public class IllegalMPIStateException extends IllegalStateException {
+    public IllegalMPIStateException() {
+        super();
+    }
 
-
-/**
- * This class provides a standard entry point for API MPI tools.
- * @author The ProActive Team
- */
-public class MPI {
-
-    /**
-     * API method for creating new MPISPMD object from an existing Virtual Node.
-     * Activate the virtual node if not already activated and return and object representing
-     * the MPI deployement process.
-     * @param vn - the virtual node which contains a list of node on which MPI will be deployed
-     * @return MPISpmd - an MPISpmd object
-     */
-    public static MPISpmd newMPISpmd(VirtualNode vn) {
-        return (MPISpmd) new MPISpmdProxy(vn);
+    public IllegalMPIStateException(String message) {
+        super(message);
     }
 }
