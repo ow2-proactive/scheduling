@@ -38,11 +38,11 @@ import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
-import org.objectweb.proactive.core.process.DependentListProcessDecorator;
+import org.objectweb.proactive.core.process.DependentListProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.HierarchicalProcess;
-import org.objectweb.proactive.core.process.IndependentListProcessDecorator;
+import org.objectweb.proactive.core.process.IndependentListProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
@@ -1749,7 +1749,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equals(PROCESS_REFERENCE_TAG)) {
-                DependentListProcessDecorator dep = (DependentListProcessDecorator) targetProcess;
+                DependentListProcess dep = (DependentListProcess) targetProcess;
                 Object result = activeHandler.getResultObject();
                 proActiveDescriptor.addProcessToSequenceList(dep,
                     (String) result);
@@ -1795,7 +1795,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equals(PROCESS_REFERENCE_TAG)) {
-                IndependentListProcessDecorator dep = (IndependentListProcessDecorator) targetProcess;
+                IndependentListProcess dep = (IndependentListProcess) targetProcess;
                 Object result = activeHandler.getResultObject();
                 proActiveDescriptor.addProcessToSequenceList(dep,
                     (String) result);

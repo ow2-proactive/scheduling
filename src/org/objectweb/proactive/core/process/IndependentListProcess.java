@@ -32,57 +32,31 @@ package org.objectweb.proactive.core.process;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+
 
 /**
- * This class contains a list of processes that have a dependency
- * with its predecessor.
+ * This class contains a list of processes which have to be executed sequentially
+ *
  * @author ProActiveTeam
  * @version 1.0, 01 Dec 2005
  * @since ProActive 3.0
  *
  */
-public class DependentListProcessDecorator
+public class IndependentListProcess
     extends AbstractSequentialListProcessDecorator {
-    public DependentListProcessDecorator() {
+    public IndependentListProcess() {
         super();
     }
 
-    /**
-     * Add a process to the processes queue - first process is not a dependent process unlike
-     * the others
-     * @param process
-     */
-    public void addProcessToList(ExternalProcess process) {
-        if (processes.size() == 0) {
-            processes.add(process);
-        }
-        // process has to be an instance of dependentProcess
-        // implements DependentProcess
-        else if (process instanceof DependentProcess) {
-            this.processes.add(process);
-        } else {
-            throw new ClassCastException(
-                " process must be a dependent process !");
-        }
+    public IndependentListProcess(ArrayList processes) {
+        super();
+        this.processes = processes;
     }
 
-    /**
-     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
-     */
-    public String getProcessId() {
-        return "dps";
-    }
-
-    public boolean isSequential() {
-        return true;
-    }
-
-    public boolean isDependent() {
-        return true;
-    }
-
-    public boolean isHierarchical() {
-        return false;
+    protected ExternalProcess createProcess() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public String getHostname() {
@@ -94,9 +68,14 @@ public class DependentListProcessDecorator
         // TODO Auto-generated method stub
     }
 
-    protected ExternalProcess createProcess() {
+    public boolean isHierarchical() {
         // TODO Auto-generated method stub
-        return null;
+        return false;
+    }
+
+    public boolean isDependent() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public void startProcess() throws IOException {
