@@ -93,7 +93,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
             /* First time */
             enableStackTrace = new Boolean(!"false".equals(System.getProperty(
-                            "stack_trace")));
+                            "proactive.stack_trace")));
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
