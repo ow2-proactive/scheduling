@@ -78,6 +78,8 @@ public class RequestImpl extends MessageImpl implements Request,
     private byte[] methodCallCipheredSignature;
     public long sessionID;
     protected String codebase;
+    private static Boolean enableStackTrace;
+    private StackTraceElement[] stackTrace;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -87,6 +89,15 @@ public class RequestImpl extends MessageImpl implements Request,
         super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
+        if (enableStackTrace == null) {
+
+            /* First time */
+            enableStackTrace = new Boolean(!"false".equals(System.getProperty(
+                            "stack_trace")));
+        }
+        if (enableStackTrace.booleanValue()) {
+            this.stackTrace = new Exception().getStackTrace();
+        }
     }
 
     //
@@ -117,6 +128,8 @@ public class RequestImpl extends MessageImpl implements Request,
         if (isOneWay) { // || (sender == null)) {
             return null;
         }
+        result.augmentException(stackTrace);
+        stackTrace = null;
         return createReply(targetBody, result);
     }
 

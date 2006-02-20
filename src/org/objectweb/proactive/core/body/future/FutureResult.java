@@ -35,6 +35,11 @@ import java.io.Serializable;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 
+class ThisIsNotAnException extends Exception {
+	public ThisIsNotAnException() {
+		super("This is the call in the proxy");
+	}
+}
 
 /**
  * This class is a placeholder for the result of a method call,
@@ -87,5 +92,17 @@ public class FutureResult implements Serializable {
         }
 
         return str + "]";
+    }
+
+    public void augmentException(StackTraceElement[] stackTrace) {
+        Throwable cause = (exception == null) ? nfe : exception;
+        if (cause != null && stackTrace != null) {
+        	while (cause.getCause() != null) {
+        		cause = cause.getCause();
+        	}
+        	Exception origCause = new ThisIsNotAnException();
+        	origCause.setStackTrace(stackTrace);
+        	cause.initCause(origCause);
+        }
     }
 }
