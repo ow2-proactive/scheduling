@@ -314,4 +314,24 @@
   <xsl:apply-templates select="revision[1]/revnumber"/>
 </xsl:template>
 
+
+<!--  PART TOCs appear on the same page as the Part title  
+(google gmane.text.docbook.apps Bob Stayton Removing extra blank pages in fo TOC)-->
+<xsl:template name="part.titlepage.before.verso" priority="1">
+  <xsl:variable name="toc.params">
+    <xsl:call-template name="find.path.params">
+      <xsl:with-param name="table" select="normalize-space($generate.toc)"/>
+    </xsl:call-template>
+  </xsl:variable>
+  <xsl:if test="contains($toc.params, 'toc')">
+    <xsl:call-template name="division.toc">
+      <xsl:with-param name="toc.context" select="."/>
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<!-- Turn off the traditional full part toc -->
+<xsl:template name="generate.part.toc"> </xsl:template>
+
+
 </xsl:stylesheet>

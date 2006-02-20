@@ -30,12 +30,12 @@
 
     <para><figure>
         <title>A network of hosts with some running the P2P Service</title>
-        <caption> Example of a ProActive P2P infrastructure.</caption>
 
         <mediaobject>
           <imageobject>
             <imagedata fileref="p2p_files/overlaynetwork.png" format="PNG" />
           </imageobject>
+          <caption><para> Example of a ProActive P2P infrastructure.</para></caption>
         </mediaobject>
       </figure> 
      </para>

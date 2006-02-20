@@ -332,11 +332,11 @@
 
     <figure>
       <title>C3D, deployed with JINI and RMI, between Baltimore (USA) and Nice (France)</title>
-      <caption>This is between a globus cluster and an LSF cluster</caption>
       <mediaobject>
         <imageobject>
           <imagedata fileref="images/clusterLogo.png" format="PNG" />
         </imageobject>
+        <caption><para>This is between a globus cluster and an LSF cluster</para></caption>
       </mediaobject>
     </figure>
 

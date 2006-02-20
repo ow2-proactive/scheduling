@@ -32,11 +32,11 @@
       <para>
         <figure>
          <title>The different kinds of components with the ProActive implementation. </title>
-         <caption>Primitive components have customizable activities (primitive components are also active objects)</caption>
           <mediaobject>
             <imageobject>
               <imagedata  fileref="components/pics/kinds-of-components.png" format="PNG"/>           
              </imageobject>
+             <caption><para>Primitive components have customizable activities (primitive components are also active objects)</para></caption>
           </mediaobject>
          </figure>
 </para>

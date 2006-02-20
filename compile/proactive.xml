@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ProActive" default="usage" basedir=".">
-    <property environment="env"/> 
+	<property environment="env"/> 
 	<property name="base" value=".."/>
 	<property name="lib" value="${base}/lib"/>
 	<property name="src.dir" value="${base}/src"/>
@@ -14,10 +14,14 @@
 	<property name="dist.dir" value="${base}/dist"/>
 	<property name="doc.src" value="${src.dir}/${proactive.dir}/doc-files"/>
 	<property name="docs.dir" value="${base}/docs"/>
+	<property name="docs.tmp" value="${docs.dir}/tmp" />
+	<property name="howto.dir"  value="${docs.dir}/howto"/>
 
 	<property name="name" value="ProActive"/>
+	<property name="version" value="3.0.1"/>
+	<property name="version_" value="3_0_1"/>
 	<property name="debug" value="on"/>
-    <property name="source" value="1.4"/>
+	<property name="source" value="1.4"/>
 	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/"/>
 	<property name="manifest.example.dir" value="${src.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/"/>	
 	<property name="config.dir" value="${classes.dir}/${proactive.core.dir}/config/" />
@@ -990,19 +994,19 @@
 	  </target>
 
 
-  <!-- ==================================================================== -->
-  <!-- The following *docbook* build the Manual                             -->
-  <!-- ==================================================================== -->
-	<xmlcatalog id="docbookcatalog" description="Description of the possible docbook xsl stylesheet locations">
+		<!-- ==================================================================== -->
+		<!-- The following *docbook* are sub-tasks to build the Manual            -->
+		<!-- ==================================================================== -->
+		<xmlcatalog id="docbookcatalog" description="Description of the possible docbook xsl stylesheet locations">
 		<!-- If a needed file doesn't exist, it will be fetched on the web -->
 
 		<classpath>			
-                 <!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
-                 <!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
-                        <pathelement location="/usr/share/docbook-xsl-1.69.1"/>
+			<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
+			<!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
+			<pathelement location="/usr/share/docbook-xsl-1.69.1"/>
 			<pathelement location="/usr/local/docbook-xsl-1.69.1"/>
 			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip"/>
- 		  <pathelement location="/usr/share/sgml/docbook/xml-dtd-4.2-1.0-25/"/> <!-- For the dtd -->
+			<pathelement location="/usr/share/sgml/docbook/xml-dtd-4.2-1.0-25/"/> <!-- For the dtd -->
     </classpath>
 
     <dtd  publicId="-//OASIS//DTD DocBook XML V4.1.2//EN"
@@ -1066,28 +1070,58 @@
            outfile="${pdfOutputFile}" 
            basedir="${doc.src}" />
 
+			<delete file="${fo.output}"/> 
 	</target>
 
 	<target name="docbook-chain" description="Build the docs (pdf + 2*html), for a given set of files/destination">
 		<!-- expecting the following arguments :  docbookInputFile pdfOutputFile bigHtmlFileName chunkedHtmlFileName -->
 
-	   <!-- Make the conversion PA docbook ==> one pdf file -->
-     <antcall target="docbookToPdf" />  
-
-	   <!-- Make the conversion docbook ==> several html files -->
+	  <!-- Make the conversion docbook ==> several html files -->
 		<antcall target="transformDocbook" >
 	    <param name="docbookOutputFile" value="${chunkedHtmlFileName}"/>
 	    <param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl"/>
 	   </antcall> 
  
-	   <!-- Make the conversion docbook ==> one big html file -->
+	  <!-- Make the conversion docbook ==> one big html file -->
 		<antcall target="transformDocbook" >
 	    <param name="docbookOutputFile" value="${bigHtmlFileName}"/>
 	    <param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl"/>
 	   </antcall> 
+
+	  <!-- Make the conversion PA docbook ==> one pdf file -->
+    <antcall target="docbookToPdf" />  
+
 	</target>
 
-		<target name="manual" description="Build the manual, through the docbook processing stages">
+	<target name="docbookBeautifier" 
+					description="Run a beautifer (code highlighting) on source files, then compile docbook">
+
+		<!-- Compile beautifier : transform <programlisting> into decorated <programlisting> -->
+		<mkdir dir="${classes.dir}"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
+     		<classpath refid="project.classpath"/>
+        <include name="util/*.java"/>
+    </javac>
+
+		<java classname="util.DocBookize" fork="false">
+     	<classpath refid="project.classpath"/>
+    	<arg value="${docbookInputFile}"/> <!-- The xml file to parse-->
+     	<arg value="${doc.src}/"/>    <!-- the path where to look for for file inclusion -->
+    </java> 			
+				
+		<antcall target="docbook-chain">
+			<param name="docbookInputFile" value="${docbookInputFile}"/>
+			<param name="pdfOutputFile" value="${pdfOutputFile}"/>
+			<param name="bigHtmlFileName" value="${bigHtmlFileName}"/>
+			<param name="chunkedHtmlFileName" value="${chunkedHtmlFileName}"/> 
+		</antcall>
+					 
+	</target>
+
+	<!-- ==================================================================== -->
+	<!-- Construct the manual from the XML files in {docs.src}                -->
+	<!-- ==================================================================== -->
+	<target name="manual" description="Build the manual, through the docbook processing stages">
 
 			<echo>********************************************************************************</echo>	
 			<echo>YOU ARE STRONGLY ADVISED TO INSTALL   docbook-xsl-1.69.1.tar.gz   IN /usr/share/</echo>	
@@ -1104,29 +1138,41 @@
 		      </fileset>
 		  </copy>
  
+			<!-- Copying files so they can be edited. -->	
+			<copy toDir="${docs.tmp}" includeemptydirs="no">
+  		      <fileset dir="${doc.src}">
+   		         <include name="**/*"/>
+   		         <exclude name="**/.svn"/>
+  		         <exclude name="xsl"/>
+   		      </fileset>
+		  </copy>
+
 			<!-- Second do the real ProActive docs -->
-      <antcall target="docbook-chain">
-				<param name="docbookInputFile" value="${doc.src}/PA_index.xml"/>
+			
+			<antcall target="docbookBeautifier">
+				<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml"/>
 				<param name="pdfOutputFile" value="${docs.dir}/pdf/ProActiveManual.pdf"/>
 				<param name="bigHtmlFileName" value="${docs.dir}/html/ProActive.html"/>
 				<param name="chunkedHtmlFileName" value="${docs.dir}/html/index.html"/> 
 			</antcall>
-
-			<!-- Last, build the docBook Tutorial -->
- 	    <property name="howto.dir"  value="${docs.dir}/howto"/>
+			
+ 			<!-- Last, build the docBook Tutorial -->
 			<copy toDir="${howto.dir}">
-			      <fileset dir="${doc.src}/docBookTutorial" >
+			      <fileset dir="${docs.tmp}/docBookTutorial" >
    			       <include name="**/*.png"/>
 			      </fileset>
 	         <fileset file="${doc.src}/ProActive.css" />
       </copy>
-			<antcall target="docbook-chain">
-				<param name="docbookInputFile" value="${doc.src}/docBookTutorial/doc_howto.xml"/>
-			  <param name="pdfOutputFile" value="${howto.dir}/docHowTo.pdf"/>
-				<param name="bigHtmlFileName" value="${howto.dir}/docHowTo.html"/>
-				<param name="chunkedHtmlFileName" value="${howto.dir}/index.html"/> 
-      </antcall>
-	 
+
+		<antcall target="docbookBeautifier">
+							<param name="docbookInputFile" value="${docs.tmp}/docBookTutorial/doc_howto.xml"/>
+						  <param name="pdfOutputFile" value="${howto.dir}/docHowTo.pdf"/>
+							<param name="bigHtmlFileName" value="${howto.dir}/docHowTo.html"/>
+							<param name="chunkedHtmlFileName" value="${howto.dir}/index.html"/> 
+		</antcall>
+		
+		<delete dir="${docs.tmp}"/> 
+		
 		</target>
 
 </project>

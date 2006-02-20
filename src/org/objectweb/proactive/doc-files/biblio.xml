@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- Converted from latex bib format with bibdb v0.1, from Sylvain Schmitz -->
 <!-- http://charybde.homeunix.org/~schmitz/code/bibdb/ -->
@@ -20,7 +20,7 @@
       </confgroup>
       <subtitle role="series">LNCS</subtitle>
       <pubdate>2005</pubdate>
-      <publisher>Springer Verlag</publisher>
+      <publisher><publishername>Springer Verlag</publishername></publisher>
     </biblioset>
   </biblioentry>
 
@@ -40,7 +40,7 @@
        <address>Seattle</address>
       </confgroup>
       <pubdate>2002</pubdate>
-      <publisher>ACM Press</publisher>
+      <publisher><publishername>ACM Press</publishername></publisher>
     </biblioset>
     <bibliomisc role="note">ISBN 1-58113-559-8</bibliomisc>
   </biblioentry>
@@ -69,7 +69,7 @@
   <authorgroup>
    <author><firstname>Francoise</firstname><surname>Baude</surname></author>
    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Christian</firstname><surname>Delbé</surname></author>
+   <author><firstname>Christian</firstname><surname>Delbe</surname></author>
    <author><firstname>Ludovic</firstname><surname>Henrio</surname></author></authorgroup>
       <title>A hybrid message logging-cic protocol for constrained checkpointability</title>
       <pagenums>644--653</pagenums>
@@ -81,7 +81,7 @@
       </confgroup>
       <subtitle role="series">LNCS</subtitle>
       <pubdate>August-September 2005</pubdate>
-      <publisher>Springer</publisher>
+      <publisher><publishername>Springer Verlag</publishername></publisher>
     </biblioset>
   </biblioentry>
 
@@ -104,7 +104,7 @@
       </confgroup>
       <subtitle role="series">LNCS 1823</subtitle>
       <pubdate>May 2000</pubdate>
-      <publisher>Springer</publisher>
+      <publisher><publishername>Springer Verlag</publishername></publisher>
     </biblioset>
   </biblioentry>
 
@@ -127,7 +127,7 @@
        <address>Edinburgh, Scotland</address>
       </confgroup>
       <pubdate>July 2002</pubdate>
-      <publisher>IEEE Computer Society</publisher>
+      <publisher><publishername>IEEE Computer Society</publishername></publisher>
     </biblioset>
   </biblioentry>
 
@@ -148,7 +148,7 @@
        <address>Springer Verlag</address>
       </confgroup>
       <pubdate>2003</pubdate>
-      <publisher>Lecture Notes in Computer Science, LNCS</publisher>
+      <publisher><publishername>Lecture Notes in Computer Science, LNCS</publishername></publisher>
     </biblioset>
     <bibliomisc role="note">ISBN ??</bibliomisc>
   </biblioentry>
@@ -185,12 +185,12 @@
        <conftitle>Proceedings of the 31st ACM Symposium on Principles of Programming Languages</conftitle>
       </confgroup>
       <pubdate>2004</pubdate>
-      <publisher>ACM Press</publisher>
+      <publisher><publishername>ACM Press</publishername></publisher>
     </biblioset>
   </biblioentry>
 
-  <biblioentry role="inproceedings" id="ckv98:tscmj">
-    <abbrev id="ckv98:tscmj.abbrev">CKV98a</abbrev>
+  <biblioentry role="inproceedings" id="ckv98tscmj">
+   <abbrev id="ckv98tscmj.abbrev">CKV98a</abbrev>
     <biblioset role="article">
   <authorgroup>
    <author><firstname>D.</firstname><surname>Caromel</surname></author>
@@ -207,7 +207,7 @@
       <editor><firstname>Geoffrey C.</firstname><surname>Fox</surname></editor>
       <volumenum>10, (11--13)</volumenum>
       <pubdate>September-November 1998</pubdate>
-      <publisher>Wiley &amp; Sons, Ltd.</publisher>
+      <publisher><publishername>Wiley and Sons, Ltd.</publishername></publisher>
     </biblioset>
   </biblioentry>
 
@@ -235,7 +235,7 @@
   <authorgroup>
    <author><firstname>F.</firstname><surname>Baude</surname></author>
    <author><firstname>D.</firstname><surname>Caromel</surname></author>
-   <author><firstname>C.</firstname><surname>Delbé</surname></author>
+   <author><firstname>C.</firstname><surname>Delbe</surname></author>
     <author><firstname>L.</firstname><surname>Henrio</surname></author>
    </authorgroup>
     <title>A fault tolerance protocol for asp calculus : Design and proof</title>

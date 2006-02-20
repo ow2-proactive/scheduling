@@ -120,13 +120,15 @@ span.part a {
         display: block;
         padding: 10px;
         border: 1px solid #bbb;
-        background-color: #a8d5ff;
-        color: #000;
+        background-color: #e1f1ff;
         overflow: auto;
         border-radius: 2.5px;
         -moz-border-radius: 2.5px;
         margin: 0.5em 2em;
 }
+
+/* This is for the comments as output by javaToDocBook parsers (ends up in programlistings)*/
+em {color: #0f9626;}
 
 .programlisting {
         font-family: monospace;
@@ -134,12 +136,11 @@ span.part a {
         display: block;
         padding: 10px;
         border: 1px solid #bbb;
-        background-color: #a8d5ff;
-        color: #000;
+        background-color: #e1f1ff;
         overflow: auto;
         border-radius: 2.5px;
         -moz-border-radius: 2.5px;
         margin: 0.5em 2em;
 }
 
-code {  font-family: monospace;}
+code {  font-family: monospace; color: #810101}

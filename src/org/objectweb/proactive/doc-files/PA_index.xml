@@ -249,9 +249,9 @@
     &FileTransfer;
     &SSHTunneling;
     &faultTolerance;
-  </part>
-
-  <part id="ProActiveComponents">
+   </part>
+   
+   <part id="ProActiveComponents">
     <title>Composing</title>
     &intro;
     &implementation;
@@ -260,24 +260,24 @@
     &adl;
     &examples;
     &perspectives;
-  </part>
-
-  <part id="ProActiveAdvancedTopics">
+   </part>
+   
+   <part id="ProActiveAdvancedTopics">
     <title>Advanced</title>
     &p2p;
     &Security;
     &WSDoc;
     &OSGi;
     &mpi;
-  </part>
-
-  <part id="ProActiveTools">
+   </part>
+   
+   <part id="ProActiveTools">
     <title>User Interface and tools</title>
     &IC2D;
     &plugin;
-  </part>
-
-  <part id="ProActiveGuidedTour">
+   </part>
+   
+   <part id="ProActiveGuidedTour">
     <title>Guided Tour</title>
     &guidedindex;
     &capabilities-intro;
@@ -285,17 +285,17 @@
     &OOSPMDJacobiexample;
     &nbody;
     &conclusion;
-  </part>
-
-  <part id="ProActiveExtensions">
+   </part>
+   
+   <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
     &DescriptorProcess;
     &devFileTransfer;
     &devFaultTolerance;
     &MOP;
-  </part>
-  
-  <part id="backMattersPart">
+   </part>
+   
+   <part id="backMattersPart">
     <title>Back matters</title>
     <!--   Should be called appendix, anyway  -->
     &biblio;

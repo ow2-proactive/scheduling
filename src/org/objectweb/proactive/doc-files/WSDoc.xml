@@ -424,13 +424,13 @@ string s = hw.helloWorld ();
           </mediaobject>
         </figure> <figure>
           <title>C# application communicating via SOAP</title>
-          <caption>The application is using the same dispatcher the ProActive user uses.</caption>
 
           <mediaobject>
             <imageobject>
               <imagedata fileref="webservices/scC3dcs.png" format="PNG"
                          contentwidth="100" width="6in" />
             </imageobject>
+            <caption><para>The application is using the same dispatcher the ProActive user uses.</para></caption>
           </mediaobject>
         </figure></para>
     </sect2>

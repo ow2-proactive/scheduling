@@ -14,30 +14,30 @@
 
     <itemizedlist>
      <listitem><para>
-        <emphasis role="bold">html.xsl</emphasis> This is where all the
-        html specific customizations are made</para>
-      </listitem>
-
-      <listitem><para>
-        <emphasis role="bold">pdf.xsl</emphasis> This is where all the
-        pdf specific customizations are made</para>
-      </listitem>
-
-      <listitem><para>
-        <emphasis role="bold">common.xsl</emphasis> This is where all
-        the common specifications are made, ie those that go and in pdf and in
-        html.</para>
-      </listitem>
-
-      <listitem><para>
-        <emphasis role="bold">html.titlepage.templates.xml</emphasis>
-        This is the template which modifies the html titlepage layout</para>
-      </listitem>
-
-      <listitem><para>
-        <emphasis role="bold">pdf.titlepage.templates.xml</emphasis>
-        This is the template which modifies the pdf titlepage layout</para>
-      </listitem>
+       <emphasis role="bold">html.xsl</emphasis> This is where all the
+       html specific customizations are made</para>
+     </listitem>
+     
+     <listitem><para>
+       <emphasis role="bold">pdf.xsl</emphasis> This is where all the
+       pdf specific customizations are made</para>
+     </listitem>
+     
+     <listitem><para>
+       <emphasis role="bold">common.xsl</emphasis> This is where all
+       the common specifications are made, ie those that go and in pdf and in
+       html.</para>
+     </listitem>
+     
+     <listitem><para>
+       <emphasis role="bold">html.titlepage.templates.xml</emphasis>
+       This is the template which modifies the html titlepage layout</para>
+     </listitem>
+     
+     <listitem><para>
+       <emphasis role="bold">pdf.titlepage.templates.xml</emphasis>
+       This is the template which modifies the pdf titlepage layout</para>
+     </listitem>
     </itemizedlist>
 
     <para><emphasis role="bold">Please mind:</emphasis> The last two files are
@@ -47,7 +47,7 @@
   </sect2>
 
   <sect2>
-    <title>What you can change</title>
+   <title>What you can change</title>
 
     <para>Basically, in the customization layers, you have full control (just
     do what you want). The only thing is that each block (template,
@@ -70,4 +70,100 @@
     intend to do some heavy editing. I have found everything I needed in this
     book, but sometimes in unexpected sections.</para>
   </sect2>
-</sect1>
+
+  <sect2>
+   <title>Todo list, provided by Denis</title>
+   
+   <orderedlist>
+   
+    <listitem>
+     <para> Make sure the itemizes are dense (done for html through LI tag in ProActive.css)</para>
+    </listitem>
+    
+    <listitem>
+     <para> Color the java key words in program listings. Same for xml files in screens (change these to programlisting lang="XML") </para>
+    </listitem>
+   
+    <listitem>
+     <para> In html and pdf the top elements (Part II - Chapter 5) are to be clickeable.</para>
+     <para> Part should be on the outside of the page, and chapter on the inside for pdf layout.</para>
+    </listitem>
+   
+    <listitem>
+     <para> Ensure no dead links exist (easy with wget --spider OR http://www.dead-links.com/ for html, harder for the pdf).</para>
+    </listitem>
+    
+    <listitem>
+     <para> Enable the FAQ.</para>
+    </listitem>
+    
+    <listitem>
+     <para> Use this info (google Re: Extending ulink Warren Young) to specialize ulinks in pdf/html [is it needed?].</para>
+    </listitem>
+    
+    <listitem>
+     <para> See for direct inclusion of code from the src files (../core/ProActive.java for example) xi:include does not work</para>
+     <para> The main files, which are produced in html by javadoc, are to be included in the pdf appendixes</para>
+    </listitem>
+   
+    <listitem>
+     <para> Create an index, and put the main words in it</para>
+    </listitem>
+   
+    <listitem>
+     <para> Create a reference chapter, with all the ProActive papers, and doucle check citations in manual </para>
+    </listitem>
+    
+    <listitem>
+     <para> Add ObjectWeb on the book titlepage</para>
+    </listitem>
+    
+    <listitem>
+     <para> Put the Part TOCs on the same page as the PART first page (it's very empty right now) </para>
+    </listitem>
+
+    <listitem>
+     <para> In the main TOC, each new part should be highlighted by a page-wide blue line </para>
+    </listitem>
+    
+    <listitem>
+     <para> Remove too long captions </para>
+    </listitem>
+    
+    <listitem>
+     <para> Check the following schema is always used :</para>
+      <itemizedlist>
+       <listitem> <para> Part in White, on blue background </para> </listitem>
+       <listitem> <para> Chapter in White, on blue background</para> </listitem>
+       <listitem> <para> Sect1 in Blue, on grey background</para> </listitem>
+      </itemizedlist>
+    </listitem>
+       
+    <listitem>
+     <para> Decide how much customization should go in the CSS, and how much in the html.xsl  </para>
+    </listitem>
+    
+    <listitem>
+     <para> Images should be centered. Code borders should only wrap code, not from left to right margin.   </para>
+    </listitem>
+    
+    <listitem>
+     <para> Enable the use of admonitions (see http://sagehill.net/docbookxsl/PrintIcons.html#PrintAdmonGraphics)  </para>
+    </listitem>
+
+    <listitem>
+     <para> All important code examples should be wrapped in EXAMPLE tags  </para>
+    </listitem>
+
+    <listitem>
+     <para> Have customized titlepage files (including tables?) see http://www.dpawson.co.uk/docbook/styling/titlepage.html</para>
+    </listitem>
+
+    <listitem>
+     <para> Have customized titlepage files (including tables?) see http://www.dpawson.co.uk/docbook/styling/titlepage.html</para>
+    </listitem>
+    
+  </orderedlist>
+  </sect2>
+  
+ </sect1>

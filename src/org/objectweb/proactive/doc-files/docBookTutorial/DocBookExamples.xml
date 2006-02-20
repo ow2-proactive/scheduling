@@ -90,29 +90,30 @@
   <sect2 id="Code">
     <title>Code</title>
 
-    <para>Code sources can be written between SCREEN tags. You can also use
+    <para>Code sources can be written between PROGRAMLISTING tags (with language="java"). 
+     You can also use
     the EXAMPLE TAG around that, to give a title, and be referenced in the
-    table of examples. Watch out, spaces count!</para>
+    table of examples. If you want to show some program output, 
+    you can use SCREEN instead of PROGRAMLISTING. Watch out, spaces count!</para>
 
-    <screen>TinyHello tiny = (TinyHello) ProActive.newActive(
+   <programlisting language="java">TinyHello tiny = (TinyHello) ProActive.newActive(
      TinyHello.class.getName(), // the class to deploy
      null // the arguments to pass to the constructor, here none
-     ); // which jvm should be used to hold the Active Object   </screen>
+     ); // which jvm should be used to hold the Active Object   </programlisting>
 
     <para>But you can also just use the LITERAL tag to highlight the
     <literal>main</literal> methods.</para>
   
    <para> You can also insert directly sources from their original files:</para>   
    
-   <example>
-    <title>My program listing</title>
-    <screen>
-     <xi:include  parse="text"
-                  href="../../examples/hello/TinyHello.java"
-                  xmlns:xi="http://www.w3.org/2001/XInclude"/>
-    </screen>
-   </example>
 
+ <example>
+    <title>My program listing</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="../examples/hello/TinyHello.java" />
+     </textobject></programlisting>
+   </example>
+  
   </sect2>
 
   <sect2 id="Links">
@@ -126,10 +127,37 @@
     web</ulink>, it's good for you!</para>
   
   <para>Use CITATION followed by an XREF for citations. For example, see 
-   <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation> to learn on groups.
+   <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation> to learn on
+   groups. Follow is an example biblio entry. You should xconsider using the bibdb
+   tool to consert from bibtex (http://charybde.homeunix.org/~schmitz/code/bibdb/).
    <!-- TODO : there should really only be one reference written in the tags, and 
    xslt parsing should work out the rest --> . 
      </para>
+     
+     <bibliography id="Bibliography">
+      <biblioentry role="inproceedings" id="BBC02">
+       <abbrev id="BBC02.abbrev">BBC02</abbrev>
+       <biblioset role="article">
+        <authorgroup>
+         <author><firstname>Laurent</firstname><surname>Baduel</surname></author>
+         <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+         <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+        </authorgroup>
+        <title>Efficient, Flexible, and Typed Group Communications in Java</title>
+        <pagenums>28--36</pagenums>
+       </biblioset>
+       <biblioset role="proceedings">
+        <confgroup>
+         <conftitle>Joint ACM Java Grande - ISCOPE 2002 Conference</conftitle>
+         <address>Seattle</address>
+        </confgroup>
+        <pubdate>2002</pubdate>
+        <publisher><publishername>ACM Press</publishername></publisher>
+       </biblioset>
+       <bibliomisc role="note">ISBN 1-58113-559-8</bibliomisc>
+      </biblioentry>
+     </bibliography >
+   
  </sect2>
 
   <sect2 id="Tables">
