@@ -243,6 +243,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="deployment" type="DeploymentType"/>
 			<xs:element name="FileTransferDefinitions" type="FileTransferDefinitionsType" minOccurs="0"/>
 			<xs:element name="infrastructure" type="InfrastructureType" minOccurs="0"/>
+			<xs:element name="technicalServices" type="TechnicalServiceType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	
@@ -376,6 +377,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				<xs:attribute name="waitForTimeout" type="xs:boolean" use="optional" default="false"/>
 				<xs:attribute name="FileTransferDeploy" type="xs:string" use="optional"/>
 				<xs:attribute name="FileTransferRetrieve" type="xs:string" use="optional"/>
+				<xs:attribute name="technicalServiceId" type="xs:string" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -529,13 +531,35 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="services" type="ServicesType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+	<!--  Technical Service is a sequence of services -->
+	<xs:complexType name="TechnicalServiceType">
+		<xs:sequence>
+			<xs:element name="technicalServiceDefinition" type="TechnicalServiceDefinitionType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TechnicalServiceDefinitionType">
+		<xs:sequence>
+			<xs:element name="arg" type="TechnicalServiceArgType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="class" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:complexType name="TechnicalServiceArgType">
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="value" type="xs:string" use="required"/>
+	</xs:complexType>
 	<!--services element has one child: serviceDefinition element that must appear once or more -->
 	<xs:complexType name="ServicesType">
 		<xs:sequence>
 			<xs:element name="serviceDefinition" type="ServiceDefinitionType" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<!-- ServiceDefinition has two childs: RMIRegistryLookup, P2PLookup but only one can be present in the parent element. This element contains also an attribute: id which must appear once and only once and represents the id of the service in order for  jvms(serviceReference element in deployment/jvms/jvm/creation/processReference)  to reference other services-->
+	<!-- ServiceDefinition has two childs: RMIRegistryLookup, P2PLookup but only one
+	can be present in the parent element. This element contains also an attribute: id
+	which must appear once and only once and represents the id of the service in
+	order for
+	jvms(serviceReference element in deployment/jvms/jvm/creation/processReference)
+	to reference other services-->
 	<xs:complexType name="ServiceDefinitionType">
 		<xs:choice>
 			<xs:element name="RMIRegistryLookup" type="RMIRegistryLookupType"/>
