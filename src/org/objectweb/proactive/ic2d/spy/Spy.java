@@ -31,14 +31,26 @@
 package org.objectweb.proactive.ic2d.spy;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
+import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.body.request.BodyRequest;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestImpl;
+import org.objectweb.proactive.core.body.request.RequestQueue;
+import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.CircularArrayList;
+
+import sun.security.action.GetBooleanAction;
 
 
 /**
@@ -84,25 +96,29 @@ public class Spy implements org.objectweb.proactive.RunActive,
         this.updateFrequence = updateFrequence;
     }
 
-    public void migrateTo(UniqueID bodyId, String nodeDestination)
-        throws MigrationException {
-        Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
-        if (body == null) {
-            throw new MigrationException("Cannot find object id=" + bodyId);
-        }
-        if (!(body instanceof Migratable)) {
-            throw new MigrationException("Object cannot Migrate");
-        }
-        Node node = null;
-        try {
-            node = org.objectweb.proactive.core.node.NodeFactory.getNode(nodeDestination);
-        } catch (org.objectweb.proactive.core.node.NodeException e) {
-            throw new MigrationException("Cannot find node " + nodeDestination,
-                e);
-        }
-        ((Migratable) body).migrateTo(node);
-    }
+    
 
+    
+    public void migrateTo(UniqueID bodyId, String nodeDestination)
+    throws MigrationException {
+    Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
+    if (body == null) {
+        throw new MigrationException("Cannot find object id=" + bodyId);
+    }
+    if (!(body instanceof Migratable)) {
+        throw new MigrationException("Object cannot Migrate");
+    }
+    Node node = null;
+    try {
+        node = org.objectweb.proactive.core.node.NodeFactory.getNode(nodeDestination);
+    } catch (org.objectweb.proactive.core.node.NodeException e) {
+        throw new MigrationException("Cannot find node " + nodeDestination,
+            e);
+    }
+    ProActive.migrateTo(body, node, true);
+}
+
+    
     public String getSystemProperty(String key) {
         return System.getProperty(key);
     }
@@ -160,6 +176,12 @@ public class Spy implements org.objectweb.proactive.RunActive,
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    
+    public MigratableBody getBody(UniqueID bodyId) {
+    	MigratableBody body = (MigratableBody)LocalBodyStore.getInstance().getLocalBody(bodyId);
+    	return body;
     }
 
     //
