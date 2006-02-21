@@ -159,20 +159,34 @@ public class ExceptionMaskLevel {
 
         NonFunctionalException nfe = res.getNFE();
         if ((nfe != null) && isExceptionTypeCaught(nfe.getClass())) {
-            parent.setException(nfe);
-            caughtExceptions.add(nfe);
+            synchronized (caughtExceptions) {
+                caughtExceptions.add(nfe);
+            }
         }
 
         Throwable exception = f.getFutureResult().getExceptionToRaise();
         if (exception != null) {
-            parent.setException(exception);
-            caughtExceptions.add(exception);
+            synchronized (caughtExceptions) {
+                caughtExceptions.add(exception);
+            }
         }
 
         notifyAll();
     }
 
-    public Collection getCaughtExceptions() {
+    Collection getCaughtExceptions() {
+        return caughtExceptions;
+    }
+
+    synchronized Collection getAllExceptions() {
+        while (nbFutures != 0) {
+            try {
+                wait();
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+                break;
+            }
+        }
         return caughtExceptions;
     }
 }

@@ -42,7 +42,7 @@ public class Exc {
     }
 
     public void voidRT() {
-        throw new RuntimeException("Test voidRT => This stacktrace is OK");
+        throw new RuntimeException("Test voidRT");
     }
 
     public Exc futureRT() {

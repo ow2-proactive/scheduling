@@ -44,12 +44,6 @@ public class ExceptionMaskStack {
     /* The combination of all masks */
     private ExceptionMaskLevel currentExceptionMask;
 
-    /* The potential pending exception */
-    private Throwable currentException;
-
-    /* Exceptions caught in the current or previous level */
-    private Collection caughtExceptions;
-
     private ExceptionMaskStack() {
         stack = new LinkedList();
         currentExceptionMask = new ExceptionMaskLevel();
@@ -75,7 +69,6 @@ public class ExceptionMaskStack {
         ExceptionMaskLevel level = new ExceptionMaskLevel(this, exceptions);
         stack.add(0, level);
         currentExceptionMask.addExceptionTypes(level);
-        caughtExceptions = level.getCaughtExceptions();
     }
 
     void pop() {
@@ -83,7 +76,7 @@ public class ExceptionMaskStack {
             throw new IllegalStateException("The stack has nothing to pop");
         }
 
-        caughtExceptions = ((ExceptionMaskLevel) stack.removeFirst()).getCaughtExceptions();
+        stack.removeFirst();
         updateExceptionMask();
     }
 
@@ -98,10 +91,12 @@ public class ExceptionMaskStack {
     }
 
     void throwArrivedException() {
-        if (currentException != null) {
-            Throwable exc = currentException;
-            currentException = null; // No more pending
-            ExceptionThrower.throwException(exc);
+        Collection caughtExceptions = getTopLevel().getCaughtExceptions();
+        synchronized (caughtExceptions) {
+            if (!caughtExceptions.isEmpty()) {
+                Throwable exc = (Throwable) caughtExceptions.iterator().next();
+                ExceptionThrower.throwException(exc);
+            }
         }
     }
 
@@ -151,13 +146,6 @@ public class ExceptionMaskStack {
         }
     }
 
-    /* Currently we only keep the first exception, but we could be smarter */
-    void setException(Throwable e) {
-        if (currentException == null) {
-            currentException = e;
-        }
-    }
-
     boolean areExceptionTypesCaught(Class[] c) {
         return currentExceptionMask.areExceptionTypesCaught(c);
     }
@@ -170,7 +158,7 @@ public class ExceptionMaskStack {
         return currentExceptionMask.catchRuntimeException();
     }
 
-    Collection getCaughtExceptions() {
-        return getTopLevel().getCaughtExceptions();
+    Collection getAllExceptions() {
+        return getTopLevel().getAllExceptions();
     }
 }

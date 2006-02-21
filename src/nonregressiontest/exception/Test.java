@@ -81,7 +81,6 @@ public class Test extends FunctionalTest {
         } finally {
             ProActive.removeTryWithCatch();
         }
-
         /* futureRT() */
         ProActive.tryWithCatch(RuntimeException.class);
         try {
@@ -160,10 +159,9 @@ public class Test extends FunctionalTest {
         try {
             r.voidExc();
             Object f = r.futureExc();
-            ProActive.waitFor(f); /* wait for both calls */
             ProActive.endTryWithCatch();
         } catch (Exception e) {
-            int size = ProActive.getCaughtExceptions().size();
+            int size = ProActive.getAllExceptions().size();
             if (size == 2) {
                 good();
             } else {

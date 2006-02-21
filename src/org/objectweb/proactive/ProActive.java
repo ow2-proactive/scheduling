@@ -2043,11 +2043,11 @@ public class ProActive {
     /**
      * Get the exceptions that have been caught in the current
      * ProActive.tryWithCatch()/ProActive.removeTryWithCatch()
-     * block.
+     * block. This waits for every call in this block to return.
      * 
      * @return a collection of these exceptions
      */
-    public static Collection getCaughtExceptions() {
-        return ExceptionHandler.getCaughtExceptions();
+    public static Collection getAllExceptions() {
+        return ExceptionHandler.getAllExceptions();
     }
 }

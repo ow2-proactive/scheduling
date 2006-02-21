@@ -77,10 +77,10 @@ public class ExceptionHandler {
         }
     }
 
-    public static Collection getCaughtExceptions() {
+    public static Collection getAllExceptions() {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
-            return stack.getCaughtExceptions();
+            return stack.getAllExceptions();
         }
     }
 
