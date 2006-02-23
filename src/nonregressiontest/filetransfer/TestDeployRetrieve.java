@@ -8,6 +8,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
@@ -23,7 +26,17 @@ public class TestDeployRetrieve extends FunctionalTest {
     File fileTest = new File("/tmp/ProActiveTestFile.dat");
     File fileRetrieved = new File("/tmp/ProActiveTestFileRetrieved.dat");
     File fileDeployed = new File("/tmp/ProActiveTestFileDeployed.dat");
-
+    File fileRetrieved2 = new File("/tmp/ProActiveTestFileRetrieved2.dat");
+    File fileDeployed2 = new File("/tmp/ProActiveTestFileDeployed2.dat");
+    static int testblocksize= org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+    static int testflyingblocks=org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+    static int filesize=2;
+    
+    
+    //Descriptor variables
+    String jvmProcess = "localJVM";
+    String hostName = "localhost";
+    
     public TestDeployRetrieve() {
         super("File Transfer at Deployment and Retrieval Time",
             "Tests that both schems work using the ProActive FileTransfer API");
@@ -35,14 +48,20 @@ public class TestDeployRetrieve extends FunctionalTest {
     }
 
     public void initTest() throws Exception {
-        cleanIfNecessary();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating 2Mb random test file in /tmp");
+            logger.debug("Creating "+filesize+"Mb random test file in /tmp");
         }
 
         //creates a new 2MB test file
-        TestAPI.createRandomContentFile(fileTest.getAbsolutePath(), 2);
+        TestAPI.createRandomContentFile(fileTest.getAbsolutePath(), filesize);
+        
+        try {
+        	hostName= java.net.InetAddress.getLocalHost().getHostName();
+        } catch (Exception e) {
+            hostName= "localhost";
+        }
+        
     }
 
     public void endTest() throws Exception {
@@ -50,7 +69,11 @@ public class TestDeployRetrieve extends FunctionalTest {
             pad.killall(false);
         }
 
-        cleanIfNecessary();
+        cleanIfNecessary(this.fileTest);
+        cleanIfNecessary(this.fileDeployed);
+        cleanIfNecessary(this.fileDeployed2);
+        cleanIfNecessary(this.fileRetrieved2);
+        cleanIfNecessary(this.fileRetrieved);
     }
 
     public void action() throws Exception {
@@ -60,15 +83,29 @@ public class TestDeployRetrieve extends FunctionalTest {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
-        pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+        
+        VariableContract vc = new VariableContract();
+        vc.setVariableFromProgram("JVM_PROCESS", jvmProcess ,VariableContractType.DescriptorDefaultVariable);
+        vc.setVariableFromProgram("HOST_NAME", hostName ,VariableContractType.DescriptorDefaultVariable);
+    
+        pad = ProActive.getProactiveDescriptor(XML_LOCATION, vc);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
+        testVNode.setFileTransferParams(testblocksize,testflyingblocks);
+        long initDeployment=System.currentTimeMillis();
         testVNode.activate();
         if(logger.isDebugEnabled()){
         	logger.debug("Getting the Node.");
         }
+        
         Node node[]=testVNode.getNodes();
+        long finitDeployment=System.currentTimeMillis();
+        
         Assertions.assertTrue(node.length > 0);
+        if(logger.isDebugEnabled()){
+        	logger.debug("Deployed "+node.length+" node from VirtualNode "+testVNode.getName()+" in "+(finitDeployment-initDeployment)+"[ms]");
+        }
+
 
         //Checking correc FileTransferDeploy
         if(logger.isDebugEnabled()){
@@ -77,16 +114,24 @@ public class TestDeployRetrieve extends FunctionalTest {
         long fileDeployedSum = TestAPI.checkSum(fileDeployed);
         Assertions.assertTrue(fileTestSum == fileDeployedSum);
         
-		
         //Checking correct FileTransferRetrieve
 		if(logger.isDebugEnabled()){
         	logger.debug("Retrieving test files");
         }
-        File file[] = testVNode.fileTransferRetrieve();
+		long initRetrieve=System.currentTimeMillis();
+        FileWrapper fileWrapper = testVNode.fileTransferRetrieve(); //async
+        File file[] = fileWrapper.getFiles(); //sync here
+        long finitRetrieve=System.currentTimeMillis();
+        
         if(logger.isDebugEnabled()){
-        	logger.debug("Retrieved "+file.length+" files from VirtualNode"+testVNode.getName());
+        	logger.debug("Retrieved "+file.length+" files from VirtualNode "+testVNode.getName()+" in "+(finitRetrieve-initRetrieve)+"[ms]");
         }
-
+        
+        Assertions.assertTrue(file.length==2);
+        
+        fileRetrieved = new File(fileRetrieved.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
+        fileRetrieved2 = new File(fileRetrieved2.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
+        
         long fileRetrievedSum = TestAPI.checkSum(fileRetrieved);
 
         if (logger.isDebugEnabled()) {
@@ -100,38 +145,35 @@ public class TestDeployRetrieve extends FunctionalTest {
 
     /**
      * Cleans test files
-
      */
-    private void cleanIfNecessary() {
-        if (fileRetrieved.exists()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old test file:" + fileRetrieved.getName());
-            }
-            fileRetrieved.delete();
-        }
-
-        if (fileTest.exists()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old randomly generated file:" +
-                    fileTest.getName());
-            }
-            fileTest.delete();
-        }
-        
-        if (fileDeployed.exists()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old randomly generated file:" +
-                		fileDeployed.getName());
-            }
-            fileDeployed.delete();
-        }
+    private void cleanIfNecessary(File f) {
+    	if (f.exists()) {
+	        if (logger.isDebugEnabled()) {
+	            logger.debug("Deleting old randomly generated file:" +
+	            		f.getName());
+	        }
+	        f.delete();
+    	}
     }
 
     /**
      * @param args
      */
     public static void main(String[] args) {
+    	
+      	if(args.length==4){
+    		filesize=Integer.parseInt(args[0]);
+    		testblocksize=Integer.parseInt(args[1]);
+    		testflyingblocks=Integer.parseInt(args[2]);
+    		XML_LOCATION=args[3];
+    	}
+    	else if(args.length !=0){
+    		System.out.println("Use with arguments: filesize[mb] fileblocksize[bytes] maxflyingblocks xmldescriptorpath");
+    	}
+      	
         TestDeployRetrieve test = new TestDeployRetrieve();
+        test.jvmProcess="remoteJVM";
+        
         try {
             System.out.println("InitTest");
             test.initTest();

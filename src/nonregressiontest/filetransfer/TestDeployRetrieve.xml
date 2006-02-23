@@ -4,6 +4,8 @@
 	<variables>
 		<DescriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
 		<DescriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
+		<DescriptorDefaultVariable name="JVM_PROCESS" value="localJVM"/>
+		<DescriptorDefaultVariable name="HOST_NAME" value="localhost"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -44,10 +46,10 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost">
-					<processReference refid="localJVM"/> <!--  change to remoteJVM when testing from eclipse to avoid "Word to long" error -->
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="${HOST_NAME}">
+					<processReference refid="localJVM"/> <!--localJVM  changed to remoteJVM when testing from eclipse to avoid "Word to long" error -->
 					<FileTransferDeploy refid="implicit">
-						<copyProtocol>pftp,scp</copyProtocol>
+						<copyProtocol>rcp,pftp</copyProtocol>
 						<sourceInfo prefix="/tmp"/>
 						<destinationInfo prefix="/tmp"/>
 					</FileTransferDeploy>
@@ -62,7 +64,8 @@
 					<!-- javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath-->
 				<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/bin/"/>
-						<!-- absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/-->
+						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>

@@ -14,7 +14,10 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
+import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 
@@ -28,6 +31,7 @@ public class TestAPI extends FunctionalTest {
     File fileTest = new File("/tmp/ProActiveTestFile.dat");
     File filePushed = new File("/tmp/ProActiveTestPushed.dat");
     File filePulled = new File("/tmp/ProActiveTestPulled.dat");
+    FileWrapper filePulledWrapper;
 
     public TestAPI() {
         super("File Transfer API: File Push and File Pull",
@@ -78,10 +82,14 @@ public class TestAPI extends FunctionalTest {
         VirtualNode testVNode = pad.getVirtualNode("test");
         testVNode.activate();
         Node[] testnode = testVNode.getNodes();
-        org.objectweb.proactive.tools.FileTransfer.pushFile(testnode[0],
+        BooleanWrapper bw = org.objectweb.proactive.tools.FileTransfer.pushFile(testnode[0],
             fileTest, filePushed);
-        filePulled = org.objectweb.proactive.tools.FileTransfer.pullFile(testnode[0],
-                fileTest, filePulled);
+        Assertions.assertTrue(bw.booleanValue());
+		
+        filePulledWrapper = org.objectweb.proactive.tools.FileTransfer.pullFile(testnode[0],fileTest, filePulled);
+        File pulled[]= filePulledWrapper.getFiles();
+        Assertions.assertTrue(pulled.length==1);
+        Assertions.assertTrue(pulled[0].equals(filePulled));
     }
 
     /**

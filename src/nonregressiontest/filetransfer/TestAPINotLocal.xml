@@ -53,7 +53,7 @@
 					<javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath>
 				<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
-						<!-- absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/-->
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
