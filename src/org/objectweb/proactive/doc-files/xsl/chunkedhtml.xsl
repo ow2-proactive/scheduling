@@ -85,9 +85,17 @@
                                   and generate-id($up) != generate-id($home)
                                   and $navig.showtitles != 0">
                     <!-- Insert the 'up' string, ie the Part title -->
-                    <xsl:apply-templates select="$up" mode="object.title.markup"/>
-                    <br/>
+               <a accesskey="p">
+                 <xsl:attribute name="href">
+                    <xsl:call-template name="href.target">
+                       <xsl:with-param name="object" select="$up"/>
+                    </xsl:call-template>
+                 </xsl:attribute>
+                 <xsl:apply-templates select="$up" mode="object.title.markup"/>
+              </a>
+              <br/>
                     <!-- Insert the 'local' string, ie the Chapter title -->                    
+                    <!--  No need for link, we're already at the top of the page!  -->
                     <xsl:apply-templates select="." mode="object.title.markup"/>
                   </xsl:when>
 

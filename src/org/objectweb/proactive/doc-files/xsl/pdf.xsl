@@ -26,6 +26,10 @@
 <!--<xsl:param name="line-height">1.2</xsl:param>-->  <!--normal value is 1.2-->
 
 
+<!-- Remove headers on blank pages please! -->
+<xsl:param name="headers.on.blank.pages">0</xsl:param>
+
+
 <!--  Paper feed -->
 <xsl:param name="paper.type">A4</xsl:param>
 <xsl:param name="page.margin.inner">10mm</xsl:param>
@@ -124,36 +128,119 @@
 </xsl:attribute-set>  
 
 <!-- adjust the headers, recalling chapter numbers -->
-<!-- TODO: align left or right, depending in the page. -->
 <xsl:template name="header.table">
   <xsl:param name="pageclass" select="''"/>
   <xsl:param name="sequence" select="''"/>
   <xsl:param name="gentext-key" select="''"/>
 
-  <!-- Really output a header? -->
-  <xsl:choose>
-    <xsl:when test="$pageclass = 'titlepage' and $gentext-key = 'book' and $sequence='first'">
-      <!-- no, book titlepages have no headers at all -->
-    </xsl:when>
-    <xsl:when test="$sequence = 'blank' and $headers.on.blank.pages = 0">
-      <!-- no output on blank pages -->
-    </xsl:when>
-    <xsl:when test="$gentext-key = 'part'">
-      <!-- parts are big enough on their page, let's not repeat the same text twice! -->
-    </xsl:when>
-    <xsl:otherwise>
-      <!-- Insert the current chapter title -->
-      <xsl:apply-templates select="." mode="object.title.markup"/>
-      <!-- Insert the PA logo  To do that, you need a table, with text left, and image right-->
-<!--      <fo:external-graphic content-height="1.2cm">
-      <xsl:attribute name="src">
-        <xsl:call-template name="fo-external-image">
-          <xsl:with-param name="filename" select="$header.image.filename"/>
-        </xsl:call-template>
-      </xsl:attribute>
-      </fo:external-graphic>-->
-    </xsl:otherwise>
-  </xsl:choose>
+  <xsl:variable name="leftS">
+   <fo:block space-before="5pt">
+    <xsl:choose>
+      <xsl:when test="$sequence = 'even'">
+        <fo:basic-link>
+         <xsl:attribute name="internal-destination">
+               <xsl:value-of select="./@id" />
+         </xsl:attribute> 
+         <xsl:apply-templates select="." mode="label.markup"/> 
+         <xsl:text>: </xsl:text>
+         <xsl:apply-templates select="." mode="title.markup"/>
+        </fo:basic-link>
+      </xsl:when>
+      <xsl:otherwise>
+        <fo:basic-link>
+         <xsl:attribute name="internal-destination">
+               <xsl:value-of select="../@id" />
+         </xsl:attribute> 
+         <xsl:call-template name="gentext">
+            <xsl:with-param name="key" select="'Part'"/>
+         </xsl:call-template>
+         <xsl:text> </xsl:text>
+         <xsl:apply-templates select=".." mode="label.markup"/> 
+         <xsl:text>: </xsl:text>
+         <xsl:apply-templates select=".." mode="title.markup"/> 
+        </fo:basic-link>
+       </xsl:otherwise>
+      </xsl:choose>
+     </fo:block>
+  </xsl:variable>
+
+  <xsl:variable name="rightS">
+    <fo:block space-before="5pt">
+     <xsl:choose>
+      <xsl:when test="$sequence = 'odd'">
+        <fo:basic-link>
+         <xsl:attribute name="internal-destination">
+               <xsl:value-of select="./@id" />
+         </xsl:attribute> 
+         <xsl:apply-templates select="." mode="label.markup"/> 
+         <xsl:text>: </xsl:text>
+         <xsl:apply-templates select="." mode="title.markup"/>
+        </fo:basic-link>
+      </xsl:when>
+      <xsl:when test="$sequence = 'even'">
+        <fo:basic-link>
+         <xsl:attribute name="internal-destination">
+               <xsl:value-of select="../@id" />
+         </xsl:attribute> 
+         <xsl:call-template name="gentext">
+            <xsl:with-param name="key" select="'Part'"/>
+         </xsl:call-template>
+         <xsl:text> </xsl:text>
+         <xsl:apply-templates select=".." mode="label.markup"/> 
+         <xsl:text>: </xsl:text>
+         <xsl:apply-templates select=".." mode="title.markup"/> 
+        </fo:basic-link>
+      </xsl:when>
+     </xsl:choose>
+    </fo:block>
+  </xsl:variable>
+
+  <xsl:variable name="candidate">
+    <fo:table table-layout="fixed" width="100%">
+      <xsl:call-template name="head.sep.rule">
+        <xsl:with-param name="pageclass" select="$pageclass"/>
+        <xsl:with-param name="sequence" select="$sequence"/>
+        <xsl:with-param name="gentext-key" select="$gentext-key"/>
+      </xsl:call-template>
+
+      <fo:table-column column-number="1"/>
+      <fo:table-column column-number="2"/>
+      <fo:table-column column-number="3"/>
+
+      <fo:table-body>
+        <fo:table-row height="15pt">
+
+          <fo:table-cell text-align="left" display-align="before">
+             <xsl:copy-of select="$leftS"/>
+          </fo:table-cell>
+
+          <fo:table-cell text-align="center" display-align="before">
+            <fo:external-graphic content-height="20pt">
+              <xsl:attribute name="src">
+               <xsl:call-template name="fo-external-image">
+                 <xsl:with-param name="filename" select="$header.image.filename"/>
+               </xsl:call-template>
+              </xsl:attribute>
+            <xsl:attribute name="height">14pt</xsl:attribute> 
+            <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
+           </fo:external-graphic>          
+          </fo:table-cell>
+
+          <fo:table-cell text-align="right" display-align="before">
+            <xsl:copy-of select="$rightS"/>
+          </fo:table-cell>
+        </fo:table-row>
+      </fo:table-body>
+    </fo:table>
+  </xsl:variable>
+
+<!-- Really output a header? -->
+ <xsl:choose>
+  <xsl:when test="$pageclass = 'body'">
+      <!-- Insert the table defined above -->
+    <xsl:copy-of select="$candidate"/>
+  </xsl:when>
+ </xsl:choose>
 </xsl:template>
 
 <!-- Footer : only have the page number -->
