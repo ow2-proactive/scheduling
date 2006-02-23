@@ -61,9 +61,15 @@
       <title>API Definition</title>
 
       <programlisting language="java">import org.objectweb.proactive.tools;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
-static public void <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
-static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);</programlisting>
+static public BooleanWrapper <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
+static public BooleanWrapper <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File<emphasis
+          role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);
+static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);
+static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File<emphasis
+          role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);</programlisting>
 
       <para>These methods can be used to put and get files on a remote Node
       while the user's application is running. Note that these methods behave
@@ -91,6 +97,9 @@ static public File <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n
       role="bold">localDest</emphasis>, in the same fashion.</para>
 
       <programlisting language="java">import org.objectweb.proactive.tools;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
 VirtualNode testVNode = pad.getVirtualNode("example");
@@ -99,11 +108,14 @@ Node[] examplenode = testVNode.getNodes();
 
 File localSource = new File("/local/source/path/file");
 File remoteDest = new File("/remote/destination/path/file");
-<emphasis role="bold">FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+<emphasis role="bold">BooleanWrapper bw=FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+<emphasis role="bold">bw.booleanValue();</emphasis>  //wait-by-neccessity for push to finish
 
 File remoteSource = new File("/remote/source/path/file");
 File localDest = new File("/local/destination/path/file");
-<emphasis role="bold">File filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);</emphasis></programlisting>
+<emphasis role="bold">FileWrapper filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);
+File files[] = filePulled.getFiles(); <emphasis>//wait-by-neccessity for pull to finish
+</emphasis></emphasis></programlisting>
     </sect2>
   </sect1>
 

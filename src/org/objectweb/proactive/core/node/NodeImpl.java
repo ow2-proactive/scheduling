@@ -36,9 +36,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -68,6 +70,7 @@ public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
     protected String vnName;
+    protected ArrayList fileTransferServicePool; 
 
     //
     // ----------Constructors--------------------
@@ -84,6 +87,7 @@ public class NodeImpl implements Node, Serializable {
         String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID, vmName);
+        this.fileTransferServicePool=new ArrayList();
     }
 
     //
@@ -347,4 +351,23 @@ public class NodeImpl implements Node, Serializable {
             body.terminate();
         }
     }
+
+    /**
+	public synchronized FileTransferService getFileTransferServiceFromPool() {
+		if(fileTransferServicePool.isEmpty()){
+			try {
+				return (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
+				        null);
+			} catch (Exception e) {
+				return null;
+			}
+		}
+		return (FileTransferService)fileTransferServicePool.get(0);
+	}
+
+	public synchronized void putFileTransferServiceInPool(FileTransferService fts) {
+		
+		fileTransferServicePool.add(fts);
+	}
+	**/
 }

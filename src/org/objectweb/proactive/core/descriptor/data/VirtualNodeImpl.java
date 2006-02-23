@@ -66,6 +66,8 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -77,6 +79,8 @@ import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -137,6 +141,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /** the list of file transfers to retrieve*/
     private java.util.ArrayList fileTransferRetrieve;
 
+    /** Holds the futures for the status of the deployed files using pftp */
+    private HashMap fileTransferDeployedStatus;
+    
+    private int fileBlockSize, overlapping;
+    	
     /** index of the last node used */
     private int lastNodeIndex;
 
@@ -227,9 +236,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         createdRuntimeF = new ArrayList();
         awaitedVirtualNodes = new Hashtable();
         fileTransferDeploy = new ArrayList();
+        fileTransferDeployedStatus = new HashMap();
         fileTransferRetrieve = new ArrayList();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-
+        fileBlockSize=org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+        overlapping=org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+        
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
                 proActiveRuntimeImpl.getVMInformation().getVMID().toString());
@@ -686,7 +698,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (!createdNodes.isEmpty()) {
             node = (Node) createdNodes.get(lastNodeIndex);
             increaseNodeIndex();
-
+            
+            //wait for pending file transfer
+            BooleanWrapper bw = (BooleanWrapper)fileTransferDeployedStatus.get(node.getNodeInformation().getName());
+            if(bw !=null) bw.booleanValue(); //wait-by-necessity
             return node;
         } else {
             throw new NodeException("Cannot get the node " + this.name);
@@ -701,6 +716,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 "Cannot return the first node, no nodes hava been created");
         }
 
+        BooleanWrapper bw = (BooleanWrapper)fileTransferDeployedStatus.get(node.getNodeInformation().getName());
+        if(bw!=null) bw.booleanValue(); //wait-by-necessity
+        
         return node;
     }
 
@@ -1277,7 +1295,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // when sleeping
             internalWait(tempNodeCount);
         }
-
+        
+        //wait for the nodes to complete their deployment file transfer
+        Collection c =fileTransferDeployedStatus.values();
+        Iterator it = c.iterator();
+        while(it.hasNext()){
+        	
+        	BooleanWrapper bw = (BooleanWrapper) it.next();
+        	bw.booleanValue(); //wait-by-necessity
+        }
+        
         return;
     }
 
@@ -1515,18 +1542,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         nodeCreated = true;
         nbCreatedNodes++;
 
-        //Performe FileTransferDeploy (if needed)
-        try {
-            fileTransferDeploy(node);
-        } catch (ProActiveException e) {
-            FILETRANSFER_LOGGER.error(
-                "Error when performing FileTransferDeploy:" + e.getCause());
-            FILETRANSFER_LOGGER.error(
-                "Activate file transfer logger debug for further error details.");
-            if (FILETRANSFER_LOGGER.isDebugEnabled()) {
-                e.printStackTrace();
-            }
-        }
+        //Performe FileTransferDeploy (if needed)       
+       	BooleanWrapper bw= fileTransferDeploy(node);
+       	this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
+        			bw);
 
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
@@ -1639,10 +1658,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
      */
-    public File[] fileTransferRetrieve() throws ProActiveException {
+    public FileWrapper fileTransferRetrieve() throws IOException, ProActiveException {
         Node[] nodes;
-        ArrayList arrayFiles = new ArrayList();
-
+        FileWrapper fileWrapper = new FileWrapper();
         try {
             nodes = getNodes();
         } catch (NodeException e) {
@@ -1678,7 +1696,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ExternalProcess eProcess = vm.getProcess();
             if (eProcess == null) {
                 if (FILETRANSFER_LOGGER.isDebugEnabled()) {
-                    FILETRANSFER_LOGGER.info("No Process linked with VM: " +
+                    FILETRANSFER_LOGGER.debug("No Process linked with VM: " +
                         vmName + " for node: " +
                         nodes[i].getNodeInformation().getName());
                 }
@@ -1687,23 +1705,24 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             FileTransferWorkShop ftwRetrieve = eProcess.getFileTransferWorkShopRetrieve();
             FileDescription[] fd = ftwRetrieve.getAllFileDescriptions();
+            
+            File[] srcFile = new File [fd.length];
+            File[] dstFile = new File [fd.length];
             for (int j = 0; j < fd.length; j++) {
-                File srcFile = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
-                File dstFile = new File(ftwRetrieve.getAbsoluteDstPath(fd[j]));
+                srcFile[j] = new File(ftwRetrieve.getAbsoluteSrcPath(fd[j]));
+                dstFile[j] = new File(ftwRetrieve.getAbsoluteDstPath(fd[j])+"-"+nodes[i].getNodeInformation().getName());
+            }
 
-                try {
-                    File f = FileTransferService.pullFile(nodes[i], srcFile,
-                            dstFile);
-                    arrayFiles.add(f);
-                } catch (Exception e) {
-                    FILETRANSFER_LOGGER.error("Unable to retrieve file:" +
-                        srcFile.getAbsolutePath() + " from node" +
-                        nodes[i].getNodeInformation().getName());
-                }
+			long init=System.currentTimeMillis();
+			fileWrapper.addFileWrapper(FileTransferService.pullFiles(nodes[i], srcFile,
+            dstFile, fileBlockSize, overlapping));
+
+            if(FILETRANSFER_LOGGER.isDebugEnabled()){
+            	FILETRANSFER_LOGGER.debug("Returned pullFiles in:"+(System.currentTimeMillis()-init));
             }
         }
 
-        return (File[]) arrayFiles.toArray(new File[0]);
+        return fileWrapper;
     }
 
     /**
@@ -1714,9 +1733,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * is transfered using the FileTransfer API.
      * @param node The node that the files will be transfered to.
      */
-    private void fileTransferDeploy(Node node) throws ProActiveException {
-        if (FILETRANSFER_LOGGER.isDebugEnabled()) {
-            FILETRANSFER_LOGGER.debug("File Transfer Deploy files for node" +
+    private BooleanWrapper fileTransferDeploy(Node node) {
+        if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+        	DEPLOYMENT_FILETRANSFER_LOGGER.debug("File Transfer Deploy files for node" +
                 node.getNodeInformation().getName());
         }
 
@@ -1724,15 +1743,21 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine vm = getVirtualMachine(vmName);
 
         if (vm == null) {
-            throw new ProActiveException("No VM found with name: " + vmName +
+        	if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+        		DEPLOYMENT_FILETRANSFER_LOGGER.debug("No VM found with name: " + vmName +
                 " for node: " + node.getNodeInformation().getName());
+        	}
+        	return new BooleanWrapper(false);
         }
 
         //TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
         ExternalProcess eProcess = vm.getProcess();
         if (eProcess == null) {
-            throw new ProActiveException("No Process linked with VM: " +
-                vmName + " for node: " + node.getNodeInformation().getName());
+        	if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+        		DEPLOYMENT_FILETRANSFER_LOGGER.debug("No Process linked with VM: " +
+        				vmName + " for node: " + node.getNodeInformation().getName());
+        	}
+        	return new BooleanWrapper(false);
         }
 
         //if the process handled the FileTransfer we have nothing to do
@@ -1741,23 +1766,41 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 DEPLOYMENT_FILETRANSFER_LOGGER.debug(
                     "No ProActive FileTransfer API is required for this node.");
             }
-            return;
+            return new BooleanWrapper(true);
         }
 
         FileTransferWorkShop ftwDeploy = eProcess.getFileTransferWorkShopDeploy();
         FileDescription[] fd = ftwDeploy.getAllFileDescriptions();
-        if (FILETRANSFER_LOGGER.isDebugEnabled()) {
-            FILETRANSFER_LOGGER.debug("Transfering " + fd.length + " file(s)");
+        if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
+        	DEPLOYMENT_FILETRANSFER_LOGGER.debug("Transfering " + fd.length + " file(s)");
         }
+
+        BooleanWrapper  bw = new BooleanWrapper(false);
+        File filesSrc[]=new File[fd.length];
+        File filesDst[]=new File[fd.length];
         for (int j = 0; j < fd.length; j++) {
             File srcFile = new File(ftwDeploy.getAbsoluteSrcPath(fd[j]));
             File dstFile = new File(ftwDeploy.getAbsoluteDstPath(fd[j]));
-
-            try {
-                FileTransferService.pushFile(node, srcFile, dstFile);
-            } catch (IOException e) {
-                throw new ProActiveException(e.getCause());
+            filesSrc[j]=srcFile;
+            filesDst[j]=dstFile;
+        }
+        
+        try {
+            bw=FileTransferService.pushFiles(node, filesSrc, filesDst, fileBlockSize, overlapping);
+        } catch (Exception e) {
+            logger.error("Unable to pushFile files to node "+ node.getNodeInformation().getName());
+            
+            if(DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()){
+            	DEPLOYMENT_FILETRANSFER_LOGGER.debug(e.getStackTrace());
             }
         }
+
+        return bw;
     }
+
+	public void setFileTransferParams(int fileBlockSize, int overlapping) {
+
+		this.fileBlockSize=fileBlockSize;
+		this.overlapping=overlapping;
+	}
 }

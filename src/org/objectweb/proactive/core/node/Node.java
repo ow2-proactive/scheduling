@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 import java.io.IOException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
@@ -97,4 +98,19 @@ public interface Node {
      * @throws IOException
      */
     public void killAllActiveObjects() throws NodeException, IOException;
+    
+    
+    /**
+     * This method gets a FileTransferService object from a pool or,
+     * if none are available creates a new one.
+     * @return A FileTransferService object
+     */
+    //public FileTransferService getFileTransferServiceFromPool();
+    
+    /**
+     * Registers the File Transfer Service in a pool for future use.
+     * @param fts The File Transfer Service that will be pooled. 
+     */
+    //public void putFileTransferServiceInPool(FileTransferService fts);
+    
 }

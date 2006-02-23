@@ -94,40 +94,6 @@ public class VariableContract implements Serializable {
     }
 
     /**
-     * Defines a variable into the contract. The value must be set using some of the set methods.
-     * Notice that calling directly a set method, will also define the variable if not already present.
-     * @param type @see XMLProperties
-     * @param name The name of the variable.
-     * @throws NullPointerException when one of the arguments is null
-     * @throws IllegalArgumentException when an important arguments is empty.
-     */
-
-    /*
-       private void defineVariable(XMLPropertiesType type, String name)
-               throws NullPointerException, IllegalArgumentException{
-    
-               if(closed) throw new IllegalArgumentException("Variable Contract is Closed. Variables can no longer be set or defined");
-    
-               checkGenericLogic(name, "",type);
-    
-               //If not defined, we define it
-               if(!list.containsKey(name)){
-                       if(logger.isDebugEnabled()){
-                               logger.debug("Defining: "+name);
-                       }
-                       unsafeAdd(name, "", type, "");
-                       return;
-               }
-    
-               //else, we check that the variable type is consistent
-                      PropertiesDatas var=(PropertiesDatas)list.get(name);
-                      if(var.type != type)
-                              throw new IllegalArgumentException("Can not define variable "+ name +" as "+type+"," +
-                                              " already defined as type: "+ var.type);
-       }
-     */
-
-    /**
      * Method for setting variables value from the deploying application.
      * @param name        The name of the variable.
      * @param value       Value of the variable
@@ -481,7 +447,7 @@ public class VariableContract implements Serializable {
 
         return sb.toString();
     }
-
+/*
     public void setDescriptorVariableOLD(String name, String value,
         VariableContractType type) {
         if (logger.isDebugEnabled()) {
@@ -495,7 +461,7 @@ public class VariableContract implements Serializable {
          *  -Priority: XML
          *  -Set Ability: XML
          *  -Default: XML
-         */
+     
         if (type.equals(VariableContractType.DescriptorVariable) &&
                 (value.length() <= 0)) {
             throw new IllegalArgumentException("Variable " + name +
@@ -506,7 +472,7 @@ public class VariableContract implements Serializable {
          *  -Priority: Program
          *  -Set Ability: Program
          *  -Default: Program
-         */
+       
         if (type.equals(VariableContractType.ProgramVariable)) {
             if (value.length() > 0) {
                 throw new IllegalArgumentException("Variable " + name +
@@ -526,7 +492,7 @@ public class VariableContract implements Serializable {
          *  -Priority: Program
          *  -Set Ability: Program, XML
          *  -Default: XML
-         */
+      
         if (type.equals(VariableContractType.DescriptorDefaultVariable)) {
             if (value.length() < 0) {
                 throw new IllegalArgumentException("Variable " + name +
@@ -553,7 +519,7 @@ public class VariableContract implements Serializable {
          *  -Priority: XML
          *  -Set Ability: Program, XML
          *  -Default: Program
-         */
+     
         if (type.equals(VariableContractType.ProgramDefaultVariable) &&
                 (value.length() <= 0)) {
             if (logger.isDebugEnabled()) {
@@ -567,7 +533,7 @@ public class VariableContract implements Serializable {
          *  -Priority: JavaProperty
          *  -Set Ability: JavaProperty
          *  -Default: JavaProperty
-         */
+
         if (type.equals(VariableContractType.JavaPropertyVariable)) {
             String prop_value = null;
 
@@ -592,7 +558,8 @@ public class VariableContract implements Serializable {
         //defineVariable(type, name);
         unsafeAdd(name, value, type, "Descriptor");
     }
-
+    */
+/*
     public void setVariableFromProgramOLD(String name, String value,
         VariableContractType type)
         throws NullPointerException, IllegalArgumentException {
@@ -603,11 +570,7 @@ public class VariableContract implements Serializable {
 
         checkGenericLogic(name, value, type);
 
-        /* DescriptorVariable
-         *  -Priority: XML
-         *  -Set Ability: XML
-         *  -Default: XML
-         */
+        // DescriptorVariable        *  -Priority: XML         *  -Set Ability: XML        *  -Default: XML         
         if (type.equals(VariableContractType.DescriptorVariable)) {
             if (value.length() > 0) {
                 throw new IllegalArgumentException("Variable " + name +
@@ -623,22 +586,14 @@ public class VariableContract implements Serializable {
             }
         }
 
-        /* ProgramVariable
-         *  -Priority: Program
-         *  -Set Ability: Program
-         *  -Default: Program
-         */
+        // ProgramVariable         *  -Priority: Program         *  -Set Ability: Program         *  -Default: Program         
         if (type.equals(VariableContractType.ProgramVariable) &&
                 (value.length() <= 0)) {
             throw new IllegalArgumentException("Variable " + name +
                 " value must be specified for type: " + type);
         }
 
-        /* DescriptorDefaultVariable
-         *  -Priority: Program
-         *  -Set Ability: Program, XML
-         *  -Default: XML
-         */
+        // DescriptorDefaultVariable         *  -Priority: Program         *  -Set Ability: Program, XML         *  -Default: XML         
         if (type.equals(VariableContractType.DescriptorDefaultVariable) &&
                 (value.length() <= 0)) {
             if (logger.isDebugEnabled()) {
@@ -648,11 +603,7 @@ public class VariableContract implements Serializable {
             return;
         }
 
-        /* ProgramDefaultVariable
-         *  -Priority: XML
-         *  -Set Ability: Program, XML
-         *  -Default: Program
-         */
+        // ProgramDefaultVariable          *  -Priority: XML         *  -Set Ability: Program, XML         *  -Default: Program         
         if (type.equals(VariableContractType.ProgramDefaultVariable)) {
             if (value.length() < 0) {
                 throw new IllegalArgumentException("Variable " + name +
@@ -675,11 +626,7 @@ public class VariableContract implements Serializable {
             }
         }
 
-        /* JavaPropertyVariable
-         *  -Priority: JavaProperty
-         *  -Set Ability: JavaProperty
-         *  -Default: JavaProperty
-         */
+        // JavaPropertyVariable         *  -Priority: JavaProperty         *  -Set Ability: JavaProperty         *  -Default: JavaProperty         
         if (type.equals(VariableContractType.JavaPropertyVariable)) {
             String prop_value = null;
 
@@ -704,7 +651,7 @@ public class VariableContract implements Serializable {
         //defineVariable(type, name);
         unsafeAdd(name, value, type, "Program");
     }
-
+*/
     /**
      * Class used for exclusive acces to global static variable:
      * org.objectweb.proactive.core.xml.XMLProperties.xmlproperties

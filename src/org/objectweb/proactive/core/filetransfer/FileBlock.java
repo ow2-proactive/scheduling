@@ -47,7 +47,7 @@ public class FileBlock implements Serializable{
     private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 	 
-	public static int DEFAULT_BLOCK_SIZE=256*1024; //Bytes
+	public static final int DEFAULT_BLOCK_SIZE=512*1024; //Bytes
 	
 	private String srcFilename;
 	private String dstFilename;
@@ -82,6 +82,9 @@ public class FileBlock implements Serializable{
 		
 		this.usage=0;
 		this.hasNextBlock=true;
+		
+		File F = new File(this.srcFilename);
+		numberOfBlocks=Math.round(Math.ceil((double)F.length()/this.blockSize));
 	}
 	
 	public String getSrcFilename() {
@@ -106,7 +109,7 @@ public class FileBlock implements Serializable{
 		try {
 			InputStream is = new FileInputStream(srcFilename);
 			long skipped=is.skip(offset);
-			if(skipped!=offset) throw new IOException("Erro while skipping file offset");
+			if(skipped!=offset) throw new IOException("Error while skipping file offset");
 			
 			usage=is.read(buffer, 0, blockSize);
 			offset+=usage;
@@ -115,8 +118,8 @@ public class FileBlock implements Serializable{
 			if(usage<blockSize)
 				hasNextBlock=false;
 			
-			File F = new File(this.srcFilename);
-			numberOfBlocks=Math.round(Math.ceil((double)F.length()/this.blockSize));
+			//File F = new File(this.srcFilename);
+			//numberOfBlocks=Math.round(Math.ceil((double)F.length()/this.blockSize));
 
 		} catch (IOException e) {
 			hasNextBlock=false;
@@ -125,10 +128,11 @@ public class FileBlock implements Serializable{
 		}
 	}
 	
+	/*
 	public boolean hasNextBlock(){
 		return hasNextBlock;
 	}
-	
+	*/
 	public void saveCurrentBlock(){
 		
 		if(usage<0) usage=0;

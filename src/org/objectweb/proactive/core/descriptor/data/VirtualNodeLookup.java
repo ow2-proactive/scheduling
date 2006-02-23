@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
 
 /**
@@ -72,11 +73,15 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     private String notActivatedMessage = "This VirtualNode lookup is not yet activated. Activate it first";
     protected String runtimeHostForLookup = "LOOKUP_HOST";
     protected String runtimePortForLookup = "LOOKUP_PORT";
-
+    private int fileBlockSize, overlapping;
+    
     public VirtualNodeLookup(String name) {
         this.name = name;
         ProActiveRuntimeImpl proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
+        fileBlockSize=org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
+        overlapping=org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+        
     }
 
     /**
@@ -402,7 +407,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
 	/* (non-Javadoc)
 	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
 	 */
-	public File[] fileTransferRetrieve() throws ProActiveException {
+	public FileWrapper fileTransferRetrieve() throws ProActiveException {
 		
 			throw new ProActiveException("No File Transfer Retrieve support from VirtualNodeLookup");
 		
@@ -417,6 +422,11 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	public void setFileTransferParams(int fileBlockSize, int overlapping) {
 
+		this.fileBlockSize=fileBlockSize;
+		this.overlapping=overlapping;
+	}
 	
 }
