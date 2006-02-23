@@ -152,14 +152,14 @@ public class DocBookize extends DefaultHandler
             if (str1 == null) {in.close(); return "";}
             String str2 = in.readLine();
             if (str2 == null) {in.close(); return str1;}
-            if (str2.contains(" * ################################################################"))
+            if (str2.startsWith(" * ################################################################"))
                 // begin PA comment, so just read it until end comment found
                 do {
                     str2 = in.readLine();
                     // if EndOfFile, just return with empty String
                     if (str2==null) return "";
                 }
-                while (!str2.contains("*/")); 
+                while (!str2.endsWith("*/")); 
             
             // just dump rest of the file into return value
             String str;
