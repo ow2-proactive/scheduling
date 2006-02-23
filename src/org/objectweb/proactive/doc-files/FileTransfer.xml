@@ -60,7 +60,7 @@
     <sect2 remap="h3">
       <title>API Definition</title>
 
-      <programlisting language="java">import org.objectweb.proactive.tools;
+      <programlisting language="java">import org.objectweb.proactive.filetransfer;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
@@ -96,7 +96,7 @@ static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>
       <emphasis>localhost</emphasis>@<emphasis
       role="bold">localDest</emphasis>, in the same fashion.</para>
 
-      <programlisting language="java">import org.objectweb.proactive.tools;
+      <programlisting language="java">import org.objectweb.proactive.filetransfer
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 

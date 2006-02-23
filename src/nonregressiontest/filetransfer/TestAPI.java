@@ -82,11 +82,11 @@ public class TestAPI extends FunctionalTest {
         VirtualNode testVNode = pad.getVirtualNode("test");
         testVNode.activate();
         Node[] testnode = testVNode.getNodes();
-        BooleanWrapper bw = org.objectweb.proactive.tools.FileTransfer.pushFile(testnode[0],
+        BooleanWrapper bw = org.objectweb.proactive.filetransfer.FileTransfer.pushFile(testnode[0],
             fileTest, filePushed);
         Assertions.assertTrue(bw.booleanValue());
 		
-        filePulledWrapper = org.objectweb.proactive.tools.FileTransfer.pullFile(testnode[0],fileTest, filePulled);
+        filePulledWrapper = org.objectweb.proactive.filetransfer.FileTransfer.pullFile(testnode[0],fileTest, filePulled);
         File pulled[]= filePulledWrapper.getFiles();
         Assertions.assertTrue(pulled.length==1);
         Assertions.assertTrue(pulled[0].equals(filePulled));

@@ -47,7 +47,7 @@
 		<processes>
 			<processDefinition id="sshProcess">
 				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="${HOST_NAME}">
-					<processReference refid="localJVM"/> <!--localJVM  changed to remoteJVM when testing from eclipse to avoid "Word to long" error -->
+					<processReference refid="${JVM_PROCESS}"/> <!--localJVM  changed to remoteJVM when testing from eclipse to avoid "Word to long" error -->
 					<FileTransferDeploy refid="implicit">
 						<copyProtocol>rcp,pftp</copyProtocol>
 						<sourceInfo prefix="/tmp"/>

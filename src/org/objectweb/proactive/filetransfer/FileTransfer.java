@@ -25,7 +25,7 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.tools;
+package org.objectweb.proactive.filetransfer;
 
 import java.io.File;
 import java.io.IOException;
