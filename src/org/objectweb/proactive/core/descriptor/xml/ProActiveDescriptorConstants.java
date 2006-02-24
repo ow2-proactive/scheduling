@@ -173,12 +173,12 @@ public interface ProActiveDescriptorConstants {
     public static final String UNICORE_KEYFILE_PATH_TAG = "keyFilePath";
     public static final String UNICORE_USITE_TAG = "usite";
     public static final String UNICORE_VSITE_TAG = "vsite";
-    public static final String FILE_TRANSFER_DEFINITIONS_TAG = "FileTransferDefinitions";
-    public static final String FILE_TRANSFER_TAG = "FileTransfer";
+    public static final String FILE_TRANSFER_DEFINITIONS_TAG = "fileTransferDefinitions";
+    public static final String FILE_TRANSFER_TAG = "fileTransfer";
     public static final String FILE_TRANSFER_FILE_TAG = "file";
     public static final String FILE_TRANSFER_DIR_TAG = "dir";
-    public static final String FILE_TRANSFER_DEPLOY_TAG = "FileTransferDeploy";
-    public static final String FILE_TRANSFER_RETRIEVE_TAG = "FileTransferRetrieve";
+    public static final String FILE_TRANSFER_DEPLOY_TAG = "fileTransferDeploy";
+    public static final String FILE_TRANSFER_RETRIEVE_TAG = "fileTransferRetrieve";
     public static final String FILE_TRANSFER_COPY_PROTOCOL_TAG = "copyProtocol";
     public static final String FILE_TRANSFER_SRC_INFO_TAG = "sourceInfo";
     public static final String FILE_TRANSFER_DST_INFO_TAG = "destinationInfo";

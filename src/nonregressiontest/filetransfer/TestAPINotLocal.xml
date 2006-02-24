@@ -31,16 +31,16 @@
 			</jvm>			
 		</jvms>
 	</deployment>
-	<FileTransferDefinitions>
-		<FileTransfer id="testRetrieve">
+	<fileTransferDefinitions>
+		<fileTransfer id="testRetrieve">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
-		</FileTransfer>
-		<FileTransfer id="testDeploy">
+		</fileTransfer>
+		<fileTransfer id="testDeploy">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed2.dat" />
-		</FileTransfer>
-	</FileTransferDefinitions>
+		</fileTransfer>
+	</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">

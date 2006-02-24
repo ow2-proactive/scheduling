@@ -23,8 +23,8 @@
 			
 		</jvms>
 	</deployment>
-	<FileTransferDefinitions>
-   <FileTransfer id="ng_transfer">
+	<fileTransferDefinitions>
+   <fileTransfer id="ng_transfer">
     <file src="http://grid.uio.no/runtime/j2re1.4.2_08.tar.gz" dest="j2re1.4.2_08.tar.gz" />
      <file src="dist/ProActive/ProActive.jar" dest="ProActive.jar" />
      <file src="lib/asm.jar" dest="asm.jar" />
@@ -34,8 +34,8 @@
      <file src="lib/xercesImpl.jar" dest="xercesImpl.jar" />
       <file src="scripts/proactive-log4j" dest="proactive-log4j" />
        <file src="scripts/proactive.java.policy" dest="proactive.java.policy" />
-  </FileTransfer>
-</FileTransferDefinitions>
+  </fileTransfer>
+</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM1">
@@ -62,10 +62,10 @@
 			<processDefinition id="ngProcess">
 				<ngProcess class="org.objectweb.proactive.core.process.nordugrid.NGProcess" hostname="ng_frontend">
 					<processReference refid="localJVM1"/>
-					<FileTransferDeploy refid="ng_transfer"> 
+					<fileTransferDeploy refid="ng_transfer"> 
 						<copyProtocol>processDefault</copyProtocol>
 						<sourceInfo prefix="file:///0/plugtest/ProActive" />
-					</FileTransferDeploy>
+					</fileTransferDeploy>
 					 <ngOption>
 					 	<executable>
 							<absolutePath value="/0/plugtest/ProActive/scripts/unix/cluster/ngStartRuntime.sh"/>

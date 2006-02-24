@@ -21,11 +21,11 @@
             </jvm>
         </jvms>
     </deployment>
-	<FileTransferDefinitions>
-		<FileTransfer id="ProActiveLite">
+	<fileTransferDefinitions>
+		<fileTransfer id="ProActiveLite">
 			<dir src="ProActive"/>
-		</FileTransfer>
-	</FileTransferDefinitions>
+		</fileTransfer>
+	</fileTransferDefinitions>
     <infrastructure>
 	<processes>
 		<processDefinition id="jvmTestSite">
@@ -68,11 +68,11 @@
 					<usite name="Gate Europe" type="CLASSIC" url="http://testgrid.unicorepro.com:4000"/>
 					<vsite name="SUPRENUM" nodes="1" processors="1" memory="256" runtime="3600" priority="normal"/>
 				</unicoreOption>
-				<FileTransferDeploy refid="ProActiveLite">
+				<fileTransferDeploy refid="ProActiveLite">
 					<copyProtocol>processDefault</copyProtocol>
 					<sourceInfo prefix="/0/plugtest/ProActiveLite"/>
 					<destinationInfo/>
-				</FileTransferDeploy>
+				</fileTransferDeploy>
 			</unicoreProcess>
 		</processDefinition>
 	  </processes>

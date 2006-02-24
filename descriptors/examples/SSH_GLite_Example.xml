@@ -21,11 +21,11 @@
             </jvm>
         </jvms>
     </deployment>
-    <FileTransferDefinitions>
-        <FileTransfer id="transfer">
+    <fileTransferDefinitions>
+        <fileTransfer id="transfer">
             <file src="job.jdl"/>
-        </FileTransfer>
-    </FileTransferDefinitions>
+        </fileTransfer>
+    </fileTransferDefinitions>
     <infrastructure>
         <processes>
             <processDefinition id="localJVM">
@@ -58,11 +58,11 @@
             <processDefinition id="sshProcess">
                 <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="glite-tutor.ct.infn.it" username="mozonne">
                     <processReference refid="gLiteProcess"/>
-                    <FileTransferDeploy refid="transfer">
+                    <fileTransferDeploy refid="transfer">
                         <copyProtocol>processDefault</copyProtocol>
                         <sourceInfo prefix="/afs/cern.ch/user/m/mozonne/public/JDL"/>
                         <destinationInfo prefix="/home/mozonne/JDL/"/>
-                    </FileTransferDeploy>
+                    </fileTransferDeploy>
                 </sshProcess>
             </processDefinition>
         </processes>

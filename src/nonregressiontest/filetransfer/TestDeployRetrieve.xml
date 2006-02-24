@@ -9,7 +9,7 @@
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="test" FileTransferDeploy="testDeploy" FileTransferRetrieve="testRetrieve" />
+			<virtualNode name="test" fileTransferDeploy="testDeploy" fileTransferRetrieve="testRetrieve" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -33,30 +33,30 @@
 			</jvm>			
 		</jvms>
 	</deployment>
-	<FileTransferDefinitions>
-		<FileTransfer id="testRetrieve">
+	<fileTransferDefinitions>
+		<fileTransfer id="testRetrieve">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
-		</FileTransfer>
-		<FileTransfer id="testDeploy">
+		</fileTransfer>
+		<fileTransfer id="testDeploy">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed.dat" />
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed2.dat" />
-		</FileTransfer>
-	</FileTransferDefinitions>
+		</fileTransfer>
+	</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
 				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="${HOST_NAME}">
 					<processReference refid="${JVM_PROCESS}"/> <!--localJVM  changed to remoteJVM when testing from eclipse to avoid "Word to long" error -->
-					<FileTransferDeploy refid="implicit">
+					<fileTransferDeploy refid="implicit">
 						<copyProtocol>rcp,pftp</copyProtocol>
 						<sourceInfo prefix="/tmp"/>
 						<destinationInfo prefix="/tmp"/>
-					</FileTransferDeploy>
-					<FileTransferRetrieve refid="implicit">
+					</fileTransferDeploy>
+					<fileTransferRetrieve refid="implicit">
 						<sourceInfo prefix="/tmp"/>
 						<destinationInfo prefix="/tmp"/>
-					</FileTransferRetrieve>
+					</fileTransferRetrieve>
 				</sshProcess>
 			</processDefinition>
 			<processDefinition id="remoteJVM">

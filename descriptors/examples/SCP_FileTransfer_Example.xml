@@ -21,12 +21,12 @@
             </jvm>
         </jvms>
     </deployment>
-	<FileTransferDefinitions>
-		<FileTransfer id="ProActiveLite">
+	<fileTransferDefinitions>
+		<fileTransfer id="ProActiveLite">
 			<file src="TestFilename.txt"/>
 			<dir src="ProActive"/>
-		</FileTransfer>
-	</FileTransferDefinitions>
+		</fileTransfer>
+	</fileTransferDefinitions>
     <infrastructure>
 	<processes>
 		<processDefinition id="jvmProcess">
@@ -56,14 +56,14 @@
 		<processDefinition id="sshProcess">
             <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost">
             	<processReference refid="jvmProcess"/>
-				<FileTransferDeploy refid="ProActiveLite">
+				<fileTransferDeploy refid="ProActiveLite">
 					<!-- scp is used to copy the files, one can still put scp, rcp,.... if the first protocol fails, the second one is tried and so on  -->
 					<copyProtocol>scp</copyProtocol>
 					<!-- following line also works since scp is the default protocol for ssh process-->
 					<!--<copyProtocol>processDefault</copyProtocol>-->
 					<sourceInfo prefix="/home1/plugtest"/>
 					<destinationInfo prefix="/home2/plugtest"/>
-				</FileTransferDeploy>
+				</fileTransferDeploy>
             </sshProcess>
 		</processDefinition>
 	  </processes>

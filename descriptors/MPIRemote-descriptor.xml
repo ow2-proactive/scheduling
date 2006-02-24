@@ -28,12 +28,12 @@
 			</jvm>
 		</jvms>
 	</deployment>
-	<FileTransferDefinitions>
-		<FileTransfer id="transfer">
+	<fileTransferDefinitions>
+		<fileTransfer id="transfer">
 			<!-- Transfer mpi program on remote host -->
 			<file src="cpi" dest="cpi" />
-		</FileTransfer>
-	</FileTransferDefinitions>
+		</fileTransfer>
+	</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 
