@@ -198,9 +198,9 @@ public class DocBookize extends DefaultHandler
     {
         comment("CHAR:   ");
         String s = new String(buf, offset, len);
-        if (storingJavaCode)
-            print(s);
-        else
+//        if (storingJavaCode)
+//            print(s);
+//        else
             print(s.replaceAll("&", "&amp;").replaceAll("<", "&lt;") );
     }
     
@@ -247,7 +247,7 @@ public class DocBookize extends DefaultHandler
                 tmpBuffer.close();
                 String generated = javaToDocBook.convert(temp.getPath());
                 temp.delete();
-                
+
                 // now put this code back into the xml we're generating
                 BufferedReader in = new BufferedReader(new FileReader(generated));
                 String str;
@@ -255,7 +255,7 @@ public class DocBookize extends DefaultHandler
                     print(str+"\n");
                 }
                 in.close();
-                new File(generated).delete();
+                //new File(generated).delete();
             } catch (IOException e) {
                 throw new SAXException("I/O error writing to temp file", e);
             }
@@ -264,7 +264,7 @@ public class DocBookize extends DefaultHandler
     /** Gets a JAVATODOCBOOK conversion class, acording to the machine possibilities.
      * @return a JavaToDocBook instance, which can be used to transform java to DocBook */
     private JavaToDocBook getConverter() {
-        String [] classes = {"util.JavaToDocBookExternal" } ; // TODO insert here other possible implementations.
+        String [] classes = { "util.JavaToDocBookExternal", "util.JavaToDocBookRegexp", } ; 
         JavaToDocBook instance = null;
         for (int i = 0 ; i < classes.length; i++) {
             try {
