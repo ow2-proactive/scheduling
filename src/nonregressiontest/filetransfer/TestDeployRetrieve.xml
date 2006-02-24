@@ -2,10 +2,10 @@
 <!--  ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd"-->
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/mleyton/ProActive/descriptors/DescriptorSchema.xsd">
 	<variables>
-		<DescriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
-		<DescriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
-		<DescriptorDefaultVariable name="JVM_PROCESS" value="localJVM"/>
-		<DescriptorDefaultVariable name="HOST_NAME" value="localhost"/>
+		<descriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
+		<descriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
+		<descriptorDefaultVariable name="JVM_PROCESS" value="localJVM"/>
+		<descriptorDefaultVariable name="HOST_NAME" value="localhost"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

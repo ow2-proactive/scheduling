@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd">
 	<variables>
-		<DescriptorVariable name="test_var3" value="value3"/>
-     	<DescriptorVariable name="test_var4" value="value4"/>
+		<descriptorVariable name="test_var3" value="value3"/>
+     	<descriptorVariable name="test_var4" value="value4"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

@@ -249,42 +249,42 @@ The following element ProActiveDescriptor defines the root of the schema
 	
 	<xs:complexType name="VariablesType">
 		<xs:sequence>
-			<xs:element name="DescriptorVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="descriptorVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="DescriptorDefaultVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="descriptorDefaultVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ProgramDefaultVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="programDefaultVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ProgramVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="programVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="optional"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="JavaPropertyVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="javaPropertyVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="IncludeXMLFile" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="includeXMLFile" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="location" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="IncludePropertyFile" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="includePropertyFile" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="location" type="xs:string" use="required"/>
 				</xs:complexType>

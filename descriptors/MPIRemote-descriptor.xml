@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
 	<variables>
-		<DescriptorVariable name="PROACTIVE_HOME" value="ProActive"/>
-		<DescriptorVariable name="REMOTE_HOME" value="/home/smariani"/>
-		<DescriptorVariable name="MPIRUN_PATH" value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun"/>
-		<DescriptorVariable name="QSUB_PATH" value="/opt/torque/bin/qsub"/>
-		<DescriptorVariable name="USER_HOME" value="/user/smariani/home"/>
+		<descriptorVariable name="PROACTIVE_HOME" value="ProActive"/>
+		<descriptorVariable name="REMOTE_HOME" value="/home/smariani"/>
+		<descriptorVariable name="MPIRUN_PATH" value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun"/>
+		<descriptorVariable name="QSUB_PATH" value="/opt/torque/bin/qsub"/>
+		<descriptorVariable name="USER_HOME" value="/user/smariani/home"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

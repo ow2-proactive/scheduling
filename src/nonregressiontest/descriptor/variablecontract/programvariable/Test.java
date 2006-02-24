@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
@@ -59,29 +60,29 @@ public class Test extends FunctionalTest {
 		//Setting from Program
 		HashMap map = new HashMap();
 		map.put("test_var", "helloworld");
-		variableContract.setVariableFromProgram(map, VariableContractType.getType("ProgramVariable"));
+		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 		
 		//Setting bogus empty variable from Program (this should fail)
 		try{
-			variableContract.setVariableFromProgram("bogus_from_program", "", VariableContractType.getType("ProgramVariable"));
+			variableContract.setVariableFromProgram("bogus_from_program", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 		}catch (Exception e){
 			bogusFromProgram=false;
 		}
 		
 		//Setting from Descriptor
-		variableContract.setDescriptorVariable("force_prog_set", "", VariableContractType.getType("ProgramVariable"));
+		variableContract.setDescriptorVariable("force_prog_set", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 		bogusCheckContract=variableContract.checkContract(); //Contract should fail (return false)
 		//Now it should be ok
-		variableContract.setVariableFromProgram("force_prog_set", "forcedhelloworld", VariableContractType.getType("ProgramVariable"));
+		variableContract.setVariableFromProgram("force_prog_set", "forcedhelloworld", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 		
 		//Setting bogus from descriptor (this should fail)
 		try{
-			variableContract.setDescriptorVariable("nonempty", "non_empty", VariableContractType.getType("ProgramVariable"));
+			variableContract.setDescriptorVariable("nonempty", "non_empty", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 		}catch (Exception e){
 			bogusFromDescriptor=false;
 		}
 		
-		variableContract.setVariableFromProgram("forcedFromDesc", "forcedhelloworldFromDesc", VariableContractType.getType("ProgramVariable"));	
+		variableContract.setVariableFromProgram("forcedFromDesc", "forcedhelloworldFromDesc", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));	
 		
 		pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
 

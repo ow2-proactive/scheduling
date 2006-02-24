@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
@@ -55,20 +56,20 @@ public class Test extends FunctionalTest {
 		//Setting from Program
 		HashMap map = new HashMap();
 		map.put("user_home", "user.home");
-		variableContract.setVariableFromProgram(map, VariableContractType.getType("JavaPropertyVariable"));
+		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		
 		//Setting Bogus from program
 		try{
-			variableContract.setVariableFromProgram("bogus_property", "bogus.property", VariableContractType.getType("JavaPropertyVariable"));
+			variableContract.setVariableFromProgram("bogus_property", "bogus.property", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		}catch (Exception e){
 			bogusFromProgram=false;
 		}
 		
 		//Setting from Descriptor
-		variableContract.setDescriptorVariable("user_dir", "user.dir", VariableContractType.getType("JavaPropertyVariable"));
+		variableContract.setDescriptorVariable("user_dir", "user.dir", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		//Setting bogus from program
 		try{
-			variableContract.setDescriptorVariable("bogus_property", "bogus.property", VariableContractType.getType("JavaPropertyVariable"));
+			variableContract.setDescriptorVariable("bogus_property", "bogus.property", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		}catch (Exception e){
 			bogusFromDescriptor=false;
 		}

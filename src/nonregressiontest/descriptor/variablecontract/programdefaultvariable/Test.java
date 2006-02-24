@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 
@@ -58,23 +59,23 @@ public class Test extends FunctionalTest {
 		//Setting from Program
 		HashMap map = new HashMap();
 		map.put("test_var1", "value1");
-		variableContract.setVariableFromProgram(map, VariableContractType.getType("ProgramDefaultVariable"));
+		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));
 				
 		//Setting bogus from Program (this should fail)
 		try{
-			variableContract.setVariableFromProgram("test_empty", "", VariableContractType.getType("ProgramDefaultVariable"));
+			variableContract.setVariableFromProgram("test_empty", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));
 		}catch (Exception e){
 			bogusFromProgram=false;
 		}
 		
 		//Setting from Program
-		variableContract.setDescriptorVariable("test_var2", "value2a", VariableContractType.getType("ProgramDefaultVariable"));
+		variableContract.setDescriptorVariable("test_var2", "value2a", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));
 		//The following value should not be set, because Program is default and therefore has lower priority
-		variableContract.setVariableFromProgram("test_var2", "value2b", VariableContractType.getType("ProgramDefaultVariable"));
+		variableContract.setVariableFromProgram("test_var2", "value2b", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));
 				
 		//Setting bogus variable from Descriptor (this should fail)
 		try{
-			variableContract.setDescriptorVariable("bogus_from_descriptor", "", VariableContractType.getType("ProgramDefaultVariable"));
+			variableContract.setDescriptorVariable("bogus_from_descriptor", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG));
 		}catch (Exception e){
 			bogusFromDescriptor=false;
 		}

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd">
 	<variables>
-		<DescriptorDefaultVariable name="test_var0" value="value0"/>
-	 	<IncludeXMLFile location="../src/nonregressiontest/descriptor/variablecontract/externalfiles/Test2.xml"/>
-	 	<IncludePropertyFile location="../src/nonregressiontest/descriptor/variablecontract/externalfiles/Test.properties"/>
+		<descriptorDefaultVariable name="test_var0" value="value0"/>
+	 	<includeXMLFile location="../src/nonregressiontest/descriptor/variablecontract/externalfiles/Test2.xml"/>
+	 	<includePropertyFile location="../src/nonregressiontest/descriptor/variablecontract/externalfiles/Test.properties"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

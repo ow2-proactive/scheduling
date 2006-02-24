@@ -23,7 +23,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<!--Uniqueness of the id attribute for infrastructure/services/serviceDefinition element-->
 		</xs:unique>
 		<xs:unique name="filetransferDefid">
-			<xs:selector xpath="FileTransferDefinitions/FileTransfer"/>
+			<xs:selector xpath="fileTransferDefinitions/fileTransfer"/>
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for FileTransferDefinitions/FileTransfer element-->
 		</xs:unique>
@@ -41,11 +41,11 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:keyref>
 		<xs:keyref name="VirtNodeDeployFileTransfer" refer="filetransferid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
-			<xs:field xpath="@FileTransferDeploy"/>
+			<xs:field xpath="@fileTransferDeploy"/>
 		</xs:keyref>
 		<xs:keyref name="VirtNodeRetrieveFileTransfer" refer="filetransferid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
-			<xs:field xpath="@FileTransferRetrieve"/>
+			<xs:field xpath="@fileTransferRetrieve"/>
 		</xs:keyref>
 		<xs:keyref name="vnFtServiceId" refer="serviceid">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
@@ -182,7 +182,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<!-- Key definition for the attribute id located at  infrastructure/services/serviceDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/services/serviceDefinition@id -->
 		</xs:key>
 		<xs:key name="filetransferid">
-			<xs:selector xpath="FileTransferDefinitions/FileTransfer"/>
+			<xs:selector xpath="fileTransferDefinitions/fileTransfer"/>
 			<xs:field xpath="@id"/>
 			<!-- Key definition for the attribute id located at FileTransferDefinitions/FileTransfer. This key will be used to ensure that the FileTransferDeploy & FileTransferRetrieve attribute defined in the VirtualNodeExtType has a correponding value in FileTransferDefinitions/FileTransfer@id -->
 		</xs:key>
@@ -241,7 +241,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				<!-- </xs:keyref>-->
 			</xs:element>
 			<xs:element name="deployment" type="DeploymentType"/>
-			<xs:element name="FileTransferDefinitions" type="FileTransferDefinitionsType" minOccurs="0"/>
+			<xs:element name="fileTransferDefinitions" type="FileTransferDefinitionsType" minOccurs="0"/>
 			<xs:element name="infrastructure" type="InfrastructureType" minOccurs="0"/>
 			<xs:element name="technicalServices" type="TechnicalServiceType" minOccurs="0"/>
 		</xs:sequence>
@@ -249,42 +249,42 @@ The following element ProActiveDescriptor defines the root of the schema
 	
 	<xs:complexType name="VariablesType">
 		<xs:sequence>
-			<xs:element name="DescriptorVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="descriptorVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="DescriptorDefaultVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="descriptorDefaultVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ProgramDefaultVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="programDefaultVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="ProgramVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="programVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="optional"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="JavaPropertyVariable" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="javaPropertyVariable" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
 					<xs:attribute name="value" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="IncludeXMLFile" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="includeXMLFile" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="location" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="IncludePropertyFile" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="includePropertyFile" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="location" type="xs:string" use="required"/>
 				</xs:complexType>
@@ -375,8 +375,8 @@ The following element ProActiveDescriptor defines the root of the schema
 				<xs:attribute name="ftServiceId" type="xs:string" use="optional"/>
 				<xs:attribute name="timeout" type="xs:positiveInteger" use="optional"/>
 				<xs:attribute name="waitForTimeout" type="xs:boolean" use="optional" default="false"/>
-				<xs:attribute name="FileTransferDeploy" type="xs:string" use="optional"/>
-				<xs:attribute name="FileTransferRetrieve" type="xs:string" use="optional"/>
+				<xs:attribute name="fileTransferDeploy" type="xs:string" use="optional"/>
+				<xs:attribute name="fileTransferRetrieve" type="xs:string" use="optional"/>
 				<xs:attribute name="technicalServiceId" type="xs:string" use="optional" />
 			</xs:extension>
 		</xs:complexContent>
@@ -502,7 +502,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--FileTransferDefinitions element has one child: FileTransfer that can appear cero or more times -->
 	<xs:complexType name="FileTransferDefinitionsType">
 		<xs:sequence>
-			<xs:element name="FileTransfer" type="FileTransferType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="fileTransfer" type="FileTransferType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="FileTransferType">
@@ -857,8 +857,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required" fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -1172,8 +1172,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="unicoreDirPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="keyFilePath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="unicoreOption" type="unicoreOptionType" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.unicore.UnicoreProcess"/>
 		<xs:attribute name="keypassword" type="xs:string" use="optional"/>
@@ -1225,8 +1225,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="processReference"/>
 			<xs:element name="hierarchicalReference" type="ProcessReferenceType"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
@@ -1246,8 +1246,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-			<xs:element name="FileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="FileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferDeploy" type="FileTransferStructureType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ngOption" type="NGOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.nordugrid.NGProcess"/>
