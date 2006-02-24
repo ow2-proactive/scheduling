@@ -39,15 +39,6 @@
 <!-- Make tables use up all space. -->
 <!-- <xsl:param name="default.table.width" >100</xsl:param> -->
 
-<!-- Renaming the table of contents to have more space ==> pushed to the right #x20 -->
-<!-- I think this was used with another xml parser. May be removed -->
-<!--<xsl:param name="local.l10n.xml" select="document('')"/> 
-<l:i18n xmlns:l="http://docbook.sourceforge.net/xmlns/l10n/1.0"> 
-  <l:l10n language="en"> 
-    <l:gentext key="TableofContents" text="Table Of Contents"/>
-  </l:l10n>
-</l:i18n>-->
-
 <!-- The chapter entries of the toc are in bold, the parts in bold and 11pt. -->
 <xsl:template name="toc.line">
   <xsl:variable name="id">
@@ -127,72 +118,73 @@
   <xsl:attribute name="font-size">12pt</xsl:attribute>
 </xsl:attribute-set>  
 
-<!-- adjust the headers, recalling chapter numbers -->
+<!-- helper for function below -->
+<xsl:template name="link.myhelper">
+  <xsl:param name="class" select="''"/>
+  <xsl:param name="level" select="''"/>
+ 
+   <fo:block space-before="5pt">
+  <fo:basic-link internal-destination="{$level/@id}">
+      <xsl:value-of select="$class"/> 
+      <xsl:text> </xsl:text>
+      <xsl:apply-templates select="$level" mode="label.markup"/> 
+      <xsl:text>: </xsl:text>
+      <xsl:apply-templates select="$level" mode="title.markup"/> 
+  </fo:basic-link>
+   </fo:block>
+  
+</xsl:template>
+
+<!-- adjust the headers, recalling chapter and part numbers -->
 <xsl:template name="header.table">
   <xsl:param name="pageclass" select="''"/>
   <xsl:param name="sequence" select="''"/>
   <xsl:param name="gentext-key" select="''"/>
 
   <xsl:variable name="leftS">
-   <fo:block space-before="5pt">
     <xsl:choose>
+
       <xsl:when test="$sequence = 'even'">
-        <fo:basic-link>
-         <xsl:attribute name="internal-destination">
-               <xsl:value-of select="./@id" />
-         </xsl:attribute> 
-         <xsl:apply-templates select="." mode="label.markup"/> 
-         <xsl:text>: </xsl:text>
-         <xsl:apply-templates select="." mode="title.markup"/>
-        </fo:basic-link>
+       <xsl:call-template name="link.myhelper">
+           <xsl:with-param name="level" select="." />
+       </xsl:call-template>
       </xsl:when>
+
       <xsl:otherwise>
-        <fo:basic-link>
-         <xsl:attribute name="internal-destination">
-               <xsl:value-of select="../@id" />
-         </xsl:attribute> 
-         <xsl:call-template name="gentext">
-            <xsl:with-param name="key" select="'Part'"/>
-         </xsl:call-template>
-         <xsl:text> </xsl:text>
-         <xsl:apply-templates select=".." mode="label.markup"/> 
-         <xsl:text>: </xsl:text>
-         <xsl:apply-templates select=".." mode="title.markup"/> 
-        </fo:basic-link>
-       </xsl:otherwise>
+        <xsl:call-template name="link.myhelper">
+          <xsl:with-param name="level" select=".." />
+          <xsl:with-param name="class">
+            <xsl:call-template name="gentext">
+              <xsl:with-param name="key" select="'Part'"/>
+            </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:otherwise>
+
       </xsl:choose>
-     </fo:block>
   </xsl:variable>
 
   <xsl:variable name="rightS">
-    <fo:block space-before="5pt">
      <xsl:choose>
+
       <xsl:when test="$sequence = 'odd'">
-        <fo:basic-link>
-         <xsl:attribute name="internal-destination">
-               <xsl:value-of select="./@id" />
-         </xsl:attribute> 
-         <xsl:apply-templates select="." mode="label.markup"/> 
-         <xsl:text>: </xsl:text>
-         <xsl:apply-templates select="." mode="title.markup"/>
-        </fo:basic-link>
-      </xsl:when>
-      <xsl:when test="$sequence = 'even'">
-        <fo:basic-link>
-         <xsl:attribute name="internal-destination">
-               <xsl:value-of select="../@id" />
-         </xsl:attribute> 
-         <xsl:call-template name="gentext">
-            <xsl:with-param name="key" select="'Part'"/>
+         <xsl:call-template name="link.myhelper">
+            <xsl:with-param name="level" select="." />
          </xsl:call-template>
-         <xsl:text> </xsl:text>
-         <xsl:apply-templates select=".." mode="label.markup"/> 
-         <xsl:text>: </xsl:text>
-         <xsl:apply-templates select=".." mode="title.markup"/> 
-        </fo:basic-link>
       </xsl:when>
+      
+      <xsl:when test="$sequence = 'even'">
+        <xsl:call-template name="link.myhelper">
+          <xsl:with-param name="level" select=".." />
+          <xsl:with-param name="class">
+             <xsl:call-template name="gentext">
+                <xsl:with-param name="key" select="'Part'"/>
+             </xsl:call-template>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+
      </xsl:choose>
-    </fo:block>
   </xsl:variable>
 
   <xsl:variable name="candidate">
@@ -243,21 +235,9 @@
  </xsl:choose>
 </xsl:template>
 
-<!-- Footer : only have the page number -->
-<!--
-<xsl:template name="footer.table">
-  <fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" text-align="center">
-     <fo:page-number/>
-  </fo:block> 
-</xsl:template>
--->
 <!-- Having long lines be broken up  -->
 <xsl:param name="hyphenate.verbatim">yes</xsl:param>
 
-<!--<xsl:attribute-set name="monospace.verbatim.properties">
-    <xsl:attribute name="wrap-option">wrap</xsl:attribute>-->
-<!-- CXXXXX    <xsl:attribute name="hyphenation-character">&#x00B6;</xsl:attribute> -->
-<!-- </xsl:attribute-set> -->
 
 <!-- Playing around with the bullet possibilities -->
 <!--<xsl:template name="itemizedlist.label.markup">
@@ -280,42 +260,12 @@
   </fo:external-graphic>
 </xsl:template>
 
-<!-- Trying to avoid skipping too many pages -->
-<!--<xsl:template name="generate.part.toc">
-  <xsl:param name="part" select="."/>
-
-  <xsl:variable name="lot-master-reference">
-    <xsl:call-template name="select.pagemaster">
-      <xsl:with-param name="pageclass" select="'lot'"/>
-    </xsl:call-template>
-  </xsl:variable>
-
-  <xsl:variable name="toc.params">
-    <xsl:call-template name="find.path.params">
-      <xsl:with-param name="node" select="$part"/>
-      <xsl:with-param name="table" select="normalize-space($generate.toc)"/>
-    </xsl:call-template>
-  </xsl:variable>
-
-  <xsl:variable name="nodes" select="reference|
-                                     preface|
-                                     chapter|
-                                     appendix|
-                                     article|
-                                     bibliography|
-                                     glossary|
-                                     index"/>
-
-  <xsl:if test="count($nodes) &gt; 0 and contains($toc.params, 'toc')">
-  </xsl:if>
-</xsl:template>-->
 
 
 <!-- No "Draft" splayed across the page -->
 <xsl:param name="draft.watermark.image"></xsl:param> 
 
 <!-- Have screens written on darker background -->
-<!-- <xsl:param name="shade.verbatim">1</xsl:param>  -->
 <xsl:attribute-set name="verbatim.properties">
    <xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
    <!-- <xsl:attribute name="border">0.5pt solid blue</xsl:attribute> -->
@@ -419,6 +369,5 @@
 
 <!-- Turn off the traditional full part toc -->
 <xsl:template name="generate.part.toc"> </xsl:template>
-
 
 </xsl:stylesheet>
