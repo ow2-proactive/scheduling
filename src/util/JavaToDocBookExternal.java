@@ -33,36 +33,39 @@ package util;
 import java.io.File;
 import java.io.IOException;
 
-/** An implementation of JavaToDocBook, by calling an external program.; 
+
+/** An implementation of JavaToDocBook, by calling an external program;
  * here is used the GNU source-highlight program.
  * Program available at www.gnu.org/software/src-highlite.
- * Run './configure && make && make install' to get the correct installation.   
- * */
+ * Run './configure && make && make install' to get the correct installation. */
 public class JavaToDocBookExternal implements JavaToDocBook {
+    private String path = "/usr/local/bin/";
+    private String exec = "source-highlight";
 
-    private String path="/usr/local/bin/" ;
-    private String exec="source-highlight";
-
-    
     /** Convert a code file into a decorated code file, using an external program.
      * Transform some java code into some nicely highlighted docbook.
-     * @param fileToConvert the name of the file to convert 
-     * @return convertedFile : the name of the file which has been created (it contains decorated code)  */   
-    public String convert(String file)  throws IOException {
-        Process converter = Runtime.getRuntime().exec(path + exec + " -f docbook -i " + file + " -o " + file + ".xml");
+     * @param fileToConvert the name of the file to convert
+     * @return convertedFile : the name of the file which has been created (it contains decorated code)  */
+    public String convert(String file) throws IOException {
+        Process converter = Runtime.getRuntime()
+                                   .exec(path + exec + " -f docbook -i " +
+                file + " -o " + file + ".xml");
+
         try {
             converter.waitFor();
         } catch (InterruptedException e) {
-            throw new IOException ("Problem with conversion to docbook of "  + file + ". " + e);
+            throw new IOException("Problem with conversion to docbook of " +
+                file + ". " + e);
         }
+
         return file + ".xml";
     }
 
-    /** Using this converter can only work if the external executable is found 
+    /** Using this converter can only work if the external executable is found
      * @return true only if the external executable is available on filesystem. */
     public boolean willWork() {
-        File executableFile = new File (this.path + this.exec);
+        File executableFile = new File(this.path + this.exec);
+
         return executableFile.exists();
     }
-
 }

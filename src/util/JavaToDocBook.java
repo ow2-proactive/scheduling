@@ -32,18 +32,17 @@ package util;
 
 import java.io.IOException;
 
+
 /** All possible ways of transforming a code file into a decorated code file
  * should implement this interface. */
 public interface JavaToDocBook {
-
-/** Convert a code file into a decorated code file.
- * @param fileToConvert the name of the file to convert 
- * @return convertedFile : the name of the file which has been created (it contains decorated code)  */   
+    /** Convert a code file into a decorated code file.
+     * @param fileToConvert the name of the file to convert
+     * @return convertedFile : the name of the file which has been created (it contains decorated code)  */
     String convert(String fileToConvert) throws IOException;
 
-/** Once an instance of this Class is created, check that it will really work when run.
- * @return true if running it will do the conversion, false if it will have trouble;
- * For example, trouble may be created by a missing extension. */
+    /** Once an instance of this Class is created, check that it will really work when run.
+     * @return true if running it will do the conversion, false if it will have trouble;
+     * For example, trouble may be created by a missing extension. */
     boolean willWork();
-
 }
