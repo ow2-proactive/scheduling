@@ -28,11 +28,11 @@ package org.objectweb.proactive.core.filetransfer;
  * ################################################################
  */
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-//import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.Serializable;
 
@@ -44,10 +44,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author ProActive Team 09/2005
  */
 public class FileBlock implements Serializable{
-    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 	protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 	 
-	public static final int DEFAULT_BLOCK_SIZE=512*1024; //Bytes
+	public static final int DEFAULT_BLOCK_SIZE=256*1024; //Bytes
 	
 	private String srcFilename;
 	private String dstFilename;
@@ -55,7 +54,6 @@ public class FileBlock implements Serializable{
 	private int usage;
 	private long offset;
 	private int blockSize;
-	private boolean hasNextBlock;
 	private long numberOfBlocks;
 	
 	public FileBlock(){
@@ -81,7 +79,6 @@ public class FileBlock implements Serializable{
 		this.numberOfBlocks=0;
 		
 		this.usage=0;
-		this.hasNextBlock=true;
 		
 		File F = new File(this.srcFilename);
 		numberOfBlocks=Math.round(Math.ceil((double)F.length()/this.blockSize));
@@ -104,53 +101,60 @@ public class FileBlock implements Serializable{
 		return numberOfBlocks;
 	}
 	
-	public void loadNexBlock() throws IOException{
+	/**
+	 * Loads the FileBlock object with a block from the source file this block references.
+	 * If the parameter is null, then it will create a new buffer from the parameters stored in
+	 * the block instance. Note that creating a new block requires performing a skip (seek) on the 
+	 * stream, which is very slow. Therefore it is better to pass the buffered stream as parameter.
+	 */
+	public void loadNextBlock(BufferedInputStream bis) throws IOException{
 
-		try {
-			InputStream is = new FileInputStream(srcFilename);
-			long skipped=is.skip(offset);
+		boolean closeAfterRead=false;
+		if(bis==null){
+			bis= new BufferedInputStream(new FileInputStream(srcFilename));
+			long skipped=bis.skip(offset);
 			if(skipped!=offset) throw new IOException("Error while skipping file offset");
+			closeAfterRead=true;
+		}
 			
-			usage=is.read(buffer, 0, blockSize);
+		try {
+			usage=bis.read(buffer, 0, blockSize);
 			offset+=usage;
-			is.close();
 			
-			if(usage<blockSize)
-				hasNextBlock=false;
+			if(closeAfterRead) bis.close();
 			
 			//File F = new File(this.srcFilename);
 			//numberOfBlocks=Math.round(Math.ceil((double)F.length()/this.blockSize));
 
 		} catch (IOException e) {
-			hasNextBlock=false;
 			usage=0;
 			throw e;
 		}
 	}
 	
-	/*
-	public boolean hasNextBlock(){
-		return hasNextBlock;
-	}
-	*/
-	public void saveCurrentBlock(){
-		
+	public void saveCurrentBlock(BufferedOutputStream bos){
+		//TODO check if bos is null
 		if(usage<0) usage=0;
-		
+		boolean closeAfterWrite=false;
+
 		try {
-			FileOutputStream fos =
-				new FileOutputStream(dstFilename, offset<=usage?false:true);
-			fos.write(buffer, 0, usage);
-			fos.flush();
-			fos.close();
+			if(bos==null){
+				bos = new BufferedOutputStream(new FileOutputStream(dstFilename, offset<=usage?false:true));
+				closeAfterWrite=true;
+			}
+			
+			bos.write(buffer, 0, usage);
+
+			if(closeAfterWrite) bos.close();
+			
 		} catch (Exception e) {
-			hasNextBlock=false;
 			e.printStackTrace();
 		}
 		
 		//Can't write the same block twice
 		usage=0;
 	}
+	
 	
 	/**
 	 * @return Returns the offset.

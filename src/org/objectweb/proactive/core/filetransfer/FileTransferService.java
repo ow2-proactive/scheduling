@@ -1,8 +1,14 @@
 package org.objectweb.proactive.core.filetransfer;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.HashMap;
 
 /*
  * ################################################################
@@ -38,11 +44,11 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 
 
 /**
@@ -53,12 +59,62 @@ public class FileTransferService implements Serializable,
     ProActiveInternalObject {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = 8;
-    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat(
-            "dd/MM/yyyy HH:mm:ss");
-
+	public static final int DEFAULT_BUFFER_SIZE=512*1024;
+	
+    protected HashMap readBufferMap; //Map for storing the opened reading sockets
+    protected HashMap writeBufferMap; //Map for storing the opened output sockets
+    
     public FileTransferService() {
+    	readBufferMap = new HashMap();
+    	writeBufferMap = new HashMap();
     }
 
+    public LongWrapper openRead(File f){
+    	
+    	try {
+			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f.getAbsolutePath()),DEFAULT_BUFFER_SIZE);
+			readBufferMap.put(f,bis);
+		} catch (FileNotFoundException e) {
+			logger.error("Unable to open file: "+f.getAbsolutePath());
+			return new LongWrapper(0);
+			
+		}
+		return new LongWrapper(f.length());
+		
+    }
+    
+    /**
+     * Opens a buffer reader for File f.
+     * @param f  The file for which a buffer read will be opened
+     * @return Length of the file
+     */
+    public BooleanWrapper openWrite(File f){
+    	try {
+    		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f.getAbsolutePath()),DEFAULT_BUFFER_SIZE);
+			writeBufferMap.put(f,bos);
+		} catch (FileNotFoundException e) {
+			logger.error("Unable to open file: "+f.getAbsolutePath());
+			return new BooleanWrapper(false);
+		}
+
+		return new BooleanWrapper(true);
+    }
+    
+    public void closeRead(File f){
+    	BufferedInputStream bis = (BufferedInputStream) readBufferMap.remove(f);
+    	try {
+    		if(bis!=null) bis.close();
+		} catch (IOException e) {}
+    	
+    }
+    
+    public void closeWrite(File f){
+    	BufferedOutputStream bos = (BufferedOutputStream) writeBufferMap.remove(f);
+    	try {
+    		if(bos!=null) bos.close();
+    	} catch (IOException e) {}
+    }
+    
     /**
      * This method will save the specified FileBlock.
      * @param fileblock
@@ -71,9 +127,9 @@ public class FileTransferService implements Serializable,
             throw new IOException("Can't write to: " +
                 fileblock.getDstFilename());
         }
-        //logger.debug("saveFileBlock:"+sayHello());
-        //logger.debug(fileblock.getClass());
-        fileblock.saveCurrentBlock();
+
+        BufferedOutputStream bos = (BufferedOutputStream)writeBufferMap.get(f);
+        fileblock.saveCurrentBlock(bos);
     }
 
     public void saveFileBlockWithoutThrowingException(FileBlock fileblock) {
@@ -100,7 +156,8 @@ public class FileTransferService implements Serializable,
         }
 
         FileBlock newBlock = new FileBlock(filename, offset, bsize);
-        newBlock.loadNexBlock();
+        BufferedInputStream bis = (BufferedInputStream)readBufferMap.get(f);
+        newBlock.loadNextBlock(bis);
 
         return newBlock;
     }
@@ -142,23 +199,41 @@ public class FileTransferService implements Serializable,
         long init = System.currentTimeMillis();
         long numBlocks = 0;
 
-        FileBlock fileBlock = new FileBlock(srcFile.getAbsolutePath(), 0, bsize);
-        fileBlock.setDstFilename(dstFile.getAbsolutePath());
-        long totalNumBlocks = fileBlock.getNumberOfBlocks();
+        //Open the local reading buffer
+       	BufferedInputStream bis;
+		try {
+			bis = new BufferedInputStream(new FileInputStream(srcFile.getAbsoluteFile()),DEFAULT_BUFFER_SIZE);
+		} catch (FileNotFoundException e1) {
+			logger.error("Can not open for sending:"+srcFile.getAbsoluteFile());
+			logger.error(e1.getMessage());
+			return new BooleanWrapper(false);
+		}
 
+		long totalNumBlocks=Math.round(Math.ceil((double)srcFile.length()/bsize));
         if (totalNumBlocks == 0) {
             logger.error("Can not send an empty File:" +
                 srcFile.getAbsolutePath());
+            try {bis.close();} catch (IOException e) {}
             return new BooleanWrapper(false);
         }
-
+		
+		//Open the remote writting buffer
+		BooleanWrapper bw = ftsRemote.openWrite(dstFile);
+		if(bw.booleanValue() !=true){
+			logger.error("Unable to open remote file for writting"+dstFile.getAbsolutePath());
+			try {bis.close();} catch (IOException e) {}
+			return new BooleanWrapper(false);
+		}
+		
+        FileBlock fileBlock = new FileBlock(srcFile.getAbsolutePath(), 0, bsize);
+        fileBlock.setDstFilename(dstFile.getAbsolutePath());
         while (numBlocks < (totalNumBlocks - 1)) {
             //Exceptions can happen here
             try {
                 for (int i = 0;
                         (i < numFlyingBlocks) &&
                         (numBlocks < (totalNumBlocks - 1)); i++) {
-                    fileBlock.loadNexBlock();
+                    fileBlock.loadNextBlock(bis);
                     //logger.debug("Num Block: "+numBlocks+"/"+fileBlock.getNumberOfBlocks()+" offset="+fileBlock.getOffset());
                     if (i == (numFlyingBlocks - 1)) { //rendevouz the burst, so the remote AO will not be clogged
                         ftsRemote.saveFileBlock(fileBlock);
@@ -174,9 +249,9 @@ public class FileTransferService implements Serializable,
             }
         }
 
-        //Handle a rendevous with last block here!
+        //Handle a rendevouz with last block here!
         try {
-            fileBlock.loadNexBlock();
+            fileBlock.loadNextBlock(bis);
             ftsRemote.saveFileBlock(fileBlock);
             numBlocks++;
         } catch (IOException e) {
@@ -185,6 +260,10 @@ public class FileTransferService implements Serializable,
             return new BooleanWrapper(false);
         }
 
+        //Close the remote/local buffers
+        ftsRemote.closeWrite(dstFile);
+        try { bis.close(); } catch (IOException e) {}
+        
         if (logger.isDebugEnabled()) {
             long fin = System.currentTimeMillis();
             long delta = (fin - init);
@@ -192,7 +271,7 @@ public class FileTransferService implements Serializable,
                 delta + "[ms]");
         }
 
-        //TODO Here We could register this FTS AO into a Node or RunTime pool for reuse!
+        //TODO Here we could register this FTS AO into a Node or RunTime pool for reuse!
         return new BooleanWrapper(true);
     }
 
@@ -232,26 +311,26 @@ public class FileTransferService implements Serializable,
         long init = System.currentTimeMillis();
         long numBlocks = 0;
 
-        FileBlock fileBlock;
-        //FileWrapper fileWrapper = new FileWrapper();
-        //fileWrapper.addFile(dstFile);
+        //Open local writting buffer
+       	BufferedOutputStream bos;
+		try {
+			bos = new BufferedOutputStream(new FileOutputStream(dstFile.getAbsoluteFile()),DEFAULT_BUFFER_SIZE);
+		} catch (FileNotFoundException e1) {
+			logger.error("Can not open local file for writing:"+dstFile.getAbsoluteFile());
+			logger.error(e1.getMessage());
+			return dstFile;
+		}
+        
+        //Open remote buffer for reading
+ 		LongWrapper length = ftsRemote.openRead(srcFile);
+		if(length.longValue() <= 0){
+			logger.error("Unable to open remote file for reading:" +srcFile.getAbsolutePath());
+			try {bos.close();} catch (IOException e) {}
+			return dstFile;
+		}
 
-        try {
-            fileBlock = ftsRemote.getFileBlock(srcFile.getAbsolutePath(), 0,
-                    bsize);
-            numBlocks++;
-        } catch (IOException e) {
-            logger.error("Error, unable to get File:" +
-                srcFile.getAbsolutePath() + " from " + ftsRemote.getHostName());
-            //return fileWrapper;
-            return dstFile;
-        }
-
-        fileBlock.setDstFilename(dstFile.getAbsolutePath());
-        fileBlock.saveCurrentBlock();
-        long totalNumBlocks = fileBlock.getNumberOfBlocks();
-        long blockSize = fileBlock.getBlockSize();
-
+		long totalNumBlocks = Math.round(Math.ceil((double)length.longValue()/bsize));
+		
         FileBlock[] flyingBlocks = new FileBlock[numFlyingBlocks];
         while (numBlocks < totalNumBlocks) {
             int i;
@@ -262,14 +341,13 @@ public class FileTransferService implements Serializable,
                         (i < flyingBlocks.length) &&
                         (numBlocks < totalNumBlocks); i++) {
                     flyingBlocks[i] = ftsRemote.getFileBlock(srcFile.getAbsolutePath(),
-                            blockSize * numBlocks, bsize); //async call
+                            bsize * numBlocks, bsize); //async call
                     numBlocks++;
                 }
             } catch (IOException e) {
                 logger.error("Error, unable to get File:" +
                     srcFile.getAbsolutePath() + " from " +
                     ftsRemote.getHostName());
-//              return fileWrapper;
                 return dstFile;
             } finally {
                 ProActive.removeTryWithCatch(); //Wait for exceptions here
@@ -278,10 +356,14 @@ public class FileTransferService implements Serializable,
             //here we sync (wait-by-necessity)                
             for (int j = 0; j < i; j++) {
                 flyingBlocks[j].setDstFilename(dstFile.getAbsolutePath());
-                flyingBlocks[j].saveCurrentBlock();
+                flyingBlocks[j].saveCurrentBlock(bos);
             }
         }
 
+        //close local and remote buffers
+        ftsRemote.closeRead(srcFile);
+        try {bos.close();} catch (IOException e) {}
+        
         if (logger.isDebugEnabled()) {
             long fin = System.currentTimeMillis();
             long delta = (fin - init);
@@ -289,8 +371,7 @@ public class FileTransferService implements Serializable,
                 delta + "[ms]");
         }
 
-        //TODO Here We could register this FTS AO into a Node or RunTime pool for reuse!
-        //return fileWrapper;
+        //TODO Here we could register this FTS AO into a Node or RunTime pool for reuse!
         return dstFile;
     }
 
