@@ -3,19 +3,7 @@
 
 <definition name="org.objectweb.proactive.examples.components.c3d.fractal.distributed">
   <interface signature="java.lang.Runnable" role="server" name="r"/>
-  <exportedVirtualNodes>
-    <exportedVirtualNode name="VN1">
-      <composedFrom>
-        <composingVirtualNode component="client" name="client-node"/>
-      </composedFrom>
-    </exportedVirtualNode>
-    <exportedVirtualNode name="VN2">
-      <composedFrom>
-        <composingVirtualNode component="server" name="server-node"/>
-      </composedFrom>
-    </exportedVirtualNode>
-  </exportedVirtualNodes>
-  <component definition="org.objectweb.proactive.examples.components.c3d.fractal.UserImpl" name="user"/>
+  <component definition="org.objectweb.proactive.examples.components.c3d.fractal.UserImpl" name="user"/> 
   <component name="Composite">
     <interface signature="org.objectweb.proactive.examples.c3d.Dispatcher" role="server" name="dispatch"/>
     <component definition="org.objectweb.proactive.examples.components.c3d.fractal.EngineImpl" name="engine2"/>

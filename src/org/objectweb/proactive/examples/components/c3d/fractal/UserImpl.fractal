@@ -6,4 +6,6 @@
   <interface signature="org.objectweb.proactive.examples.c3d.Dispatcher" role="client" name="user2dispatcher"/>
   <content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/>
   <controller desc="primitive"/>
+        <!-- deploy this component only on User Virtual Nodes (must be defined in deploy. descr.) -->
+  <virtual-node name="User" cardinality="single"/>
 </definition>

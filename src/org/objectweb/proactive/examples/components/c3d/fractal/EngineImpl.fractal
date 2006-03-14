@@ -5,4 +5,6 @@
   <interface signature="org.objectweb.proactive.examples.c3d.RenderingEngine" role="server" name="dispatcher2engine"/>
   <content class="org.objectweb.proactive.examples.components.c3d.EngineImpl"/>
   <controller desc="primitive"/>
+        <!-- deploy this component only on Renderer Virtual Nodes (must be defined in deploy. descr.) -->
+  <virtual-node name="Renderer" cardinality="single"/>
 </definition>

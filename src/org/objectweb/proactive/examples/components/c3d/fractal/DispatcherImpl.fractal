@@ -6,4 +6,6 @@
   <interface signature="org.objectweb.proactive.examples.c3d.RenderingEngine" cardinality="collection" role="client" name="dispatcher2engine"/>
   <content class="org.objectweb.proactive.examples.components.c3d.DispatcherImpl"/>
   <controller desc="primitive"/>
+        <!-- deploy this component only on Dispatcher Virtual Nodes (must be defined in deploy. descr.) -->
+  <virtual-node name="Dispatcher" cardinality="single"/>  
 </definition>
