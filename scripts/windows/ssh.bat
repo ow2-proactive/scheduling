@@ -10,7 +10,8 @@ echo.
 echo Connect to a remote host through ssh
 echo    - 1 : 
 echo. 
-echo ex : ssh.bat [-p password] username@localhot  commandline
+echo ex : ssh.bat [-p password [-l username]] localhost  commandline
+echo parameters must be given in this particular order if any
 echo.
 goto doit
 

@@ -157,15 +157,19 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
     protected String buildWindowsSSHCommand() {
         StringBuffer command = new StringBuffer();
         command.append(command_path);
-        command.append(" ");
-        command.append(hostname);
+      
         // append username
         if (username != null) {
             command.append(" -l ");
             command.append(username);
         }
-
+        
         // append host
+        command.append(" ");
+        command.append(hostname);
+      
+
+     
         command.append(" ");
         return command.toString();
     }
