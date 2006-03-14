@@ -14,7 +14,7 @@ import com.jcraft.jsch.Session;
  * process using this client should be written according the following pattern
  * <processDefinition id="ssh_crusoe"> 
  * <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="host" username="username"> 
- * <commandPath value="c:\...\proactive\scripts\windows\scp.bat -p password"/>
+ * <commandPath value="c:\...\proactive\scripts\windows\ssh.bat -p password"/>
  * <processReference refid="localJVM"></processReference> 
  * </sshProcess>
  * </processDefinition>
@@ -140,3 +140,4 @@ public class SSHClient
     }
 
 }
+
