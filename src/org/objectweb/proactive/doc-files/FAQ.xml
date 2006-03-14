@@ -3,14 +3,12 @@
   <title>Frequently Asked Questions</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FAQ.html  -->
-<!-- TODO: please uncomment all questions. Had been commented out when debugging ant task. -->
   <para><emphasis role="bold">Note:</emphasis> This FAQ is under construction.
   If one of your question is not answered here, just send it at <ulink
   url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and
   we'll update the FAQ.</para>
 
   <qandaset>
-    <qandadiv>
       <qandaentry>
         <question>
           <para>How do I build ProActive from the distribution?</para>
@@ -33,10 +31,9 @@
             </listitem>
           </itemizedlist>
 
-          <programlisting language="java">'all'       </programlisting>
-
-          <para>represents the target of the build. It will compile all
-          sources files and generate the documentation.</para>
+          <para> <literal>'all'</literal>  represents the target of the 
+          build. It will compile all sources files and generate the documentation.
+          </para>
 
           <para>If you want only to compile sources and not generate the
           documentation use</para>
@@ -160,7 +157,7 @@
       </qandaentry>
 
       
-      <!--<qandaentry>
+      <qandaentry>
        <question>
         <para>Why do I get an exception java.lang.NoClassDefFoundError about bcel?</para>
        </question>
@@ -195,8 +192,7 @@
          <literal>CLASSPATH</literal>.</para>
        </answer>
       </qandaentry>
-      --> 
-      <!--        
+               
       <qandaentry>
        <question>
         <para>Why do I get an exception java.security.AccessControlException
@@ -268,8 +264,8 @@
         <screen> java -Djava.security.policy=my.policy.file MyMainClass </screen>
        </answer>
       </qandaentry>
--->
-<!--      <qandaentry>
+   
+      <qandaentry>
        <question>
         <para>Why don't the examples and compilation work under
          Windows?</para>
@@ -288,8 +284,9 @@
          do a copy paste of the command defined in the bat file in the DOS
          window.</para>
        </answer>
-      </qandaentry>-->
-<!--      <qandaentry>
+      </qandaentry>
+      
+      <qandaentry>
        <question>
         <para>How does the node creation happen?</para>
        </question>
@@ -348,11 +345,10 @@
          active object is created without a given node. The name of the
          default node is generated based on a random number.</para>
        </answer>
-      </qandaentry>-->
+      </qandaentry>
       
-      <!--XXXXXXXXXXx BELOW Problematic  -->
-
-      <!--<qandaentry>
+      
+      <qandaentry>
  <question>
   <para>How does the RMI Registry creation happen?</para>
  </question>
@@ -369,9 +365,9 @@
    automatically create one. If one exists, 
    <emphasis role="bold">ProActive</emphasis> will automatically use it.</para>
  </answer>
-</qandaentry>-->
+</qandaentry>
 
-<!--XXXXXXXXXXx BELOW UNKNWONW  -->
+
 
 <qandaentry>
  <question>
@@ -457,9 +453,8 @@
    request to the body of the active object.</para>
  </answer>
 </qandaentry>
-<!-- XXXXXXXXX The above three are correct -->
 
-<!--<qandaentry>
+<qandaentry>
  <question>
   <para>What is a ProActive stub?</para>
  </question>
@@ -496,7 +491,7 @@
    machine as the active reference or in another one.</para>
  </answer>
 </qandaentry>
--->
+
 <qandaentry>
  <question>
   <para>Why aren't my object's properties updated?</para>
@@ -817,7 +812,6 @@
 </qandaentry> 
 
 
-<!--XXXXXXXXXXXXXXXXX BELOW CORRECT        -->
       <qandaentry>
        <question>
         <para>How do I implement the custom activity of an active
@@ -1180,6 +1174,6 @@
         </orderedlist>
        </answer>
       </qandaentry>
-     </qandadiv>
+  
   </qandaset>
 </chapter>

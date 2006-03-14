@@ -48,7 +48,7 @@
         <mediaobject>
           <imageobject>
             <imagedata fileref="guided_tour/pics/hello/clientserver.png"
-                       format="PNG" width="6in" />
+                       format="PNG" contentwidth="100" width="6in" />
           </imageobject>
         </mediaobject>
       </informalfigure></para>
@@ -89,7 +89,7 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/hello/initializedhello.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -258,7 +258,7 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/hello/migratablehello.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -407,7 +407,7 @@ cd ..       </screen>
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/hello/hellogui.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>

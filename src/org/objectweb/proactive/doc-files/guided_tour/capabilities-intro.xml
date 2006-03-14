@@ -59,7 +59,7 @@
       <mediaobject>
         <imageobject>
           <imagedata fileref="guided_tour/pics/hello/c3d.png" format="PNG"
-                     width="6in" />
+                     contentwidth="100" width="6in" />
         </imageobject>
       </mediaobject>
     </figure>
@@ -200,7 +200,7 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -589,7 +589,7 @@ windows&gt; <literal>startNode.bat rmi://mymachine/NodeZ </literal></literal></s
             <mediaobject>
               <imageobject>
                 <imagedata fileref="guided_tour/pics/screenshots/jc2d_main_panel.png"
-                           format="PNG" width="6in" />
+                           format="PNG" contentwidth="100" width="6in" />
               </imageobject>
             </mediaobject>
           </informalfigure></para>
@@ -598,7 +598,7 @@ windows&gt; <literal>startNode.bat rmi://mymachine/NodeZ </literal></literal></s
             <mediaobject>
               <imageobject>
                 <imagedata fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png"
-                           format="PNG" width="6in" />
+                           format="PNG" contentwidth="100" width="6in" />
               </imageobject>
             </mediaobject>
           </informalfigure></para>
@@ -614,7 +614,7 @@ windows&gt; <literal>startNode.bat rmi://mymachine/NodeZ </literal></literal></s
         <para><emphasis><inlinemediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </inlinemediaobject></emphasis> It is possible to visualize the
         status of each active object (processing, waiting etc...), the

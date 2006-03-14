@@ -40,6 +40,7 @@
 <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
 <!ENTITY MOP SYSTEM "MOP.xml">
+<!ENTITY FAQ SYSTEM "FAQ.xml">
 <!ENTITY biblio SYSTEM "biblio.xml">
 ]>
 <book>
@@ -52,7 +53,7 @@
       <surname>OASIS Research Team</surname>
     </author>
 
-    <corpauthor></corpauthor>
+    <corpauthor/>
 
     <!--   <releaseinfo role="svn">$Id$ </releaseinfo> -->
 
@@ -299,7 +300,7 @@
     <title>Back matters</title>
     <!--   Should be called appendix, anyway  -->
     &biblio;
-    <!--      &FAQ;  -->
+    &FAQ;   
     <!--    XXX &WordIndex;  -->
   </part>
 </book>

@@ -201,6 +201,42 @@ public class DocBookize extends DefaultHandler {
         }
     }
 
+    /** Default handler operation when a tag is closed */
+    public void endElement(String namespaceURI, String localName,
+        String realName) throws SAXException {
+        comment("END_TAG: ");
+    
+        // Just skip textobjects in programlistings. 
+        if (realName.toLowerCase().equals("textobject") && storingJavaCode) {
+            return;
+        }
+    
+        // Just skip textdata END TAGS in programlistings. 
+        if (realName.toLowerCase().equals("textdata") && storingJavaCode) {
+            return;
+        }
+    
+        if (realName.toLowerCase().equals("programlisting")) {
+            storingJavaCode = false;
+            highlight(programContent);
+            programContent = "";
+        }
+    
+        print("</" + realName + ">");
+    }
+
+    /** Default handler operation when a string of characters is encountered */
+    public void characters(char[] buf, int offset, int len)
+        throws SAXException {
+        comment("CHAR:   ");
+    
+        String s = new String(buf, offset, len);
+        //        if (storingJavaCode)
+        //            print(s);
+        //        else
+        print(s.replaceAll("&", "&amp;").replaceAll("<", "&lt;"));
+    }
+
     /** Return the content of a java file as a single String (without the first PA license comment)
      * @param fileReferenced the file which is to be eturned as a string
      * @return one very big string equal to the content of a file*/
@@ -256,42 +292,6 @@ public class DocBookize extends DefaultHandler {
         }
 
         return fileContent;
-    }
-
-    /** Default handler operation when a tag is closed */
-    public void endElement(String namespaceURI, String localName,
-        String realName) throws SAXException {
-        comment("END_TAG: ");
-
-        // Just skip textobjects in programlistings. 
-        if (realName.toLowerCase().equals("textobject") && storingJavaCode) {
-            return;
-        }
-
-        // Just skip textdata END TAGS in programlistings. 
-        if (realName.toLowerCase().equals("textdata") && storingJavaCode) {
-            return;
-        }
-
-        if (realName.toLowerCase().equals("programlisting")) {
-            storingJavaCode = false;
-            highlight(programContent);
-            programContent = "";
-        }
-
-        print("</" + realName + ">");
-    }
-
-    /** Default handler operation when a string of characters is encountered */
-    public void characters(char[] buf, int offset, int len)
-        throws SAXException {
-        comment("CHAR:   ");
-
-        String s = new String(buf, offset, len);
-        //        if (storingJavaCode)
-        //            print(s);
-        //        else
-        print(s.replaceAll("&", "&amp;").replaceAll("<", "&lt;"));
     }
 
     /** Just write to the output file the given string. need to Wrap I/O exceptions in

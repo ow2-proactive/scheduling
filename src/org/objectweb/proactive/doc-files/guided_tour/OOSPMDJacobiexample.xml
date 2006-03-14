@@ -358,7 +358,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobiic2d.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -394,7 +394,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobi9-allcoms.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -405,7 +405,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobi9-ratio-ligne.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>
@@ -478,7 +478,7 @@ private static void printMessageAndWait() {
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/jacobiic2d9vm.png"
-                         format="PNG" width="6in" />
+                         format="PNG" contentwidth="100" width="6in" />
             </imageobject>
           </mediaobject>
         </figure>

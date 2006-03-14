@@ -622,7 +622,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
            <title>Informal description of the C3D Components hierarchy</title>
             <mediaobject>
               <imageobject>
-                 <imagedata  fileref="components/pics/C3D-Components-UML.png" format="PNG"  width="6in"/> 
+                 <imagedata  fileref="components/pics/C3D-Components-UML.png" format="PNG"  contentwidth="100" width="6in"/> 
                </imageobject>
             </mediaobject>
           </figure>
@@ -740,7 +740,7 @@ e'/&gt;
            <title>IC2D component explorer with the C3D example</title>
             <mediaobject>
               <imageobject>
-                 <imagedata  fileref="components/pics/c3d_components.png" format="PNG"  width="6in"/>
+                 <imagedata  fileref="components/pics/c3d_components.png" format="PNG"  contentwidth="100" width="6in"/>
                </imageobject>
             </mediaobject>
           </figure>
