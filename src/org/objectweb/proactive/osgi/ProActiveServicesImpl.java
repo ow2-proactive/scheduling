@@ -174,8 +174,6 @@ public class ProActiveServicesImpl implements ProActiveService {
 
 				public URL getResource(String arg0) {
 					try {
-					System.out.println("----> get Resource " + arg0);
-
 						return new URL(aliasServlet + "?" + arg0);
 					} catch (MalformedURLException e) {
 						// TODO Auto-generated catch block
