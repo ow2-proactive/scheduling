@@ -36,14 +36,7 @@ package org.objectweb.proactive.osgi;
  * Utility class useful for ProActive over OSGi
  */
 public class OsgiParameters {
-    private static boolean servletEnabled = false;
-
-    public OsgiParameters() {
-        servletEnabled = "enabled".equals(System.getProperty(
-                    "proactive.http.servlet"));
-    }
-
     public static boolean servletEnabled() {
-        return servletEnabled;
+        return "enabled".equals(System.getProperty("proactive.http.servlet"));
     }
 }

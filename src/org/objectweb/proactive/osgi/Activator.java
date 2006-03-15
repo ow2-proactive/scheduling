@@ -30,125 +30,29 @@
  */
 package org.objectweb.proactive.osgi;
 
-import java.rmi.AlreadyBoundException;
-import java.util.Properties;
-
-import javax.servlet.Servlet;
-
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.rmi.ClassServer;
-import org.objectweb.proactive.core.rmi.ClassServerServlet;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceEvent;
-import org.osgi.framework.ServiceListener;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.http.HttpService;
+import org.ungoverned.gravity.servicebinder.GenericActivator;
 
 
 /**
  * @author vlegrand
  * This is the entry point of the proActiveBundle
  */
-public class Activator implements BundleActivator, ServiceListener {
-    private static final String aliasRes = "/";
-    private static final String aliasServlet = ClassServerServlet.SERVLET_NAME;
-    private static final String OSGI_NODE_NAME = "OSGiNode";
+public class Activator extends GenericActivator {
+  
+  public void start  (BundleContext context) throws Exception {
+	  super.start (context);
+	  context.registerService(
+	            org.ungoverned.osgi.service.shell.Command.class.getName(),
+	            new StartNodeCommand(), null);
+	  
 
-    static {
-        ProActiveConfiguration.load();
+  }
+    public void bindProActiveService (ProActiveService proactiveService) {    	
     }
-
-    private org.osgi.framework.ServiceRegistration reg = null;
-    private ProActiveService service = null;
-    private Servlet servlet;
-    private BundleContext bc;
-    private OsgiParameters parameters = new OsgiParameters();
-    private HttpService http;
-    private Node node;
-
-    public void start(BundleContext ctx) throws Exception {
-        this.bc = ctx;
-
-        ServiceReference ref = bc.getServiceReference(
-                "org.osgi.service.http.HttpService");
-
-        if (ref != null) {
-            this.http = (HttpService) bc.getService(ref);
-            createProActiveService();
-        }
-
-        this.bc.addServiceListener(this);
+    
+    public void unbindProActiveService (ProActiveService proactiveService ) {
+    	proactiveService.terminate();
     }
-
-    public void stop(BundleContext context) throws Exception {
-        try {
-            this.node.killAllActiveObjects();
-            System.out.println("Arret du noeud proactive");
-            ProActiveRuntimeImpl.getProActiveRuntime().killNode(OSGI_NODE_NAME);
-        } catch (ProActiveRuntimeException e) {
-        }
-    }
-
-    private void createProActiveService() {
-        int port = Integer.parseInt(this.bc.getProperty(
-                    "org.osgi.service.http.port"));
-        this.servlet = new ClassServerServlet(port);
-
-        boolean b = registerServlet();
-        Properties props = new Properties();
-        props.put("name", "proactive");
-
-        try {
-            this.node = NodeFactory.createNode(ClassServer.getUrl() + '/' +
-                    OSGI_NODE_NAME);
-        } catch (NodeException e) {
-            System.out.println("Unable to create OsgiNode");
-            e.printStackTrace();
-        } catch (AlreadyBoundException e) {
-            System.out.println("The OsgiNode is already bound in the registry");
-            e.printStackTrace();
-        }
-
-        //Register the service
-        this.service = new ProActiveServicesImpl(this.node);
-
-        reg = bc.registerService("org.objectweb.proactive.osgi.ProActiveService",
-                service, props);
-    }
-
-    private boolean registerServlet() {
-        try {
-            this.http.registerServlet(aliasServlet, this.servlet, null, null);
-
-            return true;
-        } catch (Throwable t) {
-            t.printStackTrace();
-
-            return false;
-        }
-    }
-
-    public void serviceChanged(ServiceEvent event) {
-        switch (event.getType()) {
-        case ServiceEvent.REGISTERED:
-            ServiceReference sr = (ServiceReference) event.getSource();
-            Object service = this.bc.getService(sr);
-
-            if ((service != null) && service instanceof HttpService) {
-                this.http = (HttpService) service;
-                this.createProActiveService();
-            }
-
-            //        this.createProActiveService(); 
-            break;
-        default:
-            break;
-        }
-    }
+    
 }

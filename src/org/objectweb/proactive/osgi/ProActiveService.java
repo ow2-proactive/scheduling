@@ -31,6 +31,7 @@
 package org.objectweb.proactive.osgi;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 
@@ -42,10 +43,25 @@ import org.objectweb.proactive.core.node.NodeException;
  *
  */
 public interface ProActiveService {
+	/**
+	 * 
+	 * @param classname
+	 * @param constructorParameters
+	 * @return
+	 * @throws ActiveObjectCreationException
+	 * @throws NodeException
+	 */
     public Object newActive(String classname, Object[] constructorParameters)
         throws ActiveObjectCreationException, NodeException;
 
+    /**
+     * 
+     * @param obj
+     * @param url
+     * @throws java.io.IOException
+     */
     public void register(Object obj, String url) throws java.io.IOException;
 
-    public void unregister(String url) throws java.io.IOException;
+    
+    public void terminate ();
 }
