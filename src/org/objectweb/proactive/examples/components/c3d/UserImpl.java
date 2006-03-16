@@ -30,9 +30,19 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
+import java.io.IOException;
+
+import javax.naming.NamingException;
+
+import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.examples.c3d.C3DUser;
+import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.User;
+import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 
 
 /** The component container for a User. */
@@ -78,11 +88,23 @@ public class UserImpl extends C3DUser implements Runnable, BindingController,
     public void findDispatcher() {
         // active Object related fields
         this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
-        setUserName("Bob");
-        // We suppose bind to dispatcher has been done before
+        if (getUserName() == null) // just in case it was not yet set.
+            setUserName("Bob");   
+
+        // Maybe 'binding to dispatcher' has been done before
         if (this.c3ddispatcher == null) {
-            logger.error("Could not find a dispatcher. Closing.");
-            System.exit(-1);
+            logger.error("User component could not find a dispatcher. Performing lookup"); 
+
+            String localHost = getLocalHostString();
+            // ask user through Dialog for userName & host
+            NameAndHostDialog userAndHostNameDialog = new NameAndHostDialogForComponent(localHost );
+            this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
+            setUserName(userAndHostNameDialog.getValidatedUserName());
+            if (this.c3ddispatcher == null) {
+                logger.error("Could not find a dispatcher. Closing.");
+                System.exit(-1);
+            }
         }
     }
+        
 }

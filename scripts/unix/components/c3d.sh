@@ -11,11 +11,6 @@ fi
 
 JAVACMD=$JAVACMD" -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
 
-if [ "$1" = "" ]
-then 
-  DESC=../../../descriptors/components/C3D_all.xml
-else
-  DESC=$1
-fi
-
-$JAVACMD org.objectweb.proactive.examples.components.c3d.Main $DESC
+echo --- Fractal C3D example ---------------------------------------------
+$JAVACMD org.objectweb.proactive.examples.components.c3d.Main $*
+echo ---------------------------------------------------------

@@ -39,9 +39,11 @@ import org.objectweb.fractal.util.Fractal;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentRunActive;
 import org.objectweb.proactive.core.component.body.NFRequestFilterImpl;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
@@ -49,6 +51,7 @@ import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 import org.objectweb.proactive.examples.c3d.RenderingEngine;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -142,6 +145,15 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
                 // init object Activity, which is never called more than once!
                 if (!initActivityHasBeenRun) {
                     initActivity(body);
+                    try {
+                        Fractive.register(Fractive.getComponentRepresentativeOnThis(),
+                                UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));
+                    } catch (IOException e) {
+                        System.err.println("HEY, couldn't register dispatcher");
+                        e.printStackTrace();
+                    }
+
+
                     initActivityHasBeenRun = true;
                 }
 

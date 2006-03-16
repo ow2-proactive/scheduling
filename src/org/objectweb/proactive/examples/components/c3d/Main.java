@@ -37,16 +37,32 @@ import org.objectweb.proactive.core.component.adl.Launcher;
  * This example is a C3D Component version.
  */
 public class Main {
-    public static void main(final String[] args)
-        throws Exception {
-        if (args.length != 1) {
-            System.out.println("Usage : you need to pass one descriptor file name as parameter.");
+    private static final String DEFAULT_ADL = Main.class.getPackage().getName() +
+        ".adl.userAndComposite";
+
+    public static void main(final String[] args) throws Exception {
+        if ((args.length != 2) && (args.length != 1)) {
+            System.out.println(
+                "Parameters : [fractal_ADL_file] descriptor_file" +
+                "\n        the first file describes your components layout. " +
+                "\n                Default is " + DEFAULT_ADL +
+                "\n        the second file describes your deployment of computing nodes." +
+                "\n                You may want to try ../../../descriptors/components/C3D_all.xml");
+
             return;
         }
-        String arg0 = "-fractal"; // using the fractal component model
-        String arg1 = Main.class.getPackage().getName() + ".fractal.distributed"; // the bindings description
-        String arg2 = "m";
-        String arg3 = args[0];
-        Launcher.main(new String[] { arg0, arg1, arg2, arg3 });
+
+        String adl;
+        String descriptor;
+
+        if (args.length == 1) {
+            adl = DEFAULT_ADL;
+            descriptor = args[0];
+        } else {
+            adl = args[0];
+            descriptor = args[1];
+        }
+
+        Launcher.main(new String[] { "-fractal", adl, "m", descriptor });
     }
 }
