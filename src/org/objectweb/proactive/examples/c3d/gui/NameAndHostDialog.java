@@ -58,15 +58,15 @@ import org.objectweb.proactive.examples.c3d.Dispatcher;
 public class NameAndHostDialog extends JDialog implements ActionListener,
     PropertyChangeListener {
     private String userName = null;
-    private String hostName = null;
+    protected String hostName = null;
     private JTextField userTextField;
-    private JTextField hostNameTextField;
+    protected JTextField hostNameTextField;
     private JOptionPane optionPane;
     private String enterButtonString = "Enter";
     private String cancelButtonString = "Cancel";
-    private Dispatcher c3dDispatcher;
+    protected Dispatcher c3dDispatcher;
     private VirtualNode dispatcherVN;
-    private int portNumber;
+    protected int portNumber;
 
     public NameAndHostDialog(String localHost, VirtualNode dispatcherVN) {
         super();
@@ -151,31 +151,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
                     userName = "Bob";
                 }
 
-                this.portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
-
-                try {
-                    this.hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
-
-                    this.dispatcherVN.setRuntimeInformations("LOOKUP_HOST",
-                        this.hostName);
-                    this.dispatcherVN.setRuntimeInformations("LOOKUP_PORT",
-                        this.portNumber + "");
-                    this.c3dDispatcher = (C3DDispatcher) dispatcherVN.getUniqueAO();
-                    setVisible(false);
-                    this.dispatcherVN = null; // this reference is no longer needed!
-                } catch (ActiveObjectCreationException exception) {
-                    System.err.println("TROUBLE AOC AHEAD");
-                    //exception.printStackTrace(); // this exception is a problem, for sure!
-                    treatException(exception,
-                        "Sorry, could not create stub for C3DDispatcher on host \"" +
-                        hostName + "\".");
-                    //} catch (ProActiveException exception) {
-                } catch (Exception exception) {
-                    //exception.printStackTrace(); // this exception is a problem, for sure!
-                    treatException(exception,
-                        "Sorry, could not find a registered C3DDispatcher on host \"" +
-                        hostName + "\".");
-                }
+                // OK, now we've received enough information from the user. Let's try the lookup. 
+                tryTheLookup();
             } else { //user closed dialog or clicked cancel
                 userName = hostName = null;
                 setVisible(false);
@@ -183,9 +160,32 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         }
     }
 
+    protected void tryTheLookup() {
+        try {
+            this.hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
+            this.portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
+
+            this.dispatcherVN.setRuntimeInformations("LOOKUP_HOST",
+                this.hostName);
+            this.dispatcherVN.setRuntimeInformations("LOOKUP_PORT",
+                this.portNumber + "");
+            this.c3dDispatcher = (C3DDispatcher) dispatcherVN.getUniqueAO();
+            setVisible(false);
+            this.dispatcherVN = null; // this reference is no longer needed!
+        } catch (ActiveObjectCreationException exception) {
+            treatException(exception,
+                "Sorry, could not create stub for C3DDispatcher on host \"" +
+                hostName + "\".");
+        } catch (Exception exception) {
+            treatException(exception,
+                "Sorry, could not find a registered C3DDispatcher on host \"" +
+                hostName + "\".");
+        }
+    }
+
     /** Take action against failed connections to Dispatcher.
      * In next versions, this will NOT use System.exit*/
-    private void treatException(Exception exception, String message) {
+    protected void treatException(Exception exception, String message) {
         hostNameTextField.selectAll();
         JOptionPane.showMessageDialog(NameAndHostDialog.this,
             message + "\nError is \n " + exception.getMessage(), "Try again",

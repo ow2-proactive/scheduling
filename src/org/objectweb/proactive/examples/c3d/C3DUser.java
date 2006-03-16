@@ -144,7 +144,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     }
 
     /** Gets the name of the machine this is running on. */
-    private String getLocalHostString() {
+    protected String getLocalHostString() {
         String localhost = "";
         try {
             String port = "";
