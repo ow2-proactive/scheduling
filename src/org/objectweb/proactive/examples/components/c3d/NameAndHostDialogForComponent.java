@@ -32,7 +32,6 @@ package org.objectweb.proactive.examples.components.c3d;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -57,11 +56,14 @@ public class NameAndHostDialogForComponent extends NameAndHostDialog {
         try {
             this.hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
             this.portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
+
             String protocol = UrlBuilder.getProtocol(hostNameTextField.getText());
 
-            System.out.println(protocol + " port " + portNumber + " host " + hostName);
+            System.out.println(protocol + " port " + portNumber + " host " +
+                hostName);
             System.out.println(UrlBuilder.buildUrl(this.hostName,
-                        COMPONENT_ALIAS, protocol, this.portNumber));
+                    COMPONENT_ALIAS, protocol, this.portNumber));
+
             ProActiveComponentRepresentative a;
             a = Fractive.lookup(UrlBuilder.buildUrl(this.hostName,
                         COMPONENT_ALIAS, protocol, this.portNumber));

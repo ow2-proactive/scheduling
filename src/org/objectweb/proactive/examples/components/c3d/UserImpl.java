@@ -30,17 +30,9 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import java.io.IOException;
-
-import javax.naming.NamingException;
-
-import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
-import org.objectweb.proactive.core.util.UrlBuilder;
+
 import org.objectweb.proactive.examples.c3d.C3DUser;
-import org.objectweb.proactive.examples.c3d.Dispatcher;
 import org.objectweb.proactive.examples.c3d.User;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 
@@ -51,7 +43,7 @@ public class UserImpl extends C3DUser implements Runnable, BindingController,
     public UserImpl() {
     }
 
-    /** returns all the possible bindings, here just <user--dispatcher> . */
+    /** returns all the possible bindings, here just user--dispatcher . */
     public String[] listFc() {
         return new String[] { "user2dispatcher" };
     }
@@ -61,6 +53,7 @@ public class UserImpl extends C3DUser implements Runnable, BindingController,
         if (cItf.equals("user2dispatcher")) {
             return c3ddispatcher;
         }
+
         return null;
     }
 
@@ -68,6 +61,7 @@ public class UserImpl extends C3DUser implements Runnable, BindingController,
     public void bindFc(final String cItf, final Object sItf) {
         if (cItf.equals("user2dispatcher")) {
             c3ddispatcher = (org.objectweb.proactive.examples.c3d.Dispatcher) sItf;
+
             // Registering back to the dispatcher is done in the go() method 
         }
     }
@@ -88,23 +82,27 @@ public class UserImpl extends C3DUser implements Runnable, BindingController,
     public void findDispatcher() {
         // active Object related fields
         this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
-        if (getUserName() == null) // just in case it was not yet set.
-            setUserName("Bob");   
+
+        if (getUserName() == null) { // just in case it was not yet set.
+            setUserName("Bob");
+        }
 
         // Maybe 'binding to dispatcher' has been done before
         if (this.c3ddispatcher == null) {
-            logger.error("User component could not find a dispatcher. Performing lookup"); 
+            logger.error(
+                "User component could not find a dispatcher. Performing lookup");
 
             String localHost = getLocalHostString();
+
             // ask user through Dialog for userName & host
-            NameAndHostDialog userAndHostNameDialog = new NameAndHostDialogForComponent(localHost );
+            NameAndHostDialog userAndHostNameDialog = new NameAndHostDialogForComponent(localHost);
             this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
             setUserName(userAndHostNameDialog.getValidatedUserName());
+
             if (this.c3ddispatcher == null) {
                 logger.error("Could not find a dispatcher. Closing.");
                 System.exit(-1);
             }
         }
     }
-        
 }

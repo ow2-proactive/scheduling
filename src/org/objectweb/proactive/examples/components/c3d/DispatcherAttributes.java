@@ -37,7 +37,6 @@ import org.objectweb.fractal.api.control.AttributeController;
  * Access to the properties of a Dispatcher
  */
 public interface DispatcherAttributes extends AttributeController {
-
     /** Find the id that was last given to a user. */
     int getLastUserId();
 }
