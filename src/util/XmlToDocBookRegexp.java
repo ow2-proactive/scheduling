@@ -41,29 +41,31 @@ import java.util.regex.Pattern;
 /** JavaToDocBook converter (100% java), using regular expression replacement.
  * It converts a String, pointing to a file of java code, into another String, 
  * which in turn points to a new file containing the java code plus docbook highlighting tags. */
-public class JavaToDocBookRegexp implements LanguageToDocBook {
-        
-    static String signatureKeywords = "package|import|public|private|protected|static|final|class|interface|implements|extends";
-    static String codeKeywords = "return|this|if|else|for|while|do|break|continue|try|catch|new|assert";
-    static String typeKeywords = "void|null|int|String|Object";
+public class XmlToDocBookRegexp implements LanguageToDocBook {
+            
+    private static String XML_COMMENT_START = "<!--";
+    private static String XML_COMMENT_END = "-->";
     
     //   \b in a regexp means a word boundary                     
     private static Pattern [] pattern = {
-        Pattern.compile("(\\b)("+signatureKeywords+")(\\b)"),
-        Pattern.compile("(\\b)("+codeKeywords+")(\\b)"),
-        Pattern.compile("(\\b)("+typeKeywords+")(\\b)")
+        Pattern.compile("(\\s)(\\w*)(=)(\".*\")()"), // the attributes construct, like: role="toto"
+        Pattern.compile("(&lt;/?)(\\w*)(\\b)"),   // the tag name, opening or ending
+        //Pattern.compile("("+XML_COMMENT_START+")(.*)("+XML_COMMENT_END+")"),   //  <!-- comment --> 
     }; 
     private static String [] replacement = {                    
+        "$1"+OPENTYPE+ "$2" +CLOSETYPE+"$3" + OPENSTRING + "$4" + CLOSESTRING + "$5",
         "$1"+OPENKEYWORD+ "$2" +CLOSEKEY+"$3" ,
-        "$1"+OPENCODE+ "$2" +CLOSECODE+"$3",
-        "$1"+OPENTYPE + "$2" + CLOSETYPE +"$3" 
+       // "$1"+OPENCOMMENT+ "$2" +CLOSECOMMENT+"$3" ,
     }; 
 
     
+    // When we're in a coment, nothing else matters. 
     private boolean inComment = false;   
-    private boolean inString = false;   
-    private BufferedWriter tmpBuffer;
+    // You can insert directly docbook tags to highlight your example code. 
+    private String docBookTag = null;
      
+    private BufferedWriter tmpBuffer;
+
     /** Convert the given file into docbook highlighted code.
      * @param path the place from where should be loaded the file to convert
      * @return the file which is created, with highlighted tags. 
@@ -90,57 +92,50 @@ public class JavaToDocBookRegexp implements LanguageToDocBook {
     
     // Add tags around java keywords
     private void decorate(String string)  throws IOException {
-/*        if (this.inString) {
-            int index = string.indexOf("\"");
-            if (index >= 0)
-                if (index == 0 || string.charAt(index-1) != '\\')  {
-                    echo(string.substring(0,index + "\"".length()) + CLOSESTRING);
-                    this.inString = false;
-                    decorate (string.substring(index + "\"".length()));
-                }
-                else {     
-                    echo(string.substring(0,index + "\"".length()) );
-                    decorate (string.substring(index + "\"".length()));
-                }
-            else
+        if (this.docBookTag != null) {
+            int index = string.indexOf(this.docBookTag);
+            if (index >=0)  {
+                echo(string.substring(0,index + this.docBookTag.length()) );
+                index += this.docBookTag.length();
+                this.docBookTag = null;
+                decorate (string.substring(index ));
+            }
+            else 
                 echo(string);
-        }
-        else 
-*/            if (this.inComment) {
-                int index = string.indexOf("*/");
+         }else
+        
+        if (this.inComment) {
+                int index = string.indexOf(XML_COMMENT_END);
                 if (index >=0)  {
-                    echo(string.substring(0,index + "*/".length()) + CLOSECOMMENT);
+                    echo(string.substring(0,index + XML_COMMENT_END.length()) + CLOSECOMMENT);
                     this.inComment = false;
-                    decorate (string.substring(index + "*/".length()));
+                    decorate (string.substring(index + XML_COMMENT_END.length()));
                 }
                 else
                     echo(string);
             }
             else {
-  /*              int openQuote =  string.indexOf("\"");
-                if (openQuote >=0)  {                       
-                    decorate(string.substring(0,openQuote));
-                    echo(OPENSTRING + "\"" );
-                    inString = true;
-                    decorate(string.substring(openQuote + "\"".length()));
-                    return;
+                // If start of a real docbook tag, annihilate any other processing. 
+                int ind = string.indexOf("<");
+                if (ind >=0)  {
+                    decorate (string.substring(0,ind ));
+                    this.docBookTag=string.substring(ind+1).replaceAll("(\\w*)(\\b.*)", "$1").replaceAll("\n","");
+                    echo("<" + this.docBookTag );
+                    ind += ("<" + this.docBookTag).length();
+                    this.docBookTag = "</"+ this.docBookTag+ ">";
+                    
+                    decorate (string.substring(ind) );
                 }
-    */            
-                int lineComment = string.indexOf("//");       // hey, this is a comment
-                if (lineComment >=0)  {                       
-                    decorate(string.substring(0,lineComment));
-                    echo(OPENCOMMENT + string.substring(lineComment) + CLOSECOMMENT);
-                    return;
-                }
-                int index = string.indexOf("/*");
+                else {
+                // If start of a comment find closing tag  
+                int index = string.indexOf(XML_COMMENT_START);
                 if (index >=0)  {
                     decorate (string.substring(0,index ));
-                    echo(OPENCOMMENT + "/*") ;
+                    echo(OPENCOMMENT + XML_COMMENT_START) ;
                     inComment=true;
-                    decorate (string.substring(index +"/*".length()));
+                    decorate (string.substring(index +XML_COMMENT_START.length()));
                 }
                 else { 
-
                     String result = string;
                     // for all the patterns defined, do regexp replacement 
                     for (int i = 0 ; i < pattern.length; i++)
@@ -149,6 +144,7 @@ public class JavaToDocBookRegexp implements LanguageToDocBook {
    
                     echo(result);
                 }
+            }
             }
     }
     

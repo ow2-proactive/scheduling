@@ -35,7 +35,23 @@ import java.io.IOException;
 
 /** All possible ways of transforming a code file into a decorated code file
  * should implement this interface. */
-public interface JavaToDocBook {
+public interface LanguageToDocBook {
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String 
+    SPAN="<emphasis role=",
+    OPENCOMMENT = SPAN+"\"comment\">",
+    CLOSECOMMENT = "</emphasis>", 
+    OPENKEYWORD = SPAN+"\"keyword\">",
+    CLOSEKEY = CLOSECOMMENT,
+    OPENCODE = SPAN+"\"codeword\">",
+    CLOSECODE = CLOSECOMMENT,
+    OPENTYPE = SPAN+"\"typeword\">",
+    CLOSETYPE = CLOSECOMMENT, 
+    OPENSTRING = SPAN+"\"string\">",
+    CLOSESTRING = CLOSECOMMENT, 
+    EOL = "\n";
+
     /** Convert a code file into a decorated code file.
      * @param fileToConvert the name of the file to convert
      * @return convertedFile : the name of the file which has been created (it contains decorated code)  */

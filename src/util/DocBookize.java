@@ -54,24 +54,21 @@ import javax.xml.parsers.SAXParserFactory;
 public class DocBookize extends DefaultHandler {
     final static boolean DEBUG = false;
     private final String FILEPATH;
-    private boolean storingJavaCode = false;
+    private boolean storingCode = false;
     private String programContent;
     private BufferedWriter out;
     private String outputFileName;
     private String language = "";
-    private JavaToDocBook javaToDocBook;
+    private LanguageToDocBook javaToDocBook;
+    private LanguageToDocBook xmlToDocBook;
 
     /** @param fileName The name of the XML file which should have its <screen> tags decorated
      * @param path The path on which to find the files to include in the docbook */
     public DocBookize(String fileName, String path) {
         this.outputFileName = fileName;
         FILEPATH = path;
-        this.javaToDocBook = getConverter();
-
-        if (this.javaToDocBook == null) {
-            throw new NullPointerException(
-                "No converter found, code will not be hightlighted");
-        }
+        this.javaToDocBook = new JavaToDocBookRegexp();
+        this.xmlToDocBook = new XmlToDocBookRegexp();
     }
 
     public static void main(String[] argv) {
@@ -143,12 +140,12 @@ public class DocBookize extends DefaultHandler {
         comment("TAG  " + tagName);
 
         // Just skip textobjects in programlistings (see following comment).
-        if (tagName.equals("textobject") && storingJavaCode) {
+        if (tagName.equals("textobject") && storingCode) {
             return;
         }
 
-        // replace textdata from file by the file content (xml parser should already do that, but fails. ant xslt task bugged?)
-        if (tagName.equals("textdata") && storingJavaCode) {
+        // replace textdata from file by the file content (shouldn't xslt task do that?)
+        if (tagName.equals("textdata") && storingCode) {
             String fileReferenced = "";
 
             for (int i = 0; i < attrs.getLength(); i++) {
@@ -163,7 +160,7 @@ public class DocBookize extends DefaultHandler {
                 }
             }
 
-            programContent += getJavaFileContent(fileReferenced);
+            programContent += getFileContent(fileReferenced);
 
             return;
         }
@@ -174,7 +171,7 @@ public class DocBookize extends DefaultHandler {
             for (int i = 0; i < attrs.getLength(); i++) {
                 String aName = attrs.getLocalName(i); // Attr name 
 
-                if ("".equals(aName)) {
+                if (aName.equals("")) {
                     aName = attrs.getQName(i);
                 }
 
@@ -182,21 +179,20 @@ public class DocBookize extends DefaultHandler {
                 print(' ' + aName);
                 print("=\"");
                 print(attrs.getValue(i));
-
+                print("\" ");
+                
                 if (aName.toLowerCase().equals("language")) {
-                    language = attrs.getValue(i).toLowerCase();
+                    this.language = attrs.getValue(i).toLowerCase();
                 }
 
-                print("\" ");
             }
         }
 
         print(">");
 
-        // Only highlighting java programlistings right now.
-        if ((tagName.toLowerCase().equals("programlisting") &&
-                language.equals("java"))) {
-            storingJavaCode = true;
+        // Only highlight programlistings.
+        if (tagName.equals("programlisting")) {
+            this.storingCode = true;
             programContent = "";
         }
     }
@@ -207,17 +203,17 @@ public class DocBookize extends DefaultHandler {
         comment("END_TAG: ");
     
         // Just skip textobjects in programlistings. 
-        if (realName.toLowerCase().equals("textobject") && storingJavaCode) {
+        if (realName.toLowerCase().equals("textobject") && storingCode) {
             return;
         }
     
         // Just skip textdata END TAGS in programlistings. 
-        if (realName.toLowerCase().equals("textdata") && storingJavaCode) {
+        if (realName.toLowerCase().equals("textdata") && storingCode) {
             return;
         }
     
         if (realName.toLowerCase().equals("programlisting")) {
-            storingJavaCode = false;
+            storingCode = false;
             highlight(programContent);
             programContent = "";
         }
@@ -231,16 +227,14 @@ public class DocBookize extends DefaultHandler {
         comment("CHAR:   ");
     
         String s = new String(buf, offset, len);
-        //        if (storingJavaCode)
-        //            print(s);
-        //        else
         print(s.replaceAll("&", "&amp;").replaceAll("<", "&lt;"));
     }
 
     /** Return the content of a java file as a single String (without the first PA license comment)
      * @param fileReferenced the file which is to be eturned as a string
-     * @return one very big string equal to the content of a file*/
-    private String getJavaFileContent(String fileReferenced) {
+     * @return one very big string equal to the content of a file
+     * @throws SAXException if having trouble reading the given file*/
+    private String getFileContent(String fileReferenced) throws SAXException {
         String fileContent = "";
 
         try {
@@ -276,6 +270,8 @@ public class DocBookize extends DefaultHandler {
                     }
                 } while (!str2.endsWith("*/"));
             }
+            else
+                fileContent += str1 + "\n" + str2 + "\n";
 
             // just dump rest of the file into return value
             String str;
@@ -286,19 +282,17 @@ public class DocBookize extends DefaultHandler {
 
             in.close();
         } catch (IOException e) {
-            System.err.println(
-                "Warning : trouble reading referenced file : fileReferenced");
-            System.err.println(e.getMessage());
+            throw new SAXException("Warning - trouble reading referenced file : fileReferenced " + e.getMessage());
         }
-
-        return fileContent;
+        
+        return fileContent.replaceAll("&", "&amp;").replaceAll("<", "&lt;"); 
     }
 
     /** Just write to the output file the given string. need to Wrap I/O exceptions in
      * SAX exceptions, to suit handler signature requirements
      * @throws SAXException if an error happened with file IO operations */
     private void print(String s) throws SAXException {
-        if (storingJavaCode) {
+        if (storingCode) {
             programContent += s;
         } else {
             try {
@@ -324,16 +318,27 @@ public class DocBookize extends DefaultHandler {
      * @param s The String which is to contain tags highlighting its elements.
      * @throws SAXException if writing to the stream caused problem */
     private void highlight(String s) throws SAXException {
+//        if (language.equals("xml"))
+//        {print (s); return;}
+        
         if (s.length() > 0) {
             try {
-                // First create the docbookized version of this java code : 
-                File temp = File.createTempFile("db_tmp_", ".java");
+                // Create the docbookized version of this code: 
+                // First copy this code into an independent file
+                File temp = File.createTempFile("db_tmp_", ".dbz");
                 BufferedWriter tmpBuffer = new BufferedWriter(new FileWriter(
                             temp));
                 tmpBuffer.write(s);
                 tmpBuffer.close();
 
-                String generated = javaToDocBook.convert(temp.getPath());
+                // Do the highlighting
+                String generated; 
+                if (this.language.equals("java"))
+                    generated = this.javaToDocBook.convert(temp.getPath());
+                else if (this.language.equals("xml"))
+                    generated = this.xmlToDocBook.convert(temp.getPath());
+                else 
+                    throw new SAXException("Language '"+this.language+"' is unsupported " ); 
                 temp.delete();
 
                 // now put this code back into the xml we're generating
@@ -346,39 +351,11 @@ public class DocBookize extends DefaultHandler {
 
                 in.close();
                 new File(generated).delete();
+                
             } catch (IOException e) {
                 throw new SAXException("I/O error writing to temp file", e);
             }
         }
     }
 
-    /** Gets a JAVATODOCBOOK conversion class, according to the machine possibilities.
-     * @return a JavaToDocBook instance, which can be used to transform java to DocBook */
-    private JavaToDocBook getConverter() {
-        String[] classes = {
-                "util.JavaToDocBookExternal", "util.JavaToDocBookRegexp",
-            };
-        JavaToDocBook instance = null;
-
-        for (int i = 0; i < classes.length; i++) {
-            try {
-                // create the class. 
-                instance = (JavaToDocBook) Class.forName(classes[i])
-                                                .newInstance();
-            } catch (Exception e) { // pb loading this class, well, just try another one!
-
-                continue;
-            }
-
-            if (instance.willWork()) { // class can only be used if it exists, and it will do the conversion..
-
-                break;
-            }
-
-            // if instance won't work, forget about it.
-            instance = null;
-        }
-
-        return instance;
-    }
 }

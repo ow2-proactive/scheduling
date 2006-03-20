@@ -38,7 +38,7 @@ import java.io.IOException;
  * here is used the GNU source-highlight program.
  * Program available at www.gnu.org/software/src-highlite.
  * Run './configure && make && make install' to get the correct installation. */
-public class JavaToDocBookExternal implements JavaToDocBook {
+public class JavaToDocBookExternal implements LanguageToDocBook {
     private String path = "/usr/local/bin/";
     private String exec = "source-highlight";
 
