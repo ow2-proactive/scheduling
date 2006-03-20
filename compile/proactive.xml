@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive" default="usage" basedir=".">
+<project name="ProActive" default="compile" basedir=".">
 	<property environment="env"/> 
 	<property name="base" value=".."/>
 	<property name="lib" value="${base}/lib"/>
@@ -62,51 +62,7 @@
 		<pathelement location="${lib}/examples/mlibwrapper_jai.jar"/>
 		<pathelement location="${lib}/examples/jai_imageio.jar"/>
 	</path>
-	<!-- default target that displays usage -->
-	<target name="usage">
-		<echo message=""/>
-		<echo message="================- ${name} =============="/>
-		<echo message=""/>
-		<echo message="Available targets are :"/>
-		<echo message="  ------------------------------"/>
-		<echo message="    General source file builds"/>
-		<echo message="  ------------------------------"/>
-		<echo message="  core     : ProActive core"/>
-		<echo message="  ext      : ProActive ext"/>
-		<echo message="  ic2d     : All IC2D"/>
-		<echo message="  examples : All examples"/>
-		<echo message="  compile    : means all of the above"/>
-		<echo message="  all    : means all of the above + generates the documentation"/>
-		<echo message=""/>
-		<echo message="  ------------------------------"/>
-		<echo message="         Utility builds"/>
-		<echo message="  ------------------------------"/>
-		<echo message="  docs     : creates the javadoc and the manual in the ${docs.dir} directory"/>
-		<echo message="  javadoc  : generates the javadoc in ${docs.dir}/api"/>
-		<echo message="  manual   : creates the manual and the howto in ${docs.dir}, in html and pdf format"/>
-		<echo message="  clean    : removes all build generated files"/>
-		<echo message="  dist     : creates the distribution directory and files"/>
-		<echo message=""/>
-		<echo message="  ------------------------------"/>
-		<echo message="    Special source file builds"/>
-		<echo message="  ------------------------------"/>
-		<echo message="  testsuite	:TestSuite API"/>
-		<echo message="  benchmark	:BenchMark API"/>
-		<echo message="  nonregressiontest	: Non regression tests compilation"/>
-		<echo message="  essai"/>
-		<echo message="  migration"/>
-		<echo message="  modelisation"/>
-		<echo message="  util"/>
-		<echo message="  alljunk  : means all of the above"/>
-		<echo message="  ibis     : everything related to proactive ibis"/>
-		<echo message="  rewrite  : rewrite classes to enhance performance with ibis"/>
-		<echo message="  runTests	: Run all non regression tests"/>
-		<echo message="  runTestsLocal	: Run all non regression tests on the current host only"/>
-		<echo message="  runBench	: Run benchmarks"/>
-		<echo message=""/>
-		<echo message="=========================================="/>
-	</target>
-	<!--
+ 	<!--
 	   ================================================================
 	   ==
       ==  Initialisation
@@ -127,7 +83,7 @@
       ==
       ================================================================
 	-->
-	<target name="all" depends="compile,docs" />
+	<target name="all" depends="compile,docs" description="Compile All and build the docs"/>
 	<!--
 	   ================================================================
 	   ==
@@ -135,7 +91,8 @@
       ==
       ================================================================
 	-->
-	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper" />
+	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper" 
+			description="build the class files"/>
 	<!--
 	   ================================================================
 	   ==
@@ -155,7 +112,8 @@
 		</copy>
 	</target>
 	
-	<target name="core" depends="init, configurationCopy">
+	<target name="core" depends="init, configurationCopy"
+		description="Compile the ProActive core classes">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 			<include name="*.java"/>
@@ -261,7 +219,7 @@
       ==
       ================================================================
 	-->
-	<target name="ic2d" depends="ext">
+	<target name="ic2d" depends="ext" description="Compile the IC2D Tool">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on"  source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>
@@ -315,7 +273,7 @@
       ==
       ================================================================
 	-->
-	<target name="examples" depends="ext">
+	<target name="examples" depends="ext" description="Compile all the examples">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="examples.classpath"/>
 		</javac>
@@ -343,6 +301,7 @@
 			</fileset>
 		</copy>
 	</target>
+
 	<target name="testsuite" depends="ext, copyDivers">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
@@ -430,7 +389,7 @@
       ==
       ================================================================
 	-->
-	<target name="clean">
+	<target name="clean" description="Remove all generated files">
 		<delete dir="${classes.dir}"/>
 		<delete dir="${dist.dir}"/>
 		<delete dir="${docs.dir}"/>
@@ -512,7 +471,7 @@
       ==
       ================================================================
 	-->
-	<target name="dist" depends="compile, docs">
+	<target name="dist" depends="compile, docs" description="Create the distribution binary">
 		<!-- Create the distribution directory -->
 		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
@@ -603,7 +562,7 @@
        ==
        ================================================================
 	-->
-  <target name="docs" depends="javadoc, manual" />
+  <target name="docs" depends="javadoc, manual" description="Construct the javadoc and the manual"/>
 
 	<!--
 	   ================================================================
@@ -612,7 +571,7 @@
        ==
        ================================================================
 	-->
-	<target name="javadoc">
+	<target name="javadoc" description="Use javadoc to build information on the ProActive classes">
         <!-- Create the javadoc directory -->
          <delete dir="${docs.dir}"/>
          <mkdir dir="${docs.dir}"/>
@@ -723,7 +682,7 @@
       ==
       ================================================================
 	-->
-	<target name="ibis">
+	<target name="ibis" description="Everything related to ProActive IBIS">
 		<!-- depends="ipl"> -->
 		<delete>
 			<fileset dir="${classes.dir}" includes="**/rmi*.java"/>
@@ -753,7 +712,8 @@
 	<!--
 	  we copy the proactive classfiles and unjar everything
 	-->
-	 <target name="rewrite">
+
+	 <target name="rewrite" description="Rewrite classes to enhance performance with ibis">
 	 <mkdir dir="${classlibs.dir}"/>
 	 <copy todir="${classlibs.dir}">
 	     <fileset dir="${classes.dir}" includes="**/*.class"/>
@@ -801,14 +761,17 @@
       ==
       ================================================================
 	-->
-	<target name="runTests" depends="testsuite, nonregressiontest, proActiveJar">
+	<target name="runTests" depends="testsuite, nonregressiontest, proActiveJar"
+		description="Run all non regression tests">
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
 			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
 		</java>
 	</target>
-	<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar">
+
+<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar"
+	description="Run all non regression tests on the current host only">
 		<delete dir="${base}/compile/log"/>
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
@@ -855,6 +818,7 @@
 			</fileset>
 		</copy> -->
 	</target>
+
 	<target name="benchmark" depends="testsuite, microTimer">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
@@ -867,7 +831,8 @@
       ==
       ================================================================
 	-->
-	<target name="runBench" depends="testsuite, benchmark">
+	<target name="runBench" depends="testsuite, benchmark"
+		description="Run benchmarks">
 		<java classname="benchmark.BenchCenter" fork="true">
 			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro"/>
 			<classpath refid="test.classpath"/>
@@ -994,228 +959,221 @@
 	  </target>
 
 
-		<!-- ==================================================================== -->
-		<!-- The following *docbook* are sub-tasks to build the Manual            -->
-		<!-- ==================================================================== -->
-		<xmlcatalog id="docbookcatalog" description="Description of the possible docbook xsl stylesheet locations">
+
+	<!-- ==================================================================== -->
+	<!-- The following docbook* are sub-tasks to build the Manual             -->
+	<!-- ==================================================================== -->
+	<!-- description="Description of the possible docbook xsl stylesheet locations" -->
+	<xmlcatalog id="docbookcatalog">
 		<!-- If a needed file doesn't exist, it will be fetched on the web -->
 
-		<classpath>			
+		<classpath>
 			<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
 			<!-- We want the version called 1.69, 1.65 (default Fedora install) is not sufficient -->
-			<pathelement location="/usr/share/docbook-xsl-1.69.1"/>
-			<pathelement location="/usr/local/docbook-xsl-1.69.1"/>
-			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip"/>
-			<pathelement location="/usr/share/sgml/docbook/xml-dtd-4.2-1.0-25/"/> <!-- For the dtd -->
-    </classpath>
+			<pathelement location="/usr/share/docbook-xsl-1.69.1" />
+			<pathelement location="/usr/local/docbook-xsl-1.69.1" />
+			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
+		</classpath>
 
-    <dtd  publicId="-//OASIS//DTD DocBook XML V4.1.2//EN"
-        location="docbookx.dtd"/>
-    <dtd  publicId="-//OASIS//DTD DocBook XML V4.1.2//EN"
-        location="http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd"/>
-		<entity  publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" 
-	 		location="html/chunk.xsl" />
-	 	<entity  publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl"  
-	 		location="html/docbook.xsl" />
-	 	<entity  publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl"  
-	 		location="fo/docbook.xsl" />
-	 	<entity  publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" 
-		 		location="fo/docbook.xsl" />
-	 	</xmlcatalog>
-	 	
+		<dtd publicId="-//OASIS//DTD DocBook XML V4.1.2//EN" location="dtd-4.1.2/docbookx.dtd" />
+		<dtd publicId="http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" location="dtd-4.1.2/docbookx.dtd" />
 
-	<target name="transformDocbook" description="Conversts docbook xml into ??? - uses the trax processor">
-		<xslt 
-      basedir="${doc.src}"
-      processor="trax"
-      in="${docbookInputFile}"  
-      out="${docbookOutputFile}"
-      style="${docbookStyle}"
-			force="yes" >
-			<xmlcatalog refid="docbookcatalog"/> 
+		<entity publicId="http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" location="dtd-4.1.2/docbookx.dtd" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" location="html/chunk.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" location="html/docbook.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
+	</xmlcatalog>
+
+
+	<!-- ==================================================================== -->
+	<!-- Converts docbook xml into ??? - uses the trax processor              -->
+	<!-- ==================================================================== -->
+	<target name="transformDocbook">
+		<xslt basedir="${doc.src}" processor="trax" in="${docbookInputFile}" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
+			<xmlcatalog refid="docbookcatalog" />
 			<classpath>
-        <fileset dir="${lib}">
-            <include name="**/*.jar"/>
-         </fileset>
-        <fileset dir="${base}/dev/lib">
-            <include name="**/*.jar"/>
-         </fileset>
-				</classpath>
-			</xslt>
-		</target>
-
-	  <taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop"  
-		  description="Official way to translate .fo (result of xml docbook translation) into .pdf">
-	         <classpath>
-	            <pathelement location="${base}/dev/lib/docbook/fop.jar"/>
-              <pathelement location="${base}/dev/lib/docbook/jimi.zip"/>
-	            <pathelement location="${base}/dev/lib/docbook/avalon.jar"/>
-              <pathelement location="${base}/dev/lib/docbook/batik.jar"/>
-              <pathelement location="${lib}/ws/commons-logging.jar"/>
-	         </classpath>
-	  </taskdef>
-
-		<target name="docbookToPdf" description="Build the pdf from the docbook">
-      <property name="fo.output" value="${pdfOutputFile}.fo" />
-			
-			<!-- 	First translate into intermediate fo format -->
-			<antcall target="transformDocbook" >
-				<param  name="docbookOutputFile" value="${fo.output}"/>
-				<param  name="docbookStyle" value="${doc.src}/xsl/pdf.xsl"/>
-			</antcall>
-
-			<!-- Then use the newly defined fop task to translate fo into pdf -->
-	   <fop format="application/pdf" 
-           fofile="${fo.output}"
-           outfile="${pdfOutputFile}" 
-           basedir="${doc.src}" />
-
-			<delete file="${fo.output}"/> 
+				<fileset dir="${lib}">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${base}/dev/lib">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</xslt>
 	</target>
 
-	<target name="docbook-chain" description="Build the docs (pdf + 2*html), for a given set of files/destination">
+	<taskdef name="fop" classname="org.apache.fop.tools.anttasks.Fop" description="Official way to translate .fo (result of xml docbook translation) into .pdf">
+		<classpath>
+			<pathelement location="${base}/dev/lib/docbook/fop.jar" />
+			<pathelement location="${base}/dev/lib/docbook/jimi.zip" />
+			<pathelement location="${base}/dev/lib/docbook/avalon.jar" />
+			<pathelement location="${base}/dev/lib/docbook/batik.jar" />
+			<pathelement location="${lib}/ws/commons-logging.jar" />
+		</classpath>
+	</taskdef>
+
+	<!-- ==================================================================== -->
+	<!--  Build the pdf from the docbook input files                          -->
+	<!-- ==================================================================== -->
+	<target name="docbookToPdf">
+		<property name="fo.output" value="${pdfOutputFile}.fo" />
+
+		<!-- 	First translate into intermediate fo format -->
+		<antcall target="transformDocbook">
+			<param name="docbookOutputFile" value="${fo.output}" />
+			<param name="docbookStyle" value="${doc.src}/xsl/pdf.xsl" />
+		</antcall>
+
+		<!-- Then use the newly defined fop task to translate fo into pdf -->
+		<fop format="application/pdf" fofile="${fo.output}" outfile="${pdfOutputFile}" basedir="${doc.src}" />
+
+		<!--		<delete file="${fo.output}" />  -->
+	</target>
+
+	<!-- ==================================================================== -->
+	<!-- Build the docs (pdf + 2*html), for a given set of files/destination  -->
+	<!-- ==================================================================== -->
+	<target name="docbookChain">
 		<!-- expecting the following arguments :  docbookInputFile pdfOutputFile bigHtmlFileName chunkedHtmlFileName -->
 
-	  <!-- Make the conversion docbook ==> several html files -->
-		<antcall target="transformDocbook" >
-	    <param name="docbookOutputFile" value="${chunkedHtmlFileName}"/>
-	    <param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl"/>
-	   </antcall> 
- 
-	  <!-- Make the conversion docbook ==> one big html file -->
-		<antcall target="transformDocbook" >
-	    <param name="docbookOutputFile" value="${bigHtmlFileName}"/>
-	    <param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl"/>
-	   </antcall> 
+		<!-- Make the conversion PA docbook ==> one pdf file -->
+		<antcall target="docbookToPdf" />
 
-	  <!-- Make the conversion PA docbook ==> one pdf file -->
-    <antcall target="docbookToPdf" />  
-
-	</target>
-
-        <!-- add some highlighting information to the docbook source code  -->
-        <target name="docbookBeautify" >
-          <mkdir dir="${classes.dir}"/>
-          <javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
-           <classpath refid="project.classpath"/>
-           <include name="util/*.java"/>
-          </javac>
-        
-          <java classname="util.DocBookize" fork="false">
-           <classpath refid="project.classpath"/>
-           <arg value="${docbookInputFile}"/> <!-- The xml file to parse-->
-           <arg value="${doc.src}/"/>    <!-- the path where to look for for file inclusion -->
-          </java> 			
-       </target> 
-        
-
-        <target name="docbookBeautifier" 
-					description="Run a beautifer (code highlighting) on source files, then compile docbook">
-
-		<!-- Compile beautifier : transform <programlisting> into decorated <programlisting> -->
-                  <antcall target="docbookBeautify" >
-                   <param name="docbookInputFile" value="${docbookInputFile}"/>
-                  </antcall>
-                  
-		<antcall target="docbook-chain">
-			<param name="docbookInputFile" value="${docbookInputFile}"/>
-			<param name="pdfOutputFile" value="${pdfOutputFile}"/>
-			<param name="bigHtmlFileName" value="${bigHtmlFileName}"/>
-			<param name="chunkedHtmlFileName" value="${chunkedHtmlFileName}"/> 
+		<!-- Make the conversion docbook ==> several html files -->
+		<antcall target="transformDocbook">
+			<param name="docbookOutputFile" value="${chunkedHtmlFileName}" />
+			<param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl" />
 		</antcall>
-					 
+
+		<!-- Make the conversion docbook ==> one big html file -->
+		<antcall target="transformDocbook">
+			<param name="docbookOutputFile" value="${bigHtmlFileName}" />
+			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
+		</antcall>
+
 	</target>
 
-	
-        <!-- ==================================================================== -->
-        <!-- Make just the html files for the manual                              -->
-        <!-- ==================================================================== -->
-        <target name="manual_html" description="Make only the html files in the manual">
-         
-         <!-- Copy the files needed for the html files (pics and maybe others) -->
-         <copy toDir="${docs.dir}/html/">
-          <fileset dir="${doc.src}">
-           <include name="**/*.png"/>
-           <include name="**/*.jpg"/>
-           <include name="ProActive.css"/>
-          </fileset>
-         </copy>
-         
-         <!-- Copying files so they can be edited. -->	
-         <copy toDir="${docs.tmp}" includeemptydirs="no">
-          <fileset dir="${doc.src}">
-           <include name="**/*"/>
-           <exclude name="**/.svn"/>
-           <exclude name="xsl"/>
-          </fileset>
-         </copy>
-         
-         <!-- Decorate the code a bit (code examples) -->
-         <antcall target="docbookBeautify" >
-          <param name="docbookInputFile" value="${docs.tmp}/PA_index.xml"/>
-         </antcall>
-          
-         <!--  Make the html files -->
-         <antcall target="transformDocbook" >
-          <param name="docbookInputFile" value="${docs.tmp}/PA_index.xml"/>
-          <param name="docbookOutputFile" value="${docs.dir}/html/index.html"/>
-          <param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl"/>
-         </antcall> 
-          
-         <!-- clean up -->
-         <delete dir="${docs.tmp}"/> 
-         
-        </target>
+	<!-- add some highlighting information to the docbook source code  -->
+	<target name="docbookBeautify">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="util/*.java" />
+		</javac>
 
-        <!-- ==================================================================== -->
+		<java classname="util.DocBookize" fork="false">
+			<classpath refid="project.classpath" />
+			<arg value="${docbookInputFile}" />
+			<!-- The xml file to parse-->
+			<arg value="${doc.src}/" />
+			<!-- the path where to look for for file inclusion -->
+		</java>
+	</target>
+
+
+	<!-- ==================================================================== -->
+	<!-- preprocessing for the manual: copy files and add tags to source code -->
+	<!-- ==================================================================== -->
+	<target name="docbookCopyDecorate">
+		<!-- Copy the files needed for the html files (pics and maybe others) -->
+		<copy toDir="${docs.dir}/html/">
+			<fileset dir="${doc.src}">
+				<include name="**/*.png" />
+				<include name="**/*.jpg" />
+				<include name="ProActive.css" />
+			</fileset>
+		</copy>
+
+		<!-- Copying files so they can be edited. -->
+		<copy toDir="${docs.tmp}" includeemptydirs="no">
+			<fileset dir="${doc.src}">
+				<include name="**/*" />
+				<exclude name="**/.svn" />
+				<exclude name="xsl" />
+			</fileset>
+		</copy>
+
+		<!-- Decorate the code a bit (code examples) -->
+		<antcall target="docbookBeautify">
+			<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml" />
+		</antcall>
+	</target>
+
+	<!-- ==================================================================== -->
+	<!-- Construct the docbook howto describing on how to write documentation -->
+	<!-- ==================================================================== -->
+	<target name="manualHowto" depends="docbookCopyDecorate">
+		<!-- copy the docBook howto files -->
+		<copy toDir="${howto.dir}">
+			<fileset dir="${doc.src}/docBookTutorial">
+				<include name="**/*.png" />
+			</fileset>
+			<fileset file="${doc.src}/ProActive.css" />
+		</copy>
+
+		<!-- also beautify the howto files -->
+		<antcall target="docbookBeautify">
+			<param name="docbookInputFile" value="${docs.tmp}/docBookTutorial/doc_howto.xml" />
+		</antcall>
+
+		<!-- Last, build the docBook Tutorial (or howto) -->
+		<antcall target="docbookChain">
+			<param name="docbookInputFile" value="${docs.tmp}/docBookTutorial/doc_howto.xml" />
+			<param name="pdfOutputFile" value="${howto.dir}/docHowTo.pdf" />
+			<param name="bigHtmlFileName" value="${howto.dir}/docHowTo.html" />
+			<param name="chunkedHtmlFileName" value="${howto.dir}/index.html" />
+		</antcall>
+
+	</target>
+
+	<!-- ==================================================================== -->
+	<!-- Make just the html files for the manual                              -->
+	<!-- ==================================================================== -->
+	<target name="manualHtml" description="Make only the html files in the manual" depends="docbookCopyDecorate">
+
+		<!--  Make the html files -->
+		<antcall target="transformDocbook">
+			<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml" />
+			<param name="docbookOutputFile" value="${docs.dir}/html/index.html" />
+			<param name="docbookStyle" value="${doc.src}/xsl/chunkedhtml.xsl" />
+		</antcall>
+
+	</target>
+
+	<!-- ==================================================================== -->
+	<!-- Make just the pdf files for the manual                               -->
+	<!-- ==================================================================== -->
+	<target name="manualPdf" description="Make only the pdf files in the manual" depends="docbookCopyDecorate">
+
+		<!--  Make the pdf files -->
+		<antcall target="docbookToPdf">
+			<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml" />
+			<param name="pdfOutputFile" value="${docs.dir}/pdf/ProActiveManual.pdf" />
+		</antcall>
+
+	</target>
+
+	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
 	<!-- ==================================================================== -->
-	<target name="manual" description="Build the manual, through the docbook processing stages">
+	<target name="manual" depends="docbookCopyDecorate"
+						description="Build all the different manual version: html, pdf... " >
 
-	<!-- Copy the files needed for the html files (pics and maybe others) -->
-      <copy toDir="${docs.dir}/html/">
-		      <fileset dir="${doc.src}">
-		       <include name="**/*.png"/>
-		       <include name="**/*.jpg"/>
-		       <include name="ProActive.css"/>
-		      </fileset>
-		  </copy>
- 
-			<!-- Copying files so they can be edited. -->	
-			<copy toDir="${docs.tmp}" includeemptydirs="no">
-  		      <fileset dir="${doc.src}">
-   		         <include name="**/*"/>
-   		         <exclude name="**/.svn"/>
-  		         <exclude name="xsl"/>
-   		      </fileset>
-		  </copy>
-
-			<!-- Second do the real ProActive docs -->
-			
-			<antcall target="docbookBeautifier">
-				<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml"/>
-				<param name="pdfOutputFile" value="${docs.dir}/pdf/ProActiveManual.pdf"/>
-				<param name="bigHtmlFileName" value="${docs.dir}/html/ProActive.html"/>
-				<param name="chunkedHtmlFileName" value="${docs.dir}/html/index.html"/> 
-			</antcall>
-			
- 			<!-- Last, build the docBook Tutorial -->
-			<copy toDir="${howto.dir}">
-			      <fileset dir="${docs.tmp}/docBookTutorial" >
-   			       <include name="**/*.png"/>
-			      </fileset>
-	         <fileset file="${doc.src}/ProActive.css" />
-      </copy>
-
-		<antcall target="docbookBeautifier">
-							<param name="docbookInputFile" value="${docs.tmp}/docBookTutorial/doc_howto.xml"/>
-						  <param name="pdfOutputFile" value="${howto.dir}/docHowTo.pdf"/>
-							<param name="bigHtmlFileName" value="${howto.dir}/docHowTo.html"/>
-							<param name="chunkedHtmlFileName" value="${howto.dir}/index.html"/> 
+		<!--  Make the one-html-file-doc first ( no associated target) -->
+		<antcall target="transformDocbook">
+			<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml" />
+			<param name="docbookOutputFile" value="${docs.dir}/html/index.html" />
+			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
 		</antcall>
-		
-		<delete dir="${docs.tmp}"/> 
-		
-		</target>
+
+		<antcall target="manualHtml" />
+		<antcall target="manualPdf" />
+		<antcall target="manualHowto" />
+
+		<!-- clean up -->
+		<delete dir="${docs.tmp}" />
+
+	</target>
 
 </project>
