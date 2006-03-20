@@ -12,7 +12,8 @@
 
   <para>There will be a schema specifying which are the allowed tags. For now,
   all is legal, as I haven't gotten down to writing this yet. Nonetheless, the
-  tags I recommend to use are the ones described in the section above, namely
+  tags I recommend to use are the ones described in the section above (those 
+  which are used in this tutorial), namely
   <itemizedlist>
     <listitem> <para> chapter, sect*, para, emphasis, link, ulink </para> </listitem>
     <listitem> <para> figure, informalfigure, mediaobject , imagedata </para> </listitem>

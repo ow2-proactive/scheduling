@@ -54,9 +54,9 @@
 
     <listitem>
      <para>Make sure your new additions make a nice new document. 
-      Run the script called <literal>compile/generate_doc.sh</literal>,
-      this should give you an html copy of the doc, and maybe a pdf...
-      Eventually, you will only need to run an ant target (probably build docs)</para>
+      Run the ant target <literal>build manualHtml</literal>, and  you should have 
+      an html copy of the doc. If you want to see all the possible output formats, 
+      try <literal>build manual</literal>.</para>
     </listitem>
     
     <listitem>
