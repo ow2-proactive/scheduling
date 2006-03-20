@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.services;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
 
@@ -49,7 +49,7 @@ public interface TechnicalService {
      * Initialize the Technical Service with its argument values.
      * @param argValues values of the Technical Service arguments.
      */
-    public abstract void init(HashMap argValues);
+    public abstract void init(Map argValues);
     
     /**
      * Initialize the given node with the Technical Service.
