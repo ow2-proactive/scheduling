@@ -356,7 +356,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws RemoteException, ConstructorCallExecutionFailedException, 
+        throws RemoteException, ConstructorCallExecutionFailedException,
             ProActiveException, InvocationTargetException {
         return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
             isNodeLocal);
@@ -396,7 +396,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public void launchMain(String className, String[] parameters)
-        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+        throws IOException, ClassNotFoundException, NoSuchMethodException,
             ProActiveException {
         proActiveRuntime.launchMain(className, parameters);
     }
@@ -511,7 +511,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntime.startNewSession(policy);
     }
@@ -522,14 +522,14 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntime.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         return proActiveRuntime.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
@@ -538,7 +538,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntime.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
@@ -591,5 +591,15 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
                 ((ProActiveRuntimeImpl) proActiveRuntime).killRT(false);
             }
         }
+    }
+
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws ProActiveException, IOException {
+        return this.proActiveRuntime.setLocalNodeProperty(nodeName, key, value);
+    }
+
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws ProActiveException, IOException {
+        return this.proActiveRuntime.getLocalNodeProperty(nodeName, key);
     }
 }

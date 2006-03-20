@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.node;
 import java.io.IOException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.filetransfer.FileTransferService;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
@@ -98,19 +98,40 @@ public interface Node {
      * @throws IOException
      */
     public void killAllActiveObjects() throws NodeException, IOException;
-    
-    
+
+    /**
+     * Put the specified key value in this node property list.
+     * @param key the key to be placed into this property list.
+     * @param value the value corresponding to key.
+     * @return the previous value of the specified key in this property list,
+     * or <code>null</code> if it did not have one.
+     * @throws ProActiveException
+     */
+    public Object setProperty(String key, String value)
+        throws ProActiveException;
+
+    /**
+     * Searches for the property with the specified key in this node property
+     * list.
+     * The method returns <code>null</code> if the property is not found.
+     * @param key the hashtable key.
+     * @return the value in this property list with the specified key value.
+     * @throws ProActiveException
+     */
+    public String getProperty(String key) throws ProActiveException;
+
     /**
      * This method gets a FileTransferService object from a pool or,
      * if none are available creates a new one.
      * @return A FileTransferService object
      */
+
     //public FileTransferService getFileTransferServiceFromPool();
-    
+
     /**
      * Registers the File Transfer Service in a pool for future use.
-     * @param fts The File Transfer Service that will be pooled. 
+     * @param fts The File Transfer Service that will be pooled.
      */
+
     //public void putFileTransferServiceInPool(FileTransferService fts);
-    
 }

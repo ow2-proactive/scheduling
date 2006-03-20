@@ -287,7 +287,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws RemoteException, ConstructorCallExecutionFailedException, 
+        throws RemoteException, ConstructorCallExecutionFailedException,
             ProActiveException, InvocationTargetException {
         return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
             isNodeLocal);
@@ -315,7 +315,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             RemoteException, IOException {
         return proActiveRuntime.startNewSession(policy);
     }
@@ -326,14 +326,14 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RemoteException, IOException, 
+        throws SecurityNotAvailableException, RemoteException, IOException,
             RenegotiateSessionException {
         return proActiveRuntime.randomValue(sessionID, clientRandomValue);
     }
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, RemoteException, IOException {
         return proActiveRuntime.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
@@ -342,7 +342,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             RemoteException, IOException {
         return proActiveRuntime.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
@@ -400,7 +400,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public void launchMain(String className, String[] parameters)
-        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+        throws IOException, ClassNotFoundException, NoSuchMethodException,
             ProActiveException {
         proActiveRuntime.launchMain(className, parameters);
     }
@@ -479,5 +479,21 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         } else {
             return UrlBuilder.checkUrl(url);
         }
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.RemoteProActiveRuntime#getLocalNodeProperty(java.lang.String, java.lang.String)
+     */
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws IOException, ProActiveException {
+        return this.proActiveRuntime.getLocalNodeProperty(nodeName, key);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.RemoteProActiveRuntime#setLocalNodeProperty(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws IOException, ProActiveException {
+        return this.proActiveRuntime.setLocalNodeProperty(nodeName, key, value);
     }
 }

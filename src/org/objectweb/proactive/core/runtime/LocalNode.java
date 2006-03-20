@@ -28,11 +28,11 @@
  *
  * ################################################################
  */
-
 package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -41,127 +41,124 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
+
 /**
  * For internal use only.
- * This class is a runtime representation of a node 
- * and should not be used outside a runtime 
+ * This class is a runtime representation of a node
+ * and should not be used outside a runtime
  */
-
 public class LocalNode {
+    private String name;
+    private ArrayList activeObjectsId;
+    private String jobId;
+    private ProActiveSecurityManager securityManager;
+    private String virtualNodeName;
+    private Properties localProperties;
 
-	private String name;
-	private ArrayList activeObjectsId;
-	private String jobId;
-	private ProActiveSecurityManager securityManager;
-	private String virtualNodeName;
-	
-	public LocalNode (String nodeName, String jobId, ProActiveSecurityManager securityManager, String virtualNodeName) {
-		this.name = nodeName;
-		this.jobId = jobId;
-		this.securityManager = securityManager;
-		this.virtualNodeName = virtualNodeName;
-		this.activeObjectsId = new ArrayList();
-	
-		if (this.securityManager != null) {
-            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug("Local Node : " +
-                this.name + " VN name : " + this.virtualNodeName + " policyserver for app :" +
+    public LocalNode(String nodeName, String jobId,
+        ProActiveSecurityManager securityManager, String virtualNodeName) {
+        this.name = nodeName;
+        this.jobId = jobId;
+        this.securityManager = securityManager;
+        this.virtualNodeName = virtualNodeName;
+        this.activeObjectsId = new ArrayList();
+        this.localProperties = new Properties();
+
+        if (this.securityManager != null) {
+            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
+                           .debug("Local Node : " + this.name + " VN name : " +
+                this.virtualNodeName + " policyserver for app :" +
                 this.securityManager.getPolicyServer().getApplicationName());
 
             // setting virtual node name
             this.securityManager.setVNName(this.virtualNodeName);
 
-            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug("registering node certificate for VN " +
-               this.virtualNodeName);
+            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
+                           .debug("registering node certificate for VN " +
+                this.virtualNodeName);
         }
-		
-	}
-	
-	/**
-	 * @return Returns the active objects located inside the node.
-	 */
-	public ArrayList getActiveObjectsId() {
-		return activeObjectsId;
-	}
-	
-	/**
-	 * set the list of active objects contained by the node
-	 * @param activeObjects active objects to set.
-	 */
-	public void setActiveObjects(ArrayList activeObjects) {
-		this.activeObjectsId = activeObjects;
-	}
-	
-	
-	
-	
-	/**
-	 * @return Returns the jobId.
-	 */
-	public String getJobId() {
-		return jobId;
-	}
-	
-	/**
-	 * @param jobId The jobId to set.
-	 */
-	public void setJobId(String jobId) {
-		this.jobId = jobId;
-	}
-	
-	/**
-	 * @return Returns the node name.
-	 */
-	public String getName() {
-		return name;
-	}
-	
-	/**
-	 * @param name The node name to set.
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * @return Returns the node' security manager.
-	 */
-	public ProActiveSecurityManager getSecurityManager() {
-		return securityManager;
-	}
-	
-	/**
-	 * @param securityManager The securityManager to set.
-	 */
-	public void setSecurityManager(ProActiveSecurityManager securityManager) {
-		this.securityManager = securityManager;
-	}
-	
-	/**
-	 * @return Returns the name of the virtual node by which the node 
-	 * has been instancied if any.
-	 */
-	public String getVirtualNodeName() {
-		return virtualNodeName;
-	}
-	
-	/**
-	 * @param virtualNodeName The virtualNodeName to set.
-	 */
-	public void setVirtualNodeName(String virtualNodeName) {
-		this.virtualNodeName = virtualNodeName;
-	}
+    }
 
-	public void terminateActiveObjects() {
-		
-		
-	}
-	
-	
-	public ArrayList	 getActiveObjects() {
-	  ArrayList localBodies = new ArrayList();
-	  LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-	  
-		if (activeObjectsId == null) {
+    /**
+     * @return Returns the active objects located inside the node.
+     */
+    public ArrayList getActiveObjectsId() {
+        return activeObjectsId;
+    }
+
+    /**
+     * set the list of active objects contained by the node
+     * @param activeObjects active objects to set.
+     */
+    public void setActiveObjects(ArrayList activeObjects) {
+        this.activeObjectsId = activeObjects;
+    }
+
+    /**
+     * @return Returns the jobId.
+     */
+    public String getJobId() {
+        return jobId;
+    }
+
+    /**
+     * @param jobId The jobId to set.
+     */
+    public void setJobId(String jobId) {
+        this.jobId = jobId;
+    }
+
+    /**
+     * @return Returns the node name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name The node name to set.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return Returns the node' security manager.
+     */
+    public ProActiveSecurityManager getSecurityManager() {
+        return securityManager;
+    }
+
+    /**
+     * @param securityManager The securityManager to set.
+     */
+    public void setSecurityManager(ProActiveSecurityManager securityManager) {
+        this.securityManager = securityManager;
+    }
+
+    /**
+     * @return Returns the name of the virtual node by which the node
+     * has been instancied if any.
+     */
+    public String getVirtualNodeName() {
+        return virtualNodeName;
+    }
+
+    /**
+     * @param virtualNodeName The virtualNodeName to set.
+     */
+    public void setVirtualNodeName(String virtualNodeName) {
+        this.virtualNodeName = virtualNodeName;
+    }
+
+    public void terminateActiveObjects() {
+    }
+
+    public ArrayList getActiveObjects() {
+        ArrayList localBodies = new ArrayList();
+        LocalBodyStore localBodystore = LocalBodyStore.getInstance();
+
+        if (activeObjectsId == null) {
             // Probably the node is killed
             return localBodies;
         }
@@ -193,43 +190,66 @@ public class LocalNode {
                 }
             }
         }
-            return localBodies;
-	}
-        
-        /**
-         * Unregisters the specified <code>UniqueID</code> from the node 
-         * @param bodyID. The <code>UniqueID</code> to remove
-         */
-        public  void unregisterBody(UniqueID bodyID) {
-    	  	activeObjectsId.remove(bodyID);
-      }
-      
-        /**
-         * Registers the specified body in the node. In fact it is the <code>UniqueID</code> 
-         * of the body that is attached to the node.
-         * @param body. The body to register
-         */
-      public  void registerBody(UniqueID bodyID) {
-  	  	activeObjectsId.add(bodyID);
+        return localBodies;
     }
-      
-      public void terminate() {
-    	  	ArrayList activeObjects  = this.getActiveObjectsId();
-    	  	
-    	  	 for (int i = 0; i < activeObjects.size(); i++) {
-    	         UniqueID bodyID = (UniqueID) activeObjects.get(i);
 
-             //check if the body is still on this vm
-             Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
-             
-             if (body != null) {
-            	 	try {
-            	 		ProActiveLogger.getLogger(Loggers.NODE).info("node " + this.name + " is being killed, terminating body " + bodyID);
-					body.terminate();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-             }
-    	  	 }
-      }
+    /**
+     * Unregisters the specified <code>UniqueID</code> from the node
+     * @param bodyID. The <code>UniqueID</code> to remove
+     */
+    public void unregisterBody(UniqueID bodyID) {
+        activeObjectsId.remove(bodyID);
+    }
+
+    /**
+     * Registers the specified body in the node. In fact it is the <code>UniqueID</code>
+     * of the body that is attached to the node.
+     * @param body. The body to register
+     */
+    public void registerBody(UniqueID bodyID) {
+        activeObjectsId.add(bodyID);
+    }
+
+    public void terminate() {
+        ArrayList activeObjects = this.getActiveObjectsId();
+
+        for (int i = 0; i < activeObjects.size(); i++) {
+            UniqueID bodyID = (UniqueID) activeObjects.get(i);
+
+            //check if the body is still on this vm
+            Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
+
+            if (body != null) {
+                try {
+                    ProActiveLogger.getLogger(Loggers.NODE)
+                                   .info("node " + this.name +
+                        " is being killed, terminating body " + bodyID);
+                    body.terminate();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+   /**
+    * Put the specified key value in this property list.
+    * @param key the key to be placed into this property list.
+    * @param value the value corresponding to key.
+    * @return the previous value of the specified key in this property list,
+    * or <code>null</code> if it did not have one.
+    */
+    public Object setProperty(String key, String value) {
+        return this.localProperties.setProperty(key, value);
+    }
+
+   /**
+    * Searches for the property with the specified key in this property list.
+    * The method returns <code>null</code> if the property is not found.
+    * @param key the hashtable key.
+    * @return the value in this property list with the specified key value.
+    */
+    public String getProperty(String key) {
+        return this.localProperties.getProperty(key);
+    }
 }

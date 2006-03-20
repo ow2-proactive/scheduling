@@ -36,11 +36,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -70,7 +68,7 @@ public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
     protected String vnName;
-    protected ArrayList fileTransferServicePool; 
+    protected ArrayList fileTransferServicePool;
 
     //
     // ----------Constructors--------------------
@@ -79,15 +77,16 @@ public class NodeImpl implements Node, Serializable {
     }
 
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
-            String protocol, String jobID) {
-    	this( proActiveRuntime, nodeURL, protocol, jobID, null);
+        String protocol, String jobID) {
+        this(proActiveRuntime, nodeURL, protocol, jobID, null);
     }
-    
+
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
         String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
-        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID, vmName);
-        this.fileTransferServicePool=new ArrayList();
+        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol,
+                jobID, vmName);
+        this.fileTransferServicePool = new ArrayList();
     }
 
     //
@@ -227,9 +226,10 @@ public class NodeImpl implements Node, Serializable {
         private java.net.InetAddress hostInetAddress;
         private java.rmi.dgc.VMID hostVMID;
         private String hostname;
-        private String vmName; 
-        	
-        public NodeInformationImpl(String url, String protocol, String jobID, String vmName) {
+        private String vmName;
+
+        public NodeInformationImpl(String url, String protocol, String jobID,
+            String vmName) {
             this.nodeURL = url;
             this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
             this.hostInetAddress = proActiveRuntime.getVMInformation()
@@ -238,7 +238,7 @@ public class NodeImpl implements Node, Serializable {
             this.protocol = protocol;
             this.nodeName = extractNameFromUrl(url);
             this.jobID = jobID;
-            this.vmName= vmName;
+            this.vmName = vmName;
         }
 
         /**
@@ -321,13 +321,13 @@ public class NodeImpl implements Node, Serializable {
         public String getHostName() {
             return this.hostname;
         }
-        
+
         /**
          * @see org.objectweb.proactive.core.node.NodeInformation#getDescriptorVMName()
          */
-		public String getDescriptorVMName() {
-			return vmName;
-		}
+        public String getDescriptorVMName() {
+            return vmName;
+        }
     }
 
     // SECURITY
@@ -353,21 +353,37 @@ public class NodeImpl implements Node, Serializable {
     }
 
     /**
-	public synchronized FileTransferService getFileTransferServiceFromPool() {
-		if(fileTransferServicePool.isEmpty()){
-			try {
-				return (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
-				        null);
-			} catch (Exception e) {
-				return null;
-			}
-		}
-		return (FileTransferService)fileTransferServicePool.get(0);
-	}
+     * @see org.objectweb.proactive.core.node.Node#setProperty(java.lang.String, java.lang.String)
+     */
+    public Object setProperty(String key, String value) throws ProActiveException {
+        return this.proActiveRuntime.setLocalNodeProperty(this.nodeInformation.getName(),
+            key, value);
+    }
 
-	public synchronized void putFileTransferServiceInPool(FileTransferService fts) {
-		
-		fileTransferServicePool.add(fts);
-	}
-	**/
+    /**
+     * @see org.objectweb.proactive.core.node.Node#getProperty(java.lang.String)
+     */
+    public String getProperty(String key) throws ProActiveException {
+        return this.proActiveRuntime.getLocalNodeProperty(this.nodeInformation.getName(),
+            key);
+    }
+
+    /**
+        public synchronized FileTransferService getFileTransferServiceFromPool() {
+                if(fileTransferServicePool.isEmpty()){
+                        try {
+                                return (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
+                                        null);
+                        } catch (Exception e) {
+                                return null;
+                        }
+                }
+                return (FileTransferService)fileTransferServicePool.get(0);
+        }
+
+        public synchronized void putFileTransferServiceInPool(FileTransferService fts) {
+
+                fileTransferServicePool.add(fts);
+        }
+        **/
 }

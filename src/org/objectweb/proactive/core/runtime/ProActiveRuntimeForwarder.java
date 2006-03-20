@@ -223,7 +223,7 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
      */
     public UniversalBody createBody(UniqueRuntimeID urid, String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException, ConstructorCallExecutionFailedException, 
+        throws ProActiveException, ConstructorCallExecutionFailedException,
             java.lang.reflect.InvocationTargetException;
 
     /**
@@ -262,8 +262,7 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
      */
     public void launchMain(UniqueRuntimeID urid, String className,
         String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, 
-            ProActiveException;
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException;
 
     /**
      * @see ProActiveRuntime#newRemote(String)
@@ -278,7 +277,7 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
         throws SecurityNotAvailableException, IOException;
 
     public long startNewSession(UniqueRuntimeID urid, Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     public PublicKey getPublicKey(UniqueRuntimeID urid)
@@ -286,19 +285,19 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
 
     public byte[] randomValue(UniqueRuntimeID urid, long sessionID,
         byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     public byte[][] publicKeyExchange(UniqueRuntimeID urid, long sessionID,
         byte[] myPublicKey, byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException;
 
     public byte[][] secretKeyExchange(UniqueRuntimeID urid, long sessionID,
         byte[] encodedAESKey, byte[] encodedIVParameters,
         byte[] encodedClientMacKey, byte[] encodedLockData,
         byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException;
 
     public SecurityContext getPolicy(UniqueRuntimeID urid,
@@ -322,4 +321,11 @@ public interface ProActiveRuntimeForwarder extends ProActiveRuntime {
 
     // Interface: Job
     public String getJobID(UniqueRuntimeID urid);
+
+    public Object setLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key, String value)
+        throws IOException, ProActiveException;
+
+    public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key) throws IOException, ProActiveException;
 }

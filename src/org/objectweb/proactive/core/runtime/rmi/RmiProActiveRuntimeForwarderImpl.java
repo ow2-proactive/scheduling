@@ -99,7 +99,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
 
     public UniversalBody createBody(UniqueRuntimeID urid, String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws IOException, ConstructorCallExecutionFailedException, 
+        throws IOException, ConstructorCallExecutionFailedException,
             InvocationTargetException, ProActiveException {
         return proActiveRuntimeF.createBody(urid, nodeName,
             bodyConstructorCall, isNodeLocal);
@@ -286,7 +286,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
 
     public void launchMain(UniqueRuntimeID urid, String className,
         String[] parameters)
-        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+        throws IOException, ClassNotFoundException, NoSuchMethodException,
             ProActiveException {
         proActiveRuntimeF.launchMain(className, parameters);
     }
@@ -298,7 +298,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
 
     public byte[][] publicKeyExchange(UniqueRuntimeID urid, long sessionID,
         byte[] myPublicKey, byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         return proActiveRuntimeF.publicKeyExchange(urid, sessionID,
             myPublicKey, myCertificate, signature);
@@ -306,7 +306,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
 
     public byte[] randomValue(UniqueRuntimeID urid, long sessionID,
         byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntimeF.randomValue(urid, sessionID, clientRandomValue);
     }
@@ -315,7 +315,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
         byte[] encodedAESKey, byte[] encodedIVParameters,
         byte[] encodedClientMacKey, byte[] encodedLockData,
         byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntimeF.secretKeyExchange(urid, sessionID,
             encodedAESKey, encodedIVParameters, encodedClientMacKey,
@@ -323,7 +323,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
     }
 
     public long startNewSession(UniqueRuntimeID urid, Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntimeF.startNewSession(policy);
     }
@@ -331,5 +331,18 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
     public void terminateSession(UniqueRuntimeID urid, long sessionID)
         throws IOException, SecurityNotAvailableException {
         // TODO Auto-generated method stub
+    }
+
+    public Object setLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key, String value)
+        throws IOException, ProActiveException {
+        return this.proActiveRuntimeF.setLocalNodeProperty(runtimeID, nodeName,
+            key, value);
+    }
+
+    public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key) throws IOException, ProActiveException {
+        return this.proActiveRuntimeF.getLocalNodeProperty(runtimeID, nodeName,
+            key);
     }
 }

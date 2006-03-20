@@ -147,7 +147,7 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
 
     public UniversalBody createBody(UniqueRuntimeID ruid, String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws IOException, ConstructorCallExecutionFailedException, 
+        throws IOException, ConstructorCallExecutionFailedException,
             java.lang.reflect.InvocationTargetException, ProActiveException;
 
     public UniversalBody receiveBody(UniqueRuntimeID ruid, String nodeName,
@@ -183,7 +183,7 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
         throws SecurityNotAvailableException, java.io.IOException;
 
     public long startNewSession(UniqueRuntimeID ruid, Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
     public PublicKey getPublicKey(UniqueRuntimeID ruid)
@@ -191,19 +191,19 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
 
     public byte[] randomValue(UniqueRuntimeID ruid, long sessionID,
         byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
     public byte[][] publicKeyExchange(UniqueRuntimeID ruid, long sessionID,
         byte[] myPublicKey, byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, java.io.IOException;
 
     byte[][] secretKeyExchange(UniqueRuntimeID ruid, long sessionID,
         byte[] encodedAESKey, byte[] encodedIVParameters,
         byte[] encodedClientMacKey, byte[] encodedLockData,
         byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
     public SecurityContext getPolicy(UniqueRuntimeID ruid,
@@ -225,9 +225,16 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
 
     public void launchMain(UniqueRuntimeID ruid, String className,
         String[] parameters)
-        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+        throws IOException, ClassNotFoundException, NoSuchMethodException,
             ProActiveException;
 
     public void newRemote(UniqueRuntimeID ruid, String className)
         throws IOException, ClassNotFoundException, ProActiveException;
+
+    public Object setLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key, String value)
+        throws IOException, ProActiveException;
+
+    public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
+        String nodeName, String key) throws IOException, ProActiveException;
 }

@@ -290,7 +290,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      */
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException, ConstructorCallExecutionFailedException, 
+        throws ProActiveException, ConstructorCallExecutionFailedException,
             java.lang.reflect.InvocationTargetException;
 
     /**
@@ -368,8 +368,7 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      * @throws ProActiveException
      */
     public void launchMain(String className, String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, 
-            ProActiveException;
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException;
 
     /**
      * construct a new instance remotly
@@ -390,4 +389,27 @@ public interface ProActiveRuntime extends Job, SecurityEntity {
      */
     public ProActiveDescriptor getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException;
+
+    /**
+     * Set a property on the specified local node.
+     * @param nodeName local node name.
+     * @param key the hashtable key.
+     * @param value the value corresponding to key.
+     * @return the previous value of the specified key in this property list,
+     * or <code>null</code> if it did not have one.
+     * @throws ProActiveException
+     */
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws ProActiveException;
+
+    /**
+     * Get a property on the specified local node.
+     * @param nodeName local node name.
+     * @param key the hashtable key.
+     * @return  the value in the local node property list with the specified key
+     * value.
+     * @throws ProActiveException
+     */
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws ProActiveException;
 }

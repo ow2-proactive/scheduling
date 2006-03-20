@@ -443,7 +443,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
      */
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ConstructorCallExecutionFailedException, 
+        throws ConstructorCallExecutionFailedException,
             InvocationTargetException, ProActiveException {
         try {
             return proActiveRuntime.createBody(urid, nodeName,
@@ -551,8 +551,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
     }
 
     public void launchMain(String className, String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, 
-            ProActiveException {
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
         try {
             proActiveRuntime.launchMain(urid, className, parameters);
         } catch (IOException e) {
@@ -591,14 +590,14 @@ public class ProActiveRuntimeAdapterForwarderImpl
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         return proActiveRuntime.publicKeyExchange(urid, sessionID, myPublicKey,
             myCertificate, signature);
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntime.randomValue(urid, sessionID, clientRandomValue);
     }
@@ -606,7 +605,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntime.secretKeyExchange(urid, sessionID,
             encodedAESKey, encodedIVParameters, encodedClientMacKey,
@@ -614,7 +613,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
     }
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proActiveRuntime.startNewSession(urid, policy);
     }
@@ -627,5 +626,25 @@ public class ProActiveRuntimeAdapterForwarderImpl
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
         return proActiveRuntime.getPolicy(urid, securityContext);
+    }
+
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws ProActiveException {
+        try {
+            return this.proActiveRuntime.setLocalNodeProperty(this.urid,
+                nodeName, key, value);
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
+    }
+
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws ProActiveException {
+        try {
+            return this.proActiveRuntime.getLocalNodeProperty(this.urid,
+                nodeName, key);
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
     }
 }

@@ -139,7 +139,7 @@ public interface RemoteProActiveRuntime extends Serializable {
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws IOException, ConstructorCallExecutionFailedException, 
+        throws IOException, ConstructorCallExecutionFailedException,
             java.lang.reflect.InvocationTargetException, ProActiveException;
 
     public UniversalBody receiveBody(String nodeName, Body body)
@@ -168,7 +168,7 @@ public interface RemoteProActiveRuntime extends Serializable {
         throws IOException, ProActiveException;
 
     public void launchMain(String className, String[] parameters)
-        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+        throws IOException, ClassNotFoundException, NoSuchMethodException,
             ProActiveException;
 
     public void newRemote(String className)
@@ -184,25 +184,25 @@ public interface RemoteProActiveRuntime extends Serializable {
         throws SecurityNotAvailableException, java.io.IOException;
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, java.io.IOException;
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, java.io.IOException;
 
     byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             java.io.IOException;
 
     public SecurityContext getPolicy(SecurityContext securityContext)
@@ -216,4 +216,10 @@ public interface RemoteProActiveRuntime extends Serializable {
 
     public void terminateSession(long sessionID)
         throws java.io.IOException, SecurityNotAvailableException;
+
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws IOException, ProActiveException;
+
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws IOException, ProActiveException;
 }

@@ -472,7 +472,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException, ConstructorCallExecutionFailedException, 
+        throws ProActiveException, ConstructorCallExecutionFailedException,
             InvocationTargetException, HTTPRemoteException {
         if (isLocal) {
             return localruntime.createBody(nodeName, bodyConstructorCall,
@@ -679,7 +679,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     }
 
     public void launchMain(String className, String[] parameters)
-        throws IOException, ClassNotFoundException, NoSuchMethodException, 
+        throws IOException, ClassNotFoundException, NoSuchMethodException,
             ProActiveException {
         if (isLocal) {
             localruntime.launchMain(className, parameters);
@@ -807,7 +807,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     }
 
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (isLocal) {
             return localruntime.startNewSession(policy);
@@ -860,7 +860,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (isLocal) {
             return localruntime.randomValue(sessionID, clientRandomValue);
@@ -889,7 +889,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         if (isLocal) {
             return localruntime.publicKeyExchange(sessionID, myPublicKey,
@@ -923,7 +923,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         if (isLocal) {
             return localruntime.secretKeyExchange(sessionID, encodedAESKey,
@@ -1058,6 +1058,63 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public Object setLocalNodeProperty(String nodeName, String key, String value)
+        throws IOException, ProActiveException {
+        if (isLocal) {
+            return localruntime.setLocalNodeProperty(nodeName, key, value);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(nodeName);
+        params.add(key);
+        params.add(value);
+
+        RuntimeRequest req = new RuntimeRequest("setLocalNodeProperty", params,
+                this.url);
+
+        req.send();
+
+        try {
+            return (Object) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+
+    public String getLocalNodeProperty(String nodeName, String key)
+        throws IOException, ProActiveException {
+        if (isLocal) {
+            return localruntime.getLocalNodeProperty(nodeName, key);
+        }
+
+        ArrayList params = new ArrayList();
+        params.add(nodeName);
+        params.add(key);
+
+        RuntimeRequest req = new RuntimeRequest("getLocalNodeProperty", params,
+                this.url);
+
+        req.send();
+
+        try {
+            return (String) req.getReturnedObject();
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
         }
     }
 }

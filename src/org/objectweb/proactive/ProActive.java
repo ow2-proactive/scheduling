@@ -203,9 +203,6 @@ public class ProActive {
     /** Used for profiling */
     private static CompositeAverageMicroTimer timer;
 
-    //
-    // -- STATIC MEMBERS -----------------------------------------------
-    //
     static {
         ProActiveConfiguration.load();
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
@@ -236,8 +233,7 @@ public class ProActive {
      */
     public static void newMain(String classname, String[] mainParameters,
         Node node)
-        throws ClassNotFoundException, NoSuchMethodException, 
-            ProActiveException {
+        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
         ProActiveRuntime part = node.getProActiveRuntime();
         part.launchMain(classname, mainParameters);
     }
@@ -797,7 +793,8 @@ public class ProActive {
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
                                                              .generateSiblingCertificate(nameOfTargetType));
 
-            ProActiveLogger.getLogger(Loggers.SECURITY).debug("new active object with security manager");
+            ProActiveLogger.getLogger(Loggers.SECURITY)
+                           .debug("new active object with security manager");
         }
 
         try {
@@ -2044,10 +2041,20 @@ public class ProActive {
      * Get the exceptions that have been caught in the current
      * ProActive.tryWithCatch()/ProActive.removeTryWithCatch()
      * block. This waits for every call in this block to return.
-     * 
+     *
      * @return a collection of these exceptions
      */
     public static Collection getAllExceptions() {
         return ExceptionHandler.getAllExceptions();
+    }
+
+    /**
+     * @return The node of the current active object.
+     * @throws NodeException problem with the node.
+     */
+    public static Node getNode() throws NodeException {
+        BodyProxy destProxy = (BodyProxy) ((StubObject) getStubOnThis()).getProxy();
+
+        return NodeFactory.getNode(destProxy.getBody().getNodeURL());
     }
 }
