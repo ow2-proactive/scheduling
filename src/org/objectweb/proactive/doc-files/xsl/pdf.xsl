@@ -1,373 +1,912 @@
 <?xml version='1.0'?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:fo="http://www.w3.org/1999/XSL/Format"
-                xmlns:date="http://exslt.org/dates-and-times"  
-                exclude-result-prefixes="date"  
-                version="1.0">
+	xmlns:fo="http://www.w3.org/1999/XSL/Format"
+	xmlns:date="http://exslt.org/dates-and-times"
+	exclude-result-prefixes="date" version="1.0">
 
-<xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl"/>
-<xsl:import href="common.xsl"/>
+	<xsl:import	href="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" />
+	<xsl:import href="common.xsl" />
 
-<!--  Changing font sizes -->
-<!-- <xsl:param name="body.font.family">Times New Roman</xsl:param>  -->
-<!-- <xsl:param name="body.font.master">11</xsl:param> -->
-<!--<xsl:param name="title.font.family">Times New Roman</xsl:param> 
-<xsl:param name="footnote.font.size">9</xsl:param>-->
-<xsl:param name="monospace.font.family">Helvetica</xsl:param> 
-<!-- <xsl:param name="monospace.font.size">5</xsl:param> -->
+	<!--  Changing font sizes -->
+	<!-- <xsl:param name="body.font.family">Times New Roman</xsl:param>  -->
+	<!-- <xsl:param name="body.font.master">11</xsl:param> -->
+	<!--<xsl:param name="title.font.family">Times New Roman</xsl:param> 
+		<xsl:param name="footnote.font.size">9</xsl:param>-->
+	<xsl:param name="monospace.font.family">Helvetica</xsl:param>
+	<!-- <xsl:param name="monospace.font.size">5</xsl:param> -->
 
-<!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
-<xsl:param name="fop.extensions" select="'1'"/>
-<!-- <xsl:param name="draft.mode">no</xsl:param>  -->
-<!-- <xsl:param name="draft.watermark.image"></xsl:param>  -->
-
-
-<!-- This is good for pdf generation : the blank lines around titles are squeezed -->
-<!--<xsl:param name="line-height">1.2</xsl:param>-->  <!--normal value is 1.2-->
+	<!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
+	<xsl:param name="fop.extensions" select="'1'" />
+	<!-- <xsl:param name="draft.mode">no</xsl:param>  -->
+	<!-- <xsl:param name="draft.watermark.image"></xsl:param>  -->
 
 
-<!-- Remove headers on blank pages please! -->
-<xsl:param name="headers.on.blank.pages">0</xsl:param>
+	<!-- This is good for pdf generation : the blank lines around titles are squeezed -->
+	<!--<xsl:param name="line-height">1.2</xsl:param>-->
+	<!--normal value is 1.2-->
+
+<!-- set this parameter to a zero width value -->
+<xsl:param name="body.start.indent">4pt</xsl:param>
+<!--  set the title.margin.left parameter to the negative value of the desired indent.  -->
+<xsl:param name="title.margin.left">-4pt</xsl:param> 
 
 
-<!--  Paper feed -->
-<xsl:param name="paper.type">A4</xsl:param>
-<xsl:param name="page.margin.inner">10mm</xsl:param>
-<xsl:param name="page.margin.outer">13mm</xsl:param>
-<xsl:param name="double.sided">1</xsl:param>
 
-<!-- Make tables use up all space. -->
-<!-- <xsl:param name="default.table.width" >100</xsl:param> -->
 
-<!-- The chapter entries of the toc are in bold, the parts in bold and 11pt. -->
-<xsl:template name="toc.line">
-  <xsl:variable name="id">
-    <xsl:call-template name="object.id"/>
-  </xsl:variable>
+	<!-- Remove headers on blank pages please! -->
+<!-- 	<xsl:param name="headers.on.blank.pages">0</xsl:param> -->
+<!-- No longer used because the header template is customized -->
 
-  <xsl:variable name="label">
-    <xsl:apply-templates select="." mode="label.markup"/>
-  </xsl:variable>
+	<!--  Paper feed -->
+	<xsl:param name="paper.type">A4</xsl:param>
+	<xsl:param name="page.margin.inner">10mm</xsl:param>
+	<xsl:param name="page.margin.outer">13mm</xsl:param>
+	<xsl:param name="double.sided">1</xsl:param>
 
-  <fo:block text-align-last="justify"
-            end-indent="{$toc.indent.width}pt"
-            last-line-end-indent="-{$toc.indent.width}pt">
-    <fo:inline keep-with-next.within-line="always">
-      <xsl:choose>
-        <xsl:when test="self::chapter">
-          <xsl:attribute name="font-weight">bold</xsl:attribute>
-        </xsl:when>
-        <xsl:when test="self::part">
-          <xsl:attribute name="background-color">#FFFF00</xsl:attribute>
-          <xsl:attribute name="font-weight">bold</xsl:attribute>
-          <xsl:attribute name="font-size">11pt</xsl:attribute>
-          <xsl:attribute name="color">#00257E</xsl:attribute>
-        </xsl:when>
-      </xsl:choose>
-      <fo:basic-link internal-destination="{$id}">
-        <xsl:if test="$label != ''">
-          <xsl:copy-of select="$label"/>
-          <xsl:value-of select="$autotoc.label.separator"/>
-        </xsl:if>
-        <xsl:apply-templates select="." mode="title.markup"/>
-      </fo:basic-link>
-    </fo:inline>
-    <fo:inline keep-together.within-line="always">
-      <xsl:text> </xsl:text>
-      <fo:leader leader-pattern="dots"
-                 leader-pattern-width="3pt"
-                 leader-alignment="reference-area"
-                 keep-with-next.within-line="always"/>
-      <xsl:text> </xsl:text>
-      <fo:basic-link internal-destination="{$id}">
-        <fo:page-number-citation ref-id="{$id}"/>
-      </fo:basic-link>
-    </fo:inline>
-  </fo:block>
-</xsl:template>
+	<!-- Make tables use up all space. -->
+	<!-- <xsl:param name="default.table.width" >100</xsl:param> -->
 
-<!-- Make graphics in pdf be smaller than page width, if needed-->
-<!--  ??? How do I do that, I need to compare a measure of imagewidth with pagewidth! -->
-<!-- default.image.width exists, should be set maybe only for pdf and big images?? -->
+	<!-- The chapter entries of the toc are in bold, the parts in bold and 11pt. -->
+	<xsl:template name="toc.line">
+		<xsl:variable name="id">
+			<xsl:call-template name="object.id" />
+		</xsl:variable>
 
-<!--  Make sure figures have a white background, in case of transparent pixels -->
-<!--  Also removed figures borders, which are a nuisance -->
-<!--<xsl:attribute-set name="figure.properties" use-attribute-sets="formal.object.properties">
-  <xsl:attribute name="border-color">#000000</xsl:attribute>
-  <xsl:attribute name="border-style">solid</xsl:attribute>
-  <xsl:attribute name="border-width">0px</xsl:attribute>
-  <xsl:attribute name="padding">1em</xsl:attribute>
-  <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
-</xsl:attribute-set>-->
+		<xsl:variable name="label">
+			<xsl:apply-templates select="." mode="label.markup" />
+		</xsl:variable>
 
-<!--  Changing the appearance of ALL the section titles -->
-<xsl:attribute-set name="section.title.properties">
-  <xsl:attribute name="font-weight">bold</xsl:attribute> 
-  <xsl:attribute name="color">blue</xsl:attribute>
-  <xsl:attribute name="font-size">11pt</xsl:attribute> <!--All titles not reconfigured are 11pt-->
-</xsl:attribute-set>  
+		<xsl:variable name="line">
+			<fo:inline keep-with-next.within-line="always">
+				<xsl:choose>
+					<xsl:when test="self::chapter">
+						<xsl:attribute name="font-weight">bold</xsl:attribute>
+						<xsl:attribute name="font-size">12pt</xsl:attribute>
+						<xsl:attribute name="color">#00257E</xsl:attribute>
+					</xsl:when>
+					<xsl:when test="self::part">
+						<xsl:attribute name="font-weight">bold</xsl:attribute>
+						<xsl:attribute name="font-size">14pt</xsl:attribute>
+						<xsl:attribute name="color">#FFFFFF</xsl:attribute>
+					</xsl:when>
+				</xsl:choose>
+				<fo:basic-link internal-destination="{$id}">
+					<xsl:if test="$label != ''">
+						<xsl:if test="self::part">
+							<xsl:call-template name="gentext">
+								<xsl:with-param name="key"
+									select="'Part'" />
+							</xsl:call-template>
+							<xsl:text> </xsl:text>
+						</xsl:if>
+						<xsl:if test="self::chapter">
+							<xsl:call-template name="gentext">
+								<xsl:with-param name="key"
+									select="'Chapter'" />
+							</xsl:call-template>
+							<xsl:text> </xsl:text>
+						</xsl:if>
+						<xsl:copy-of select="$label" />
+						<xsl:value-of select="$autotoc.label.separator" />
+					</xsl:if>
+					<xsl:apply-templates select="." mode="title.markup" />
+				</fo:basic-link>
+				<fo:basic-link internal-destination="{$id}">
+				<xsl:text> </xsl:text>
+				<fo:leader leader-pattern="dots"
+					leader-pattern-width="3pt" leader-alignment="reference-area"
+					keep-with-next.within-line="always" />
+				<xsl:text> </xsl:text>
+				<fo:page-number-citation ref-id="{$id}" />
+				</fo:basic-link>
+			</fo:inline>
+		</xsl:variable>
 
-<!-- Extra configure for sect1 and sect2 -->
-<xsl:attribute-set name="section.title.level1.properties">
-<xsl:attribute name="font-size">14pt</xsl:attribute>
-<!--  Adding a grey box under all section1 titles -->
-  <xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
-</xsl:attribute-set>  
+		<xsl:choose>
+			<xsl:when test="self::part">
+				<fo:block text-align-last="justify"
+					end-indent="{$toc.indent.width}pt"
+					last-line-end-indent="-{$toc.indent.width}pt"
+					background-color="#00257E" space-before="8mm" space-after="2mm"
+					line-height="19pt" padding-top="2mm">
+					<xsl:copy-of select="$line" />
+				</fo:block>
+			</xsl:when>
+			<xsl:when test="self::chapter">
+				<fo:block text-align-last="justify"
+					end-indent="{$toc.indent.width}pt"
+					last-line-end-indent="-{$toc.indent.width}pt" space-before="3mm" space-after="1mm">
+					<xsl:copy-of select="$line" />
+				</fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<fo:block text-align-last="justify"
+					end-indent="{$toc.indent.width}pt"
+					last-line-end-indent="-{$toc.indent.width}pt">
+					<xsl:copy-of select="$line" />
+				</fo:block>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+		
+	</xsl:template>
 
-<xsl:attribute-set name="section.title.level2.properties">
-  <xsl:attribute name="font-size">12pt</xsl:attribute>
-</xsl:attribute-set>  
+	<!-- Make graphics in pdf be smaller than page width, if needed-->
+	<!--  ??? How do I do that, I need to compare a measure of imagewidth with pagewidth! -->
+	<!-- default.image.width exists, should be set maybe only for pdf and big images?? -->
 
-<!-- helper for function below -->
-<xsl:template name="link.myhelper">
-  <xsl:param name="class" select="''"/>
-  <xsl:param name="level" select="''"/>
+	<!--  Make sure figures have a white background, in case of transparent pixels -->
+	<!--  Also removed figures borders, which are a nuisance -->
+	<!--<xsl:attribute-set name="figure.properties" use-attribute-sets="formal.object.properties">
+		<xsl:attribute name="border-color">#000000</xsl:attribute>
+		<xsl:attribute name="border-style">solid</xsl:attribute>
+		<xsl:attribute name="border-width">0px</xsl:attribute>
+		<xsl:attribute name="padding">1em</xsl:attribute>
+		<xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
+		</xsl:attribute-set>-->
+
+	<!--  Changing the appearance of ALL the section titles -->
+	<xsl:attribute-set name="section.title.properties">
+		<xsl:attribute name="font-weight">bold</xsl:attribute>
+		<xsl:attribute name="color">#0010FF</xsl:attribute>
+		<xsl:attribute name="font-size">10pt</xsl:attribute>
+		<!--All titles not reconfigured are 10pt-->
+	</xsl:attribute-set>
+
+	<!-- Extra configure for sect1 and sect2 -->
+	<xsl:attribute-set name="section.title.level1.properties">
+		<xsl:attribute name="font-size">14pt</xsl:attribute>
+		<!--  Adding a grey box under all section1 titles -->
+		<xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="section.title.level2.properties">
+		<xsl:attribute name="font-size">12pt</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="section.title.level3.properties">
+		<xsl:attribute name="font-size">11pt</xsl:attribute>
+	</xsl:attribute-set>
+
+	<xsl:attribute-set name="section.title.level4.properties">
+		<xsl:attribute name="font-size">10pt</xsl:attribute>
+	</xsl:attribute-set>
+
+<!-- Q&A title customized -->
+	<xsl:attribute-set name="qanda.title.properties">
+		<xsl:attribute name="color">#0010FF</xsl:attribute>
+		<xsl:attribute name="font-size">10pt</xsl:attribute>
+		<xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
+	</xsl:attribute-set>
+
+
+	<!-- helper for function below -->
+	<xsl:template name="link.myhelper">
+		<xsl:param name="class" select="''" />
+		<xsl:param name="level" select="''" />
+
+		<xsl:if test="$level/@id != ''">
+
+				<fo:block space-before="5pt">
+					<fo:basic-link
+						internal-destination="{$level/@id}">
+						<xsl:if test="$class != ''">
+							<xsl:call-template name="gentext">
+								<xsl:with-param name="key" select="$class" />
+							</xsl:call-template>
+							<xsl:text> </xsl:text>
+							<xsl:apply-templates select="$level" mode="label.markup" />
+							<xsl:text>: </xsl:text>
+						</xsl:if>
+						<xsl:apply-templates select="$level" mode="title.markup" />
+					</fo:basic-link>
+				</fo:block>
+		</xsl:if>
+
+	</xsl:template>
+
+	<!-- adjust the headers, recalling chapter and part numbers -->
+	<xsl:template name="header.table">
+		<xsl:param name="pageclass" select="''" />
+		<xsl:param name="sequence" select="''" />
+		<xsl:param name="gentext-key" select="''" />
+
+<!--  Left is the current node level if it's not chapter: it can be part/TOC/LOT  
+      if current node is chapter, display part information. -->
+		<xsl:variable name="leftS">
  
-   <fo:block space-before="5pt">
-  <fo:basic-link internal-destination="{$level/@id}">
-      <xsl:value-of select="$class"/> 
-      <xsl:text> </xsl:text>
-      <xsl:apply-templates select="$level" mode="label.markup"/> 
-      <xsl:text>: </xsl:text>
-      <xsl:apply-templates select="$level" mode="title.markup"/> 
-  </fo:basic-link>
-   </fo:block>
-  
-</xsl:template>
+			<xsl:choose>
 
-<!-- adjust the headers, recalling chapter and part numbers -->
-<xsl:template name="header.table">
+				<xsl:when test="$gentext-key = 'part'">
+					<xsl:call-template name="link.myhelper">
+						<xsl:with-param name="level" select="." />
+						<xsl:with-param name="class" select="$gentext-key"/>
+					</xsl:call-template>
+				</xsl:when>
+
+				<xsl:otherwise>
+					<xsl:call-template name="link.myhelper">
+						<xsl:with-param name="level" select=".." />
+						<xsl:with-param name="class" select="'part'"/>
+					</xsl:call-template>
+				</xsl:otherwise>
+
+			</xsl:choose>
+		</xsl:variable>
+
+		<!-- Right will be put if current node != Part -->
+		<xsl:variable name="rightS">
+	
+				<xsl:if test="$gentext-key != 'part'">
+ 					<xsl:call-template name="link.myhelper">
+						<xsl:with-param name="level" select="." />
+						<xsl:with-param name="class">
+	      			<xsl:if test="$gentext-key = 'chapter'" >
+   	      			<xsl:copy-of select="$gentext-key"/>
+							</xsl:if>
+						</xsl:with-param>
+					</xsl:call-template>
+   	   	</xsl:if>
+   	   	
+		</xsl:variable>
+
+		<xsl:variable name="candidate">
+			<fo:table table-layout="fixed" width="100%">
+				<xsl:call-template name="head.sep.rule">
+					<xsl:with-param name="pageclass"
+						select="$pageclass" />
+					<xsl:with-param name="sequence" select="$sequence" />
+					<xsl:with-param name="gentext-key"
+						select="$gentext-key" />
+				</xsl:call-template>
+
+				<fo:table-column column-number="1" />
+				<fo:table-column column-number="2" />
+				<fo:table-column column-number="3" />
+
+				<fo:table-body>
+					<fo:table-row height="15pt">
+
+						<fo:table-cell text-align="left"
+							display-align="before">
+							<xsl:copy-of select="$leftS" />
+						</fo:table-cell>
+
+						<fo:table-cell text-align="center"
+							display-align="before">
+							<fo:external-graphic
+								content-height="20pt">
+								<xsl:attribute name="src">
+									<xsl:call-template
+										name="fo-external-image">
+										<xsl:with-param name="filename"
+											select="$header.image.filename" />
+									</xsl:call-template>
+								</xsl:attribute>
+								<xsl:attribute name="height">
+									14pt
+								</xsl:attribute>
+								<xsl:attribute
+									name="background-color">
+									#FFFFFF
+								</xsl:attribute>
+							</fo:external-graphic>
+						</fo:table-cell>
+
+						<fo:table-cell text-align="right"
+							display-align="before">
+							<xsl:copy-of select="$rightS" />
+						</fo:table-cell>
+					</fo:table-row>
+				</fo:table-body>
+			</fo:table>
+		</xsl:variable>
+
+		<!-- Really output a header only if not one of the first pages of book -->
+		<xsl:if test="$gentext-key != 'book'">
+				<!-- Insert the table defined above -->
+				<xsl:copy-of select="$candidate" />
+		</xsl:if>
+	</xsl:template>
+
+
+<!-- This footer template's only modification concerns the final test, ie which pages have a footer line.  -->
+<xsl:template name="footer.table">
   <xsl:param name="pageclass" select="''"/>
   <xsl:param name="sequence" select="''"/>
   <xsl:param name="gentext-key" select="''"/>
 
-  <xsl:variable name="leftS">
-    <xsl:choose>
-
-      <xsl:when test="$sequence = 'even'">
-       <xsl:call-template name="link.myhelper">
-           <xsl:with-param name="level" select="." />
-       </xsl:call-template>
+  <xsl:choose>
+      <xsl:when test="$pageclass = 'index'">
+          <xsl:attribute name="margin-left">0pt</xsl:attribute>
       </xsl:when>
+  </xsl:choose>
 
-      <xsl:otherwise>
-        <xsl:call-template name="link.myhelper">
-          <xsl:with-param name="level" select=".." />
-          <xsl:with-param name="class">
-            <xsl:call-template name="gentext">
-              <xsl:with-param name="key" select="'Part'"/>
-            </xsl:call-template>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:otherwise>
-
-      </xsl:choose>
+  <xsl:variable name="column1">
+    <xsl:choose>
+      <xsl:when test="$double.sided = 0">1</xsl:when>
+      <xsl:when test="$sequence = 'first' or $sequence = 'odd'">1</xsl:when>
+      <xsl:otherwise>3</xsl:otherwise>
+    </xsl:choose>
   </xsl:variable>
 
-  <xsl:variable name="rightS">
-     <xsl:choose>
-
-      <xsl:when test="$sequence = 'odd'">
-         <xsl:call-template name="link.myhelper">
-            <xsl:with-param name="level" select="." />
-         </xsl:call-template>
-      </xsl:when>
-      
-      <xsl:when test="$sequence = 'even'">
-        <xsl:call-template name="link.myhelper">
-          <xsl:with-param name="level" select=".." />
-          <xsl:with-param name="class">
-             <xsl:call-template name="gentext">
-                <xsl:with-param name="key" select="'Part'"/>
-             </xsl:call-template>
-          </xsl:with-param>
-        </xsl:call-template>
-      </xsl:when>
-
-     </xsl:choose>
+  <xsl:variable name="column3">
+    <xsl:choose>
+      <xsl:when test="$double.sided = 0">3</xsl:when>
+      <xsl:when test="$sequence = 'first' or $sequence = 'odd'">3</xsl:when>
+      <xsl:otherwise>1</xsl:otherwise>
+    </xsl:choose>
   </xsl:variable>
 
   <xsl:variable name="candidate">
     <fo:table table-layout="fixed" width="100%">
-      <xsl:call-template name="head.sep.rule">
+      <xsl:call-template name="foot.sep.rule">
         <xsl:with-param name="pageclass" select="$pageclass"/>
         <xsl:with-param name="sequence" select="$sequence"/>
         <xsl:with-param name="gentext-key" select="$gentext-key"/>
       </xsl:call-template>
-
-      <fo:table-column column-number="1"/>
-      <fo:table-column column-number="2"/>
-      <fo:table-column column-number="3"/>
+      <fo:table-column column-number="1">
+        <xsl:attribute name="column-width">
+          <xsl:text>proportional-column-width(</xsl:text>
+          <xsl:call-template name="header.footer.width">
+            <xsl:with-param name="location">footer</xsl:with-param>
+            <xsl:with-param name="position" select="$column1"/>
+          </xsl:call-template>
+          <xsl:text>)</xsl:text>
+        </xsl:attribute>
+      </fo:table-column>
+      <fo:table-column column-number="2">
+        <xsl:attribute name="column-width">
+          <xsl:text>proportional-column-width(</xsl:text>
+          <xsl:call-template name="header.footer.width">
+            <xsl:with-param name="location">footer</xsl:with-param>
+            <xsl:with-param name="position" select="2"/>
+          </xsl:call-template>
+          <xsl:text>)</xsl:text>
+        </xsl:attribute>
+      </fo:table-column>
+      <fo:table-column column-number="3">
+        <xsl:attribute name="column-width">
+          <xsl:text>proportional-column-width(</xsl:text>
+          <xsl:call-template name="header.footer.width">
+            <xsl:with-param name="location">footer</xsl:with-param>
+            <xsl:with-param name="position" select="$column3"/>
+          </xsl:call-template>
+          <xsl:text>)</xsl:text>
+        </xsl:attribute>
+      </fo:table-column>
 
       <fo:table-body>
-        <fo:table-row height="15pt">
-
-          <fo:table-cell text-align="left" display-align="before">
-             <xsl:copy-of select="$leftS"/>
+        <fo:table-row height="14pt">
+          <fo:table-cell text-align="left"
+                         display-align="after">
+            <xsl:if test="$fop.extensions = 0">
+              <xsl:attribute name="relative-align">baseline</xsl:attribute>
+            </xsl:if>
+            <fo:block>
+              <xsl:call-template name="footer.content">
+                <xsl:with-param name="pageclass" select="$pageclass"/>
+                <xsl:with-param name="sequence" select="$sequence"/>
+                <xsl:with-param name="position" select="'left'"/>
+                <xsl:with-param name="gentext-key" select="$gentext-key"/>
+              </xsl:call-template>
+            </fo:block>
           </fo:table-cell>
-
-          <fo:table-cell text-align="center" display-align="before">
-            <fo:external-graphic content-height="20pt">
-              <xsl:attribute name="src">
-               <xsl:call-template name="fo-external-image">
-                 <xsl:with-param name="filename" select="$header.image.filename"/>
-               </xsl:call-template>
-              </xsl:attribute>
-            <xsl:attribute name="height">14pt</xsl:attribute> 
-            <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
-           </fo:external-graphic>          
+          <fo:table-cell text-align="center"
+                         display-align="after">
+            <xsl:if test="$fop.extensions = 0">
+              <xsl:attribute name="relative-align">baseline</xsl:attribute>
+            </xsl:if>
+            <fo:block>
+              <xsl:call-template name="footer.content">
+                <xsl:with-param name="pageclass" select="$pageclass"/>
+                <xsl:with-param name="sequence" select="$sequence"/>
+                <xsl:with-param name="position" select="'center'"/>
+                <xsl:with-param name="gentext-key" select="$gentext-key"/>
+              </xsl:call-template>
+            </fo:block>
           </fo:table-cell>
-
-          <fo:table-cell text-align="right" display-align="before">
-            <xsl:copy-of select="$rightS"/>
+          <fo:table-cell text-align="right"
+                         display-align="after">
+            <xsl:if test="$fop.extensions = 0">
+              <xsl:attribute name="relative-align">baseline</xsl:attribute>
+            </xsl:if>
+            <fo:block>
+              <xsl:call-template name="footer.content">
+                <xsl:with-param name="pageclass" select="$pageclass"/>
+                <xsl:with-param name="sequence" select="$sequence"/>
+                <xsl:with-param name="position" select="'right'"/>
+                <xsl:with-param name="gentext-key" select="$gentext-key"/>
+              </xsl:call-template>
+            </fo:block>
           </fo:table-cell>
         </fo:table-row>
       </fo:table-body>
     </fo:table>
   </xsl:variable>
 
-<!-- Really output a header? -->
- <xsl:choose>
-  <xsl:when test="$pageclass = 'body'">
-      <!-- Insert the table defined above -->
-    <xsl:copy-of select="$candidate"/>
-  </xsl:when>
- </xsl:choose>
+  <!-- Really output a footer? -->
+  <!-- book titlepages have no footers at all -->
+		<xsl:if test="$gentext-key != 'book'">
+      <xsl:copy-of select="$candidate"/>
+  </xsl:if>
 </xsl:template>
 
-<!-- Having long lines be broken up  -->
-<xsl:param name="hyphenate.verbatim">yes</xsl:param>
+	<!-- Having long lines be broken up  -->
+	<xsl:param name="hyphenate.verbatim">yes</xsl:param>
 
 
-<!-- Playing around with the bullet possibilities -->
-<!--<xsl:template name="itemizedlist.label.markup">
-  <xsl:param name="itemsymbol" select="'disc'"/> -  
-</xsl:template>-->
+	<!-- Trying to improve itemized lists rendering -->
+	<!-- FIND AND MODIFY <xsl:template match="itemizedlist"> -->
 
-<!-- Trying to improve itemized lists rendering -->
-<!-- FIND AND MODIFY <xsl:template match="itemizedlist"> -->
+	<!-- No "Draft" splayed across the page -->
+	<xsl:param name="draft.watermark.image"></xsl:param>
 
-<!-- JUST TO HAVE THE THREE LOGOS ON TITLE PAGE -->
-<xsl:template match="corpauthor" mode="book.titlepage.recto.mode">
-  <fo:inline color="blue">
-    <xsl:apply-templates mode="titlepage.mode"/> <!--If there is text, include it-->
-  </fo:inline>
-  <!-- Now just put the image -->  
-  <fo:external-graphic>
-       <xsl:attribute name="src">  
-            <xsl:copy-of select="$threeinstitutes.image.filename"/> 
-      </xsl:attribute>    
-  </fo:external-graphic>
+	<!-- Have screens written on darker background -->
+	<xsl:attribute-set name="verbatim.properties">
+		<xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
+		<!-- <xsl:attribute name="border">0.5pt solid blue</xsl:attribute> -->
+		<!-- <xsl:attribute name="padding">4mm</xsl:attribute> -->
+	</xsl:attribute-set>
+
+
+	<!-- Changing the first page appearance -->
+
+<!--  Changing the font for the authors on titlepage -->
+  <xsl:template match="bookinfo/author" mode="book.titlepage.recto.mode">
+		<fo:inline color="#0010FF" >
+			<xsl:attribute name="font-weight">bold</xsl:attribute>
+			<xsl:attribute name="font-size">16pt</xsl:attribute>
+   		<xsl:apply-templates mode="titlepage.mode" /> 
+		</fo:inline>
+	</xsl:template>
+
+<!--  The appearance of the Subtitle -->
+  <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
+		<fo:inline color="#0010FF" >
+			<xsl:attribute name="font-weight">bold</xsl:attribute>
+			<xsl:attribute name="font-size">20pt</xsl:attribute>
+   		<xsl:apply-templates mode="titlepage.mode" /> 
+		</fo:inline>
+
+	</xsl:template>
+
+
+<!-- Remove the copyright from the second page, as it appears in the legal notice anyways. -->
+  <xsl:template match="copyright" mode="book.titlepage.verso.auto.mode"/> 
+ 
+ <xsl:template match="legalnotice" mode="titlepage.mode">
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+  <fo:block id="{$id}">
+    <xsl:call-template name="formal.object.heading">
+      <xsl:with-param name="title">
+        Legal Notice
+      </xsl:with-param>
+    </xsl:call-template>
+    <xsl:apply-templates mode="titlepage.mode"/>
+  </fo:block>
 </xsl:template>
 
+   
+ 	<xsl:template name="book.titlepage.recto">
+		<fo:block break-after="page">
 
-
-<!-- No "Draft" splayed across the page -->
-<xsl:param name="draft.watermark.image"></xsl:param> 
-
-<!-- Have screens written on darker background -->
-<xsl:attribute-set name="verbatim.properties">
-   <xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
-   <!-- <xsl:attribute name="border">0.5pt solid blue</xsl:attribute> -->
-   <!-- <xsl:attribute name="padding">4mm</xsl:attribute> -->
-</xsl:attribute-set>
-
-<!-- Changing the first page appearance -->
-<xsl:template name="book.titlepage.recto">
-  <fo:block>
-    <fo:table inline-progression-dimension="100%" table-layout="fixed">
-      <fo:table-column column-width="50%"/>
-      <fo:table-column column-width="50%"/>
-      <fo:table-body>
 <!-- The Main Title -->
-        <fo:table-row >
-          <fo:table-cell number-columns-spanned="2">
-            <fo:block text-align="center" space-after="5cm">
+            <fo:block text-align="center" space-before="0cm">
               <xsl:apply-templates 
                      mode="book.titlepage.recto.mode" 
                      select="bookinfo/mediaobject"/>
             </fo:block>
-          </fo:table-cell>
-        </fo:table-row>
+
 <!-- The Subtitle -->
-        <fo:table-row >
-          <fo:table-cell number-columns-spanned="2">
-            <fo:block text-align="center"  space-after="5cm">
+            <fo:block text-align="center" space-before="5cm" >
               <xsl:apply-templates 
                      mode="book.titlepage.recto.mode" 
                      select="bookinfo/subtitle"/>
             </fo:block>
-          </fo:table-cell>
-        </fo:table-row>
 
-<!-- The authors -->
-        <fo:table-row >
-          <fo:table-cell number-columns-spanned="2" >
-            <fo:block text-align="center"  space-after="3cm">
+<!-- Two logos and the author's name in a 1x3 table -->
+			<fo:table table-layout="fixed" space-before="5cm">
+
+				<fo:table-column column-width="33%" />
+				<fo:table-column column-width="34%" />
+				<fo:table-column column-width="33%" />
+
+				<fo:table-body>
+					<fo:table-row>
+						<fo:table-cell >
+							<fo:external-graphic >
+								<xsl:attribute name="src">
+									images/logo-INRIA.png
+								</xsl:attribute>
+								<xsl:attribute name="height">70pt</xsl:attribute>
+							</fo:external-graphic>
+						</fo:table-cell>
+						<fo:table-cell >
+							<fo:block text-align="center" space-before="3cm">
               <xsl:apply-templates 
                      mode="book.titlepage.recto.mode" 
                      select="bookinfo/author"/>
-            </fo:block>
-          </fo:table-cell>
-        </fo:table-row>
+							</fo:block>
+						</fo:table-cell>
+						<fo:table-cell>
+							<fo:block text-align="center">
+								<fo:external-graphic>
+									<xsl:attribute name="src">
+										images/logo-objectweb250.png
+									</xsl:attribute>
+									<xsl:attribute name="height">200pt</xsl:attribute>
+								</fo:external-graphic>
+							</fo:block>
+						</fo:table-cell>
+					</fo:table-row>
+				</fo:table-body>
+			</fo:table>
 
-<!-- TODO: The Logos -->
+<!-- The other 2 missing logos, also in a table -->
+			<fo:table table-layout="fixed" space-before="1cm">
+							<fo:table-column column-width="20%" />
+							<fo:table-column column-width="20%" />
+							<fo:table-column column-width="20%" />
+							<fo:table-column column-width="20%" />
+			       	<fo:table-column column-width="20%" />
+				<fo:table-body>
+					<fo:table-row>
+						<fo:table-cell />
+						<fo:table-cell >
+							<fo:external-graphic
+								content-height="100pt">
+								<xsl:attribute name="src">
+									images/logo-UNSA.png
+								</xsl:attribute>
+								<xsl:attribute name="height">
+									70pt
+								</xsl:attribute>
+							</fo:external-graphic>
+						</fo:table-cell>
+						<fo:table-cell />
+						<fo:table-cell >
+							<fo:block text-align="center">
+								<fo:external-graphic
+									content-height="100pt">
+									<xsl:attribute name="src">
+										images/logo-CNRS.png
+									</xsl:attribute>
+									<xsl:attribute name="height">
+										70pt
+									</xsl:attribute>
+								</fo:external-graphic>
+							</fo:block>
+						</fo:table-cell>
+						<fo:table-cell />
+					</fo:table-row>
 
-        <fo:table-row >
-          <fo:table-cell number-columns-spanned="2">
-            <fo:block text-align="center"  space-after="3cm">
-              <xsl:apply-templates 
-                     mode="book.titlepage.recto.mode" 
-                     select="bookinfo/corpauthor"/>
-            </fo:block>
-          </fo:table-cell>
-        </fo:table-row>
+				</fo:table-body>
+			</fo:table>
 
-<!-- The Revision and copyright -->
+ <!-- The Revision and copyright -->
+			<fo:table table-layout="fixed" space-before="3cm" >
+
+				<fo:table-column column-width="50%" />
+				<fo:table-column column-width="50%" />
+        <fo:table-body>
         <fo:table-row>
           <fo:table-cell>
-            <fo:block text-align="left" >
-              <xsl:apply-templates 
-                     mode="book.titlepage.recto.mode" 
-                     select="bookinfo/revhistory"/>
-            </fo:block>
-          </fo:table-cell>
+
+						<!-- The Revision and copyright -->
+						<fo:block text-align="left" font-size="12pt" font-weight="bold">
+							V
+							<xsl:apply-templates
+								mode="book.titlepage.recto.mode"
+								select="bookinfo/revhistory/revision/revnumber" />
+							<xsl:call-template name="gentext.space" />
+							<xsl:call-template name="gentext.space" />
+							<xsl:call-template name="gentext.space" />
+							<xsl:apply-templates
+								mode="book.titlepage.recto.mode"
+								select="bookinfo/revhistory/revision/date" />
+						</fo:block>
+
+           </fo:table-cell>
           <fo:table-cell>
-            <fo:block text-align="right">
-              <xsl:apply-templates 
-                     mode="book.titlepage.recto.mode" 
-                     select="bookinfo/copyright"/>
-            </fo:block>
+            <fo:block text-align="right"  font-size="12pt" font-weight="bold">
+							<xsl:apply-templates
+								mode="book.titlepage.recto.mode" select="bookinfo/copyright" />
+						</fo:block>
           </fo:table-cell> 
         </fo:table-row >  
-      </fo:table-body> 
-    </fo:table>
+				</fo:table-body>
+			</fo:table>
+			
+		</fo:block>
+
+	</xsl:template>
+
+<!--  END OF TITLEPAGE TEMPLATE -->
+
+	<!--  force PART TOCs to appear on the same page as the Part title  
+		(google gmane.text.docbook.apps Bob Stayton Removing extra blank pages in fo TOC)-->
+	<xsl:template name="part.titlepage.before.verso" priority="1">
+		<xsl:variable name="toc.params">
+			<xsl:call-template name="find.path.params">
+				<xsl:with-param name="table"
+					select="normalize-space($generate.toc)" />
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:if test="contains($toc.params, 'toc')">
+			<xsl:call-template name="division.toc">
+				<xsl:with-param name="toc.context" select="." />
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+
+	<!-- Turn off the traditional full part toc -->
+	<xsl:template name="generate.part.toc"/>
+
+<xsl:attribute-set name="compact.list.item.spacing">
+  <xsl:attribute name="space-before.optimum">0em</xsl:attribute>
+  <xsl:attribute name="space-before.minimum">0em</xsl:attribute>
+  <xsl:attribute name="space-before.maximum">0.2em</xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="list.item.spacing">
+  <xsl:attribute name="space-before.optimum">0.25em</xsl:attribute>
+  <xsl:attribute name="space-before.minimum">0.1em</xsl:attribute>
+  <xsl:attribute name="space-before.maximum">0.4em</xsl:attribute>
+</xsl:attribute-set>
+
+
+<!-- qandaset bug - had to remove some ids. -->
+<xsl:template match="question">
+  <xsl:variable name="id"><xsl:call-template name="object.id"/></xsl:variable>
+
+  <xsl:variable name="entry.id">
+    <xsl:call-template name="object.id">
+      <xsl:with-param name="object" select="parent::*"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:variable name="deflabel">
+    <xsl:choose>
+      <xsl:when test="ancestor-or-self::*[@defaultlabel]">
+        <xsl:value-of select="(ancestor-or-self::*[@defaultlabel])[last()] /@defaultlabel"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$qanda.defaultlabel"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <fo:block id="{$entry.id}" xsl:use-attribute-sets="qanda.title.properties">
+    <xsl:apply-templates select="." mode="label.markup" />
+    <xsl:apply-templates select="." mode="intralabel.punctuation"/>
+    <xsl:apply-templates select="." mode="title.markup" />
+    <xsl:apply-templates select="*[local-name(.)!='label']"/>
+  </fo:block>
+  
+</xsl:template>
+
+<!-- qandaset bug - had to remove some ids. -->
+<xsl:template match="answer">
+  <xsl:variable name="id"><xsl:call-template name="object.id"/></xsl:variable>
+  <xsl:variable name="entry.id">
+    <xsl:call-template name="object.id">
+      <xsl:with-param name="object" select="parent::*"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:variable name="deflabel">
+    <xsl:choose>
+      <xsl:when test="ancestor-or-self::*[@defaultlabel]">
+        <xsl:value-of select="(ancestor-or-self::*[@defaultlabel])[last()]
+                              /@defaultlabel"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$qanda.defaultlabel"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <fo:block >
+    <fo:block>
+      <xsl:choose>
+        <xsl:when test="$deflabel = 'none'">
+          <fo:block/>
+        </xsl:when>
+        <xsl:otherwise>
+          <fo:block>
+            <xsl:variable name="answer.label">
+              <xsl:apply-templates select="." mode="label.markup"/>
+            </xsl:variable>
+            <xsl:copy-of select="$answer.label"/>
+          </fo:block>
+        </xsl:otherwise>
+      </xsl:choose>
+    </fo:block>
+    <fo:block >
+      <xsl:apply-templates select="*[local-name(.)!='label']"/>
+    </fo:block>
+  </fo:block>
+</xsl:template>
+
+<!--  more Q&A specifics  -->
+<xsl:template match="qandaset">
+  <xsl:variable name="id"><xsl:call-template name="object.id"/></xsl:variable>
+
+  <xsl:variable name="label-width">
+    <xsl:call-template name="dbfo-attribute">
+      <xsl:with-param name="pis"
+                      select="processing-instruction('dbfo')"/>
+      <xsl:with-param name="attribute" select="'label-width'"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:variable name="label-length">
+    <xsl:choose>
+      <xsl:when test="$label-width != ''">
+        <xsl:value-of select="$label-width"/>
+      </xsl:when>
+      <xsl:when test="descendant::label">
+        <xsl:call-template name="longest.term">
+          <xsl:with-param name="terms" select="descendant::label"/>
+          <xsl:with-param name="maxlength" select="20"/>
+        </xsl:call-template>
+        <xsl:text>em * 0.50</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>2.5em</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <fo:block id="{$id}">
+    <xsl:if test="blockinfo/title|info/title|title">
+      <xsl:apply-templates select="(blockinfo/title|info/title|title)[1]"/>
+    </xsl:if>
+
+    <xsl:apply-templates select="*[name(.) != 'title'
+                                 and name(.) != 'titleabbrev'
+                                 and name(.) != 'qandadiv'
+                                 and name(.) != 'qandaentry']"/>
+    <xsl:apply-templates select="qandadiv"/>
+
+    <xsl:if test="qandaentry">
+        <xsl:apply-templates select="qandaentry"/>
+    </xsl:if>
   </fo:block>
 </xsl:template>
 
 
-<!--  The history displayed on titlepage is only the top element -->
-<xsl:template match="revhistory" mode="book.titlepage.verso.mode">
-  <xsl:apply-templates select="revision[1]/revnumber"/>
+<!-- Inserting the FAQ into the toc -->
+<xsl:template match="qandaset" mode="toc">
+  <xsl:call-template name="toc.line"/>
 </xsl:template>
 
 
-<!--  PART TOCs appear on the same page as the Part title  
-(google gmane.text.docbook.apps Bob Stayton Removing extra blank pages in fo TOC)-->
-<xsl:template name="part.titlepage.before.verso" priority="1">
-  <xsl:variable name="toc.params">
-    <xsl:call-template name="find.path.params">
-      <xsl:with-param name="table" select="normalize-space($generate.toc)"/>
+<xsl:template match="part" mode="toc">
+  <xsl:param name="toc-context" select="."/>
+
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+
+  <xsl:variable name="cid">
+    <xsl:call-template name="object.id">
+      <xsl:with-param name="object" select="$toc-context"/>
     </xsl:call-template>
   </xsl:variable>
-  <xsl:if test="contains($toc.params, 'toc')">
-    <xsl:call-template name="division.toc">
-      <xsl:with-param name="toc.context" select="."/>
-    </xsl:call-template>
+
+  <xsl:call-template name="toc.line"/>
+
+  <xsl:variable name="nodes" select="qandaset|chapter|appendix|preface|reference|
+                                     refentry|article|index|glossary|
+                                     bibliography"/>
+
+  <xsl:variable name="depth.from.context" select="count(ancestor::*)-count($toc-context/ancestor::*)"/>
+
+  <xsl:if test="$toc.section.depth > 0 
+                and $toc.max.depth > $depth.from.context
+                and $nodes">
+    <fo:block id="toc.{$cid}.{$id}">
+      <xsl:attribute name="margin-left">
+        <xsl:call-template name="set.toc.indent"/>
+      </xsl:attribute>
+      
+      <xsl:apply-templates select="$nodes" mode="toc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+      </xsl:apply-templates>
+    </fo:block>
   </xsl:if>
 </xsl:template>
 
-<!-- Turn off the traditional full part toc -->
-<xsl:template name="generate.part.toc"> </xsl:template>
+<!-- XXXXXXXXXXXXXXXXXXXXXXXX emphasising with color XXXXXXXXXXXXXXXXX -->
+
+<xsl:template match="emphasis">
+  <xsl:variable name="depth">
+    <xsl:call-template name="dot.count">
+      <xsl:with-param name="string">
+				<xsl:number level="multiple"/>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:choose>
+    <xsl:when test="@role='bold' or @role='strong'">
+      <xsl:call-template name="inline.boldseq"/>
+    </xsl:when>
+    <xsl:when test="@role='underline'">
+      <fo:inline text-decoration="underline">
+        <xsl:call-template name="inline.charseq"/>
+      </fo:inline>
+    </xsl:when>
+    <xsl:when test="@role='strikethrough'">
+      <fo:inline text-decoration="line-through">
+        <xsl:call-template name="inline.charseq"/>
+      </fo:inline>
+    </xsl:when>
+
+<!--  Added this test, which can be triggered after code beautifier -->
+    <xsl:when test="@role='keyword' or @role='codeword' or @role='typeword' or @role='comment' or @role='string'">
+        <xsl:call-template name="myinline.emphasis">
+          <xsl:with-param name="role" select="@role"/>
+         </xsl:call-template>
+    </xsl:when>
+
+    <xsl:otherwise>
+      <xsl:choose>
+        <xsl:when test="$depth mod 2 = 1">
+          <fo:inline font-style="normal">
+            <xsl:apply-templates/>
+          </fo:inline>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="inline.italicseq"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+
+	<xsl:template name="myinline.emphasis">
+		<xsl:param name="role" select="''" />
+
+		<xsl:param name="content">
+			<xsl:apply-templates />
+		</xsl:param>
+
+		<fo:inline>
+			<xsl:if test="@id">
+				<xsl:attribute name="id">
+					<xsl:value-of select="@id" />
+				</xsl:attribute>
+			</xsl:if>
+
+			<xsl:if test="@role = 'comment' or @role = 'string'">
+				<xsl:attribute name="font-style">italic</xsl:attribute>
+			</xsl:if>
+			<xsl:attribute name="color">
+				<xsl:choose>
+					<xsl:when test="@role = 'keyword'">#00257E</xsl:when>
+					<xsl:when test="@role = 'codeword'">#00257E</xsl:when>
+					<xsl:when test="@role = 'typeword'">#931793</xsl:when>
+					<xsl:when test="@role = 'comment'">#0f9626</xsl:when>
+					<xsl:when test="@role = 'string'">#707070</xsl:when>
+					<xsl:otherwise>#F00000</xsl:otherwise> <!-- This should never happen. -->
+				</xsl:choose>
+			</xsl:attribute>
+
+			<xsl:if test="@dir">
+				<xsl:attribute name="direction">
+					<xsl:choose>
+						<xsl:when test="@dir = 'ltr' or @dir = 'lro'">ltr</xsl:when>
+						<xsl:otherwise>rtl</xsl:otherwise>
+					</xsl:choose>
+				</xsl:attribute>
+			</xsl:if>
+			<xsl:copy-of select="$content" />
+		</fo:inline>
+
+	</xsl:template>
 
 </xsl:stylesheet>

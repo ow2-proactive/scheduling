@@ -75,11 +75,13 @@
     </mediaobject>
 
     
-      <revision>
+    <revhistory>  
+    <revision>
         <revnumber>3.01</revnumber>
         <date>2005-12-16</date>
       </revision>
-
+    </revhistory>
+    
     <abstract>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis
       role="bold">GRID</emphasis> Java library for <emphasis
@@ -95,9 +97,9 @@
       workstations</emphasis>, on <emphasis role="bold">P2P desktop
       Grids</emphasis>, or on I<emphasis role="bold">nternet Grids</emphasis>.
       The library is based on an Active Object pattern that is a uniform way
-      to encapsulate:</para>
-
-      <para><itemizedlist>
+      to encapsulate:
+      
+      <itemizedlist>
           <listitem>
             <para>a <emphasis role="bold">remotely accessible
             object</emphasis>,</para>
@@ -122,12 +124,12 @@
             <para>a <emphasis role="bold">mobile</emphasis> and potentially
             secure entity.</para>
           </listitem>
-        </itemizedlist></para>
-
-      <para>On top of those basic features, ProActive also includes <emphasis
-      role="bold">advanced</emphasis> aspects, such as:</para>
-
-      <para><itemizedlist>
+        </itemizedlist>
+        
+     On top of those basic features, ProActive also includes <emphasis
+      role="bold">advanced</emphasis> aspects, such as:
+       
+       <itemizedlist>
           <listitem>
             <para>Typed <emphasis role="bold">Group</emphasis>
             Communications</para>
@@ -169,9 +171,9 @@
             <para><emphasis role="bold">File transfer</emphasis> capabilities
             over the <emphasis role="bold">Grid</emphasis></para>
           </listitem>
-        </itemizedlist></para>
-
-      <para><emphasis role="bold">ProActive</emphasis> is only made of
+        </itemizedlist>
+        
+      <emphasis role="bold">ProActive</emphasis> is only made of
       standard Java classes, and requires <emphasis role="bold">no changes to
       the Java Virtual Machine</emphasis>, no preprocessing or compiler
       modification; programmers write standard Java code. Based on a simple
@@ -192,9 +194,9 @@
       <emphasis role="bold">Standards</emphasis>: ProActive has an
       architecture that allows the library to <emphasis
       role="bold">interoperate</emphasis> with various official or de facto
-      <emphasis role="bold">standards</emphasis>:</para>
-
-      <para><itemizedlist>
+      <emphasis role="bold">standards</emphasis>:
+      
+      <itemizedlist>
           <listitem>
             <para>Web Service Exportation</para>
           </listitem>
@@ -215,9 +217,9 @@
           <listitem>
             <para>LSF, PBS, Sun Grid Engine, OAR</para>
           </listitem>
-        </itemizedlist></para>
-
-      <para>Please send us comments, suggestions, bug reports at <ulink
+        </itemizedlist>
+        
+      Please send us comments, suggestions, bug reports at <ulink
       url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>
       Your input will be greatly appreciated.</para>
     </abstract>
