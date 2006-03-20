@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="FAQ">
+<appendix id="FAQ">
   <title>Frequently Asked Questions</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/FAQ.html  -->
   <para><emphasis role="bold">Note:</emphasis> This FAQ is under construction.
   If one of your question is not answered here, just send it at <ulink
   url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and
@@ -1176,4 +1175,10 @@
       </qandaentry>
   
   </qandaset>
-</chapter>
+  <sect1>
+  <title>Test section</title>
+  <para>test </para>
+</sect1>
+
+  
+</appendix>

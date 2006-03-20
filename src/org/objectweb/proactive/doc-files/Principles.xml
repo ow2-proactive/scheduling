@@ -2,13 +2,11 @@
 <chapter id="Principles">
   <title>Principles</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Principles.html  -->
-
   <sect1 remap="h2">
     <title><anchor id="Principles_html_intro" />Seamless sequential,
-    multithreaded and distributed</title>
-
-    <para>Most of the time, activities and distribution are not known at the
+    multithreaded and distributed</title>   
+   
+   <para>Most of the time, activities and distribution are not known at the
     beginning, and change over time. <emphasis role="bold">Seamless implies
     reuse, smooth and incremental transitions</emphasis>.</para>
 
@@ -70,8 +68,8 @@
       <title>Class-based</title>
 
       
-        <para><programlisting language="java">Object[] params = new Object[] { new Integer (26), 'astring' };
-A a = (A) ProActive.newActive('example.A', params, node); </programlisting></para>
+        <para><programlisting language="java">Object[] params = new Object[] { new Integer (26), "astring" };
+A a = (A) ProActive.newActive("example.A", params, node); </programlisting></para>
       
     </sect2>
 
@@ -80,8 +78,8 @@ A a = (A) ProActive.newActive('example.A', params, node); </programlisting></par
 
       
         <para><programlisting language="java">public class AA extends A implements Active {}
-Object[] params = new Object[] { new Integer (26), 'astring' };
-A a = (A) ProActive.newActive('example.AA', params, node); </programlisting></para>
+Object[] params = new Object[] { new Integer (26), "astring" };
+A a = (A) ProActive.newActive("example.AA", params, node); </programlisting></para>
       
     </sect2>
 
@@ -93,7 +91,7 @@ A a = (A) ProActive.newActive('example.AA', params, node); </programlisting></pa
       mobility.</para>
 
       
-        <para><programlisting language="java">A a = new A (26, 'astring');
+        <para><programlisting language="java">A a = new A (26, "astring");
 a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
       
 
@@ -211,7 +209,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
       <title>The TinyHello class</title>
 
       <para>This class can be used as an Active Object, serving requests. Its
-      creation involves the following steps:</para>
+      creation involves the following steps:
 
       <itemizedlist>
         <listitem>
@@ -229,59 +227,15 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
         </listitem>
       </itemizedlist>
 
-      <para>Here is a possible implementation for the
-      <literal>TinyHello</literal> class:</para>
+			</para>
 
-      <programlisting language="java">package org.objectweb.proactive.examples.hello;
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.log.*;
-import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
-import java.net.UnknownHostException;
-/** 
- * A stripped-down Active Object example.
- * The object has only one public method, sayHello()
- * The object does nothing but reflect the host its on. 
- */
-public class TinyHello implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    private final String message = 'Hello World!';
-    /** ProActive compulsory no-args constructor */
-    public TinyHello() {
-    }
+ <example>
+    <title>A possible implementation for the <literal>TinyHello</literal> class</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="../examples/hello/TinyHello.java" />
+     </textobject></programlisting>
+   </example>
 
-    /** The Active Object creates and returns information on its location
-     * @return a StringWrapper which is a Serialized version, for asynchrony */
-    public StringMutableWrapper sayHello() {
-        return new StringMutableWrapper(
-            this.message + '\n from ' + getHostName() + '\n at ' +
-            new java.text.SimpleDateFormat('dd/MM/yyyy HH:mm:ss').format(new java.util.Date()));
-    }
-
-    /** finds the name of the local machine */
-    static String getHostName() {
-        try {
-            return java.net.InetAddress.getLocalHost().toString();
-        } catch (UnknownHostException e) {
-            return 'unknown';
-        }
-    }
-
-    /** The call that starts the Acive Objects, and displays results.
-     * @param args must contain the name of an xml descriptor */
-    public static void main(String[] args)  throws Exception {
-        // Creates an active instance of class Tiny on the local node
-        TinyHello tiny = (TinyHello) ProActive.newActive(
-                TinyHello.class.getName(), // the class to deploy
-                null // the arguments to pass to the constructor, here none
-            );  
-        // get and display a value 
-        StringMutableWrapper received = tiny.sayHello();
-        // possibly remote call
-        logger.info('On ' + getHostName() + ', a message was received: ' + received); 
-        // potential wait-by-necessity 
-    }
-}</programlisting>
     </sect2>
 
     <sect2 remap="h3">
@@ -328,7 +282,7 @@ public class TinyHello implements java.io.Serializable {
       is the following (in the <literal>main</literal> method):</para>
 
       <programlisting language="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
-        logger.info('On ' + getHostName() + ', a message was received: ' + received); // potential wait-by-necessity 
+        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity 
 </programlisting>
     </sect2>
 

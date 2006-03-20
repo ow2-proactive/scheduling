@@ -194,9 +194,8 @@
     more be guaranteed.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="ActiveObjectCreation_html_activity" />Specifying the
-    activity of an active object</title>
+  <sect1 remap="h2" id="ActiveObjectCreation_html_activity">
+    <title>Specifying the activity of an active object</title>
 
     <para>Customizing the activity of the active object is at the core of
     ProActive because it allows to specify fully the behavior of an active
@@ -499,9 +498,8 @@ public void terminate (){ hasToTerminate=true;}
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="ActiveObjectCreation_html_factory" />Using the Factory
-    Method Design Pattern</title>
+  <sect1 remap="h2" id="ActiveObjectCreation_html_factory" >
+    <title> Using the Factory Method Design Pattern</title>
 
     <para>Creating an active object using ProActive might be a little bit
     cumbersome and requires more lines of code that for creating a regular
@@ -531,9 +529,8 @@ public void terminate (){ hasToTerminate=true;}
     object have to be dealt with somewhere in the code.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="ActiveObjectCreation_html_customize" />Advanced:
-    Customizing the Body of an Active Object</title>
+  <sect1 remap="h2" id="ActiveObjectCreation_html_customize" >
+    <title>Advanced: Customizing the Body of an Active Object</title>
 
     <sect2 remap="h3">
       <title>Motivations</title>
@@ -1177,11 +1174,10 @@ public void terminate (){ hasToTerminate=true;}
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 remap="h3" id="FutureObjectCreation_commonerror" >
       <title>Important Notes: Errors to avoid</title>
 
-      <para><anchor id="FutureObjectCreation_commonerror" /> there are few
-      things to remember with asynchronous method call and futures, in order
+      <para> there are few things to remember with asynchronous method call and futures, in order
       to avoid annoying debugs:</para>
 
       <itemizedlist>

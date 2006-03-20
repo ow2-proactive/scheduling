@@ -847,7 +847,7 @@ ssfully
       <para><example>
           <title>userAndComposite.fractal, a component ADL file</title>
 
-          <programlisting language=""><textobject>
+          <programlisting language="xml"><textobject>
               <textdata fileref="../examples/components/c3d/adl/userAndComposite.fractal" />
             </textobject></programlisting>
         </example></para>
@@ -945,7 +945,7 @@ ssfully
           <para>The component Registration</para>
 
           <para><programlisting language="java">Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-              UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));   </programlisting></para>
+       UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));</programlisting></para>
 
           <para>The Component lookup</para>
 
