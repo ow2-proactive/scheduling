@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import java.util.StringTokenizer;
-
-import javax.naming.directory.InvalidAttributeValueException;
-
 import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
@@ -66,7 +63,12 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+
 import org.xml.sax.SAXException;
+
+import java.util.StringTokenizer;
+
+import javax.naming.directory.InvalidAttributeValueException;
 
 
 //import org.xml.sax.SAXException;
@@ -1228,8 +1230,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     GLiteProcess.jad.addAttribute(Jdl.MYPROXY, myProxyServer);
                 }
                 String cpuNumber = (attributes.getValue("cpuNumber"));
-                if (checkNonEmpty(cpuNumber)){
-                	((GLiteProcess) targetProcess).setCpuNumber(Integer.parseInt(cpuNumber));
+                if (checkNonEmpty(cpuNumber)) {
+                    ((GLiteProcess) targetProcess).setCpuNumber(Integer.parseInt(
+                            cpuNumber));
                 }
 
                 //((GLiteProcess) targetProcess).setJad(jad);
@@ -1351,7 +1354,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(GLITE_CONFIG_TAG, bch);
                 this.addHandler(GLITE_REMOTE_PATH_TAG, bch);
                 this.addHandler(GLITE_INPUTSANDBOX_TAG,
-                        new SingleValueUnmarshaller());
+                    new SingleValueUnmarshaller());
                 this.addHandler(GLITE_OUTPUTSANDBOX_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(GLITE_ARGUMENTS_TAG,
@@ -1375,7 +1378,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                         ((GLiteProcess) targetProcess).setConfigFile((String) activeHandler.getResultObject());
                         ((GLiteProcess) targetProcess).setConfigFileOption(true);
                     } else if (name.equals(GLITE_INPUTSANDBOX_TAG)) {
-                    	String sandbox = (String) activeHandler.getResultObject();
+                        String sandbox = (String) activeHandler.getResultObject();
                         StringTokenizer st = new StringTokenizer(sandbox);
                         while (st.hasMoreTokens()) {
                             GLiteProcess.jad.addAttribute(Jdl.INPUTSB,
@@ -1680,7 +1683,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 bch.addHandler(REL_PATH_TAG, pathHandler);
                 this.addHandler(MPI_LOCAL_PATH_TAG, bch);
                 this.addHandler(MPI_REMOTE_PATH_TAG, bch);
-                this.addHandler(PROCESS_NUMBER_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESS_NUMBER_TAG,
+                    new SingleValueUnmarshaller());
             }
 
             public void startContextElement(String name, Attributes attributes)
@@ -1721,6 +1725,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             super();
             this.proActiveDescriptor = proActiveDescriptor;
             this.addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
+            this.addHandler(SERVICE_REFERENCE_TAG, new ProcessReferenceHandler());
         }
 
         public void startContextElement(String name, Attributes attributes)
@@ -1752,6 +1757,13 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 DependentListProcess dep = (DependentListProcess) targetProcess;
                 Object result = activeHandler.getResultObject();
                 proActiveDescriptor.addProcessToSequenceList(dep,
+                    (String) result);
+            }
+            if (name.equals(SERVICE_REFERENCE_TAG)) {
+                DependentListProcess dep = (DependentListProcess) targetProcess;
+                Object result = activeHandler.getResultObject();
+                System.out.println(" ON service found: " + (String) result);
+                proActiveDescriptor.addServiceToSequenceList(dep,
                     (String) result);
             }
         } //  END OF DEPENDENTPROCESSSEQUENCE PROCESS HANDLER

@@ -30,13 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
@@ -57,6 +52,13 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * <p>
@@ -327,7 +329,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * @param fileTransferID
      * @return a new FileTransfer definition
      */
-    protected FileTransferDefinition createFileTransferDefinition(String fileTransferID) {
+    protected FileTransferDefinition createFileTransferDefinition(
+        String fileTransferID) {
         FileTransferDefinition ft = new FileTransferDefinition(fileTransferID);
         fileTransferMapping.put(fileTransferID, ft);
 
@@ -435,7 +438,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-    public synchronized FileTransferDefinition getFileTransfer(String fileTransferID) {
+    public synchronized FileTransferDefinition getFileTransfer(
+        String fileTransferID) {
         //TODO throw new ProActiveException 
         //if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
         FileTransferDefinition ft = (FileTransferDefinition) fileTransferMapping.get(fileTransferID);
@@ -471,6 +475,19 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             addSequentialPendingProcess(processID, sequentialListProcess);
         } else {
             sequentialListProcess.addProcessToList(process);
+        }
+    }
+
+    public void addServiceToSequenceList(
+        AbstractSequentialListProcessDecorator sequentialListProcess,
+        String processID) {
+        UniversalService service = (UniversalService) processMapping.get(processID);
+        if (service == null) {
+            addSequentialPendingService(processID, sequentialListProcess);
+            sequentialListProcess.setFirstElementIsService(true);
+        } else {
+            sequentialListProcess.addServiceToList(service);
+            sequentialListProcess.setFirstElementIsService(true);
         }
     }
 
@@ -668,6 +685,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         addProcessUpdater(processID, updater);
     }
 
+    private void addSequentialPendingService(String processID,
+        AbstractSequentialListProcessDecorator sp) {
+        ServiceUpdater updater = new SequentialServiceUpdater(sp);
+        addServiceUpdater(processID, updater);
+    }
+
     //Commented in the fist version of jvm extension
     //    private void addPendingJVMProcess(String processID, JVMProcess jvmProcess) {
     //        ProcessUpdater updater = new ExtendedJVMProcessUpdater(jvmProcess);
@@ -832,6 +855,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
+    private class SequentialServiceUpdater implements ServiceUpdater {
+        private AbstractSequentialListProcessDecorator spd;
+
+        public SequentialServiceUpdater(
+            AbstractSequentialListProcessDecorator spd) {
+            this.spd = spd;
+        }
+
+        public void updateService(UniversalService s) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating Sequential Service");
+            }
+
+            // add the process in head of list
+            spd.addServiceToList(0, (UniversalService) s);
+        }
+    }
+
     //  Commented in the fist version of jvm extension
     //    private class ExtendedJVMProcessUpdater implements ProcessUpdater {
     //        private JVMProcess jvmProcess;
@@ -904,5 +945,4 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     public VariableContract getVariableContract() {
         return this.variableContract;
     }
-
 }

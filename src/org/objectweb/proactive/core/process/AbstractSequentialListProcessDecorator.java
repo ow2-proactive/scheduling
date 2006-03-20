@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
@@ -46,11 +47,13 @@ import java.util.ArrayList;
  */
 public abstract class AbstractSequentialListProcessDecorator
     implements ExternalProcessDecorator {
+    boolean isFirstElementService = false;
+
     //Array of processes
     protected ArrayList processes;
 
     // position of the next process to return  
-    protected int currentRank = 0;
+    protected int currentProcessRank = 0;
 
     public AbstractSequentialListProcessDecorator() {
         processes = new ArrayList();
@@ -65,6 +68,14 @@ public abstract class AbstractSequentialListProcessDecorator
     }
 
     /**
+     * Add a service to the processes queue
+     * @param service
+     */
+    public void addServiceToList(UniversalService service) {
+        this.processes.add(service);
+    }
+
+    /**
      * Add a process to the processes queue at index rank
      * @param rank
      * @param process
@@ -74,12 +85,30 @@ public abstract class AbstractSequentialListProcessDecorator
     }
 
     /**
-     * Return the next process to be launched and increase current rank
-     * @return process
+     * Add a service to the processes queue at index rank
+     * @param rank
+     * @param service
+     */
+    public void addServiceToList(int rank, UniversalService service) {
+        this.processes.add(rank, service);
+    }
+
+    /**
+     * Return the first process to be launched and increase current rank
+     * @return ExternalProcess
      */
     public ExternalProcess getFirstProcess() {
-        currentRank++;
+        currentProcessRank++;
         return (ExternalProcess) processes.get(0);
+    }
+
+    /**
+     * Return the first service to be launched and increase current rank
+     * @return UniversalService
+     */
+    public UniversalService getFirstService() {
+        currentProcessRank++;
+        return (UniversalService) processes.get(0);
     }
 
     /**
@@ -88,9 +117,9 @@ public abstract class AbstractSequentialListProcessDecorator
      */
     public ExternalProcess getNextProcess() {
         ExternalProcess res = null;
-        if (currentRank < processes.size()) {
-            res = (ExternalProcess) processes.get(currentRank);
-            currentRank++;
+        if (currentProcessRank < processes.size()) {
+            res = (ExternalProcess) processes.get(currentProcessRank);
+            currentProcessRank++;
         }
         return res;
     }
@@ -102,28 +131,28 @@ public abstract class AbstractSequentialListProcessDecorator
      * @see org.objectweb.proactive.core.process.ExternalProcessDecorator#getTargetProcess()
      */
     public ExternalProcess getTargetProcess() {
-        return ((ExternalProcessDecorator) processes.get(currentRank)).getTargetProcess();
+        return ((ExternalProcessDecorator) processes.get(currentProcessRank)).getTargetProcess();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcessDecorator#setTargetProcess(org.objectweb.proactive.core.process.ExternalProcess)
      */
     public void setTargetProcess(ExternalProcess targetProcess) {
-        ((ExternalProcessDecorator) processes.get(currentRank)).setTargetProcess(targetProcess);
+        ((ExternalProcessDecorator) processes.get(currentProcessRank)).setTargetProcess(targetProcess);
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcessDecorator#getCompositionType()
      */
     public int getCompositionType() {
-        return ((ExternalProcess) processes.get(currentRank)).getCompositionType();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getCompositionType();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcessDecorator#setCompositionType(int)
      */
     public void setCompositionType(int compositionType) {
-        ((ExternalProcessDecorator) processes.get(currentRank)).setCompositionType(compositionType);
+        ((ExternalProcessDecorator) processes.get(currentProcessRank)).setCompositionType(compositionType);
     }
 
     public FileTransferWorkShop getFileTransferWorkShopRetrieve() {
@@ -161,28 +190,28 @@ public abstract class AbstractSequentialListProcessDecorator
      * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
      */
     public void closeStream() {
-        ((ExternalProcess) processes.get(currentRank)).closeStream();
+        ((ExternalProcess) processes.get(currentProcessRank)).closeStream();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getInputMessageLogger()
      */
     public RemoteProcessMessageLogger getInputMessageLogger() {
-        return ((ExternalProcess) processes.get(currentRank)).getInputMessageLogger();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getInputMessageLogger();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getErrorMessageLogger()
      */
     public RemoteProcessMessageLogger getErrorMessageLogger() {
-        return ((ExternalProcess) processes.get(currentRank)).getErrorMessageLogger();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getErrorMessageLogger();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getOutputMessageSink()
      */
     public MessageSink getOutputMessageSink() {
-        return ((ExternalProcess) processes.get(currentRank)).getOutputMessageSink();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getOutputMessageSink();
     }
 
     /**
@@ -218,28 +247,28 @@ public abstract class AbstractSequentialListProcessDecorator
      * @see org.objectweb.proactive.core.process.UniversalProcess#getEnvironment()
      */
     public String[] getEnvironment() {
-        return ((ExternalProcess) processes.get(currentRank)).getEnvironment();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getEnvironment();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#setEnvironment(java.lang.String[])
      */
     public void setEnvironment(String[] environment) {
-        ((ExternalProcess) processes.get(currentRank)).setEnvironment(environment);
+        ((ExternalProcess) processes.get(currentProcessRank)).setEnvironment(environment);
     }
 
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#getUsername()
      */
     public String getUsername() {
-        return ((ExternalProcess) processes.get(currentRank)).getUsername();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getUsername();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#setUsername(java.lang.String)
      */
     public void setUsername(String username) {
-        ((ExternalProcess) processes.get(currentRank)).setUsername(username);
+        ((ExternalProcess) processes.get(currentProcessRank)).setUsername(username);
     }
 
     /**
@@ -260,14 +289,14 @@ public abstract class AbstractSequentialListProcessDecorator
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
-        return ((ExternalProcessDecorator) processes.get(currentRank)).getNodeNumber();
+        return ((ExternalProcessDecorator) processes.get(currentProcessRank)).getNodeNumber();
     }
 
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
      */
     public UniversalProcess getFinalProcess() {
-        return ((ExternalProcessDecorator) processes.get(currentRank)).getFinalProcess();
+        return ((ExternalProcessDecorator) processes.get(currentProcessRank)).getFinalProcess();
     }
 
     public ArrayList getListProcess() {
@@ -278,7 +307,7 @@ public abstract class AbstractSequentialListProcessDecorator
      * @see org.objectweb.proactive.core.process.UniversalProcess#stopProcess()
      */
     public void stopProcess() {
-        ((ExternalProcess) processes.get(currentRank)).stopProcess();
+        ((ExternalProcess) processes.get(currentProcessRank)).stopProcess();
     }
 
     /**
@@ -286,7 +315,7 @@ public abstract class AbstractSequentialListProcessDecorator
      */
     public int waitFor() throws InterruptedException {
         int status = 0;
-        status = ((ExternalProcess) processes.get(currentRank)).waitFor();
+        status = ((ExternalProcess) processes.get(currentProcessRank)).waitFor();
         return status;
     }
 
@@ -295,7 +324,7 @@ public abstract class AbstractSequentialListProcessDecorator
      */
     public boolean isStarted() {
         boolean started = true;
-        started = ((ExternalProcess) processes.get(currentRank)).isStarted();
+        started = ((ExternalProcess) processes.get(currentProcessRank)).isStarted();
         return started;
     }
 
@@ -304,7 +333,7 @@ public abstract class AbstractSequentialListProcessDecorator
      */
     public boolean isFinished() {
         boolean finished = true;
-        finished = ((ExternalProcess) processes.get(currentRank)).isFinished();
+        finished = ((ExternalProcess) processes.get(currentProcessRank)).isFinished();
         return finished;
     }
 
@@ -316,14 +345,14 @@ public abstract class AbstractSequentialListProcessDecorator
      * @see org.objectweb.proactive.core.process.UniversalProcess#setCommandPath(java.lang.String)
      */
     public void setCommandPath(String path) {
-        ((ExternalProcess) processes.get(currentRank)).setCommandPath(path);
+        ((ExternalProcess) processes.get(currentProcessRank)).setCommandPath(path);
     }
 
     /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#getCommandPath()
      */
     public String getCommandPath() {
-        return ((ExternalProcess) processes.get(currentRank)).getCommandPath();
+        return ((ExternalProcess) processes.get(currentProcessRank)).getCommandPath();
     }
 
     //
@@ -342,5 +371,13 @@ public abstract class AbstractSequentialListProcessDecorator
 
     public void setFinished(boolean isStarted) {
         // TODO Auto-generated method stub
+    }
+
+    public boolean isFirstElementIsService() {
+        return isFirstElementService;
+    }
+
+    public void setFirstElementIsService(boolean isFirstElementIsService) {
+        this.isFirstElementService = isFirstElementIsService;
     }
 }

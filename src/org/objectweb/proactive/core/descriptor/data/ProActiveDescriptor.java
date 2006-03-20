@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
@@ -44,6 +41,9 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -355,6 +355,15 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * @param string a processID
      */
     public void addProcessToSequenceList(
+        AbstractSequentialListProcessDecorator sequentialListProcess,
+        String string);
+
+    /**
+     * Add the service given by the specified processID in the list of sequential services.
+     * @param sequentialListProcess
+     * @param string a processID
+     */
+    public void addServiceToSequenceList(
         AbstractSequentialListProcessDecorator sequentialListProcess,
         String string);
 }
