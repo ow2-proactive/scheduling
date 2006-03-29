@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+ 
+ <variables>
+
+  <javaPropertyVariable name="USER_HOME"    value="user.home" />
+  <descriptorVariable name="PROACTIVE_HOME" value="${USER_HOME}/ProActive" />
+  <descriptorVariable name="JAVA"           value="${USER_HOME}/OASIS/jdk/java" />
+  <descriptorVariable name="RMI_PORT"       value="5000" />
+  <descriptorVariable name="COM_PROTO"      value="rmi" />
+  
+  <descriptorVariable name="DURATION"       value="00:10:00" />
+<!-- From more reliable to less reliable -->
+  <descriptorVariable name="SOPHIA_NODES"   value="0" />
+  <descriptorVariable name="ORSAY_NODES"    value="0" />
+  <descriptorVariable name="PARACI_NODES"   value="0" />
+  <descriptorVariable name="PARASOL_NODES"  value="0" />
+  <descriptorVariable name="PARAVENT_NODES" value="0" />
+  <descriptorVariable name="BORDEAUX_NODES" value="0" />
+  <descriptorVariable name="LYON_NODES"     value="0" />
+  <descriptorVariable name="NANCY_NODES"    value="0" />
+  
+  
+ </variables>
+ 
+ <componentDefinition>
+  <virtualNodesDefinition>
+   <virtualNode name="vn" timeout="180000" />
+  </virtualNodesDefinition>
+ </componentDefinition>
+ <deployment>
+  <mapping>
+   <map virtualNode="vn">
+    <jvmSet>
+     <vmName value="Sophia" /> 
+     <vmName value="Orsay" /> 
+     <vmName value="Paraci" />
+     <vmName value="Parasol" /> 
+     <vmName value="Paravent" />
+     <vmName value="Bordeaux" />
+     <vmName value="Lyon" />
+     <vmName value="Nancy" />
+    </jvmSet>
+   </map>
+  </mapping>
+  <jvms>
+   
+   <jvm name="Sophia">
+    <creation>
+     <processReference refid="sshSophia" />
+    </creation>
+   </jvm>
+  
+   <jvm name="Orsay">
+    <creation>
+     <processReference refid="sshOrsay" />
+    </creation>
+   </jvm>
+   
+   <jvm name="Paraci">
+    <creation>
+     <processReference refid="sshParaci" />
+    </creation>
+   </jvm>
+   
+   <jvm name="Parasol">
+    <creation>
+     <processReference refid="sshParasol" />
+    </creation>
+   </jvm>
+   
+   <jvm name="Paravent">
+    <creation>
+     <processReference refid="sshParavent" />
+    </creation>
+   </jvm>
+  
+   <jvm name="Lyon">
+    <creation>
+     <processReference refid="sshLyon" />
+    </creation>
+   </jvm>
+
+ 
+   <jvm name="Bordeaux">
+    <creation>
+     <processReference refid="sshBordeaux" />
+    </creation>
+   </jvm>
+  
+   <jvm name="Nancy">
+    <creation>
+     <processReference refid="sshNancy" />
+    </creation>
+   </jvm>
+ 
+ 
+  </jvms>
+ </deployment>
+ 
+ <infrastructure>
+  <processes>
+   
+   <processDefinition id="JVM_G5K">
+    <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+     <classpath>
+      <absolutePath value="${PROACTIVE_HOME}/classes/" />
+      
+      <absolutePath value="${PROACTIVE_HOME}/lib/./osgi/servicebinder.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./osgi/oscar.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./osgi/moduleloader.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./osgi/http.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./osgi/osgi.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./glite/glite-wms-jdlj.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./glite/classad.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./unicore/njs_client.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./unicore/ajo.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./unicore/client.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./unicore/jh.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./unicore/scriptPlugin.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/julia-runtime.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/dtdparser.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/julia-mixins.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/fractal-adl.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/fractal.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/ow_deployment_scheduling.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/fractal-gui.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/SVGGraphics.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/fractal-swing.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./components/julia-asm.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ibis/ibis.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./jini/jini-core.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./jini/jini-ext.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./jini/reggie.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/saaj-api.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/axis.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/servlet-api.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/jaxrpc.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/wsdl4j.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/xml-apis.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/commons-discovery.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/commons-logging.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/activation.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/mail.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./ws/soap.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/cog-jglobus-1.2.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/cryptix32.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/cog-jglobus.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/puretls.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/cryptix-asn1.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/cryptix.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./globus/cog-ogce.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./examples/clibwrapper_jiio.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./examples/mlibwrapper_jai.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./examples/jai_core.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./examples/jai_imageio.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./examples/jai_codec.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./javassist.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./jsch.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./bouncycastle.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./xercesImpl.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./log4j.jar" />
+      <absolutePath value="${PROACTIVE_HOME}/lib/./asm.jar" />
+            
+     </classpath>
+     <javaPath>
+      <absolutePath value="${JAVA}" />
+     </javaPath>
+     <policyFile>
+      <absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
+     </policyFile>
+     <log4jpropertiesFile>
+      <absolutePath value="${PROACTIVE_HOME}/scripts/proactive-log4j" />
+     </log4jpropertiesFile>
+     <jvmParameters>
+      <parameter value="-Dproactive.rmi.port=${RMI_PORT}" />
+      <parameter value="-Dproactive.communication.protocol=${COM_PROTO}" />
+     </jvmParameters>
+    </jvmProcess>
+   </processDefinition>
+   
+   
+   <!--
+       ###
+       ### Site : Sophia
+       ###
+       -->
+   
+   <processDefinition id="sshSophia">
+    <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                hostname="oar.sophia.grid5000.fr" >
+     <processReference refid="oarSophia" />
+    </sshProcess>
+   </processDefinition>
+    
+   <processDefinition id="oarSophia">
+    <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                bookedNodesAccess="ssh">
+     <processReference refid="JVM_G5K" />
+     <commandPath value="/usr/bin/oarsub" />
+     <oarOption>
+      <resources>nodes=${SOPHIA_NODES},weight=2,walltime=${DURATION}</resources>
+      <scriptPath>
+       <absolutePath
+                    value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+      </scriptPath>
+     </oarOption>
+    </oarProcess>
+   </processDefinition>
+   
+   <!--
+       ###
+       ### Site : Orsay
+       ###
+       -->
+   <processDefinition id="sshOrsay">
+    <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                         hostname="oar.orsay.grid5000.fr" >
+     <processReference refid="oarOrsay" />
+    </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarOrsay">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${ORSAY_NODES},walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+              
+
+    
+    
+    <!--
+        ###
+        ### Site : Grenoble
+        ###
+        -->
+    <processDefinition id="sshGrenoble">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="oar.icluster2.grenoble.grid5000.fr" >
+      <processReference refid="oarGrenoble" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarGrenoble">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/local/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${GRENOBLE_NODES},walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+    
+    <!--
+        ###
+        ### Site : Lyon
+        ###
+        -->
+    <processDefinition id="sshLyon">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="oar.lyon.grid5000.fr" >
+      <processReference refid="oarLyon" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarLyon">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${LYON_NODES},weight=1,walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+    
+    
+    <!--
+        ###
+        ### Site : Paraci
+        ###
+        -->
+    <processDefinition id="sshParaci">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="paraci-dev.rennes.grid5000.fr" >
+      <processReference refid="oarParaci" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarParaci">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/local/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${PARACI_NODES},weight=2,walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+  
+    <!--
+        ###
+        ### Site : Parasol
+        ###
+        -->
+    <processDefinition id="sshParasol">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="parasol-dev.rennes.grid5000.fr" >
+      <processReference refid="oarParasol" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarParasol">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/local/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${PARASOL_NODES},weight=2,walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+   
+    <!--
+        ###
+        ### Site : Paravent
+        ###
+        -->
+    <processDefinition id="sshParavent">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="paravent-dev.rennes.grid5000.fr" >
+      <processReference refid="oarParavent" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarParavent">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/local/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${PARAVENT_NODES},weight=2,walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+
+
+   
+    <!--
+        ###
+        ### Site : Bordeaux 
+        ###
+        -->
+    <processDefinition id="sshBordeaux">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="oar.bordeaux.grid5000.fr" >
+      <processReference refid="oarBordeaux" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarBordeaux">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/local/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${BORDEAUX_NODES},weight=2,walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+ 
+
+ 
+    <!--
+        ###
+        ### Site : Nancy
+        ###
+        -->
+    <processDefinition id="sshNancy">
+     <sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+                 hostname="oar.nancy.grid5000.fr" >
+      <processReference refid="oarNancy" />
+     </sshProcess>
+    </processDefinition>
+    
+    <processDefinition id="oarNancy">
+     <oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess"
+                 bookedNodesAccess="ssh">
+      <processReference refid="JVM_G5K" />
+      <commandPath value="/usr/bin/oarsub" />
+      <oarOption>
+       <resources>nodes=${NANCY_NODES},weight=2,walltime=${DURATION}</resources>
+       <scriptPath>
+        <absolutePath
+                     value="${PROACTIVE_HOME}/scripts/unix/cluster/oarStartRuntime.sh" />
+       </scriptPath>
+      </oarOption>
+     </oarProcess>
+    </processDefinition>
+ 
+
+
+   </processes>
+ </infrastructure>
+</ProActiveDescriptor>
