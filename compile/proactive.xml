@@ -402,7 +402,7 @@
       ==
       ================================================================
 	-->
-	<target name="proActiveJar" depends="ext,tools, bnb">
+	<target name="proActiveJar" depends="ext,tools, bnb, daemon">
 		<mkdir dir="${dist.dir}/ProActive"/>
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
