@@ -106,7 +106,7 @@ public class SshTunnel {
             int lport = 0;
             int i = 0;
             while (i < 5) {
-                lport = _random.nextInt(65000) + 1024;
+                lport = _random.nextInt(64540) + 1024;
                 try {
                     session.setPortForwardingL("127.0.0.1", lport, distantHost,
                         distantPort);
