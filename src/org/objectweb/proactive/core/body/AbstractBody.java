@@ -169,12 +169,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         if ((psm = factory.getProActiveSecurityManager()) == null) {
             isSecurityOn = false;
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("Active Object security Off");
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
+                           .debug("Active Object security Off");
         } else {
             isSecurityOn = true;
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("Active Object security On application is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
+                           .debug("Active Object security On application is " +
                 psm.getPolicyServer().getApplicationName());
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("current thread is " +
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
+                           .debug("current thread is " +
                 Thread.currentThread().getName());
         }
 
@@ -332,7 +335,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public void renegociateSessionIfNeeded(long sID)
-        throws RenegotiateSessionException, SecurityNotAvailableException, 
+        throws RenegotiateSessionException, SecurityNotAvailableException,
             IOException {
         try {
             enterInThreadStore();
@@ -423,7 +426,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public long startNewSession(Communication policy)
-        throws RenegotiateSessionException, SecurityNotAvailableException, 
+        throws RenegotiateSessionException, SecurityNotAvailableException,
             IOException {
         try {
             enterInThreadStore();
@@ -478,7 +481,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         try {
             enterInThreadStore();
@@ -504,7 +507,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         try {
             enterInThreadStore();
@@ -534,7 +537,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         try {
             enterInThreadStore();
@@ -762,15 +765,16 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
 
         try {
-            try {
-                if (!isSecurityOn) {
-                    bodyLogger.debug("security is off");
-                } else {
+            if (!isSecurityOn) {
+                bodyLogger.debug("security is off");
+            } else {
+                try {
                     if (internalBodySecurity.isLocalBody()) {
                         byte[] certE = destinationBody.getCertificateEncoded();
 
                         X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                        ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("send Request AbstractBody " +
+                        ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
+                                       .debug("send Request AbstractBody " +
                             this + ", method " + methodCall.getName() +
                             " cert " + cert.getSubjectDN() + " " +
                             cert.getPublicKey());
@@ -781,18 +785,18 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                             sessionID = this.psm.getSessionIDTo(cert);
                         }
                     }
+                } catch (SecurityNotAvailableException e) {
+                    // do nothing 
+                    bodyLogger.debug("communication without security");
+                    //e.printStackTrace();
                 }
-            } catch (SecurityNotAvailableException e) {
-                // do nothing 
-                bodyLogger.debug("communication without security");
-                //e.printStackTrace();
             }
 
             localBodyStrategy.sendRequest(methodCall, future, destinationBody);
         } catch (RenegotiateSessionException e) {
             if (e.getUniversalBody() != null) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO).debug("renegotiate session " +
-                    sessionID);
+                ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO)
+                               .debug("renegotiate session " + sessionID);
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
                 psm.terminateSession(sessionID);
                 sendRequest(methodCall, future, e.getUniversalBody());
@@ -982,7 +986,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         if (this.ftmanager != null) {
             if (this.ftmanager.isACheckpoint()) {
                 //re-use remote view of the old body if any                
-                Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
+                Body toKill = LocalBodyStore.getInstance()
+                                            .getLocalBody(this.bodyID);
                 if (toKill != null) {
                     //this body is still alive
                     toKill.blockCommunication();
