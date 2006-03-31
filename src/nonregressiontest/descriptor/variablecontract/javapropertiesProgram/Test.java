@@ -52,10 +52,13 @@ public class Test extends FunctionalTest {
 		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
 		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userprogram"));
 		
+		boolean bogus=false;
 		try{
 			variableContract.setVariableFromProgram("bogus.property", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
-			Assertions.assertTrue(false); //shouldn't reach this line
+			bogus=true; //shouldn't reach this line
 		}catch(Exception e){}
+		Assertions.assertTrue(!bogus);
+		
 		variableContract.setVariableFromProgram("bogus.property", "bogus_value", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
 		Assertions.assertTrue( variableContract.getValue("bogus.property").equals("bogus_value"));
 		 
@@ -63,6 +66,13 @@ public class Test extends FunctionalTest {
 		//Setting from Descriptor
 		variableContract.setDescriptorVariable("user.home", "/home/userdesc", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
 		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userprogram"));
+		
+		try{
+			bogus=false;
+			variableContract.setDescriptorVariable("${ilegal.var.name}", "ilegalvariablename", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
+			bogus=true; //shouldn't reach this line
+		}catch(Exception e){}
+		Assertions.assertTrue(!bogus);
 		
 		//Setting bogus from program
 		variableContract.setDescriptorVariable("bogus.property", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));

@@ -59,11 +59,13 @@ public class Test extends FunctionalTest {
 		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userdesc"));
 		
 		//Setting bogus from program
+		boolean bogus=false;
 		try{
 			variableContract.setDescriptorVariable("bogus.property", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-			Assertions.assertTrue(false); //shouldn't reach this line
+			bogus=true;//shouldn't reach this line
 		}catch (Exception e){
 		}
+		Assertions.assertTrue(!bogus);
 
 		pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
 		variableContract = pad.getVariableContract();
