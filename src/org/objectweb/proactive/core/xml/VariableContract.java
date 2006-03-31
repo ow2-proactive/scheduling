@@ -56,7 +56,7 @@ public class VariableContract implements Serializable {
     private boolean closed;
     
     private static final Pattern variablePattern = Pattern.compile("(\\$\\{(.*?)\\})");
-    private static final Pattern legalPattern = Pattern.compile("^\\$\\{\\w+\\}$");
+    private static final Pattern legalPattern = Pattern.compile("^\\$\\{[\\w\\.]+\\}$");
     
     private class PropertiesDatas {
         public String value;
@@ -316,7 +316,7 @@ public class VariableContract implements Serializable {
 
     /**
      * Checks common parameters.
-     * @param name Must be not null or empty
+     * @param name Must be not null or empty, and legal.
      * @param value Must be not null
      * @param type Checks if variable is already defined with different type
      */
@@ -334,6 +334,11 @@ public class VariableContract implements Serializable {
             throw new IllegalArgumentException("Variable Name is empty.");
         }
 
+        if (!isLegalName("${"+name+"}")) {
+            throw new IllegalArgumentException("Illegal variable name:"+name);
+        }
+
+        
         if (value == null) {
             throw new NullPointerException("Variable Value is null.");
         }
@@ -429,6 +434,11 @@ public class VariableContract implements Serializable {
         return sb.toString();
     }
     
+    /**
+     * This methods tells if a variable name is acceptable
+     * @param var The variable name, without the ${} wrapping.
+     * @return true if the variable is legal, false otherwise.
+     */
 	public boolean isLegalName(String var){
 		Matcher  m = legalPattern.matcher(var);
 		return m.matches();
