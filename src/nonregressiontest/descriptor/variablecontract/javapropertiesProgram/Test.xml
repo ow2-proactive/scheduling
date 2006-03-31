@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd">
+	<variables>
+		<javaPropertyProgramDefault name="bogus.property" />
+	</variables>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="test"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="test">
+				<jvmSet>
+					<vmName value="JvmNode"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="JvmNode">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>	
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
