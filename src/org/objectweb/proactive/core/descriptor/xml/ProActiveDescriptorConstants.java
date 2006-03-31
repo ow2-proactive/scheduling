@@ -48,6 +48,8 @@ public interface ProActiveDescriptorConstants {
     public static final String VARIABLES_DESCRIPTOR_DEFAULT_TAG ="descriptorDefaultVariable";
     public static final String VARIABLES_PROGRAM_DEFAULT_TAG ="programDefaultVariable";
     public static final String VARIABLES_JAVAPROPERTY_TAG ="javaPropertyVariable";    
+    public static final String VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG ="javaPropertyDescriptorDefault";
+    public static final String VARIABLES_JAVAPROPERTY_PROGRAM_TAG ="javaPropertyProgramDefault";
     public static final String VARIABLES_INCLUDE_XML_FILE_TAG ="includeXMLFile";
     public static final String VARIABLES_INCLUDE_PROPERTY_FILE_TAG ="includePropertyFile";
     public static final String DEPLOYMENT_TAG = "deployment";

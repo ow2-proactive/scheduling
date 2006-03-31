@@ -40,6 +40,8 @@
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.descriptorvariable.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.externalfiles.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.javaproperties.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.javapropertiesDescriptor.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.javapropertiesProgram.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.programdefaultvariable.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.programvariable.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.extendedjvm.Test" />

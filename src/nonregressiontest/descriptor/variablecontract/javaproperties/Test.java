@@ -31,9 +31,9 @@ public class Test extends FunctionalTest {
 		
 		return !bogusFromProgram &&
 				!bogusFromDescriptor &&
-				variableContract.getValue("user_home").equals(System.getProperty("user.home")) &&
-				variableContract.getValue("user_dir").equals(System.getProperty("user.dir")) &&
-				variableContract.getValue("user_name").equals(System.getProperty("user.name")) &&
+				variableContract.getValue("user.home").equals(System.getProperty("user.home")) &&
+				variableContract.getValue("user.dir").equals(System.getProperty("user.dir")) &&
+				variableContract.getValue("user.name").equals(System.getProperty("user.name")) &&
 				variableContract.isClosed();
 	}
 
@@ -55,21 +55,21 @@ public class Test extends FunctionalTest {
 		
 		//Setting from Program
 		HashMap map = new HashMap();
-		map.put("user_home", "user.home");
+		map.put("user.home", "");
 		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		
 		//Setting Bogus from program
 		try{
-			variableContract.setVariableFromProgram("bogus_property", "bogus.property", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+			variableContract.setVariableFromProgram("bogus.property", "value", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		}catch (Exception e){
 			bogusFromProgram=false;
 		}
 		
 		//Setting from Descriptor
-		variableContract.setDescriptorVariable("user_dir", "user.dir", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+		variableContract.setDescriptorVariable("user.dir", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		//Setting bogus from program
 		try{
-			variableContract.setDescriptorVariable("bogus_property", "bogus.property", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+			variableContract.setDescriptorVariable("bogus.property", "value", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 		}catch (Exception e){
 			bogusFromDescriptor=false;
 		}

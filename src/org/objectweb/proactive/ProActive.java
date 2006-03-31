@@ -1105,6 +1105,7 @@ public class ProActive {
 
         //Check the contract (proposed optimization: Do this when parsing </variable> tag instead of here!)
         if (!variableContract.checkContract()) {
+        	logger.error(variableContract.toString());
             throw new ProActiveException("Variable Contract has not been met!");
         }
 

@@ -35,6 +35,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.xml.VariablesHandler;
@@ -52,7 +55,10 @@ public class VariableContract implements Serializable {
     public static VariableContract xmlproperties = null;
     public static final Lock lock = new Lock();
     private boolean closed;
-
+    
+    private static final Pattern variablePattern = Pattern.compile("(\\$\\{(.*?)\\})");
+    private static final Pattern legalPattern = Pattern.compile("^\\$\\{\\w+\\}$");
+    
     private class PropertiesDatas {
         public String value;
         public VariableContractType type;
@@ -82,24 +88,53 @@ public class VariableContract implements Serializable {
      * Marks the contract as closed. No more variables can be defined or set.
      */
     public void close() {
-        closed = true;
-    }
+
+    	//before closing we set the JavaProperties values
+		java.util.Iterator it = list.keySet().iterator();
+		while (it.hasNext()) {
+			String name = (String) it.next();
+			PropertiesDatas data = (PropertiesDatas) list.get(name);
+			if (data.type.equals(VariableContractType.JavaPropertyVariable)
+					|| data.type
+							.equals(VariableContractType.JavaPropertyDescriptor)
+					|| data.type
+							.equals(VariableContractType.JavaPropertyProgram)) {
+
+				try {
+					String value = System.getProperty(name);
+					if (value == null) value="";
+					setVariableFrom(name, value, data.type, "JavaProperty");
+				} catch (Exception ex) {
+					if (logger.isDebugEnabled())
+						logger.debug("Unable to get java property: " + name);
+				}
+			}// if
+		}// while
+
+		closed = true;
+	}
 
     /**
-     * Tells wether this contract is closed or not.
-     * @return True if it is closed, false otherwise.
-     */
+	 * Tells wether this contract is closed or not.
+	 * 
+	 * @return True if it is closed, false otherwise.
+	 */
     public boolean isClosed() {
         return closed;
     }
 
     /**
-     * Method for setting variables value from the deploying application.
-     * @param name        The name of the variable.
-     * @param value       Value of the variable
-     * @throws NullPointerException if the arguments are null.
-     * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
-     */
+	 * Method for setting variables value from the deploying application.
+	 * 
+	 * @param name
+	 *            The name of the variable.
+	 * @param value
+	 *            Value of the variable
+	 * @throws NullPointerException
+	 *             if the arguments are null.
+	 * @throws IllegalArgumentException
+	 *             if setting the value breaches the variable (contract) type
+	 */
     public void setVariableFromProgram(String name, String value,
         VariableContractType type) {
         setVariableFrom(name, value, type, "Program");
@@ -150,21 +185,6 @@ public class VariableContract implements Serializable {
             }
         }
 
-        if (type.equals(VariableContractType.JavaPropertyVariable)) {
-            String prop_value;
-            try {
-                prop_value = System.getProperty(value);
-                if (prop_value == null) {
-                    throw new Exception();
-                }
-            } catch (Exception ex) {
-                throw new IllegalArgumentException(
-                    "Unable to get System Property: " + value);
-            }
-
-            value = prop_value;
-        }
-
         unsafeAdd(name, value, type, from);
     }
 
@@ -199,7 +219,7 @@ public class VariableContract implements Serializable {
         VariableContractType type) {
         setVariableFrom(name, value, type, "Descriptor");
     }
-
+    
     /**
      * Loads the variable contract from a Java Properties file format
      * @param file The file location.
@@ -263,55 +283,36 @@ public class VariableContract implements Serializable {
     }
 
     /**
-     * TODO
-     * Method to transform a variable to it's value.
-     * @param         text        Text with properties inside to translates.
-     * @return        string with properties swapped to their text value.
+     * Replaces the variables inside a text with their values.
+     * I  
+     * @param         text        Text with variables inside.
+     * @return        The text with the values
      */
     public String transform(String text) {
-        //if ( text==null || text.equals("")) return text;
-        do {
-            // try to find the begining of property
-            int begin = text.indexOf("${");
-            if (begin < 0) {
-                break;
-            }
-            begin += 2;
-            // find the end of proprety name
-            int end = text.indexOf("}");
-            if (end < 0) {
-                break;
-            }
-            String endText = text.substring(end + 1, text.length());
+    	if(text==null) return null;
+    	
+    	Matcher m=variablePattern.matcher(text);
+    	StringBuffer sb=new StringBuffer();
+    	while(m.find()){
 
-            // the name is empty ?
-            if (begin == end) {
-                if (begin > 2) {
-                    text = text.substring(0, begin - 2) + endText;
-                } else {
-                    text = endText;
-                }
-                continue;
-            }
+    		if(!isLegalName(m.group(1)))
+    			throw new IllegalArgumentException("Error, malformed variable:"+m.group(1));
+    		
+    		String name=m.group(2);
+    		String value=getValue(name);
 
-            // build the name of the proterty
-            String name = text.substring(begin, end);
-
-            // if the property name does'n exist just return.
-            if (list.containsKey(name) != true) {
-                break;
-            }
-            PropertiesDatas datas = (PropertiesDatas) list.get(name);
-
-            // check if there are some chars to keep at the begining of text.  
-            if (begin > 2) {
-                text = text.substring(0, begin - 2) + datas.value + endText;
-            } else {
-                text = datas.value + endText;
-            }
-        } while (true);
-
-        return text;
+    		if(value==null || value.length()>0)
+    			throw new IllegalArgumentException("Error, variable value not found: "+name+"=?");
+    			
+    		if(logger.isDebugEnabled()){
+    			logger.debug("Matched:"+name+" = "+value);
+    			//logger.debug(m);
+    		}
+    		m.appendReplacement(sb, name.toLowerCase());
+    	}
+    	m.appendTail(sb);
+    	
+    	return sb.toString();
     }
 
     /**
@@ -338,6 +339,10 @@ public class VariableContract implements Serializable {
             throw new NullPointerException("Variable Value is null.");
         }
 
+        if (type == null) {
+            throw new NullPointerException("Variable Type is null.");
+        }
+        
         if (list.containsKey(name) &&
                 !((PropertiesDatas) list.get(name)).type.equals(type)) {
             throw new IllegalArgumentException("Variable " + name +
@@ -345,9 +350,6 @@ public class VariableContract implements Serializable {
                 ((PropertiesDatas) list.get(name)).type);
         }
 
-        if (type == null) {
-            throw new NullPointerException("Variable Type is null.");
-        }
     }
 
     /**
@@ -375,12 +377,12 @@ public class VariableContract implements Serializable {
         if (list.containsKey(name)) {
             data = (PropertiesDatas) list.get(name);
             if (logger.isDebugEnabled()) {
-                logger.debug("...Modifying variable registry");
+                logger.debug("...Modifying variable registry: "+name+"="+value);
             }
         } else {
             data = new PropertiesDatas();
             if (logger.isDebugEnabled()) {
-                logger.debug("...Creating new registry for variable");
+                logger.debug("...Creating new registry for variable: "+name+"="+value);
             }
         }
 
@@ -403,29 +405,9 @@ public class VariableContract implements Serializable {
             name = (String) it.next();
             PropertiesDatas data = (PropertiesDatas) list.get(name);
 
-            if (data.type.equals(VariableContractType.DescriptorVariable) &&
-                    (data.value.length() <= 0)) {
-                logger.error("Contract breached. Variable " + name +
-                    " has no value. The value must be set in the Descriptor.");
-                retval = false;
-            }
-            if (data.type.equals(VariableContractType.ProgramVariable) &&
-                    (data.value.length() <= 0)) {
-                logger.error("Contract breached. Variable " + name +
-                    " has no value. The value must be set in the Program.");
-                retval = false;
-            }
-            if (data.type.equals(VariableContractType.ProgramDefaultVariable) &&
-                    (data.value.length() <= 0)) {
-                logger.error("Contract breached. Variable " + name +
-                    " has no value. The value should be set in the Program.");
-                retval = false;
-            }
-            if (data.type.equals(VariableContractType.DescriptorDefaultVariable) &&
-                    (data.value.length() <= 0)) {
-                logger.error("Contract breached. Variable " + name +
-                    " has no value. The value should be set in the Descriptor.");
-                retval = false;
+            if(data.value.length()<=0){
+            	logger.error(data.type.getEmptyErrorMessage(name));
+            	retval=false;
             }
         }
 
@@ -447,6 +429,12 @@ public class VariableContract implements Serializable {
 
         return sb.toString();
     }
+    
+	public boolean isLegalName(String var){
+		Matcher  m = legalPattern.matcher(var);
+		return m.matches();
+	}
+    
 /*
     public void setDescriptorVariableOLD(String name, String value,
         VariableContractType type) {

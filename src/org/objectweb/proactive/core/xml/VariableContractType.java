@@ -47,14 +47,19 @@ public class VariableContractType {
             new String[] { "Program", "Descriptor" },
             new String[] { "Program" }, new String[] { "Descriptor" });
     static final public VariableContractType JavaPropertyVariable = new VariableContractType(2,
-            new String[0], new String[] { "Program", "Descriptor" },
-            new String[0]);
+            new String[] {"JavaProperty"},  new String[] {"JavaProperty"}, new String[] { "Program", "Descriptor" } );
     static final public VariableContractType ProgramDefaultVariable = new VariableContractType(3,
             new String[] { "Descriptor", "Program" },
             new String[] { "Descriptor", "Program" }, new String[0]);
     static final public VariableContractType DescriptorDefaultVariable = new VariableContractType(4,
             new String[] { "Program", "Descriptor" },
             new String[] { "Descriptor", "Program" }, new String[0]);
+    static final public VariableContractType JavaPropertyDescriptor = new VariableContractType(5,
+            new String[] {"JavaProperty","Descriptor","Program"}, new String[] {"JavaProperty", "Descriptor", "Program"},
+            new String[] {"Program"});
+    static final public VariableContractType JavaPropertyProgram = new VariableContractType(6,
+    		new String[] {"JavaProperty","Program","Descriptor"}, new String[] {"JavaProperty","Program","Descriptor"},
+    		new String[] {"Descriptor"});
     private int type; //Type internal identefier
     private String[] priority; //The lower indexed element has higher priority
     private String[] setAbility; //Who can set a non empty value
@@ -99,6 +104,12 @@ public class VariableContractType {
         if (type == 4) {
             return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG;
         }
+        if (type == 5) {
+            return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG;
+        }
+        if (type == 6) {
+            return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG;
+        }
 
         return "UnkownVariable";
     }
@@ -120,6 +131,12 @@ public class VariableContractType {
         if (type.equals(
                     ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG)) {
             return DescriptorDefaultVariable;
+        }
+        if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG)) {
+            return JavaPropertyDescriptor;
+        }
+        if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG)) {
+            return JavaPropertyProgram;
         }
 
         return null;
@@ -154,7 +171,7 @@ public class VariableContractType {
     }
 
     /**
-     * Compares two sources and determines how has higher priority to set the value.
+     * Compares two sources and determines who has higher priority to set the value.
      * @param current The last source to set a value.
      * @param candidate The current source trying to replace a value.
      * @return True if candidate has better or equal priority than current. False otherwise.
@@ -176,5 +193,16 @@ public class VariableContractType {
             }
 
         return j <= i;
+    }
+    
+    public String getEmptyErrorMessage(String name){
+    	
+    	String canSetValue="nobody";
+    	for(int i=0;i<setAbility.length;i++){
+    		canSetValue=setAbility[i]+" ";
+    	}
+    	
+    	return "Empty value for variable"+ this.toString() +" "+name+
+    			" value can be set by: "+canSetValue;
     }
 }
