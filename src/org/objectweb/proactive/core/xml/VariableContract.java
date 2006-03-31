@@ -96,9 +96,9 @@ public class VariableContract implements Serializable {
 			PropertiesDatas data = (PropertiesDatas) list.get(name);
 			if (data.type.equals(VariableContractType.JavaPropertyVariable)
 					|| data.type
-							.equals(VariableContractType.JavaPropertyDescriptor)
+							.equals(VariableContractType.JavaPropertyDescriptorDefault)
 					|| data.type
-							.equals(VariableContractType.JavaPropertyProgram)) {
+							.equals(VariableContractType.JavaPropertyProgramDefault)) {
 
 				try {
 					String value = System.getProperty(name);

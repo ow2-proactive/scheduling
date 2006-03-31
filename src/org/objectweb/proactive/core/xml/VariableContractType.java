@@ -54,10 +54,10 @@ public class VariableContractType {
     static final public VariableContractType DescriptorDefaultVariable = new VariableContractType(4,
             new String[] { "Program", "Descriptor" },
             new String[] { "Descriptor", "Program" }, new String[0]);
-    static final public VariableContractType JavaPropertyDescriptor = new VariableContractType(5,
+    static final public VariableContractType JavaPropertyDescriptorDefault = new VariableContractType(5,
             new String[] {"JavaProperty","Descriptor","Program"}, new String[] {"JavaProperty", "Descriptor", "Program"},
             new String[] {"Program"});
-    static final public VariableContractType JavaPropertyProgram = new VariableContractType(6,
+    static final public VariableContractType JavaPropertyProgramDefault = new VariableContractType(6,
     		new String[] {"JavaProperty","Program","Descriptor"}, new String[] {"JavaProperty","Program","Descriptor"},
     		new String[] {"Descriptor"});
     private int type; //Type internal identefier
@@ -133,10 +133,10 @@ public class VariableContractType {
             return DescriptorDefaultVariable;
         }
         if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG)) {
-            return JavaPropertyDescriptor;
+            return JavaPropertyDescriptorDefault;
         }
         if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG)) {
-            return JavaPropertyProgram;
+            return JavaPropertyProgramDefault;
         }
 
         return null;

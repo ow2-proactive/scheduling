@@ -96,7 +96,29 @@
 
               <entry>-</entry>
 
-              <entry>-</entry>
+              <entry>JavaProperty</entry>
+            </row>
+
+            <row>
+              <entry><emphasis
+              role="bold">JavaPropertyDescriptorDefault</emphasis></entry>
+
+              <entry>JavaProperty, Descriptor, Program</entry>
+
+              <entry>Program</entry>
+
+              <entry>JavaProperty, Descriptor, Program</entry>
+            </row>
+
+            <row>
+              <entry><emphasis
+              role="bold">JavaPropertyProgramDefault</emphasis></entry>
+
+              <entry>JavaProperty, Descriptor, Program</entry>
+
+              <entry>Descriptor</entry>
+
+              <entry>JavaProperty, Program, Descriptor</entry>
             </row>
           </tbody>
         </tgroup>
@@ -104,7 +126,8 @@
 
       <para>Variables can be set in more than one place. When the value is set
       on multiple places, then the definition specified in the priority column
-      will take precedence.</para>
+      will take precedence. In the priority column, items towards the left
+      have more priority.</para>
     </sect2>
 
     <sect2 remap="h3">
@@ -198,7 +221,34 @@
                 property.</para></entry>
 
                 <entry><para>When a variable will only be known at runtime
-                through the Java properties.</para></entry>
+                through the Java properties, and no default has to be provided
+                by the descriptor or the application.</para></entry>
+              </row>
+
+              <row>
+                <entry><emphasis
+                role="bold">javaPropertyDescriptorDefault</emphasis></entry>
+
+                <entry>Takes the value from the corresponding java property. A
+                default value can also be set from the descriptor or the
+                program. If no property is found, the descriptor default value
+                will override the program default value.</entry>
+
+                <entry>When the descriptor sets a default value, that can be
+                overrided at deployment using a java property.</entry>
+              </row>
+
+              <row>
+                <entry><emphasis
+                role="bold">javaPropertyProgramDefault</emphasis></entry>
+
+                <entry>Takes the value from the corresponding java property. A
+                defualt value can also be set from the program or the
+                descriptor. If no property is found, the program default value
+                will override the program default value</entry>
+
+                <entry>When the program sets a default value, than can be
+                overrided at deployment using a java property.</entry>
               </row>
             </tbody>
           </tgroup>
@@ -220,12 +270,16 @@
             role="bold">ProActive/dist/ProActive</emphasis>"/&gt;
          &lt;<emphasis role="bold">descriptorDefaultVariable</emphasis> name="<emphasis
             role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>" value="<emphasis
-            role="bold">4</emphasis>"/&gt;
+            role="bold">20</emphasis>"/&gt;
          &lt;<emphasis role="bold">programVariable</emphasis> name="<emphasis
-            role="bold">VIRTUAL_NODE_NAME</emphasis>" value=""/&gt;     
-         &lt;!-- Example Using java properties --&gt;
+            role="bold">VIRTUAL_NODE_NAME</emphasis>"/&gt;
          &lt;<emphasis role="bold">javaPropertyVariable</emphasis> name="<emphasis
-            role="bold">USER_HOME</emphasis>" value="<emphasis role="bold">java.home</emphasis>"/&gt;
+            role="bold">java.home</emphasis>"/&gt;
+         &lt;<emphasis role="bold">javaPropertyDescriptorDefault</emphasis> name="<emphasis
+            role="bold">host.name</emphasis>" value="<emphasis role="bold">localhost</emphasis>"/&gt; 
+         &lt;<emphasis role="bold">javaPropertyProgramDefault</emphasis> name="<emphasis
+            role="bold">priority.queue</emphasis>"/&gt; 
+
          &lt;!-- Include external variables from files--&gt;
          &lt;<emphasis role="bold">includeXMLFile</emphasis> location="<emphasis
             role="bold">file.xml</emphasis>"/&gt;
@@ -250,8 +304,13 @@
             role="bold">testnode</emphasis>", <emphasis role="bold">VariableContractType.ProgramVariable</emphasis>);
          variableContract.setVariableFromProgram( "<emphasis role="bold">NUMBER_OF_VIRTUAL_NODES</emphasis>", "<emphasis
             role="bold">10</emphasis>", <emphasis role="bold">VariableContractType.DescriptorDefaultVariable</emphasis>);
+         variableContract.setVariableFromProgram( "<emphasis role="bold">priority.queue</emphasis>", "<emphasis
+            role="bold">vip</emphasis>", <emphasis role="bold">VariableContractType.JavaPropertyProgramDefault</emphasis>);
          ProActiveDescriptor pad = ProActive.getProactiveDescriptor(XML_LOCATION, variableContract);
-</screen>
+
+         //Usage example
+         VariableContract vc=pad.getVariableContract;
+         String proActiveHome=vc.getValue("PROACTIVE_HOME");</screen>
       </sect3>
     </sect2>
 
@@ -337,6 +396,16 @@ import org.objectweb.proactive.core.xml.VariableContractType;        </screen>
           <listitem>
             <para>VariableContractType.<emphasis
             role="bold">JavaPropertyVariable</emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para>VariableContractType.<emphasis
+            role="bold">JavaPropertyDescriptorDefault</emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para>VariableContractType.<emphasis
+            role="bold">JavaPropertyProgramDefault</emphasis></para>
           </listitem>
         </itemizedlist>
       </sect3>
