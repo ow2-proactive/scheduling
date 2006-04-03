@@ -50,7 +50,7 @@ public class Test extends FunctionalTest {
 		HashMap map = new HashMap();
 		map.put("user.home", "/home/userprogram");
 		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
-		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userprogram"));
+		Assertions.assertTrue( variableContract.getValue("user.home").equals(System.getProperty("user.home")));
 		
 		boolean bogus=false;
 		try{
@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
 		
 		//Setting from Descriptor
 		variableContract.setDescriptorVariable("user.home", "/home/userdesc", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
-		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userprogram"));
+		Assertions.assertTrue( variableContract.getValue("user.home").equals(System.getProperty("user.home")));
 		
 		try{
 			bogus=false;

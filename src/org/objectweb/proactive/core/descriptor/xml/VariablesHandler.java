@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.InputSource;
 
@@ -61,7 +62,13 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         
         this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG, new IncludeXMLFileHandler());
         this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG, new IncludePropertiesFileHandler());
-        
+    }
+    
+    protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    	
+    	//Once the variables have been defined, we load pending values from the javaproperties
+    	variableContract.setJavaPropertiesValues();
     }
 
     /**

@@ -52,11 +52,11 @@ public class Test extends FunctionalTest {
 		variableContract.setVariableFromProgram(map, VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
 		variableContract.setVariableFromProgram("bogus.property", "", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
 		
-		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userprogram")); 
+		Assertions.assertTrue( variableContract.getValue("user.home").equals(System.getProperty("user.home")));
 		
 		//Setting from Descriptor
 		variableContract.setDescriptorVariable("user.home", "/home/userdesc", VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-		Assertions.assertTrue( variableContract.getValue("user.home").equals("/home/userdesc"));
+		Assertions.assertTrue( variableContract.getValue("user.home").equals(System.getProperty("user.home")));
 		
 		//Setting bogus from program
 		boolean bogus=false;

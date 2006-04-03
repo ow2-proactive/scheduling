@@ -87,29 +87,6 @@ public class VariableContract implements Serializable {
      * Marks the contract as closed. No more variables can be defined or set.
      */
     public void close() {
-
-    	//before closing we set the JavaProperties values
-		java.util.Iterator it = list.keySet().iterator();
-		while (it.hasNext()) {
-			String name = (String) it.next();
-			PropertiesDatas data = (PropertiesDatas) list.get(name);
-			if (data.type.equals(VariableContractType.JavaPropertyVariable)
-					|| data.type
-							.equals(VariableContractType.JavaPropertyDescriptorDefault)
-					|| data.type
-							.equals(VariableContractType.JavaPropertyProgramDefault)) {
-
-				try {
-					String value = System.getProperty(name);
-					if (value == null) value="";
-					setVariableFrom(name, value, data.type, "JavaProperty");
-				} catch (Exception ex) {
-					if (logger.isDebugEnabled())
-						logger.debug("Unable to get java property: " + name);
-				}
-			}// if
-		}// while
-
 		closed = true;
 	}
 
@@ -137,8 +114,46 @@ public class VariableContract implements Serializable {
     public void setVariableFromProgram(String name, String value,
         VariableContractType type) {
         setVariableFrom(name, value, type, "Program");
+        setFromJavaProperty(name, type);
     }
 
+    /**
+     * Finds and sets all pending values for java properties
+     *
+     */
+    public void setJavaPropertiesValues(){
+    	//before closing we set the JavaProperties values
+		java.util.Iterator it = list.keySet().iterator();
+		while (it.hasNext()) {
+			String name = (String) it.next();
+			PropertiesDatas data = (PropertiesDatas) list.get(name);
+			setFromJavaProperty(name, data.type);
+		}// while
+    }
+    
+    /**
+     * If the variable can be set from the javaProperty, then it looks
+     * for the corresponding.
+     * @param name
+     * @param type
+     */
+    public void setFromJavaProperty(String name, VariableContractType type){
+    	
+    	if(!type.hasSetAbility("JavaProperty")) return;
+    	
+    	try {
+			String value = System.getProperty(name);
+			if(logger.isDebugEnabled()){
+				logger.debug("Found java property "+name+"="+value);
+			}
+			if (value == null) value="";
+			setVariableFrom(name, value, type, "JavaProperty");
+		} catch (Exception ex) {
+			if (logger.isDebugEnabled())
+				logger.debug("Unable to get java property: " + name);
+		}
+    }
+    
     /**
      * Method for setting variables value from the deploying application. If the variable is not defined,
      * this method will also define it.
@@ -216,7 +231,9 @@ public class VariableContract implements Serializable {
      */
     public void setDescriptorVariable(String name, String value,
         VariableContractType type) {
+    	
         setVariableFrom(name, value, type, "Descriptor");
+        setFromJavaProperty(name, type);
     }
     
     /**
@@ -300,7 +317,7 @@ public class VariableContract implements Serializable {
     		String name=m.group(2);
     		String value=getValue(name);
 
-    		if(value==null || value.length()>0)
+    		if(value==null || value.length()<=0)
     			throw new IllegalArgumentException("Error, variable value not found: "+name+"=?");
     			
     		if(logger.isDebugEnabled()){
