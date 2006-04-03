@@ -27,7 +27,11 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+      					<absolutePath value="${bogus.property}/plop" />
+      				</classpath>
+      			</jvmProcess>
 			</processDefinition>	
 		</processes>
 	</infrastructure>
