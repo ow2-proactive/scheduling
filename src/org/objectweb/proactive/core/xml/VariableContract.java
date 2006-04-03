@@ -324,7 +324,7 @@ public class VariableContract implements Serializable {
     			logger.debug("Matched:"+name+" = "+value);
     			//logger.debug(m);
     		}
-    		m.appendReplacement(sb, name.toLowerCase());
+    		m.appendReplacement(sb, value);
     	}
     	m.appendTail(sb);
     	
