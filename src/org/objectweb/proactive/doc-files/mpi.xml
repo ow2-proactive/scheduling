@@ -68,7 +68,7 @@ selection, resource location and type, or mapping process on resources.
 				<para>Primary objective is to provide user an automatic deployment of his application 
 through a file deployment descriptor. In fact, ProActive provides support for File Transfer. In this way, user can
 transfer MPI application <emphasis role="bold">input data</emphasis> and/or MPI <emphasis role="bold">application code</emphasis> to the remote host. The File Transfer happens before the user launches his application.
-For more details about File Transfer click <link linkend="FileTransfer_html_intro">here</link>.
+For more details about File Transfer see  <xref linkend="FileTransfer_html_intro"/>.
 		</para>
 			</listitem>
 			<listitem>
@@ -310,7 +310,7 @@ logger.info(<emphasis role="bold">my_spmd</emphasis>);
 					<emphasis role="bold">File Transfer: </emphasis> specify all the files which
  have to be transferred on the remote host like <emphasis role="bold">binary code</emphasis> and <emphasis role="bold">input data</emphasis>. 
 In the following example, "cpi" is the binary of the MPI program.
-For more details about File Transfer click <link linkend="FileTransfer_html_intro">here</link>.
+For more details about File Transfer see <xref linkend="FileTransfer_html_intro"/>.
 				</para>
 				<screen>&lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;

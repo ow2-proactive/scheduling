@@ -80,7 +80,8 @@
     </sect1>
     <sect1 remap="h2">
       <title><anchor id="adl_html_Example"/>Example</title>
-      <para>The easiest way to understand the ADL is to see <link linkend="HelloWorldADLFiles">an example</link>. It corresponds to the helloworld example described later in this document.</para>
+      <para>The easiest way to understand the ADL is to see an example (<xref linkend="HelloWorldADLFiles"/>).
+       It corresponds to the helloworld example described later in this document.</para>
       <para><anchor id="adl_html_composition_of_virtual_nodes"/></para>
     </sect1>
     <sect1 remap="h2">

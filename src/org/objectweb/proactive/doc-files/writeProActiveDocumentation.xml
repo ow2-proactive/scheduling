@@ -12,10 +12,10 @@
     you should be reading this chapter. </para>
    
    <para> 
-    The <link linkend="DocBookExamples"> examples sections </link> 
+    The examples sections (<xref linkend="DocBookExamples"/>)
     describes the use of the main tags you will use (eventually, 
     all the ProActive-allowed docbook tags should be described). 
-    The <link linkend="DocBookLimitations"> limitations </link> 
+    The limitations (<xref linkend="DocBookLimitations"/>)
     section describes what is allowed in our docbook style, and 
     why we restrict ourselves to a subset of docbook.</para>
 </sect1>
@@ -134,7 +134,7 @@
    </listitem>
    
    <listitem>
-    <para>&lt;link&gt; when you want to reference another
+    <para>&lt;xref&gt; when you want to reference another
      section/chapter/part</para>
    </listitem>
    
@@ -285,18 +285,20 @@ public class JavaToDocBook {
   <sect2 id="Links">
    <title>Links</title>
    
-   <para>Use LINK tags to point to the <link linkend="Figures">Figures
-     id</link> which is in the doc above.</para>
+   <para>Use XREF tags to point to the Figures id (<xref linkend="Figures"/>) 
+    which is in the doc above. The LINKEND attribute points to the id which 
+   is referenced, for example, in a SECT1 tag. The ENDTERM tag (example with the biblio)
+   is used to customize the string which will be used to point to the reference. </para>
    
-   <para>Use ULINK tags to point to <ulink
-                                          url="http://www-sop.inria.fr/oasis/proactive/">ProActive on the
+   <para>Use ULINK tags to point to 
+    <ulink url="http://www-sop.inria.fr/oasis/proactive/">ProActive on the
      web</ulink>, it's good for you!</para>
    
    <para>Use CITATION followed by an XREF for citations. For example, see 
     <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation> to learn on
     groups. Example  biblio entry can be found in the <literal>biblio.xml</literal> 
-    file. You should consider using the bibdb
-    tool to convert from bibtex (http://charybde.homeunix.org/~schmitz/code/bibdb/).
+    file. You should consider using the bibdb tool to convert from bibtex 
+    (http://charybde.homeunix.org/~schmitz/code/bibdb/).
    </para>
    
   </sect2>

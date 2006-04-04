@@ -603,8 +603,8 @@
 
           <listitem>
             <para>This is the case when the process referenced is a cluster
-            process(LSF, PBS, GLOBUS, ....) or a <link
-            linkend="Descriptor_html_processlist">process list</link></para>
+            process(LSF, PBS, GLOBUS, ....) or a process list
+            (see <xref linkend="Descriptor_html_processlist" />) </para>
           </listitem>
         </itemizedlist></para>
     </sect2>

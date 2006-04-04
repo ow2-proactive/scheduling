@@ -700,7 +700,7 @@ public void terminate (){ hasToTerminate=true;}
       the language that are not normally objects (such as method calls,
       constructor calls, references, types,...) is what <emphasis>metaobject
       programming</emphasis> is all about. The metaobject protocol (MOP)
-      ProActive is built on is described <link linkend="MOP">here</link> but
+     ProActive is built on is described in <xref linkend="MOP"/> but
       it is not a prerequisite for understanding and using ProActive.</para>
 
       <para>As one of our objectives is to provide transparent active objects,

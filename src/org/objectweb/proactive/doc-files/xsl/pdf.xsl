@@ -30,7 +30,8 @@
 <!--  set the title.margin.left parameter to the negative value of the desired indent.  -->
 <xsl:param name="title.margin.left">-4pt</xsl:param> 
 
-
+<!-- All xrefs have the numbering AND the title -->
+<xsl:param name="xref.with.number.and.title" select="'1'" />
 
 
  <!-- Remove headers on blank pages please! -->
@@ -736,10 +737,6 @@
   </xsl:variable>
 
 
-<xsl:message>
-<xsl:text> OK, qandaset.id </xsl:text> <xsl:value-of select="../@id" /> 
-</xsl:message>
-
 <!-- Output a TOC for every qandaset -->
     <fo:block >
         <xsl:attribute name="margin-left">
@@ -800,11 +797,6 @@
       <xsl:otherwise>2.5em</xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-
-
-<xsl:message>
-<xsl:text> qandaDIV.id </xsl:text> <xsl:value-of select="../@id" /> 
-</xsl:message>
 
   <fo:block id="{$id}">
     <xsl:if test="blockinfo/title|info/title|title">

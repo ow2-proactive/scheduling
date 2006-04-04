@@ -459,9 +459,8 @@ private static void printMessageAndWait() {
           </listitem>
         </itemizedlist>
 
-        <para>A detailed presentation of XML descriptors is available in the
-        <link linkend="Descriptor_html_objectives">descriptors
-        chapter</link></para>
+        <para>A detailed presentation of XML descriptors is available in  
+        <xref linkend="Descriptor_html_objectives"/>.</para>
       </sect3>
 
       <sect3 remap="h4">
@@ -861,8 +860,8 @@ private static void printMessageAndWait() {
 
         <para>ssh, LSF, PBS, Globus, etc.</para>
 
-        <para>Have a look at <link linkend="Descriptor_html_objectives"> XML
-        Descriptors documentation</link> to get the format of the XML
+        <para>Have a look at <xref  linkend="Descriptor_html_objectives"/>
+         to get the format of the XML
         descriptor for each of the supported protocols.</para>
       </sect3>
     </sect2>

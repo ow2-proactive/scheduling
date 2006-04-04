@@ -182,8 +182,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
     the API.</para>
 
     <para>You can get a more complete 'hello world' example, with deployment
-    on a remote host, <link linkend="HelloWorld">further on</link> in the
-    manual.</para>
+     on a remote host, further on in the manual (<xref linkend="HelloWorld"/>).</para>
 
     <para>A client object displays a <literal>String</literal> received from
     elsewhere (the original VM). This illustrates the creation of an Active

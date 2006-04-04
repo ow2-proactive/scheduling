@@ -62,12 +62,15 @@
       </sect2>
       <sect2 remap="h3">
         <title>Activities</title>
-        <para>A fundamental concept of the ProActive library is this of <link linkend="ProActiveBasis">active objects</link>, where activities can actually be <link linkend="ActiveObjectCreation">redefined</link> so as to customize their <emphasis role="bold">behavior</emphasis>.</para>
+        <para>A fundamental concept of the ProActive library is this of Active Objects 
+         (see <xref linkend="ProActiveBasis"/>), where activities can actually be 
+         redefined (see also <xref linkend="ActiveObjectCreation"/>)
+         to customize their <emphasis role="bold">behavior</emphasis>.</para>
       </sect2>
       <sect2 remap="h3">
         <title>Asynchronous method calls with futures</title>
-        <para><link linkend="FutureObjectCreation">Asynchronous method calls with transparent
- futures</link> is a core feature of ProActive, and it allows concurrent processing. Indeed, suppose
+        <para>Asynchronous method calls with transparent futures is a core feature of ProActive
+         (<xref  linkend="FutureObjectCreation"/>), and it allows concurrent processing. Indeed, suppose
  a caller invokes a method on a callee. This method returns a result on a component. With
  synchronous method calls, the flow of execution of the caller is blocked until the result of the
  method called is received. In the case of intensive computations, this can be relatively long.

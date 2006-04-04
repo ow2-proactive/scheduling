@@ -557,7 +557,7 @@
           
           <para>When you reference an active object, you always reference it
            through its associated stub 
-           (<link linkend="ActiveObjectCreation_html_elementRole">see definition of Stub</link>). 
+           (see <xref linkend="ActiveObjectCreation_html_elementRole"/> for the definition of Stub). 
            The stub class inheriting from the reified class, it
            has also all its attributes. But those attributes are totally
            useless as the only role of the generated stub is to reify every
@@ -863,7 +863,7 @@
        </question>
        
        <answer>
-        <para>As explained <link linkend="activity">before</link>, there are
+        <para>As explained before in <xref linkend="activity"/>, there are
          two ways to define the activity of your active object</para>
         
         <itemizedlist>
@@ -1053,8 +1053,8 @@
          future is not yet available or the method returns null or 
          <emphasis role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if the future is
          available, but result_from_method is <emphasis role="bold">never
-          null</emphasis>. See <link linkend="FutureObjectCreation_commonerror">
-          Documentation on Futures</link> for more documentation about common errors to
+          null</emphasis>. See Documentation on Futures in <xref linkend="FutureObjectCreation_commonerror"/>
+         for more documentation about common errors to
          avoid.</para>
        </answer>
       </qandaentry>

@@ -12,8 +12,8 @@
     or a pessimistic message logging protocol (PML). Making a ProActive
     application fault-tolerant is <emphasis role="bold">fully
     transparent</emphasis>; active objects are turned fault-tolerant using
-    Java properties that can be set in the <link
-    linkend="XML_Descriptors">deployment descriptor</link> . The programmer
+    Java properties that can be set in the deployment descriptor
+    (see <xref  linkend="XML_Descriptors"/>). The programmer
     can select <emphasis>at deployment time</emphasis> the most adapted
     protocol regarding the application and the execution environment.</para>
 
@@ -94,8 +94,8 @@
         </listitem>
 
         <listitem>
-          <para>at execution time: the resource server can use an <link
-          linkend="p2p">underlying p2p network</link> to reclaim free nodes
+          <para>at execution time: the resource server can use an 
+           underlying p2p network (see <xref linkend="p2p"/>) to reclaim free nodes
           when a hosting node is needed.</para>
         </listitem>
       </itemizedlist>
@@ -150,9 +150,9 @@
         </listitem>
 
         <listitem>
-          <para>the URL of a <link linkend="p2p">p2p service</link> that can
-          be used by the resource server: <literal>-p2p
-          &lt;serviceURL&gt;</literal>. There is no default value for this
+         <para>the URL of a p2p service (see <xref linkend="p2p"/>) that can
+          be used by the resource server: <literal>-p2p &lt;serviceURL&gt;</literal>. 
+          There is no default value for this
           option.</para>
         </listitem>
       </itemizedlist>
@@ -174,10 +174,8 @@ this.server.startProcess();</screen></para>
       automatically and transparently disabled for all the application.</para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="faultTolerance_html_configuration"
-      xreflabel="Configure fault-tolerance for  a ProActive application" />Configure
-      fault-tolerance for a ProActive application</title>
+    <sect2 remap="h3" id="faultTolerance_html_configuration">
+      <title>Configure fault-tolerance for a ProActive application</title>
 
       <para>Fault-tolerance capabilities of a ProActive application are set in
       the deployment descriptor, using the <literal>faultTolerance</literal>
@@ -447,12 +445,12 @@ rvice(body);
 
       <itemizedlist>
         <listitem>
-          <para>active objects exposed as <link linkend="WSDoc">Web
-          services</link>, or reachable using http protocol,</para>
+          <para>active objects exposed as Web services
+           (see <xref linkend="WSDoc"/>), or reachable using http protocol,</para>
         </listitem>
 
         <listitem>
-          <para>and <link linkend="Security">security</link>, as
+         <para>and security (see <xref linkend="Security"/>), as
           fault-tolerance servers are implemented using standard RMI.</para>
         </listitem>
       </itemizedlist>

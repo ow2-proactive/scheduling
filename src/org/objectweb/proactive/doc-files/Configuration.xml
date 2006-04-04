@@ -86,7 +86,7 @@
 
     <para>A specific tag: <emphasis
     role="bold">&lt;ProActiveUserPropertiesFile&gt;</emphasis> is provided in
-    <link linkend="XML_Descriptors">Deployment Descriptor</link> to notify
+     Deployment Descriptors (see <xref linkend="XML_Descriptors"/>) to notify
     remote jvms which configuration file to load once created:</para>
 
     <screen>&lt;jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcesss'&gt;
@@ -133,8 +133,8 @@
             <listitem>
               <para><emphasis role="bold">proactive.future.ac</emphasis> . Two
               values are possible:<emphasis role="bold">enable,
-              disable</emphasis> If enable, <link linkend="AC">automatic
-              continuations</link> are activated. Default is <emphasis
+              disable</emphasis> If 'enable' is chosen, automatic continuations
+              are activated (see <xref linkend="AC"/>). Default is <emphasis
               role="bold">enable</emphasis></para>
             </listitem>
           </itemizedlist></para>
@@ -148,8 +148,8 @@
         properties</emphasis></para>
 
         <para>Note that those properties should not be altered if the
-        programmer uses deployment descriptor files. See <link
-        linkend="faultTolerance">here</link> for more details.</para>
+        programmer uses deployment descriptor files. See 
+        <xref linkend="faultTolerance"/> for more details.</para>
 
         <itemizedlist>
           <listitem>
@@ -163,46 +163,39 @@
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.checkpoint</emphasis> is the URL
-            of the <link
-            linkend="faultTolerance_html_configuration">checkpoint
-            server</link>.</para>
+             of the checkpoint server (see <xref linkend="faultTolerance_html_configuration"/>).</para>
           </listitem>
 
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.location</emphasis> is the URL of
-            the <link linkend="faultTolerance_html_configuration">location
-            server</link>.</para>
+             the location server (see <xref linkend="faultTolerance_html_configuration"/>).</para>
           </listitem>
 
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.recovery</emphasis> is the URL of
-            the <link linkend="faultTolerance_html_configuration">recovery
-            process</link>.</para>
+             the recovery process (see <xref linkend="faultTolerance_html_configuration"/>).</para>
           </listitem>
 
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.resource</emphasis> is the URL of
-            the <link linkend="faultTolerance_html_configuration">resource
-            server</link>.</para>
+             the resource server (see <xref linkend="faultTolerance_html_configuration"/>).</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">proactive.ft.server.global</emphasis>
-            is the URL of the <link
-            linkend="faultTolerance_html_configuration">global server</link>.
+             is the URL of the global server (see <xref linkend="faultTolerance_html_configuration"/>).
             If this property is set, all others <emphasis
             role="bold">proactive.fr.server.*</emphasis> are ignored.</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">proactive.ft.ttc</emphasis> is the
-            value of the <link
-            linkend="faultTolerance_html_configuration">Time To
-            Checkpoint</link> counter, in seconds. The default value is 30
-            sec.</para>
+             value of the Time To Checkpoint counter, in seconds 
+             (see <xref linkend="faultTolerance_html_configuration"/>). 
+             The default value is 30 sec.</para>
           </listitem>
         </itemizedlist>
       </listitem>
@@ -303,8 +296,8 @@
       </listitem>
     </itemizedlist>
 
-    <para>The following properties are specific to the protocol <link
-    linkend="SSHTunneling">rmissh</link></para>
+    <para>The following properties are specific to the rmissh protocol 
+     (<xref linkend="SSHTunneling"/></para>
 
     <para><itemizedlist>
         <listitem>

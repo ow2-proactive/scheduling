@@ -13,7 +13,7 @@
  Language. The fourth section goes through some examples to illustrate the use of the API and the
  distribution of components. The final section is about our forthcoming research work. You can
  also get an overview of the architecture of this implementation 
- <link linkend="componentArchitecture">here</link>.</para>
+ in <xref linkend="componentArchitecture"/>.</para>
     
 <para><emphasis>
   For a general overview of our work , you can also refer to the paper 
