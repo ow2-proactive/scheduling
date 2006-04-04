@@ -30,8 +30,18 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -53,6 +63,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
@@ -71,19 +82,6 @@ import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.rmi.AlreadyBoundException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
 
 
 /**
@@ -593,7 +591,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return res;
             } else {
                 res++;
-                process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+                process = ((ExternalProcess) ((ExternalProcessDecorator) process).getTargetProcess());
             }
         }
         return -1;
@@ -610,7 +608,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return ((GLiteProcess) process).getCpuNumber();
             } else {
                 res++;
-                process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+                process = ((ExternalProcess) ((ExternalProcessDecorator) process).getTargetProcess());
             }
         }
         return -1;
@@ -1006,7 +1004,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine virtualMachine = null;
 
         for (int i = 0; i < virtualMachines.size(); i++) {
-            if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
+            if (((VirtualMachine) virtualMachines.get(i)).getName()
+                     .equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
             }
         }
@@ -1035,7 +1034,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine virtualMachine = null;
 
         for (int i = 0; i < virtualMachines.size(); i++) {
-            if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
+            if (((VirtualMachine) virtualMachines.get(i)).getName()
+                     .equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
             }
         }
@@ -1074,10 +1074,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     registerAttempts = REGISTRATION_ATTEMPTS;
 
                     while (registerAttempts > 0) { // If there is an
-                        // AlreadyBoundException, we
-                        // will gerate an other
-                        // random node's name and
-                        // try to register it again
+                                                   // AlreadyBoundException, we
+                                                   // will gerate an other
+                                                   // random node's name and
+                                                   // try to register it again
                         nodeName = this.name +
                             Integer.toString(ProActiveRuntimeImpl.getNextInt());
                         url = buildURL(nodeHost, nodeName, protocol, port);
@@ -1442,7 +1442,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         jvmProcess = (JVMProcess) process.getFinalProcess();
 
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
-        if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
+        if (jvmProcess.getClassname()
+                          .equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             String vnName = this.name;
 
             String localruntimeURL = null;
