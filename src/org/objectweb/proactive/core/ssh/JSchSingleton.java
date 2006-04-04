@@ -34,10 +34,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ssh.SshParameters;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -143,8 +144,20 @@ public class JSchSingleton {
             try {
                 session.connect();
             } catch (JSchException e) {
-                e.printStackTrace();
-                throw new IOException(e.getMessage());
+                if (e.getMessage().indexOf("java.net.NoRouteToHostException") != -1) {
+                    logger.info("No route to host from " +
+                        InetAddress.getLocalHost().getHostName() + " to " +
+                        hostname + ":" + sshPort +
+                        "; please check your descriptor file.");
+                    if (ProActiveConfiguration.isForwarder()) {
+                        logger.info("Forwarding enabled." +
+                            " An internal IP is probably returned by a forwarder," +
+                            " you can fix this using internal_ip attribute");
+                    }
+                } else {
+                    e.printStackTrace();
+                    throw new IOException(e.getMessage());
+                }
             }
         }
         return session;
