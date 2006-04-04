@@ -109,8 +109,12 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
         boolean replacePreviousBinding, ProActiveSecurityManager ps,
         String VNname, String jobId)
         throws IOException, NodeException, AlreadyBoundException {
-        return proActiveRuntimeF.createLocalNode(urid, nodeName,
+        if (urid == null) {
+        	return super.createLocalNode(nodeName, replacePreviousBinding, ps, VNname, jobId);
+        } else {
+    	return proActiveRuntimeF.createLocalNode(urid, nodeName,
             replacePreviousBinding, ps, VNname, jobId);
+        }
     }
 
     public void createVM(UniqueRuntimeID urid, UniversalProcess remoteProcess)
