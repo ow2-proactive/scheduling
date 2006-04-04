@@ -15,7 +15,6 @@
 	<property name="doc.src" value="${src.dir}/${proactive.dir}/doc-files"/>
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="docs.tmp" value="${docs.dir}/tmp" />
-	<property name="howto.dir"  value="${docs.dir}/howto"/>
 
 	<property name="name" value="ProActive"/>
 	<property name="version" value="3.0.1"/>
@@ -518,7 +517,6 @@
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**"/>
 				<exclude name="compile/**"/>
-    <exclude name="docs/howto/**"/>
 			</zipfileset>
 		</zip>
 		<!-- 
@@ -532,7 +530,6 @@
 		-->
 		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs">
-      <exclude name="docs/howto/**"/>
 		  </zipfileset>
 		</zip>
 		<!--
@@ -1101,33 +1098,6 @@
 	</target>
 
 	<!-- ==================================================================== -->
-	<!-- Construct the docbook howto describing on how to write documentation -->
-	<!-- ==================================================================== -->
-	<target name="manualHowto" depends="docbookCopyDecorate">
-		<!-- copy the docBook howto files -->
-		<copy toDir="${howto.dir}">
-			<fileset dir="${doc.src}/docBookTutorial">
-				<include name="**/*.png" />
-			</fileset>
-			<fileset file="${doc.src}/ProActive.css" />
-		</copy>
-
-		<!-- also beautify the howto files -->
-		<antcall target="docbookBeautify">
-			<param name="docbookInputFile" value="${docs.tmp}/docBookTutorial/doc_howto.xml" />
-		</antcall>
-
-		<!-- Last, build the docBook Tutorial (or howto) -->
-		<antcall target="docbookChain">
-			<param name="docbookInputFile" value="${docs.tmp}/docBookTutorial/doc_howto.xml" />
-			<param name="pdfOutputFile" value="${howto.dir}/docHowTo.pdf" />
-			<param name="bigHtmlFileName" value="${howto.dir}/docHowTo.html" />
-			<param name="chunkedHtmlFileName" value="${howto.dir}/index.html" />
-		</antcall>
-
-	</target>
-
-	<!-- ==================================================================== -->
 	<!-- Make just the html files for the manual                              -->
 	<!-- ==================================================================== -->
 	<target name="manualHtml" description="Make only the html files in the manual" depends="docbookCopyDecorate">
@@ -1169,7 +1139,6 @@
 
 		<antcall target="manualHtml" />
 		<antcall target="manualPdf" />
-		<antcall target="manualHowto" />
 
 		<!-- clean up -->
 		<delete dir="${docs.tmp}" />
