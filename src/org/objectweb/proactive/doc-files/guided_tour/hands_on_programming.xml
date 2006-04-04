@@ -113,25 +113,24 @@
 
         <para>Here is the initActivity method:</para>
 
-        <screen>public void initActivity(Body body) {
-        System.out.println('I am about to start my activity');
-}         </screen>
+        <programlisting language="java">public void initActivity(Body body) {
+        System.out.println("I am about to start my activity");
+}         </programlisting>
 
         <para>Here is the endActivity method:</para>
 
-        <screen>public void endActivity(Body body) {
-        System.out.println('I have finished my activity');
-}          </screen>
+        <programlisting language="java">public void endActivity(Body body) {
+        System.out.println("I have finished my activity");
+}          </programlisting>
 
         <para>The following code shows how to terminate the activity of the
         active object:</para>
 
-        <screen>public void terminate() {
+       <programlisting language="java">public void terminate() throws IOException {
         // the termination of the activity is done through a call on the
-        // terminate method of the body associated to the current active ob\
-ject
+        // terminate method of the body associated to the current active object
         ProActive.getBodyOnThis().terminate();
-}          </screen>
+}          </programlisting>
 
         <para>The only differences from the the previous example is the
         classes instantiated, which are now InitializedHello (and not Hello)
@@ -177,25 +176,25 @@ linux&gt;export  CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:
       <sect3 remap="h4">
         <title>Starting the server</title>
 
-        <para><screen><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
+        <para><screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
             -Dlog4j.configuration=file:scripts/proactive-log4j 
             org.objectweb.proactive.examples.hello.InitializedHello 
 
 windows&gt; java -Djava.security.policy=scripts\proactive.java.policy  \
               -Dlog4j.configuration=file:scripts\proactive-log4j \
-              org.objectweb.proactive.examples.hello.InitializedHello &amp;</literal></screen></para>
+              org.objectweb.proactive.examples.hello.InitializedHello &amp;</screen></para>
       </sect3>
 
       <sect3 remap="h4">
         <title>Launching the client</title>
 
-        <para><screen><literal>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy 
+        <para><screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy 
             -Dlog4j.configuration=file:scripts/proactive-log4j  \
             org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello 
 
 windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
               -Dlog4j.configuration=file:scripts\proactive-log4j 
-              org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello</literal></screen></para>
+              org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello </screen></para>
       </sect3>
     </sect2>
   </sect1>
@@ -293,21 +292,21 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
 
         <para>The migration is initiated by the moveTo method:</para>
 
-        <screen>/** method for migrating
+        <programlisting language="java">/** method for migrating
 * @param destination_node destination node
 */
 public void moveTo(String destination_node) {
-        System.out.println('\n-----------------------------');
-        System.out.println('starting migration to node: ' + destination_node\
+        System.out.println("\n-----------------------------");
+        System.out.println("starting migration to node: " + destination_node\
 );
-        System.out.println('...');
+        System.out.println("...");
         try {
                 // THIS MUST BE THE LAST CALL OF THE METHOD
                 ProActive.migrateTo(destination_node);
         } catch (MigrationException me) {
-                System.out.println('migration failed: ' + me.toString());
+                System.out.println("migration failed: " + me.toString());
         }
-}          </screen>
+}          </programlisting>
 
         <para>Note that the call to the ProActive primitive
         <literal>migrateTo</literal> is the last one of the method moveTo. See
@@ -437,11 +436,9 @@ cd ..       </screen>
         this operation is the initActivity method (from InitActive interface),
         that we override:</para>
 
-        <screen>/**
- * This method attaches a migration strategy manager to the current active \
-object.
- * The migration strategy manager will help to define which actions to take\
- before
+       <programlisting language="java">/**
+ * This method attaches a migration strategy manager to the current active object.
+ * The migration strategy manager will help to define which actions to take before
  * and after migrating
  */
 public void initActivity(Body body) {
@@ -451,19 +448,19 @@ able) ProActive.getBodyOnThis());
         // specify what to do when the active object is about to migrate
         // the specified method is then invoked by reflection
         migrationStrategyManager.onDeparture('clean');
-}          </screen>
+}          </programlisting>
 
         <para>The MigrationStrategyManager defines methods such as
         'onDeparture', that can be configured in the application. For example
         here, the method 'clean' will be called before the migration,
         conveniently killing the frame:</para>
 
-        <screen>public void clean() {
-        System.out.println('killing frame');
+       <programlisting language="java">public void clean() {
+        System.out.println("killing frame");
         helloFrame.dispose();
         helloFrame = null;
-        System.out.println('frame is killed');
-}          </screen>
+        System.out.println("frame is killed");
+}          </programlisting>
       </sect3>
 
       <sect3 remap="h4">
@@ -489,12 +486,12 @@ able) ProActive.getBodyOnThis());
       </itemizedlist>
 
       <para><literal>MigratableHello migratable_hello =
-      MigratableHello.createMigratableHello('agent1');</literal></para>
+      MigratableHello.createMigratableHello("agent1");</literal></para>
 
       <para>with</para>
 
       <para><literal>MigratableHello migratable_hello =
-      HelloFrameController.createHelloFrameController('agent1');</literal></para>
+      HelloFrameController.createHelloFrameController("agent1");</literal></para>
 
       <itemizedlist>
         <listitem>

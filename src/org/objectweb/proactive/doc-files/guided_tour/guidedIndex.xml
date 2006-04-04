@@ -54,14 +54,14 @@
 
     <para>Under linux:</para>
 
-    <para><screen>export CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:
-./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:
+    <para><screen>export CLASSPATH=.:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:\
+./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:\
 ./lib/components/fractal.jar:./lib/bouncycastle.jar</screen></para>
 
     <para>Under windows:</para>
 
-    <para><screen>set CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;
-.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;
+    <para><screen>set CLASSPATH=.;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;\
+.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;\
 .\lib\components\fractal.jar;.\lib\bouncycastle.jar</screen></para>
 
     <para>Concerning <emphasis role="underline">the second part</emphasis> of

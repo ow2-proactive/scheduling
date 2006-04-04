@@ -1304,8 +1304,8 @@ if(result_from_method == null){
           couple(Future,BodyDestination) as an Automatic Continuation occurs
           when the future is serialized(indeed every request or reply are
           serialized before being sent, and the future is part of the request
-          or the reply). More precisely, a thread <emphasis
-          role="bold">T</emphasis> sending the message(request or
+          or the reply). More precisely, a thread 
+          <emphasis role="bold">T</emphasis> sending the message(request or
           reply)---therefore the thread doing the serialization---, keeps in a
           static table (<emphasis
           role="bold">FuturePool.bodyDestination</emphasis>) a reference of

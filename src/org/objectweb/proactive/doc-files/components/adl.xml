@@ -50,7 +50,7 @@
  (first if there are several nodes mapped) node of the virtual node. For a primitive component, if
  the virtual node defines several nodes (cardinality='multiple'), there will be as many
  instances of the primitive component as there are underlying nodes. Each of these instances will
- have a suffixed name looking like: 'primiveComponentName-cyclicInstanceNumber-n',
+ have a suffixed name looking like: <screen>primiveComponentName-cyclicInstanceNumber-n</screen>
  where primitiveComponentName is the name defined in the ADL. This automatic replication is used
  in the parallel components.</para>
 <screen> virtual-node name='client-node' cardinality='single' </screen>
