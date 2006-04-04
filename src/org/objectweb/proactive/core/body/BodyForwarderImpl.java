@@ -230,7 +230,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#publicKeyExchange(long, byte[], byte[], byte[]) */
     public byte[][] publicKeyExchange(UniqueID id, long sessionID,
         byte[] my_pub, byte[] my_cert, byte[] sig_code)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
@@ -279,12 +279,6 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
             Object o = bodies.get(id);
             BodyAdapter rbody = (BodyAdapter) o;
             if (rbody != null) {
-                if (createdBodies.containsKey(request.getSender().getID()) &&
-                        createdBodies.containsKey(rbody.getID())) {
-                    // We assume that these two bodies can talk directly.
-                    request.getSender().updateLocation(id, rbody);
-                }
-
                 return rbody.receiveRequest(request);
             } else {
                 throw new IOException("No BodyAdapter associated to id=" + id);
@@ -308,7 +302,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[]) */
     public byte[][] secretKeyExchange(UniqueID id, long sessionID, byte[] tmp,
         byte[] tmp1, byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
@@ -343,7 +337,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#startNewSession(Communication) */
     public long startNewSession(UniqueID id, Communication policy)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
@@ -377,7 +371,7 @@ public class BodyForwarderImpl implements UniversalBodyForwarder {
 
     /** @see org.objectweb.proactive.ext.security.SecurityEntity#randomValue(long, byte[]) */
     public byte[] randomValue(UniqueID id, long sessionID, byte[] cl_rand)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         BodyAdapter rbody = (BodyAdapter) bodies.get(id);
         if (rbody != null) {
