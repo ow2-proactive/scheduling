@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -108,9 +109,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntime proActiveRuntime;
 
     static {
-        String val = System.getProperty("proactive.hierarchicalRuntime");
-
-        if ((val != null) && val.equals("true")) {
+        
+        if (ProActiveConfiguration.isForwarder()) {
             proActiveRuntime = new ProActiveRuntimeForwarderImpl();
         } else {
             proActiveRuntime = new ProActiveRuntimeImpl();

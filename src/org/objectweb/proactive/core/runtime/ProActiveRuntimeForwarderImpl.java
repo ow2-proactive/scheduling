@@ -162,6 +162,12 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return remoteBodyForwarder;
     }
 
+    public boolean isRoot() {
+        String val = System.getProperty("proactive.hierarchicalRuntime");
+
+        return ((val != null) && val.equals("root"));
+    }
+
     //
     // --- OVERIDING SOME METHODS
     //
@@ -187,8 +193,13 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 parentRuntime.register(adapter, proActiveRuntimeName,
                     creatorID, creationProtocol, vmName);
             } else {
-                logger.warn(
-                    "setParent() as not yet be called. Cannot forward the registration");
+                if (isRoot()) {
+                    super.register(proActiveRuntimeDist, proActiveRuntimeName,
+                        creatorID, creationProtocol, vmName);
+                } else {
+                    logger.warn(
+                        "setParent() as not yet be called. Cannot forward the registration");
+                }
             }
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -203,16 +214,21 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
-        String padURL) {
-
-        /* Used only in multi-heriarchical deployment. */
-        HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
-                    padURL, vmName));
-
-        if (hp != null) {
-            return hp.getHierarchicalProcess();
+        String padURL) throws ProActiveException {
+        if (this.isRoot()) {
+            return super.getProcessToDeploy(proActiveRuntimeDist, creatorID,
+                vmName, padURL);
         } else {
-            return null;
+
+            /* Used only in multi-heriarchical deployment. */
+            HierarchicalProcess hp = (HierarchicalProcess) hierarchicalProcesses.get(buildKey(
+                        padURL, vmName));
+
+            if (hp != null) {
+                return hp.getHierarchicalProcess();
+            } else {
+                return null;
+            }
         }
     }
 

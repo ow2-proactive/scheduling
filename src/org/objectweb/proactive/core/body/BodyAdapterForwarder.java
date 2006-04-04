@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
@@ -130,8 +131,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
          *  All calls doing on the adapter will be send to the forwarder which
          *  will forward the call.
          */
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-        if ((prop != null) && prop.equals("true")) {
+        if (ProActiveConfiguration.isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             try {
@@ -328,7 +328,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException, 
+        throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return proxiedRemoteBody.startNewSession(bodyID, policy);
     }
@@ -345,7 +345,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
      * @see org.objectweb.proactive.core.body.UniversalBody#randomValue(long, byte[])
      */
     public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proxiedRemoteBody.randomValue(bodyID, sessionID, cl_rand);
     }
@@ -356,7 +356,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proxiedRemoteBody.secretKeyExchange(bodyID, sessionID,
             encodedAESKey, encodedIVParameters, encodedClientMacKey,
@@ -428,7 +428,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
 
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         try {
             return proxiedRemoteBody.publicKeyExchange(bodyID, sessionID,

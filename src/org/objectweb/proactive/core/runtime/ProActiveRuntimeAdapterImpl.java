@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -102,9 +103,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
     }
 
     protected Object readResolve() throws ObjectStreamException {
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-
-        if ((prop != null) && prop.equals("true")) {
+        if (ProActiveConfiguration.isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             if (!partf.registeredRuntimes.containsKey(urid)) {

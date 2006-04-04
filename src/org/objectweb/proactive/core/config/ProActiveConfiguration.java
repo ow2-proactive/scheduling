@@ -202,6 +202,19 @@ public class ProActiveConfiguration {
         return System.getProperty("proactive.ft.protocol");
     }
 
+    // Cached value since isForwarder is frequently called
+    private static boolean isForwarder;
+
+    static {
+        String prop = System.getProperty("proactive.hierarchicalRuntime");
+        isForwarder = ((prop != null) &&
+            (prop.equals("true") || prop.equals("root")));
+    }
+
+    public static boolean isForwarder() {
+        return isForwarder;
+    }
+
     //To be used for the launcher 
     //    /**
     //     * Sets the value of proactive.home if not already set

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime.rmi;
 import java.rmi.RemoteException;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -99,8 +100,7 @@ public class RmiRuntimeFactory extends RuntimeFactory {
                 e.printStackTrace();
             }
 
-            String val = System.getProperty("proactive.hierarchicalRuntime");
-            if ((val != null) && val.equals("true")) {
+            if (ProActiveConfiguration.isForwarder()) {
                 defaultRmiRuntime = createRuntimeAdapterForwarder();
             } else {
                 defaultRmiRuntime = createRuntimeAdapter();

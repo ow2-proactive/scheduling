@@ -83,6 +83,11 @@ public class StartHierarchical {
     }
 
     public static void main(String[] args) {
+        // It's hard to know if we are on a forwarder or not in some spots 
+        // (serialization for example), so we set property to help us.
+        System.setProperty("proactive.hierarchicalRuntime", "true");
+
+    	
         if ("true".equals(System.getProperty("log4j.defaultInitOverride")) &&
                 (System.getProperty("log4j.configuration") != null)) {
             // configure log4j here to avoid classloading problems with log4j classes
@@ -118,10 +123,6 @@ public class StartHierarchical {
     }
 
     private void run() {
-        // It's hard to know if we are on a forwarder or not in some spots 
-        // (serialization for example), so we set property to help us.
-        System.setProperty("proactive.hierarchicalRuntime", "true");
-
         padURL = System.getProperty("proactive.pad");
 
         ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();

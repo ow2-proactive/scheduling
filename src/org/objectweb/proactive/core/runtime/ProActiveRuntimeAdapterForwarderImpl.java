@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueRuntimeID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -115,9 +116,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
 
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-
-        if ((prop != null) && prop.equals("true")) {
+        if (ProActiveConfiguration.isForwarder()) {
             // on a forwarder and during the deserialization of a ProActiveAdapterForwarderImpl.
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 

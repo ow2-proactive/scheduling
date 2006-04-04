@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarderImpl;
@@ -279,7 +280,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      * @throws RenegotiateSessionException if the session immediatly expires
      */
     public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proxiedRemoteBody.startNewSession(policy);
     }
@@ -303,7 +304,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      * @throws RenegotiateSessionException if the session has expired
      */
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proxiedRemoteBody.randomValue(sessionID, clientRandomValue);
     }
@@ -323,7 +324,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
      */
     public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
         byte[] myCertificate, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         return proxiedRemoteBody.publicKeyExchange(sessionID, myPublicKey,
             myCertificate, signature);
@@ -350,7 +351,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException, 
+        throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return proxiedRemoteBody.secretKeyExchange(sessionID, encodedAESKey,
             encodedIVParameters, encodedClientMacKey, encodedLockData,
@@ -439,9 +440,7 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
     }
 
     protected Object readResolve() throws ObjectStreamException {
-        String prop = System.getProperty("proactive.hierarchicalRuntime");
-
-        if ((prop != null) && prop.equals("true")) {
+        if (ProActiveConfiguration.isForwarder()) {
             ProActiveRuntimeForwarderImpl partf = (ProActiveRuntimeForwarderImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
             try {
