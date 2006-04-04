@@ -7,23 +7,25 @@
  <xsl:import href="/tmp/docbook-xsl-1.69.1/fo/docbook.xsl" />
  <xsl:import href="common.xsl" />
 
+
+
  <!--  Changing font sizes -->
- <!-- <xsl:param name="body.font.family">Times New Roman</xsl:param>  -->
- <!-- <xsl:param name="body.font.master">11</xsl:param> -->
- <!--<xsl:param name="title.font.family">Times New Roman</xsl:param> 
-  <xsl:param name="footnote.font.size">9</xsl:param>-->
  <xsl:param name="monospace.font.family">Helvetica</xsl:param>
- <!-- <xsl:param name="monospace.font.size">5</xsl:param> -->
 
  <!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
  <xsl:param name="fop.extensions" select="'1'" />
  <!-- <xsl:param name="draft.mode">no</xsl:param>  -->
  <!-- <xsl:param name="draft.watermark.image"></xsl:param>  -->
+ <xsl:param name="draft.watermark.image" />
 
+ <!-- Having long lines be broken up  -->
+ <xsl:param name="hyphenate.verbatim">yes</xsl:param>
 
- <!-- This is good for pdf generation : the blank lines around titles are squeezed -->
- <!--<xsl:param name="line-height">1.2</xsl:param>-->
- <!--normal value is 1.2-->
+ <!-- Have screens written on darker background -->
+ <xsl:attribute-set name="verbatim.properties">
+  <xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
+ </xsl:attribute-set>
+
 
 <!-- set this parameter to a zero width value -->
 <xsl:param name="body.start.indent">4pt</xsl:param>
@@ -34,18 +36,26 @@
 <xsl:param name="xref.with.number.and.title" select="'1'" />
 
 
- <!-- Remove headers on blank pages please! -->
-<!--  <xsl:param name="headers.on.blank.pages">0</xsl:param> -->
-<!-- No longer used because the header template is customized -->
-
  <!--  Paper feed -->
  <xsl:param name="paper.type">A4</xsl:param>
  <xsl:param name="page.margin.inner">10mm</xsl:param>
  <xsl:param name="page.margin.outer">13mm</xsl:param>
  <xsl:param name="double.sided">1</xsl:param>
 
- <!-- Make tables use up all space. -->
- <!-- <xsl:param name="default.table.width" >100</xsl:param> -->
+
+<xsl:attribute-set name="compact.list.item.spacing">
+  <xsl:attribute name="space-before.optimum">0em</xsl:attribute>
+  <xsl:attribute name="space-before.minimum">0em</xsl:attribute>
+  <xsl:attribute name="space-before.maximum">0.2em</xsl:attribute>
+</xsl:attribute-set>
+
+<xsl:attribute-set name="list.item.spacing">
+  <xsl:attribute name="space-before.optimum">0.25em</xsl:attribute>
+  <xsl:attribute name="space-before.minimum">0.1em</xsl:attribute>
+  <xsl:attribute name="space-before.maximum">0.4em</xsl:attribute>
+</xsl:attribute-set>
+
+
 
  <!-- The chapter entries of the toc are in bold, the parts in bold and 11pt. -->
  <xsl:template name="toc.line">
@@ -73,9 +83,9 @@
     </xsl:choose>
     <fo:basic-link internal-destination="{$id}">
 
-<xsl:variable name="toc_line_name">
-  <xsl:copy-of select="name(.)" />
-</xsl:variable >
+      <xsl:variable name="toc_line_name">
+        <xsl:copy-of select="name(.)" />
+      </xsl:variable >
 
      <xsl:if test="$toc_line_name = 'chapter' or $toc_line_name = 'part'  or $toc_line_name = 'appendix'">
        <xsl:call-template name="gentext">
@@ -132,17 +142,10 @@
  <!--  ??? How do I do that, I need to compare a measure of imagewidth with pagewidth! -->
  <!-- default.image.width exists, should be set maybe only for pdf and big images?? -->
 
- <!--  Make sure figures have a white background, in case of transparent pixels -->
- <!--  Also removed figures borders, which are a nuisance -->
- <!--<xsl:attribute-set name="figure.properties" use-attribute-sets="formal.object.properties">
-  <xsl:attribute name="border-color">#000000</xsl:attribute>
-  <xsl:attribute name="border-style">solid</xsl:attribute>
-  <xsl:attribute name="border-width">0px</xsl:attribute>
-  <xsl:attribute name="padding">1em</xsl:attribute>
-  <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
-  </xsl:attribute-set>-->
 
- <!--  Changing the appearance of ALL the section titles -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!--    Changing the appearance of ALL the section titles    -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
  <xsl:attribute-set name="section.title.properties">
   <xsl:attribute name="font-weight">bold</xsl:attribute>
   <xsl:attribute name="color">#0010FF</xsl:attribute>
@@ -187,7 +190,7 @@
  </xsl:attribute-set>
 
 
- <!-- helper for function below -->
+ <!-- helper for header.table below -->
  <xsl:template name="link.myhelper">
   <xsl:param name="class" select="''" />
   <xsl:param name="level" select="''" />
@@ -242,7 +245,7 @@
    </xsl:choose>
   </xsl:variable>
 
-  <!-- Right will be put if current node != Part -->
+  <!-- Right is only put if current node != Part -->
   <xsl:variable name="rightS">
  
     <xsl:if test="$gentext-key != 'part'">
@@ -311,13 +314,16 @@
 
   <!-- Really output a header only if not one of the first pages of book -->
   <xsl:if test="$gentext-key != 'book'">
-    <!-- Insert the table defined above -->
     <xsl:copy-of select="$candidate" />
   </xsl:if>
  </xsl:template>
 
 
-<!-- This footer template's only modification concerns the final test, ie which pages have a footer line.  -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!--  Changing the footer, which contains the page number    -->
+<!--  This footer template's only modification concerns the  -->
+<!--     final test, ie which pages have a footer line.      -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 <xsl:template name="footer.table">
   <xsl:param name="pageclass" select="''"/>
   <xsl:param name="sequence" select="''"/>
@@ -432,32 +438,16 @@
     </fo:table>
   </xsl:variable>
 
-  <!-- Really output a footer? -->
-  <!-- book titlepages have no footers at all -->
+  <!-- Really output a footer?  book titlepages have no footers at all -->
   <xsl:if test="$gentext-key != 'book'">
       <xsl:copy-of select="$candidate"/>
   </xsl:if>
 </xsl:template>
 
- <!-- Having long lines be broken up  -->
- <xsl:param name="hyphenate.verbatim">yes</xsl:param>
 
-
- <!-- Trying to improve itemized lists rendering -->
- <!-- FIND AND MODIFY <xsl:template match="itemizedlist"> -->
-
- <!-- No "Draft" splayed across the page -->
- <xsl:param name="draft.watermark.image"></xsl:param>
-
- <!-- Have screens written on darker background -->
- <xsl:attribute-set name="verbatim.properties">
-  <xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
-  <!-- <xsl:attribute name="border">0.5pt solid blue</xsl:attribute> -->
-  <!-- <xsl:attribute name="padding">4mm</xsl:attribute> -->
- </xsl:attribute-set>
-
-
- <!-- Changing the first page appearance -->
+<!-- - - - - - - - - - - - - - - - - -  -->
+<!-- Changing the first page appearance -->
+<!-- - - - - - - - - - - - - - - - - -  -->
 
 <!--  Changing the font for the authors on titlepage -->
   <xsl:template match="bookinfo/author" mode="book.titlepage.recto.mode">
@@ -480,7 +470,7 @@
 
 
 <!-- Remove the copyright from the second page, as it appears in the legal notice anyways. -->
-  <xsl:template match="copyright" mode="book.titlepage.verso.auto.mode"/> 
+ <xsl:template match="copyright" mode="book.titlepage.verso.auto.mode"/> 
  
  <xsl:template match="legalnotice" mode="titlepage.mode">
   <xsl:variable name="id">
@@ -587,26 +577,20 @@
         <fo:table-row>
           <fo:table-cell>
 
-      <!-- The Revision and copyright -->
       <fo:block text-align="left" font-size="12pt" font-weight="bold">
        V
-       <xsl:apply-templates
-        mode="book.titlepage.recto.mode"
-        select="bookinfo/revhistory/revision/revnumber" />
+       <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/revnumber" />
        <xsl:call-template name="gentext.space" />
        <xsl:call-template name="gentext.space" />
        <xsl:call-template name="gentext.space" />
-       <xsl:apply-templates
-        mode="book.titlepage.recto.mode"
-        select="bookinfo/revhistory/revision/date" />
+       <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/date" />
       </fo:block>
 
-           </fo:table-cell>
+          </fo:table-cell>
           <fo:table-cell>
             <fo:block text-align="right"  font-size="12pt" font-weight="bold">
-       <xsl:apply-templates
-        mode="book.titlepage.recto.mode" select="bookinfo/copyright" />
-      </fo:block>
+               <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/copyright" />
+            </fo:block>
           </fo:table-cell> 
         </fo:table-row >  
     </fo:table-body>
@@ -616,11 +600,14 @@
 
  </xsl:template>
 
-<!--  END OF TITLEPAGE TEMPLATE -->
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
+<!--        Making Part TOC appear on part pages   -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - -->
 
  <!--  force PART TOCs to appear on the same page as the Part title  
   (google gmane.text.docbook.apps Bob Stayton Removing extra blank pages in fo TOC)-->
- <xsl:template name="part.titlepage.before.verso" priority="1">
+<xsl:template name="part.titlepage.before.verso" priority="1">
   <xsl:variable name="toc.params">
    <xsl:call-template name="find.path.params">
     <xsl:with-param name="table"
@@ -632,23 +619,48 @@
     <xsl:with-param name="toc.context" select="." />
    </xsl:call-template>
   </xsl:if>
- </xsl:template>
+</xsl:template>
 
+ <!-- DANGER: THIS MEANS TOCS FOR PARTS ARE FORCED -->
  <!-- Turn off the traditional full part toc -->
- <xsl:template name="generate.part.toc"/>
+<xsl:template name="generate.part.toc"/>
 
-<xsl:attribute-set name="compact.list.item.spacing">
-  <xsl:attribute name="space-before.optimum">0em</xsl:attribute>
-  <xsl:attribute name="space-before.minimum">0em</xsl:attribute>
-  <xsl:attribute name="space-before.maximum">0.2em</xsl:attribute>
-</xsl:attribute-set>
+<!-- HOW A PART TOC IS GENERATED -->
+<xsl:template match="part" mode="toc">
+  <xsl:param name="toc-context" select="."/>
 
-<xsl:attribute-set name="list.item.spacing">
-  <xsl:attribute name="space-before.optimum">0.25em</xsl:attribute>
-  <xsl:attribute name="space-before.minimum">0.1em</xsl:attribute>
-  <xsl:attribute name="space-before.maximum">0.4em</xsl:attribute>
-</xsl:attribute-set>
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
 
+  <xsl:variable name="cid">
+    <xsl:call-template name="object.id">
+      <xsl:with-param name="object" select="$toc-context"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:call-template name="toc.line"/>
+
+  <xsl:variable name="nodes" select="qandaset|chapter|appendix|preface|reference|
+                                     refentry|article|index|glossary|
+                                     bibliography"/>
+
+  <xsl:variable name="depth.from.context" select="count(ancestor::*)-count($toc-context/ancestor::*)"/>
+
+  <xsl:if test="$toc.section.depth > 0 
+                and $toc.max.depth > $depth.from.context
+                and $nodes">
+    <fo:block id="toc.{$cid}.{$id}">
+      <xsl:attribute name="margin-left">
+        <xsl:call-template name="set.toc.indent"/>
+      </xsl:attribute>
+      
+      <xsl:apply-templates select="$nodes" mode="toc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+      </xsl:apply-templates>
+    </fo:block>
+  </xsl:if>
+</xsl:template>
 
 <!-- qandaset bug - had to remove some ids. -->
 <xsl:template match="question">
@@ -670,7 +682,6 @@
   <fo:block id="{$id}" xsl:use-attribute-sets="question.title.properties">
      <xsl:value-of select="$label_and_text"/> 
   </fo:block>
-  
 </xsl:template>
 
 <!-- qandaset bug - had to remove some ids. -->
@@ -714,8 +725,7 @@
 
   <xsl:variable name="label-width">
     <xsl:call-template name="dbfo-attribute">
-      <xsl:with-param name="pis"
-                      select="processing-instruction('dbfo')"/>
+      <xsl:with-param name="pis" select="processing-instruction('dbfo')"/>
       <xsl:with-param name="attribute" select="'label-width'"/>
     </xsl:call-template>
   </xsl:variable>
@@ -762,7 +772,9 @@
                                  and name(.) != 'qandadiv'
                                  and name(.) != 'qandaentry']"/>
 
-    <xsl:apply-templates select="qandadiv"/>
+    <xsl:if test="qandadiv">
+       <xsl:apply-templates select="qandadiv"/>
+    </xsl:if>
 
     <xsl:if test="qandaentry">
         <xsl:apply-templates select="qandaentry"/>
@@ -818,48 +830,12 @@
 </xsl:template>
 
 
+<!-- DEBUG METHOD. -->
 <xsl:template name="toto.tutu">
   <fo:block background-color="#FF0000">Toto Tutu</fo:block>
 </xsl:template>
 
-<xsl:template match="part" mode="toc">
-  <xsl:param name="toc-context" select="."/>
-
-  <xsl:variable name="id">
-    <xsl:call-template name="object.id"/>
-  </xsl:variable>
-
-  <xsl:variable name="cid">
-    <xsl:call-template name="object.id">
-      <xsl:with-param name="object" select="$toc-context"/>
-    </xsl:call-template>
-  </xsl:variable>
-
-  <xsl:call-template name="toc.line"/>
-
-  <xsl:variable name="nodes" select="qandaset|chapter|appendix|preface|reference|
-                                     refentry|article|index|glossary|
-                                     bibliography"/>
-
-  <xsl:variable name="depth.from.context" select="count(ancestor::*)-count($toc-context/ancestor::*)"/>
-
-  <xsl:if test="$toc.section.depth > 0 
-                and $toc.max.depth > $depth.from.context
-                and $nodes">
-    <fo:block id="toc.{$cid}.{$id}">
-      <xsl:attribute name="margin-left">
-        <xsl:call-template name="set.toc.indent"/>
-      </xsl:attribute>
-      
-      <xsl:apply-templates select="$nodes" mode="toc">
-        <xsl:with-param name="toc-context" select="$toc-context"/>
-      </xsl:apply-templates>
-    </fo:block>
-  </xsl:if>
-</xsl:template>
-
-<!-- XXXXXXXXXXXXXXXXXXXXXXXX emphasising with color XXXXXXXXXXXXXXXXX -->
-
+<!-- emphasis in programlistings contains color -->
 <xsl:template match="emphasis">
   <xsl:variable name="depth">
     <xsl:call-template name="dot.count">
@@ -907,6 +883,7 @@
 </xsl:template>
 
 
+<!-- A way to color in the emphasis, key being the 'role' attribute in {keyword,codeword,typeword,comment,string} -->
  <xsl:template name="myinline.emphasis">
   <xsl:param name="role" select="''" />
 
@@ -948,10 +925,13 @@
 
  </xsl:template>
 
-<!-- XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX addnig the questions of the FAQ in the TOC -->
 
+<!-- - - - - - - - - - - - - - - - - - - - - -  -->
+<!-- adding the questions of the FAQ in the TOC -->
+<!-- - - - - - - - - - - - - - - - - - - - - -  -->
 
-<xsl:template match="preface|chapter|appendix|article" mode="toc">
+<!-- How to write a toc, for an appendix -->
+<xsl:template match="appendix" mode="toc">
   <xsl:param name="toc-context" select="."/>
 
   <xsl:variable name="id">
@@ -972,9 +952,7 @@
 
   <xsl:variable name="depth.from.context" select="count(ancestor::*)-count($toc-context/ancestor::*)"/>
 
-  <xsl:if test="$toc.section.depth > 0 
-                and $toc.max.depth > $depth.from.context
-                and $nodes">
+  <xsl:if test="$toc.section.depth > 0 and $toc.max.depth > $depth.from.context and $nodes">
     <fo:block id="toc.{$cid}.{$id}">
       <xsl:attribute name="margin-left">
         <xsl:call-template name="set.toc.indent"/>
@@ -1015,11 +993,6 @@
 
 
 <xsl:template match="question" mode="toc"> 
-    <xsl:call-template name="question.toc"/>
-</xsl:template >
-
-
-<xsl:template name="question.toc">
   <xsl:variable name="id">
     <xsl:call-template name="object.id"/>
   </xsl:variable>
@@ -1032,12 +1005,18 @@
       <xsl:value-of select="."/>
   </xsl:variable>
 
-<!-- Hacking the question toc line indent. Couldn't do it better, sorry   -->
 <fo:block text-align-last="justify"
             text-align="start"
             end-indent="{$toc.indent.width}pt"
-            last-line-end-indent="15pt"
-            margin-left="25mm">
+            last-line-end-indent="15pt" >
+
+<!-- Hacking the question toc line indent, to skip the qandaset gap -->
+      <xsl:attribute name="margin-left">
+        <xsl:call-template name="set.toc.indent">
+          <xsl:with-param name="reldepth" select="3"/>
+        </xsl:call-template>
+      </xsl:attribute>
+
     
 <fo:inline keep-with-next.within-line="always">
       <fo:basic-link internal-destination="{$id}">
@@ -1069,64 +1048,12 @@
   <!--  Should be done through a nodes scheme, but it's harder -->
   <!--  Indeed, I'm skipping out the direct sons, to have the question grandchildren only-->
   <xsl:for-each select="./qandaentry/question">
-     <xsl:call-template name="question.toc" />
+     <xsl:apply-templates select="." mode="toc" />
   </xsl:for-each > 
 </xsl:template>
 
 
-<!-- ZZZZZZZZZZ -->
- <xsl:template name="toc.line.set">
-  <xsl:variable name="id">
-   <xsl:call-template name="object.id" />
-  </xsl:variable>
-
-  <xsl:variable name="label">
-   <xsl:apply-templates select=".." mode="label.markup" />
-  </xsl:variable>
-
-  <xsl:variable name="line">
-   <fo:inline keep-with-next.within-line="always">
-    <fo:basic-link internal-destination="{$id}">
-
-<xsl:variable name="toc_line_name">
-  <xsl:copy-of select="name(.)" />
-</xsl:variable >
-
-     <xsl:if test="$label != ''">
-      <xsl:copy-of select="$label" />
-      <xsl:value-of select="$autotoc.label.separator" />
-     </xsl:if>
-
-
-
-     <xsl:if test="$label = ''">
-      NO LABEL FOR QANDASET 
-     </xsl:if>
-
-
-
-     <xsl:apply-templates select="." mode="title.markup" />
-    <xsl:call-template name="gentext.space" />
-    <fo:leader leader-pattern="dots"
-     leader-pattern-width="3pt" leader-alignment="reference-area"
-     keep-with-next.within-line="always" />
-     <xsl:call-template name="gentext.space" />
-    <fo:page-number-citation ref-id="{$id}" />
-    </fo:basic-link>
-   </fo:inline>
-  </xsl:variable>
-
-    <fo:block text-align-last="justify"
-     end-indent="{$toc.indent.width}pt"
-     last-line-end-indent="-{$toc.indent.width}pt">
-     <xsl:copy-of select="$line" />
-    </fo:block>
-  
- </xsl:template>
-
-<!-- ZZZZZZZZZZ -->
-
-
+<!-- Representation of a qandaset and siblings in a TOC -->
 <xsl:template match="qandaset" mode="toc">
   <xsl:param name="toc-context" select="."/>
 
@@ -1142,6 +1069,7 @@
 
 <!-- This is the line that makes qandasets appear in the TOC. Removed on purpose.  -->
 <!--   <xsl:call-template name="toc.line"/> -->
+<!-- In fact, we only want the siblings, not the qandaset -->
 
   <xsl:variable name="nodes" select="qandadiv|qandaentry|question"/>
 
@@ -1161,7 +1089,8 @@
 
 
 
-<!-- Just a copy of labels.xsl, line 272 for sect1 -->
+<!-- Just a copy of labels.xsl, line 272 which applied to 'sect1' -->
+<!-- I also needed to skip the parent qandaset, so a ".." is turned into a "../.." -->
 <xsl:template match="qandadiv" mode="label.markup">
   <!-- if the parent is a component, maybe label that too -->
   <xsl:variable name="parent.is.component">
@@ -1204,9 +1133,6 @@
   </xsl:choose>
 </xsl:template>
 
-
-
-<!-- Questions in the toc are badly handled. -->
 
 <xsl:template match="question" mode="label.markup">
   <xsl:variable name="lparent" select="(ancestor::set
@@ -1277,7 +1203,6 @@
 </xsl:template>
 
 </xsl:stylesheet>
-
 
 <!-- 
 <xsl:message>
