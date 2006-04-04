@@ -31,16 +31,21 @@
     consequence, these distributed objects libraries do not allow polymorphism
     between local and remote objects. This feature is our first requirement
     for a metacomputing framework. It is strongly required in order to let the
-    programmer concentrate first on modeling and algorithmic issues rather
-    than lower-level tasks such as object distribution, mapping and load
-    balancing.</para>
+    programmer <emphasis>concentrate first on modeling and algorithmic issues 
+    rather than lower-level tasks </emphasis> such as object distribution,
+    mapping and load balancing.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Principles_html_active" />Active objects: Unifying
-    threads and remote objects</title>
+  <sect1 remap="h2" id="Principles_html_active" >
+    <title> Active objects: Unifying threads and remote objects</title>
 
-    <para>Given a standard object, we provide the ability to give it:</para>
+    <para>
+     <literal>Active Objects</literal> is the core of the ProActive computing 
+     concept. It unifies a <emphasis>Remote Object</emphasis> (which allows 
+     to deploy it on a distant host)  and a <emphasis>Thread</emphasis> 
+     (which gives it its own activity, its own behaviour independently and in 
+     concurrency with other Active Objects deployed). Given a standard object, 
+     turning it into an Active Objects provides:</para>
 
     <itemizedlist>
       <listitem>
@@ -56,53 +61,41 @@
       </listitem>
     </itemizedlist>
 
-    <sect2 remap="h3">
-      <title>==&gt; only with modifications of the instanciation code
-      !</title>
+    <para> <emphasis> This <literal>Active Object</literal> concept requires 
+      only to modify the instanciation code !</emphasis></para>
 
-      <para>Three ways to transform a standard object into an active
-      one:</para>
-    </sect2>
+      <para>Here are given as example three ways to transform a standard 
+       <literal>Object</literal> into an <literal>Active Object</literal>:</para>
+     
 
-    <sect2 remap="h3">
-      <title>Class-based</title>
+    <example>
+      <title>Class-based Active Object</title>
+      <programlisting language="java">Object[] params = new Object[] { new Integer (26), "astring" };
+A a = (A) ProActive.newActive("example.A", params, node); </programlisting>
+    </example>
 
-      
-        <para><programlisting language="java">Object[] params = new Object[] { new Integer (26), "astring" };
-A a = (A) ProActive.newActive("example.A", params, node); </programlisting></para>
-      
-    </sect2>
-
-    <sect2 remap="h3">
-      <title>Instantiation-based</title>
-
-      
-        <para><programlisting language="java">public class AA extends A implements Active {}
+    <example>
+      <title>Instantiation-based Active Object</title>
+      <programlisting language="java">public class AA extends A implements Active {}
 Object[] params = new Object[] { new Integer (26), "astring" };
-A a = (A) ProActive.newActive("example.AA", params, node); </programlisting></para>
-      
-    </sect2>
+A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
+    </example>
 
-    <sect2 remap="h3">
-      <title>Object-based</title>
-
-      <para>Allows to turn active and remote objects for which you do not have
-      the source code; a necessary feature in the context of code
-      mobility.</para>
-
-      
-        <para><programlisting language="java">A a = new A (26, "astring");
-a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
-      
-
-      <para><emphasis role="bold">Notes:</emphasis><emphasis>Node allows to
-      control the mapping</emphasis></para>
-    </sect2>
+      <para>Object-based <literal>Active Objects</literal> Allows to turn active 
+       and set remote objects for which you do not have the source code; this is 
+       a necessary feature in the context of code mobility.</para>
+       
+       <example>
+        <title>Object-based Active Object</title>
+      <programlisting language="java">A a = new A (26, "astring");
+a = (A) ProActive.turnActive(a, node) ; </programlisting>    
+    </example>
+    
+      <note><para> Nodes allows to control the mapping to the hosts </para></note>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Principles_html_model" />Model of Computation: Based on
-    previous works and studies</title>
+  <sect1 remap="h2" id="Principles_html_model">
+    <title> Model of Computation: Based on  previous works and studies</title>
 
     <itemizedlist>
       <listitem>
@@ -137,30 +130,22 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Principles_html_reuse"
-    xreflabel="Reuse and Seamless: why and how do we achieve  better reuse?" />Reuse
-    and Seamless: why and how do we achieve better reuse?</title>
+  <sect1 remap="h2" id="Principles_html_reuse">
+    <title>Reuse and Seamless: why and how do we achieve better reuse?</title>
 
     <para>Two key features:</para>
 
     <itemizedlist>
       <listitem>
         <para><emphasis role="bold">Wait-by-necessity: inter-objects
-        synchronization</emphasis></para>
+        synchronization</emphasis>.
+       Systematic, implicit and transparent futures. Ease the programming
+       of synchronization and reuse of existing methods</para>
       </listitem>
-    </itemizedlist>
-
-    <para>Systematic, implicit and transparent futures. Ease the programming
-    of synchronization and reuse of existing methods</para>
-
-    <itemizedlist>
+      
       <listitem>
         <para><emphasis role="bold">Polymorphism between standard and active
         objects</emphasis></para>
-      </listitem>
-    </itemizedlist>
-
     <itemizedlist>
       <listitem>
         <para>Type compatibility for classes and not just for interface</para>
@@ -174,6 +159,8 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
         <para>Dynamic mechanism (dynamically achieve if needed)</para>
       </listitem>
     </itemizedlist>
+   </listitem>
+  </itemizedlist>
 
     <para><figure>
         <title>Polymorphism</title>
@@ -263,8 +250,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
       <programlisting language="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
                 TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
-            ); // which jvm should be used to hold the Active Object
-</programlisting>
+            ); // which jvm should be used to hold the Active Object</programlisting>
     </sect2>
 
     <sect2 remap="h3">
@@ -273,7 +259,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
 
       <para>This is exactly like invoking a method on a local object of the
       same type. The user does not have to deal with catching
-      distribution-related exceptions.</para>
+      exceptions related to the distant deployment.</para>
 
       <para>As already stated, the only modification brought to the code by
       ProActive is located at the place where active objects are created. All
@@ -282,8 +268,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
       is the following (in the <literal>main</literal> method):</para>
 
       <programlisting language="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
-        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity 
-</programlisting>
+        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity</programlisting>
     </sect2>
 
     <sect2 remap="h3">
@@ -291,17 +276,17 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting></para>
 
       <para>To launch the example, you may type:<screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
             -Dlog4j.configuration=file:scripts/proactive-log4j \
-            org.objectweb.proactive.examples.hello.TinyHello 
-
-windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
+            org.objectweb.proactive.examples.hello.TinyHello</screen> 
+           
+<screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
               -Dlog4j.configuration=file:scripts\proactive-log4j \
                org.objectweb.proactive.examples.hello.TinyHello</screen></para>
 
       <para>There are also scripts in the <literal>scripts</literal>
       directory:<screen>linux&gt; cd scripts/unix/ 
-linux&gt; tinyHello.sh 
+linux&gt; tinyHello.sh</screen> 
 
-windows&gt; cd scripts/windows 
+<screen>windows&gt; cd scripts/windows 
 windows&gt; tinyHello.bat</screen></para>
 
       <sect3 remap="h4">
