@@ -6,7 +6,7 @@
 
  <!-- Say we need the "one single html file" style -->
  <xsl:import
-  href="/tmp/docbook-xsl-1.69.1/html/docbook.xsl" />
+  href="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" />
  <xsl:import href="html.xsl" />
 
  <!--  Changing font sizes -->

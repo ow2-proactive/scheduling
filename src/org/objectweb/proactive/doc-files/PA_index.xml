@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-"/tmp/docbook-xsl-1.69.1/dtd-4.1.2/docbookx.dtd" [
+"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
 <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
