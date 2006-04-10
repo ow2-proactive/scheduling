@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Migration">
   <title>Active Object Migration</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Migration.html  -->
 
-  <sect1 remap="h2">
-    <title><anchor id="Migration_html_prim" />Migration Primitive</title>
+  <sect1 >
+    <title>Migration Primitive</title>
 
-    <para>The migration of an active object can be triggered by the active
+    <indexterm significance="prefered"><primary>Migration</primary></indexterm>
+    
+      <para>The migration of an active object can be triggered by the active
     object itself, or by an external agent. In both cases a single primitive
     will eventually get called to perform the migration. It is the method
     <literal> migrateTo</literal> accessible from a migratable body (a body
@@ -61,8 +64,8 @@
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Migration_html_use" />Using migration</title>
+  <sect1 >
+    <title>Using migration</title>
 
     <para>Any active object has the ability to migrate. If it references some
     passive objects, they will also migrate to the new location. Since we rely
@@ -89,8 +92,8 @@
     its <literal>moveTo()</literal> method.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Migration_html_example" />Complete example</title>
+  <sect1 >
+    <title>Complete example</title>
 
     
       <para><programlisting language="java">  import org.objectweb.proactive.ProActive;
@@ -146,9 +149,8 @@
     location.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Migration_html_non_seri" />Dealing with
-    non-serializable attributes</title>
+  <sect1 >
+    <title>Dealing with non-serializable attributes</title>
 
     <para>The migration of an active object uses the serialization.
     Unfortunately, not all the objects in the Java language are serializable.
@@ -167,7 +169,7 @@
     the standard method</para>
 
     
-      <para><programlisting language="java"> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </programlisting></para>
+     <programlisting language="java"> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </programlisting>
     
 
     <para>See the <literal>Serializable</literal> interface in the standard

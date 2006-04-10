@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="capabilities-intro">
   <title>Introduction to some of the functionalities of ProActive</title>
 
@@ -22,7 +23,7 @@
     </listitem>
   </itemizedlist>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Parallel processing and collaborative application with
     ProActive</title>
 
@@ -32,16 +33,15 @@
     <para>A typical application is C3D.</para>
 
     <para>Note that parallelisation of programs can be facilitated with
-    ProActive, thanks to <ulink url="../FutureObjectCreation.xml">asynchronism
-    method calls</ulink>, as well as <ulink
-    url="../TypedGroupCommunication.xml">group communications</ulink>.</para>
+     ProActive, thanks to asynchronous method calls (see <xref linkend="FutureObjectCreation"/>), 
+     as well as group communications (see <xref linkend="TypedGroupCommunication"/>).</para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1  id="C3D_example">
     <title>C3D: a parallel, distributed and collaborative 3D renderer</title>
 
     <para><ulink
-    url="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.xml">C3D</ulink> is
+    url="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.html">C3D</ulink> is
     a Java benchmark application that measures the performance of a 3D
     raytracer renderer distributed over several Java virtual machines using
     Java RMI. It showcases some of the benefits of ProActive, notably the ease
@@ -64,7 +64,7 @@
       </mediaobject>
     </figure>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start C3D</title>
 
       <para>using the script c3d_no_user</para>
@@ -99,7 +99,7 @@
       renderers.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start a user</title>
 
       <para>using c3d_add_user</para>
@@ -144,7 +144,7 @@
       renderers).</emphasis></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start a user from another machine</title>
 
       <para>using the c3d_add_user script, and <emphasis
@@ -178,7 +178,7 @@
       starting some actions (or that a timeout occured).</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start IC2D to visualize the topology</title>
 
       <para>to visualize all Active objects, you need to acquire ('monitoring'
@@ -226,8 +226,11 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
-      <title>drag-and-drop migration</title>
+    <sect2 >
+      
+     <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
+
+     <title>drag-and-drop migration</title>
 
       <para>From IC2D, you can drag-and-drop active objects from one JVM to
       another. Click the right button on a C3DRenderingEngine, and drag and
@@ -246,7 +249,7 @@
       can also migrate the client windows!</emphasis></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start a new JVM in a computation</title>
 
       <para>manually you can start a new JVM - a 'Node' in the ProActive
@@ -294,7 +297,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       look for the most efficient configuration.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Look at the source code for the main classes</title>
 
       <para>The main classes of this application are:</para>
@@ -323,7 +326,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Synchronization with ProActive</title>
 
     <para>ProActive provides an advanced synchronization mechanism that allows
@@ -342,7 +345,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </listitem>
     </itemizedlist>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The readers-writers</title>
 
       <para>The readers and the writers want to access the same data. In order
@@ -352,11 +355,11 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       sequentially.</para>
 
       <para>The <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/apps/readers.xml">implementation
+      url="http://www-sop.inria.fr/oasis/ProActive/apps/readers.html">implementation
       with ProActive</ulink> uses 3 active objects: Reader, Writer, and the
       controller class (ReaderWriter).</para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>start the application</title>
 
         <para><figure>
@@ -387,14 +390,14 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
           </figure></para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>look and check the effect of different policies: even, writer
         priority, reader priority</title>
 
         <para>What happens when priority is set to 'reader priority'?</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>look at the code for programming such policies</title>
 
         <para>in
@@ -418,7 +421,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         <para>How does it work?</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Introduce a bug in the Writer Priority policy</title>
 
         <para>For instance, let several writers go through at the same
@@ -452,7 +455,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The dining philosophers</title>
 
       <para>The 'dining philosophers' problem is a classical exercise in the
@@ -460,12 +463,12 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       deadlocks.</para>
 
       <para>We have provided <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/apps/phil.xml">an
+      url="http://www-sop.inria.fr/oasis/ProActive/apps/phil.html">an
       illustration of the solution</ulink> using ProActive, where all the
       philosophers are active objects, as well as the table (controller) and
       the dinner frame (user interface).</para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>start the philosophers application</title>
 
         <para><figure>
@@ -494,7 +497,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
           </figure></para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>understand the color codes</title>
 
         <informaltable frame="none">
@@ -567,14 +570,14 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         </informaltable>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>test the autopilot mode</title>
 
         <para>The application runs by itself without encountering a
         deadlock.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>test the manual mode</title>
 
         <para>Click on the philosophers' heads to switch their modes</para>
@@ -585,13 +588,15 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         others alternate eating and thinking while one never eats!)</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>start the IC2D application</title>
 
+        <indexterm><primary>IC2D</primary><secondary>example usage</secondary></indexterm>
+
         <para><ulink
-        url="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.xml">IC2D</ulink>
+        url="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.html">IC2D</ulink>
         is a graphical environment for monitoring and steering of distributed
-        and metacomputing applications.</para>
+        and Grid Computing applications.</para>
 
         <para>- being in the autopilot mode, start the IC2D visualization
         application (using ic2d.sh or ic2d.bat)</para>
@@ -662,8 +667,11 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title>Migration of active objects</title>
+  <sect1 >
+    
+   <indexterm><primary>Migration</primary><secondary>example</secondary></indexterm>
+
+   <title>Migration of active objects</title>
 
     <para>ProActive allows the transparent migration of objects between
     virtual machines.</para>
@@ -671,18 +679,18 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
     <para>A nice visual example is the penguin's one.</para>
 
     <para>This example shows a set of <ulink
-    url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.xml">mobile
+    url="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.html">mobile
     agents</ulink> moving around while still communicating with their base and
     with each other. It also features the capability to move a swing window
     between screens while moving an agent from one JVM to the other.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start the penguin application</title>
 
       <para>using the <literal>penguin</literal> script.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>start IC2D to see what is going on</title>
 
       <para>using the <literal>ic2d</literal> script</para>
@@ -690,7 +698,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       <para>acquire the machines you have started nodes on</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>add an agent</title>
 
       <itemizedlist>
@@ -724,7 +732,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>add several agents</title>
 
       <para>after selecting them, use the buttons to:</para>
@@ -745,7 +753,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>move the control window to another user</title>
 
       <itemizedlist>

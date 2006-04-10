@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Security">
   <title>ProActive Security Mechanism</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Security.html  -->
-
   <para>In order to use the Proactive Security features, you have to
   install<emphasis role="bold">the Java(TM) Cryptography Extension (JCE)
-  Unlimited Strength Jurisdiction Policy Files</emphasis> available at <ulink
-  url="http://www.java.sun.com">Sun's website</ulink>. Extract the file and
-  copy jar files to your &lt;jre_home&gt;/lib/security.</para>
+  Unlimited Strength Jurisdiction Policy Files</emphasis> available at 
+  <ulink url="http://www.java.sun.com">Sun's website</ulink>. Extract the file 
+   and copy jar files to your &lt;jre_home&gt;/lib/security.</para>
 
-  <sect1 remap="h2">
-    <title><anchor id="Security_html_Overview" />Overview</title>
+  <sect1 >
+    <title>Overview</title>
 
     <para>Usually, applications and security are developed for a specific use.
     We propose here a security framework that allows to dynamically deploy
@@ -30,11 +29,10 @@
     descriptor.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Security_html_architecture" />Security
-    Architecture</title>
+  <sect1 >
+    <title>Security Architecture</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Base model</title>
 
       <para>A distributed or concurrent application built using
@@ -81,7 +79,7 @@
         </figure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
      <title>Security is expressed at different levels</title>
      
      <para>Security is expressed at different levels, according to who wants
@@ -123,11 +121,11 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Security_html_detail" />Detailed Security
+  <sect1 >
+    <title>Detailed Security
     Architecture</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Virtual Nodes and Nodes</title>
 
       <para>The security architecture relies on two related abstractions for
@@ -148,10 +146,8 @@
       Nodes, the mapping, is done at application starting time.</para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="Security_html_SECTION00033000000000000000"
-      xreflabel="Hierarchical Security Entities" />Hierarchical Security
-      Entities</title>
+    <sect2  id="Security_html_SECTION00033000000000000000">
+      <title>Hierarchical Security Entities</title>
 
       <para>Grid programming is about deploying processes (activities) on
       various machines. In the end, the security policy that must be ensured
@@ -233,8 +229,8 @@
       <para>The Grid user can specify additional rules directly in his
       deployment descriptor for the domains he deploys onto. Note that those
       domains are actually dynamic as they can be obtained through external
-      allocators, or even Web Services in an OGSA infrastructure .
-      <!--[<ulink url="security_images/node18.xml#foster98security">5</ulink>]. -->
+      allocators, or even Web Services in an OGSA infrastructure 
+      (see <citation><xref linkend="foster98security" endterm="foster98security.abbrev"/></citation>).
       Joker rules might be important in that case to cover all cases, and to provide
       a conservative security strategy for un-forecasted deployments.</para>
 
@@ -268,10 +264,8 @@
         </figure></para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="Security_html_SECTION00034000000000000000"
-      xreflabel="Resource  provider security features" />Resource provider
-      security features</title>
+    <sect2  id="Security_html_SECTION00034000000000000000">
+      <title>Resource provider security features</title>
 
       <para>Prior to start application on a Grid, a user needs to acquire some
       resources (CPU time, disk storage, bandwidth) from the Grid. A
@@ -283,10 +277,8 @@
       its own policy. Theses runtimes could be worldwide distributed.</para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="Security_html_SECTION00037000000000000000"
-      xreflabel="Interactions, Security Attributes" />Interactions, Security
-      Attributes</title>
+    <sect2  id="Security_html_SECTION00037000000000000000">
+      <title>Interactions, Security Attributes</title>
 
       <para>Security policies are able to control all the
       <emphasis>interactions</emphasis> that can occur when deploying and
@@ -296,7 +288,10 @@
       communications. Here is a brief description of those
       interactions:</para>
 
-      <itemizedlist>
+     <indexterm><primary>Migration</primary><secondary>security</secondary></indexterm>
+ 
+     
+     <itemizedlist>
         <listitem>
           <para>RuntimeCreation (RC): creation of a new Runtime process</para>
         </listitem>
@@ -354,9 +349,8 @@
       dynamically. The next two sections present that aspect.</para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title><anchor id="Security_html_SECTION00038000000000000000"
-      xreflabel="Combining Policies" />Combining Policies</title>
+    <sect2  id="Security_html_SECTION00038000000000000000">
+      <title>Combining Policies</title>
 
       <para>As the proposed infrastructure takes into account different actors
       of the Grid (domain administrator, Grid user), even for a
@@ -374,8 +368,7 @@
             <imagedata fileref="security_images/img9.png" format="PNG" />
           </imageobject>
         </inlinemediaobject> ). 
-      Figure 6 
-      <!--<ulink url="security_images/node11.xml#hierarchicalsecurityrule">6</ulink>-->
+        <xref linkend="HierarchicalSecurityLevels"/>
       hierarchically represents the security rules that can be activated at
       execution: from the top, hierarchical domains ( <inlinemediaobject>
           <imageobject>
@@ -389,7 +382,7 @@
       (O) policy. Of course, such policies can be inconsistent, and there must
       be clear principles to combine the various sets of rules.</para>
 
-      <para><figure>
+     <para><figure id="HierarchicalSecurityLevels">
           <title>Hierarchical Security Levels</title>
 
           <mediaobject>
@@ -424,7 +417,7 @@
       error is reported.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Dynamic Policy Negotiation</title>
 
       <para>During execution, entities interact by pair with each other. Each
@@ -432,8 +425,7 @@
       ...), will want to apply a security policy based on the resolution
       presented in the previous section. Before starting an interaction, a
       <emphasis>negotiation</emphasis> occurs between the two entities
-      involved. Figure 7 
-      <!--<ulink url="security_images/node12.xml#sac">7</ulink>-->
+      involved. <xref linkend="Result_of_security_negotiations"/>
       shows the result of such negotiation. For example, if for a given
       interaction, entity A's policy is [+A,?I,?C], and B's policy is
       [+A,?I,-C], the negotiated policy will be [A,?I,-C]. If, for a result
@@ -448,7 +440,7 @@
       agreed security policy includes confidentiality, the two entities
       negotiate a session key.</para>
 
-      <para><table>
+     <para><table id="Result_of_security_negotiations">
           <title>Result of security negotiations</title>
 
           <tgroup cols="5">
@@ -511,8 +503,11 @@
         </table></para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title>Migration and Negotiation</title>
+    <sect2 >
+      
+     <indexterm><primary>Migration</primary><secondary>security</secondary></indexterm>
+
+     <title>Migration and Negotiation</title>
 
       <para>In large scale Grid applications, migration of activities is an
       important issue. The migration of Active Objects must not weaken the
@@ -548,8 +543,8 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Security_html_descriptors" />Activating security
+  <sect1 >
+    <title>Activating security
     mechanism</title>
 
     <para>Within descriptor, the tag &lt;security&gt; is used to specify the
@@ -600,7 +595,7 @@
       </listitem>
     </itemizedlist>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Construction of an XML policy:</title>
 
       <para>A policy file must begin with:</para>
@@ -806,8 +801,8 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Security_html_certificate" />How to quickly generate
+  <sect1 >
+    <title>How to quickly generate
     certificate?</title>
 
     <para>A GUI has been created to facilitate certificate generation.</para>

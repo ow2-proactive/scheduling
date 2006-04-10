@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="perspectives"><title>Component perspectives: a support for our research work</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/perspectives.html  -->
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="perspectives">
+ <title>Component perspectives: a support for our research work</title>
   
-    <para> <anchor id="perspectives_html_perspectives"/></para>
+    <para> </para>
     <para>Currently, we have a functional implementation of the Fractal API and
  model. One can configure and deploy a distributed system made of components.</para>
-    <sect1 remap="h2">
-      <title><anchor id="perspectives_html_Optimizations"/>Optimizations</title>
+    <sect1 >
+      <title>Optimizations</title>
       <para>However, there are currently no optimizations apart from those already
  offered by ProActive, such as direct communications when communicating entities are in the same
  virtual machine.</para>
@@ -15,14 +16,14 @@
  already implemented a first mechanism for shortcuts, which does not allow reconfiguration. We are
  currently working on a more sophisticated version that will allow dynamic reconfigurations.</para>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="perspectives_html_Packaging"/>Packaging</title>
+    <sect1 >
+      <title>Packaging</title>
       <para>Reusability and Components should be accessible through predefined / preconfigured packages. A
  bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of
  composition of deployment that should be addressed.</para>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="perspectives_html_GUI" xreflabel="Graphical user interface"/>Graphical user interface</title>
+    <sect1  id="perspectives_html_GUI"  >
+      <title>Graphical user interface</title>
       <para>Another area of investigation is the tools for configuring, deploying and
  monitoring distributed component systems.</para>
       <para>Because component based programming is somewhat analogous to the assembly
@@ -40,7 +41,7 @@
       <para>Ultimately, we would like to couple the visualization of components at runtime (currently
  unavailable here) with the standard monitoring capabilities of IC2D: we would get a structural
  view of the application in the Fractal GUI, and a topological view in the standard IC2D frame</para>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Usage</title>
         <para>If you want to try out the extended Fractal GUI for ProActive:</para>
         <itemizedlist>
@@ -77,8 +78,8 @@
 </itemizedlist>
       </sect2>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="perspectives_html_Other"/>Other</title>
+    <sect1 >
+      <title>Other</title>
       <para>Other areas of research that we are opening around this work include:</para>
       <itemizedlist>
         <listitem>
@@ -102,8 +103,8 @@
         </listitem>
 </itemizedlist>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="perspectives_html_limitations"/>Limitations</title>
+    <sect1 >
+      <title>Limitations</title>
       <para>Some features of the Fractal model are not implemented:</para>
       <itemizedlist>
         <listitem>

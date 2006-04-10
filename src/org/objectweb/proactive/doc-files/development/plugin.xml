@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="plugin"><title>ProActive Eclipse plugin</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/plugin.html  -->
   
-    <sect1 remap="h2">
-      <title><anchor id="plugin_html_external"/>Overview</title>
+    <sect1 >
+      <title>Overview</title>
       <para>The main objective of this plugin is to facilitate the use of ProActive in
  the Eclipse environment. The plugin has three main purposes:</para>
       <itemizedlist>
@@ -21,8 +21,8 @@
         </listitem>
 </itemizedlist>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="plugin_html_external.1"/>The Guided Tour</title>
+    <sect1 >
+      <title>The Guided Tour</title>
       <para>The aim of the guided tour is to provide a step by step explanation to the
  ProActive beginners.</para>
       <figure>
@@ -46,8 +46,8 @@
         </listitem>
 </itemizedlist>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="plugin_html_external.2"/>Wizards</title>
+    <sect1 >
+      <title>Wizards</title>
       <para>These wizards will guide developpers to make complex operations with
  ProActive, such as installation, integration , configuration or execution. We have created 4
  wizards:</para>
@@ -74,8 +74,8 @@
         </mediaobject>
       </figure>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="plugin_html_external.3"/>The ProActive Editor</title>
+    <sect1 >
+      <title>The ProActive Editor</title>
       <para>This editor checks coding rules. It informs the developper of error
  concerning ProActive in his classes and can resolve some of these errors.</para>
       <figure>

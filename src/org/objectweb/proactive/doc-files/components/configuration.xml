@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="configuration">
   <title>Configuration</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/configuration.html  -->
 
-  <para><anchor id="configuration_html_Configuration" /></para>
+  <para></para>
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="configuration_html_Controllers_and_interceptors" />Controllers and
-    interceptors</title>
+  <sect1  id="configuration_html_Controllers_and_interceptors" > 
+    <title>Controllers and interceptors</title>
 
     <para>This section explains how to customize the membranes of component
     through the configuration, composition and creation of controllers and
     interceptors.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Configuration of controllers</title>
 
       <para>It is possible to customize controllers, by specifying a control
@@ -55,7 +54,7 @@
    myContentDescription); </screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Writing a custom controller</title>
 
       <para>The controller interface is a standard interface which defines
@@ -111,7 +110,7 @@ protected void setControllerItfType() {
       </orderedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Configuration of interceptors</title>
 
       <para>Controllers can also act as interceptors: they can intercept
@@ -206,7 +205,7 @@ OutputInterceptor2
 </screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Writing a custom interceptor</title>
 
       <para>An interceptor being a controller, it must follow the rules
@@ -275,10 +274,8 @@ MyInputInterceptor
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle" />Lifecycle:
-     encapsulation of functional activity in component lifecycle</title>
+  <sect1  id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle">
+    <title>Lifecycle: encapsulation of functional activity in component lifecycle</title>
 
     <para>In this implementation of the Fractal component model, Fractal
     components are active objects. Therefore it is possible to redefine
@@ -299,7 +296,9 @@ MyInputInterceptor
     <para>2 conditions are required for a smooth integration between custom
     management of functional activities and lifecycle of the component:</para>
 
-    <orderedlist>
+   <indexterm><primary>Request Queue</primary></indexterm>
+ 
+   <orderedlist>
       <listitem>
         <para>the control of the request queue must use the
         org.objectweb.proactive.Service class</para>
@@ -319,10 +318,10 @@ MyInputInterceptor
     lifecycle of the component is set to STOPPED.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="configuration_html_Shortcuts" />Shortcuts</title>
+  <sect1 >
+    <title>Shortcuts</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Principles</title>
 
       <para>Communications between components in a hierarchical model may
@@ -408,7 +407,7 @@ MyInputInterceptor
           -->
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Configuration</title>
 
       <para>Shortcuts are available when composite components are synchronous

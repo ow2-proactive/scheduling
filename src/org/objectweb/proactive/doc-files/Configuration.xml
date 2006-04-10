@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Configuration">
   <title>ProActive Basic Configuration</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Configuration.html  -->
-
-  <sect1 remap="h2">
-    <title><anchor id="Configuration_html_overview" />Overview</title>
+  <sect1 >
+    <title>Overview</title>
 
     <para>In order to get easier and more flexible configuration in ProActive,
     we introduced an xml file where all ProActive related configuration is
@@ -18,9 +17,8 @@
   </sect1>
   
 
-  <sect1 remap="h2">
-    <title><anchor id="Configuration_html_howItWorks" />How does it
-    work?</title>
+  <sect1 >
+    <title>How does it work?</title>
 
     <para>Using this file is very straightforward, since all lines must follow
     the model: &lt;prop <emphasis role="bold">key</emphasis>='somekey'
@@ -59,8 +57,8 @@
     role="bold">value</emphasis>='valuen'/&gt;</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Configuration_html_whereIsIt" />Where to access this
+  <sect1 >
+    <title>Where to access this
     file?</title>
 
     <para>There is a default file with default ProActive options located under
@@ -98,13 +96,11 @@
 &lt;/jvmProcess&gt; </screen>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Configuration_html_properties" />ProActive
-    properties</title>
+  <sect1 >
+    <title>ProActive properties</title>
 
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Required</emphasis></para>
+    <sect2>
+     <title>Required</title>
 
         <para><itemizedlist>
             <listitem>
@@ -133,7 +129,8 @@
             <listitem>
               <para><emphasis role="bold">proactive.future.ac</emphasis> . Two
               values are possible:<emphasis role="bold">enable,
-              disable</emphasis> If 'enable' is chosen, automatic continuations
+               disable</emphasis> If 'enable' is chosen, Automatic Continuations
+              <indexterm><primary>Automatic Continuation</primary><secondary>proactive.future.ac</secondary></indexterm>
               are activated (see <xref linkend="AC"/>). Default is <emphasis
               role="bold">enable</emphasis></para>
             </listitem>
@@ -141,15 +138,16 @@
 
         <para>Note that if not specified those properties are set
         programmatically with the default value.</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Fault-tolerance
-        properties</emphasis></para>
+        
+      </sect2>
+      <sect2>
+        <title>Fault-tolerance properties</title>
 
         <para>Note that those properties should not be altered if the
         programmer uses deployment descriptor files. See 
-        <xref linkend="faultTolerance"/> for more details.</para>
+        <xref linkend="faultTolerance"/> and more specifically
+        <xref linkend="faultTolerance_html_configuration"/>
+        for more details.</para>
 
         <itemizedlist>
           <listitem>
@@ -163,46 +161,44 @@
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.checkpoint</emphasis> is the URL
-             of the checkpoint server (see <xref linkend="faultTolerance_html_configuration"/>).</para>
+             of the checkpoint server.</para>
           </listitem>
 
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.location</emphasis> is the URL of
-             the location server (see <xref linkend="faultTolerance_html_configuration"/>).</para>
+             the location server.</para>
           </listitem>
 
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.recovery</emphasis> is the URL of
-             the recovery process (see <xref linkend="faultTolerance_html_configuration"/>).</para>
+             the recovery process .</para>
           </listitem>
 
           <listitem>
             <para><emphasis
             role="bold">proactive.ft.server.resource</emphasis> is the URL of
-             the resource server (see <xref linkend="faultTolerance_html_configuration"/>).</para>
+             the resource server.</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">proactive.ft.server.global</emphasis>
-             is the URL of the global server (see <xref linkend="faultTolerance_html_configuration"/>).
+             is the URL of the global server.
             If this property is set, all others <emphasis
             role="bold">proactive.fr.server.*</emphasis> are ignored.</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">proactive.ft.ttc</emphasis> is the
-             value of the Time To Checkpoint counter, in seconds 
-             (see <xref linkend="faultTolerance_html_configuration"/>). 
+             value of the Time To Checkpoint counter, in seconds. 
              The default value is 30 sec.</para>
           </listitem>
         </itemizedlist>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">Peer-to-Peer properties<anchor
-        id="Configuration_html_p2p_properties" /></emphasis></para>
+       </sect2>
+       
+       <sect2 id="Configuration_html_p2p_properties" >
+        <title> Peer-to-Peer properties </title>
 
         <para><itemizedlist>
             <listitem>
@@ -289,15 +285,12 @@
               than a single node.</para>
             </listitem>
           </itemizedlist></para>
-      </listitem>
+      </sect2>
 
-      <listitem>
-        <para><emphasis role="bold">rmi ssh properties</emphasis></para>
-      </listitem>
-    </itemizedlist>
-
+      <sect2>
+        <title>rmi ssh properties</title>
     <para>The following properties are specific to the rmissh protocol 
-     (<xref linkend="SSHTunneling"/></para>
+     (see <xref linkend="SSHTunneling"/>).</para>
 
     <para><itemizedlist>
         <listitem>
@@ -376,10 +369,11 @@
           value is 10000ms.</para>
         </listitem>
       </itemizedlist></para>
+    </sect2>
+    
+    <sect2>
 
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Other properties</emphasis></para>
+    <title>Other properties</title>
 
         <para><itemizedlist>
             <listitem>
@@ -446,36 +440,42 @@
               be added.</para>
             </listitem>
           </itemizedlist></para>
-      </listitem>
-    </itemizedlist>
+        </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="Configuration_html_Example" />Example</title>
+  <sect1 >
+    <title>Configuration file example</title>
 
-    <para>Configuration file must have following structure:</para>
+    <para>A configuration file could have following structure:</para>
 
+    <example>
+     <title>A configuration file example</title>
     <screen>&lt;ProActiveUserProperties&gt;
  &lt;properties&gt;
- &lt;prop <emphasis role="bold">key</emphasis>='schema.validation' <emphasis
+   &lt;prop <emphasis role="bold">key</emphasis>='schema.validation' <emphasis
         role="bold">value</emphasis>='disable'/&gt;
- &lt;prop <emphasis role="bold">key</emphasis>='proactive.future.ac' <emphasis
+   &lt;prop <emphasis role="bold">key</emphasis>='proactive.future.ac' <emphasis
         role="bold">value</emphasis>='enable'/&gt;
- &lt;prop <emphasis role="bold">key</emphasis>='proactive.communication.protocol' <emphasis
+   &lt;prop <emphasis role="bold">key</emphasis>='proactive.communication.protocol' <emphasis
         role="bold">value</emphasis>='rmi'/&gt;
- &lt;prop <emphasis role="bold">key</emphasis>='proactive.rmi.port' <emphasis
+   &lt;prop <emphasis role="bold">key</emphasis>='proactive.rmi.port' <emphasis
         role="bold">value</emphasis>='2001-2005'/&gt;
- ....
- &lt;prop <emphasis role="bold">key</emphasis>='myprop' <emphasis role="bold">value</emphasis>='myvalue'/&gt;
+   ....
+   &lt;prop <emphasis role="bold">key</emphasis>='myprop' <emphasis role="bold">value</emphasis>='myvalue'/&gt;
  ....
  &lt;/properties&gt;
 &lt;/ProActiveUserProperties&gt;</screen>
+</example>
 
-    <para>Note that tag <emphasis
-    role="bold">ProActiveUserProperties</emphasis>, tag <emphasis
-    role="bold">properties</emphasis> and the model: &lt;prop <emphasis
-    role="bold">key</emphasis>='somekey' <emphasis
-    role="bold">value</emphasis>='somevalue'/&gt; are mandatory for ProActive
-    to parse correctly the document</para>
+    <note><para>
+      In order to have ProActive parse correctly the document, the following are mandatory:
+      <itemizedlist>
+       <listitem> the <emphasis role="bold">ProActiveUserProperties</emphasis> tag, </listitem>
+       <listitem> the <emphasis role="bold">properties</emphasis> tag,  </listitem>
+       <listitem> and the model: &lt;prop <emphasis role="bold">key</emphasis>='somekey' 
+                    <emphasis role="bold">value</emphasis>='somevalue'/&gt;  </listitem>
+     </itemizedlist>
+       
+     </para></note>
   </sect1>
 </chapter>

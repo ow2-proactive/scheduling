@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 
 <!-- Converted from latex bib format with bibdb v0.1, from Sylvain Schmitz -->
 <!-- http://charybde.homeunix.org/~schmitz/code/bibdb/ -->
@@ -11,7 +12,8 @@
   <authorgroup>
    <author><firstname>Isabelle</firstname><surname>Attali</surname></author>
    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
-   <author><firstname>Arnaud</firstname><surname>Contes</surname></author></authorgroup>
+   <author><firstname>Arnaud</firstname><surname>Contes</surname></author>
+  </authorgroup>
       <title>Deployment-based security for grid applications</title>
     </biblioset>
     <biblioset role="proceedings">
@@ -30,7 +32,8 @@
   <authorgroup>
    <author><firstname>Laurent</firstname><surname>Baduel</surname></author>
    <author><firstname>Francoise</firstname><surname>Baude</surname></author>
-   <author><firstname>Denis</firstname><surname>Caromel</surname></author></authorgroup>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+  </authorgroup>
       <title>Efficient, Flexible, and Typed Group Communications in Java</title>
       <pagenums>28--36</pagenums>
     </biblioset>
@@ -70,7 +73,8 @@
    <author><firstname>Francoise</firstname><surname>Baude</surname></author>
    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
    <author><firstname>Christian</firstname><surname>Delbe</surname></author>
-   <author><firstname>Ludovic</firstname><surname>Henrio</surname></author></authorgroup>
+   <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+  </authorgroup>
       <title>A hybrid message logging-cic protocol for constrained checkpointability</title>
       <pagenums>644--653</pagenums>
     </biblioset>
@@ -116,7 +120,8 @@
    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
    <author><firstname>Lionel</firstname><surname>Mestre</surname></author>
    <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
-   <author><firstname>Julien</firstname><surname>Vayssi�e</surname></author></authorgroup>
+   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+  </authorgroup>
       <title>Interactive and descriptor-based deployment of object-oriented grid applications</title>
       <pagenums>93--102</pagenums>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/Julien.Vayssiere/publications/hpdc2002vayssiere.pdf</bibliosource>
@@ -169,13 +174,26 @@
     </biblioset>
   </biblioentry>
 
+  <biblioentry role="book" id="TDO-book">
+    <abbrev id="TDO-book.abbrev">CH05</abbrev>
+  <authorgroup>
+    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+    <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+   </authorgroup>
+    <title>A Theory of Distributed Object</title>
+    <publisher>Springer-Verlag</publisher>
+    <pubdate>2005</pubdate>
+  </biblioentry>
+
+
   <biblioentry role="inproceedings" id="CHSPOPL04">
     <abbrev id="CHSPOPL04.abbrev">CHS04</abbrev>
     <biblioset role="article">
   <authorgroup>
    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
    <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
-   <author><firstname>Bernard</firstname><surname>Serpette</surname></author></authorgroup>
+   <author><firstname>Bernard</firstname><surname>Serpette</surname></author>
+  </authorgroup>
       <title>Asynchronous and deterministic objects</title>
       <pagenums>123--134</pagenums>
       <bibliosource class="doi">http://doi.acm.org/10.1145/964001.964012</bibliosource>
@@ -193,9 +211,10 @@
    <abbrev id="ckv98tscmj.abbrev">CKV98a</abbrev>
     <biblioset role="article">
   <authorgroup>
-   <author><firstname>D.</firstname><surname>Caromel</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
    <author><firstname>W.</firstname><surname>Klauser</surname></author>
-   <author><firstname>J.</firstname><surname>Vayssiere</surname></author></authorgroup>
+   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+  </authorgroup>
       <title>Towards seamless computing and metacomputing in java</title>
       <pagenums>1043--1061</pagenums>
       <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/javallCPE.ps</bibliosource>
@@ -246,4 +265,27 @@
     <pubdate>2004</pubdate>
   </biblioentry>
 
+  
+  <biblioentry role="inproceedings" id="foster98security">
+   <abbrev id="foster98security.abbrev">FKTT98</abbrev>
+   <biblioset role="article">
+    <authorgroup>
+      <author><firstname>Ian T.</firstname><surname>Foster</surname></author>
+      <author><firstname>Carl</firstname><surname>Kesselman</surname></author>
+      <author><firstname>Gene</firstname><surname>Tsudik</surname></author>
+      <author><firstname>Steven</firstname><surname>Tuecke</surname></author>
+    </authorgroup>
+    <title>A security architecture for computational grids</title>
+    <pagenums>83--92</pagenums>
+    <bibliosource class="uri">citeseer.ist.psu.edu/foster98security.html</bibliosource>
+   </biblioset>
+   <biblioset role="proceedings">
+    <confgroup>
+       <conftitle>ACM Conference on Computer and Communications Security</conftitle>
+    </confgroup>
+    <pubdate>1998</pubdate>
+   </biblioset>
+  </biblioentry>
+
+  
 </bibliography>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="XML_Descriptors">
   <title>XML Deployment Descriptors</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Descriptor.html  -->
-
-  <sect1 remap="h2">
-    <title id="Descriptor_html_objectives">Objectives</title>
+  <indexterm><primary>Descriptors</primary><secondary>definition</secondary></indexterm>
+  
+    <sect1  id="Descriptor_html_objectives">
+    <title>Objectives</title>
 
     <para>Parameters tied to the deployment of an application should be
     totally described in a xml deployment descriptor. Hence within the source
@@ -34,9 +35,10 @@
               <para>lsf, pbs, sun grid engine, oar, prun</para>
             </listitem>
 
+            <indexterm><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
+              
             <listitem>
-              <para>globus(GT2, GT3 and GT4), unicore, glite, arc
-              (nordugrid)</para>
+              <para>globus(GT2, GT3 and GT4), unicore, glite, arc (nordugrid)</para>
             </listitem>
           </itemizedlist></para>
       </listitem>
@@ -81,8 +83,7 @@
             </listitem>
 
             <listitem>
-              <para>other protocols like globus, glite will be supported
-              soon</para>
+              <para>other protocols like globus, glite will be supported soon</para>
             </listitem>
           </itemizedlist></para>
       </listitem>
@@ -93,7 +94,7 @@
     source code</para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1  id="Descriptor_Principles">
     <title>Principles</title>
 
     <itemizedlist>
@@ -287,7 +288,7 @@
     get nodes associated to VirtualNodes.</para>
   </sect1>
 
-  <sect1 id="Descriptor_html_vn" remap="h2">
+  <sect1 id="Descriptor_html_vn" >
     <title>Different types of VirtualNodes</title>
 
     <sect2>
@@ -561,7 +562,7 @@
     </sect2>
   </sect1>
 
-  <sect1 id="Descriptor_html_jvms" remap="h2">
+  <sect1 id="Descriptor_html_jvms" >
     <title>Different types of JVMs</title>
 
     <sect2>
@@ -638,7 +639,7 @@
     </sect2>
   </sect1>
 
-  <sect1 id="Descriptor_html_validation" remap="h2">
+  <sect1 id="Descriptor_html_validation" >
     <title>Validation against XML Schema</title>
 
     <para>To avoid mistake when building XML descriptors, ProActive provides
@@ -657,17 +658,16 @@
     transparent validation of the file using <ulink
     url="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</ulink> if
     the ProActive property <emphasis role="bold">schema.validation</emphasis>
-    is set to <emphasis role="bold">enable</emphasis>(see <ulink
-    url="Configuration">configuration file</ulink> for more details). If a
+    is set to <emphasis role="bold">enable</emphasis>
+    (see <xref linkend="Configuration"/> for more details). If a
     problem occurs during the validation, an error message is displayed
     otherwise if the validation is successful no message appear. An XML
     validation tool such as XMLSPY5.0(windows) can also be used to validate
     XML descriptors.</para>
 
-    <para><anchor id="Descriptor_html_example" /></para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Complete description and examples</title>
 
     <para>Following XML files examples are used for the C3D application. The
@@ -676,7 +676,7 @@
     described earlier in this document.</para>
 
     <example>
-      <title>Example1: C3D_Dispatcher_Render.xml</title>
+      <title>C3D_Dispatcher_Render.xml</title>
 
       <para><screen> &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -762,7 +762,7 @@
     role="bold">Jvm4</emphasis>.</para>
 
     <example>
-      <title>Example2: C3D_User.xml</title>
+      <title>C3D_User.xml</title>
 
       <para><screen> &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -808,7 +808,7 @@
     runtime.</para>
   </sect1>
 
-  <sect1 id="Descriptor_html_infrastructure" remap="h2">
+  <sect1 id="Descriptor_html_infrastructure" >
     <title>Infrastructure and processes</title>
 
     <para>In the previous example, all defined JVMs will be created using
@@ -838,8 +838,7 @@
       <screen> &lt;infrastructure&gt;                          
   &lt;processes&gt;
    &lt;processDefinition id='<emphasis role="bold">jvmProcess</emphasis>'&gt;
-    &lt;<emphasis role="bold">jvmProcess</emphasis>
- class='org.objectweb.proactive.core.process.JVMNodeProcesss'&gt;
+    &lt;<emphasis role="bold">jvmProcess</emphasis> class='org.objectweb.proactive.core.process.JVMNodeProcesss'&gt;
      &lt;classpath&gt;
       &lt;absolutePath
  value='/home/ProActive/classes'/&gt;
@@ -884,19 +883,20 @@
  &lt;/infrastructure&gt;
 </screen>
 
-      <para>As shown in the example above, <emphasis
+<indexterm><primary>CLASSPATH</primary><secondary>deployment descriptor</secondary></indexterm>
+      
+<para>As shown in the example above, <emphasis
       role="bold">ProActive</emphasis> provides the ability to define or
       change the <emphasis role="bold">classpath</emphasis> environment
       variable, the <emphasis role="bold">java path</emphasis>, the <emphasis
       role="bold">policy file path</emphasis>, the <emphasis role="bold">log4j
       properties file path</emphasis>, the <emphasis role="bold">ProActive
-      properties file path</emphasis> (see <ulink
-      url="Configuration.xml">configuration file</ulink> for more details) and
+      properties file path</emphasis> (see <xref linkend="Configuration"/>  for more details) and
       also to pass <emphasis role="bold">parameters</emphasis> to the JVM to
       be created. <emphasis role="bold">Note that parameters to be passed here
-      are related to the jvm in opposition to properties given in the <ulink
-      url="Configuration.xml">configuration file</ulink>(more focused on
-      ProActive or application behaviour). In fact parameters given here will
+      are related to the jvm in opposition to properties given in the 
+      configuration file (see <xref linkend="Configuration"/>), which is more focused on
+      ProActive or application behaviour. In fact parameters given here will
       be part of the java command to create other jvms, whereas properties
       given in the config file will be loaded once the jvm is
       created.</emphasis></para>
@@ -921,8 +921,7 @@
       role="bold">locally</emphasis>, i.e on the jvm reading the descriptor
       and not on the remote jvm that is going to be created.</para>
 
-      <para>As mentionned in the <ulink url="Configuration.xml">configuration
-      file</ulink>, if the &lt;ProActiveUserPropertiesFile&gt; is not defined
+     <para>As mentionned in the configuration file (see <xref linkend="Configuration"/>), if the &lt;ProActiveUserPropertiesFile&gt; is not defined
       for remote jvms, they will load a default one once created.</para>
 
       <para>Even if not shown in this example, a specific tag is provided for
@@ -1112,9 +1111,8 @@
           complete ssh deployment example.</para>
         </listitem>
 
-        <listitem>
-          <para><anchor id="Descriptor_html_processlist"
-          xreflabel="Process  list" />Process list</para>
+        <listitem id="Descriptor_html_processlist" xreflabel="Process list">
+          <para>Process list</para>
 
           <para>ProActive provides a way to define a list of processes for
           <emphasis role="bold">RSH, SSH, RLOGIN</emphasis> protocols. Using
@@ -1544,7 +1542,7 @@
 
           <para>PRUN is a cluster protocol develloped at Amsterdam to manage
           their <ulink
-          url="http://www.cs.vu.nl/das/prun/prun.1.xml">cluster</ulink>.
+          url="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</ulink>.
           ProActive provides
           <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
           to use such protocol.</para>
@@ -1554,7 +1552,10 @@
         </listitem>
 
         <listitem>
-          <para>GLOBUS</para>
+         
+         <indexterm significance="prefered"><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
+ 
+         <para>GLOBUS</para>
 
           <para>Like <emphasis role="bold">ssh</emphasis>, using <emphasis
           role="bold">globus</emphasis> requires some steps to be performed.
@@ -1573,7 +1574,9 @@
           <para><emphasis role="bold">ProActive</emphasis> provides
           <literal>org.objectweb.proactive.core.process.globus.GlobusProcess</literal>
           to create <emphasis role="bold">globus</emphasis> process.</para>
-
+         
+         <indexterm><primary>Globus</primary><secondary>XML Descriptor</secondary><tertiary>GlobusProcess</tertiary></indexterm>
+           
           <screen> &lt;jvm name='<emphasis role="bold">Jvm2</emphasis>'&gt;                              
   &lt;creation&gt;
   &lt;processReference refid='<emphasis role="bold">globusProcess</emphasis>'/&gt;
@@ -1649,7 +1652,9 @@
         <listitem>
           <para>GLITE</para>
 
-          <para>ProActive provides
+          <indexterm significance="prefered"><primary>GLITE</primary><secondary>XML Descriptor</secondary></indexterm>
+          
+            <para>ProActive provides
           <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
           to use such protocol.</para>
 
@@ -1897,7 +1902,7 @@
     </sect2>
   </sect1>
 
-  <sect1 id="Descriptor_html_services" remap="h2">
+  <sect1 id="Descriptor_html_services" >
     <title>Infrastructure and services</title>
 
     <para>As mentionned previously, instead of creating jvms, ProActive gives
@@ -1971,8 +1976,7 @@
     role="bold">port</emphasis> represent the communication protocol and the
     listening port for the P2P Service, if a P2P Service is already running
     with this configuration the descriptor will use this one else a new one is
-    started. See <ulink url="p2p.xml">P2P documentation</ulink> for more
-    information.</para>
+    started.  <xref linkend="p2p"/> provides more information.</para>
 
     <para>The example above shows a VirtualNode <emphasis
     role="bold">VnTest</emphasis>, that is mapped with two jvms, <emphasis
@@ -1982,14 +1986,13 @@
     that will be found in the P2P infrastructure, so at the end 3 acquired
     jvms are expected.</para>
 
-    <para>Fault Tolerance can also be defined at the service level. See <ulink
-    url="faultTolerance.xml">Fault Tolerance documentation</ulink> for more
-    information.</para>
+    <para>Fault Tolerance can also be defined at the service level. See 
+     <xref linkend="faultTolerance"/> for more information.</para>
 
-    <para><anchor id="Descriptor_html_killing" /></para>
+    <para></para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Killing the application</title>
 
     <para>ProActive gives the ability to kill all JVMs and Nodes deployed with
@@ -2011,10 +2014,9 @@ pad.killall(false);
     empty before dying. To be more precise a thread is created to ask
     periodically the registry if objects are still registered.</para>
 
-    <para><anchor id="Descriptor_html_processes" /></para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Processes</title>
 
     <para>There is the possiblity to use only the infrastructure part in order

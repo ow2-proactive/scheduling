@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="implementation"><title>An implementation of the Fractal component model with ProActive</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/implementation.html  -->
-<!--     <para> <anchor id="implementation_html_implementation_of_fractal_with_proactive"/></para> -->
+<!--     <para> </para> -->
     <para>Fractal defines a general conceptual model, along with a programming
  application interface (API) in Java. According to the official documentation, the Fractal
  component model is '<emphasis>a modular and extensible component model that can be used with
@@ -33,17 +34,17 @@
  the programming technniques. As previously stated, we target Grid and P2P environments. The
  programming techniques and the architecture of the implementation is described in a following
  section.</para>
-    <sect1 remap="h2">
-      <title><anchor id="implementation_html_Specific_features_of_this_implementation"/>Specific features of this implementation</title>
+    <sect1 >
+      <title>Specific features of this implementation</title>
       <para>The combination of the Fractal model with the ProActive library leverages
  the capabilities of both of them.</para>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Distribution</title>
         <para>Distribution is achieved in a transparent manner over the Java RMI protocol thanks to the use
  of a stub/proxy pattern. Components are manipulated indifferently of their location (local or on
  a remote JVM).</para>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Deployment framework</title>
         <para>ProActive provides a deployment framework for creating a distributed component system. Using a
  configuration file and the concept of virtual nodes, this framework:</para>
@@ -60,14 +61,14 @@
           </listitem>
 </orderedlist>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Activities</title>
         <para>A fundamental concept of the ProActive library is this of Active Objects 
          (see <xref linkend="ProActiveBasis"/>), where activities can actually be 
          redefined (see also <xref linkend="ActiveObjectCreation"/>)
          to customize their <emphasis role="bold">behavior</emphasis>.</para>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Asynchronous method calls with futures</title>
         <para>Asynchronous method calls with transparent futures is a core feature of ProActive
          (<xref  linkend="FutureObjectCreation"/>), and it allows concurrent processing. Indeed, suppose

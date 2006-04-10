@@ -1,5 +1,5 @@
 <para>
- <anchor id="distributed-wrappers-fractal" />
+ 
 org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal
 </para>
 <screen>
@@ -42,7 +42,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
 </screen >
 
 <para>
- <anchor id="ClientType-fractal" />
+ 
  org.objectweb.proactive.examples.components.helloworld.ClientType.fractal
 </para>
 <screen>
@@ -59,7 +59,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
 </screen>
 
 <para>
- <anchor id="ClientImpl-fractal" />
+ 
   org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal
  </para>
 <screen>
@@ -82,7 +82,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
 </screen>
  
 <para>
- <anchor id="ServerType-fractal" />
+ 
  org.objectweb.proactive.examples.components.ServerType
 </para>
 <screen> 
@@ -98,7 +98,7 @@ org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wr
   
  
  <para>
-  <anchor id="ServerImpl-fractal" />
+  
  org.objectweb.proactive.examples.components.helloworld.ServerImpl
 </para>
 <screen>

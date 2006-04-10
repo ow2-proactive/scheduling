@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="hands_on_programming">
   <title>Hands-on programming</title>
 
@@ -34,12 +35,12 @@
     </listitem>
   </itemizedlist>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>The client - server example</title>
 
-    <para>This example implements a very simple client-server application. You
-    will find it <ulink url="../HelloWorld.xml">here</ulink>, as it is the
-    HelloWorld example earlier mentionned in this manual. A client object
+    <para>This example implements a very simple client-server application. 
+     A detailled explaination is given in  <xref linkend="HelloWorld"/>; 
+    it is the HelloWorld example earlier mentionned in this manual. A client object
     displays a <literal>String</literal> gotten from a remote server.</para>
 
     <para>The corresponding class diagram is the following:</para>
@@ -54,7 +55,7 @@
       </informalfigure></para>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Initialization of the activity</title>
 
     <para>Active objects, as indicates their name, have an activity of their
@@ -75,7 +76,7 @@
     (i.e. from a call to its own body). This is the reason why we have written
     a terminate method in the following example.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Design of the application</title>
 
       <para>The InitializedHello class extends the Hello class, and implements
@@ -95,10 +96,10 @@
         </informalfigure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Programming</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>InitializedHello</title>
 
         <para>The source code of the InitializedHello class is <ulink
@@ -166,14 +167,14 @@ linux&gt;export  CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Execution</title>
 
       <para>Execution is similar to the previous example; just use the
       InitializedHelloClient client class and InitializedHello server
       class.</para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Starting the server</title>
 
         <para><screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
@@ -185,7 +186,7 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy  \
               org.objectweb.proactive.examples.hello.InitializedHello &amp;</screen></para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Launching the client</title>
 
         <para><screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy 
@@ -199,14 +200,16 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>A simple migration example</title>
+
+    <indexterm><primary>Migration</primary></indexterm>
 
     <para>This program is a very simple one: it creates an active object that
     migrates between virtual machines. It is a extension of the previous
     client-server example, the server now being mobile.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Required conditions</title>
 
       <para>The conditions for MigratableHello to be a migratable active
@@ -223,11 +226,11 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
       be transferred remotely. It does not have to implement directly
       java.io.Serializable, but its attributes should be serializable - or
       transient. For more information on this topic, check the <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.xml">
+      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.html">
       manual</ulink>.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Design</title>
 
       <para>We want to further enhance InitializedHello it by making
@@ -244,7 +247,7 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
       why we have to write the moveTo method in the code of MigratableHello -
       i.e. a method that contains an explicit call to the migration primitive.
       (cf <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.xml">
+      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.html">
       migration documentation</ulink>)</emphasis></para>
 
       <para>MigratableHello also implements a factory method for instanciating
@@ -263,10 +266,10 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
         </informalfigure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Programming</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>a) the MigratableHello class</title>
 
         <para>The code of the MigratableHello class is <ulink
@@ -310,11 +313,10 @@ public void moveTo(String destination_node) {
 
         <para>Note that the call to the ProActive primitive
         <literal>migrateTo</literal> is the last one of the method moveTo. See
-        the <ulink url="../Migration.xml">manual</ulink> for more
-        information.</para>
+        <xref linkend="Migration"/> for more information.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>c) the client class</title>
 
         <para>The entry point of the program is written in a separate class:
@@ -330,7 +332,7 @@ public void moveTo(String destination_node) {
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Execution</title>
 
       <para>- start several nodes using the <literal>startnode</literal>
@@ -382,7 +384,7 @@ cd ..       </screen>
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>migration of graphical interfaces</title>
 
     <para>Graphical interfaces are not serializable, yet it is possible to
@@ -395,7 +397,7 @@ cd ..       </screen>
     <para>Of course, this is a very basic example, but you can later build
     more sophisticated frames.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Design of the application</title>
 
       <para>We will write a new active object class, that extends
@@ -412,10 +414,10 @@ cd ..       </screen>
         </informalfigure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Programming</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>HelloFrameController</title>
 
         <para>The code of the HelloFrameController is <ulink
@@ -463,7 +465,7 @@ able) ProActive.getBodyOnThis());
 }          </programlisting>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>HelloFrame</title>
 
         <para>This is an example of a graphical class that could be associated
@@ -473,7 +475,7 @@ able) ProActive.getBodyOnThis());
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Execution</title>
 
       <itemizedlist>

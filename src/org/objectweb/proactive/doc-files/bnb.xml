@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="bnb">
   <title>Branch and Bound API</title>
 
@@ -8,28 +9,28 @@
 
   <orderedlist>
     <listitem>
-      <para><link linkend="mozTocId894456">Overview</link></para>
+     <para><link linkend="bnb_overview">Overview</link></para>
     </listitem>
 
     <listitem>
-      <para><link linkend="mozTocId664917">The API Architecture</link></para>
+      <para><link linkend="bnb_model">The API Architecture</link></para>
     </listitem>
 
     <listitem>
-      <para><link linkend="mozTocId204520">The API Description</link></para>
+     <para><link linkend="bnb_api">The API Description</link></para>
     </listitem>
 
     <listitem>
-      <para><link linkend="mozTocId733244">An Example: FlowShop</link></para>
+      <para><link linkend="bnb_flowshop">An Example: FlowShop</link></para>
     </listitem>
 
     <listitem>
-      <para><link linkend="mozTocId331057">Future Work</link></para>
+      <para><link linkend="bnb_future_work">Future Work</link></para>
     </listitem>
   </orderedlist>
 
-  <sect1 remap="h2">
-    <title><anchor id="mozTocId894456" />Overview</title>
+  <sect1  id="bnb_overview">
+    <title>Overview</title>
 
     <para>The Branch and Bound (BnB) consists to an algorithmic technique for
     exploring a solution tree from which returns the optimal solution.</para>
@@ -72,8 +73,8 @@
     url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</ulink>.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="mozTocId664917" />The Model Architecture</title>
+  <sect1  id="bnb_model">
+    <title> The Model Architecture</title>
 
     <para>The next figure show the architecture of the API:</para>
 
@@ -97,6 +98,9 @@
         attributes Tasks to free workers. The Tasks are provided the Task
         Queue.</para>
       </listitem>
+
+      
+      <indexterm><primary>Queue</primary><secondary>Task Queue</secondary></indexterm>
 
       <listitem>
         <para><emphasis role="bold">Task Queue</emphasis>: provides Task in a
@@ -166,10 +170,10 @@
     task's splitted task.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="mozTocId204520" />The API Details</title>
+  <sect1  id="bnb_api">
+    <title>The API Details</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The Task Description</title>
 
       <para>The <emphasis role="bold">Task</emphasis> object is located in
@@ -179,7 +183,7 @@
 
       <para>All abstract methods are described bellow:</para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>public Result execute()</title>
 
         <para>It is the place where the user has to put his code for solving a
@@ -188,7 +192,7 @@
         result. The second is to try to improve the best solution.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>public Vector split()</title>
 
         <para>This is for helping the user when he wants to divide a task. In
@@ -196,19 +200,19 @@
         way.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>public void initLowerBound()</title>
 
         <para>Initialize a lower bound local to the task.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>public void initUpperBound()</title>
 
         <para>Initialize a upper bound local to the task.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>public Result gather(Result[] results)</title>
 
         <para>This one is <emphasis role="bold">not abstract</emphasis> but it
@@ -259,7 +263,7 @@ protected Worker worker; // to interact with the API (see after)
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The Task Queue Description</title>
 
       <para>This manages the task allocation. The main functions are:
@@ -284,7 +288,7 @@ protected Worker worker; // to interact with the API (see after)
       can use a specialized task allocator for your need.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The ProActiveBranchNBound Description</title>
 
       <para>Finally, it is the main entry point for starting, and controlling
@@ -306,8 +310,8 @@ Result futureResult = manager.start(); // this call is asynchronous</programlist
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="mozTocId733244" />An Example: FlowShop</title>
+  <sect1  id="bnb_flowshop">
+    <title> An Example: FlowShop</title>
 
     <para>This example solves the permutation flowshop scheduling problem,
     with the monoobjective case. The main objective is to minimized the
@@ -410,8 +414,8 @@ ion;
     url="http://www-sop.inria.fr/oasis/ProActive/apps/flowshop.html">here</ulink>.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="mozTocId331057" />Future Work</title>
+  <sect1  id="bnb_future_work">
+    <title>Future Work</title>
 
     <itemizedlist>
       <listitem>

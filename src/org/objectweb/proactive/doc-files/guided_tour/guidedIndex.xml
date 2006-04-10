@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="guidedIndex">
   <title>ProActive guided tour</title>
 
@@ -23,15 +24,14 @@
 
   <para>If you need further details on how the examples work, check the
   ProActive <ulink
-  url="http://www-sop.inria.fr/oasis/ProActive/apps/index.xml">applications</ulink>
+  url="http://www-sop.inria.fr/oasis/ProActive/apps/index.html">applications</ulink>
   page.</para>
 
-  <sect1 remap="h2">
+  <sect1 >
     <title>Installation and setup</title>
 
-    <para>Follow the <ulink
-    url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/Installation.html">instructions</ulink>
-    for downloading and installing ProActive.</para>
+    <para>Follow the instructions for downloading and installing ProActive, in 
+       <xref linkend="Installation"/>.</para>
 
     <para>The programming exercises in the first part imply that you:</para>
 

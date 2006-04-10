@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="adl"><title>Architecture Description Language</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/adl.html  -->
-  
-    <para> <anchor id="adl_html_adl"/></para>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="adl">
+ <title>Architecture Description Language</title>
+ 
+ <indexterm significance="prefered"><primary>ADL</primary><secondary>definition</secondary></indexterm>
+
+    <para> </para>
     <para>The Architecture Description Language (ADL) is used to configure and deploy
  component systems. The architecture of the system is described in a normalized XML file.</para>
     <para><emphasis role="bold">The ADL has been updated</emphasis> and is now an extension of the standard Fractal ADL, allowing
@@ -12,14 +15,14 @@
  virtual node is integrated in the component ADL. For this reason, the components ADL has to be
  associated with a deployment descriptor (this is done at parsing time: both files are given to
  the parser).</para>
-    <para>One should refer to the <ulink url="http://fractal.objectweb.org/tutorials/adl/index.xml">Fractal ADL tutorial</ulink> for more
+    <para>One should refer to the <ulink url="http://fractal.objectweb.org/tutorials/adl/index.html">Fractal ADL tutorial</ulink> for more
  detailed information about the ADL. Here is a short overview, and a presentation of some added
  features.</para>
     <para>Note that because this ADL is based on the Fractal ADL, it requires the following libraries
  (included in the /lib directory of the ProActive distribution): fractal-adl.jar, dtdparser.jar,
  ow_deployment_scheduling.jar</para>
-    <sect1 remap="h2">
-      <title><anchor id="adl_html_Overview"/>Overview</title>
+    <sect1 >
+      <title>Overview</title>
       <para>Components are defined in <emphasis role="bold">definition</emphasis> files, which are .fractal files. The syntax of the
  document is validated against a DTD retreived from the classpath</para>
 <screen> classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd </screen>
@@ -78,14 +81,14 @@
         </listitem>
 </itemizedlist>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="adl_html_Example"/>Example</title>
+    <sect1 >
+      <title>Example</title>
       <para>The easiest way to understand the ADL is to see an example (<xref linkend="HelloWorldADLFiles"/>).
        It corresponds to the helloworld example described later in this document.</para>
-      <para><anchor id="adl_html_composition_of_virtual_nodes"/></para>
+      <para></para>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="adl_html_Exportation_and_composition_of_virtual_nodes"/>Exportation and composition of virtual
+    <sect1 >
+      <title>Exportation and composition of virtual
  nodes</title>
       <para>Components are deployed on the virtual node that is specified in their definition ; it has to
  appear in the deployment descriptor <emphasis role="underline">unless</emphasis> this virtual node is exported. In this case,
@@ -146,8 +149,8 @@ exportedVirtualNodes
       <para>When specifying 'null' as the name of an exported virtual node, the components will
  be deployed on the current virtual machine. This can be useful for debugging purposes.</para>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="adl_html_usage" xreflabel="Usage"/>Usage</title>
+    <sect1  id="adl_html_usage"  >
+      <title> Usage</title>
       <para>The launcher, which parses the ADL, creates a corresponding component factory, and
  instantiates and assembles the components as defined in the ADL, is started from the <literal>org.objectweb.proactive.core.component.adl.Launcher</literal> class:</para>
 <screen> Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descriptor])  </screen>

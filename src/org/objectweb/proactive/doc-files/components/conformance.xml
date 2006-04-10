@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="conformance"><title>Conformance to the Fractal model and extensions</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/conformance.html  -->
-  
-    <para> <anchor id="conformance_html_conformance_to_fractal"/></para>
-    <sect1 remap="h2">
-      <title><anchor id="conformance_html_Model"/>Model</title>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="conformance">
+ 
+ <title>Conformance to the Fractal model and extensions</title>
+ 
+ <indexterm significance="prefered"><primary>Fractal</primary></indexterm>
+   
+   <sect1 >
+      <title>Model</title>
       <para>The conceptual model of Fractal is the base of our work, and as it is
  extensible, we have added a few concepts to fulfill our needs. The Fractal specification defines
  conformance levels for implementations of the API (section 7.1. of the Fractal 2 specification).
@@ -41,9 +44,9 @@
          </figure>
 </para>
     </sect1>
-    <sect1 remap="h2">
-      <title><anchor id="conformance_html_Implementation_specific_API"/>Implementation specific API</title>
-      <sect2 remap="h3">
+    <sect1 >
+      <title>Implementation specific API</title>
+      <sect2 >
         <title>fractal.provider</title>
         <para>The API is the same for any Fractal implementation, though some classes are
  implementation-specific:</para>
@@ -64,7 +67,7 @@
           </listitem>
 </itemizedlist>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Content and controller descriptions</title>
         <para>The controller description and the content description of the components,
  as specified in the method <literal>public Component newFcInstance(Type type, Object controllerDesc,
@@ -73,7 +76,7 @@
  to the classes <literal>org.objectweb.proactive.core.component.ControllerDescription</literal> and
  <literal>org.proactive.core.component.ContentDescription</literal>.</para>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Collective bindings</title>
         <para>In composite or parallel components, collective bindings are performed
  automatically. For primitive component, the developer has to implement the bindings explicitely
@@ -98,11 +101,11 @@ public void bindFc(String clientItfName, Object serverItf) {
 } </screen>
         <para>You will be able to see the collective interface as an object of type I,
  and therefore invoke methods defined by I. But you will also be able to see the collective
- interface as a <ulink url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Collection.xml">collection</ulink>, 
+ interface as a <ulink url="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Collection.html">collection</ulink>, 
  as a group can also be manipulated as a collection:</para>
 <screen> Collection c = ProActiveGroup.getGroup(i); </screen>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Requirements</title>
         <para>As this implementation is based on ProActive, several 
          <ulink url="../ActiveObjectCreation.xml">conditions</ulink> are required:</para>
@@ -120,7 +123,7 @@ public void bindFc(String clientItfName, Object serverItf) {
     </sect1>
   
     
-    <sect1 remap="h2" id="componentArchitecture">
+    <sect1  id="componentArchitecture">
      <title>Architecture and design</title>
      <para>The implementation of the Fractal model is achieved by reusing the
       extensible architecture of ProActive, notably the meta-object protocol and the management of the
@@ -129,7 +132,7 @@ public void bindFc(String clientItfName, Object serverItf) {
      <para>A fundamental idea is to manage the non-functional properties at the
       meta-level: <emphasis role="bold">each component is actually an active object</emphasis> with 
       dedicated meta-objects in charge of the component aspects.</para>
-     <sect2 remap="h3">
+     <sect2 >
       <title>Meta-object protocol</title>
       <para>ProActive is based on a meta-object protocol (MOP), that allows the
        addition of many aspects on top of standard Java objects, such as asynchronism and mobility.
@@ -187,7 +190,7 @@ public void bindFc(String clientItfName, Object serverItf) {
       </para>
       
      </sect2>
-     <sect2 remap="h3">
+     <sect2 >
       <title>Components vs active objects</title>
       <para>In our implementation, because we make use of the MOP's facilities, all
        components are constituted of one active object (at least), are they composite or primitive
@@ -202,7 +205,7 @@ public void bindFc(String clientItfName, Object serverItf) {
        build active objects, and their names help to identify them with the IC2D visual monitoring
        tool.</para>
      </sect2>
-     <sect2 remap="h3">
+     <sect2 >
       <title>Method invocations on components interfaces</title>
       <para>Invoking a method on an active object means invoking a method on the stub
        of this active object. What usually happens then is that the method call is reified as a
@@ -233,7 +236,7 @@ public void bindFc(String clientItfName, Object serverItf) {
         ; </screen>
       </para>
      </sect2>
-     <sect2 remap="h3">
+     <sect2 >
       <title>Collective interfaces and typed group communications</title>
       <para>One may specify the cardinality of the interfaces of Fractal components
        (section 6.1). The <emphasis>collection</emphasis> cardinality means that a given component may have several

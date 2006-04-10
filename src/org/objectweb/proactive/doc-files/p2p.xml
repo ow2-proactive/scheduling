@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="p2p">
   <title>ProActive Peer-to-Peer Infrastructure</title>
 
-  <sect1 remap="h2" id="mozTocId121981" >
+  <indexterm><primary>P2P</primary></indexterm>
+  
+    <sect1  id="mozTocId121981" >
     <title> Overview</title>
     
     <para>Computational Peer-To-Peer (P2P) is becoming a key execution
@@ -42,10 +45,10 @@
     some nodes (JVMs). The next section describes how to use it.</para>
 
     <para>Further research information is available <ulink
-    url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.xml">here</ulink>.</para>
+    url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</ulink>.</para>
   </sect1>
 
-  <sect1 remap="h2" id="p2p_html_infrastructure_model">
+  <sect1  id="p2p_html_infrastructure_model">
     <title>The P2P Infrastructure Model</title>
 
     <para>The goals of this work are to use sparse CPU cycles from
@@ -67,7 +70,7 @@
     <para>Before going on to consider the P2P infrastructure, it's important
     to define what Peer-to-Peer is.</para>
 
-   <sect2 remap="h3" id="mozTocId356736" >
+   <sect2  id="mozTocId356736" >
       <title>What is Peer-to-Peer?</title>
 
       <para>There are a lot of P2P definitions, many of them are similar to
@@ -102,11 +105,11 @@
       instability and fault tolerance.</emphasis></para>
     </sect2>
 
-    <sect2 remap="h3" id="mozTocId928306" >
+    <sect2  id="mozTocId928306" >
       <title>The P2P Infrastructure in
       short</title>
 
-     <sect3 remap="h4" id="mozTocId101413" >
+     <sect3  id="mozTocId101413" >
         <title>Bootstrapping: First Contact</title>
 
         <para>A fresh (or new) peer which would like to join the P2P network,
@@ -175,12 +178,13 @@
               <imageobject>
                 <imagedata fileref="p2p_files/firstContact.png" format="PNG" />
               </imageobject>
+              <caption><para> Example of first contact (Bootstrapping).</para></caption>
+
             </mediaobject>
-          </figure> <emphasis role="bold">Example of first contact
-        (Bootstrapping).</emphasis></para>
+          </figure> </para>
       </sect3>
 
-      <sect3 remap="h4" id="mozTocId470123" >
+      <sect3  id="mozTocId470123" >
         <title>Discovering and Self-Organizing
         in Continue</title>
 
@@ -333,7 +337,7 @@
           </figure></para>
       </sect3>
 
-      <sect3 remap="h4" id="mozTocId299524" >
+      <sect3  id="mozTocId299524" >
         <title>Asking Computational Nodes</title>
 
         <para>The main goal of this work is to provide an infrastructure for
@@ -490,10 +494,10 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2" id="p2p_html_implementation">
+  <sect1  id="p2p_html_implementation">
     <title> The P2P Infrastructure Implementation</title>
 
-    <sect2 remap="h3" id="mozTocId467214"> 
+    <sect2  id="mozTocId467214"> 
       <title>Peers Implementation</title>
 
       <para>The P2P infrastructure is implemented with ProActive. Thus the
@@ -579,7 +583,7 @@
       the point of the next section.</para>
     </sect2>
 
-    <sect2 remap="h3" id="mozTocId587594">
+    <sect2  id="mozTocId587594">
       <title>  Dynamic Shared ProActive Group</title>
 
       <para>ProActive typed group does not allow access to group elements and
@@ -635,7 +639,7 @@
       call.</para>
     </sect2>
 
-    <sect2 remap="h3"  id="mozTocId690451" >
+    <sect2   id="mozTocId690451" >
       <title>Sharing Node Mechanism</title>
 
       <para>The sharing node mechanism is an independent activity from the P2P
@@ -700,7 +704,7 @@
       integrated to the ProActive XML deployment descriptor.</para>
     </sect2>
 
-    <sect2 remap="h3" id="mozTocId586812">
+    <sect2  id="mozTocId586812">
       <title> IC2D Screen shot</title>
 
       <para>A screen shot made with IC2D. You can see 3 P2P services which are
@@ -720,10 +724,10 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2" id="mozTocId325247">
+  <sect1  id="mozTocId325247">
     <title> Installing and Using the P2P Infrastructure</title>
 
-    <sect2 remap="h3"  id="p2p_html_network" >
+    <sect2   id="p2p_html_network" >
       <title> Create your P2P Network</title>
 
       <para>The P2P infrastructure is self-organized and configurable. When
@@ -752,9 +756,8 @@
       </itemizedlist>
 
       <para>All parameter descriptions and the way to change their default
-      values are explained <ulink
-      url="Configuration.xml#p2p_properties">here</ulink>. Next section shows
-      how to configure the infrastructure when starting the P2P Service with
+       values are explained in <xref linkend="Configuration_html_p2p_properties"/>. 
+      Next section shows how to configure the infrastructure when starting the P2P Service with
       the command line.</para>
 
       <para>The bootstrapping or first contact problem is how a new peer can
@@ -766,7 +769,7 @@
       <para>Now, you just have to start peers. There are two ways to do
       so:</para>
 
-     <sect3 remap="h4" id="mozTocId117139">
+     <sect3  id="mozTocId117139">
         <title> Quick Start Peer</title>
 
         <para>This method explains how to rapidly launch a simple P2P Service
@@ -904,7 +907,7 @@
         re-starts a new one.</para>
       </sect3>
 
-      <sect3 remap="h4" id="mozTocId979491">
+      <sect3  id="mozTocId979491">
         <title> Usage Example</title>
 
         <para>In this illustration, we will explain how to start a first peer
@@ -949,7 +952,7 @@
           </figure></para>
       </sect3>
 
-      <sect3 remap="h4" id="mozTocId690540">
+      <sect3  id="mozTocId690540">
         <title> The P2P Daemon</title>
 
         <para>The daemon aims to use computers in Peer-to-Peer computations.
@@ -960,7 +963,7 @@
         and during the night. Next, we will explain how to change the
         schedule. The JVM is running with the lowest priority.</para>
 
-       <sect4 remap="h5" id="mozTocId895651">
+       <sect4  id="mozTocId895651">
           <title> Installation</title>
 
           <para><emphasis role="bold">UNIX</emphasis></para>
@@ -1004,7 +1007,7 @@
           role="bold">9015</emphasis>.</para>
         </sect4>
 
-        <sect4 remap="h5" id="mozTocId799743">
+        <sect4  id="mozTocId799743">
           <title> Configuration</title>
 
           <para>The daemon is configured with XML files in the <emphasis
@@ -1087,7 +1090,7 @@
           which is equivalent to <emphasis>rmi://host:9301</emphasis>.</para>
         </sect4>
 
-        <sect4 remap="h5" id="mozTocId994982" >
+        <sect4  id="mozTocId994982" >
           <title> Control</title>
 
           <para>The following commands only work with UNIX friendly
@@ -1146,7 +1149,7 @@
       </sect3>
     </sect2>
 
-    <sect2 remap="h3" id="p2p_html_appli" >
+    <sect2  id="p2p_html_appli" >
       <title> Example of Acquiring Nodes by ProActive XML
       Deployment Descriptors</title>
 
@@ -1299,11 +1302,11 @@
 
       <para>For more information about ProActive XML Deployment Descriptor see
       this <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Descriptor.xml">
+      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Descriptor.html">
       page</ulink>.</para>
     </sect2>
 
-    <sect2 remap="h3" id="mozTocId294040">
+    <sect2  id="mozTocId294040">
       <title> The P2P Infrastructure API Usage Example</title>
 
       <para>The next little sample of code explains how, from an application,
@@ -1350,7 +1353,7 @@ p2pNodeLookup.killAllNodes();</programlisting>
     </sect2>
   </sect1>
 
-  <sect1 remap="h2" id="p2p_html_limitations">
+  <sect1  id="p2p_html_limitations">
     <title> Future Work</title>
 
     <itemizedlist>

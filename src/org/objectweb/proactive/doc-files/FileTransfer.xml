@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="FileTransfer">
   <title>ProActive File Transfer Model</title>
 
-  <sect1 remap="h2">
-    <title><anchor id="FileTransfer_html_intro"
-    xreflabel="Introduction and Concepts" />Introduction and Concepts</title>
+  <sect1  id="FileTransfer_html_intro">
+    <title>Introduction and Concepts</title>
 
     <para>Currently we provide support for the following type of
     transfers:</para>
@@ -53,11 +53,10 @@
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.FileTransfer_html_objectives"
-    xreflabel="Objectives" />File Transfer API</title>
+  <sect1  id="dbdoclet.id.FileTransfer_html_objectives">
+    <title>File Transfer API</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>API Definition</title>
 
       <programlisting language="java">import org.objectweb.proactive.filetransfer;
@@ -80,7 +79,7 @@ static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>
       calls and futures</emphasis> section of this manual.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>How to use the API</title>
 
       <para>In the following example, a Node is deployed using a descriptor
@@ -216,7 +215,7 @@ and implicitly inferred from the process information. --&gt;
 
     &lt;<emphasis role="bold">fileTransferRetrieve</emphasis> refid="example"&gt;
       &lt;<emphasis role="bold">sourceInfo</emphasis> prefix="/tmp"/&gt;
-      &lt;<emphasis role="bold">destinatinoInfo</emphasis> prefix="/home/user"/&gt;
+      &lt;<emphasis role="bold">destinationInfo</emphasis> prefix="/home/user"/&gt;
     &lt;/<emphasis role="bold">fileTransferRetrieve</emphasis>&gt;
   &lt;/sshProcess&gt;
 &lt;/processDefinition&gt;
@@ -355,15 +354,14 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.FileTransfer_html_design"
-    xreflabel="FileTransfer Design" />Advanced: FileTransfer Design</title>
+  <sect1  id="dbdoclet.id.FileTransfer_html_design" xreflabel="FileTransfer Design" >
+    <title>Advanced: FileTransfer Design</title>
 
     <para>This section provides internal details and information on how the
     File Transfer is implemented. Reading the following section to use the
     File Transfer mechanisms provided by ProActive is not necessary.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Abstract Definition (High level)</title>
 
       <para>This definitions can be referenced from a VirtualNode. They
@@ -388,7 +386,7 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
       definition name.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Concrete Definition (Low level)</title>
 
       <para>These definitions contain more architecture specific information,
@@ -417,7 +415,7 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
       overridden if specified.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>How Deployment File Transfer Works</title>
 
       <figure>

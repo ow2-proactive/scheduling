@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="TypedGroupCommunication">
   <title>Typed Group Communication</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/TypedGroupCommunication.html  -->
 
-  <sect1 remap="h2" id="TypedGroupCommunication_html_overview">
+  <sect1  id="TypedGroupCommunication_html_overview">
     <title>Overview</title>
 
     <para>Group communication is a crucial feature for high-performance and
@@ -43,7 +44,7 @@ vg.f1();</programlisting></para>
     
   </sect1>
 
-  <sect1 remap="h2" id="TypedGroupCommunication_html_Creation" >
+  <sect1  id="TypedGroupCommunication_html_Creation" >
     <title>Creation of a Group</title>
 
     <para>Any object that is reifiable has the ability to be included in a
@@ -97,7 +98,7 @@ A ag3 = (A) ProActiveGroup.newGroup('A', params[],
     be invoked on the group.</para>
   </sect1>
 
-  <sect1 remap="h2" id="TypedGroupCommunication_html_repr" >
+  <sect1  id="TypedGroupCommunication_html_repr" >
     <title>Group representation and manipulation</title>
 
     <para>The <emphasis role="bold">typed group representation</emphasis> we
@@ -150,7 +151,7 @@ A ag1new = (A) gA.getGroupByType();</programlisting></para>
     
   </sect1>
 
-  <sect1 remap="h2" id="TypedGroupCommunication_html_result">
+  <sect1  id="TypedGroupCommunication_html_result">
     <title>Group as result of group communications</title>
 
     <para>The particularity of our group communication mechanism is that the
@@ -201,7 +202,7 @@ ProActiveGroup.waitAll(vg);
     
   </sect1>
 
-  <sect1 remap="h2" id="TypedGroupCommunication_html_comms" >
+  <sect1  id="TypedGroupCommunication_html_comms" >
     <title>Broadcast vs Dispatching</title>
 
     <para>Regarding the parameters of a method call towards a group of

@@ -41,7 +41,7 @@
  <!-- <xsl:param name="component.label.includes.part.label">1</xsl:param> -->
 
 
- <xsl:param name="generate.index">0</xsl:param>
+<!--  <xsl:param name="generate.index">0</xsl:param> -->
 
  <!--  Which levels should be having a toc? I say : book, parts, appendixes and q&a only -->
  <xsl:param name="generate.toc">
@@ -60,5 +60,17 @@
  <xsl:param name="threeinstitutes.image.filename">images/logo-cnrs-inria-unsa.png</xsl:param>
  <!--  The objectweb logo -->
  <xsl:param name="objectweb.image.filename">images/logo-ObjectWeb.png</xsl:param>
+
+<!-- Strange: affiliation,phone, is a docbook elements, which has no corresponding template! -->
+<xsl:template match="affiliation">
+       <xsl:apply-templates/>
+</xsl:template>
+
+<!--  Redefining ==> get the phone|fax string in the output.-->
+<xsl:template match="phone|fax">
+  <xsl:value-of select="name(.)"/>
+  <xsl:text>: </xsl:text>
+  <xsl:call-template name="inline.charseq"/>
+</xsl:template>
 
 </xsl:stylesheet>

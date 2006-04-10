@@ -452,7 +452,7 @@ public class TestGroupCreation extends ProActiveFunctionalTest
           <colspec colname="c1" colwidth="100*"/>
           <tbody>
             <row>
-              <entry align="center" valign="middle"><para><emphasis role="bold"><anchor id="howto_html_agent"/>Agent.java</emphasis></para></entry>
+              <entry align="center" valign="middle"><para><emphasis role="bold">Agent.java</emphasis></para></entry>
             </row>
             <row>
               <entry><para>

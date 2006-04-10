@@ -43,18 +43,31 @@
  <xsl:param name="double.sided">1</xsl:param>
 
 
+<!-- Make "compact" listitems be *very* close to each other -->
 <xsl:attribute-set name="compact.list.item.spacing">
   <xsl:attribute name="space-before.optimum">0em</xsl:attribute>
   <xsl:attribute name="space-before.minimum">0em</xsl:attribute>
   <xsl:attribute name="space-before.maximum">0.2em</xsl:attribute>
 </xsl:attribute-set>
 
+<!-- Make listitems close to each other -->
 <xsl:attribute-set name="list.item.spacing">
   <xsl:attribute name="space-before.optimum">0.25em</xsl:attribute>
   <xsl:attribute name="space-before.minimum">0.1em</xsl:attribute>
   <xsl:attribute name="space-before.maximum">0.4em</xsl:attribute>
 </xsl:attribute-set>
 
+
+<!-- Indent to the left all listitems, also modified space before & after -->
+<xsl:attribute-set name="list.block.spacing">
+  <xsl:attribute name="margin-left">1em</xsl:attribute>    <!--Added margin!-->
+  <xsl:attribute name="space-before.optimum">0.5em</xsl:attribute>
+  <xsl:attribute name="space-before.minimum">0.4em</xsl:attribute>
+  <xsl:attribute name="space-before.maximum">0.7em</xsl:attribute>
+  <xsl:attribute name="space-after.optimum">0.5em</xsl:attribute>
+  <xsl:attribute name="space-after.minimum">0.4em</xsl:attribute>
+  <xsl:attribute name="space-after.maximum">0.7em</xsl:attribute>
+</xsl:attribute-set>
 
 
  <!-- The chapter entries of the toc are in bold, the parts in bold and 11pt. -->
@@ -70,7 +83,7 @@
   <xsl:variable name="line">
    <fo:inline keep-with-next.within-line="always">
     <xsl:choose>
-     <xsl:when test="self::chapter or self::appendix or self::bibliography">
+     <xsl:when test="self::chapter or self::appendix or self::bibliography or self::index">
       <xsl:attribute name="font-weight">bold</xsl:attribute>
       <xsl:attribute name="font-size">12pt</xsl:attribute>
       <xsl:attribute name="color">#00257E</xsl:attribute>
@@ -119,7 +132,7 @@
      <xsl:copy-of select="$line" />
     </fo:block>
    </xsl:when>
-   <xsl:when test="self::chapter or self::appendix or self::bibliography">
+   <xsl:when test="self::chapter or self::appendix or self::bibliography or self::index">
     <fo:block text-align-last="justify"
      end-indent="{$toc.indent.width}pt"
      last-line-end-indent="-{$toc.indent.width}pt" space-before="3mm" space-after="1mm">
@@ -191,7 +204,7 @@
 
 
  <!-- helper for header.table below -->
- <xsl:template name="link.myhelper">
+<xsl:template name="link.myhelper">
   <xsl:param name="class" select="''" />
   <xsl:param name="level" select="''" />
 
@@ -214,10 +227,10 @@
     </fo:block>
   </xsl:if>
 
- </xsl:template>
+</xsl:template>
 
  <!-- adjust the headers, recalling chapter and part numbers -->
- <xsl:template name="header.table">
+<xsl:template name="header.table">
   <xsl:param name="pageclass" select="''" />
   <xsl:param name="sequence" select="''" />
   <xsl:param name="gentext-key" select="''" />
@@ -250,61 +263,50 @@
  
     <xsl:if test="$gentext-key != 'part'">
       <xsl:call-template name="link.myhelper">
-      <xsl:with-param name="level" select="." />
-      <xsl:with-param name="class">
+        <xsl:with-param name="level" select="." />
+        <xsl:with-param name="class">
           <xsl:if test="$gentext-key = 'chapter'" >
              <xsl:copy-of select="$gentext-key"/>
-       </xsl:if>
-      </xsl:with-param>
-     </xsl:call-template>
-        </xsl:if>
+          </xsl:if>
+        </xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
         
   </xsl:variable>
 
   <xsl:variable name="candidate">
    <fo:table table-layout="fixed" width="100%">
     <xsl:call-template name="head.sep.rule">
-     <xsl:with-param name="pageclass"
-      select="$pageclass" />
+     <xsl:with-param name="pageclass" select="$pageclass" />
      <xsl:with-param name="sequence" select="$sequence" />
-     <xsl:with-param name="gentext-key"
-      select="$gentext-key" />
+     <xsl:with-param name="gentext-key" select="$gentext-key" />
     </xsl:call-template>
 
-    <fo:table-column column-number="1" />
-    <fo:table-column column-number="2" />
-    <fo:table-column column-number="3" />
+    <!--  fop requires one table-column per column in the table (this tag can be left empty though)  -->
+    <fo:table-column />
+    <fo:table-column />
+    <fo:table-column />
 
     <fo:table-body>
      <fo:table-row height="15pt">
 
-      <fo:table-cell text-align="left"
-       display-align="before">
+      <fo:table-cell text-align="left" display-align="before">
        <xsl:copy-of select="$leftS" />
       </fo:table-cell>
 
-      <fo:table-cell text-align="center"
-       display-align="before">
+      <fo:table-cell text-align="center" display-align="before">
        <fo:external-graphic>
         <xsl:attribute name="src">
-         <xsl:call-template
-          name="fo-external-image">
-          <xsl:with-param name="filename"
-           select="$header.image.filename" />
+         <xsl:call-template name="fo-external-image">
+          <xsl:with-param name="filename" select="$header.image.filename" />
          </xsl:call-template>
         </xsl:attribute>
-        <xsl:attribute name="height">
-         14pt
-        </xsl:attribute>
-        <xsl:attribute
-         name="background-color">
-         #FFFFFF
-        </xsl:attribute>
+        <xsl:attribute name="height">14pt</xsl:attribute>
+        <xsl:attribute name="background-color">#FFFFFF</xsl:attribute>
        </fo:external-graphic>
       </fo:table-cell>
 
-      <fo:table-cell text-align="right"
-       display-align="before">
+      <fo:table-cell text-align="right" display-align="before">
        <xsl:copy-of select="$rightS" />
       </fo:table-cell>
      </fo:table-row>
@@ -453,7 +455,7 @@
   <xsl:template match="bookinfo/author" mode="book.titlepage.recto.mode">
   <fo:inline color="#0010FF" >
    <xsl:attribute name="font-weight">bold</xsl:attribute>
-   <xsl:attribute name="font-size">16pt</xsl:attribute>
+   <xsl:attribute name="font-size">18pt</xsl:attribute>
      <xsl:apply-templates mode="titlepage.mode" /> 
   </fo:inline>
  </xsl:template>
@@ -462,7 +464,7 @@
   <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
   <fo:inline color="#0010FF" >
    <xsl:attribute name="font-weight">bold</xsl:attribute>
-   <xsl:attribute name="font-size">34pt</xsl:attribute>
+   <xsl:attribute name="font-size">44pt</xsl:attribute>
      <xsl:apply-templates mode="titlepage.mode" /> 
   </fo:inline>
 
@@ -472,41 +474,67 @@
 <!-- Remove the copyright from the second page, as it appears in the legal notice anyways. -->
  <xsl:template match="copyright" mode="book.titlepage.verso.auto.mode"/> 
  
+<!-- WARNING : font-size="10pt" was added but should be standard para font size instead!  -->
  <xsl:template match="legalnotice" mode="titlepage.mode">
   <xsl:variable name="id">
     <xsl:call-template name="object.id"/>
   </xsl:variable>
-  <fo:block id="{$id}">
+  <fo:block id="{$id}" xsl:use-attribute-sets="normal.para.spacing" font-size="10pt" >
     <xsl:call-template name="formal.object.heading">
       <xsl:with-param name="title">Legal Notice</xsl:with-param>
     </xsl:call-template>
-    <xsl:apply-templates mode="titlepage.mode"/>
+  <xsl:apply-templates mode="titlepage.mode"/> 
   </fo:block>
 </xsl:template>
 
-   
-  <xsl:template name="book.titlepage.recto">
+<!-- <xsl:template match="legalnotice" mode="titlepage.mode"/> -->
+<xsl:template match="legalnotice/title" mode="titlepage.mode"/>
+<xsl:template match="legalnotice/title" mode="titlepage.legalnotice.title.mode"/>
+<!-- Add the preface on the second page -->
+<!-- <xsl:template match="preface" mode="titlepage.mode">
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+  <fo:block id="{$id}">
+    <xsl:apply-templates mode="titlepage.mode"/>
+  </fo:block>
+</xsl:template>-->
+
+<!--  - - - - - - - - - - - - - - - - - - -->
+<!--  How the first page should look like -->
+<!--  - - - - - - - - - - - - - - - - - - -->
+
+<xsl:template name="book.titlepage.recto">
   <fo:block break-after="page">
 
+<!-- The ObjectWeb Logo -->
+  <fo:block text-align="center">
+    <fo:external-graphic>
+      <xsl:attribute name="src">images/logo-objectweb250.png</xsl:attribute>
+      <xsl:attribute name="height">50pt</xsl:attribute>
+      <xsl:attribute name="content-height">50pt</xsl:attribute>
+    </fo:external-graphic>
+  </fo:block>
+
 <!-- The Main Title -->
-            <fo:block text-align="center" space-before="0cm">
-              <xsl:apply-templates 
-                     mode="book.titlepage.recto.mode" 
-                     select="bookinfo/mediaobject"/>
-            </fo:block>
+  <fo:block text-align="center" space-before="-1cm">
+     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/mediaobject"/>
+  </fo:block>
 
 <!-- The Subtitle -->
-            <fo:block text-align="center" space-before="40mm"  
-                   margin-left="2cm" margin-right="2cm"  line-height="25mm"
-                   border-color="blue" border-width="0.7mm" border-style="solid"
-                   padding-top="5mm">
-              <xsl:apply-templates 
-                     mode="book.titlepage.recto.mode" 
-                     select="bookinfo/subtitle"/>
-            </fo:block>
+  <fo:block text-align="center" space-before="25mm"  
+         margin-left="0cm" margin-right="0cm"  line-height="25mm"
+         padding-top="5mm">
+     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/subtitle"/>
+  </fo:block>
 
-<!-- Two logos and the author's name in a 1x3 table -->
-   <fo:table table-layout="fixed" space-before="45mm">
+<!-- The author's name -->
+  <fo:block text-align="center" space-before="25mm"  >
+     <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/author"/>
+  </fo:block>
+
+<!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
+  <fo:table table-layout="fixed" space-before="35mm">
 
     <fo:table-column />
     <fo:table-column />
@@ -514,39 +542,17 @@
 
     <fo:table-body>
      <fo:table-row>
-      <fo:table-cell padding-right="5mm">
-       <fo:block text-align="right">
+      <fo:table-cell>
+       <fo:block text-align="center">
           <fo:external-graphic >
-        <xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
+            <xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
+            <xsl:attribute name="height">60pt</xsl:attribute>
+            <xsl:attribute name="content-height">60pt</xsl:attribute>
            </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
-      <fo:table-cell padding-top="20mm">
-       <fo:block text-align="center" >
-                                                          <xsl:apply-templates 
-                                                            mode="book.titlepage.recto.mode" 
-                                                            select="bookinfo/author"/>
-       </fo:block>
-      </fo:table-cell>
-      <fo:table-cell padding-left="5mm">
-       <fo:block text-align="left"  space-before="3mm">
-        <fo:external-graphic>
-         <xsl:attribute name="src">images/logo-objectweb250.png</xsl:attribute>
-         </fo:external-graphic>
-       </fo:block>
-      </fo:table-cell>
-     </fo:table-row>
-    </fo:table-body>
-   </fo:table>
-
-<!-- The other 2 missing logos, also in a table -->
-   <fo:table table-layout="fixed" space-before="2mm">
-     <fo:table-column  />
-     <fo:table-column  />
-     <fo:table-body>
-     <fo:table-row>
-      <fo:table-cell  padding-right="10mm">
-       <fo:block text-align="right">
+      <fo:table-cell>
+       <fo:block text-align="center">
        <fo:external-graphic>
         <xsl:attribute name="src">images/logo-UNSA.png</xsl:attribute>
         <xsl:attribute name="height">60pt</xsl:attribute>
@@ -554,8 +560,8 @@
        </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
-      <fo:table-cell  padding-left="1cm">
-       <fo:block text-align="left">
+      <fo:table-cell>
+       <fo:block text-align="center">
         <fo:external-graphic>
          <xsl:attribute name="src">images/logo-CNRS.png</xsl:attribute>
          <xsl:attribute name="height">60pt</xsl:attribute>
@@ -564,21 +570,20 @@
        </fo:block>
       </fo:table-cell>
      </fo:table-row>
-
     </fo:table-body>
-   </fo:table>
+  </fo:table>
 
  <!-- The Revision and copyright -->
-   <fo:table table-layout="fixed" space-before="1cm" >
+  <fo:table table-layout="fixed" space-before="25mm" >
 
-    <fo:table-column  />
-    <fo:table-column  />
-        <fo:table-body>
-        <fo:table-row>
-          <fo:table-cell>
+    <fo:table-column/>
+    <fo:table-column/>
+    <fo:table-body>
+      <fo:table-row>
+        <fo:table-cell>
 
       <fo:block text-align="left" font-size="12pt" font-weight="bold">
-       V
+       <xsl:text>V</xsl:text>
        <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/revnumber" />
        <xsl:call-template name="gentext.space" />
        <xsl:call-template name="gentext.space" />
@@ -586,19 +591,85 @@
        <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/date" />
       </fo:block>
 
-          </fo:table-cell>
-          <fo:table-cell>
-            <fo:block text-align="right"  font-size="12pt" font-weight="bold">
-               <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/copyright" />
-            </fo:block>
-          </fo:table-cell> 
-        </fo:table-row >  
+        </fo:table-cell>
+        <fo:table-cell>
+          <fo:block text-align="right"  font-size="12pt" font-weight="bold">
+            <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/copyright" />
+          </fo:block>
+        </fo:table-cell> 
+      </fo:table-row >  
     </fo:table-body>
-   </fo:table>
+  </fo:table>
    
   </fo:block>
 
- </xsl:template>
+</xsl:template>
+
+<!--  - - - - - - - - - - - - - - - - - - -->
+<!--  How the second page should look like -->
+<!--  - - - - - - - - - - - - - - - - - - -->
+
+<xsl:template name="book.titlepage.verso">
+  <xsl:choose>
+    <xsl:when test="bookinfo/title">
+      <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/title"/>
+    </xsl:when>
+    <xsl:when test="info/title">
+      <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/title"/>
+    </xsl:when>
+    <xsl:when test="title">
+      <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="title"/>
+    </xsl:when>
+  </xsl:choose>
+
+
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/corpauthor"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/corpauthor"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/authorgroup"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/authorgroup"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/author"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/author"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/othercredit"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/othercredit"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/pubdate"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/pubdate"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/copyright"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/copyright"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/abstract"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/abstract"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="bookinfo/legalnotice"/>
+  <xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/legalnotice"/>
+<!--   <xsl:apply-templates mode="titlepage.mode" select="preface"/> -->
+
+    <xsl:if test="preface">
+    <xsl:call-template name="toto.tutu"/>
+    </xsl:if>
+
+</xsl:template>
+
+
+<xsl:template name="book.verso.title">
+  <fo:block>
+    <xsl:apply-templates mode="titlepage.mode"/>
+  </fo:block>
+
+  <xsl:if test="following-sibling::subtitle|following-sibling::info/subtitle|following-sibling::bookinfo/subtitle">
+    <fo:block>
+      <xsl:apply-templates select="(following-sibling::subtitle|following-sibling::info/subtitle|following-sibling::bookinfo/subtitle)[1]"
+                         mode="book.verso.subtitle.mode"/>
+    </fo:block>
+  </xsl:if>
+  
+</xsl:template>
+
+
+<!--<xsl:template match="title" mode="book.titlepage.verso.auto.mode">
+  <fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" xsl:use-attribute-sets="book.titlepage.verso.style" font-size="14.4pt" font-weight="bold" font-family="{$title.fontset}">
+   <xsl:call-template name="toto.tutu"/>
+   <xsl:call-template name="book.verso.title"/>
+   <xsl:call-template name="toto.tutu"/>
+  </fo:block>
+</xsl:template>-->
 
 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -835,50 +906,65 @@
   <fo:block background-color="#FF0000">Toto Tutu</fo:block>
 </xsl:template>
 
-<!-- emphasis in programlistings contains color -->
+<!-- emphasis in programlistings contains color, specified by the @role -->
 <xsl:template match="emphasis">
   <xsl:variable name="depth">
     <xsl:call-template name="dot.count">
       <xsl:with-param name="string">
-    <xsl:number level="multiple"/>
+        <xsl:number level="multiple"/>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:variable>
 
   <xsl:choose>
-    <xsl:when test="@role='bold' or @role='strong'">
-      <xsl:call-template name="inline.boldseq"/>
+    <xsl:when test="@role='bold' or @role='' or @role='strong'">
+      <xsl:choose>
+         <!--  BOLD WITHIN PROGRAMLISTING -->
+         <xsl:when test="parent::programlisting">
+            <fo:inline background-color="#eaf91f"> 
+              <xsl:call-template name="inline.boldseq"/>
+            </fo:inline>
+		    </xsl:when>
+	      	<!-- NORMAL BOLD  -->	
+				<xsl:otherwise>
+		       <xsl:call-template name="inline.boldseq"/> 
+				</xsl:otherwise>  
+			</xsl:choose>
     </xsl:when>
+	      	<!--  ITALICS -->	
+    <xsl:when test="@role='italics'">
+       <xsl:call-template name="inline.italicseq"/>
+    </xsl:when>
+	      	<!--  UNDERLINE  -->	
     <xsl:when test="@role='underline'">
       <fo:inline text-decoration="underline">
         <xsl:call-template name="inline.charseq"/>
       </fo:inline>
     </xsl:when>
+	      	<!--  STRIKETHROUGH  -->	
     <xsl:when test="@role='strikethrough'">
       <fo:inline text-decoration="line-through">
         <xsl:call-template name="inline.charseq"/>
       </fo:inline>
     </xsl:when>
 
-<!--  Added this test, which can be triggered after code beautifier -->
+	      	<!--  WITHIN PROGRAMLISTINGS (not bold, but colorized)  -->	
+    <!--  Added this test, which can be triggered after code beautifier parsing -->
     <xsl:when test="@role='keyword' or @role='codeword' or @role='typeword' or @role='comment' or @role='string'">
         <xsl:call-template name="myinline.emphasis">
           <xsl:with-param name="role" select="@role"/>
-         </xsl:call-template>
+        </xsl:call-template>
     </xsl:when>
 
-    <xsl:otherwise>
-      <xsl:choose>
-        <xsl:when test="$depth mod 2 = 1">
-          <fo:inline font-style="normal">
-            <xsl:apply-templates/>
-          </fo:inline>
+	      	<!--  SHOULD NEVER HAPPEN, role not recognized -->	
+     <xsl:otherwise>
+       <xsl:call-template name="inline.boldseq"/> 
+       <xsl:choose>
+        <xsl:when test="@role">
+          <xsl:message> <!-- This should never happen. -->Emphasis with role=<xsl:value-of select="@role"/> is not allowed ==> <xsl:value-of select=".."/> </xsl:message>
         </xsl:when>
-        <xsl:otherwise>
-          <xsl:call-template name="inline.italicseq"/>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:otherwise>
+       </xsl:choose>
+     </xsl:otherwise>   
   </xsl:choose>
 </xsl:template>
 
@@ -898,17 +984,18 @@
     </xsl:attribute>
    </xsl:if>
 
-   <xsl:if test="@role = 'comment' or @role = 'string'">
+   <xsl:if test="@role = 'comment'">
     <xsl:attribute name="font-style">italic</xsl:attribute>
    </xsl:if>
    <xsl:attribute name="color">
     <xsl:choose>
-     <xsl:when test="@role = 'keyword'">#00257E</xsl:when>
-     <xsl:when test="@role = 'codeword'">#00257E</xsl:when>
+     <xsl:when test="@role = 'comment'">#018101</xsl:when>
+     <xsl:when test="@role = 'keyword'">#0101ff</xsl:when>
+     <xsl:when test="@role = 'codeword'">#0101ff</xsl:when>
      <xsl:when test="@role = 'typeword'">#931793</xsl:when>
-     <xsl:when test="@role = 'comment'">#0f9626</xsl:when>
-     <xsl:when test="@role = 'string'">#707070</xsl:when>
-     <xsl:otherwise>#F00000</xsl:otherwise> <!-- This should never happen. -->
+     <xsl:when test="@role = 'string'">#ff2aff</xsl:when>
+     <xsl:otherwise>#F00000</xsl:otherwise><!-- This should never happen. -->
+
     </xsl:choose>
    </xsl:attribute>
 
@@ -1202,10 +1289,132 @@
 
 </xsl:template>
 
+<xsl:template match="legalnotice">
+        <xsl:apply-templates/>
+</xsl:template>
+
+<!-- I like emails to be mailto: pointers  -->
+<!-- this emailF trick is contrived - I want emails in general, including in.address mode, to appear the same  -->
+<xsl:template name="emailF">
+  <xsl:call-template name="inline.charseq">
+    <xsl:with-param name="content">
+      <fo:inline keep-together.within-line="always" hyphenate="false">
+        <fo:basic-link>
+          <xsl:attribute name="external-destination">mailto:<xsl:value-of select="."/></xsl:attribute>
+          <xsl:apply-templates/>
+        </fo:basic-link>
+      </fo:inline>
+    </xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template match="email">
+  <xsl:call-template name="emailF" />
+</xsl:template>
+
+<xsl:template match="email" mode="in.address">
+  <xsl:call-template name="emailF" />
+</xsl:template>
+
+<xsl:template match="phone|fax"  mode="in.address">
+    <fo:block>
+      <xsl:value-of select="name(.)"/>
+      <xsl:text>: </xsl:text>
+      <xsl:call-template name="inline.charseq"/>
+    </fo:block>
+</xsl:template>
+
+<!-- Created a new mode, "in.address", which adds a fo block around the contents. -->
+<xsl:template match="*" mode="in.address">
+    <fo:block>
+       <xsl:apply-templates/>
+    </fo:block>
+</xsl:template>
+
+
+<!-- Address had no dedicated template, so creating one -->
+<!-- Modification of fo/verbatim.xsl Line #158 -->
+<xsl:template match="address">
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+  
+  <fo:block id="{$id}" space-before="0.5em">
+   <xsl:apply-templates mode="in.address"/> 
+<!--    <xsl:for-each select="*"> -->
+      <!--<xsl:message>
+      <xsl:text> In ADDRESS, </xsl:text><xsl:value-of select="name(.)" /> <xsl:value-of select="." /> 
+      </xsl:message>   -->
+<!--     </xsl:for-each> -->
+  </fo:block>
+</xsl:template>
+
+
+<!-- copy of xref.xsl, line 783. The lik also contains the [url] -->
+<xsl:template match="ulink" name="ulink">
+  <fo:basic-link xsl:use-attribute-sets="xref.properties">
+    <xsl:attribute name="external-destination">
+      <xsl:call-template name="fo-external-image">
+        <xsl:with-param name="filename" select="@url"/>
+      </xsl:call-template>
+    </xsl:attribute>
+
+    <xsl:choose>
+      <xsl:when test="count(child::node())=0">
+        <xsl:call-template name="hyphenate-url">
+          <xsl:with-param name="url" select="@url"/>
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates/>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  <xsl:if test="count(child::node()) != 0
+                and string(.) != @url
+                and $ulink.show != 0">
+    <!-- yes, show the URI -->
+    <xsl:choose>
+      <xsl:when test="$ulink.footnotes != 0 and not(ancestor::footnote)">
+        <fo:footnote>
+          <xsl:call-template name="ulink.footnote.number"/>
+          <fo:footnote-body xsl:use-attribute-sets="footnote.properties">
+            <fo:block>
+              <xsl:call-template name="ulink.footnote.number"/>
+              <xsl:text> </xsl:text>
+              <fo:inline>
+                <xsl:value-of select="@url"/>
+              </fo:inline>
+            </fo:block>
+          </fo:footnote-body>
+        </fo:footnote>
+      </xsl:when>
+      <xsl:otherwise>
+        <fo:inline hyphenate="false">
+          <xsl:text> [</xsl:text>
+          <xsl:call-template name="hyphenate-url">
+            <xsl:with-param name="url" select="@url"/>
+          </xsl:call-template>
+          <xsl:text>]</xsl:text>
+        </fo:inline>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:if>
+  </fo:basic-link>
+</xsl:template>
+
+
+
 </xsl:stylesheet>
 
 <!-- 
 <xsl:message>
 <xsl:text> OK, question.toc </xsl:text> <xsl:copy-of select="$id" /> 
 </xsl:message>
+
+<xsl:for-each select="./@*">
+      <xsl:message>
+        <xsl:text> Attribute  <xsl:value-of select="name(.)"/> = <xsl:value-of select="."/>  </xsl:text> 
+      </xsl:message>
+</xsl:for-each >
  -->

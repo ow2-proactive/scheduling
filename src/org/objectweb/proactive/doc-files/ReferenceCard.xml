@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ReferenceCard.html  -->
 <appendix id="ReferenceCard">
   <title>Reference Card</title>
@@ -13,7 +14,7 @@
   graphical interface. The library is based on an Active Object pattern that
   is a uniform way to encapsulate:</para>
 
-  <informaltable frame="none">
+  <informaltable frame="none" colsep="0">
     <tgroup cols="2">
       <tbody>
         <row>
@@ -65,11 +66,16 @@
     <title>Main concepts and definitions</title>
 
     <para><itemizedlist>
-        <listitem>
+        
+      <indexterm><primary>Active Object</primary><secondary>definition</secondary></indexterm>
+
+      <listitem>
           <para><emphasis role="bold">Active Objects (AO):</emphasis> a remote
           object, with its own thread, receiving calls on its public
           methods</para>
         </listitem>
+
+        <indexterm><primary>Activity</primary><secondary>definition</secondary></indexterm>
 
         <listitem>
           <para><emphasis role="bold">FIFO activity:</emphasis> an AO, by
@@ -88,35 +94,49 @@
           method calls towards AOs are asynchronous</para>
         </listitem>
 
-        <listitem>
+        <indexterm><primary>Future</primary><secondary>definition</secondary></indexterm>
+        
+          <listitem>
           <para><emphasis role="bold">Future:</emphasis> the result of a
           non-void asynchronous method call</para>
         </listitem>
 
+        <indexterm><primary>Request</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Request:</emphasis> the occurrence of a
           method call towards an AO</para>
         </listitem>
 
+        <indexterm><primary>Service</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Service:</emphasis> the execution by an
           AO of a request</para>
         </listitem>
+
+        <indexterm><primary>Reply</primary><secondary>definition</secondary></indexterm>
 
         <listitem>
           <para><emphasis role="bold">Reply:</emphasis> after a service, the
           method result is sent back to the caller</para>
         </listitem>
 
+        <indexterm><primary>Wait-by-necessity</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Wait-by-necessity:</emphasis> automatic
           wait upon the use of a still awaited future</para>
         </listitem>
 
-        <listitem>
+        <indexterm><primary>Automatic Continuation</primary><secondary>definition</secondary></indexterm>
+        
+          <listitem>
           <para><emphasis role="bold">Automatic Continuation:</emphasis>
           transmission of futures and replies between AO and JVMs</para>
         </listitem>
+
+        <indexterm><primary>Migration</primary><secondary>definition</secondary></indexterm>
 
         <listitem>
           <para><emphasis role="bold">Migration:</emphasis> an AO moving from
@@ -124,12 +144,16 @@
           migrate and stack is lost</para>
         </listitem>
 
+        <indexterm><primary>Group</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Group:</emphasis> a typed group of
           objects or AOs. Methods are called in parallel on all group
           members.</para>
         </listitem>
 
+        <indexterm><primary>Component</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Component:</emphasis> made of AOs, a
           component defines server and client interfaces</para>
@@ -158,18 +182,24 @@
           dynamic code loading.</para>
         </listitem>
 
+        <indexterm><primary>Virtual Node</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Virtual Node (VN):</emphasis> an
           abstraction (a string) representing where to locate AOs at
           creation</para>
         </listitem>
 
+        <indexterm><primary>Deployment descriptor</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Deployment descriptor:</emphasis> an XML
           file where a mapping VN --&gt; JVMs --&gt; Machine is
           specified.</para>
         </listitem>
 
+        <indexterm><primary>Node</primary><secondary>definition</secondary></indexterm>
+          
         <listitem>
           <para><emphasis role="bold">Node:</emphasis> the result of mapping a
           VN to a set of JVMs. After activation, a VN contains a set of nodes,
@@ -536,6 +566,8 @@ void </emphasis>migrationStrategy.remove(Destination d) ;
     machines. Component systems are defined in XML files (ADL: Architecture
     Description Language); these files describe the definition, the assembly,
     and the bindings of components.</para>
+   
+   <indexterm><primary>ADL</primary></indexterm>
 
     <para>Components follow the Fractal hierarchical component model
     specification and API, see http://fractal.objectweb.org</para>
@@ -865,7 +897,7 @@ ProActive.unExposeAsWebService('a', 'http://localhost:8080');
     infrastructure maintains a dynamic JVMs network for deploying
     computational applications.</para>
 
-    <para><emphasis remap="h3" role="bold">Deploying the
+    <para><emphasis  role="bold">Deploying the
     Infrastructure:</emphasis></para>
 
     <para>Firstly, you have to start P2P Services on each shared
@@ -898,7 +930,7 @@ ProActive.unExposeAsWebService('a', 'http://localhost:8080');
     <screen>second.peer.host$ ./startP2PService.sh -s //first.peer.host</screen>
     <screen>third.peer.host$ ./startP2PService.sh -s //second.peer.host</screen></para>
 
-    <para><emphasis remap="h3" role="bold">Acquiring Nodes:</emphasis></para>
+    <para><emphasis  role="bold">Acquiring Nodes:</emphasis></para>
 
     <para>Now you have a P2P Infrastructure running, you might want to deploy
     your ProActive application on it. That is simple, just modify the XML

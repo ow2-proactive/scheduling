@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="DescriptorProcess">
   <title>Adding a Deployment Protocol</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/DescriptorProcess.html  -->
-
-  <sect1 remap="h2">
-    <title><anchor id="DescriptorProcess_html_objectives"
-    xreflabel="Objectives" />Objectives</title>
+  <sect1  id="DescriptorProcess_html_objectives">
+    <title> Objectives</title>
 
     <para>ProActive support several deployment protocols. This protocols can
     be configured through an XML Descriptor file in the <emphasis
@@ -15,9 +13,8 @@
     protocol (process) to ProActive.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="DescriptorProcess_html_overview"
-    xreflabel="Overview" />Overview</title>
+  <sect1  id="DescriptorProcess_html_overview">
+    <title>  Overview</title>
 
     <para>Adding a new process can be divided into two related tasks:</para>
 
@@ -44,15 +41,14 @@
     Class is used when parsing the Descriptor XML.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="DescriptorProcess_html_javaProcess"
-    xreflabel="Java Process Class" />Java Process Class</title>
+  <sect1  id="DescriptorProcess_html_javaProcess">
+    <title>  Java Process Class</title>
 
     <para>The Java Process Classes are defined in the <emphasis
     role="bold">org.objectweb.proactive.core.process</emphasis>
     package.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Process Package Arquitecture</title>
 
       <para>Most implementations extend the class <emphasis
@@ -89,7 +85,7 @@
       envirorment variable.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The New Process Class</title>
 
       <para>Usualy the new java process class will have a name such as:
@@ -139,7 +135,7 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The StartRuntime.sh script</title>
 
       <para>On certain clusters, a starting script might be required.
@@ -152,15 +148,14 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="DescriptorProcess_html_xmlProcess"
-    xreflabel="XML Descriptor Process" />XML Descriptor Process</title>
+  <sect1  id="DescriptorProcess_html_xmlProcess">
+    <title>  XML Descriptor Process</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Schema Modifications</title>
 
       <para>The schema file is located at: <emphasis
-      role="bold">ProActive/descriptors/DescriptorSchema.sxd</emphasis>. This
+      role="bold">ProActive/descriptors/DescriptorSchema.xsd</emphasis>. This
       file contains the valid tags allowed in an XML descriptor file.</para>
 
       <itemizedlist>
@@ -233,10 +228,10 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>XML Parsing Handler</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>ProActiveDescriptorConstants.java:</title>
 
         <para>This file is located in <emphasis
@@ -246,7 +241,7 @@
         file.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>ProcessDefinitinonHandler.java:</title>
 
         <para>Located in: <emphasis

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="WSDoc">
-  <title>Exporting Active Objects and components as web services</title>
+  <title>Exporting Active Objects and components as Web Services</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/WSDoc.html  -->
-
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_overview" />Overview</title>
+  <sect1  id="WS_Overwiew">
+    <title>Overview</title>
 
     <para>This feature allows the call and monitoring of active objects and
     ProActive components from any client written in any foreign
@@ -18,8 +17,8 @@
     language.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_principle" />Principles</title>
+  <sect1 >
+    <title>Principles</title>
 
     <para>A <emphasis role="bold">web service</emphasis> is a software entity,
     providing one or several functionnalities, that can be exposed, discovered
@@ -31,7 +30,9 @@
       <listitem>
         <para><emphasis role="bold">The SOAP Message</emphasis></para>
 
-        <para>The SOAP message is used to exchange XML based data over the
+        <indexterm><primary>SOAP</primary></indexterm>
+        
+          <para>The SOAP message is used to exchange XML based data over the
         internet. It can be sent via HTTP and provides a serialization format
         for communicating over a network.</para>
       </listitem>
@@ -78,8 +79,8 @@
       </figure></para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_pre" />Pre-requisite: Installing the Web
+  <sect1 >
+    <title>Pre-requisite: Installing the Web
     Server and the SOAP engine</title>
 
     <para>First of all, you need to install the Jakarta Tomcat web server here
@@ -122,8 +123,8 @@
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_expose" />Steps to expose an active object
+  <sect1 >
+    <title>Steps to expose an active object
     or a component as a web services</title>
 
     <para>The steps for exporting and using an active object as a web service
@@ -207,8 +208,8 @@
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_undeploy" /> Undeploy the services</title>
+  <sect1 >
+    <title> Undeploy the services</title>
 
     <para>To undeploy an active object as a service, use the ProActive static
     method:</para>
@@ -234,18 +235,18 @@
     <programlisting language="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_access" /> Accessing the services</title>
+  <sect1 >
+    <title> Accessing the services</title>
 
     <para>Once the active object or the interfaces component are deployed, you
-    can access it via any web service enabled client ( such as C#).</para>
+    can access it via any web service enabled client (such as C#).</para>
 
     <para>First of all, the client will get the WSDL file matching this active
     object. This WSDL file is the 'identity card' of the service. It contains
     the web service public interfaces and its location. Generally, WSDL files
     are used to generate a proxy to the service. For example, for a given
-    service, say 'compute' ,you can get the WSDL document at <ulink
-    url="#">http://localhost:8080/servlet/wsdl?id=compute</ulink>.</para>
+    service, say 'compute', you can get the WSDL document at 
+    <ulink url="http://localhost:8080/servlet/wsdl?id=compute">http://localhost:8080/servlet/wsdl?id=compute</ulink>.</para>
 
     <para>Now that this client knows what and where to call the service, it
     will send a SOAP message to the web server, the web server looks into the
@@ -253,8 +254,8 @@
     SOAP message to the client.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_limits" /> Limitations</title>
+  <sect1 >
+    <title> Limitations</title>
 
     <para>Apache Soap supports all defined types in the SOAP 1.1
     specification. All Java primitive types are supported but it is not always
@@ -267,11 +268,11 @@
     <literal>$APACHE_SOAP_HOME/WEB_INF/classes</literal>.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_example" /> A simple example: Hello
+  <sect1 >
+    <title> A simple example: Hello
     World</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Hello World web service code</title>
 
       <para>Let's start with a simple example, an Hello world active object
@@ -307,10 +308,10 @@ ect []{});
       new client application in Visual Studio .NET.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Access with Visual Studio</title>
 
-      <para><anchor id="WSDoc_html_steps" /></para>
+      <para></para>
 
       <para>In your new Visual Studio Project:</para>
 
@@ -322,8 +323,8 @@ ect []{});
 
         <listitem>
           <para>In the address box enter the WSDL service address, for
-          example: <ulink
-          url="#">http://localhost:8080/soap/servlet/wsdl?id=helloWorld</ulink>
+          example: 
+          <ulink url="http://localhost:8080/soap/servlet/wsdl?id=helloWorld">http://localhost:8080/soap/servlet/wsdl?id=helloWorld</ulink>
           .When clicking the 'add reference' button, this will get the
           service's WSDL and creates the specific proxy to the service.</para>
         </listitem>
@@ -341,11 +342,11 @@ string s = hw.helloWorld ();
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="WSDoc_html_interop" /> C# interoperability: an example
+  <sect1 >
+    <title> C# interoperability: an example
     with C3D</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Overview</title>
 
       <para><ulink
@@ -370,12 +371,11 @@ string s = hw.helloWorld ();
                 });</programlisting>
 
       <para>Once the dispatcher is deployed as a web service, we have a WSDL
-      url: <ulink
-      url="#">http://localhost:8080/soap/servlet/id=C3DDispactcher</ulink> It
-      will be usefull to construct the dispatcher client.</para>
+      url: <ulink url="http://localhost:8080/soap/servlet/id=C3DDispactcher">http://localhost:8080/soap/servlet/id=C3DDispactcher</ulink>.
+      It will be usefull to construct the dispatcher client.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Access with a C# client</title>
 
       <para>First of all, we have to generate the service proxy following the
@@ -394,7 +394,7 @@ string s = hw.helloWorld ();
         </figure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Dispatcher methods calls and callbacks</title>
 
       <para>C# client registers to the C3D dispatcher and then can send
@@ -435,7 +435,7 @@ string s = hw.helloWorld ();
         </figure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Download the C# example</title>
 
       <para>You can find <ulink

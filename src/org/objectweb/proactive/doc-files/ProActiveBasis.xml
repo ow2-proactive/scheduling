@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="ProActiveBasis"><title>ProActive Basis, Active Object definition</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ProActiveBasis.html  -->
   
-    <sect1 remap="h2">
+    <sect1 >
       <title>Active objects basis</title>
       <para>Active objects are the basic units of activity and distribution used for
  building concurrent applications using ProActive. An active object owns its own thread. This
@@ -94,7 +95,7 @@
       
       
     </sect1>
-    <sect1 remap="h2" id="ProActiveBasis_html_def">
+    <sect1  id="ProActiveBasis_html_def">
       <title>What is an active object</title>
       <para>The active object is actually the composition of two objects: a <emphasis>body</emphasis>
  and a standard Java object. The body is not visible from the outside of the active object, then

@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="OSGi">
   <title>ProActive on top of OSGi</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/OSGi.html  -->
-
-  <sect1 remap="h2">
-    <title><anchor id="OSGi_html_overview"
-    xreflabel="Overview of OSGi -- Open Services Gateway  initiative" />Overview
-    of OSGi -- Open Services Gateway initiative</title>
+  <sect1  id="OSGi_html_overview" >
+    <title>Overview of OSGi -- Open Services Gateway initiative</title>
 
     <para><emphasis role="bold">OSGi</emphasis> is a corporation that works on
     the definition and promotion of open specifications. These specifications
@@ -85,10 +82,8 @@
     url="http://www.osgi.org"></ulink>OSGi website .</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OSGi_html_proactiveBundle"
-    xreflabel="ProActive bundle and  service" />ProActive bundle and
-    service</title>
+  <sect1  id="OSGi_html_proactiveBundle">
+    <title>ProActive bundle and service</title>
 
     <para>In order to use ProActive on top of OSGi, we have developped the
     <emphasis role="bold">ProActive Bundle</emphasis> that contains all
@@ -120,9 +115,8 @@
     service.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OSGi_html_helloWorld"
-    xreflabel="Yet another Hello World" />Yet another Hello World</title>
+  <sect1  id="OSGi_html_helloWorld">
+    <title> Yet another Hello World</title>
 
     <para>The example above is <emphasis role="bold">a simple hello world that
     uses ProActive Service</emphasis> . It creates an Hello active Object and
@@ -273,9 +267,9 @@ Bundle-Activator: org.objectweb.proactive.examples.osgi.hello.HelloActivator
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OSGi_html_futureWorks"
-    xreflabel="Current and Future works" />Current and Future works</title>
+  <sect1  id="OSGi_html_futureWorks">
+    <title>
+     Current and Future works</title>
 
     <itemizedlist>
       <listitem>

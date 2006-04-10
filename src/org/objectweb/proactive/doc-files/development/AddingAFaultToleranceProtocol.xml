@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter id="AddingAFaultToleranceProtocol"><title>Adding a Fault-Tolerance Protocol</title>
-<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/FaultTolerance.html  -->
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="AddingAFaultToleranceProtocol">
+ <title>Adding a Fault-Tolerance Protocol</title>
   
     <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
  ProActive. A more complete version should be released with the version 3.1. If you wish to get
  more informations, please feel free to send a mail to <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>.</para>
-    <sect1 remap="h2">
-      <title><anchor id="FaultTolerance_html_objectives" xreflabel="Overview"/>Overview</title>
-      <sect2 remap="h3">
+<sect1  id="FaultTolerance_html_objectives" >
+      <title> Overview</title>
+      <sect2 >
         <title>Active Object side</title>
         <para>Fault-tolerance mechanism in ProActive is mainly based on the <literal>org.objectweb.proactive.core.body.ft.protocols.FTManager</literal> class. This class contains
  several hooks that are called before and after the main actions of an active object, e.g. sending
@@ -118,7 +119,7 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
  contains all the informations linked to the checkpoint used for recovering the active object, and
  is used to restore its state. The programmer might defines his own class implementing <literal>CheckpointInfo</literal>, to add needed informations, depending on the protocol.</para>
       </sect2>
-      <sect2 remap="h3">
+      <sect2 >
         <title>Server side</title>
         <para>ProActive include a global server that provide fault detection, active object localization,
  resource service and checkpoint storage. For developing a new fault-tolerance protocol, the

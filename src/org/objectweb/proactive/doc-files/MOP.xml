@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="MOP">
   <title>MOP: Metaobject Protocol</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/MOP.html  -->
 
-  <sect1 remap="h2">
-    <title><anchor id="MOP_html_impl" />Implementation: a Meta-Object
+  <sect1 >
+    <title>Implementation: a Meta-Object
     Protocol</title>
 
     <para>ProActive is built on top of a metaobject protocol (MOP) that
@@ -23,8 +24,8 @@
     non-public method or constructor calls.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="MOP_html_principles" />Principles</title>
+  <sect1 >
+    <title>Principles</title>
 
     <para>If the programmer wants to implement a new metabehavior using our
     metaobject protocol, he or she has to write both a concrete (as opposed to
@@ -61,8 +62,8 @@
     example, is implemented through this feature.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="MOP_html_echoproxy" />Example of a different
+  <sect1 >
+    <title>Example of a different
     metabehavior: EchoProxy</title>
 
     <para>Here's the implementation of a very simple yet useful metabehavior:
@@ -84,7 +85,7 @@ interface Echo extends Reflect {
 }</programlisting></para>
     
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Instantiating with the metabehavior</title>
 
       <para>Instantiating an object of any class with this metabehavior can be
@@ -136,8 +137,8 @@ interface Echo extends Reflect {
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="MOP_html_reflect" />The Reflect interface</title>
+  <sect1 >
+    <title>The Reflect interface</title>
 
     <para>All the interfaces used for declaring
     <emphasis>metabehaviors</emphasis> inherit directly or indirectly from
@@ -166,8 +167,8 @@ interface Echo extends Reflect {
     build new metabehaviors out of existing ones.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="MOP_html_limitations" />Limitations</title>
+  <sect1 >
+    <title>Limitations</title>
 
     <para>Due to its commitment to be a 100% Java library, the MOP has a few
     limitations:</para>

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="Installation">
   <title>ProActive Installation</title>
 
   <para>ProActive is made available for <ulink
-  url="http://www-sop.inria.fr/oasis/proactive/disclaimer.xml">download</ulink>
+  url="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download</ulink>
   under a <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL
   license</ulink>. ProActive requires the <ulink
   url="http://java.sun.com/j2se/1.4/">JDK 1.4</ulink> or later to be installed
   on your computer. Please note that ProActive will NOT run with any version
   prior to 1.4 since some features introduced in JDK 1.4 are essential.</para>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.quickStart" />Quick Start</title>
+  <sect1 >
+    <title>Quick Start</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>To Test ProActive with the examples</title>
 
       <itemizedlist>
@@ -26,6 +27,8 @@
           distribution you want to use</para>
         </listitem>
 
+        <indexterm><primary>Microsoft Windows</primary><secondary>scripts</secondary></indexterm>
+          
         <listitem>
           <para>Launch the scripts located in
           <literal>ProActive/scripts/unix</literal> or
@@ -39,7 +42,7 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>To develop with ProActive</title>
 
       <itemizedlist>
@@ -55,11 +58,14 @@
           ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
 
+        <indexterm><primary>CLASSPATH</primary><secondary>configuration</secondary></indexterm>
+
+        
         <listitem>
           <para>Don't forget to launch the JVM with a <ulink
-          url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.xml">security
+          url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">security
           policy file</ulink>. You can also specify a <ulink
-          url="http://logging.apache.org/log4j/docs/manual.xml">log4j
+          url="http://logging.apache.org/log4j/docs/manual.html">log4j
           configuration file</ulink> with the property
           <literal>-Dlog4j.configuration=file:pathToFile</literal>. If not
           specified a default logger that logs on the console will be
@@ -71,13 +77,13 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.downloadExpand" />Download and expand the
+  <sect1 >
+    <title>Download and expand the
     archive</title>
 
-    <para>You can download the archive file (a standard <emphasis
+    <para>You can download the archive file (a standard <emphasis 
     role="bold">zip</emphasis> file) containing ProActive from the <ulink
-    url="http://www-sop.inria.fr/oasis/proactive/disclaimer.xml">download
+    url="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download
     section</ulink> of the ProActive home page. You will be asked to accept
     the licence agreement and provide a few personal details including your
     email address. You will then within a few minutes receive an email.</para>
@@ -194,8 +200,8 @@
     </table>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.runExamples" />Run a few examples for
+  <sect1 >
+    <title>Run a few examples for
     testing</title>
 
     <para>You can try to run the test applications provided with ProActive.
@@ -206,7 +212,7 @@
     examples can be found in the directory
     <literal>ProActive/src/org/objectweb/proactive/examples</literal>.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Local Example 1: Hello world !</title>
 
       <para>A simple example</para>
@@ -223,7 +229,7 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Local Example 2: Reader/Writer</title>
 
       <para>This example is the ProActive version of the Readers/Writers
@@ -244,7 +250,7 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Local Example 3: The Dining Philosophers</title>
 
       <para>This example is one possible implementation of the well-known
@@ -281,9 +287,11 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.setClassPath" />CLASSPATH to set when
-    writing application using ProActive</title>
+  <sect1 >
+    <title>CLASSPATH to set when writing application using ProActive</title>
+    
+    <indexterm significance="prefered"><primary>CLASSPATH</primary><secondary>to run ProActive</secondary></indexterm>
+
 
     <para><emphasis>Note that if you use the scripts provided with the
     distribution to run the examples you do not need to update your
@@ -307,7 +315,7 @@
       <listitem>
         <para><literal>log4j.jar</literal> in <literal>lib</literal> directory
         : <ulink
-        url="http://logging.apache.org/log4j/docs/manual.xml">Log4j</ulink> is
+        url="http://logging.apache.org/log4j/docs/manual.html">Log4j</ulink> is
         the logging mechanism used in ProActive. You can define the way you
         want to log(console, file, GUI) by creating a log4j configuration
         file, like the one used in ProActive's example and located under
@@ -320,23 +328,23 @@
       <listitem>
         <para><literal>xercesImpl.jar</literal> in <literal>lib</literal>
         directory : Xerces is the library used to parse and validate xml
-        files, like <ulink url="Descriptor.xml">Deployment
-        Descriptors</ulink>, <ulink url="Configuration.xml">Configuration
-        files</ulink> and <ulink url="./components/intro.xml">Component
-        files</ulink></para>
+        files, like Deployment Descriptors, Configuration files and Component files 
+        (see <xref linkend="XML_Descriptors"/>,
+        <xref linkend="Configuration"/>, and  
+        <xref linkend="intro"/>).
+      </para>
       </listitem>
 
       <listitem>
         <para><literal>fractal.jar</literal> in
         <literal>lib/components</literal> directory : Fractal is the component
-        model used for <ulink url="./components/intro.xml">ProActive
-        Components</ulink></para>
+        model used for ProActive Components (see <xref linkend="intro"/>).</para>
       </listitem>
 
       <listitem>
         <para><literal>bouncycastle.jar</literal> in <literal>lib</literal>
-        directory : This library is used by the <ulink
-        url="Security.xml">ProActive security framework</ulink></para>
+        directory : This library is used by the ProActive security framework
+        (see <xref linkend="Security"/>).</para>
       </listitem>
     </orderedlist>
 
@@ -384,8 +392,8 @@
     </orderedlist>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.javaPolicy" />Create a java.policy file to
+  <sect1 >
+    <title>Create a java.policy file to
     set permissions</title>
 
     <para><emphasis>If you use the scripts provided with the distribution to
@@ -394,7 +402,7 @@
     default</emphasis></para>
 
     <para>See <ulink
-    url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.xml">Permissions
+    url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions
     in the JavaTM 2 SDK</ulink> to learn more about Java permissions. As a
     first approximation to run your code you can create a simple policy file
     granted all for everything :</para>
@@ -404,8 +412,8 @@
 };        </screen></para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.log4j" />Create a log4j configuration
+  <sect1 >
+    <title>Create a log4j configuration
     file</title>
 
     <para><emphasis>If you use the scripts provided with the distribution to
@@ -436,8 +444,8 @@ log4j.appender.A1.layout.ConversionPattern=%m %n
       </example></para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.eclipse" />ProActive and the Eclipse
+  <sect1 >
+    <title>ProActive and the Eclipse
     IDE</title>
 
     <para>We highly recommend you to use the Eclispe IDE to develop your
@@ -509,13 +517,12 @@ log4j.appender.A1.layout.ConversionPattern=%m %n
     ProActive library.</para>
 
     <para>We are currently developping an eclipse plugin that will help
-    developpers to create easily ProActive applications. Take a look at <ulink
-    url="development/plugin.xml">the plugin documentation page</ulink>
-    .</para>
+    developpers to create easily ProActive applications. Have a look 
+    at the plugin documentation page, <xref linkend="plugin"/>.  </para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="dbdoclet.id.support" />Troubleshooting and
+  <sect1 >
+    <title>Troubleshooting and
     support</title>
 
     <para>If you encounter any problem with installing ProActive and running
@@ -594,8 +601,7 @@ java.security.AccessControlException: access denied
     </itemizedlist>
 
     <para>If you cannot solve the problem, feel free to email us for support
-    at <ulink
-    url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>. Make
+    at <email>proactive@objectweb.org<email>. Make
     sure you include a precise description of your problem along with a full
     copy of the error message you get.</para>
   </sect1>

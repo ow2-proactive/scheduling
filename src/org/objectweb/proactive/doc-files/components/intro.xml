@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="intro"><title>Components introduction</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/intro.html  -->
     <para>Computing Grids and Peer-to-Peer networks are inherently heterogeneous and

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <appendix id="FAQ">
   <title>Frequently Asked Questions</title>
 
   <para><emphasis role="bold">Note:</emphasis> This FAQ is under construction.
-  If one of your question is not answered here, just send it at <ulink
-  url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink> and
-  we'll update the FAQ.</para>
+  If one of your question is not answered here, just send it at 
+  <email>proactive@objectweb.org</email> and we'll update the FAQ.</para>
 
  <qandaset>
  <qandadiv>
@@ -108,7 +108,9 @@
         <para>Why don't the examples and compilation work under Windows?</para>
        </question>
        
-       <answer>
+       <indexterm><primary>Microsoft Windows</primary><secondary>Running ProActive</secondary></indexterm>
+       
+         <answer>
         <para>It happens quite often, that the default installation
          directory under Windows is under Program Files which contains space.
          Then setting the JAVA_HOME environment variable to the install
@@ -249,7 +251,7 @@
         </answer>
        </qandaentry>
        
-       <qandaentry>
+       <qandaentry id="reifiableDefinition">
         <question>
          <para>What is a reifiable object?</para>
         </question>
@@ -355,8 +357,8 @@
        
        <answer>
         <para>No. Calls to an Active Object methods are asynchronous under
-         some conditions. This is explained 
-         <ulink url="FutureObjectCreation.xml">here</ulink>. If for instance the
+         some conditions. This is explained in
+         <xref linkend="FutureObjectCreation"/>. If for instance the
          return type of a method call is not reifiable, you can use wrappers
          to keep asynchronism capabilities: suppose that one of your object
          has a method</para>
@@ -420,6 +422,8 @@
 
           <para>The problem can simply be fixed by adding asm<literal>.jar</literal> in the
           <literal>CLASSPATH</literal>.</para>
+         
+         <indexterm><primary>CLASSPATH</primary><secondary>missing</secondary></indexterm>
         </answer>
       </qandaentry>
 
@@ -431,8 +435,7 @@
        
        <answer>
 
-        <para>ProActive uses <ulink
-                                   url="http://jakarta.apache.org/bcel/">BCEL</ulink> for the on the
+        <para>ProActive uses <ulink url="http://jakarta.apache.org/bcel/">BCEL</ulink> for the on the
          fly generation of stub classes. The library
          <literal>bcel.jar</literal>, provided in the directory
          <literal>lib</literal> of <emphasis role="bold">ProActive</emphasis>
@@ -455,8 +458,10 @@
          at DiscoveryManager.main(DiscoveryManager.java:226)</screen>
         
         <para>The problem can simply be fixed by adding
-         <literal>bcel.jar</literal> in the
-         <literal>CLASSPATH</literal>.</para>
+         <literal>bcel.jar</literal> in the <literal>CLASSPATH</literal>.</para>
+        
+        <indexterm><primary>CLASSPATH</primary><secondary>missing</secondary></indexterm>
+
        </answer>
       </qandaentry>
                
@@ -516,7 +521,7 @@
          packages.</para>
         
         <para>See Permissions in the 
-         <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.xml">JavaTM
+         <ulink url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">JavaTM
           2 SDK</ulink> to learn more about Java permissions.</para>
         
         <para>As a first approximation, in order to run your code, you can
@@ -532,6 +537,30 @@
        </answer>
       </qandaentry>
  
+      <qandaentry>
+       <question>
+        <para>Why do I get an exception when using Jini?</para>
+       </question>
+       
+       <answer>
+        <para>In order to get <emphasis role="bold">Jini</emphasis> working
+         properly in ProActive, you have to put in your HOME directory a copy
+         of proactive.java.policy located in ProActive/scripts/unix or
+         windows. Indeed the rmid deamon needs this file to start. If you try
+         to use Jini without this policy file, it will not work. Moreover, if
+         you did it once, make sure that there is no file called
+         machine_namejiniLockFile in your working directory. This file is
+         usefull to avoid many Service Lookup to be created by concurrent
+         threads. This file is removed automatically when a Lookup Service is
+         created. If the application failed(for instance because of the
+         policy file) it is possible that this file remains in the directory,
+         in that case if you restart the application it will not work. So
+         checkout if this file is present in your working directory, if so
+         remove it and restart the application</para>
+       </answer>
+      </qandaentry>
+       
+     
      </qandadiv>
        <qandadiv>
         <title>Writing ProActive-oriented code</title>
@@ -745,7 +774,7 @@
  </question>
  
  <answer>
-  <para><emphasis remap="h3" role="bold">Defining Active Object
+  <para><emphasis  role="bold">Defining Active Object
     Activity</emphasis></para>
   
   <para>When an active object is created from a given object, all
@@ -796,7 +825,7 @@
    its activity automatically without invoking the init or ending
    phases. Only the activity itself is restarted.</para>
   
-  <para><emphasis remap="h3" role="bold">Setting Active Object
+  <para><emphasis  role="bold">Setting Active Object
     Activity</emphasis></para>
   
   <para>Two ways are possible to define each of the three phases of an
@@ -881,7 +910,7 @@
          </listitem>
         </itemizedlist>
         
-        <para><emphasis remap="h3" role="bold">Implementing the interfaces
+        <para><emphasis  role="bold">Implementing the interfaces
           directly in the class used to create the active
           object</emphasis></para>
         
@@ -915,7 +944,7 @@
          }
          }</screen>
         
-        <para><emphasis remap="h3" role="bold">Passing an object
+        <para><emphasis  role="bold">Passing an object
           implementing the interfaces when creating the active
           object</emphasis></para>
         
@@ -1068,33 +1097,11 @@
         <para>In order to use <emphasis role="bold">Jini</emphasis> in
          ProActive you have to configure properly the deployment descriptor.
          All informations on how to configure XML deployment descriptor are
-         provided <ulink url="Descriptor.xml">here</ulink></para>
+         provided in <xref linkend="XML_Descriptors"/>.</para>
        </answer>
       </qandaentry>
       
       <qandaentry>
-       <question>
-        <para>Why do I get an exception when using Jini?</para>
-       </question>
-       
-       <answer>
-        <para>In order to get <emphasis role="bold">Jini</emphasis> working
-         properly in ProActive, you have to put in your HOME directory a copy
-         of proactive.java.policy located in ProActive/scripts/unix or
-         windows. Indeed the rmid deamon needs this file to start. If you try
-         to use Jini without this policy file, it will not work. Moreover, if
-         you did it once, make sure that there is no file called
-         machine_namejiniLockFile in your working directory. This file is
-         usefull to avoid many Service Lookup to be created by concurrent
-         threads. This file is removed automatically when a Lookup Service is
-         created. If the application failed(for instance because of the
-         policy file) it is possible that this file remains in the directory,
-         in that case if you restart the application it will not work. So
-         checkout if this file is present in your working directory, if so
-         remove it and restart the application</para>
-       </answer>
-      
-       <qandaentry>
         <question>
          <para>How do I make a Component version out of an Active Object
           version?</para>
@@ -1133,8 +1140,51 @@
         </answer>
        </qandaentry>
   
-      </qandaentry>
       
+       <qandaentry>
+        <question>
+         <para>How can I use Jini in ProActive?</para>
+        </question>
+        
+        <answer>
+         <para>In order to use <emphasis role="bold">Jini</emphasis> in
+          ProActive you have to configure properly the deployment descriptor.
+          All informations on how to configure XML deployment descriptor are
+          provided in <xref linkend="XML_Descriptors"/>.</para>
+        </answer>
+       </qandaentry>
+       
+       <qandaentry>
+        <question>
+         <para>Why is my call not asynchronous?</para>
+        </question>
+        
+        <answer>
+         <para>ProActive allows to have asynchronous code, 
+          in the following cases:</para>
+          
+          <itemizedlist>
+           <listitem>
+            <para>The return value is reifiable (see <xref linkend="reifiableDefinition"/>).
+             This is needed to ensure the creation of the Future, which is the container
+             returned (the future is used while waiting for the effective result to arrive). 
+             The returned class has to be Serializable, can not be final, and must have an empty 
+             no-arguments constructor.</para>
+           </listitem>
+          
+           <listitem>
+            <para>The return value is void. In this case, the rendez-vous is made, and
+             then the caller resumes its activity, while the receiver has now a new methodCall
+             in its queue.  </para>
+           </listitem>
+
+          </itemizedlist>
+          
+          <para>More explanations can be found in <xref linkend="FutureObjectCreation"/>.</para>
+        </answer>
+        
+       </qandaentry>
+       
       
      </qandadiv>
      <qandadiv>

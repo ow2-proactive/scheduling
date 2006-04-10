@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="ActiveObjectCreation">
   <title>Active Objects: creation and advanced concepts</title>
 
@@ -17,6 +18,9 @@
   the caller thread. By contrast, the same call done on the active object
   <emphasis>aa</emphasis> created from <literal>A</literal> would result into
   placing a request embedding the method call for <emphasis>m</emphasis> in
+  
+  <indexterm><primary>Request Queue</primary></indexterm>
+
   the request queue of the active object <emphasis>aa</emphasis>. Then, later
   on, the active thread of <emphasis>aa</emphasis> would eventually pick-up
   and serve the request for the method <emphasis>m</emphasis>. That would
@@ -34,9 +38,8 @@
   a new object, the other is to use <literal>ProActive.turnActive</literal>
   and is based on the use of an existing object.</para>
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="ActiveObjectCreation_html_instantiationCreation" />Instantiation-Based
+  <sect1 >
+    <title>Instantiation-Based
     Creation</title>
 
     <para>When using instantiation based creation, any argument passed to the
@@ -73,7 +76,7 @@
     <literal>newActive</literal> returns, the active object has been created
     and its active thread is started.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Possible ambiguities on the constructor</title>
 
       <para>The first parameter of newActive is a string containing the
@@ -120,7 +123,7 @@
     }</programlisting>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2  id="Active_Object_On_Node">
       <title>Using a Node</title>
 
       <para>It is possible to pass a third parameter to the call to
@@ -146,9 +149,8 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="ActiveObjectCreation_html_objectCreation" />Object-Based
+  <sect1 >
+    <title>Object-Based
     Creation</title>
 
     <para>Object-based creation is used for turning an existing passive object
@@ -194,7 +196,7 @@
     more be guaranteed.</para>
   </sect1>
 
-  <sect1 remap="h2" id="ActiveObjectCreation_html_activity">
+  <sect1  id="ActiveObjectCreation_html_activity">
     <title>Specifying the activity of an active object</title>
 
     <para>Customizing the activity of the active object is at the core of
@@ -226,14 +228,18 @@
     <para>Three interfaces are used to define and implement each step:</para>
 
     <itemizedlist>
+     <indexterm><primary>InitActive</primary><secondary>interface</secondary></indexterm>
       <listitem>
         <para><ulink url="../InitActive.html">InitActive</ulink></para>
       </listitem>
 
+      <indexterm><primary>RunActive</primary><secondary>interface</secondary></indexterm>
       <listitem>
         <para><ulink url="../RunActive.html">RunActive</ulink></para>
       </listitem>
 
+      <indexterm><primary>EndActive</primary><secondary>interface</secondary></indexterm>
+ 
       <listitem>
         <para><ulink url="../EndActive.html">EndActive</ulink></para>
       </listitem>
@@ -263,7 +269,7 @@
     <para>Note that the methods defined by those 3 interfaces are guaranted to
     be called by the active thread of the active object.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Algorithms for deciding what activity to invoke</title>
 
       <para>The algorithms that decide for each phase what to do are the
@@ -271,7 +277,9 @@
       a parameter to <literal>newActive</literal> or
       <literal>turnActive</literal>):</para>
 
-      <para><emphasis role="bold">InitActive</emphasis></para>
+     <indexterm  significance="preferred"><primary>InitActive</primary><secondary>interface</secondary></indexterm>
+ 
+     <para><emphasis role="bold">InitActive</emphasis></para>
 
       <screen>if activity is non null and implements InitActive
   we invoke the method initActivity defined in the object activity
@@ -280,7 +288,9 @@ else if the class of the reified object implements InitActive
 else
   we don't do any initialization</screen>
 
-      <para><emphasis role="bold">RunActive</emphasis></para>
+ <indexterm  significance="preferred"><primary>RunActive</primary><secondary>interface</secondary></indexterm>
+      
+   <para><emphasis role="bold">RunActive</emphasis></para>
 
       <screen>if activity is non null and implements RunActive
   we invoke the method runActivity defined in the object activity
@@ -289,7 +299,10 @@ else if the class of the reified object implements RunActive
 else
   we run the standard FIFO activity</screen>
 
-      <para><emphasis role="bold">EndActive</emphasis></para>
+      
+ <indexterm  significance="preferred"><primary>EndActive</primary><secondary>interface</secondary></indexterm>
+
+ <para><emphasis role="bold">EndActive</emphasis></para>
 
       <screen>if activity is non null and implements EndActive
   we invoke the method endActivity defined in the object activity
@@ -299,7 +312,7 @@ else
   we don't do any cleanup</screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
      <title>Implementing the interfaces directly in the class</title>
 
       <para> Implementing the interfaces directly in the class used to create
@@ -407,7 +420,7 @@ public void terminate (){ hasToTerminate=true;}
       reactivity is up to the length of going around the loop.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Passing an object implementing the interfaces at creation-time</title>
 
       <para>Passing an object implementing the interfaces when creating the
@@ -457,7 +470,7 @@ public void terminate (){ hasToTerminate=true;}
     </sect2>
   </sect1>
 
-  <sect1 remap="h2" id="ActiveObjectCreation_html_restrictions">
+  <sect1  id="ActiveObjectCreation_html_restrictions">
     <title>Restrictions on reifiable objects</title>
 
     <para>Not all classes can give birth to active objects. There exist some
@@ -498,7 +511,7 @@ public void terminate (){ hasToTerminate=true;}
     </itemizedlist>
   </sect1>
 
-  <sect1 remap="h2" id="ActiveObjectCreation_html_factory" >
+  <sect1  id="ActiveObjectCreation_html_factory" >
     <title> Using the Factory Method Design Pattern</title>
 
     <para>Creating an active object using ProActive might be a little bit
@@ -529,10 +542,10 @@ public void terminate (){ hasToTerminate=true;}
     object have to be dealt with somewhere in the code.</para>
   </sect1>
 
-  <sect1 remap="h2" id="ActiveObjectCreation_html_customize" >
+  <sect1  id="ActiveObjectCreation_html_customize" >
     <title>Advanced: Customizing the Body of an Active Object</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Motivations</title>
 
       <para>There are many cases where you may want to customize the body used
@@ -560,7 +573,7 @@ public void terminate (){ hasToTerminate=true;}
       methods for that.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>How to do it</title>
 
       <para>First you have to write a new MetaObject factory that inherits
@@ -626,7 +639,7 @@ public void terminate (){ hasToTerminate=true;}
     </sect2>
   </sect1>
 
-  <sect1 id="ActiveObjectCreation_html_elementRole" remap="h2">
+  <sect1 id="ActiveObjectCreation_html_elementRole" >
     <title>Advanced: Role of the elements of an active object</title>
 
     <para>In this section, we'll have a very close look at what happens when
@@ -682,9 +695,11 @@ public void terminate (){ hasToTerminate=true;}
       </listitem>
     </itemizedlist>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Role of the stub</title>
 
+      <indexterm><primary>Stub</primary></indexterm>
+      
       <para>The role of the class <literal>Stub_B</literal> is to reify all
       method calls that can be performed through a reference of type
       <literal>B</literal>, and only these as calling a method declared in a
@@ -771,7 +786,7 @@ public void terminate (){ hasToTerminate=true;}
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Role of the proxy</title>
 
       <para>The role of the proxy is to handle asynchronism in calls to active
@@ -783,7 +798,7 @@ public void terminate (){ hasToTerminate=true;}
       method.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Role of the body</title>
 
       <para>The <literal>body</literal> is responsible for storing calls
@@ -794,7 +809,7 @@ public void terminate (){ hasToTerminate=true;}
       pending ones and executes the associated call.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Role of the instance of class B</title>
 
       <para>This is a standard instance of class <literal>B</literal>. It may
@@ -811,10 +826,10 @@ public void terminate (){ hasToTerminate=true;}
     </sect2>
   </sect1>
 
-  <sect1 id="FutureObjectCreation" remap="h2">
+  <sect1 id="FutureObjectCreation" >
     <title>Asynchronous calls and futures</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Creation of a Future Object</title>
 
       <para>Whenever possible a method call on an active object is reified as
@@ -922,7 +937,7 @@ public void terminate (){ hasToTerminate=true;}
       current futures become available. An application can be found in the
       FutureList class.</para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>HashCode and equals</title>
 
         <para>Any call to a future object is reified in order to be blocked if
@@ -934,7 +949,7 @@ public void terminate (){ hasToTerminate=true;}
         deadlocks if they are called on a not yet available object.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>hashCode()</title>
 
         <para>Instead of returning the hashcode of the object, it returns the
@@ -942,7 +957,7 @@ public void terminate (){ hasToTerminate=true;}
         object, there is a unique equivalence between them.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>equals()</title>
 
         <para>The default implementation of <literal>equals()</literal> in the
@@ -957,7 +972,7 @@ public void terminate (){ hasToTerminate=true;}
         methods.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>toString()</title>
 
         <para>The <literal>toString()</literal> method is most of the time
@@ -971,10 +986,10 @@ public void terminate (){ hasToTerminate=true;}
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Asynchronous calls in details</title>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>The setup</title>
 
         <para>First, let's introduce the example we'll use throughout this
@@ -987,7 +1002,7 @@ public void terminate (){ hasToTerminate=true;}
         by the call to <literal>foo</literal>.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>What would have happened in a sequential world</title>
 
         <para>In a sequential, single-threaded version of the same
@@ -1016,7 +1031,7 @@ public void terminate (){ hasToTerminate=true;}
           </figure></para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Visualizing the graph of objects</title>
 
         <para>Let us first get an idea of what the graph of objects at
@@ -1090,7 +1105,7 @@ public void terminate (){ hasToTerminate=true;}
         </itemizedlist>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Sequence Diagram</title>
 
         <para>Let us now concentrate on how and when and by which thread the
@@ -1174,7 +1189,7 @@ public void terminate (){ hasToTerminate=true;}
       </sect3>
     </sect2>
 
-    <sect2 remap="h3" id="FutureObjectCreation_commonerror" >
+    <sect2  id="FutureObjectCreation_commonerror" >
       <title>Important Notes: Errors to avoid</title>
 
       <para> there are few things to remember with asynchronous method call and futures, in order
@@ -1208,7 +1223,7 @@ public void terminate (){ hasToTerminate=true;}
           <para>calling this method with ProActive is sychronous. So to keep
           the asynchronism it is advised to use</para>
 
-          <programlisting language="java"> <emphasis role="bold">InWrapper </emphasis>giveSolution(parameter) </programlisting>
+          <programlisting language="java"> <emphasis role="bold">IntWrapper </emphasis>giveSolution(parameter) </programlisting>
 
           <para>In that case call to this method is asynchronous.</para>
 
@@ -1268,13 +1283,19 @@ if(result_from_method == null){
     </sect2>
   </sect1>
 
-  <sect1 id="AC" remap="h2">
-    <title>Automatic Continuation in ProActive</title>
-
-    <sect2 remap="h3">
+  <sect1 id="AC" >
+   <title>Automatic Continuation in ProActive</title>
+   
+ <indexterm significance="preferred">
+  <primary>Automatic Continuation</primary>
+ </indexterm> 
+   
+    <sect2 >
       <title>Objectives</title>
 
-      <para>An Automatic Continuation is due to the propagation of a future
+      <para>
+   
+       An Automatic Continuation is due to the propagation of a future
       outside the activity that has sent the corresponding request.</para>
 
       <para>Automatic Continuations allow to pass in parameter or return as a
@@ -1284,7 +1305,7 @@ if(result_from_method == null){
       update the result in all objects to which it passed the future.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Principles</title>
 
       <itemizedlist>
@@ -1300,8 +1321,8 @@ if(result_from_method == null){
 
           <para>Outgoing futures are registered in the <emphasis
           role="bold">FuturePool</emphasis> of the Active Object sending this
-          future(request or reply). Registration for
-          couple(Future,BodyDestination) as an Automatic Continuation occurs
+          future(request or reply). Registration for couple(Future,BodyDestination) as an 
+          Automatic Continuation occurs
           when the future is serialized(indeed every request or reply are
           serialized before being sent, and the future is part of the request
           or the reply). More precisely, a thread 
@@ -1358,7 +1379,7 @@ if(result_from_method == null){
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Example</title>
 
       <para>The following piece of code shows both cases: passing a future as
@@ -1400,9 +1421,10 @@ if(result_from_method == null){
 } //end of class B</programlisting></para>
     </sect2>
 
-    <sect2 remap="h3">
-      <title>Illustration of an Automatic Continuation </title>
-      
+    <sect2 >
+     <title>Illustration of an Automatic Continuation  </title>
+     
+     <indexterm><primary>Automatic Continuation </primary></indexterm>
       <para>We will illustrate here how a future is first created, 
        then passed as parameter to a method later on.</para>
       

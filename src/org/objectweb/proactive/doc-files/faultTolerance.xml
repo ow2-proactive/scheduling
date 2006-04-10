@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="faultTolerance">
   <title>Fault-Tolerance</title>
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/faultTolerance.html  -->
 
-  <sect1 remap="h2">
-    <title><anchor id="faultTolerance_html_overview" />Overview</title>
+  <sect1 >
+    <title>Overview</title>
 
     <para>ProActive can provide fault-tolerance capabilities through two
     differents protocols: a Communication-Induced Checkpointing protocol (CIC)
@@ -23,7 +24,7 @@
     protocol. As a consequence, a fault-tolerant active object must be
     serializable.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Communication Induced Checkpointing (CIC)</title>
 
       <para>Each active object in a CIC fault-tolerant application have to
@@ -46,7 +47,7 @@
       more active object.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Pessimistic message logging (PML)</title>
 
       <para>Each active object in a PML fault-tolerant application have to
@@ -69,11 +70,11 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="faultTolerance_html_making" />Making a ProActive
+  <sect1 >
+    <title>Making a ProActive
     application fault-tolerant</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Resource Server</title>
 
       <para>To be able to recover a failed active object, the fault-tolerance
@@ -105,7 +106,7 @@
       when no more such nodes are available, the p2p network is used.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Fault-Tolerance servers</title>
 
       <para>Fault-tolerance mechanism needs servers for the checkpoints
@@ -174,7 +175,7 @@ this.server.startProcess();</screen></para>
       automatically and transparently disabled for all the application.</para>
     </sect2>
 
-    <sect2 remap="h3" id="faultTolerance_html_configuration">
+    <sect2  id="faultTolerance_html_configuration">
       <title>Configure fault-tolerance for a ProActive application</title>
 
       <para>Fault-tolerance capabilities of a ProActive application are set in
@@ -230,7 +231,7 @@ this.server.startProcess();</screen></para>
       used.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>A deployment descriptor example</title>
 
       <para>Here is an example of deployment descriptor that deploys 3 virtual
@@ -322,10 +323,10 @@ this.server.startProcess();</screen></para>
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="faultTolerance_html_rules" />Programming rules</title>
+  <sect1 >
+    <title>Programming rules</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Serializable</title>
 
       <para>Persistence of active objects is obtained through standard Java
@@ -337,7 +338,7 @@ this.server.startProcess();</screen></para>
       automatically and transparently disabled for this active object.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Standard Java main method</title>
 
       <para>Standard Java thread, typically main method, cannot be turned
@@ -367,7 +368,7 @@ s.getName()', args);
       consistent.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Checkpointing occurrence</title>
 
       <para>To keep fault-tolerance fully transparent (see <ulink
@@ -393,7 +394,7 @@ public void infiniteMethod(){
 
       <para>The second consequence concerns the definition of the
       <literal>runActivity()</literal> method (see <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/RunActive.xml"><literal>runActive</literal></ulink>).
+      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/RunActive.html"><literal>runActive</literal></ulink>).
       Let us consider the following example:</para>
 
       
@@ -428,7 +429,7 @@ rvice(body);
       <literal>runActivity()</literal> method.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Activity Determinism</title>
 
       <para>All the activities of a fault-tolerant application must be deterministic 
@@ -437,7 +438,7 @@ rvice(body);
        methods such as <literal>Math.random()</literal>.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Limitations</title>
 
       <para>Fault-tolerance in ProActive is still not compliant with the
@@ -457,17 +458,16 @@ rvice(body);
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="faultTolerance_html_nbody"
-    xreflabel="A complete example" />A complete example</title>
+  <sect1  id="faultTolerance_html_nbody">
+    <title>  A complete example</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Description</title>
 
       <para>You can find in
       <literal>ProActive/scripts/[unix|windows]/ft/nbodyft.[sh|bat]</literal>
       a script that starts a fault-tolerant version of the <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/apps/nbody.xml">ProActive
+      url="http://www-sop.inria.fr/oasis/ProActive/apps/nbody.html">ProActive
       NBody</ulink> example. This script actually call the
       <literal>ProActive/scripts/[unix|windows]/nbody.[sh|bat]</literal>
       script with the option <literal>-displayft</literal>. The java source
@@ -499,7 +499,7 @@ rvice(body);
       had just before the failure.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Running NBody example</title>
 
       <para>Before starting the fault-tolerant body example, you have to edit

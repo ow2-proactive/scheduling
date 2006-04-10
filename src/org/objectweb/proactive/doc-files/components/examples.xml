@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="componentExamples">
   <title>Examples</title>
 
@@ -7,10 +8,8 @@
   tutorial, and C3D component version. The programming model is Fractal, and
   one should refer to the Fractal documentation for detailed examples.</para>
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="examples_html_From_objects_to_active_objects_to_distributed_components" />From
-    objects to active objects to distributed components</title>
+ <sect1  id="examples_html_From_objects_to_active_objects_to_distributed_components" >
+    <title> From objects to active objects to distributed components</title>
 
     <para>In Java, objects are created by instantiation of classes. With
     ProActive, one can create active objects from Java classes, while
@@ -35,8 +34,8 @@
     <screen> A object = new AImpl(); </screen>
 
     <para>Active objects are instantiated using factory methods from the
-    ProActive class (see the <ulink url="../HelloWorld.xml">ProActive Hello
-    World example</ulink> ). It is also possible to specify the activity of
+     ProActive class (see <xref linkend="HelloWorld"/>). 
+     It is also possible to specify the activity of
     the active object, the location (node or virtual node), or a factory for
     meta-objects, using the appropriate factory method.</para>
 
@@ -53,7 +52,7 @@
     definition of a component requires 3 sub-definitions: the type, the
     description of the content, and the description of the controller.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Type</title>
 
       <para>The type of the component (i.e. the functional interfaces provided
@@ -83,7 +82,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 }); </screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Description of the content</title>
 
       <para>The second step in the definition of a component is the definition
@@ -97,7 +96,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 ); </screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Description of the controller</title>
 
       <para>Properties relative to the controller can be specified in the
@@ -120,7 +119,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 ); </screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>From attributes to client interfaces</title>
 
       <para>There are 2 kinds of interfaces for a component: those that offer
@@ -190,14 +189,14 @@ public class AImpl implements A, BindingController {
     </sect2>
   </sect1>
 
-  <sect1 id="helloworldExample" remap="h2">
+  <sect1 id="helloworldExample" >
     <title>The HelloWorld example</title>
 
     <para>The mandatory helloworld example (from the Fractal tutorial) shows
     the different ways of creating a component system (programmatically and
     using the ADL), and it can easily be implemented using ProActive.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Set-up</title>
 
       <para>You can find the code for this example in the package
@@ -205,7 +204,7 @@ public class AImpl implements A, BindingController {
       distribution.</para>
 
       <para>The code is almost identical to the <ulink
-      url="http://fractal.objectweb.org/tutorials/fractal/index.xml">Fractal
+      url="http://fractal.objectweb.org/tutorials/fractal/index.html">Fractal
       tutorial's example</ulink>.</para>
 
       <para>The differences are the following:</para>
@@ -250,7 +249,7 @@ public class AImpl implements A, BindingController {
       </itemizedlist>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Architecture</title>
 
       <para>The helloworld example is a simple client-server application,
@@ -277,7 +276,7 @@ public class AImpl implements A, BindingController {
         </figure></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Distributed deployment</title>
 
       <para>This section is specific to the ProActive implementation, as it
@@ -292,8 +291,7 @@ public class AImpl implements A, BindingController {
       <para>One can of course customize the deployment descriptor and deploy
       components onto virtually any computer, provided it is connectable by
       supported protocols. Supported protocols include LAN, clusters and Grid
-      protocols (see <ulink url="../Descriptor.xml">deployment descriptors
-      documentation</ulink>).</para>
+      protocols (see <xref linkend="XML_Descriptors"/>).</para>
 
     <para>Have a look at the ADL files 'helloworld-distributed-no-wrappers.fractal' and
       'helloworld-distributed-wrappers.fractal'. In a nutshell, they say: 'the
@@ -336,7 +334,7 @@ public class AImpl implements A, BindingController {
       imply compromises between dynamicity and performance issues.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Execution</title>
 
       <para>You can either compile and run the code yourself, or follow the
@@ -527,10 +525,12 @@ ssfully
 17 Server: print done.</screen>
     </sect2>
 
-    <sect2 id="HelloWorldADLFiles" remap="h3">
+    <sect2 id="HelloWorldADLFiles" >
       <title>The HelloWorld ADL files</title>
 
-      <para><anchor id="distributed-wrappers-fractal" />
+      <indexterm><primary>ADL</primary><secondary>example</secondary></indexterm>
+
+      <para>
       org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal</para>
 
      <programlisting language="xml"><textobject>
@@ -538,28 +538,28 @@ ssfully
       </textobject></programlisting>
  
 
-      <para><anchor id="ClientType-fractal" />
+      <para>
       org.objectweb.proactive.examples.components.helloworld.ClientType.fractal</para>
 
      <programlisting language="xml"><textobject>
        <textdata fileref="../examples/components/helloworld/ClientType.fractal" />
       </textobject></programlisting>
      
-      <para><anchor id="ClientImpl-fractal" />
+      <para>
       org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal</para>
 
      <programlisting language="xml"><textobject>
        <textdata fileref="../examples/components/helloworld/ClientImpl.fractal" />
       </textobject></programlisting>
      
-      <para><anchor id="ServerType-fractal" />
+      <para>
       org.objectweb.proactive.examples.components.ServerType</para>
      
      <programlisting language="xml"><textobject>
        <textdata fileref="../examples/components/helloworld/ServerType.fractal" />
       </textobject></programlisting>
       
-     <para><anchor id="ServerImpl-fractal" />
+     <para>
       org.objectweb.proactive.examples.components.helloworld.ServerImpl</para>
      
      <programlisting language="xml"><textobject>
@@ -568,11 +568,11 @@ ssfully
         </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="examples_html_The_Comanche_example" />The Comanche
+  <sect1 >
+    <title>The Comanche
     example</title>
 
-    <para><ulink url="http://fractal.objectweb.org/tutorial/index.xml">The
+    <para><ulink url="http://fractal.objectweb.org/tutorial/index.html">The
     Comanche example</ulink> is a nice introduction to component based
     development with Fractal. It explains how to design applications using
     components, and how to implement these applications using the Fractal
@@ -584,9 +584,8 @@ ssfully
     <literal>Request</literal> objects are passed by reference. This is
     incompatible with the ProActive programming model, where, to avoid shared
     passive objects, all passive objects passed to active objects are actually
-    <emphasis role="bold">passed by copy</emphasis>(see <ulink
-    url="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/ProActiveBasis.xml">
-    ProActive basis</ulink>). As active objects are themselves passed by
+    <emphasis role="bold">passed by copy</emphasis>
+    (see <xref linkend="ProActiveBasis"/>). As active objects are themselves passed by
     reference, one could argue that we could turn some passive object into
     active objects. This would allow remote referencing through stubs.
     Unfortunately, for reasons specific to the Sockets and Streams
@@ -595,12 +594,10 @@ ssfully
     needed resource classes into active objects.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor
-    id="examples_html_The_C3D_example_turning_Active_Objects_into_Components" />C3D
-    - from Active Objects to Components</title>
+  <sect1  id="C3D_component_example">
+    <title>C3D - from Active Objects to Components</title>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Reason for this example</title>
 
       <para>This is an example of an application that is refactored to fit the
@@ -613,7 +610,7 @@ ssfully
       directory of the proactive source.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Using working C3D code with components</title>
 
       <para><figure>
@@ -640,17 +637,17 @@ ssfully
       and User interface that have to be implemented.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>How the application is written</title>
 
-      <para>First of all, have a look at the doc on <ulink
-      url="c3d.xml">C3D</ulink> to remember how this application is written.
+      <para>First of all, have a look at the doc on C3D to remember how 
+      this application is written, in <xref linkend="C3D_example"/>.
       Most important is the class diagram, showing C3DUser, C3DDispatcher and
       C3DRederingEngine. We decided that the only objects worth wrapping in
       components were those three. The rest is too small to be worth the
       hassle.</para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Creating the interfaces</title>
 
         <para>What we need to do is to extract the interfaces of the Objects,
@@ -684,7 +681,7 @@ ssfully
         extend the classes.</para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Creating the Component Wrappers</title>
 
         <para>You now have to create a class that englobes the previous Active
@@ -721,7 +718,7 @@ ssfully
           </example></para>
       </sect3>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>Discarding direct reference acknowledgment</title>
 
         <para>If you're out of luck, the code contains instructions to retain
@@ -750,7 +747,7 @@ ssfully
       </sect3>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>ADL</title>
 
       <para>You may be wanting to see how we have bound the components

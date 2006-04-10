@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="writingProActiveDocumentation">
  
   <title>How to write ProActive documentation</title>
@@ -197,8 +198,8 @@
    regular expression replacement, and not on language grammars.
    If you want to show some program output, you can use SCREEN instead 
    of PROGRAMLISTING. In any case, watch out, because spaces count (and produce your own indentation)! 
-   You can also use the EXAMPLE TAG around your PROGRAMLISTING or SCREEN tags, to give a title, and be referenced in the
-   table of examples. </para>
+   You can also use the EXAMPLE TAG around your PROGRAMLISTING or SCREEN tags, to give a title, 
+   and be referenced in the table of examples. </para>
   
   <para> You can also insert directly sources from their original files, or type the code in the docbook.
    When you are typing the code inside the docbook file, you can even highlight yourself some 
@@ -228,10 +229,8 @@
    
   <screen>linux > start.sh &amp; </screen>
   
-  <para>
-  Here is some java code directly included in the docbook (you can use CDATA 
-  to escape
-  &amp; and &lt;):  </para>
+  <para> Here is some java code directly included in the docbook (you can 
+  use CDATA to escape  &amp; and &lt;):  </para>
   
   <programlisting language="java"><![CDATA[package util;
                                                    
@@ -246,8 +245,8 @@ public class JavaToDocBook {
    * @return a String created  */   
   String convert(String fileToConvert) throws IOException {
     if (a > b && c < d ) {
-      // can use 'this' for 'NodeCreationEvent'
-      VirtualNode vn = pad.getVirtualNode('p2pvn');
+      // can use "this" for 'NodeCreationEvent'
+      VirtualNode vn = pad.getVirtualNode("p2pvn");
       vn.start();
       }
     return "Hello World";      
@@ -257,7 +256,8 @@ public class JavaToDocBook {
    
    <para>Here is an example of deployment descriptor that deploys 3 virtual nodes .</para>
    
-   <programlisting language="xml"> &lt;ProActiveDescriptor&gt;                        
+   <programlisting language="xml">  &lt;!-- Deoploying 3 virtual Nodes  --&gt;
+ &lt;ProActiveDescriptor&gt;                        
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="NonFT-Workers" property="multiple"/&gt;

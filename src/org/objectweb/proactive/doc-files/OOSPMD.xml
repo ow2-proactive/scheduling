@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="OOSPMD">
   <title>OOSPMD</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/OOSPMD.html  -->
+  <sect1 >
+    <title>OOSPMD: Introduction</title>
 
-  <sect1 remap="h2">
-    <title><anchor id="OOSPMD_html_intro" />OOSPMD: Introduction</title>
-
+    <indexterm><primary>OOSPMD</primary><secondary>definition</secondary></indexterm>
+    
     <para>SPMD stands for Single Program Multiple Data. Merged into an
     object-oriented framework, an SPMD programming model becomes an OOSPMD
     programming model.</para>
@@ -35,9 +36,11 @@
     objects.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OOSPMD_html_spmdGroups" />SPMD Groups</title>
+  <sect1 >
+    <title>SPMD Groups</title>
 
+    <indexterm><primary>OOSPMD</primary><secondary>groups</secondary></indexterm>
+    
     <para>An spmd group is a ProActive typed group built with the <emphasis
     role="bold">ProSPMD.newSPMDGroup()</emphasis> method. This method looks
     like the <emphasis role="bold">ProActiveGroup.newGroup()</emphasis>; they
@@ -75,9 +78,10 @@
     role="bold">ProSPMD</emphasis> class.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OOSPMD_html_introBarrier" />Barrier:
-    Introduction</title>
+  <sect1 >
+    <title>Barrier: Introduction</title>
+
+    <indexterm><primary>Barriers</primary><secondary>definition</secondary></indexterm>
 
     <para>ProActive provides three kinds of barrier to synchronize activities.
     The feature is specially useful in a SPMD programming style. A barrier
@@ -109,8 +113,8 @@
     <para>Here is a presentation about how to use those barriers.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OOSPMD_html_totalBarrier" />Total Barrier</title>
+  <sect1 >
+    <title>Total Barrier</title>
 
     <para>Total barrier directly involves the spmd group. A call to <emphasis
     role="bold">barrier(String)</emphasis> will block until all the members in
@@ -169,8 +173,8 @@
     members of the group may indefinitely wait.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OOSPMD_html_neighbourBarrier" />Neighbor
+  <sect1 >
+    <title>Neighbor
     barrier</title>
 
     <para>The Neighbor barrier is a kind of light weighted barrier, involving
@@ -212,8 +216,8 @@
     exchanged messages.</para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="OOSPMD_html_methodBarrier" />Method Barrier</title>
+  <sect1 >
+    <title>Method Barrier</title>
 
     <para>The Method barrier does no more involve extra messages to
     communicate (i.e. the <emphasis>barrier messages</emphasis>).

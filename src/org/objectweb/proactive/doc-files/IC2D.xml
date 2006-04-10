@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="IC2D">
   <title>IC2D: Interactive Control and Debugging of Distribution</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/IC2D.html  -->
+  <indexterm><primary>IC2D</primary><secondary>Description</secondary></indexterm>
+  <indexterm><primary>Globus</primary><secondary>Monitoring</secondary></indexterm>
 
   <para><emphasis role="bold">IC2D</emphasis> is a <emphasis
   role="bold">graphical environment</emphasis> for remote monitoring and
@@ -74,8 +76,8 @@
   <para><ulink url="../doc/ProActive_src_html/index.xml">Source code
   index</ulink></para>
 
-  <sect1 remap="h2">
-    <title><anchor id="IC2D_html_visualisation" />Graphical Visualisation
+  <sect1 >
+    <title>Graphical Visualisation
     within IC2D</title>
 
     <para><emphasis role="bold">IC2D features graphical visualisation of
@@ -93,13 +95,16 @@
       </figure></para>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="IC2D_html_control" />Control within IC2D</title>
+  <sect1 >
+    <title>Control within IC2D</title>
 
     <para><emphasis role="bold">IC2D permits to interactively and dynamically
     create new Jvms and Nodes.</emphasis></para>
 
-    <para><figure>
+  <indexterm><primary>Migration</primary><secondary>drang-and-drop</secondary></indexterm>
+  
+  
+  <para><figure>
         <title>A 'drag-and-drop' migration allows to graphically move running
         active objects</title>
 
@@ -121,11 +126,11 @@
     </figure>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="IC2D_html_applications" />Job monitoring and
+  <sect1 >
+    <title>Job monitoring and
     control</title>
 
-    <para><anchor id="IC2D_html_JobMonitoringTag" /><emphasis role="bold">IC2D
+    <para><emphasis role="bold">IC2D
     now provides a Job monitoring tool, in order to visualize and control high
     number of resources. This tool offers different views of a deployed
     application: per hosts, per jobs,.... To start the Job monitor tool,
@@ -147,12 +152,20 @@
         </imageobject>
       </mediaobject>
     </informalfigure>
-  </sect1>
+   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="IC2D_html_launcher" />Launcher</title>
+   <indexterm><primary>IC2D</primary><secondary>Fractal GUI</secondary></indexterm>
+     
+    <sect1>
+     <title>Fractal GUI</title>
+     <para> You can find a Fractal GUI (menu->Fractal GUI)to edit your ADL files 
+      in IC2D. This can only be done before deployment. </para>
+    </sect1>
 
-    <sect2 remap="h3">
+   <sect1>
+    <title>Launcher</title>
+
+    <sect2 >
       <title>Principles</title>
 
       <para>The launcher allows users to launch applications directly from an
@@ -165,7 +178,7 @@
       application.</para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>MainDefinition tag</title>
 
       <para>A new tag has been introduced, just before the component
@@ -257,7 +270,7 @@
   &lt;/ProActiveDescriptor&gt;</screen>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>API</title>
 
       <para>The Launcher class is located in the package <emphasis
@@ -282,7 +295,7 @@
       ;</literal></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Launcher in IC2D</title>
 
       <para>You will find the launcher in the <emphasis role="bold">launcher
@@ -320,8 +333,8 @@
     </sect2>
   </sect1>
 
-  <sect1 remap="h2">
-    <title><anchor id="IC2D_html_gridcomp" />Grid and cluster
+  <sect1 >
+    <title>Grid and cluster
     computing</title>
 
     <para><emphasis role="bold">As ProActive is interfaced with Globus and

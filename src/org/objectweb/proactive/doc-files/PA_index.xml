@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-"http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY contributors SYSTEM "contributors.xml">
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
 <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
@@ -66,7 +67,7 @@
     <legalnotice id="LegalNotice">
       <para>ProActive is a GRID Java middleware, with source code under <ulink
       url="http://www.gnu.org/copyleft/lesser.txt">LGPL license</ulink>.
-      Copyright INRIA 2001-2006.</para>
+      </para><para>Copyright &copy; INRIA 2001-2006.</para>
     </legalnotice>
 
     <mediaobject>
@@ -91,7 +92,7 @@
       role="bold">concurrent</emphasis> computing, also featuring <emphasis
       role="bold">mobility</emphasis> and <emphasis
       role="bold">security</emphasis> in a uniform framework. With a reduced
-      set of simple primitives, <emphasis role="bold">ProActive</emphasis>
+      set of simple primitives, ProActive 
       provides a comprehensive API allowing to simplify the programming of
       applications that are distributed on <emphasis role="bold">Local Area
       Network</emphasis> (LAN), on <emphasis role="bold">cluster of
@@ -179,10 +180,9 @@
       the Java Virtual Machine</emphasis>, no preprocessing or compiler
       modification; programmers write standard Java code. Based on a simple
       Meta-Object Protocol, the library is itself extensible, making the
-      system open for adaptations and optimizations. <emphasis
-      role="bold">ProActive</emphasis> currently uses the <emphasis
-      role="bold">RMI</emphasis> Java standard library as default portable
-      transport layer.</para>
+      system open for adaptations and optimizations. ProActive
+      currently uses the <emphasis role="bold">RMI</emphasis> Java standard 
+      library as default portable transport layer.</para>
 
       <para><emphasis role="bold">ProActive</emphasis> features several
       optimizations improving performance. For instance, whenever two active
@@ -191,11 +191,11 @@
       stack. This optimization is ensured even when the co-location occurs
       after a migration of one or both of the active objects.</para>
 
-      <para><emphasis role="bold">ProActive</emphasis> and the (de facto)
+       <para><emphasis role="bold">ProActive</emphasis> and the (de facto)
       <emphasis role="bold">Standards</emphasis>: ProActive has an
       architecture that allows the library to <emphasis
       role="bold">interoperate</emphasis> with various official or de facto
-      <emphasis role="bold">standards</emphasis>:
+      standards:
       
       <itemizedlist>
           <listitem>
@@ -219,12 +219,11 @@
             <para>LSF, PBS, Sun Grid Engine, OAR</para>
           </listitem>
         </itemizedlist>
-       </para><para>
-      Please send us comments, suggestions, bug reports at <ulink
-      url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>
-      Your input will be greatly appreciated.</para>
+       </para>
     </abstract>
   </bookinfo>
+
+   &contributors;
 
   <part id="ProActiveIntroduction">
     <title>Introduction</title>
@@ -282,13 +281,13 @@
     &OSGi;
     &mpi;
    </part>
-   
+
    <part id="ProActiveTools">
     <title>User Interface and tools</title>
     &IC2D;
     &plugin;
    </part>
-   
+
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
     &writeDoc;
@@ -297,10 +296,13 @@
     &devFaultTolerance;
     &MOP;
    </part>
+   
    <part id="backMattersPart">
     <title>Back matters</title>
-    &biblio;
     &FAQ;   
     &referenceCard;
-  </part>
+    &biblio;
+    <index/>
+   </part> 
+
  </book>

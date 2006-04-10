@@ -1,12 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Principles">
   <title>Principles</title>
 
-  <sect1 remap="h2">
-    <title><anchor id="Principles_html_intro" />Seamless sequential,
-    multithreaded and distributed</title>   
-   
-   <para>Most of the time, activities and distribution are not known at the
+  <para>GRID computing is now a key aspect, from scientific to business
+  applications, from large scale simulations to everyday-life enterprise IT,
+  including telcos and embedded domains. We are just entering the era of
+  Ubiquitous Computing with many computers at hand of every single individual
+  - after the old days of mainframes and servers, hundreds of persons sharing
+  the same machines, and the quite current days of PCs, one person/one
+  computer. Potentially spanning all over the world, involving several
+  thousands or several hundred thousands of nodes, the programming of Grid
+  applications call for a new paradigms. The ProActive Grid solution relies on
+  systematic <emphasis role="bold">asynchronous method calls</emphasis>,
+        <indexterm><primary>asynchronous method calls</primary></indexterm>
+  allowing to mastering both complexity and
+  efficiency. Overall, ProActive promotes a few basic and simple
+  principles:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>remote objects unified with activities,</para>
+    </listitem>
+
+    <listitem>
+      <para>systematic interaction through asynchronous method calls,</para>
+    </listitem>
+
+    <listitem>
+      <para>generalized futures as first class entities:
+      wait-by-necessity.</para>
+    </listitem>
+  </itemizedlist>
+
+  <para>ProActive takes advantage of this sound programming model, to further
+  propose advanced features such as groups, mobility, and components. In the
+  framework of a formal calculus, ASP (Asynchronous Sequential processes),
+  confluence and determinism have been proved for this programming model:
+  <xref endterm="TDO-book.abbrev" linkend="TDO-book" /> and <xref
+  endterm="CHSPOPL04.abbrev" linkend="CHSPOPL04" />.</para>
+
+  <para>Asynchronous method calls with returns lead to an emerging
+   abstraction: <emphasis role="bold">futures</emphasis>, 
+        <indexterm><primary>futures</primary></indexterm>
+   the expected result of a given asynchronous
+  method call. Futures turn out to be a very effective abstraction for large
+  distributed systems, preserving both low coupling and high
+  structuring.</para>
+
+  <para>Asynchronous method calls and first-class futures are provided in the
+   unifying framework of an <emphasis role="bold">Active Object</emphasis>.</para>
+   <indexterm> <primary>Active Object</primary> </indexterm>
+
+  <sect1 >
+    <title>Seamless sequential, multithreaded and distributed</title>
+
+    <para>Most of the time, activities and distribution are not known at the
     beginning, and change over time. <emphasis role="bold">Seamless implies
     reuse, smooth and incremental transitions</emphasis>.</para>
 
@@ -15,8 +64,9 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/proActiveModelColor.png" format="PNG"
-                       contentwidth="100" width="6in"/>
+            <imagedata contentwidth="100"
+                       fileref="images/proActiveModelColor.png" format="PNG"
+                       width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -30,22 +80,21 @@
     remote objects need to be accessed through some specific interfaces. As a
     consequence, these distributed objects libraries do not allow polymorphism
     between local and remote objects. This feature is our first requirement
-    for a metacomputing framework. It is strongly required in order to let the
-    programmer <emphasis>concentrate first on modeling and algorithmic issues 
-    rather than lower-level tasks </emphasis> such as object distribution,
-    mapping and load balancing.</para>
+    for a Grid Computing framework. It is strongly required in order to let
+    the programmer <emphasis>concentrate first on modeling and algorithmic
+    issues rather than lower-level tasks </emphasis> such as object
+    distribution, mapping and load balancing.</para>
   </sect1>
 
-  <sect1 remap="h2" id="Principles_html_active" >
-    <title> Active objects: Unifying threads and remote objects</title>
+  <sect1 id="Principles_html_active" >
+    <title>Active objects: Unifying threads and remote objects</title>
 
-    <para>
-     <literal>Active Objects</literal> is the core of the ProActive computing 
-     concept. It unifies a <emphasis>Remote Object</emphasis> (which allows 
-     to deploy it on a distant host)  and a <emphasis>Thread</emphasis> 
-     (which gives it its own activity, its own behaviour independently and in 
-     concurrency with other Active Objects deployed). Given a standard object, 
-     turning it into an Active Objects provides:</para>
+    <para><literal>Active Objects</literal> is the core of the ProActive
+    computing concept. It unifies a <emphasis>Remote Object</emphasis> (which
+    allows to deploy it on a distant host) and a <emphasis>Thread</emphasis>
+    (which gives it its own activity, its own behaviour independently and in
+    concurrency with other Active Objects deployed). Given a standard object,
+    turning it into an Active Objects provides:</para>
 
     <itemizedlist>
       <listitem>
@@ -61,41 +110,62 @@
       </listitem>
     </itemizedlist>
 
-    <para> <emphasis> This <literal>Active Object</literal> concept requires 
-      only to modify the instanciation code !</emphasis></para>
+    <para>Communications to an active object are by default asynchronous. So,
+    an active object is: a main object + a single thread + a queue of pending
+    <indexterm><primary>Request Queue</primary></indexterm>
+    requests. As such, a reference to a remote object is equivalent to a
+    reference to a remote activity. An activity is an object ; but being in a
+    non-uniform model, not all objects are active objects, the majority
+    remaining standard Java objects. As there cannot be any sharing, an active
+    object is also a unit of computational mobility (see <xref
+    linkend="Migration" />).</para>
 
-      <para>Here are given as example three ways to transform a standard 
-       <literal>Object</literal> into an <literal>Active Object</literal>:</para>
-     
+    <para><emphasis> This <literal>Active Object</literal> concept requires
+    only to modify the instanciation code !</emphasis></para>
+
+    <para>On activation, an object becomes a remotely accessible entity with
+    its own thread of control: an active object. Here are given as example
+    three ways to transform a standard <literal>Object</literal> into an
+    <literal>Active Object</literal>:</para>
 
     <example>
       <title>Class-based Active Object</title>
+
       <programlisting language="java">Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) ProActive.newActive("example.A", params, node); </programlisting>
     </example>
 
     <example>
       <title>Instantiation-based Active Object</title>
+
       <programlisting language="java">public class AA extends A implements Active {}
 Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
     </example>
 
-      <para>Object-based <literal>Active Objects</literal> Allows to turn active 
-       and set remote objects for which you do not have the source code; this is 
-       a necessary feature in the context of code mobility.</para>
-       
-       <example>
-        <title>Object-based Active Object</title>
+    <para>Object-based <literal>Active Objects</literal> Allows to turn active
+    and set remote objects for which you do not have the source code; this is
+    a necessary feature in the context of code mobility.</para>
+
+    <example>
+      <title>Object-based Active Object</title>
+
       <programlisting language="java">A a = new A (26, "astring");
-a = (A) ProActive.turnActive(a, node) ; </programlisting>    
+a = (A) ProActive.turnActive(a, node) ; </programlisting>
     </example>
-    
-      <note><para> Nodes allows to control the mapping to the hosts </para></note>
+
+    <note>
+      <para>Nodes allow to control the mapping to the hosts. See <xref
+      linkend="Active_Object_On_Node" /> for an example use of a Node, and
+      <xref linkend="Descriptor_Principles" /> for a definition.</para>
+    </note>
   </sect1>
 
-  <sect1 remap="h2" id="Principles_html_model">
-    <title> Model of Computation: Based on  previous works and studies</title>
+  <sect1 id="Principles_html_model" >
+    <title>Model of Computation</title>
+
+    <para>Let us summarized the model of computation being used by
+    ProActive:</para>
 
     <itemizedlist>
       <listitem>
@@ -128,9 +198,17 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
         control</emphasis> , libraries of Abstractions</para>
       </listitem>
     </itemizedlist>
+
+    <para> To compare to Java RMI, a Java remote object is not by essence an
+    activity. The fact that several threads can execute several remote method
+    calls simultaneously within a remote object does reveal that facet. When
+    writing <literal>ro.foo(p);</literal>, what ro identifies is not a remote
+    activity, but just a remote object. This has several consequences, along
+    with the presence of sharing between remote objects that prevents them
+    from being a unit of computational migration. </para>
   </sect1>
 
-  <sect1 remap="h2" id="Principles_html_reuse">
+  <sect1 id="Principles_html_reuse" >
     <title>Reuse and Seamless: why and how do we achieve better reuse?</title>
 
     <para>Two key features:</para>
@@ -138,29 +216,31 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
     <itemizedlist>
       <listitem>
         <para><emphasis role="bold">Wait-by-necessity: inter-objects
-        synchronization</emphasis>.
-       Systematic, implicit and transparent futures. Ease the programming
-       of synchronization and reuse of existing methods</para>
+        synchronization</emphasis>. Systematic, implicit and transparent
+        futures. Ease the programming of synchronization and reuse of existing
+        methods</para>
       </listitem>
-      
+
       <listitem>
         <para><emphasis role="bold">Polymorphism between standard and active
         objects</emphasis></para>
-    <itemizedlist>
-      <listitem>
-        <para>Type compatibility for classes and not just for interface</para>
-      </listitem>
 
-      <listitem>
-        <para>Needed and done for the future objects as well</para>
-      </listitem>
+        <itemizedlist>
+          <listitem>
+            <para>Type compatibility for classes and not just for
+            interface</para>
+          </listitem>
 
-      <listitem>
-        <para>Dynamic mechanism (dynamically achieve if needed)</para>
+          <listitem>
+            <para>Needed and done for the future objects as well</para>
+          </listitem>
+
+          <listitem>
+            <para>Dynamic mechanism (dynamically achieve if needed)</para>
+          </listitem>
+        </itemizedlist>
       </listitem>
     </itemizedlist>
-   </listitem>
-  </itemizedlist>
 
     <para><figure>
         <title>Polymorphism</title>
@@ -173,7 +253,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
       </figure></para>
   </sect1>
 
-  <sect1 id="TinyHelloWorld" remap="h2">
+  <sect1 id="TinyHelloWorld" >
     <title>Hello world ! (tiny example)</title>
 
     <para>This example implements the smallest program in ProActive. This is
@@ -182,7 +262,8 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
     the API.</para>
 
     <para>You can get a more complete 'hello world' example, with deployment
-     on a remote host, further on in the manual (<xref linkend="HelloWorld"/>).</para>
+    on a remote host, further on in the manual (<xref
+    linkend="HelloWorld" />).</para>
 
     <para>A client object displays a <literal>String</literal> received from
     elsewhere (the original VM). This illustrates the creation of an Active
@@ -191,40 +272,37 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
     <para>Only one class is needed: we have put the main method inside the
     class, which when deployed will be an Active Object.</para>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>The TinyHello class</title>
 
       <para>This class can be used as an Active Object, serving requests. Its
-      creation involves the following steps:
+      creation involves the following steps: <itemizedlist>
+          <listitem>
+            <para>Provide an implementation for the required server-side
+            functionalities</para>
+          </listitem>
 
-      <itemizedlist>
-        <listitem>
-          <para>Provide an implementation for the required server-side
-          functionalities</para>
-        </listitem>
+          <listitem>
+            <para>Provide an empty, no-arg constructor</para>
+          </listitem>
 
-        <listitem>
-          <para>Provide an empty, no-arg constructor</para>
-        </listitem>
+          <listitem>
+            <para>Write a <literal>main</literal> method in order to
+            instantiate one server object.</para>
+          </listitem>
+        </itemizedlist></para>
 
-        <listitem>
-          <para>Write a <literal>main</literal> method in order to instantiate
-          one server object.</para>
-        </listitem>
-      </itemizedlist>
+      <example>
+        <title>A possible implementation for the <literal>TinyHello</literal>
+        class</title>
 
-			</para>
-
- <example>
-    <title>A possible implementation for the <literal>TinyHello</literal> class</title>
-    <programlisting language="java"><textobject>
-      <textdata fileref="../examples/hello/TinyHello.java" />
-     </textobject></programlisting>
-   </example>
-
+        <programlisting language="java"><textobject>
+            <textdata fileref="../examples/hello/TinyHello.java" />
+          </textobject></programlisting>
+      </example>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Implement the required functionalities</title>
 
       <para>Implementing any remotely-accessible functionality is simply done
@@ -233,7 +311,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
       class. Here, the only method is <literal>sayHello</literal></para>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Creating the <literal>Hello</literal> Active Object</title>
 
       <para>Now that we know how to write the class that implements the
@@ -252,13 +330,13 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
             ); // which jvm should be used to hold the Active Object</programlisting>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Invoking a method on a remote object and printing out the
       message</title>
 
       <para>This is exactly like invoking a method on a local object of the
-      same type. The user does not have to deal with catching
-      exceptions related to the distant deployment.</para>
+      same type. The user does not have to deal with catching exceptions
+      related to the distant deployment.</para>
 
       <para>As already stated, the only modification brought to the code by
       ProActive is located at the place where active objects are created. All
@@ -270,25 +348,21 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
         logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity</programlisting>
     </sect2>
 
-    <sect2 remap="h3">
+    <sect2 >
       <title>Launching</title>
 
       <para>To launch the example, you may type:<screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
             -Dlog4j.configuration=file:scripts/proactive-log4j \
-            org.objectweb.proactive.examples.hello.TinyHello</screen> 
-           
-<screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
+            org.objectweb.proactive.examples.hello.TinyHello</screen> <screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
               -Dlog4j.configuration=file:scripts\proactive-log4j \
                org.objectweb.proactive.examples.hello.TinyHello</screen></para>
 
       <para>There are also scripts in the <literal>scripts</literal>
       directory:<screen>linux&gt; cd scripts/unix/ 
-linux&gt; tinyHello.sh</screen> 
-
-<screen>windows&gt; cd scripts/windows 
+linux&gt; tinyHello.sh</screen> <screen>windows&gt; cd scripts/windows 
 windows&gt; tinyHello.bat</screen></para>
 
-      <sect3 remap="h4">
+      <sect3 >
         <title>The output</title>
 
         <screen>[apple unix]tinyhello.sh
