@@ -601,7 +601,7 @@ java.security.AccessControlException: access denied
     </itemizedlist>
 
     <para>If you cannot solve the problem, feel free to email us for support
-    at <email>proactive@objectweb.org<email>. Make
+    at <email>proactive@objectweb.org</email>. Make
     sure you include a precise description of your problem along with a full
     copy of the error message you get.</para>
   </sect1>
