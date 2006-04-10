@@ -1133,7 +1133,7 @@
 		<!--  Make the one-html-file-doc first ( no associated target) -->
 		<antcall target="transformDocbook">
 			<param name="docbookInputFile" value="${docs.tmp}/PA_index.xml" />
-			<param name="docbookOutputFile" value="${docs.dir}/html/index.html" />
+                        <param name="docbookOutputFile" value="${docs.dir}/html/ProActive.html" />
 			<param name="docbookStyle" value="${doc.src}/xsl/onehtml.xsl" />
 		</antcall>
 
