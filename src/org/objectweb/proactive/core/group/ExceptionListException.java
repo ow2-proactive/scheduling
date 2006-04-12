@@ -56,7 +56,7 @@ public class ExceptionListException extends RuntimeException {
      * Adds an exception into this list
      * @param exception - the exception to add
      */
-    public void add(ExceptionInGroup exception) {
+    public synchronized void add(ExceptionInGroup exception) {
         if (getCause() == this) {
             initCause(exception);
         }
