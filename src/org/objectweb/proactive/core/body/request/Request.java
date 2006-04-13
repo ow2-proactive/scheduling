@@ -58,6 +58,14 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
  */
 public interface Request extends Message, Securizable {
 
+	
+	// Next request to serve
+	public static final int NFREQUEST_IMMEDIATE_PRIORITY = 2;
+	// FIFO among non functional requests
+	public static final int NFREQUEST_PRIORITY = 1;
+	// FIFO among all requests
+	public static final int NFREQUEST_NO_PRIORITY = 0;
+	
     /**
      * Returns true if the request has been forwarded
      * @return true if the request has been forwarded
@@ -127,4 +135,33 @@ public interface Request extends Message, Securizable {
      */
     public void notifyReception(UniversalBody bodyReceiver)
         throws java.io.IOException;
+    
+    /**
+     * Returns true if the request is a non fuctional request.
+     * Non Functional requests are requests which do not modify application's computation.
+     * @return isFunctionalRequest
+     */
+    public boolean isFunctionalRequest();
+    
+    /**
+     * Set the request to a non functional request or not. 
+     * @param isFunctionalRequest 
+     */
+    public void setFunctionalRequest(boolean isFunctionalRequest);
+    
+    
+    /**
+     * Set the priority of the non functional request
+     * Request.NFREQUEST_IMMEDIATE_PRIORITY or
+     * Request.NFREQUEST_PRIORITY or
+     * Request.NFREQUEST_NO_PRIORITY
+     * @param NFReqPriority
+     */
+    public void setNFRequestPriority(int NFReqPriority);
+    
+    /**
+     * Returns the request priority 
+     * @return request priority
+     */
+    public int getNFRequestPriority();
 }

@@ -73,6 +73,10 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     private Request wrappedRequest;
     private boolean isArrived;
 
+    //Non Functional Requests
+	protected boolean isNFRequest = false;
+	protected int nfRequestPriority;
+
     /**
      * Create a new awaited request.
      * @param awaitedSender the id of the awaited sender.
@@ -250,4 +254,24 @@ public class AwaitedRequest implements Request, java.io.Serializable {
         UniversalBody destinationBody) throws RenegotiateSessionException {
         return this.wrappedRequest.crypt(psm, destinationBody);
     }
+    
+    //
+    // -- Methods dealing with Non Functional Requests
+    //
+    
+	public boolean isFunctionalRequest() {
+		return isNFRequest;
+	}
+
+	public void setFunctionalRequest(boolean isFunctionalRequest) {
+	   this.isNFRequest = isFunctionalRequest; 
+	}
+
+	public void setNFRequestPriority(int nfReqPriority) {
+		this.nfRequestPriority = nfReqPriority;
+	}
+
+	public int getNFRequestPriority() {
+		return nfRequestPriority;
+	}
 }

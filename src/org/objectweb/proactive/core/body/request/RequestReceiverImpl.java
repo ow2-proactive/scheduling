@@ -58,7 +58,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         immediateServices = new Hashtable(2);
         immediateServices.put("toString", ANY_PARAMETERS);
         immediateServices.put("hashCode", ANY_PARAMETERS);
-        immediateServices.put("terminateAOImmediatly", ANY_PARAMETERS);
+        immediateServices.put("terminateAO_", ANY_PARAMETERS);
     }
 
     public int receiveRequest(Request request, Body bodyReceiver)

@@ -443,11 +443,11 @@ public class ProActiveComponentRepresentativeImpl
         return Constants.PRIMITIVE.equals(hierarchicalType);
     }
 
-	public void terminateAO(Proxy proxy) {
+	public void _terminateAO(Proxy proxy) {
 
 	}
 
-	public void terminateAOImmediatly(Proxy proxy) {
+	public void _terminateAOImmediatly(Proxy proxy) {
 	
 	}
 	

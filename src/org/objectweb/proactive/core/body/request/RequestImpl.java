@@ -81,14 +81,24 @@ public class RequestImpl extends MessageImpl implements Request,
     private static Boolean enableStackTrace;
     private StackTraceElement[] stackTrace;
 
+    //Non Functional requests
+    protected boolean isNFRequest = false;
+    protected int nfRequestPriority;
+    
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
+    
+    
+    // Constructor of simple requests
     public RequestImpl(MethodCall methodCall, UniversalBody sender,
         boolean isOneWay, long nextSequenceID) {
-        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+    	super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
+        this.isNFRequest = false;
+        
         if (enableStackTrace == null) {
 
             /* First time */
@@ -100,6 +110,46 @@ public class RequestImpl extends MessageImpl implements Request,
         }
     }
 
+    // Constructor of non functional requests without priority
+    public RequestImpl(MethodCall methodCall, UniversalBody sender,
+            boolean isOneWay, long nextSequenceID, boolean isNFRequest) {
+    	super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+        this.methodCall = methodCall;
+        this.sender = sender;
+        this.isNFRequest = isNFRequest;
+        this.nfRequestPriority = Request.NFREQUEST_NO_PRIORITY;
+        
+        if (enableStackTrace == null) {
+
+            /* First time */
+            enableStackTrace = new Boolean(!"false".equals(System.getProperty(
+                            "proactive.stack_trace")));
+        }
+        if (enableStackTrace.booleanValue()) {
+            this.stackTrace = new Exception().getStackTrace();
+        }
+    }
+    
+    // Constructor of non functional requests with priority
+    public RequestImpl(MethodCall methodCall, UniversalBody sender,
+            boolean isOneWay, long nextSequenceID, boolean isNFRequest, int nfRequestPriority) {
+    	super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+        this.methodCall = methodCall;
+        this.sender = sender;
+        this.isNFRequest = isNFRequest;
+        this.nfRequestPriority = nfRequestPriority;
+        
+        if (enableStackTrace == null) {
+
+            /* First time */
+            enableStackTrace = new Boolean(!"false".equals(System.getProperty(
+                            "proactive.stack_trace")));
+        }
+        if (enableStackTrace.booleanValue()) {
+            this.stackTrace = new Exception().getStackTrace();
+        }
+    }
+    
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -267,7 +317,7 @@ public class RequestImpl extends MessageImpl implements Request,
             this.crypt(((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager(),
                 destinationBody);
         } catch (SecurityNotAvailableException e) {
-            //TODO remove SecurityNotAvalaible e.printStackTrace();
+            //todo remove SecurityNotAvalaible e.printStackTrace();
         }
 
         int ftres = destinationBody.receiveRequest(this);
@@ -359,4 +409,24 @@ public class RequestImpl extends MessageImpl implements Request,
         in.defaultReadObject();
         sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }
+    
+    //
+    // -- METHODS DEALING WITH NON FUNCTIONAL REQUESTS
+    //
+    
+	public boolean isFunctionalRequest() {
+		return isNFRequest;
+	}
+
+	public void setFunctionalRequest(boolean isFunctionalRequest) {
+	   this.isNFRequest = isFunctionalRequest; 
+	}
+
+	public void setNFRequestPriority(int nfReqPriority) {
+		this.nfRequestPriority = nfReqPriority;
+	}
+
+	public int getNFRequestPriority() {
+		return nfRequestPriority;
+	}
 }

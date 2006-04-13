@@ -115,7 +115,7 @@ public class Spy implements org.objectweb.proactive.RunActive,
         throw new MigrationException("Cannot find node " + nodeDestination,
             e);
     }
-    ProActive.migrateTo(body, node, true);
+    ProActive.migrateTo(body, node, true, Request.NFREQUEST_IMMEDIATE_PRIORITY);
 }
 
     

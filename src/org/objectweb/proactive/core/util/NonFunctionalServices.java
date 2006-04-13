@@ -44,8 +44,6 @@ import org.objectweb.proactive.core.mop.Proxy;
  *  
  * The methods are reifed in the active object's Stub, so that their implementation is transparent for the programmer.
  *   
- * @author mozonne
- *
  */
 
 public class NonFunctionalServices {
@@ -63,8 +61,8 @@ public class NonFunctionalServices {
 			stubObjectClass = java.lang.Class.forName ("org.objectweb.proactive.core.mop.StubObject");
 			paramTypes = new Class[1];
 			paramTypes [0] = java.lang.Class.forName ("org.objectweb.proactive.core.mop.Proxy");
-			terminateAOMethod = stubObjectClass.getMethod("terminateAO", paramTypes);
-			terminateAOImmediatlyMethod = stubObjectClass.getMethod("terminateAOImmediatly", paramTypes);
+			terminateAOMethod = stubObjectClass.getMethod("_terminateAO", paramTypes);
+			terminateAOImmediatlyMethod = stubObjectClass.getMethod("_terminateAOImmediatly", paramTypes);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -81,7 +79,7 @@ public class NonFunctionalServices {
 	 * @param proxy 
 	 * @throws Throwable
 	 */
-	public static void terminateAO (Proxy proxy) throws Throwable {
+	public static void _terminateAO (Proxy proxy) throws Throwable {
 		proxy.reify(MethodCall.getMethodCall(terminateAOMethod, paramTypes));		
 	}
 	
@@ -91,7 +89,7 @@ public class NonFunctionalServices {
 	 * @param proxy 
 	 * @throws Throwable
 	 */
-	public static void terminateAOImmediatly(Proxy proxy) throws Throwable {
+	public static void _terminateAOImmediatly(Proxy proxy) throws Throwable {
 		proxy.reify(MethodCall.getMethodCall(terminateAOImmediatlyMethod, paramTypes));
 	}
 

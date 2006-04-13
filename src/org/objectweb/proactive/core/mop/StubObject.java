@@ -49,11 +49,11 @@ public interface StubObject {
     /**
      * Kill an Active Object while calling terminate() method on its body.
      */
-    public void terminateAO(Proxy proxy);
+    public void _terminateAO(Proxy proxy);
     
     /**
      * Kill and Active Object immediatly. This method is an immediate service 
      * and call terminate() methode on the active object's body.
      */
-    public void terminateAOImmediatly(Proxy proxy);
+    public void _terminateAOImmediatly(Proxy proxy);
 }

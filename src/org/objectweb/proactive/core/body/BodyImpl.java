@@ -491,7 +491,7 @@ public abstract class BodyImpl extends AbstractBody
          * @return true if the name of the method is "terminateAO" or "terminateAOImmediatly".
          */
         private boolean isTerminateAORequest(Request request) {
-        	boolean terminateRequest = (request.getMethodName()).startsWith("terminateAO");
+        	boolean terminateRequest = (request.getMethodName()).startsWith("_terminateAO");
         	if (terminateRequest) {
         		terminate();
         	}

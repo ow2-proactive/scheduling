@@ -104,6 +104,8 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
 
+
+
 import ibis.rmi.RemoteException;
 
 
@@ -203,6 +205,9 @@ public class ProActive {
     /** Used for profiling */
     private static CompositeAverageMicroTimer timer;
 
+    //
+    // -- STATIC MEMBERS -----------------------------------------------
+    //
     static {
         ProActiveConfiguration.load();
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
@@ -1346,79 +1351,83 @@ public class ProActive {
      * Migrates the given body to the same location as the active object given in parameter.
      * This method can be called from any object and does not perform the migration.
      * Instead it generates a migration request that is sent to the targeted body.
-     * Two strategies are possible :
-     *   - the request is high priority and is processed before all existing requests
-     *   the body may have received (priority = true)
-     *   - the request is normal priority and is processed after all existing requests
-     *   the body may have received (priority = false)
      * The object given as destination must be an active object.
      * @param bodyToMigrate the body to migrate.
      * @param activeObject the active object indicating the destination of the migration.
-     * @param priority a boolean indicating the priority of the migration request sent to the body.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
      */
     public static void migrateTo(Body bodyToMigrate, Object activeObject,
-        boolean priority) throws MigrationException {
-        migrateTo(bodyToMigrate,
-            getNodeFromURL(getNodeURLFromActiveObject(activeObject)), priority);
+        boolean isNFRequest) throws MigrationException {
+        ProActive.migrateTo(bodyToMigrate,
+            getNodeFromURL(getNodeURLFromActiveObject(activeObject)), isNFRequest);
     }
 
     /**
      * Migrates the given body to the node caracterized by the given url.
      * This method can be called from any object and does not perform the migration.
      * Instead it generates a migration request that is sent to the targeted body.
-     * Two strategies are possible :
-     *   - the request is high priority and is processed before all existing requests
-     *   the body may have received (priority = true)
-     *   - the request is normal priority and is processed after all existing requests
-     *   the body may have received (priority = false)
      * The object given as destination must be an active object.
      * @param bodyToMigrate the body to migrate.
      * @param nodeURL the url of an existing where to migrate to.
-     * @param priority a boolean indicating the priority of the migration request sent to the body.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
      */
     public static void migrateTo(Body bodyToMigrate, String nodeURL,
-        boolean priority) throws MigrationException {
-        ProActive.migrateTo(bodyToMigrate, getNodeFromURL(nodeURL), priority);
+        boolean isNFRequest) throws MigrationException {
+        ProActive.migrateTo(bodyToMigrate, getNodeFromURL(nodeURL), isNFRequest);
     }
 
     /**
      * Migrates the body <code>bodyToMigrate</code> to the given node.
      * This method can be called from any object and does not perform the migration.
      * Instead it generates a migration request that is sent to the targeted body.
-     * Two strategies are possible :
-     *   - the request is high priority and is processed before all existing requests
-     *   the body may have received (priority = true)
-     *   - the request is normal priority and is processed after all existing requests
-     *   the body may have received (priority = false)
      * The object given as destination must be an active object.
      * @param bodyToMigrate the body to migrate.
      * @param node an existing node where to migrate to.
-     * @param priority a boolean indicating the priority of the migration request sent to the body.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
      */
-    public static void migrateTo(Body bodyToMigrate, Node node, boolean priority)
+    public static void migrateTo(Body bodyToMigrate, Node node, boolean isNFRequest)
         throws MigrationException {
-        if (!(bodyToMigrate instanceof Migratable)) {
-            throw new MigrationException(
-                "This body cannot migrate. It doesn't implement Migratable interface");
-        }
-
-        Object[] arguments = { node };
-
-        try {
-            BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo",
-                    new Class[] { Node.class }, arguments, priority);
-            request.send(bodyToMigrate);
-        } catch (NoSuchMethodException e) {
-            throw new MigrationException("Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
-                e);
-        } catch (java.io.IOException e) {
-            throw new MigrationException("Cannot send the request to migrate", e);
-        }
+    	//In the context of ProActive, migration of an active object is considered as a non functional request. 
+    	//That's why "true" is set by default for the "isNFRequest" parameter. 
+        ProActive.migrateTo(bodyToMigrate, node, true, org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 
+    /**
+     * Migrates the body <code>bodyToMigrate</code> to the given node.
+     * This method can be called from any object and does not perform the migration.
+     * Instead it generates a migration request that is sent to the targeted body.
+     * The object given as destination must be an active object.
+     * @param bodyToMigrate the body to migrate.
+     * @param node an existing node where to migrate to.
+     * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
+     * @param priority  the level of priority of the non functional request. Levels are defined in Request interface of ProActive.
+     * @exception MigrationException if the migration fails
+     */
+    public static void migrateTo(Body bodyToMigrate, Node node, boolean isNFRequest, int priority)
+    throws MigrationException {
+    	if (!(bodyToMigrate instanceof Migratable)) {
+    		throw new MigrationException(
+    		"This body cannot migrate. It doesn't implement Migratable interface");
+    	}
+    	
+    	Object[] arguments = { node };
+    	
+    	try {
+    		BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo",
+    				new Class[] { Node.class }, arguments, isNFRequest, priority);
+    		request.send(bodyToMigrate);
+    	} catch (NoSuchMethodException e) {
+    		throw new MigrationException("Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
+    				e);
+    	} catch (java.io.IOException e) {
+    		throw new MigrationException("Cannot send the request to migrate", e);
+    	}
+    }
+    
+    
     /**
      * Blocks the calling thread until one of the futures in the vector is available.
      * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
@@ -1656,9 +1665,9 @@ public class ProActive {
         Proxy proxy = ((StubObject) ao).getProxy();
         try {
             if (immediate) {
-                NonFunctionalServices.terminateAOImmediatly(proxy);
+                NonFunctionalServices._terminateAOImmediatly(proxy);
             } else {
-                NonFunctionalServices.terminateAO(proxy);
+                NonFunctionalServices._terminateAO(proxy);
             }
         } catch (Throwable e) {
             e.printStackTrace();

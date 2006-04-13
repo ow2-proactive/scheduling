@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.examples.jacobi;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -39,7 +41,7 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 
 
-public class SubMatrix {
+public class SubMatrix implements Serializable{
 
     /** Default width value of a submatrix */
     private static final int DEFAULT_WIDTH = 100;

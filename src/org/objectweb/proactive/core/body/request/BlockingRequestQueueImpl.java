@@ -197,7 +197,9 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             if (this.spmdManager == null) {
                 this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
             }
+            if(!spmdManager.isCurrentBarriersEmpty()) {
             return this.barrierBlockingRemove(); // the oospmd way ...
+            }
         }
 
         long timeStartWaiting = 0;
