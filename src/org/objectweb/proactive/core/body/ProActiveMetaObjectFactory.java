@@ -75,8 +75,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
+// TODO JAVADOC SHOULD BE REWRITTEN 
 /**
- * THIS JAVADOC SHOULD BE REWRITTEN
  * <p>
  * This class provides singleton instances of all default factories
  * creating MetaObjects used in the Body.
