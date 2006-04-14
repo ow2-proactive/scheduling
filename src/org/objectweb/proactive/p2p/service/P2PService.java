@@ -280,8 +280,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     Node current = (Node) nodes.get(i);
                     if (vnName != null) {
                         try {
-                            current.getProActiveRuntime().registerVirtualNode(vnName,
-                                true);
+                            current.getProActiveRuntime()
+                                   .registerVirtualNode(vnName, true);
                         } catch (Exception e) {
                             logger.warn("Couldn't register " + vnName +
                                 " in the PAR", e);
@@ -464,7 +464,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @return the number of asked nodes.
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
-        return this.getNodes(numberOfNodes, null, vnName, jobId);
+        return this.getNodes(numberOfNodes, ".*", vnName, jobId);
     }
 
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName,
@@ -524,8 +524,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public Node getANode(String vnName, String jobId, P2PService service) {
         if (service.equals(this.stubOnThis)) {
-            return this.acquaintanceManager.randomPeer().getANode(vnName,
-                jobId, service);
+            return this.acquaintanceManager.randomPeer()
+                                           .getANode(vnName, jobId, service);
         }
         P2PNode askedNode = this.nodeManager.askingNode(null);
         Node nodeAvailable = askedNode.getNode();
@@ -533,8 +533,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (nodeAvailable != null) {
             if (vnName != null) {
                 try {
-                    nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName,
-                        true);
+                    nodeAvailable.getProActiveRuntime()
+                                 .registerVirtualNode(vnName, true);
                 } catch (Exception e) {
                     logger.warn("Couldn't register " + vnName + " in the PAR", e);
                 }
@@ -544,8 +544,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             }
             return nodeAvailable;
         }
-        return this.acquaintanceManager.randomPeer().getANode(vnName, jobId,
-            service);
+        return this.acquaintanceManager.randomPeer()
+                                       .getANode(vnName, jobId, service);
     }
 
     /**
@@ -579,10 +579,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     }
 
     /**
-     * @return a reference to the local acquaintance manager.
+     * @return the list of current acquaintances.
      */
-    public P2PAcquaintanceManager getP2PAcquaintanceManager() {
-        return this.acquaintanceManager;
+    public Vector getAcquaintanceList() {
+        return this.acquaintanceManager.getAcquaintanceList();
     }
 
     // -------------------------------------------------------------------------
@@ -744,7 +744,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         } catch (NodeException e) {
             logger.fatal("Couldn't create one the managers", e);
         }
-
         logger.debug("Exiting initActivity");
     }
 
