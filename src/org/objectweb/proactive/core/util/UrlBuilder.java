@@ -262,8 +262,7 @@ public class UrlBuilder {
         if (System.getProperty("proactive.hostname") != null) {
             return System.getProperty("proactive.hostname");
         }
-        if ((System.getProperty("proactive.useIPaddress") != null) &&
-                (System.getProperty("proactive.useIPaddress").equals("true"))) {
+        if ("true".equals(System.getProperty("proactive.useIPaddress"))) {
             return address.getHostAddress();
         } else {
             return address.getCanonicalHostName();
