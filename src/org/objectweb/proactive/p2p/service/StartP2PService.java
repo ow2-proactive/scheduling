@@ -439,7 +439,7 @@ public class StartP2PService implements P2PConstants {
                     "://" + url;
             }
 
-            if (!url.matches(".*:[0-9]+$")) {
+            if (!url.matches(".*:[0-9]+.*")) {
                 url += (":" + System.getProperty(P2PConstants.PROPERTY_PORT));
             }
 
