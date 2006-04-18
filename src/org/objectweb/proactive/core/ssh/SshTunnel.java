@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.ssh;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.util.Random;
 
@@ -57,6 +58,7 @@ import com.jcraft.jsch.*;
 public class SshTunnel {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private static Random _random = new Random();
+    static private int lastTriedPort = _random.nextInt(65536-1024)+1024;
     private int _localPort;
     private Session _session;
     private String _username;
@@ -103,11 +105,21 @@ public class SshTunnel {
                 throw new IOException("SSH tunnel failed: 127.0.0.1 -->" +
                     distantHost + ":" + distantPort + "for " + username);
             }
-            int lport = 0;
-            int i = 0;
-            while (i < 5) {
-                lport = _random.nextInt(64540) + 1024;
-                try {
+            
+            /*
+             * We are under JSchSingle lock. lastTriedPort will not change until we release it.
+             *
+             * Try to find a free port by looping until we find a free port.
+             */ 
+            int lport;
+            for (
+            		// Start search at the last allocated port
+            		lport = lastTriedPort==65535 ? 1024 : lastTriedPort+1;
+            		// No free port found
+            		lport != lastTriedPort;
+            		lport = lport==65535 ? 1024 : lport+1) {
+            				
+            	try {
                     session.setPortForwardingL("127.0.0.1", lport, distantHost,
                         distantPort);
                     _session = session;
@@ -118,16 +130,22 @@ public class SshTunnel {
                     _sshPort = sshPort;
                     break;
                 } catch (JSchException e) {
-                    i++;
+                    // Port probably in use...
+                	logger.info("Please ignore the previous line. Everithing is ok; JSch is just a bit too verbose");
                 }
+            	
+                
             }
-            if (i == 5) {
-                throw new IOException(
+            
+            if (lport == lastTriedPort) {
+            	throw new IOException(
                     "SSH tunnel failed (could not allocate port number): 127.0.0.1 -->" +
                     distantHost + ":" + distantPort);
             }
+            
+            lastTriedPort = lport;
         } catch (IOException e) {
-            throw e;
+        	throw e;
         } finally {
             JSchSingleton.releaseLock();
         }
