@@ -155,7 +155,9 @@ public class JSchSingleton {
                             " you can fix this using internal_ip attribute");
                     }
                 } else {
-                    e.printStackTrace();
+                    logger.info(e.getMessage() + " when connecting from " +
+                        InetAddress.getLocalHost().getHostName() + "to " +
+                        hostname + ":" + sshPort);
                     throw new IOException(e.getMessage());
                 }
             }
