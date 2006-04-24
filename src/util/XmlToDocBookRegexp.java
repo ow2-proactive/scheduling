@@ -48,7 +48,7 @@ public class XmlToDocBookRegexp implements LanguageToDocBook {
     
     //   \b in a regexp means a word boundary                     
     private static Pattern [] pattern = {
-        Pattern.compile("(\\s)(\\w*)(=)(\".*\")()"), // the attributes construct, like: role="toto"
+        Pattern.compile("(\\s)(\\w*)(=)(\".*?\")()"), // the attributes construct, like: role="toto"
         Pattern.compile("(&lt;/?)(\\w*)(\\b)"),   // the tag name, opening or ending
         //Pattern.compile("("+XML_COMMENT_START+")(.*)("+XML_COMMENT_END+")"),   //  <!-- comment --> 
     }; 

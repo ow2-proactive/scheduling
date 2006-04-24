@@ -81,7 +81,7 @@ public class DocBookize extends DefaultHandler {
         }
 
         System.out.println(
-            "Beautifying code examples within [programlisting] tags in " +
+            "Beautifying code examples within <programlisting> tags in " +
             argv[0]);
 
         // Create SAX machinery 
@@ -137,8 +137,6 @@ public class DocBookize extends DefaultHandler {
             tagName = realName; // namespaceAware = false
         }
 
-        comment("TAG  " + tagName);
-
         // Just skip textobjects in programlistings (see following comment).
         if (tagName.equals("textobject") && storingCode) {
             return;
@@ -175,7 +173,6 @@ public class DocBookize extends DefaultHandler {
                     aName = attrs.getQName(i);
                 }
 
-                comment("   ATTR: ");
                 print(' ' + aName);
                 print("=\"");
                 print(attrs.getValue(i));
@@ -200,8 +197,7 @@ public class DocBookize extends DefaultHandler {
     /** Default handler operation when a tag is closed */
     public void endElement(String namespaceURI, String localName,
         String realName) throws SAXException {
-        comment("END_TAG: ");
-    
+
         // Just skip textobjects in programlistings. 
         if (realName.toLowerCase().equals("textobject") && storingCode) {
             return;
@@ -224,8 +220,6 @@ public class DocBookize extends DefaultHandler {
     /** Default handler operation when a string of characters is encountered */
     public void characters(char[] buf, int offset, int len)
         throws SAXException {
-        comment("CHAR:   ");
-    
         String s = new String(buf, offset, len);
         print(s.replaceAll("&", "&amp;").replaceAll("<", "&lt;"));
     }
@@ -235,6 +229,7 @@ public class DocBookize extends DefaultHandler {
      * @return one very big string equal to the content of a file
      * @throws SAXException if having trouble reading the given file*/
     private String getFileContent(String fileReferenced) throws SAXException {
+
         String fileContent = "";
 
         try {
@@ -282,7 +277,7 @@ public class DocBookize extends DefaultHandler {
 
             in.close();
         } catch (IOException e) {
-            throw new SAXException("Warning - trouble reading referenced file : fileReferenced " + e.getMessage());
+            throw new SAXException("Warning - trouble reading referenced file " + fileReferenced + ": " + e.getMessage());
         }
         
         return fileContent.replaceAll("&", "&amp;").replaceAll("<", "&lt;"); 
@@ -307,19 +302,10 @@ public class DocBookize extends DefaultHandler {
         }
     }
 
-    //  Debugging method TODO : remove  
-    private void comment(String s) {
-        if (DEBUG) {
-            System.out.println(s);
-        }
-    }
-
     /** Transform the given string into nice docbook highlighted stuff
      * @param s The String which is to contain tags highlighting its elements.
      * @throws SAXException if writing to the stream caused problem */
     private void highlight(String s) throws SAXException {
-//        if (language.equals("xml"))
-//        {print (s); return;}
         
         if (s.length() > 0) {
             try {
@@ -338,7 +324,7 @@ public class DocBookize extends DefaultHandler {
                 else if (this.language.equals("xml"))
                     generated = this.xmlToDocBook.convert(temp.getPath());
                 else 
-                    throw new SAXException("Language '"+this.language+"' is unsupported " ); 
+                    throw new SAXException("Language '"+this.language+"' is unsupported in programlistings" ); 
                 temp.delete();
 
                 // now put this code back into the xml we're generating
