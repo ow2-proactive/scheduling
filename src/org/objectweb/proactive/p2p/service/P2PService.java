@@ -50,8 +50,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
-import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.node.P2PNodeAck;
@@ -113,11 +111,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     private Vector waitingNodesLookup = new Vector();
     private Vector waitingMaximunNodesLookup = new Vector();
     private P2PService stubOnThis = null;
-
-    /**
-     * The load balancer reference
-     */
-    private P2PLoadBalancer p2pLoadBalancer;
 
     // For asking nodes
     private Service service = null;
@@ -384,29 +377,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 numberOfNodes, lookup, vnName, jobId, nodeFamilyRegexp);
             logger.debug("Broadcast askingNode message with #" + uuid);
         }
-    }
-
-    /**
-     * <b>Method called on Load Balanced enviroments.</b>
-     * <p>Booking a free node.</p>
-     * @param ttl Time to live of the message, in number of hops.
-     * @param uuid UUID of the message.
-     * @param remoteService The original sender.
-     * @param numberOfNodes Number of asked nodes.
-     * @param lookup The P2P nodes lookup.
-     * @param vnName Virtual node name.
-     * @param jobId
-     * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
-     */
-    public void askingNode(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
-        String vnName, String jobId, boolean underloadedOnly) {
-        if (!underloadedOnly || !amIUnderloaded(0)) {
-            return;
-        }
-
-        this.askingNode(ttl, uuid, remoteService, numberOfNodes, lookup,
-            vnName, jobId, null);
     }
 
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
@@ -718,10 +688,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             this.p2pServiceNode.getNodeInformation().getURL());
 
         this.stubOnThis = (P2PService) ProActive.getStubOnThis();
-
-        if (WITH_BALANCE) {
-            this.p2pLoadBalancer = new P2PLoadBalancer(this.stubOnThis);
-        }
 
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
