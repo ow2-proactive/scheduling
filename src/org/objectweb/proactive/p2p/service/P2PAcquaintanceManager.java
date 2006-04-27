@@ -218,53 +218,6 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(
                 service));
     }
-
-    /**
-     * @param n number of neighbors which receive the balance request
-     * @param sender who sends the request
-     * @param ranking the ranking of the caller
-     */
-    public void chooseNneighborsAndSendTheBalanceRequest(int n,
-        P2PService sender, double ranking) {
-        int size = this.groupOfAcquaintances.size();
-        if (size <= 0) {
-            return;
-        }
-        if (n > size) {
-            n = size;
-        }
-
-        int candidate = (int) (Math.random() * size);
-
-        for (int i = 0; i < n; i++) {
-            ((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).balanceWithMe(sender,
-                ranking);
-        }
-    }
-
-    /**
-     * @param n number of neighbors which receive the balance request
-     * @param ranking who sends the request
-     * @param myNodeAddress the ranking of the caller
-     */
-    public void chooseNneighborsAndStealTheirWork(int n, double ranking,
-        String myNodeAddress) {
-        int size = this.groupOfAcquaintances.size();
-        if (size <= 0) {
-            return;
-        }
-        if (n > size) {
-            n = size;
-        }
-
-        int candidate = (int) (Math.random() * size);
-
-        for (int i = 0; i < n; i++) {
-            ((P2PService) this.groupOfAcquaintances.get((candidate + i) % size)).ImStealingYou(ranking,
-                myNodeAddress);
-        }
-    }
-
     private Random randomizer = new Random();
 
     /**
