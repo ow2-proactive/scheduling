@@ -60,7 +60,11 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  */
 public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     P2PConstants, Serializable, ProActiveInternalObject {
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private Vector waitingNodesList;
     private Vector nodesToKillList;
     private long expirationTime;
@@ -80,7 +84,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private String parUrl;
     private HashMap nodeManagerMap = new HashMap();
     private boolean killAllFlag = false;
-    private boolean onlyUnderloadedAnswer = false;
 	private String nodeFamilyRegexp = null;
 
     public P2PNodeLookup() {
@@ -103,25 +106,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         this.vnName = vnName;
         this.jobId = jobId;
         this.nodeFamilyRegexp  = nodeFamilyRegexp;
-    }
-
-    // new constructor, for a load balanced environment
-    public P2PNodeLookup(Integer numberOfAskedNodes,
-        P2PService localP2pService, String vnName, String jobId,
-        Boolean onlyUnderloadedAnswer) {
-        this.onlyUnderloadedAnswer = onlyUnderloadedAnswer.booleanValue();
-        this.waitingNodesList = new Vector();
-        this.nodesToKillList = new Vector();
-        this.expirationTime = System.currentTimeMillis() + TIMEOUT;
-        this.numberOfAskedNodes = numberOfAskedNodes.intValue();
-        assert (this.numberOfAskedNodes > 0) ||
-        (this.numberOfAskedNodes == MAX_NODE) : "None authorized value for asked nodes";
-        if (this.numberOfAskedNodes == MAX_NODE) {
-            this.expirationTime = Long.MAX_VALUE;
-        }
-        this.localP2pService = localP2pService;
-        this.vnName = vnName;
-        this.jobId = jobId;
     }
 
     // -------------------------------------------------------------------------
@@ -373,16 +357,10 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             logger.debug("Aksing nodes");
 
             // Send a message to everybody
-            if (onlyUnderloadedAnswer) {
-                this.localP2pService.askingNode(1, null, this.localP2pService,
-                    this.numberOfAskedNodes - this.acquiredNodes, stub,
-                    this.vnName, this.jobId, onlyUnderloadedAnswer); // Load balancer question
-            } else {
-                this.localP2pService.askingNode(TTL, null,
-                    this.localP2pService,
-                    this.numberOfAskedNodes - this.acquiredNodes, stub,
-                    this.vnName, this.jobId, this.nodeFamilyRegexp);
-            }
+            this.localP2pService.askingNode(TTL, null,
+                this.localP2pService,
+                this.numberOfAskedNodes - this.acquiredNodes, stub,
+                this.vnName, this.jobId, this.nodeFamilyRegexp);
 
             // Serving request
             logger.debug("Waiting for requests");
