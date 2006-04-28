@@ -92,8 +92,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
     private static final long ACQ_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
-    private static final boolean WITH_BALANCE = Boolean.getBoolean(P2PConstants.PROPERTY_LOAD_BAL);
-
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
      */
