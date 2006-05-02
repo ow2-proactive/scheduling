@@ -30,9 +30,11 @@
  */
 package org.objectweb.proactive.core.descriptor.services;
 
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.node.Node;
+
 
 /**
  * <p>Interface to implement for defining  a Technical Service.</p>
@@ -50,11 +52,19 @@ public interface TechnicalService {
      * @param argValues values of the Technical Service arguments.
      */
     public abstract void init(Map argValues);
-    
+
     /**
      * Initialize the given node with the Technical Service.
      * @param node the node where to apply the Technical Service.
      */
     public abstract void apply(Node node);
-    
+
+    /**
+     * This method is called on all deployed nodes, which run this technical
+     * service. After this method is executed, nodes are returned to the
+     * deployer.
+     *
+     * @param nodes list of nodes with the technical services.
+     */
+    public abstract void syncAllTechnicalServices(List nodes);
 }
