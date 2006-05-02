@@ -23,7 +23,7 @@
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="localJVM1">
+			<processDefinition id="internalJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath value="/home/plugtest/ProActive/lib/ProActive.jar"/>
