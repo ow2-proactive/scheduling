@@ -12,7 +12,7 @@
   <property name="classes.dir" value="${base}/classes"/>
   <property name="classlibs.dir" value="${base}/classlibs"/>
   <property name="dist.dir" value="${base}/dist"/>
-  <property name="doc.src" value="${src.dir}/${proactive.dir}/doc-files"/>
+  <property name="doc.src" value="${base}/doc-files"/>
   <property name="docs.dir" value="${base}/docs"/>
   <property name="docs.tmp" value="${docs.dir}/tmp" />
   <property name="docs.mainFile" value="PA_index.xml" />
