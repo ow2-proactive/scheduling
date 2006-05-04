@@ -30,119 +30,232 @@
  */
 package org.objectweb.proactive.p2p.loadbalancer;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Vector;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.BodyMap;
-import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.loadbalancing.Balanceable;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.loadbalancing.CPURanking;
 import org.objectweb.proactive.loadbalancing.LinuxCPURanking;
 import org.objectweb.proactive.loadbalancing.LoadBalancer;
 import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
 import org.objectweb.proactive.loadbalancing.LoadMonitorLinux;
 import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
-public class P2PLoadBalancer extends LoadBalancer {
-    private P2PService p2pSer;
-    private String myNodeAddress;
+public class P2PLoadBalancer extends LoadBalancer implements RunActive {
+	static int MAX_KNOWN_PEERS = 10;
+	static long MAX_DISTANCE = 100;
+    protected Random randomizer;
+	protected P2PService p2pService;
+    protected Vector acquaintances, forBalancing, forStealing;
+    protected Node myNode;
+    protected P2PLoadBalancer myThis;
+    
+    public P2PLoadBalancer() {}
 
-    public P2PLoadBalancer(P2PService p2pSer) {
-        this.p2pSer = p2pSer;
-        underloaded = false;
-        // by now we use only P2P over Linux
-        lm = new LoadMonitorLinux(this);
-        new Thread(lm).start();
+    protected void addToBalanceList(int n) {
+    	int i=0;
+    	Iterator it = acquaintances.iterator();
+    	while (i < n && it.hasNext()) {
+    		P2PService oService = (P2PService) it.next();
+    		String itAddress = oService.getAddress().stringValue();
+    		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/robinhood";
+    		try {
+				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
+				
+				if (!forBalancing.contains(oLB)) {
+					long distance = System.currentTimeMillis() - oLB.ping(new LongWrapper(System.currentTimeMillis())).longValue();
+					if (distance < MAX_DISTANCE && oLB.getRanking() > this.ranking * LoadBalancingConstants.RANKING_EPSILON) {
+						forBalancing.add(oLB);
+						i++;
+						}
+					}
+				} catch (ActiveObjectCreationException e) {
+				} catch (IOException e) {
+				}
+    		}
+    	if (i >= n) return;
+    	
+    	// Still missing acquaintances
 
-        /* And we update the ranking */
-        CPURanking thisCPURanking = new LinuxCPURanking();
-        ranking = thisCPURanking.getRanking();
-        String address = ProActive.getActiveObjectNodeUrl(p2pSer);
-        address = address.substring(0, address.indexOf('/', 3));
-        myNodeAddress = address + "/" + P2PConstants.SHARED_NODE_NAME + "_0";
+    	it = acquaintances.iterator();
+    	while (i < n && it.hasNext()) {
+    		P2PService oService = (P2PService) it.next();
+    		String itAddress = oService.getAddress().stringValue();
+    		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/robinhood";
+    		try {
+				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
+				
+				if (!forBalancing.contains(oLB)) {
+					if (oLB.getRanking() > this.ranking * LoadBalancingConstants.RANKING_EPSILON) {
+						forBalancing.add(oLB);
+						i++;
+						}
+					}
+				} catch (ActiveObjectCreationException e) {
+				} catch (IOException e) {
+				}
+    		}
+}
+    
+    public LongWrapper ping (LongWrapper lw) {
+    	return lw;
     }
+    
+    public double getRanking() {
+    	return this.ranking;
+    }
+    
+    protected void addToStealList(int n) {
+    	int i=0;
+    	Iterator it = acquaintances.iterator();
+    	while (i < n && it.hasNext()) {
+    		P2PService oService = (P2PService) it.next();
+    		String itAddress = oService.getAddress().stringValue();
+    		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/robinhood";
+    		try {
+				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
+				
+				if (!forStealing.contains(oLB)) {
+					long distance = System.currentTimeMillis() - oLB.ping(new LongWrapper(System.currentTimeMillis())).longValue();
+					if (distance < MAX_DISTANCE && oLB.getRanking() < this.ranking * LoadBalancingConstants.STEAL_PONDERATION) {
+						forStealing.add(oLB);
+						i++;
+						}
+					}
+				} catch (ActiveObjectCreationException e) {
+				} catch (IOException e) {
+				}
+    		}
+    	if (i >= n) return;
+    	
+    	// Still missing acquaintances
 
+    	it = acquaintances.iterator();
+    	while (i < n && it.hasNext()) {
+    		P2PService oService = (P2PService) it.next();
+    		String itAddress = oService.getAddress().stringValue();
+    		itAddress = itAddress.substring(0,itAddress.lastIndexOf("/"))+"/robinhood";
+    		try {
+				P2PLoadBalancer oLB =  (P2PLoadBalancer) ProActive.lookupActive(P2PLoadBalancer.class.getName(),itAddress);
+				
+				if (!forStealing.contains(oLB)) {
+					if (oLB.getRanking() < this.ranking * LoadBalancingConstants.STEAL_PONDERATION) {
+						forBalancing.add(oLB);
+						i++;
+						}
+					}
+				} catch (ActiveObjectCreationException e) {
+				} catch (IOException e) {
+				}
+    		}
+    	
+    	
+    }
     /**
      * This method use the P2P infrastructure to search nodes which can
-     * receive its active objects.
+     * receive its active objects.  Method extended from LoadBalancer class.
      */
     public void startBalancing() {
-        p2pSer.tellToMyNeighborsThatIWantToShareActiveObjects(ranking);
+    	int size = forBalancing.size();
+    	if (size < 1) return;
+    	
+    	boolean fixList = false;
+    	int badLinks = 0;
+    	
+    	int first = randomizer.nextInt(size);
+    	for (int i = 0; i < LoadBalancingConstants.SUBSET_SIZE; i++) {
+  		P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forBalancing.get((first+i)%size));
+  		try {
+    		remoteP2Plb.sendActiveObjectsTo(myNode);
+  		} catch (RemoteException e) {
+  			fixList = true;
+  			forBalancing.remove(remoteP2Plb);
+  			badLinks++;
+  			}
+    	}
+    	
+    	if (fixList) addToBalanceList(badLinks); 
     }
 
     /**
      * This method use the P2P infrastructure to search nodes which I
-     * can steal work.
+     * can steal work.  Method extended from LoadBalancer class.
      */
     public void stealWork() {
-        p2pSer.startStealingNeighbors(ranking, myNodeAddress);
+    	int size = forStealing.size();
+    	if (size < 1) return;
+    	
+    	boolean fixList = false;
+    	int badLinks = 0;
+    	
+    	int first = randomizer.nextInt(size);
+    	for (int i = 0; i < LoadBalancingConstants.NEIGHBORS_TO_STEAL; i++) {
+    		P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forStealing.get((first+i)%size));
+    		try {
+    			remoteP2Plb.sendActiveObjectsTo(myNode);
+    			} catch (RemoteException e) {
+    				fixList = true;
+    				forStealing.remove(remoteP2Plb);
+    				badLinks ++;
+    		}
+    	}
+    	
+    	if (fixList) addToStealList(badLinks); 
     }
 
-    /**
-     * This method is to know if this machine is underloaded and "better" than
-     * who want to send active objects
-     * receive its active objects.
-     * @param remoteRanking ranking of the overloaded machine
-     * @return <code>true</code> if this machine is underloaded in relation to the overloaded one.
-     * Else <code>false</code>.
-     */
-    public boolean AreYouUnderloaded(double remoteRanking) {
-        if (myLoad >= LoadBalancingConstants.OVERLOADED_THREASHOLD) {
-            return false;
-        }
+public void runActivity(Body body) {
 
-        return myLoad < (LoadBalancingConstants.UNDERLOADED_THREASHOLD * (ranking / remoteRanking));
-    }
+	this.acquaintances = p2pService.getAcquaintanceList();
+	this.forBalancing = new Vector(MAX_KNOWN_PEERS);
+	this.forStealing = new Vector(MAX_KNOWN_PEERS);
+    this.randomizer = new Random();
+    this.underloaded = false;
+    this.myThis = (P2PLoadBalancer) ProActive.getStubOnThis();
 
-    public void ImStealingYou(double remoteRanking, String remoteNodeAddress) {
-        // Is the remote better than me (really better)?
-        if (remoteRanking < (ranking * LoadBalancingConstants.STEAL_PONDERATION)) {
-            return;
-        }
+    /* Updating the node reference */
+    try {
+    	myNode = ProActive.getNode();
+		} catch (NodeException e) {
+			ProActive.terminateActiveObject(myThis,true);
+		}
 
-        // have I somebody to send?
-        BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
-        Body candidateBody = null;
+    // registering myself
+    try {
+		ProActive.register(myThis,"///robinhood");
+	} catch (IOException e) {
+		ProActive.terminateActiveObject(myThis,true);
+	}
 
-        if (knownBodies.size() < 1) {
-            return;
-        }
+	// by now we use only P2P over Linux
+    lm = new LoadMonitorLinux(myThis);
+    new Thread(lm).start();
 
-        java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();
+    /* And we update the ranking */
+    CPURanking thisCPURanking = new LinuxCPURanking();
+    ranking = thisCPURanking.getRanking();
+    
+    /* We update the lists */
+    this.addToBalanceList(MAX_KNOWN_PEERS);
+    this.addToStealList(MAX_KNOWN_PEERS);
+    
+	Service service = new Service(body);
+	while (body.isActive()) {
+	    service.blockingServeOldest(); 
+	    }
+	}
 
-        /** ******** Choosing a candidate ******** */
-        while (bodiesIterator.hasNext()) {
-            Body activeObjectBody = (Body) bodiesIterator.next();
-            Object testObject = activeObjectBody.getReifiedObject();
-
-            /********** Only some Active Objects can migrate *************/
-            boolean testSerialization = testObject instanceof Balanceable;
-
-            if (activeObjectBody.isAlive()) {
-                if (activeObjectBody.isActive() && testSerialization) {
-                    candidateBody = activeObjectBody;
-                    break;
-                }
-            }
-        }
-
-        /******* somebody? *********/
-        if (candidateBody == null) {
-            return;
-        }
-
-        if (candidateBody.isActive()) {
-            logger.debug("Migrating from " + candidateBody.getNodeURL() +
-                " to " + remoteNodeAddress);
-
-            try {
-                ProActive.migrateTo(candidateBody, remoteNodeAddress, true);
-            } catch (MigrationException e) {
-
-                /** ****** if you cannot migrate, is not my business ********** */
-            }
-        }
-    }
+	public void killMePlease() {
+		ProActive.terminateActiveObject(myThis,true);
+	}
 }
