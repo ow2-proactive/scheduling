@@ -175,7 +175,7 @@ public class DocBookize extends DefaultHandler {
             return;
         }
 
-        // XREF with role=xmlFileSrc or javaFileSrc are warped to add the correct references.  
+        // XREF with role=xmlFileSrc or javaFileSrc are wraped to add the correct references.  
         if (tagName.equals("xref") && (attrs != null)) {
             String fileRef = "";
             String role = "";
@@ -206,11 +206,11 @@ public class DocBookize extends DefaultHandler {
                     String listing = new String();
                     listing += ("<example id=\"" +
                     fileRef.replaceAll("/", ".") + "\">");
-                    listing += (" <title> " + fileRef + "</title>");
-                    listing += (" <programlisting language=\"" + this.language +
+                    listing += (" <title os=\"html\" > <ulink url=\"" + fileRef + "\"> "+fileRef+"</ulink></title>");
+                    listing += (" <title os=\"pdf\" > " + fileRef + "</title>");
+                    listing += (" <programlisting os=\"pdf\" language=\"" + this.language +
                     "\">");
                     listing += (highlight(getFileContent(fileRef)));
-                    //listing += "YYYYYYYYYYYYYYYYYYYY" +  fileRef + "YYYYYYYYYYYYYYYYYYYYYYYYYYY";
                     listing += (" </programlisting>");
                     listing += ("</example>");
 

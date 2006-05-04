@@ -5,9 +5,6 @@
 <appendix id="srcCodeAppendix">
  <title>Files of the ProActive source base cited in the manual</title>
  
-<!-- TODO: check if the html output needs the following two sections 
-     (html javadoc ==> files ok) (javadoc ant target ==> xml files copied) -->
- 
 <sect1 id="xmlFileSrc">
  <title>XML descriptors cited in the manual</title>
 </sect1>
@@ -104,6 +101,6 @@
       </textobject></programlisting>
     </example>
 
-
 </sect1>
+
 </appendix>

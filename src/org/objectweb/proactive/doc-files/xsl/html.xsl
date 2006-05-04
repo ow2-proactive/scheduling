@@ -92,11 +92,10 @@
 <!--- - - - - - - - - - - - - - - - - - - - - - - - -->
  <xsl:template name="book.titlepage.recto">
 
-
   <div> <xsl:attribute name="align">center</xsl:attribute><!-- Everything in titlepage is centered -->
 
       <a href="http://www.objectweb.org"><img border="0"> <!-- Start off with ObjectWeb -->
-        <xsl:attribute name="src">images/logo-ObjectWeb236.png</xsl:attribute>
+        <xsl:attribute name="src">images/logo-objectweb250.png</xsl:attribute>
         <xsl:attribute name="alt">ObjectWeb</xsl:attribute>
         <xsl:attribute name="title">A project of the ObjectWeb Consortium</xsl:attribute>
        </img></a><br/>
@@ -114,9 +113,9 @@
     <tr>
      <td>
       <b>Version<xsl:call-template name="gentext.space" />
-       <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/revnumber" />
+       <xsl:copy-of select="$VERSION" />          <!--This variable is passed as a parameter in the ant task-->
        <xsl:call-template name="gentext.space" />
-       <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/date" />
+       <xsl:copy-of select="$TODAY" />            <!--This variable is passed as a parameter in the ant task-->
       </b>
      </td>
      <td style="width: 50px;"/>   <!--Empty cell to leave room between cells-->

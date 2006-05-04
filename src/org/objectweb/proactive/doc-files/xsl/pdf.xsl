@@ -583,12 +583,13 @@
         <fo:table-cell>
 
       <fo:block text-align="left" font-size="12pt" font-weight="bold">
-       <xsl:text>V</xsl:text>
-       <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/revnumber" />
+       <xsl:text>Version</xsl:text>
+       <xsl:call-template name="gentext.space" />
+       <xsl:copy-of select="$VERSION" />        <!--This variable is passed as a parameter in the ant task-->
        <xsl:call-template name="gentext.space" />
        <xsl:call-template name="gentext.space" />
        <xsl:call-template name="gentext.space" />
-       <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/revhistory/revision/date" />
+       <xsl:copy-of select="$TODAY" />          <!--This variable is passed as a parameter in the ant task-->
       </fo:block>
 
         </fo:table-cell>
