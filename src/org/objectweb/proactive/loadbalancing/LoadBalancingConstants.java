@@ -65,12 +65,12 @@ public interface LoadBalancingConstants {
     /**
      * <code>RANKING_EPSILON</code>: Used to avoid similar CPUs rejections.
      */
-    public static final double RANKING_EPSILON = 0.5;
+    public static final double RANKING_EPSILON = 0.7;
 
     /**
      * <code>SUBSET_SIZE</code>: Number of acquaintances requested for balancing.
      */
     public static final int SUBSET_SIZE = 3;
-    public static final int NEIGHBORS_TO_STEAL = 2;
-    public static final double STEAL_PONDERATION = 1.5;
+    public static final int NEIGHBORS_TO_STEAL = 1;
+    public static final double STEAL_PONDERATION = 1.0;
 }

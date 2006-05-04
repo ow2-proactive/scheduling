@@ -60,7 +60,7 @@ public class LinuxCPURanking implements CPURanking {
                 if (line.startsWith("cpu MHz")) {
                     String[] splited = line.split(":");
                     double cpuClock = Double.parseDouble(splited[1]); // obtaining the cpu clock
-                    ranking = Math.log(cpuClock) / Math.log(10);
+                    ranking = cpuClock / 1000;
                 }
             }
         } catch (FileNotFoundException e) {

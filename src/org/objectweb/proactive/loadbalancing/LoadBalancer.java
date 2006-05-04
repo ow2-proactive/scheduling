@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.loadbalancing;
 
+import java.rmi.RemoteException;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -109,7 +111,6 @@ public class LoadBalancer {
      */
     public void stealWork() {
     }
-    ;
 
     /**
      * This method sends an active object to a destiny, choosing the active objects
@@ -118,7 +119,7 @@ public class LoadBalancer {
      * If this node is local, this method does nothing.
      * @return none
      */
-    public void sendActiveObjectsTo(Node destNode) {
+    public void sendActiveObjectsTo(Node destNode) throws RemoteException {
         if (NodeFactory.isNodeLocal(destNode)) {
             return;
         }
@@ -141,7 +142,7 @@ public class LoadBalancer {
                 Object testObject = activeObjectBody.getReifiedObject();
 
                 /********** Only some Active Objects can migrate *************/
-                boolean testSerialization = testObject instanceof Balanceable;
+                boolean testSerialization = !(testObject instanceof LoadBalancer);
 
                 if (activeObjectBody.isAlive()) {
                     if (activeObjectBody.isActive() && testSerialization) {
