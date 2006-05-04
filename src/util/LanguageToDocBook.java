@@ -30,35 +30,50 @@
  */
 package util;
 
-import java.io.IOException;
 
-
-/** All possible ways of transforming a code file into a decorated code file
- * should implement this interface. */
+/** All possible ways of transforming a code file into a decorated
+ * code file should implement this interface. */
 public interface LanguageToDocBook {
+    /** A few tags used in the resulting highlighted docbook */
+    static final String SPAN = "<emphasis role=";
 
     /** A few tags used in the resulting highlighted docbook */
-    static final String 
-    SPAN="<emphasis role=",
-    OPENCOMMENT = SPAN+"\"comment\">",
-    CLOSECOMMENT = "</emphasis>", 
-    OPENKEYWORD = SPAN+"\"keyword\">",
-    CLOSEKEY = CLOSECOMMENT,
-    OPENCODE = SPAN+"\"codeword\">",
-    CLOSECODE = CLOSECOMMENT,
-    OPENTYPE = SPAN+"\"typeword\">",
-    CLOSETYPE = CLOSECOMMENT, 
-    OPENSTRING = SPAN+"\"string\">",
-    CLOSESTRING = CLOSECOMMENT, 
-    EOL = "\n";
+    static final String OPENCOMMENT = SPAN + "\"comment\">";
 
-    /** Convert a code file into a decorated code file.
-     * @param fileToConvert the name of the file to convert
-     * @return convertedFile : the name of the file which has been created (it contains decorated code)  */
-    String convert(String fileToConvert) throws IOException;
+    /** A few tags used in the resulting highlighted docbook */
+    static final String CLOSECOMMENT = "</emphasis>";
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String OPENKEYWORD = SPAN + "\"keyword\">";
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String CLOSEKEY = CLOSECOMMENT;
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String OPENCODE = SPAN + "\"codeword\">";
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String CLOSECODE = CLOSECOMMENT;
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String OPENTYPE = SPAN + "\"typeword\">";
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String CLOSETYPE = CLOSECOMMENT;
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String OPENSTRING = SPAN + "\"string\">";
+
+    /** A few tags used in the resulting highlighted docbook */
+    static final String CLOSESTRING = CLOSECOMMENT;
+
+    /** Add docbook tags to the parameter code String.
+     * @param codeString the initial String of code, which is to be beautified.
+     * @return the initial String, with intersparsed docbook tags <=> decorated code */
+    String convert(String codeString);
 
     /** Once an instance of this Class is created, check that it will really work when run.
-     * @return true if running it will do the conversion, false if it will have trouble;
-     * For example, trouble may be created by a missing extension. */
+     * @return true if running it will do the conversion, false if it will have trouble.
+     * For example, trouble may be created by a missing helper program. */
     boolean willWork();
 }

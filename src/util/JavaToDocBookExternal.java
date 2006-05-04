@@ -30,38 +30,77 @@
  */
 package util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 
-/** An implementation of JavaToDocBook, by calling an external program;
- * here is used the GNU source-highlight program.
+/** An implementation of JavaToDocBook, calling an external program;
+ * here the GNU source-highlight program is used.
  * Program available at www.gnu.org/software/src-highlite.
  * Run './configure && make && make install' to get the correct installation. */
 public class JavaToDocBookExternal implements LanguageToDocBook {
-    private String path = "/usr/local/bin/";
-    private String exec = "source-highlight";
+    protected String path = "/usr/local/bin/";
+    protected String exec = "source-highlight";
 
-    /** Convert a code file into a decorated code file, using an external program.
-     * Transform some java code into some nicely highlighted docbook.
-     * @param fileToConvert the name of the file to convert
-     * @return convertedFile : the name of the file which has been created (it contains decorated code)  */
-    public String convert(String file) throws IOException {
-        Process converter = Runtime.getRuntime()
-                                   .exec(path + exec + " -f docbook -i " +
-                file + " -o " + file + ".xml");
-
+    /** Convert a code String into a <b>decorated</b> code String, using an external program.
+     * Can only transform java code into highlighted docbook.
+     * @param codeString a long String of code to convert
+     * @return a long string containing the input code plus docbook tags highlighting it. */
+    public String convert(String codeString) {
         try {
-            converter.waitFor();
-        } catch (InterruptedException e) {
-            throw new IOException("Problem with conversion to docbook of " +
-                file + ". " + e);
-        }
+            // First copy the input code into an independent file
+            File temp = File.createTempFile("db_tmp_", ".dbz");
+            BufferedWriter tmpBuffer = new BufferedWriter(new FileWriter(temp));
+            tmpBuffer.write(codeString);
+            tmpBuffer.close();
 
-        return file + ".xml";
+            // Do the highlighting, which creates the File outputFileName
+            String fileToConvert = temp.getPath();
+            String outputFileName = fileToConvert + ".xml";
+            String execString = path + exec + " -f docbook -i " +
+                fileToConvert + " -o " + outputFileName;
+            Process converter = Runtime.getRuntime().exec(execString);
+
+            try {
+                converter.waitFor();
+            } catch (InterruptedException e) {
+                System.err.println("Problem with program " + exec +
+                    " used to convert " + fileToConvert + ": " +
+                    e.getMessage());
+
+                return codeString;
+            }
+
+            temp.delete();
+
+            // read from the newly created file, and turn that into one single string. 
+            BufferedReader in = new BufferedReader(new FileReader(
+                        outputFileName));
+            String str;
+            String result = "";
+
+            while ((str = in.readLine()) != null) {
+                result += (str + "\n");
+            }
+
+            in.close();
+            new File(outputFileName).delete();
+
+            return result;
+        } catch (IOException e) {
+            System.err.println(
+                "Problem writing temp files used with converter " + exec +
+                ": " + e.getMessage());
+
+            return codeString;
+        }
     }
 
-    /** Using this converter can only work if the external executable is found
+    /** Using this converter can only work if the external executable is found.
      * @return true only if the external executable is available on filesystem. */
     public boolean willWork() {
         File executableFile = new File(this.path + this.exec);
