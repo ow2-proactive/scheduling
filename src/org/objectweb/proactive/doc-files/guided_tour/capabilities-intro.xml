@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="capabilities-intro">
   <title>Introduction to some of the functionalities of ProActive</title>
-
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/capabilities-intro.html  -->
 
   <para>This chapter will present some of the facilities offered by ProActive,
   namely:</para>
@@ -54,7 +52,7 @@
     dispatcher.</para>
 
     <figure>
-      <title>the active objects in the c3d application</title>
+      <title>The active objects in the c3d application</title>
 
       <mediaobject>
         <imageobject>
@@ -65,24 +63,11 @@
     </figure>
 
     <sect2 >
-      <title>start C3D</title>
+      <title>Start C3D</title>
 
-      <para>using the script c3d_no_user</para>
-
-      <para>A 'Dispatcher' object is launched (ie a centralized server) as
-      well as 4 'Renderer' objects, that are active objects to be used for
-      parallel rendering.</para>
-
-      <para><figure>
-          <title>the 4 renderers are launched</title>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_renderers_consoles.png"
-                         format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
+      <para>Using the script <literal>c3d_no_user</literal>, a "Dispatcher" 
+       object is launched (ie a centralized server) as well as 4 "Renderer" 
+       objects, which are active objects to be used for parallel rendering.</para>
 
       <para><figure>
           <title>the dispatcher GUI is launched</title>
@@ -90,24 +75,25 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png"
-                         format="PNG" />
+                         format="PNG" width="4.5in"/>
             </imageobject>
           </mediaobject>
         </figure></para>
 
-      <para>The bottom part of the window allows the addition and removal of
-      renderers.</para>
+      <para>The bottom part of the window allows to choose which renderers
+       should participate in the rendering. You may want to stop using a given machine 
+       (because for instance it is overloaded), and thus remove it from the renderers
+       used in the current computation.</para>
     </sect2>
 
     <sect2 >
-      <title>start a user</title>
+      <title>Start a user</title>
 
-      <para>using c3d_add_user</para>
-
+      <para>Using <literal>c3d_add_user</literal>, </para>
       <itemizedlist>
-        <listitem>
-          <para>connect on the current host (proposed by default) by just
-          giving your name</para>
+       <listitem>
+          <para>Connect on the current host (proposed by default) by just
+          giving your name.</para>
         </listitem>
       </itemizedlist>
 
@@ -115,21 +101,21 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png"
-                         format="PNG" />
+                         format="PNG"  width="4.5in"/>
             </imageobject>
           </mediaobject>
         </informalfigure></para>
 
-      <para>for example the user 'alice'</para>
+      <para>For example, the user 'alice'</para>
 
       <itemizedlist>
         <listitem>
-          <para>spin the scene, add a random sphere, and observe how the
+          <para>Spin the scene, add a random sphere, and observe how the
           action takes place immediately</para>
         </listitem>
 
         <listitem>
-          <para>add and remove renderers, and observe the effect on the 'speed
+          <para>Add and remove renderers, and observe the effect on the 'speed
           up' indication from the user window.</para>
         </listitem>
       </itemizedlist>
@@ -138,18 +124,16 @@
 
       <para>Are you on a multi-processor machine?</para>
 
-      <para><emphasis>* you might not perceive the difference of the
+      <note><para>You might not perceive the difference of the
       performance. The difference is better seen with more distributed nodes
-      and objects (for example on a cluster with 30+
-      renderers).</emphasis></para>
+      and objects (for example on a cluster) .</para></note>
     </sect2>
 
     <sect2 >
-      <title>start a user from another machine</title>
+      <title>Start a user from another machine</title>
 
-      <para>using the c3d_add_user script, and <emphasis
-      role="underline">specifying the host</emphasis> (NOT set by
-      default)</para>
+      <para>Using the <literal>c3d_add_user</literal> script, and <emphasis>specifying the host</emphasis> 
+       (set to local host bydefault)</para>
 
       <para><figure>
           <title>Specifying the host</title>
@@ -162,14 +146,12 @@
           </mediaobject>
         </figure></para>
 
-      <para>If you use rlogin, make sure the DISPLAY is properly set.</para>
-
-      <para>You must use the same version of ProActive on both
-      machines!</para>
+      <para>If you use rlogin, make sure the DISPLAY is properly set. 
+       You must use the same version of ProActive on both machines!</para>
 
       <itemizedlist>
         <listitem>
-          <para>test the collaborative behavior of the application when
+          <para>Test the collaborative behavior of the application when
           several users are connected.</para>
         </listitem>
       </itemizedlist>
@@ -179,18 +161,18 @@
     </sect2>
 
     <sect2 >
-      <title>start IC2D to visualize the topology</title>
+      <title>Start IC2D to visualize the topology</title>
 
-      <para>to visualize all Active objects, you need to acquire ('monitoring'
+      <para>To visualize all Active objects, you need to acquire ('monitoring'
       menu):</para>
 
       <itemizedlist>
         <listitem>
-          <para>the machine on which you started the 'Dispatcher'</para>
+          <para>The machine on which you started the 'Dispatcher'</para>
         </listitem>
 
         <listitem>
-          <para>the machine on which you started the second user</para>
+          <para>The machine on which you started the second user</para>
         </listitem>
       </itemizedlist>
 
@@ -207,18 +189,18 @@
 
       <itemizedlist>
         <listitem>
-          <para>add random spheres for instance, and observe messages
+          <para>Add random spheres for instance, and observe messages
           (Requests) between Active Objects.</para>
         </listitem>
 
         <listitem>
-          <para>add and remove renderers, and check graphically whether the
+          <para>Add and remove renderers, and check graphically whether the
           corresponding Active Objects are contacted or not, in order to
           achieve the rendering.</para>
         </listitem>
 
         <listitem>
-          <para>you can textually visualize this information by activating
+          <para>You can textually visualize this information by activating
           'add event timeline for this WorldObject' on the World panel with
           the right mouse button, and then 'show the event list window' on the
           top menu window</para>
@@ -230,7 +212,7 @@
       
      <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
 
-     <title>drag-and-drop migration</title>
+     <title>Drag-and-drop migration</title>
 
       <para>From IC2D, you can drag-and-drop active objects from one JVM to
       another. Click the right button on a C3DRenderingEngine, and drag and
@@ -245,18 +227,22 @@
       it is communicating (for instance when a rendering action is in
       progress). Give it a try!</para>
 
-      <para><emphasis role="bold">Since version 1.0.1 of the C3D example, you
-      can also migrate the client windows!</emphasis></para>
+      <note><para>You can also migrate Active Objects which create a GUI. If you do that 
+        for the User, you will see the graphical window beiung destroyed, and rebuilt once more.</para></note>
     </sect2>
 
     <sect2 >
-      <title>start a new JVM in a computation</title>
+      <title>Start a new JVM in a computation</title>
 
-      <para>manually you can start a new JVM - a 'Node' in the ProActive
+      <para>Manually you can start a new JVM - a 'Node' in the ProActive
       terminology - that will be used in a running system.</para>
 
-      <para>- on a different machine, or by remote login on another host,
-      start another Node, named for instance NodeZ:</para>
+     <itemizedlist>
+      <listitem>
+      <para>On a different machine, or by remote login on another host,
+      start another Node, named for instance NodeZ</para>
+    </listitem>
+     </itemizedlist>
 
       <screen>linux&gt; startNode.sh rmi://mymachine/NodeZ &amp;
 windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
@@ -267,28 +253,28 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
 
       <itemizedlist>
         <listitem>
-          <para>the node just started has no active object running in it. Drag
+          <para>The node just started has no active object running in it. Drag
           and drop one of the renderers, and check that the node is now taking
           place in the computation</para>
         </listitem>
 
         <listitem>
-          <para>spin the scene to trigger a new rendering</para>
+          <para>Spin the scene to trigger a new rendering</para>
         </listitem>
 
         <listitem>
-          <para>see the topology</para>
+          <para>See the topology</para>
         </listitem>
       </itemizedlist>
 
-      <para><emphasis>* if you feel uncomfortable with the automatic layout,
+      <note><para>If you feel uncomfortable with the automatic layout,
       switch to manual using the 'manual layout' option (right click on the
       World panel). You can then reorganize the layout of the
-      machines.</emphasis></para>
+      machines.</para></note>
 
       <itemizedlist>
         <listitem>
-          <para>to fully distribute the computation, start several nodes (you
+          <para>To fully distribute the computation, start several nodes (you
           need 2 more) and drag-and drop renderers in them.</para>
         </listitem>
       </itemizedlist>
@@ -320,7 +306,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         </listitem>
       </itemizedlist>
 
-      <para>look at the method public void
+      <para>Look at the method public void
       processRotate(org.objectweb.proactive.Body body, String methodName,
       Request r) that handles election of the next action to undertake.</para>
     </sect2>
@@ -360,10 +346,10 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       controller class (ReaderWriter).</para>
 
       <sect3 >
-        <title>start the application</title>
+        <title>Start the application</title>
 
         <para><figure>
-            <title>using the readers script</title>
+            <title>Using the readers script</title>
 
             <mediaobject>
               <imageobject>
@@ -378,7 +364,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         application) and a ReaderDisplay, that are active objects.</para>
 
         <para><figure>
-            <title>a GUI is started that illustrates the activities of the
+            <title>A GUI is started that illustrates the activities of the
             Reader and Writer objects.</title>
 
             <mediaobject>
@@ -391,34 +377,28 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </sect3>
 
       <sect3 >
-        <title>look and check the effect of different policies: even, writer
+        <title>Check the effect of different policies: even, writer
         priority, reader priority</title>
 
         <para>What happens when priority is set to 'reader priority'?</para>
       </sect3>
 
       <sect3 >
-        <title>look at the code for programming such policies</title>
+        <title>Look at the code for programming such policies</title>
 
         <para>in
-        <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal></para>
+        <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal>. 
+        More specifically, look at the routines in:</para>
 
-        <para>More specifically, look at the routines in:</para>
+       <screen>public void evenPolicy(org.objectweb.proactive.Service service)</screen>
 
-        <para>public void evenPolicy(org.objectweb.proactive.Service
-        service)</para>
+       <screen>public void readerPolicy(org.objectweb.proactive.Service service)</screen>
 
-        <para>public void readerPolicy(org.objectweb.proactive.Service
-        service)</para>
-
-        <para>public void writerPolicy(org.objectweb.proactive.Service
-        service)</para>
+       <screen>public void writerPolicy(org.objectweb.proactive.Service service)</screen>
 
         <para>Look at the inner class <literal>MyRequestFilterm</literal> that
-        implements
-        <literal>org.objectweb.proactive.core.body.request.RequestFilter</literal></para>
-
-        <para>How does it work?</para>
+        implements <literal>org.objectweb.proactive.core.body.request.RequestFilter</literal>. 
+        How does it work?</para>
       </sect3>
 
       <sect3 >
@@ -429,26 +409,26 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
 
         <itemizedlist>
           <listitem>
-            <para>observe the Writer Policy policy before recompiling</para>
+            <para>Observe the Writer Policy policy before recompiling</para>
           </listitem>
 
           <listitem>
-            <para>recompile (using compile.sh readers or compile.bat
+            <para>Recompile (using compile.sh readers or compile.bat
             readers)</para>
           </listitem>
 
           <listitem>
-            <para>observe that stub classes are regenerated and
+            <para>Observe that stub classes are regenerated and
             recompiled</para>
           </listitem>
 
           <listitem>
-            <para>observe the difference due to the new synchronization
+            <para>Observe the difference due to the new synchronization
             policy: what happens now?</para>
           </listitem>
 
           <listitem>
-            <para>correct the bug and recompile again ; check that everything
+            <para>Correct the bug and recompile again ; check that everything
             is back to normal</para>
           </listitem>
         </itemizedlist>
@@ -469,10 +449,10 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       the dinner frame (user interface).</para>
 
       <sect3 >
-        <title>start the philosophers application</title>
+        <title>Start the philosophers application</title>
 
         <para><figure>
-            <title>with philosophers.sh or philosophers.bat</title>
+            <title>With philosophers.sh or philosophers.bat</title>
 
             <mediaobject>
               <imageobject>
@@ -486,7 +466,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         of the application: DinnerLayout, Table, and Philosopher</para>
 
         <para><figure>
-            <title>the GUI is started.</title>
+            <title>The GUI is started.</title>
 
             <mediaobject>
               <imageobject>
@@ -498,87 +478,94 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </sect3>
 
       <sect3 >
-        <title>understand the color codes</title>
+        <title>Understand the color codes</title>
 
-        <informaltable frame="none">
-          <tgroup cols="3">
-            <tbody>
-              <row>
-                <entry align="center" morerows="2" valign="middle">
-                 <para><emphasis role="bold">Philosophers</emphasis></para>
-                </entry>
-
-                <entry><mediaobject>
-                  <imageobject>
-                   <imagedata fileref="guided_tour/pics/think.png" format="PNG" />
-                  </imageobject>
-        </mediaobject></entry>
-
-                <entry><para><emphasis role="bold">philosophing</emphasis></para></entry>
-              </row>
-
-              <row>
-               <entry><mediaobject>
-                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/wait.png" format="PNG" />
-                 </imageobject>
-        </mediaobject></entry>
-
-                <entry><para>
-                   <emphasis role="bold">hungry, wants the fork !</emphasis>
-                  </para></entry>
-              </row>
-
-              <row>
-               <entry><mediaobject>
-                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/eat.png" format="PNG" />
-                 </imageobject>
-        </mediaobject></entry>
-
-                <entry><para><emphasis
-                role="bold">eating</emphasis></para></entry>
-              </row>
-
-              <row>
-                <entry align="center" morerows="1"
-                valign="middle"><para><emphasis
-                role="bold">Forks</emphasis></para></entry>
-
-                <entry><mediaobject>
-                  <imageobject>
-                   <imagedata fileref="guided_tour/pics/fork1.png" format="PNG" />
-                  </imageobject>
-        </mediaobject></entry>
-
-                <entry><para><emphasis
-                role="bold">taken</emphasis></para></entry>
-              </row>
-
-              <row>
-               <entry><mediaobject>
-                 <imageobject>
-                  <imagedata fileref="guided_tour/pics/fork0.png" format="PNG" />
-                 </imageobject>
-        </mediaobject></entry>
-
-                <entry><para><emphasis
-                role="bold">free</emphasis></para></entry>
-              </row>
-            </tbody>
-          </tgroup>
+        <informaltable frame="none" colsep="0">
+         <tgroup cols="4">
+          <tbody>
+           <row>
+            <entry align="center" valign="middle">
+             <para><emphasis role="bold">Philosophers</emphasis></para>
+            </entry>
+            
+            <entry align="center"  valign="middle">
+             <para>
+              <inlinemediaobject>
+               <imageobject>
+                <imagedata fileref="guided_tour/pics/think.png" format="PNG" />
+               </imageobject>
+              </inlinemediaobject> 
+              <emphasis role="bold">philosophing</emphasis>
+             </para>
+            </entry>
+            <entry align="center">
+             <para>
+              <inlinemediaobject>
+               <imageobject>
+                <imagedata fileref="guided_tour/pics/wait.png" format="PNG" />
+               </imageobject>
+              </inlinemediaobject>
+              <emphasis role="bold">hungry, wants the fork!</emphasis>
+             </para>
+            </entry>
+            <entry align="center">
+             <para>
+              <inlinemediaobject>
+               <imageobject>
+                <imagedata fileref="guided_tour/pics/eat.png" format="PNG" />
+               </imageobject>
+              </inlinemediaobject>
+              <emphasis role="bold">eating</emphasis>
+             </para>
+            </entry>
+            
+           </row>
+          </tbody>
+         </tgroup>
         </informaltable>
+        <informaltable frame="none" colsep="0">
+         <tgroup cols="3">
+          <tbody>
+           <row>
+            <entry align="center"  valign="middle">
+             <para><emphasis role="bold">Forks</emphasis></para>
+            </entry>
+            
+            <entry align="center"  valign="middle">
+             <para>
+              <inlinemediaobject>
+               <imageobject>
+                <imagedata fileref="guided_tour/pics/fork1.png" format="PNG" />
+               </imageobject>
+              </inlinemediaobject>
+              <emphasis role="bold">taken</emphasis>
+             </para>
+            </entry>
+            <entry align="center" morerows="2" valign="middle">
+             <para>
+              <inlinemediaobject>
+               <imageobject>
+                <imagedata fileref="guided_tour/pics/fork0.png" format="PNG" />
+               </imageobject>
+              </inlinemediaobject>
+              <emphasis role="bold">free</emphasis>
+             </para>
+            </entry>
+           </row>
+          </tbody>
+         </tgroup  >
+        </informaltable  >
       </sect3>
 
       <sect3 >
-        <title>test the autopilot mode</title>
+        <title>Test the autopilot mode</title>
 
         <para>The application runs by itself without encountering a
         deadlock.</para>
       </sect3>
 
       <sect3 >
-        <title>test the manual mode</title>
+        <title>Test the manual mode</title>
 
         <para>Click on the philosophers' heads to switch their modes</para>
 
@@ -589,7 +576,7 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       </sect3>
 
       <sect3 >
-        <title>start the IC2D application</title>
+        <title>Start the IC2D application</title>
 
         <indexterm><primary>IC2D</primary><secondary>example usage</secondary></indexterm>
 
@@ -598,8 +585,8 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         is a graphical environment for monitoring and steering of distributed
         and Grid Computing applications.</para>
 
-        <para>- being in the autopilot mode, start the IC2D visualization
-        application (using ic2d.sh or ic2d.bat)</para>
+       <itemizedlist><listitem><para>Being in the autopilot mode, start the IC2D visualization
+          application (using ic2d.sh or ic2d.bat)</para></listitem></itemizedlist>
 
         <para><informalfigure>
             <mediaobject>
@@ -628,10 +615,10 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
             </mediaobject>
           </informalfigure></para>
 
-        <para>the ic2d GUI is started. It is composed of 2 panels: the main
+        <para>The ic2d GUI is started. It is composed of 2 panels: the main
         panel and the events list panel</para>
 
-        <para>- acquire your current machine</para>
+       <itemizedlist><listitem><para>Acquire your current machine</para></listitem></itemizedlist>
 
         <figure>
          <title>Monitoring new RMI host with IC2D</title>
@@ -685,25 +672,25 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
     between screens while moving an agent from one JVM to the other.</para>
 
     <sect2 >
-      <title>start the penguin application</title>
+      <title>Start the penguin application</title>
 
-      <para>using the <literal>penguin</literal> script.</para>
+      <para>Using the <literal>penguin</literal> script.</para>
     </sect2>
 
     <sect2 >
-      <title>start IC2D to see what is going on</title>
+      <title>Start IC2D to see what is going on</title>
 
-      <para>using the <literal>ic2d</literal> script</para>
+      <para>Using the <literal>ic2d</literal> script</para>
 
-      <para>acquire the machines you have started nodes on</para>
+      <para>Acquire the machines you have started nodes on</para>
     </sect2>
 
     <sect2 >
-      <title>add an agent</title>
+      <title>Add an agent</title>
 
       <itemizedlist>
         <listitem>
-          <para>on the Advanced Penguin Controller window: button 'add
+          <para>On the Advanced Penguin Controller window: button 'add
           agent'</para>
         </listitem>
       </itemizedlist>
@@ -717,15 +704,15 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
           </mediaobject>
         </informalfigure></para>
 
-      <para>an agent is materialized by a picture in a java window.</para>
+      <para>An agent is materialized by a picture in a java window.</para>
 
       <itemizedlist>
         <listitem>
-          <para>select it, and press button 'start'</para>
+          <para>Sselect it, and press button 'start'</para>
         </listitem>
 
         <listitem>
-          <para>observe that the active object is moving between the machines,
+          <para>Observe that the active object is moving between the machines,
           and that the penguin window disappears and reappears on the screen
           associated with the new JVM.</para>
         </listitem>
@@ -733,51 +720,51 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
     </sect2>
 
     <sect2 >
-      <title>add several agents</title>
+      <title>Add several agents</title>
 
-      <para>after selecting them, use the buttons to:</para>
+      <para>After selecting them, use the buttons to:</para>
 
       <itemizedlist>
         <listitem>
-          <para>communicate with them ('chained calls')</para>
+          <para>Communicate with them ('chained calls')</para>
         </listitem>
 
         <listitem>
-          <para>start, stop, resume them</para>
+          <para>Atart, stop, resume them</para>
         </listitem>
 
         <listitem>
-          <para>trigger a communication between them ('call another
+          <para>Trigger a communication between them ('call another
           agent')</para>
         </listitem>
       </itemizedlist>
     </sect2>
 
     <sect2 >
-      <title>move the control window to another user</title>
+      <title>Move the control window to another user</title>
 
       <itemizedlist>
         <listitem>
-          <para>start a node on a different computer, using another screen and
+          <para>Start a node on a different computer, using another screen and
           keyboard</para>
         </listitem>
 
         <listitem>
-          <para>monitor the corresponding JVM with IC2D</para>
+          <para>Monitor the corresponding JVM with IC2D</para>
         </listitem>
 
         <listitem>
-          <para>drag-and-drop the active object 'AdvancedPenguinController'
+          <para>Drag-and-drop the active object 'AdvancedPenguinController'
           with IC2D into the newly created JVM: the control window will appear
           on the other computer</para>
         </listitem>
 
         <listitem>
-          <para> and its user can now control the penguins application.</para>
+          <para>And its user can now control the penguins application.</para>
         </listitem>
 
         <listitem>
-          <para>still with IC2D, doing a drag-and-drop back to the original
+          <para>Still with IC2D, doing a drag-and-drop back to the original
           JVM, you will be able to get back the window, and control yourself
           the application.</para>
         </listitem>

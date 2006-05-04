@@ -5,7 +5,7 @@
   
     <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
  ProActive. A more complete version should be released with the version 3.1. If you wish to get
- more informations, please feel free to send a mail to <ulink url="mailto:proactive@objectweb.org">proactive@objectweb.org</ulink>.</para>
+ more informations, please feel free to send a mail to <email>proactive@objectweb.org</email>.</para>
 <sect1  id="FaultTolerance_html_objectives" >
       <title> Overview</title>
       <sect2 >

@@ -241,8 +241,9 @@ ProActiveGroup.setScatterGroup(gb);
 ag1.foo(gb);</programlisting></para>
     
 
-    <para>To learn more, see the <ulink url="../api/index.html">JavaDoc</ulink> and the paper 
-      <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation>.
+     <para>To learn more, see the 
+      <ulink url="../api/org/objectweb/proactive/core/group/package-summary.html">JavaDoc</ulink> 
+      and the paper <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation>.
      </para>
   </sect1>
 </chapter>

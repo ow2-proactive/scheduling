@@ -228,21 +228,17 @@
     <para>Three interfaces are used to define and implement each step:</para>
 
     <itemizedlist>
-     <indexterm><primary>InitActive</primary><secondary>interface</secondary></indexterm>
-      <listitem>
-        <para><ulink url="../InitActive.html">InitActive</ulink></para>
-      </listitem>
-
-      <indexterm><primary>RunActive</primary><secondary>interface</secondary></indexterm>
-      <listitem>
-        <para><ulink url="../RunActive.html">RunActive</ulink></para>
-      </listitem>
-
-      <indexterm><primary>EndActive</primary><secondary>interface</secondary></indexterm>
- 
-      <listitem>
-        <para><ulink url="../EndActive.html">EndActive</ulink></para>
-      </listitem>
+     <listitem>
+      <para>InitActive (see code in <xref role="javaFileSrc" linkend="InitActive.java"/>)</para>
+     </listitem>
+     
+     <listitem>
+      <para>RunActive (see code in <xref role="javaFileSrc" linkend="RunActive.java"/>)</para>
+     </listitem>
+     
+     <listitem>
+      <para>EndActive (see code in <xref role="javaFileSrc" linkend="EndActive.java"/>)</para>
+     </listitem>
     </itemizedlist>
 
     <para>In case of a migration, an active object stops and restarts its
@@ -324,7 +320,7 @@ else
       an example that has a custom initialization and activity.</para>
 
       <example>
-        <title>Example 1: Custom Init and Run</title>
+        <title>Custom Init and Run</title>
 
         <para><programlisting language="java">  import org.objectweb.proactive.*;
   public class A implements InitActive, RunActive {
@@ -351,7 +347,7 @@ else
       </example>
 
       <para><example>
-          <title>Example2: start, stop, suspend, restart a simulation algorithm in runActivity method</title>
+          <title>Start, stop, suspend, restart a simulation algorithm in runActivity method</title>
 
           <para><programlisting language="java">import org.objectweb.proactive.*;
 public class Simulation implements RunActive {
@@ -394,7 +390,7 @@ public class Simulation implements RunActive {
         </example></para>
 
       <example>
-        <title>Example3: Reactive Active Object.</title>
+        <title>Reactive Active Object</title>
 
         <para>Even when an AO is busy doing its own work, it can remain
         reactive to external events (method calls). One just has to program
@@ -556,35 +552,63 @@ public void terminate (){ hasToTerminate=true;}
       already used by default in ProActive but one can easily replace any of
       those MetaObjects by a custom one.</para>
 
-      <para>We have defined the <ulink
-      url="../core/body/MetaObjectFactory.html">MetaObjectFactory</ulink>
-      interface able to create factories for each of those MetaObjects. This
-      interface is implemented by <ulink
-      url="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</ulink>
+      <para>We have defined the <literal>MetaObjectFactory</literal> interface 
+       (see code in <xref role="javaFileSrc" linkend="core/body/MetaObjectFactory.java"/>)
+       able to create factories for each of those MetaObjects. This
+       interface is implemented by <literal>ProActiveMetaObjectFactory</literal>
+       (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)
       which provides all the default factories used in ProActive.</para>
 
       <para>When creating an active object, as we saw above, it is possible to
       specify which <literal>MetaObjectFactory</literal> to use for that
-      particular instance of active object being created. The class <ulink
-      url="../ProActive.html">ProActive</ulink> provides extra <ulink
-      url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">newActive</ulink>
-      and <ulink
-      url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">turnActive</ulink>
-      methods for that.</para>
+      particular instance of active object being created. The class 
+      <literal>ProActive</literal>
+      (see code in <xref role="javaFileSrc" linkend="ProActive.java"/>)
+      provides extra newActive and turnActive methods for that:</para>
+      
+     <!-- Don't link theses complicated methods in PDF manual -->
+     <screen os="pdf">ProActive.newActive(
+  java.lang.String, 
+  java.lang.Object[],
+  org.objectweb.proactive.core.node.Node, 
+  org.objectweb.proactive.Active,  
+  org.objectweb.proactive.core.body.MetaObjectFactory)
+               
+ProActive.turnActive(
+  java.lang.Object,
+  org.objectweb.proactive.core.node.Node,
+  org.objectweb.proactive.Active,
+  org.objectweb.proactive.core.body.MetaObjectFactory)</screen>
+      
+     <!-- Create links for the HTML manual -->
+     <ulink os="html"  url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">
+        <screen>ProActive.newActive(
+  java.lang.String, 
+  java.lang.Object[],
+  org.objectweb.proactive.core.node.Node, 
+  org.objectweb.proactive.Active,  
+  org.objectweb.proactive.core.body.MetaObjectFactory)</screen></ulink>
+               
+     <ulink os="html"  url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">
+        <screen>ProActive.turnActive(
+  java.lang.Object,
+  org.objectweb.proactive.core.node.Node,
+  org.objectweb.proactive.Active,
+  org.objectweb.proactive.core.body.MetaObjectFactory)</screen></ulink>
+
     </sect2>
 
     <sect2 >
       <title>How to do it</title>
 
       <para>First you have to write a new MetaObject factory that inherits
-      from <ulink
-      url="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</ulink>
-      or directly implements <ulink
-      url="../core/body/MetaObjectFactory.html">MetaObjectFactory</ulink> in
-      order to redefine everything. Inheriting from <ulink
-      url="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</ulink>
-      is a great time saver as you only redefine what you really need to. Here
-      is an example:</para>
+        from <literal>ProActiveMetaObjectFactory</literal>
+      (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)
+      or directly implements the <literal>MetaObjectFactory</literal> interface 
+      (see code in <xref role="javaFileSrc" linkend="core/body/MetaObjectFactory.java"/>), in
+      order to redefine everything. Inheriting from 
+      <literal>ProActiveMetaObjectFactory</literal> is a great time saver 
+      as you only redefine what you really need to. Here is an example:</para>
 
       <para><programlisting language="java">public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
   private static final MetaObjectFactory instance = new MyMetaObjectFactory();
@@ -615,11 +639,12 @@ public void terminate (){ hasToTerminate=true;}
       <literal>RequestFactory</literal> in order to make the body use a new
       type of request. The method <literal>protected RequestFactory
       newRequestFactorySingleton()</literal> is one convenience method that
-      <ulink
-      url="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</ulink>
-      to simplify the creation of factories as singleton. More explanations
-      can be found in the javadoc of that class. The use of that new factory
-      is fairly simple. All you have to do is to pass an instance of the
+      <literal>ProActiveMetaObjectFactory</literal>
+       (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)      
+      provides to simplify the creation of factories as singleton. More explanations
+      can be found in the 
+      <ulink url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">javadoc of that class</ulink>. 
+      The use of that factory  is fairly simple. All you have to do is to pass an instance of the
       factory when creating a new active object. If we take the same example
       as before we have:</para>
 
@@ -1515,7 +1540,7 @@ if(result_from_method == null){
   </sect1>
 
   <sect1 id="HelloWorld">
-    <title>The Hello world ! example</title>
+    <title>The Hello world example</title>
 
     <para>This example implements a very simple client-server application. A
     client object display a <literal>String</literal> received from a remote
@@ -1807,14 +1832,18 @@ if(result_from_method == null){
 
         <para>Log on to the client Host, and launch the client</para>
 
-        <screen>linux clientHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
+        <screen>linux clientHost&gt; java -cp $CLASSPATH -Djava.security.policy=scripts/proactive.java.policy
    -Dlog4j.configuration=file:scripts/proactive-log4j
    org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello &amp;</screen>
 
-        <screen>windows clientHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
+  <screen>windows clientHost&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy
   -Dlog4j.configuration=file:scripts\proactive-log4j
   org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
-      </sect3>
+      
+ <note><para>There is also a Guided Tour section on the Hello world example: 
+             <xref linkend="hands_on_programming"/></para></note>
+
+</sect3>
     </sect2>
   </sect1>
 </chapter>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This appendix stores code files which are meant to make the manual self contained. 
+     Be careful, some elements are automagically added by the util.DocBookize mechanics -->
+
+<appendix id="srcCodeAppendix">
+ <title>Files of the ProActive source base cited in the manual</title>
+ 
+<!-- TODO: check if the html output needs the following two sections 
+     (html javadoc ==> files ok) (javadoc ant target ==> xml files copied) -->
+ 
+<sect1 id="xmlFileSrc">
+ <title>XML descriptors cited in the manual</title>
+</sect1>
+
+ 
+<sect1 id="javaFileSrc">
+  <title>Java classes cited in the manual</title>
+ </sect1>
+
+ <sect1 id="tutorialCodeSrc">
+  
+  <title>Tutorial files : Adding activities and migration to HelloWorld</title>
+  
+  <para>The following files illustrate the tutorial. They are the results
+   of the addition of <itemizedlist>
+    <listitem>migration capabilities</listitem>
+    <listitem>init and end activities</listitem>
+   </itemizedlist>
+   to the helloworld example of <xref linkend="HelloWorld"/>.</para>
+   
+   
+   <example id="tutorialCodeSrc.InitializedHello.java">
+    <title>InitializedHello.java</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="guided_tour/code/InitializedHello.java" />
+     </textobject></programlisting>
+   </example>
+   
+   <example id="tutorialCodeSrc.InitializedHelloClient.java">
+    <title>InitializedHelloClient.java</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="guided_tour/code/InitializedHelloClient.java" />
+     </textobject></programlisting>
+   </example>
+   
+   <example id="tutorialCodeSrc.MigratableHello.java">
+    <title>MigratableHello.java</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="guided_tour/code/MigratableHello.java" />
+     </textobject></programlisting>
+   </example>
+   
+   <example id="tutorialCodeSrc.MigratableHelloClient.java">
+    <title>MigratableHelloClient.java</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="guided_tour/code/MigratableHelloClient.java" />
+     </textobject></programlisting>
+   </example>
+   
+   <example id="tutorialCodeSrc.HelloFrameController.java">
+    <title>HelloFrameController.java</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="guided_tour/code/HelloFrameController.java" />
+     </textobject></programlisting>
+   </example>
+   
+   <example id="tutorialCodeSrc.HelloFrame.java">
+    <title>HelloFrame.java</title>
+    <programlisting language="java"><textobject>
+      <textdata fileref="guided_tour/code/HelloFrame.java" />
+     </textobject></programlisting>
+   </example>
+   
+  </sect1>
+   
+  <sect1 id="miscFileSrc">
+    <title>Other files cited in the manual</title>
+
+    <example id="miscFileSrc.p2p_files.proactivep2p.xsd">
+     <title>P2P configuration: proactivep2p.xsd</title>
+     <programlisting language="xml"><textobject>
+       <textdata fileref="p2p_files/proactivep2p.xsd" />
+      </textobject></programlisting>
+    </example>
+    
+    <example id="miscFileSrc.p2p_files.sample_p2p.xml">
+     <title>P2P configuration: sample_p2p.xml</title>
+     <programlisting language="xml"><textobject>
+       <textdata fileref="p2p_files/sample_p2p.xml" />
+      </textobject></programlisting>
+    </example>
+    
+    <example id="miscFileSrc.webservices.web.xml">
+     <title>SOAP configuration: webservices/web.xml</title>
+     <programlisting language="xml"><textobject>
+       <textdata fileref="webservices/web.xml" />
+      </textobject></programlisting>
+    </example>
+    
+    <example id="miscFileSrc.mpi_files.MPIRemote-descriptor.xml">
+     <title>MPI Wrapping: mpi_files/MPIRemote-descriptor.xml</title>
+     <programlisting language="xml"><textobject>
+       <textdata fileref="mpi_files/MPIRemote-descriptor.xml" />
+      </textobject></programlisting>
+    </example>
+
+
+</sect1>
+</appendix>

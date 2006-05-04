@@ -152,7 +152,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       <para>The Service interface is the following:</para>
 
       <programlisting language="java"><textobject>
-        <textdata fileref="../examples/components/helloworld/Service.java" />
+        <textdata fileref="examples/components/helloworld/Service.java" />
        </textobject></programlisting>
 
 
@@ -534,7 +534,7 @@ ssfully
       org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal</para>
 
      <programlisting language="xml"><textobject>
-       <textdata fileref="../examples/components/helloworld/helloworld-distributed-wrappers.fractal" />
+       <textdata fileref="examples/components/helloworld/helloworld-distributed-wrappers.fractal" />
       </textobject></programlisting>
  
 
@@ -542,28 +542,28 @@ ssfully
       org.objectweb.proactive.examples.components.helloworld.ClientType.fractal</para>
 
      <programlisting language="xml"><textobject>
-       <textdata fileref="../examples/components/helloworld/ClientType.fractal" />
+       <textdata fileref="examples/components/helloworld/ClientType.fractal" />
       </textobject></programlisting>
      
       <para>
       org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal</para>
 
      <programlisting language="xml"><textobject>
-       <textdata fileref="../examples/components/helloworld/ClientImpl.fractal" />
+       <textdata fileref="examples/components/helloworld/ClientImpl.fractal" />
       </textobject></programlisting>
      
       <para>
       org.objectweb.proactive.examples.components.ServerType</para>
      
      <programlisting language="xml"><textobject>
-       <textdata fileref="../examples/components/helloworld/ServerType.fractal" />
+       <textdata fileref="examples/components/helloworld/ServerType.fractal" />
       </textobject></programlisting>
       
      <para>
       org.objectweb.proactive.examples.components.helloworld.ServerImpl</para>
      
      <programlisting language="xml"><textobject>
-       <textdata fileref="../examples/components/helloworld/ServerImpl.fractal" />
+       <textdata fileref="examples/components/helloworld/ServerImpl.fractal" />
       </textobject></programlisting>
         </sect2>
   </sect1>
@@ -605,9 +605,15 @@ ssfully
       and component wrappers have been created. This way, one can see what is
       needed to transform an application into component-oriented code.</para>
 
-      <para>You may find the code in the <ulink
-      url="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.index.xml">examples/components/c3d</ulink>
+     <!-- The link to the source code is made only for the html -->
+     <para os="html">You may find the code in the 
+      <ulink url="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">examples/components/c3d</ulink>
       directory of the proactive source.</para>
+     
+     <!-- Only the name of the package appears in the pdf -->
+     <para os="pdf">You may find the code in the 
+      <literal>examples/components/c3d</literal> directory of the proactive source.</para>
+
     </sect2>
 
     <sect2 >
@@ -713,7 +719,7 @@ ssfully
             <title>The UserImpl class, a component wrapper</title>
 
             <programlisting language="java"><textobject>
-                <textdata fileref="../examples/components/c3d/UserImpl.java" />
+                <textdata fileref="examples/components/c3d/UserImpl.java" />
               </textobject></programlisting>
           </example></para>
       </sect3>
@@ -747,8 +753,8 @@ ssfully
       </sect3>
     </sect2>
 
-    <sect2 >
-      <title>ADL</title>
+    <sect2 id="fractal_gui_with_c3d">
+      <title>The C3D ADL</title>
 
       <para>You may be wanting to see how we have bound the components
       together, now. Since the design is pretty simple, there is not much to
@@ -768,7 +774,7 @@ ssfully
           <title>userAndComposite.fractal, a component ADL file</title>
 
           <programlisting language="xml"><textobject>
-              <textdata fileref="../examples/components/c3d/adl/userAndComposite.fractal" />
+              <textdata fileref="examples/components/c3d/adl/userAndComposite.fractal" />
             </textobject></programlisting>
         </example></para>
 
@@ -904,31 +910,30 @@ this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");</programl
        ---------------------------------------------------------</screen></para>
 
       <para>You have there the way to start this example. If you only want to
-      start the Composite (Dispatcher + Renderer), try this: <screen>scripts/unix/components$ ./c3d.sh org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend \
+      start the Composite (Dispatcher + Renderer), try this (don't insert the new lines): 
+      <screen>scripts/unix/components$ ./c3d.sh org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend \
        ../../../descriptors/components/C3D_all.xml</screen></para>
 
       <para>If you want to start only a User, you will be asked for the
-      address of a Dispatcher to which to connect to: <screen>scripts/unix/components$ ./c3d.sh org.objectweb.proactive.examples.components.c3d.adl.UserImpl \
+      address of a Dispatcher to which to connect to: 
+      <screen>scripts/unix/components$ ./c3d.sh org.objectweb.proactive.examples.components.c3d.adl.UserImpl \
        ../../../descriptors/components/C3D_all.xml</screen></para>
     </sect2>
 
     <sect2>
       <title>Source Code</title>
 
-      <para>You may find the source code of this application at the following
-      locations :</para>
+      <para>You may find the code of this application in the following packages: </para>
 
       <itemizedlist>
         <listitem>
-          <para><ulink
-          url="../doc/ProActive_src_html/org.objectweb.proactive.examples.c3d.index.xml">Active
-          Object version</ulink> ( examples/c3d )</para>
+         <para><literal>org.objectweb.proactive.examples.c3d</literal>, 
+               the Active Object version </para>
         </listitem>
 
         <listitem>
-          <para><ulink
-          url="../doc/ProActive_src_html/org.objectweb.proactive.examples.components.c3d.index.xml">Component
-          version</ulink> ( examples/components/c3d )</para>
+         <para><literal>org.objectweb.proactive.examples.components.c3d</literal>, 
+                the Component version </para>
         </listitem>
       </itemizedlist>
     </sect2>

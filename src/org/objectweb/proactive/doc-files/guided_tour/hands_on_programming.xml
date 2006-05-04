@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="hands_on_programming">
   <title>Hands-on programming</title>
-
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/hands_on_programming.html  -->
 
   <para>Here is an introduction to programming with ProActive. It should give
   you a first flavor, and you will be able to see some more advanced examples
@@ -39,9 +37,9 @@
     <title>The client - server example</title>
 
     <para>This example implements a very simple client-server application. 
-     A detailled explaination is given in  <xref linkend="HelloWorld"/>; 
-    it is the HelloWorld example earlier mentionned in this manual. A client object
-    displays a <literal>String</literal> gotten from a remote server.</para>
+     It has an in-depth explaination in <xref linkend="HelloWorld"/>; you
+     might wish to skim through it. Summarized, it is a client object
+    displaying a <literal>StringWrapper</literal> received from a remote server.</para>
 
     <para>The corresponding class diagram is the following:</para>
 
@@ -77,7 +75,7 @@
     a terminate method in the following example.</para>
 
     <sect2 >
-      <title>Design of the application</title>
+      <title>Design of the application with Init activity</title>
 
       <para>The InitializedHello class extends the Hello class, and implements
       the interfaces InitActive and EndActive.It acts a a server for the
@@ -102,8 +100,8 @@
       <sect3 >
         <title>InitializedHello</title>
 
-        <para>The source code of the InitializedHello class is <ulink
-        url="hands_on_programming/code/InitializedHello.java.xml">here</ulink>.</para>
+        <para>The source code of the InitializedHello class is in
+         <xref linkend="tutorialCodeSrc.InitializedHello.java"/>.</para>
 
         <para>initActivity and endActivity here just log messages onto the
         console, so you can see when they are called.</para>
@@ -138,13 +136,10 @@
         and InitializedHelloClient, and you will add a call to
         hello.terminate().</para>
 
-        <para><emphasis role="bold">InitializedHello</emphasis>: Code is
-        <ulink
-        url="hands_on_programming/code/InitializedHello.java.xml">here</ulink>.</para>
-
-        <para><emphasis role="bold">InitializedHelloClient</emphasis>: Code is
-        <ulink
-        url="hands_on_programming/code/InitializedHelloClient.java.xml">here</ulink>.</para>
+       <para>The source code of <emphasis role="bold">InitializedHello</emphasis> is
+         in <xref linkend="tutorialCodeSrc.InitializedHello.java"/>,
+         and the  code for <emphasis role="bold">InitializedHelloClient</emphasis> is
+         in <xref linkend="tutorialCodeSrc.InitializedHelloClient.java"/>.</para>
 
         <para>So, create InitializedHelloClient.java and InitializedHello.java
         in src/org/objectweb/proactive/examples/hello</para>
@@ -272,8 +267,8 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
       <sect3 >
         <title>a) the MigratableHello class</title>
 
-        <para>The code of the MigratableHello class is <ulink
-        url="hands_on_programming/code/MigratableHello.java.xml">here</ulink>.</para>
+        <para>The code of the MigratableHello class is 
+         in <xref linkend="tutorialCodeSrc.MigratableHello.java"/>.</para>
 
         <para>MigratableHello derives from the Hello class from the previous
         example</para>
@@ -319,9 +314,8 @@ public void moveTo(String destination_node) {
       <sect3 >
         <title>c) the client class</title>
 
-        <para>The entry point of the program is written in a separate class:
-        <ulink
-        url="hands_on_programming/code/MigratableHelloClient.java.xml">MigratableHelloClient</ulink></para>
+        <para>The entry point of the program is written in a separate class: MigratableHelloClient
+         (see <xref linkend="tutorialCodeSrc.MigratableHelloClient.java"/>).</para>
 
         <para>It takes as arguments the locations of the nodes the object will
         be migrated to.</para>
@@ -398,7 +392,7 @@ cd ..       </screen>
     more sophisticated frames.</para>
 
     <sect2 >
-      <title>Design of the application</title>
+      <title>Design of the migratable application</title>
 
       <para>We will write a new active object class, that extends
       MigratableHello. The sayHello method will create a window containing the
@@ -420,8 +414,8 @@ cd ..       </screen>
       <sect3 >
         <title>HelloFrameController</title>
 
-        <para>The code of the HelloFrameController is <ulink
-        url="hands_on_programming/code/HelloFrameController.java.xml">here</ulink>.</para>
+        <para>The code of the HelloFrameController is 
+         in <xref linkend="tutorialCodeSrc.HelloFrameController.java"/>.</para>
 
         <para>This class extends MigratableHello, and adds an activity and a
         migration strategy manager to the object .</para>
@@ -469,9 +463,8 @@ able) ProActive.getBodyOnThis());
         <title>HelloFrame</title>
 
         <para>This is an example of a graphical class that could be associated
-        with the active object. <ulink
-        url="hands_on_programming/code/HelloFrame.java.xml">Here</ulink> is
-        the code.</para>
+         with the active object (see code in 
+         <xref linkend="tutorialCodeSrc.HelloFrame.java"/> ).</para>
       </sect3>
     </sect2>
 

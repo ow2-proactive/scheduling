@@ -196,10 +196,16 @@
     role="bold">Plan</emphasis> that provides methods to get the reference of
     neighbor members (<emphasis role="bold">left</emphasis>, <emphasis
     role="bold">right</emphasis>, <emphasis role="bold">up</emphasis>,
-    <emphasis role="bold">down</emphasis>). See the javadoc of the <ulink
-    url="../../../../org/objectweb/proactive/core/group/topology/package-summary.xml">topology
-    package</ulink> for more informations.</para>
-
+    <emphasis role="bold">down</emphasis>). 
+    
+    See the javadoc of the topology package for more information:</para>
+   
+   <blockquote> 
+    <ulink url="../api/org/objectweb/proactive/core/group/topology/package-summary.html">
+       <screen>org.objectweb.proactive.core.group.topology</screen>
+      </ulink>
+   </blockquote>
+   
     <para>Like for the Total barrier, the string parameter represents a unique
     identity name for the barrier. The second parameter is the group of
     neighbors built by the programmer. Here is an example:</para>
@@ -244,7 +250,37 @@
     
 
     <para>A method barrier is used without any group (spmd or not). To learn
-    more, browse the <ulink
-    url="../../../../index.xml">JavaDoc</ulink>.</para>
+     more on Groups, please refer to <xref linkend="TypedGroupCommunication"/>.</para>
+  
+  </sect1>
+  <sect1>
+   <title>When does a barrier get triggered?</title>
+   <para>
+   
+    Barriers are not triggered at the place they are declared in the code. 
+    Instead, they are run at the end of the method. Look at this code:</para>
+    <programlisting language="java">public void MyMethodWithBarrier () {
+    foo();
+    ProSPMD.barrier("barrier");
+    bar();
+    } </programlisting>
+  <para>In this case, the call to bar() will be made <emphasis>BEFORE</emphasis> 
+   the barrier is really triggered. In fact, the barriers only start blocking 
+   at the <emphasis>END</emphasis> of the method. If you use something like 
+   <literal>this.asyncRefToSelf.bar()</literal>, it's ok, because then this 
+   call is put on the request queue, and will be effectively run 
+   <emphasis>AFTER</emphasis> the end of the current method. But if, like in the 
+   previous case (with the <literal> bar()</literal> method), a call is declared 
+   before the end of the method, then the barrier will be run after this call 
+   is made.</para>
+  
+  <para>To enforce the barrier, you should make the barrier the last action 
+   of your method, or you can use this trick:</para>
+  <programlisting language="java">    foo();
+    ProSPMD.barrier("barrier");
+    this.asyncRefToSelf.bar();</programlisting>
+    
+    <note><para>The behavior of barrier is peculiar in this sense. You should keep 
+      in mind this particularity when writing code with barriers.</para></note>
   </sect1>
 </chapter>

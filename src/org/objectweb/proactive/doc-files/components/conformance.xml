@@ -108,7 +108,7 @@ public void bindFc(String clientItfName, Object serverItf) {
       <sect2 >
         <title>Requirements</title>
         <para>As this implementation is based on ProActive, several 
-         <ulink url="../ActiveObjectCreation.xml">conditions</ulink> are required:</para>
+         conditions are required (more in <xref linkend="ActiveObjectCreation"/>):</para>
         <itemizedlist>
           <listitem>
             <para> the base class for the implementation of a primitive component has to
@@ -243,7 +243,7 @@ public void bindFc(String clientItfName, Object serverItf) {
        interfaces of a given type ; the name of each of these interfaces has to begin with the same
        name.</para>
       <para>This feature is provided in our implementation through the 
-       <ulink url="../TypedGroupCommunication.xml">Groups API</ulink>, and slightly differs from the
+       Groups API (more in <xref linkend="TypedGroupCommunication"/>), and slightly differs from the
        Julia implementation: instead of creating one new interface with an extended name for each
        member of the collection, we just use one interface, which is a group. Collective bindings are
        then performed transparently as if they were successive bindings on the same interface. Using a

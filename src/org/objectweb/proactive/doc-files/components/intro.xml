@@ -16,9 +16,9 @@
  also get an overview of the architecture of this implementation 
  in <xref linkend="componentArchitecture"/>.</para>
     
-<para><emphasis>
+<note><para>
   For a general overview of our work , you can also refer to the paper 
   <citation><xref linkend="BCM03" endterm="BCM03.abbrev"/></citation>.
-</emphasis></para>
+</para></note>
   
 </chapter>

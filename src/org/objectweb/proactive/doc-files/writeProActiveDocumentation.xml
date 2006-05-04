@@ -84,8 +84,11 @@
   <listitem>
    <para>Make sure your new additions make a nice new document. 
     Run the ant target <literal>build manualHtml</literal>, and  you should have 
-    an html copy of the doc. If you want to see all the possible output formats, 
-    try <literal>build manual</literal>.</para>
+    an html copy of the doc. If you want to generate all the possible output formats, 
+    call <literal>build manual</literal>. You can also see what the results seem to be 
+    without compiling! Try to open one of the docbook xml files in a browser
+    (mozilla/firefox do it) and you have a preview of what it might look like. Those 
+    who dislike XXE should be more than happy of it... </para>
   </listitem>
   
   <listitem>
@@ -213,14 +216,14 @@
   <example>
    <title>JAVA program listing with file inclusion</title>
    <programlisting language="java"><textobject>
-     <textdata fileref="../examples/hello/TinyHello.java" />
+     <textdata fileref="examples/hello/TinyHello.java" />
     </textobject></programlisting>
   </example>
   
   <example>
    <title>XML program listing with file inclusion</title>
    <programlisting language="xml"><textobject>
-     <textdata fileref="../examples/components/c3d/adl/UserImpl.fractal" />
+     <textdata fileref="examples/components/c3d/adl/UserImpl.fractal" />
     </textobject></programlisting>
   </example>
   
@@ -289,15 +292,20 @@ public class JavaToDocBook {
     which is in the doc above. The LINKEND attribute points to the id which 
    is referenced, for example, in a SECT1 tag. The ENDTERM tag (example with the biblio)
    is used to customize the string which will be used to point to the reference. </para>
-   
+  <para>You can also use XREF to include files which are in the html hierararchy already.
+  This goes for java files, and deployment descriptors. You have a few examples in
+  <literal>Descriptor.xml</literal>. (technical note: including files is done through the java
+  files in util. This may be done in pure xsl, but I gave up! The pdf and html look different
+ thanks to profiling) </para>
+  
    <para>Use ULINK tags to point to 
-    <ulink url="http://www-sop.inria.fr/oasis/proactive/">ProActive on the
-     web</ulink>, it's good for you!</para>
+    <ulink url="http://www-sop.inria.fr/oasis/proactive/">web references 
+     (ProActive for instance)</ulink>. Use freely, it sticks out nicely in pdf too!</para>
    
    <para>Use CITATION followed by an XREF for citations. For example, see 
     <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation> to learn on
-    groups. Example  biblio entry can be found in the <literal>biblio.xml</literal> 
-    file. You should consider using the bibdb tool to convert from bibtex 
+    groups. All the biblio entries should be put in <literal>biblio.xml</literal>. 
+    You should consider using the bibdb tool to convert from bibtex 
     (http://charybde.homeunix.org/~schmitz/code/bibdb/).
    </para>
    
@@ -373,8 +381,8 @@ public class JavaToDocBook {
   the entrails of the machinery? OK, hop on and enjoy the ride! Here are a few
   notes on how you should go about customizing the output. That means,
   changing how the pdf and html are written.</para>
- 
- <sect2 id="directory">
+
+  <sect2 id="xsl.directory">
   <title>File hierarchy</title>
   
   <para>The files for configuration are the following:</para>
@@ -434,6 +442,47 @@ public class JavaToDocBook {
    book, but sometimes in unexpected sections.</para>
  </sect2>
  
+ 
+ <sect2 id="xsl.profiling">
+  <title>Profiling</title>
+  <para>If you want to write some stuff that should go in pdf but not html, or vice-versa, 
+   you want to do some "profiling". This is very easy to do, as it was needed and tuned 
+   for the processing stages. Add an "os" attribute to the sections you want to exclude, 
+   specifying the wanted output format in which it should only appear.</para>
+  <screen> &lt;para os="pdf"&gt; This paragraph only appears in pdf output! &lt;/para&gt;</screen>
+  <para>(Comment) Using the "os" attribute to specify the output is not elegant. Agreed. But 
+   in docbook there is no default attribute intended to express the expected output file format, 
+   and using the "role" attribute is discouraged. </para>
+ </sect2>
+ 
+ <sect2 id="xsl.debugging">
+  <title>The XSL debugging nightmare</title>
+  
+  <para>If you are editing the xsl stylesheets, and are having a hard time figuring
+   out what's happening, don't panic! Use many messages 
+   to find out what the values of the variables are at a given time:
+   <screen><![CDATA[<xsl:message>
+     <xsl:text> OK, in question.toc, id is </xsl:text> <xsl:copy-of select="$id" /> 
+    </xsl:message>
+    
+    <xsl:for-each select="./@*">
+     <xsl:message>
+      <xsl:text> Attribute  <xsl:value-of select="name(.)"/> = <xsl:value-of select="."/>  </xsl:text> 
+     </xsl:message>
+    </xsl:for-each > ]]> </screen>
+  </para>
+  
+  
+  <para> You will very soon find that you still have to dig deeper into the templates, 
+   and they certainly are not easy to follow. Here's a little helper:
+   <screen>java -cp $CLASSPATH org.apache.xalan.xslt.Process -TT -xsl ...  -in ... -out ...</screen>
+   This uses the specified templates with the xsl file specified, but tracing every 
+   template called. Useful when you're wondering what's being called.
+   I'm sorry but I have not found a way to trace the call tree of a method, 
+   ie knowing exactly where it comes from. Have to do without!
+  </para>
+ </sect2>
+ 
  <sect2>
   <title>Todo list, provided by Denis</title>
   
@@ -445,27 +494,12 @@ public class JavaToDocBook {
    </listitem>
    
    <listitem>
-    <para> Enable the FAQ.</para>
-   </listitem>
-   
-   <listitem>
-    <para> Use this info (google Re: Extending ulink Warren Young) to specialize ulinks in pdf/html 
-     [is it needed?].</para>
-   </listitem>
-   
-   <listitem>
     <para> Create an index, and put the main words in it</para>
    </listitem>
    
    <listitem>
     <para> All important code examples should be wrapped in EXAMPLE tags  </para>
    </listitem>
-   
-   <listitem>
-    <para> Add another appendix to the pdf containing all the main code for ProActive. 
-     Hum, what are those main files? </para>
-   </listitem>
-   
    
   </orderedlist>
  </sect2>

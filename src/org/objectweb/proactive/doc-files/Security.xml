@@ -845,6 +845,5 @@
     <para>Certificates are saved under a PKCS12 format (extension .p12). This
     format is natively supported by the ProActive Security mechanism.</para>
 
-    <para>To learn more, see the <ulink url="../api/index.html">JavaDoc</ulink>.</para>
   </sect1>
 </chapter>

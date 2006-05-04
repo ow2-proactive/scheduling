@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="OOSPMDJacobiexample">
   <title>SPMD PROGRAMMING</title>
-
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/OOSPMDJacobiexample.html  -->
 
   <sect1 >
     <title>OO SPMD on a Jacobi example</title>

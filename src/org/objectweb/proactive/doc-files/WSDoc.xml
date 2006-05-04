@@ -117,8 +117,8 @@
       </listitem>
 
       <listitem>
-        <para>Replace the $TOMCAT/webapps/soap/WEB-INF/web.xml by <ulink
-        url="webservices/web.xml">this one</ulink>.</para>
+        <para>Replace the $TOMCAT/webapps/soap/WEB-INF/web.xml by 
+         the one found in <xref linkend="miscFileSrc.webservices.web.xml"/>.</para>
       </listitem>
     </itemizedlist>
   </sect1>

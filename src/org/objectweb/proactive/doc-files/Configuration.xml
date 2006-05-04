@@ -428,9 +428,10 @@
             <listitem>
               <para><emphasis role="bold">proactive.classloader</emphasis>
               runtimes created with this property enabled fetch missing
-              classes using a <ulink
-              url="../core/classloader/package.html">special
-              mechanism</ulink>. This is an alternative to RMI dynamic class
+              classes using a special mechanism
+              (see the 
+              <ulink url="../api/org/objectweb/proactive/core/classloader/package-summary.html">
+               classloader package javadoc</ulink>). This is an alternative to RMI dynamic class
               downloading, useful for instance when performing hierarchical
               deployment.</para>
             </listitem>

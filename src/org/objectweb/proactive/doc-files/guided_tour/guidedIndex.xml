@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="guidedIndex">
-  <title>ProActive guided tour</title>
+  <title>Introduction to the Guided Tour and Tutorial</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/guided_tour/index.html  -->
-
+  <sect1 id="guidedOverview">
+   <title>Overview</title>
+   
   <para>This tour is a practical introduction to ProActive, giving an
   illustrated introduction to some of the functionnalities and facilities
-  offered by the library.</para>
+  offered by the library, through the means of a 
+  <emphasis>step-by-step tutorial</emphasis>.</para>
 
-  <para>First off, we give an explaination on how to install and configure
-  ProActive. Next are introduced the different functionalities of the library
-  through some runnning examples. Then are given some details on how this is
-  put down in code, and you will be challenged to write your bits of code.
-  This should give you practical experience on how to program using ProActive.
-  A section on OO-SPMD (Object-Oriented Single Program Multiple Data) will
-  show how to use this programming paradigm.</para>
-
-  <para>The guided tour is finished off by the complete N-Body example. This
-  application is first written trivially, then some speed-ups are plugged in,
-  to show how ProActive can help you. We hope this will help your
-  understanding of the library, and of the concepts driving it.</para>
+ <itemizedlist> 
+  <listitem>
+    <para>First off, we give an explaination on how to install and configure
+      ProActive, in <xref linkend="guidedInstallation"/>.   </para>
+  </listitem><listitem>
+     
+     <para>Next are introduced the different functionalities of the library
+      through some runnning examples, in <xref linkend="capabilities-intro"/>.   </para>
+  </listitem><listitem>
+     
+    <para>Then are given some details on how this is
+     put down in code, and you will be challenged to write your bits of code,
+     in <xref linkend="hands_on_programming"/>.   
+     This should give you practical experience on how to program using ProActive.</para>
+  </listitem><listitem>
+     
+   <para> <xref linkend="OOSPMDJacobiexample"/>, will show how to use the OO-SPMD 
+    (Object-Oriented Single Program Multiple Data) programming paradigm. </para>
+   </listitem><listitem>
+   
+     <para>The guided tour is finished off by the complete N-Body example,
+      in <xref linkend="nbody"/>. This application is first written trivially, 
+      then some speed-ups are inserted, to show how ProActive can help you. </para>
+  </listitem> 
+ </itemizedlist>
+  
+ <para> We hope this will help your  understanding of the library, and of the concepts driving it.</para>
 
   <para>If you need further details on how the examples work, check the
   ProActive <ulink
   url="http://www-sop.inria.fr/oasis/ProActive/apps/index.html">applications</ulink>
   page.</para>
 
-  <sect1 >
+</sect1>
+ <sect1 id="guidedInstallation">
     <title>Installation and setup</title>
 
     <para>Follow the instructions for downloading and installing ProActive, in 
@@ -72,8 +90,8 @@
         <para>Note that the compilation is managed by <ulink
         url="http://jakarta.apache.org/ant">Ant</ulink> ; we suggest you use
         this tool to make modifications to the source code, while doing this
-        tutorial. Nevertheless, you can just change the code and compile using
-        compile.sh &lt;the example application&gt; (or compile.bat under
+        tutorial. Nevertheless, you can just change the code and recompile using
+        <literal>compile.sh</literal> (or <literal>compile.bat</literal> under
         windows)</para>
       </listitem>
 
@@ -81,8 +99,8 @@
         <para>The examples used in the second part of this tutorial are
         provided in the /scripts directory of the distribution.</para>
 
-        <para>The scripts are platform dependant: .sh files on linux are
-        equivalent to the .bat files on windows</para>
+       <para>The scripts are platform dependant: <literal>.sh</literal> files on linux are
+        equivalent to the <literal>.bat</literal> files on windows.</para>
       </listitem>
     </itemizedlist>
 

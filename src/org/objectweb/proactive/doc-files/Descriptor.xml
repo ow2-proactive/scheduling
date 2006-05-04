@@ -962,8 +962,11 @@
       role="bold">jvmProcess</emphasis> to create a jvm(discussed
       previoulsy).</para>
 
-      <para>You can find <ulink
-      url="../../../../../xml_examples/">here</ulink> several examples of
+     <!-- This paragraph only appears in the html version  -->
+     <para os="html">You can find <ulink url="../examples/">here</ulink> several examples of
+      supported protocols and useful combinations.</para>
+     <!-- This paragraph only appears in the pdfversion  -->
+     <para os="pdf">You can find in <xref linkend="xmlFileSrc"/> several examples of
       supported protocols and useful combinations.</para>
 
       <para><emphasis role="bold">Note that it is mandatory for using all
@@ -1017,8 +1020,7 @@
           node will be created on sea.inria.fr thanks to the process defined
           by <emphasis role="bold">jvmProcess</emphasis>.</para>
 
-          <para>Check <ulink
-          url="../../../../../xml_examples/RSH_Example.xml">here</ulink> for a
+          <para>Check <xref role="xmlFileSrc" linkend="examples/RSH_Example.xml"/> for a
           complete rsh deployment example.</para>
         </listitem>
 
@@ -1106,9 +1108,8 @@
           familiar with ssh, see <ulink
           url="http://www.openssh.org">openSSH</ulink></para>
 
-          <para>Check <ulink
-          url="../../../../../xml_examples/SSH_Example.xml">here</ulink> for a
-          complete ssh deployment example.</para>
+         <para>Check <xref role="xmlFileSrc" linkend="examples/SSH_Example.xml"/> 
+          for a complete ssh deployment example.</para>
         </listitem>
 
         <listitem id="Descriptor_html_processlist" xreflabel="Process list">
@@ -1149,14 +1150,20 @@
  &lt;/processes&gt;
 </screen>
 
-          <para>When using <emphasis role="bold">processList tag</emphasis>,
-          the <emphasis role="bold">class</emphasis> attribute can take 3
-          values: <ulink
-          url="../core/process/ssh/SSHProcessList.xml">org.objectweb.proactive.core.process.ssh.SSHProcessList</ulink>,
-          <ulink
-          url="../core/process/rsh/RSHProcessList.xml">org.objectweb.proactive.core.process.rsh.RSHProcessList</ulink>,
-          <ulink
-          url="../core/process/rlogin/RLoginProcessList.xml">org.objectweb.proactive.core.process.rlogin.RLoginProcessList</ulink>
+ <para>When using <emphasis role="bold">processList tag</emphasis>,
+ the <emphasis role="bold">class</emphasis> attribute can take 3 values: 
+     <itemizedlist>
+      <listitem>
+       org.objectweb.proactive.core.process.ssh.SSHProcessList 
+       (see <xref role="javaFileSrc" linkend="core/process/ssh/SSHProcessList.java"/>),
+      </listitem><listitem>
+       org.objectweb.proactive.core.process.rsh.RSHProcessList
+       (see <xref role="javaFileSrc" linkend="core/process/rsh/RSHProcessList.java"/>),
+    </listitem><listitem>
+       org.objectweb.proactive.core.process.rlogin.RLoginProcessList
+       (see <xref role="javaFileSrc" linkend="core/process/rlogin/RLoginProcessList.java"/>),
+    </listitem>
+   </itemizedlist>
           according to the protocol being used is ssh, rsh or rlogin. The
           <emphasis role="bold">fixedName</emphasis> attribute is mandatory
           and represents the fixed part shared by all machine's names. The
@@ -1211,10 +1218,8 @@
           attribute. In the example, a jvm is going to be created using ssh on
           crusoe.inria.fr, waha.inria.fr, nahuel.inria.fr.</para>
 
-          <para>Check <ulink
-          url="../../../../../xml_examples/SSHList_example.xml">SSHList_example.xml</ulink>
-          or <ulink
-          url="../../../../../xml_examples/SSHListbyHost_Example.xml">SSHListbyHost_Example.xml</ulink>
+         <para>Check <xref role="xmlFileSrc" linkend="examples/SSHList_example.xml"/> 
+          or <xref role="xmlFileSrc" linkend="examples/SSHListbyHost_Example.xml"/> 
           for list examples.</para>
         </listitem>
 
@@ -1346,8 +1351,7 @@
           in the bsub command: interactive mode, and the name of the
           queue.</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_LSF_Example.xml">SSH_LSF_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_LSF_Example.xml"/> .</para>
         </listitem>
 
         <listitem>
@@ -1413,8 +1417,7 @@
           frontend_host of the script pbsStartRuntime.sh(default is
           /user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_PBS_Example.xml">SSH_PBS_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_PBS_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1472,8 +1475,7 @@
           frontend_host of the script gridEngineStartRuntime.sh (default is
           /user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_SGE_Example.xml">SSH_SGE_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_SGE_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1531,10 +1533,8 @@
           frontend_host of the script oarStartRuntime.sh (default is
           /user.home/ProActive/scripts/unix/cluster/oarStartRuntime.sh).</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_OAR_Example.xml">SSH_OAR_Example.xml</ulink>
-          and <ulink
-          url="../../../../../xml_examples/SSH_OARGRID_Example.xml">SSH_OARGRID_Example.xml</ulink></para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_OAR_Example.xml"/> 
+          and <xref role="xmlFileSrc" linkend="examples/SSH_OARGRID_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1547,8 +1547,7 @@
           <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
           to use such protocol.</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_PRUN_Example.xml">SSH_PRUN_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_PRUN_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1619,8 +1618,7 @@
           &lt;count&gt; element is 1. It represents the number of processor
           requested.</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/Globus_Example.xml">Globus_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/Globus_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1630,8 +1628,7 @@
           <literal>org.objectweb.proactive.core.process.unicore.UnicoreProcess</literal>
           to use such protocol.</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/Unicore_Example.xml">Unicore_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/Unicore_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1645,8 +1642,7 @@
           url="http://ftp.nordugrid.org/download/index.php">ARC
           Client</ulink></para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/NorduGrid_Example.xml">NorduGrid_Example.xml</ulink>.</para>
+        <para>Check also <xref role="xmlFileSrc" linkend="examples/NorduGrid_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1658,8 +1654,7 @@
           <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
           to use such protocol.</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_GLite_Example.xml">SSH_GLite_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_GLite_Example.xml"/>.</para>
         </listitem>
 
         <listitem>
@@ -1670,8 +1665,7 @@
           to use such protocol. You have to couple this process with the
           DependentListProcessDecorator explained below.</para>
 
-          <para>Check also <ulink
-          url="../../../../../xml_examples/SSH_MPI_Example.xml">SSH_MPI_Example.xml</ulink>.</para>
+         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_MPI_Example.xml"/>.</para>
 
           <para><screen>
 &lt;processDefinition id='<emphasis role="bold">mpiProcess</emphasis>'&gt;
@@ -1885,8 +1879,7 @@
       one must be a DependentProcess thus has to implement the
       org.objectweb.proactive.core.process.DependentProcess interface.</para>
 
-      <para>Check also <ulink
-      url="../../../../../xml_examples/SSH_MPI_Example.xml">SSH_MPI_Example.xml</ulink>.</para>
+     <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_MPI_Example.xml"/>.</para>
 
       <para><screen>   &lt;processDefinition id='<emphasis role="bold">dependentProcessSequence</emphasis>'&gt;
     &lt;dependentProcessSequence class='<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcessDecorator</emphasis>'&gt;
@@ -1916,7 +1909,7 @@
     role="bold">P2PService</emphasis> service allows when using ProActive's
     P2P infrastructure to get as many jvms as desired.</para>
 
-    <screen> &lt;?xml version='1.0' encoding='UTF-8'?&gt;                      
+    <programlisting language="xml"> &lt;?xml version='1.0' encoding='UTF-8'?&gt;                      
  &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
@@ -1964,7 +1957,7 @@
     &lt;/serviceDefinition&gt;
    &lt;/services&gt;
   &lt;/infrastructure&gt;
- &lt;/ProActiveDescriptor&gt;</screen>
+ &lt;/ProActiveDescriptor&gt;</programlisting>
 
     <para>The <emphasis role="bold">RMIRegistryLookup</emphasis> service needs
     only an <emphasis role="bold">url</emphasis> to perform the lookup. Many
@@ -1996,17 +1989,17 @@
     <title>Killing the application</title>
 
     <para>ProActive gives the ability to kill all JVMs and Nodes deployed with
-    an XML descriptor with the method: killall(boolean softly) in class <ulink
-    url="../core/descriptor/data/ProActiveDescriptor.xml">ProActiveDescriptor</ulink>:</para>
+     an XML descriptor with the method: killall(boolean softly) in class ProActiveDescriptor
+     (this class's code is in <xref role="javaFileSrc" linkend ="core/descriptor/data/ProActiveDescriptor.java"/>) </para>
 
-    <para><screen><literal>ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
+    <para><programlisting language="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
 pad.activateMappings();
 --------------------------------------------
 --------------------------------------------
 --------------------------------------------
 pad.killall(false);
-//----------- Kills every jvms deployed with the descriptor</literal></screen></para>
+//----------- Kills every jvms deployed with the descriptor</programlisting></para>
 
     <para>If <emphasis role="bold">softly</emphasis> is set to false, all jvms
     created when activating the descriptor are killed abruptely. If true a jvm
@@ -2026,8 +2019,14 @@ pad.killall(false);
     Deployment Descriptor. You can programmatically create such
     processes.</para>
 
-    <para>In order to get familiar on how to create processes programmatically
-    see <ulink url="../core/process/package-use.xml">Process
-    package</ulink></para>
+    <para>In order to get familiar on how to create processes programmatically,
+     see the Process package </para>
+     
+    <blockquote>
+       <ulink url="../api/org/objectweb/proactive/core/process/package-summary.html">
+          <screen> org.objectweb.proactive.core.process</screen>
+       </ulink>
+    </blockquote>
+
   </sect1>
 </chapter>

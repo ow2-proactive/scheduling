@@ -303,7 +303,8 @@ logger.info(<emphasis role="bold">my_spmd</emphasis>);
 			Using the Simple Wrapping Infrastructure</title>
 		<para>
 	 Resources booking is specified using ProActive Descriptors.
-	We explain the operation with the example included in the release. The entire file is available <ulink url="mpi_files/MPIRemote-descriptor.xml">here</ulink>.
+	We explain the operation with the example included in the release. The entire file is available 
+        in <xref linkend="miscFileSrc.mpi_files.MPIRemote-descriptor.xml"/>.
 </para>
 		<itemizedlist>
 			<listitem>

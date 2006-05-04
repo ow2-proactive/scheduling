@@ -1025,10 +1025,10 @@
           mechanism can be useful to setup a default configuration and have a
           specific configuration for some hosts.</para>
 
-          <para>The reference is the XML Schema in <ulink
-          url="p2p_files/proactivep2p.xsd">proactivep2p.xsd</ulink>. For those
+         <para>The reference is the XML Schema called proactivep2p.xsd, shown in
+          <xref linkend="miscFileSrc.p2p_files.proactivep2p.xsd"/>. For those
           not fluent in XML Schema, here is a description of all markup
-          tags--</para>
+          tags</para>
 
           <para>The root element in <emphasis
           role="bold">&lt;configFile&gt;</emphasis> it contains one or many
@@ -1282,8 +1282,8 @@
  &lt;/infrastructure&gt;
 </screen>
 
-      <para>A complete example of file is available <ulink
-      url="p2p_files/sample_p2p.xml">here</ulink>.</para>
+      <para>A complete example of file is available, see 
+       <xref linkend="miscFileSrc.p2p_files.sample_p2p.xml"/> .</para>
 
       <para>The next figure shows a P2P Service started with a XML deployment
       descriptor (xml_path attribute). Six nodes are shared on different

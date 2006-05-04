@@ -45,11 +45,11 @@
 <!ENTITY FAQ SYSTEM "FAQ.xml">
 <!ENTITY biblio SYSTEM "biblio.xml">
 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
-
+<!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
 ]>
 <book>
   <bookinfo>
-    <title>ProActive v3.0.1 Documentation</title>
+    <title>ProActive v3.1 Documentation</title>
 
     <subtitle>A Comprehensive Solution for Grid Computing</subtitle>
 
@@ -79,9 +79,13 @@
     
     <revhistory>  
     <revision>
+        <revnumber>3.1</revnumber>
+        <date>2006-04-12</date>
+    </revision>
+    <revision>
         <revnumber>3.01</revnumber>
         <date>2005-12-16</date>
-      </revision>
+    </revision>
     </revhistory>
     
     <abstract>
@@ -232,7 +236,7 @@
   </part>
    
  <part id="ProActiveGuidedTour">
-   <title>Guided Tour</title>
+   <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
    &hands_on_programming;
@@ -301,8 +305,9 @@
     <title>Back matters</title>
     &FAQ;   
     &referenceCard;
+    &srcCodeAppendix; 
     &biblio;
-    <index/>
+    <index id="keywordIndex"/>
    </part> 
 
  </book>

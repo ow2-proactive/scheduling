@@ -412,36 +412,19 @@
 };        </screen></para>
   </sect1>
 
-  <sect1 >
-    <title>Create a log4j configuration
-    file</title>
+  <sect1>
+    <title>Create a log4j configuration file</title>
 
-    <para><emphasis>If you use the scripts provided with the distribution to
-    run the examples an existing log4j file named <emphasis
-    role="bold">proactive-log4j</emphasis> will be used by
-    default</emphasis></para>
+    <note><para>If you use the scripts provided with the distribution to
+    run the examples an existing log4j file named <literal>proactive-log4j</literal> 
+    will be used by  default.</para></note>
 
-    <para><example>
+    <example>
         <title>A simple proactive-log4j file</title>
-
-        <para><screen><emphasis># the default logging level is INFO
-
-log4j.rootLogger=INFO, A1
-
-#A1 uses PatternLayout
-#and displays the associated message (%m)
-#using the platform dependant separator (%n)
-#Use %M for method names
-#see log4j documentation for details
-
-log4j.appender.A1=org.apache.log4j.ConsoleAppender
-log4j.appender.A1.layout=org.apache.log4j.PatternLayout
-log4j.appender.A1.layout.ConversionPattern=%m %n
-
-########### Change here default logging level on a 
-########### per-logger basis
-########### usage is log4j.logger.className=Level, Appender</emphasis></screen></para>
-      </example></para>
+        <programlisting><textobject>
+           <textdata fileref="../../scripts/proactive-log4j" />
+          </textobject></programlisting> 
+      </example> 
   </sect1>
 
   <sect1 >

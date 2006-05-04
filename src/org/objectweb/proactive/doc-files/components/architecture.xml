@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!-- <?xml version="1.0" encoding="UTF-8"?> -->
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/architecture.html  -->
   
     <sect1 remap="h2">
@@ -114,7 +114,8 @@
  (section 6.1). The <emphasis>collection</emphasis> cardinality means that a given component may have several
  interfaces of a given type ; the name of each of these interfaces has to begin with the same
  name.</para>
-        <para>This feature is provided in our implementation through the <ulink url="../TypedGroupCommunication.xml">Groups API</ulink>, and slightly differs from the
+        <para>This feature is provided in our implementation through the 
+ Groups API (see <xref role="javaFileSrc" linkend="core/group/Group.java"/>), and slightly differs from the
  Julia implementation: instead of creating one new interface with an extended name for each
  member of the collection, we just use one interface, which is a group. Collective bindings are
  then performed transparently as if they were successive bindings on the same interface. Using a

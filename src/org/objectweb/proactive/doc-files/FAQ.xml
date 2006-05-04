@@ -8,7 +8,8 @@
   <email>proactive@objectweb.org</email> and we'll update the FAQ.</para>
 
  <qandaset>
- <qandadiv>
+ 
+  <qandadiv>
    <title>Running ProActive</title>
   
   <qandaentry>
@@ -17,90 +18,55 @@
         </question>
 
         <answer>
-          <para>ProActive uses <ulink
-          url="http://jakarta.apache.org/ant/">Ant</ulink> for its build.
+         <para>ProActive uses 
+          <ulink url="http://jakarta.apache.org/ant/">Ant</ulink> for its build.
           Assuming that the environment variable <literal>JAVA_HOME</literal>
           is properly set to your Java distribution, just go into the
           <literal>compile</literal> directory and use the script:</para>
-
-          <itemizedlist>
-            <listitem>
-              <para>on Windows: <literal>build.bat all</literal></para>
-            </listitem>
-
-            <listitem>
-              <para>on Unix systems: <literal>build all</literal></para>
-            </listitem>
-          </itemizedlist>
-
-          <para> <literal>'all'</literal>  represents the target of the 
+         
+         <itemizedlist>
+          <listitem> <para>on Windows: <literal>build.bat all</literal></para> </listitem>
+          <listitem> <para>on Unix systems: <literal>build all</literal></para> </listitem>
+         </itemizedlist>
+         
+         <para> <literal>'all'</literal>  represents the target of the 
           build. It will compile all sources files and generate the documentation.
-          </para>
+          To compile only the source files, for example if you 
+          have modified the code, you should try</para>          
+         <itemizedlist>
+          <listitem> <para>on Windows: <literal>build.bat compile</literal></para> </listitem>
+          <listitem> <para>on Unix systems: <literal>build compile</literal></para> </listitem>
+         </itemizedlist>
 
-          <para>If you want only to compile sources and not generate the
-          documentation use</para>
+          <para>If you want only to compile only parts of ProActive, 
+           you should try <literal>build</literal>, with no arguments. 
+           As of version v3.1, the result is: </para>
+          
+          <screen>/home/bob/ProActive/compile/$ build
+           Buildfile: ./proactive.xml
+           
+           Main targets:
+           
+           all            Compile All and build the docs
+           clean          Remove all generated files
+           compile        build the class files
+           core           Compile the ProActive core classes
+           dist           Create the distribution binary
+           docs           Construct the javadoc and the manual
+           examples       Compile all the examples
+           ibis           Everything related to ProActive IBIS
+           ic2d           Compile the IC2D Tool
+           javadoc        Use javadoc to build information on the ProActive classes
+           manual         Build all the different manual version: html, pdf...
+           manualHtml     Make only the html files in the manual
+           manualPdf      Make only the pdf files in the manual
+           rewrite        Rewrite classes to enhance performance with ibis
+           runBench       Run benchmarks
+           runTests       Run all non regression tests
+           runTestsLocal  Run all non regression tests on the current host only
+           Default target: compile </screen>          
 
-          <itemizedlist>
-            <listitem>
-              <para>on Windows: <literal>build.bat compile</literal></para>
-            </listitem>
-
-            <listitem>
-              <para>on Unix systems: <literal>build compile</literal></para>
-            </listitem>
-          </itemizedlist>
-
-          <para>Other targets are available if needed:</para>
-
-          <para><emphasis role="bold">General source file
-          builds</emphasis></para>
-
-          <itemizedlist>
-            <listitem>
-              <para><literal>core</literal>: ProActive core</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>ext</literal>: ProActive ext</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>ic2d</literal>: All IC2D</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>examples</literal>: All examples</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>compile</literal>: means all of the above</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>all</literal>: means all of the above + generates
-              the documentation</para>
-            </listitem>
-          </itemizedlist>
-
-          <para><emphasis role="bold">Utility builds</emphasis></para>
-
-          <itemizedlist>
-            <listitem>
-              <para><literal>docs</literal>: creates the docs directory with
-              javadoc + doc</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>clean</literal>: removes all build generated
-              file</para>
-            </listitem>
-
-            <listitem>
-              <para><literal>dist</literal>: creates the distribution
-              directory and files</para>
-            </listitem>
-          </itemizedlist>
-        </answer>
+          </answer>
       </qandaentry>
 
       <qandaentry>
@@ -298,13 +264,14 @@
           that represent the activity of the active object.</para>
          
          <para>The body has two representations. One is local and given by
-          the interface <ulink url="../Body.xml">Body</ulink>. This is the
+          the interface Body (see code in <xref role="javaFileSrc" linkend="Body.java"/>). This is the
           local view of the body an object can have when being in the same JVM
           as the body. For instance, the implementation of the activity of an
           object done through the method <literal>runActivity(Body)</literal>
           of the interface <literal>RunActive</literal> sees the body locally
           as it is instantiated by the body itself. The other representation,
-          given by the interface <ulink url="../core/body/UniversalBody.xml">UniversalBody</ulink>, is
+          given by the interface UniversalBody 
+          (see code in <xref role="javaFileSrc" linkend="core/body/UniversalBody.java"/>), is
           remote. It represents the view of the body a remote object can have
           and therefore the methods that can be invoked. That view is the one
           used by the proxy of a remote reference to the active object to send
@@ -509,8 +476,8 @@
          at org.objectweb.proactive.core.node.NodeFactory.createNode(NodeFactory.java:158)
          ...</screen>
         
-        <para>ProActive uses <ulink
-                                   url="http://java.sun.com/products/jdk/rmi/">RMI</ulink> as its
+        <para>ProActive uses 
+         <ulink url="http://java.sun.com/products/jdk/rmi/">RMI</ulink> as its
          underlying transport technology. Moreover it uses code downloading
          features to automatically move generated stub classes from one JVM
          to another one. For those reasons, ProActive needs to install a
@@ -559,7 +526,23 @@
          remove it and restart the application</para>
        </answer>
       </qandaentry>
+      
+      <qandaentry>
+       <question>
+        <para>Why do I get a java.rmi.ConnectException: Connection refused to host: 127.0.0.1 ?</para>
+       </question>
        
+       <answer>
+        <para>Sometimes, the hosts files (<literal>/etc/hosts</literal> for UNIX)
+         contains <literal>127.0.0.1</literal> along with the name of the machine.
+         This troubles ProActive, and JAVA network connexions in general. To circumvent
+         this issue , you should start your programs with the command line argument 
+         <screen>-Dsun.net.spi.nameservice.provider.1=dns,sun"</screen>
+         This tells java not to look at the hosts file, but rather to ask
+         the DNS for network information.</para>
+       </answer>
+      </qandaentry>
+      
      
      </qandadiv>
        <qandadiv>
@@ -767,133 +750,16 @@
  </answer>
 </qandaentry>
 
-<qandaentry>
- <question>
-  <para id="activity">How do I control the activity of an active
-   object?</para>
- </question>
- 
- <answer>
-  <para><emphasis  role="bold">Defining Active Object
-    Activity</emphasis></para>
-  
-  <para>When an active object is created from a given object, all
-   method calls are sent as requests to the body (automatically
-   associated to the active object). Those requests are stored in a
-   queue waiting to be served. Serving those requests as well as
-   performing some other work represent the activity of this active
-   object. One can completely specify what will be this activity. The
-   standard behavior is to serve all incoming requests one by one in a
-   FIFO order.</para>
-  
-  <para>In addition to the activity, it is possible to specify what to
-   do before the activity starts, and after it ends. The three steps
-   are:</para>
-  
-  <itemizedlist>
-   <listitem>
-    <para>the initialization of the activity (done only once)</para>
-   </listitem>
-   
-   <listitem>
-    <para>the activity itself</para>
-   </listitem>
-   
-   <listitem>
-    <para>the end of the activity (done only once)</para>
-   </listitem>
-  </itemizedlist>
-  
-  <para>Three interfaces are used to define and implement each
-   step:</para>
-  
-  <itemizedlist>
-   <listitem>
-    <para><ulink url="../InitActive.xml">InitActive</ulink></para>
-   </listitem>
-   
-   <listitem>
-    <para><ulink url="../RunActive.xml">RunActive</ulink></para>
-   </listitem>
-   
-   <listitem>
-    <para><ulink url="../EndActive.xml">EndActive</ulink></para>
-   </listitem>
-  </itemizedlist>
-  
-  <para>In case of a migration, an active object stops and restarts
-   its activity automatically without invoking the init or ending
-   phases. Only the activity itself is restarted.</para>
-  
-  <para><emphasis  role="bold">Setting Active Object
-    Activity</emphasis></para>
-  
-  <para>Two ways are possible to define each of the three phases of an
-   active object.</para>
-  
-  <itemizedlist>
-   <listitem>
-    <para>Implementing one or more of the three interfaces directly
-     in the class used to create the active object</para>
-   </listitem>
-   
-   <listitem>
-    <para>Passing an object implementing one or more of the three
-     interfaces in parameter to the method
-     <literal>newActive</literal> or <literal>turnActive</literal>
-     (parameter active in those methods)</para>
-   </listitem>
-  </itemizedlist>
-  
-  <para>Note that the methods defined by those 3 interfaces are
-   guaranted to be called by the active thread of the active
-   object.</para>
-  
-  <para>The algorithms that decide for each phase what to do are the
-   following (<literal>activity</literal> is the eventual object passed
-   as a parameter to <literal>newActive</literal> or
-   <literal>turnActive</literal>):</para>
-  
-  <simpara><emphasis role="bold">InitActive</emphasis></simpara>
-  
-  <screen>if activity is non null and implements InitActive
-   we invoke the method initActivity defined in the object activity
-   else if the class of the reified object implements InitActive
-   we invoke the method initActivity of the reified object
-   else
-   we don't do any initialization</screen>
-  
-  <simpara><emphasis role="bold">RunActive</emphasis></simpara>
-  
-  <screen>if activity is non null and implements RunActive
-   we invoke the method runActivity defined in the object activity
-   else if the class of the reified object implements RunActive
-   we invoke the method runActivity of the reified object
-   else
-   we run the standard FIFO activity
-  </screen>
-  
-  <simpara><emphasis role="bold">EndActive</emphasis></simpara>
-  
-  <screen>if activity is non null and implements EndActive
-   we invoke the method endActivity defined in the object activity
-   else if the class of the reified object implements EndActive
-   we invoke the method endActivity of the reified object
-   else
-   we don't do any cleanup</screen>
- </answer>
-</qandaentry> 
-
-
       <qandaentry>
        <question>
-        <para>How do I implement the custom activity of an active
+        <para id="activity">How do I control the activity of an active
          object?</para>
        </question>
        
        <answer>
-        <para>As explained before in <xref linkend="activity"/>, there are
-         two ways to define the activity of your active object</para>
+
+        <para>As explained in <xref linkend="ActiveObjectCreation_html_activity"/>, 
+         there are two ways to define the activity of your active object</para>
         
         <itemizedlist>
          <listitem>
@@ -1006,9 +872,9 @@
         <para>The former <literal>Active</literal> interface was simply a
          marker interface allowing to change the body and/or the proxy of an
          active object. It was of no use most of the time and was made
-         obsolete with the introduction of the 
-         <ulink url="../core/body/MetaObjectFactory.xml">MetaObjectFactory</ulink>
-         in the <emphasis role="bold">0.9.3</emphasis> release</para>
+         obsolete with the introduction of the MetaObjectFactory 
+         (see code in <xref role="javaFileSrc" linkend="core/body/MetaObjectFactory.java"/>)
+         in the <emphasis role="bold">0.9.3</emphasis> release.</para>
         
         <para>Up to <emphasis role="bold">ProActive 0.9.3</emphasis> the
          activity of an active object was given by a method

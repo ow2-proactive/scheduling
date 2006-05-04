@@ -120,8 +120,8 @@
     object is also a unit of computational mobility (see <xref
     linkend="Migration" />).</para>
 
-    <para><emphasis> This <literal>Active Object</literal> concept requires
-    only to modify the instanciation code !</emphasis></para>
+    <note><para> This <literal>Active Object</literal> concept requires
+    only to modify the instanciation code !</para></note>
 
     <para>On activation, an object becomes a remotely accessible entity with
     its own thread of control: an active object. Here are given as example
@@ -130,14 +130,12 @@
 
     <example>
       <title>Class-based Active Object</title>
-
       <programlisting language="java">Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) ProActive.newActive("example.A", params, node); </programlisting>
     </example>
-
+    
     <example>
       <title>Instantiation-based Active Object</title>
-
       <programlisting language="java">public class AA extends A implements Active {}
 Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
@@ -149,7 +147,6 @@ A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
 
     <example>
       <title>Object-based Active Object</title>
-
       <programlisting language="java">A a = new A (26, "astring");
 a = (A) ProActive.turnActive(a, node) ; </programlisting>
     </example>
@@ -293,11 +290,9 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
         </itemizedlist></para>
 
       <example>
-        <title>A possible implementation for the <literal>TinyHello</literal>
-        class</title>
-
+        <title>A possible implementation for the <literal>TinyHello</literal> class</title>
         <programlisting language="java"><textobject>
-            <textdata fileref="../examples/hello/TinyHello.java" />
+            <textdata fileref="examples/hello/TinyHello.java" />
           </textobject></programlisting>
       </example>
     </sect2>
@@ -351,10 +346,10 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
     <sect2 >
       <title>Launching</title>
 
-      <para>To launch the example, you may type:<screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy \
-            -Dlog4j.configuration=file:scripts/proactive-log4j \
-            org.objectweb.proactive.examples.hello.TinyHello</screen> <screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
-              -Dlog4j.configuration=file:scripts\proactive-log4j \
+      <para>To launch the example, you may type:<screen>linux&gt; java -cp $CLASSPATH -Djava.security.policy=scripts/proactive.java.policy 
+            -Dlog4j.configuration=file:scripts/proactive-log4j 
+            org.objectweb.proactive.examples.hello.TinyHello</screen> <screen>windows&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy 
+              -Dlog4j.configuration=file:scripts\proactive-log4j 
                org.objectweb.proactive.examples.hello.TinyHello</screen></para>
 
       <para>There are also scripts in the <literal>scripts</literal>

@@ -25,14 +25,13 @@
   </entry> </row> </tbody> </tgroup> </informaltable>
 
         <!--   Oasis team and past contributors on two columns <==> in a two column table   -->
-     
      <informaltable colsep="0" frame="none" width="100%">
       <tgroup cols="2">
        <tbody>
         <row>
          <entry align="center" valign="top">
     
-    <itemizedlist mark="none" >
+    <itemizedlist mark="none" role="sorted">
      
      <title>OASIS Team</title>
      
@@ -54,6 +53,10 @@
      
      <listitem>
       <para><personname><firstname>Arnaud</firstname> <surname>Contes</surname></personname></para>
+     </listitem>
+     
+     <listitem>
+      <para><personname><firstname>Alexandre</firstname> <surname>di Costanzo</surname></personname></para>
      </listitem>
      
      <listitem>
@@ -107,16 +110,13 @@
      <listitem>
       <para><personname><firstname>Bernard</firstname> <surname>Serpette</surname></personname></para>
      </listitem>
-     
-     <listitem>
-      <para><personname><firstname>Alexandre</firstname> <surname>di Costanzo</surname></personname></para>
-     </listitem>
+    
     </itemizedlist>
    </entry>
    
    <entry align="center"  valign="top">
     
-    <itemizedlist mark="none" >
+    <itemizedlist mark="none" role="sorted">
      
      <title>Past and External Contributors</title>
 
@@ -131,11 +131,11 @@
      <listitem>
       <para><personname><firstname>Roland</firstname> <surname>Bertuli</surname></personname></para>
      </listitem>
-     
+          
      <listitem>
-      <para><personname><firstname>Julien</firstname> <surname>Vayssiere</surname></personname></para>
+      <para><personname><firstname>Juan</firstname> <surname>Casanova Rodriguez</surname></personname></para>
      </listitem>
-     
+
      <listitem>
       <para><personname><firstname>Florian</firstname> <surname>Doyon</surname></personname></para>
      </listitem>
@@ -149,11 +149,19 @@
      </listitem>
      
      <listitem>
+      <para><personname><firstname>Felipe</firstname> <surname>Luna</surname></personname></para>
+     </listitem>
+     
+     <listitem>
+      <para><personname><firstname>Elton</firstname> <surname>Mathias</surname></personname></para>
+     </listitem>
+     
+     <listitem>
       <para><personname><firstname>Olivier</firstname> <surname>Nano</surname></personname></para>
      </listitem>
      
      <listitem>
-      <para><personname><firstname>Felipe</firstname> <surname>Luna</surname></personname></para>
+      <para><personname><firstname>Nikos</firstname> <surname>Parlavantzas</surname></personname></para>
      </listitem>
      
      <listitem>
@@ -165,20 +173,25 @@
      </listitem>
      
      <listitem>
-      <para><personname><firstname>Elton</firstname> <surname>Mathias</surname></personname></para>
+      <para><personname><firstname>Nadia</firstname> <surname>Ranaldo</surname></personname></para>
+     </listitem>
+     
+     <listitem>
+      <para><personname><firstname>Ward</firstname> <surname>Vanlooy</surname></personname></para>
+     </listitem>
+
+     <listitem>
+      <para><personname><firstname>Remi</firstname> <surname>Vankeisbelck</surname></personname></para>
+     </listitem>
+     
+     <listitem>
+      <para><personname><firstname>Julien</firstname> <surname>Vayssiere</surname></personname></para>
      </listitem>
      
      <listitem>
       <para><personname><firstname>Eugenio</firstname> <surname>Zimeo</surname></personname></para>
      </listitem>
      
-     <listitem>
-      <para><personname><firstname>Nadia</firstname> <surname>Ranaldo</surname></personname></para>
-     </listitem>
-     
-     <listitem>
-      <para>personne du CSTB</para>
-     </listitem>
      
     </itemizedlist>
    </entry>
@@ -186,15 +199,16 @@
  </tbody>
 </tgroup>
   </informaltable>    
-    <para><emphasis role="bold">Public questions/comments/discussions should
-      be posted on the ProActive public mailing list</emphasis></para>
-       <blockquote><email>proactive@objectweb.org</email></blockquote>
     
-    <para><emphasis role="bold">Mailing list archive at</emphasis></para>
-       <blockquote><ulink url="http://www.objectweb.org/wws/arc/proactive"/></blockquote>
+  <para><emphasis role="bold">Public questions/comments/discussions should
+    be posted on the ProActive public mailing list</emphasis></para>
+    <blockquote> <para><email>proactive@objectweb.org</email> </para></blockquote> 
     
-    <para><emphasis role="bold">Post bugs to ProActive bug-tracking system GForge</emphasis></para>
-       <blockquote><ulink url="http://gforge.inria.fr/tracker/?group_id=180"/></blockquote>
+  <para><emphasis role="bold">Mailing list archive at</emphasis></para>
+      <blockquote> <para><ulink url="http://www.objectweb.org/wws/arc/proactive"/> </para></blockquote> 
+    
+  <para><emphasis role="bold">Post bugs to ProActive bug-tracking system GForge</emphasis></para>
+      <blockquote> <para><ulink url="http://gforge.inria.fr/tracker/?group_id=180"/> </para></blockquote> 
     
      <!-- Voir mailing liste pour d'autres contributeurs, trouveurs de bugs, etc.
           Liste a completer et a mettre à jour, a trier par ordre alphabetique -->

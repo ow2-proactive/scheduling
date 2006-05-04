@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="nbody"><title>The nbody example</title>
   
     <sect1 >
       <title>Using facilities provided by ProActive on a complete example</title>
       <sect2 >
-        <title>1 Rationale and overview
+        <title>Rationale and overview
         </title>
         <para>This section of the guided tour goes through the different steps that could take you to
  writing an application with ProActive, from a simple design, to a more complicated structure.
@@ -107,8 +107,7 @@
 </para>
       </sect2>
       <sect2 >
-        <title>2 Source files:
- ProActive/src/org/objectweb/proactive/examples/nbody</title>
+        <title>Source files: ProActive/src/org/objectweb/proactive/examples/nbody</title>
         <para>This guided tour is based on the files you may find in the directory
  ProActive/src/org/objectweb/proactive/examples/nbody. You'll find the following tree:</para>
         <para>
@@ -130,7 +129,7 @@
          
       </sect2>
       <sect2 >
-        <title>3 Common files</title>
+        <title>Common files</title>
         <para>The files contained in 'common' are those that are reused throughout the different
  versions.  Let's see what they do:</para>
          
@@ -225,7 +224,7 @@
          
       </sect2>
       <sect2 >
-        <title>4 Simple Active Objects</title>
+        <title>Simple Active Objects</title>
         <para>This is the implementation of the simplest example of nbody. We defined the <literal>Planet</literal> to be a passive object, and it does nothing. It is a container for position,
  velocity and mass, as we've seen in the description given higher up. The real actors are the <literal>Domains</literal>, they do all the work. To every <literal>Planet</literal> in the universe, is
  associated a <literal>Domain</literal>, which is an <literal>Active Object</literal>. This  <literal>Domain</literal> contains the code to manage the communication of the possitions of the <literal>Planets</literal> during the simulation. They are created in the Start.java file:</para>
@@ -310,7 +309,7 @@
  You may find another view of this example on this <ulink url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web page</ulink>.</para>
       </sect2>
       <sect2 >
-        <title>5 Groups of Active objects</title>
+        <title>Groups of Active objects</title>
         <para>This is a simple improvement, which allows to have faster communication. You may have noticed
  the Group capabilities of ProActive. They give us the ability to call an operation on an object
  which is  a Group, and have it sent to all the members of the Group. We can use them in this
@@ -364,7 +363,7 @@
  You may find another view of this example on this <ulink url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupcom.html">web page</ulink>.</para>
       </sect2>
       <sect2 >
-        <title>6 groupdistrib</title>
+        <title>groupdistrib</title>
         <para>Now, do like the idea that the synchronization is centralized on one entity, the <literal>Maestro</literal>? I don't and it's the bottleneck of the application anyway: once a <literal>Domain</literal> has finished, it sends the notifyFinshed, and then sits idle. Well, a way of
  making this better is to remove this bottleneck completely! This is done by using an odd-even
  scheme: if a Domain receives information from a distant <literal>Domain</literal> too early (ie in the
@@ -409,7 +408,7 @@
  You may find another view of this example on this <ulink url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">web page</ulink>.</para>
       </sect2>
       <sect2 >
-        <title>7 Object Oriented SPMD Groups</title>
+        <title>Object Oriented SPMD Groups</title>
         <para>This is another way to improve the groupcom example. It also removes the master, but this time
  by inserting oospmd barriers, that can be thought as behaving like the maestro class, but faster.
  To create functional OOspmd Groups, there is a special instruction, which takes the same
@@ -442,7 +441,7 @@
  You may find another view of this example on this <ulink url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">web page</ulink>.</para>
       </sect2>
       <sect2 >
-        <title>8 Barnes-Hut</title>
+        <title>Barnes-Hut</title>
         <para>This way to construct the nbody simulation is based on a very different
  algorithm. This is inserted to show how one can express this algorithm in ProActive, but breaks
  off from the previous track, having such a different approach to solving the problem. Here's
@@ -500,7 +499,7 @@
         <para>You may find another view of this example on this <ulink url="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web page</ulink>.</para>
       </sect2>
       <sect2 >
-        <title>9 Conclusion</title>
+        <title>Conclusion</title>
         <para>In this guided tour, we tried to show different facilities provided by ProActive, based on a
  real problem (nbody). We first saw how to deploy the application, then tuned it by adding Group
  communication, then removed a bottleneck ( due to the hard synchronization ) . Finally, given is

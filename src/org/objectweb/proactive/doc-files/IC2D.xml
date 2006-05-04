@@ -71,10 +71,9 @@
   </table>
 
   <para>The full source of IC2D is included in the distribution and is also
-  browseable on line.</para>
+  browseable on line:</para>
 
-  <para><ulink url="../doc/ProActive_src_html/index.xml">Source code
-  index</ulink></para>
+ <para><ulink url="../api/org/objectweb/proactive/ic2d/package-summary.html"/></para>
 
   <sect1 >
     <title>Graphical Visualisation
@@ -160,7 +159,22 @@
      <title>Fractal GUI</title>
      <para> You can find a Fractal GUI (menu->Fractal GUI)to edit your ADL files 
       in IC2D. This can only be done before deployment. </para>
-    </sect1>
+    
+     <para><figure>
+       <title>Starting the Fractal GUI through IC2D</title>
+       
+       <mediaobject>
+        <imageobject>
+         <imagedata fileref="images/fractal_GUI_launch.png" format="PNG" />
+        </imageobject>
+       </mediaobject>
+      </figure></para>
+    
+     <para> Within this editor, you have the ability to change the component configuration,
+      described in ADL files. This visual architecture design is easier than directly 
+      typing either java code, or xml descriptions. See <xref linkend="fractal_gui_with_c3d"/>
+      which contains an example use of this GUI. </para>
+</sect1>
 
    <sect1>
     <title>Launcher</title>
