@@ -102,9 +102,18 @@
 
 
  <!-- Making the parts and chapters stick out in the toc  -->
- <!-- Hum, I don't know where the tocs are generated... -->
-
  <xsl:param name="header.rule">1</xsl:param>
+
+ <!--  Which levels should be having a toc? For one htmmml file, only one toc, at the beginning. -->
+ <xsl:param name="generate.toc">
+  appendix nop
+  book toc,title,figure,table,example,equation
+  article nop 
+  part title
+  chapter title
+  qandaset toc
+ </xsl:param>
+
 
 </xsl:stylesheet>
 

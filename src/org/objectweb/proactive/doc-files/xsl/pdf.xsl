@@ -23,7 +23,7 @@
 
  <!-- Have screens written on darker background -->
  <xsl:attribute-set name="verbatim.properties">
-  <xsl:attribute name="background-color">#E0E0E0</xsl:attribute>
+  <xsl:attribute name="background-color">#f1e6d7</xsl:attribute>
  </xsl:attribute-set>
 
 
@@ -529,12 +529,12 @@
   </fo:block>
 
 <!-- The author's name -->
-  <fo:block text-align="center" space-before="25mm"  >
+  <fo:block text-align="center" space-before="35mm"  >
      <xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/author"/>
   </fo:block>
 
 <!-- The three logos, in a 1x3 table: INRIA, UNSA, CNRS/I3S -->
-  <fo:table table-layout="fixed" space-before="35mm">
+  <fo:table table-layout="fixed" space-before="25mm">
 
     <fo:table-column />
     <fo:table-column />
@@ -712,7 +712,7 @@
 
   <xsl:call-template name="toc.line"/>
 
-  <xsl:variable name="nodes" select="qandaset|chapter|appendix|preface|reference|
+  <xsl:variable name="nodes" select="chapter|appendix|preface|reference|
                                      refentry|article|index|glossary|
                                      bibliography"/>
 
@@ -818,7 +818,7 @@
   </xsl:variable>
 
 
-<!-- Output a TOC for every qandaset -->
+<!-- At the beginning of the qandaset, output a TOC -->
     <fo:block >
         <xsl:attribute name="margin-left">
           <xsl:call-template name="set.toc.indent">
@@ -1035,7 +1035,7 @@
 
   <xsl:variable name="nodes" select="section|sect1
                                      |simplesect[$simplesect.in.toc != 0]
-                                     |refentry|qandaset|qandadiv|question"/>
+                                     |refentry|qandaset|qandadiv"/>
 
   <xsl:variable name="depth.from.context" select="count(ancestor::*)-count($toc-context/ancestor::*)"/>
 
@@ -1067,7 +1067,7 @@
 
   <xsl:variable name="nodes" select="section|sect1|refentry
                                      |article|bibliography|glossary
-                                     |appendix|index|qandaset|qandadiv|question"/>
+                                     |appendix|index|qandaset|qandadiv"/>
   <xsl:if test="$nodes">
     <fo:block id="toc...{$id}" xsl:use-attribute-sets="toc.margin.properties">
       <xsl:call-template name="table.of.contents.titlepage"/>
@@ -1134,7 +1134,7 @@
   <xsl:call-template name="toc.line"/>
   <!--  Should be done through a nodes scheme, but it's harder -->
   <!--  Indeed, I'm skipping out the direct sons, to have the question grandchildren only-->
-  <xsl:for-each select="./qandaentry/question">
+  <xsl:for-each select="qandaentry/question">
      <xsl:apply-templates select="." mode="toc" />
   </xsl:for-each > 
 </xsl:template>
@@ -1158,7 +1158,7 @@
 <!--   <xsl:call-template name="toc.line"/> -->
 <!-- In fact, we only want the siblings, not the qandaset -->
 
-  <xsl:variable name="nodes" select="qandadiv|qandaentry|question"/>
+  <xsl:variable name="nodes" select="qandadiv|qandaentry/question"/>
 
   <xsl:if test="$nodes">
     <fo:block id="toc.{$cid}.{$id}">
@@ -1350,7 +1350,7 @@
 </xsl:template>
 
 
-<!-- copy of xref.xsl, line 783. The lik also contains the [url] -->
+<!-- copy of xref.xsl, line 783. The link on [url] is also clickeable-->
 <xsl:template match="ulink" name="ulink">
   <fo:basic-link xsl:use-attribute-sets="xref.properties">
     <xsl:attribute name="external-destination">
@@ -1404,6 +1404,280 @@
 </xsl:template>
 
 
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!--    Treat differently if @role=javaFileSrc or xmlFileSrc     -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsl:template match="xref" name="xref">
+
+<!--  replace all '/' by '.' in the reference name  -->
+ <xsl:variable name="endRef" >
+    <xsl:value-of select="translate(@linkend,'/','.')"/> 
+  </xsl:variable> 
+
+      
+  <xsl:choose>
+    <xsl:when test="@role='javaFileSrc' or @role='xmlFileSrc'">
+      <!--<xsl:message>
+        <xsl:text> file available: </xsl:text><xsl:value-of select="$endRef"/>
+      </xsl:message>-->
+      <xsl:call-template name="normal.xref">
+        <xsl:with-param name="linkend" select="$endRef"/>
+      </xsl:call-template> 
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="normal.xref"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- Copied from xref.xsl, first template. Modified to take role attributes into account -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+<xsl:template name="normal.xref">
+  <xsl:param name="linkend" select="@linkend"/>
+  <xsl:variable name="targets" select="key('id',$linkend)"/>
+  <xsl:variable name="target" select="$targets[1]"/>
+  <xsl:variable name="refelem" select="local-name($target)"/>
+
+  <xsl:call-template name="check.id.unique">
+    <xsl:with-param name="linkend" select="$linkend"/>
+  </xsl:call-template>
+
+  <xsl:variable name="xrefstyle">
+    <xsl:choose>
+      <xsl:when test="@role and not(@xrefstyle) 
+                      and $use.role.as.xrefstyle != 0">
+        <xsl:value-of select="@role"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="@xrefstyle"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:choose>
+    <xsl:when test="$refelem=''">
+      <xsl:message>
+        <xsl:text>XRef to nonexistent id: </xsl:text>
+        <xsl:value-of select="$linkend"/>
+      </xsl:message>
+      <xsl:text>???</xsl:text>
+    </xsl:when>
+
+    <xsl:when test="@endterm">
+      <fo:basic-link internal-destination="{$linkend}"
+                     xsl:use-attribute-sets="xref.properties">
+        <xsl:variable name="etargets" select="key('id',@endterm)"/>
+        <xsl:variable name="etarget" select="$etargets[1]"/>
+        <xsl:choose>
+          <xsl:when test="count($etarget) = 0">
+            <xsl:message>
+              <xsl:value-of select="count($etargets)"/>
+              <xsl:text>Endterm points to nonexistent ID: </xsl:text>
+              <xsl:value-of select="@endterm"/>
+            </xsl:message>
+            <xsl:text>???</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="$etarget" mode="endterm"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </fo:basic-link>
+    </xsl:when>
+
+    <xsl:when test="$target/@xreflabel">
+      <fo:basic-link internal-destination="{$linkend}"
+                     xsl:use-attribute-sets="xref.properties">
+        <xsl:call-template name="xref.xreflabel">
+          <xsl:with-param name="target" select="$target"/>
+        </xsl:call-template>
+      </fo:basic-link>
+    </xsl:when>
+
+    <xsl:otherwise>
+      <xsl:if test="not(parent::citation)">
+        <xsl:apply-templates select="$target" mode="xref-to-prefix"/>
+      </xsl:if>
+
+      <fo:basic-link internal-destination="{$linkend}"
+                     xsl:use-attribute-sets="xref.properties">
+        <xsl:apply-templates select="$target" mode="xref-to">
+          <xsl:with-param name="referrer" select="."/>
+          <xsl:with-param name="xrefstyle" select="$xrefstyle"/>
+        </xsl:apply-templates>
+      </fo:basic-link>
+
+      <xsl:if test="not(parent::citation)">
+        <xsl:apply-templates select="$target" mode="xref-to-suffix"/>
+      </xsl:if>
+
+    </xsl:otherwise>
+  </xsl:choose>
+
+  <!-- Add standard page reference? -->
+  <xsl:if test="not(starts-with(normalize-space($xrefstyle), 'select:') 
+                and (contains($xrefstyle, 'page')
+                     or contains($xrefstyle, 'Page')))
+                and ( $insert.xref.page.number = 'yes' 
+                   or $insert.xref.page.number = '1')
+                or local-name($target) = 'para'">
+    <xsl:apply-templates select="$target" mode="page.citation">
+      <xsl:with-param name="id" select="$linkend"/>
+    </xsl:apply-templates>
+  </xsl:if>
+</xsl:template>
+
+
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- - - putting the list of figures before the TOC  -->
+<!-- - - - - - - - - - - - - - - - - - - - - - - - - -->
+<!-- use division.xsl: <xsl:template match="book"> -->
+<xsl:template name="division.toc">
+  <xsl:param name="toc-context" select="."/>
+
+  <xsl:variable name="cid">
+    <xsl:call-template name="object.id">
+      <xsl:with-param name="object" select="$toc-context"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:variable name="toc.params">
+    <xsl:call-template name="find.path.params">
+      <xsl:with-param name="node" select="."/>
+      <xsl:with-param name="table" select="normalize-space($generate.toc)"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+<xsl:variable name="nodes"
+                select="$toc-context/part
+                        |$toc-context/reference
+                        |$toc-context/preface
+                        |$toc-context/chapter
+                        |$toc-context/appendix
+                        |$toc-context/article
+                        |$toc-context/bibliography
+                        |$toc-context/glossary
+                        |$toc-context/index"/>
+
+  <xsl:if test="$nodes">
+    <fo:block id="toc...{$cid}" xsl:use-attribute-sets="toc.margin.properties" space-after="3mm">
+      <xsl:if test="$axf.extensions != 0">
+        <xsl:attribute name="axf:outline-level">1</xsl:attribute>
+        <xsl:attribute name="axf:outline-expand">false</xsl:attribute>
+        <xsl:attribute name="axf:outline-title">
+          <xsl:call-template name="gentext">
+            <xsl:with-param name="key" select="'TableofContents'"/>
+          </xsl:call-template>
+        </xsl:attribute>
+      </xsl:if>
+      <xsl:call-template name="table.of.contents.titlepage"/>
+ <!-- Possible links to the tables of (figure table example equation procedure)  -->
+
+
+  <xsl:if test="contains($toc.params,'figure') and .//figure">
+    <xsl:call-template name="special.toc.line">
+       <xsl:with-param name="id" select="'lot...figure...toto'"/>
+       <xsl:with-param name="label" select="'List of figures'"/>
+    </xsl:call-template>
+  </xsl:if> <xsl:if test="contains($toc.params,'table') and .//table">
+    <xsl:call-template name="special.toc.line">
+       <xsl:with-param name="id" select="'lot...table...toto'"/>
+       <xsl:with-param name="label" select="'List of tables'"/>
+    </xsl:call-template>
+  </xsl:if> <xsl:if test="contains($toc.params,'example') and .//example">
+    <xsl:call-template name="special.toc.line">
+       <xsl:with-param name="id" select="'lot...example...toto'"/>
+       <xsl:with-param name="label" select="'List of examples'"/>
+    </xsl:call-template>
+  </xsl:if> <xsl:if test="contains($toc.params,'equation') and .//equation">
+    <xsl:call-template name="special.toc.line">
+       <xsl:with-param name="id" select="'lot...equation...toto'"/>
+       <xsl:with-param name="label" select="'List of equations'"/>
+    </xsl:call-template>
+  </xsl:if> <xsl:if test="contains($toc.params,'procedure') and .//procedure">
+    <xsl:call-template name="special.toc.line">
+       <xsl:with-param name="id" select="'lot...procedure...toto'"/>
+       <xsl:with-param name="label" select="'List of procedures'"/>
+    </xsl:call-template>
+  </xsl:if> 
+
+      <xsl:apply-templates select="$nodes" mode="toc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+      </xsl:apply-templates>
+    </fo:block>
+  </xsl:if>
+</xsl:template>
+
+
+ <xsl:template name="special.toc.line">
+  <xsl:param name="id" select="'???'"/>
+  <xsl:param name="label" select="'???'"/>
+
+  <xsl:variable name="line">
+   <fo:inline keep-with-next.within-line="always">
+      <xsl:attribute name="font-weight">bold</xsl:attribute>
+      <xsl:attribute name="font-size">12pt</xsl:attribute>
+      <xsl:attribute name="color">#00257E</xsl:attribute>
+      <fo:basic-link internal-destination="{$id}">
+         <xsl:copy-of select="$label" />
+         <xsl:call-template name="gentext.space" />
+         <fo:leader leader-pattern="dots"
+                leader-pattern-width="3pt" leader-alignment="reference-area"
+                keep-with-next.within-line="always" />
+         <xsl:call-template name="gentext.space" />
+         <fo:page-number-citation ref-id="{$id}" />
+      </fo:basic-link>
+   </fo:inline>
+  </xsl:variable>
+
+  <fo:block text-align-last="justify" end-indent="{$toc.indent.width}pt" margin-left="24pt"
+     last-line-end-indent="-{$toc.indent.width}pt" space-before="3mm" space-after="1mm">
+     <xsl:copy-of select="$line" />
+  </fo:block>
+  
+ </xsl:template>
+
+
+
+<!-- Customizing just the id of list_of_... -->
+<xsl:template name="list.of.titles">
+  <xsl:param name="titles" select="'table'"/>
+  <xsl:param name="nodes" select=".//table"/>
+  <xsl:param name="toc-context" select="."/>
+
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+
+  <xsl:if test="$nodes">
+    <fo:block id="lot...{$titles}...toto">
+<!--     <fo:block id="lot...{$titles}...{$id}"> -->
+      <xsl:choose>
+        <xsl:when test="$titles='table'">
+          <xsl:call-template name="list.of.tables.titlepage"/>
+        </xsl:when>
+        <xsl:when test="$titles='figure'">
+          <xsl:call-template name="list.of.figures.titlepage"/>
+        </xsl:when>
+        <xsl:when test="$titles='equation'">
+          <xsl:call-template name="list.of.equations.titlepage"/>
+        </xsl:when>
+        <xsl:when test="$titles='example'">
+          <xsl:call-template name="list.of.examples.titlepage"/>
+        </xsl:when>
+        <xsl:when test="$titles='procedure'">
+          <xsl:call-template name="list.of.procedures.titlepage"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:call-template name="list.of.unknowns.titlepage"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:apply-templates select="$nodes" mode="toc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+      </xsl:apply-templates>
+    </fo:block>
+  </xsl:if>
+</xsl:template>
 
 </xsl:stylesheet>
 
