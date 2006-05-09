@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -60,10 +61,6 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  */
 public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     P2PConstants, Serializable, ProActiveInternalObject {
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private Vector waitingNodesList;
     private Vector nodesToKillList;
@@ -185,10 +182,9 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      *
      * @param givenNode the shared node.
      * @param remoteNodeManager the remote node manager for the given node.
-     * @return true if the given node is accepted by the P2PNodeLookup, false
-     * else.
+     * @return the total number of nodes still needed.
      */
-    public P2PNodeAck giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
+    public IntWrapper giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
         if (logger.isDebugEnabled()) {
             logger.debug("Given node received from " +
                 givenNode.getNodeInformation().getURL());
@@ -212,9 +208,9 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             }
             logger.info("Node at " + nodeUrl + " succefuly added");
             logger.info("Lookup got " + this.acquiredNodes + " nodes");
-            return new P2PNodeAck(true);
+            return new IntWrapper(this.numberOfAskedNodes - this.acquiredNodes);
         }
-        return new P2PNodeAck(false);
+        return new IntWrapper(-1);
     }
 
     public void giveNodeForMax(Vector givenNodes,

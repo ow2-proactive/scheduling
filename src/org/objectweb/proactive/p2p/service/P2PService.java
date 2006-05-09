@@ -49,10 +49,10 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
-import org.objectweb.proactive.p2p.service.node.P2PNodeAck;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -291,7 +291,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 // Asking node available?
                 Node nodeAvailable = askedNode.getNode();
                 if (nodeAvailable != null) {
-                    P2PNodeAck nodeAck = null;
+                    IntWrapper nodeAck;
 
                     try {
                         nodeAck = lookup.giveNode(nodeAvailable,
@@ -328,7 +328,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     }
 
                     // Waiting ACK or NACK
-                    if (nodeAck.ackValue()) {
+                    if (nodeAck.intValue() > -1) {
                         // Setting vnInformation and JobId
                         if (vnName != null) {
                             try {
@@ -343,8 +343,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                             nodeAvailable.getNodeInformation().setJobID(jobId);
                         }
                         numberOfNodes = (numberOfNodes == MAX_NODE) ? MAX_NODE
-                                                                    : (numberOfNodes -
-                            1);
+                                                                    : nodeAck.intValue();
                         logger.info("Giving 1 node to vn: " + vnName);
                     } else {
                         // It's a NACK node
