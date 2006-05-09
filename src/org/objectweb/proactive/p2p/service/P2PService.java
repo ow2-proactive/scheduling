@@ -42,11 +42,13 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -92,6 +94,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 P2PConstants.PROPERTY_EXPLORING_MSG)) - 1;
     private static final long ACQ_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
      */
@@ -710,4 +713,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         logger.debug("Exiting initActivity");
     }
 
+    /**
+     * @return the P2PService of this local JVM.
+     * @throws ProActiveException no P2PService in this local JVM.
+     */
+    public static P2PService getLocalP2PService() throws ProActiveException {
+        return (P2PService) ProActiveRuntimeImpl.getProActiveRuntime()
+                                                .getActiveObjects(P2PService.class.getName())
+                                                .get(0);
+    }
 }
