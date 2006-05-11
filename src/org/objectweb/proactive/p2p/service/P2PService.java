@@ -42,9 +42,11 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -678,11 +680,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /**
      * @return the P2PService of this local JVM.
-     * @throws ProActiveException no P2PService in this local JVM.
+     * @throws Exception no P2PService in this local JVM.
      */
-    public static P2PService getLocalP2PService() throws ProActiveException {
-        return (P2PService) ProActiveRuntimeImpl.getProActiveRuntime()
-                                                .getActiveObjects(P2P_NODE_NAME,
-            P2PService.class.getName()).get(0);
+    public static P2PService getLocalP2PService() throws Exception {
+        UniversalBody body = (UniversalBody) ProActiveRuntimeImpl.getProActiveRuntime()
+                                                                 .getActiveObjects(P2P_NODE_NAME,
+                P2PService.class.getName()).get(0);
+        return (P2PService) MOP.newInstance(P2PService.class.getName(),
+            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+            new Object[] { body });
     }
 }
