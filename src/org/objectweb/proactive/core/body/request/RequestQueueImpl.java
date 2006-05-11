@@ -307,16 +307,19 @@ public class RequestQueueImpl extends AbstractEventProducer
      * @return the oldest matching request or null
      */
     private Request findOldest(RequestFilter requestFilter, boolean shouldRemove) {
-        java.util.Iterator iterator = requestQueue.iterator();
+    	java.util.Iterator iterator;
         Request r;
         
         //First, we deal with priority non functional requests
-        while (!nfRequestsProcessor.isEmpty()) {
-        	r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
-        	LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
-        	requestQueue.remove(r);	
+        if(shouldRemove) {
+        	while (!nfRequestsProcessor.isEmpty()) {
+        		r = nfRequestsProcessor.getOldestPriorityNFRequest(true);
+        		LocalBodyStore.getInstance().getLocalBody(ownerID).serve(r);
+        		requestQueue.remove(r);	
+        	}
         }
         
+         iterator = requestQueue.iterator();
         //then we look for the oldest request fullfilling the criteria defined by the given filter
         while (iterator.hasNext()) {
              r = (Request) iterator.next();
