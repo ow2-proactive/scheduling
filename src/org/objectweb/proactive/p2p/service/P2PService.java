@@ -719,7 +719,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public static P2PService getLocalP2PService() throws ProActiveException {
         return (P2PService) ProActiveRuntimeImpl.getProActiveRuntime()
-                                                .getActiveObjects(P2PService.class.getName())
-                                                .get(0);
+                                                .getActiveObjects(P2P_NODE_NAME,
+            P2PService.class.getName()).get(0);
     }
 }
