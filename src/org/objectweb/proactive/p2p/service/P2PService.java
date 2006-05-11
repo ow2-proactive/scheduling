@@ -437,43 +437,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         return this.getNodes(numberOfNodes, ".*", vnName, jobId);
     }
 
-    public P2PNodeLookup getNodes(int numberOfNodes, String vnName,
-        String jobId, boolean onlyUnderloaded) {
-        Object[] params = new Object[5];
-        params[0] = new Integer(numberOfNodes);
-        params[1] = this.stubOnThis;
-        params[2] = vnName;
-        params[3] = jobId;
-        params[4] = new Boolean(onlyUnderloaded);
-
-        P2PNodeLookup lookup = null;
-        try {
-            lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
-                    params, this.p2pServiceNode);
-            ProActive.enableAC(lookup);
-            this.waitingNodesLookup.add(lookup);
-        } catch (ActiveObjectCreationException e) {
-            logger.fatal("Couldn't create an active lookup", e);
-            return null;
-        } catch (NodeException e) {
-            logger.fatal("Couldn't connect node to creat", e);
-            return null;
-        } catch (IOException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Couldn't enable AC for a nodes lookup", e);
-            }
-        }
-
-        if (logger.isInfoEnabled()) {
-            if (numberOfNodes != MAX_NODE) {
-                logger.info("Asking for" + numberOfNodes + " nodes");
-            } else {
-                logger.info("Asking for maxinum nodes");
-            }
-        }
-        return lookup;
-    }
-
     /**
      * For asking a single node to the p2p infrastructure.
      * There no warranties that a node will be returned.
