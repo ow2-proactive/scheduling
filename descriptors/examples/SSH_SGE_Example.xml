@@ -51,7 +51,7 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="sgeprocess">
-                	<gridEngineProcess class="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess">
+                	<gridEngineProcess class="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess" queue="normal">
 						<processReference refid="internalJVM"/>
 						<commandPath value="/opt/gridengine/bin/lx26-x86/qsub"/>
                 		<gridEngineOption>
