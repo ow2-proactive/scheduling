@@ -956,6 +956,37 @@ public class ProActive {
     }
 
     /**
+     * Looks-up all Active Objects registered on a host, using a registry(RMI or JINI or HTTP or IBIS)
+     * The registry where to look for is fully determined with the protocol included in the url.
+     * @param url The url where to perform the lookup. The url takes the following form:
+     * protocol://machine_name:port. Protocol and port can be ommited if respectively RMI and 1099:
+     * //machine_name
+     * @return String [] the list of names registered on the host; if no Registry found, returns {} 
+     * @throws IOException If the given url does not map to a physical host, or if the connection is refused. 
+     */
+    public static String [] listActive(String url)
+    throws java.io.IOException {
+    String [] activeNames = null;
+
+    String protocol = UrlBuilder.getProtocol(url);
+
+    // First step towards Body factory, will be introduced after the release
+    if (protocol.equals("rmi:")) {
+        activeNames = new RmiBodyAdapter().list(url);
+    } else if (protocol.equals("rmissh:")) {
+        activeNames = new SshRmiBodyAdapter().list(url);
+    } else if (protocol.equals("http:")) {
+        activeNames = new HttpBodyAdapter().list(url);
+    } else if (protocol.equals("ibis:")) {
+        activeNames = new IbisBodyAdapter().list(url);
+    } else {
+        throw new IOException("Protocol " + protocol + " not defined");
+    }
+
+    return activeNames;
+}
+
+    /**
      * Return the URL of the remote <code>activeObject</code>.
      * @param activeObject the remote active object.
      * @return the URL of <code>activeObject</code>.
