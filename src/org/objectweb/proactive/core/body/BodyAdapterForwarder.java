@@ -440,4 +440,11 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
             return null;
         }
     }
+
+    /**
+     * List all the existing objects registered in a registry. 
+     */
+    public String[] list(String url) throws IOException {
+        throw new IOException ("Lookup is not implemented for this Adapter");
+    }
 }

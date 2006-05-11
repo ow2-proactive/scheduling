@@ -455,4 +455,10 @@ public abstract class BodyAdapterImpl extends BodyAdapter implements Cloneable,
 
         return this;
     }
+    
+
+    public String[] list(String url) throws IOException {
+        throw new IOException ("Lookup is not implemented yet for this Adapter");
+    }
+
 }
