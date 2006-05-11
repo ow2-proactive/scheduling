@@ -48,21 +48,20 @@ import org.objectweb.proactive.core.mop.Proxy;
 
 public class NonFunctionalServices {
 		
-	static Class stubObjectClass = null;
+	static Class nonFunctionalServicesClass = null;
 	static Method terminateAOMethod = null;
-	static Method terminateAOImmediatlyMethod = null;
+	static Method terminateAOImmediatelyMethod = null;
 	static Class paramTypes[];
 	
 	
 	static {
 		
 		try {
-			// "terminateAO" and "terminateAOImmediatly" are declared in the StubObject interface.
-			stubObjectClass = java.lang.Class.forName ("org.objectweb.proactive.core.mop.StubObject");
+			nonFunctionalServicesClass = java.lang.Class.forName ("org.objectweb.proactive.core.util.NonFunctionalServices");
 			paramTypes = new Class[1];
 			paramTypes [0] = java.lang.Class.forName ("org.objectweb.proactive.core.mop.Proxy");
-			terminateAOMethod = stubObjectClass.getMethod("_terminateAO", paramTypes);
-			terminateAOImmediatlyMethod = stubObjectClass.getMethod("_terminateAOImmediatly", paramTypes);
+			terminateAOMethod = nonFunctionalServicesClass.getMethod("_terminateAO", paramTypes);
+			terminateAOImmediatelyMethod = nonFunctionalServicesClass.getMethod("_terminateAOImmediately", paramTypes);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -74,23 +73,37 @@ public class NonFunctionalServices {
 		} 
 	}
 
-	/**
-	 * Reify the "terminateAOMethod" call in the active object's stub. 
-	 * @param proxy 
-	 * @throws Throwable
-	 */
-	public static void _terminateAO (Proxy proxy) throws Throwable {
-		proxy.reify(MethodCall.getMethodCall(terminateAOMethod, paramTypes));		
-	}
-	
-	/**
-	 * Reify the "terminateAOMethod" call in the active object's stub.
-	 * A call on this method is an immediateService. 
-	 * @param proxy 
-	 * @throws Throwable
-	 */
-	public static void _terminateAOImmediatly(Proxy proxy) throws Throwable {
-		proxy.reify(MethodCall.getMethodCall(terminateAOImmediatlyMethod, paramTypes));
-	}
+    /**
+     * Reify the "_terminateAO" method. 
+     * @param proxy 
+     * @throws Throwable
+     */
+    public static void terminateAO (Proxy proxy) throws Throwable {
+        proxy.reify(MethodCall.getMethodCall(terminateAOMethod, paramTypes));       
+    }
+    
+    /**
+     * Reify the "_terminateAOImmediately" method.
+     * A call on this method is an immediateService. 
+     * @param proxy 
+     * @throws Throwable
+     */
+    public static void terminateAOImmediately(Proxy proxy) throws Throwable {
+        proxy.reify(MethodCall.getMethodCall(terminateAOImmediatelyMethod, paramTypes));
+    }
 
+    /**
+     * This method is reified by terminateAO(Proxy proxy).
+     * The _terminateAO request is then intercepted by BodyImpl.serve() which calls AbstractBody.terminate(). 
+     * @param proxy
+     */
+    public void  _terminateAO(Proxy proxy){}
+    
+    /**
+     * This method is reified by terminateAOImmediately(Proxy proxy).
+     * The _terminateAOImmediately request is turn into an immediate service, 
+     * then intercepted by BodyImpl.serve() which calls AbstractBody.terminate(). 
+     * @param proxy
+     */
+    public void _terminateAOImmediately(Proxy p) {}
 }

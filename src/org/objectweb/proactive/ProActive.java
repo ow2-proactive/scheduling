@@ -1665,9 +1665,9 @@ public class ProActive {
         Proxy proxy = ((StubObject) ao).getProxy();
         try {
             if (immediate) {
-                NonFunctionalServices._terminateAOImmediatly(proxy);
+                NonFunctionalServices.terminateAOImmediately(proxy);
             } else {
-                NonFunctionalServices._terminateAO(proxy);
+                NonFunctionalServices.terminateAO(proxy);
             }
         } catch (Throwable e) {
             e.printStackTrace();

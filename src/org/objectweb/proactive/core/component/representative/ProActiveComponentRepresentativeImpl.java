@@ -442,13 +442,4 @@ public class ProActiveComponentRepresentativeImpl
     private boolean isPrimitive() {
         return Constants.PRIMITIVE.equals(hierarchicalType);
     }
-
-	public void _terminateAO(Proxy proxy) {
-
-	}
-
-	public void _terminateAOImmediatly(Proxy proxy) {
-	
-	}
-	
 }
