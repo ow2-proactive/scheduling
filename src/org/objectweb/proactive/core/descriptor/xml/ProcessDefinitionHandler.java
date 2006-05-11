@@ -603,10 +603,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
 
-            //  String queueName = (attributes.getValue("queue"));
-            //        if (checkNonEmpty(queueName)) {
-            //            ((PBSSubProcess) targetProcess).setQueueName(queueName);
-            //        }
+              String queueName = (attributes.getValue("queue"));
+                    if (checkNonEmpty(queueName)) {
+                        ((GridEngineSubProcess) targetProcess).setQueueName(queueName);
+                    }
         }
 
         protected class GridEngineOptionHandler
