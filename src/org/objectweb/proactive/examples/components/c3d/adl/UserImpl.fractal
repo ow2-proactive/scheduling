@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
-<!-- A user component. It has an interface to the dispatcher, and is runnable. -->
+<!-- A user component. It has an interface to the dispatcher. -->
 
 <definition name="org.objectweb.proactive.examples.components.c3d.adl.UserImpl">
 
 <!-- The interfaces the component defines -->
-  <interface signature="java.lang.Runnable" role="server" name="r"/>
   <interface signature="org.objectweb.proactive.examples.c3d.Dispatcher" role="client" name="user2dispatcher"/>
 
 <!-- The implementation of the component -->

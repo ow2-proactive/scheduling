@@ -6,17 +6,13 @@ is attached to a composite, which englobes a dispatcher and 2 renderers. -->
 
 <definition name="org.objectweb.proactive.examples.components.c3d.adl.userAndComposite">
 
-<!-- This component is runnable, ie can be started. -->
-  <interface signature="java.lang.Runnable" role="server" name="r"/>
-
 <!-- Creating one user component -->
   <component definition="org.objectweb.proactive.examples.components.c3d.adl.UserImpl" name="user"/> 
   <component 
      definition="org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend" 
      name="composite"/> 
 
-<!-- binding together the user, the composite and the outer component (the outside world) -->
-  <binding client="this.r" server="user.r"/>
+<!-- binding together the user and the composite -->
   <binding client="user.user2dispatcher" server="composite.dispatch"/>
   <controller desc="composite"/>
   
