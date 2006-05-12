@@ -49,24 +49,20 @@ public class NameAndHostDialogForComponent extends NameAndHostDialog {
     private static final String COMPONENT_ALIAS = "Dispatcher";
 
     public NameAndHostDialogForComponent(String localHost) {
-        super(localHost, null); // no need to specify virtual node in the component case.
+        super(localHost);  
     }
 
     protected void tryTheLookup() {
+        String hostName = null;
         try {
-            this.hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
-            this.portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
+            hostName = UrlBuilder.getHostNameFromUrl(hostNameTextField.getText());
+            int portNumber = UrlBuilder.getPortFromUrl(hostNameTextField.getText());
 
             String protocol = UrlBuilder.getProtocol(hostNameTextField.getText());
 
-            System.out.println(protocol + " port " + portNumber + " host " +
-                hostName);
-            System.out.println(UrlBuilder.buildUrl(this.hostName,
-                    COMPONENT_ALIAS, protocol, this.portNumber));
-
             ProActiveComponentRepresentative a;
-            a = Fractive.lookup(UrlBuilder.buildUrl(this.hostName,
-                        COMPONENT_ALIAS, protocol, this.portNumber));
+            a = Fractive.lookup(UrlBuilder.buildUrl( hostName,
+                        COMPONENT_ALIAS, protocol, portNumber));
             this.c3dDispatcher = (Dispatcher) a.getFcInterface(
                     "user2dispatcher");
             setVisible(false);

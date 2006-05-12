@@ -30,56 +30,32 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
+/** These are the methods accessible by the User Gui classes, which somewhat control the User active
+ * object. The implementation will often simply forward the call to the dispatcher */
 public interface UserLogic {
 
-    /** The initialization and linkage is made in this method, instead of using the constructor */
-    public abstract void run();
-
-    /** called after migration, to reconstruct the logic.
-     * In the initActivity :  myStrategyManager.onArrival("rebuild"); */
-
-    // shouldn't be called from outside the class. 
-    public abstract void rebuild();
-
-    /** Called just before migration, as specified in the initActivity :
-     * myStrategyManager.onDeparture("leaveHost");  */
-
-    // shouldn't be called from outside the class. 
-    public abstract void leaveHost();
-
-    /**
-     * Tells what are the operations to perform before starting the activity of the AO.
-     * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild
-     */
-    public abstract void initActivity(Body body);
-
-    /**
-     * Exit the application
-     */
-    public abstract void terminate();
+    /** Exit the application */
+    public void terminate();
 
     /** Displays the list of users connected to the dispatcher */
-    public abstract void getUserList();
+    public void getUserList();
 
     /** Ask the dispatcher to revert to original scene*/
-    public abstract void resetScene();
+    public void resetScene();
 
     /** Ask the dispatcher to add a sphere*/
-    public abstract void addSphere();
+    public void addSphere();
 
-    public abstract void showUserInfo();
+    /**  Send a mesage to a given other user, or to all */
+    public void sendMessage(String message, String recipientName);
 
     /**
      * ask for the scene to be rotated by some angle
      * @param rotationAngle = <x y z> means rotate x radians along the x axis,
      *         then y radians along the y axis, and finally  z radians along the z axis
      */
-    public abstract void rotateScene(Vec rotationAngle);
-
-    /**  Send a mesage to a given other user, or to all */
-    public abstract void sendMessage(String message, String recipientName);
+    public void rotateScene(Vec rotationAngle);
 }

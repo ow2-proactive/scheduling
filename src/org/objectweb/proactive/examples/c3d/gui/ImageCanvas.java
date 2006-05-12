@@ -47,19 +47,17 @@ import org.objectweb.proactive.examples.c3d.Interval;
  * A visual Component for an Image, which displays results coming from Renderers
  */
 public class ImageCanvas extends Canvas {
-    private final int my_HEIGHT;
-    private final int my_WIDTH;
+    private int my_HEIGHT;
+    private int my_WIDTH;
     private Dimension preferedSize; // the Canvas prefered size
     private BufferedImage display; // the image that is drawn 
     Image offScreenBuffer;
 
-    public ImageCanvas(int imageWidth, int imageHeight) {
-        this.my_HEIGHT = imageWidth;
-        this.my_WIDTH = imageHeight;
-        display = new BufferedImage(my_WIDTH, my_HEIGHT,
+    public ImageCanvas() {
+        this.my_HEIGHT = 200; // this will change on first image received (see setPixels)
+        this.my_WIDTH = 200;
+        this.display = new BufferedImage(my_WIDTH, my_HEIGHT,
                 BufferedImage.TYPE_INT_RGB);
-        Dimension size = getSize();
-        offScreenBuffer = this.createImage(size.width, size.height);
     }
 
     /** Drawing the Component with a double-buffer.
@@ -73,19 +71,19 @@ public class ImageCanvas extends Canvas {
         // Will hold the graphics context from the offScreenBuffer.
         // We need to make sure we keep our offscreen buffer the same size
         // as the graphics context we're working with.
-        if ((offScreenBuffer == null) ||
-                (!((offScreenBuffer.getWidth(this) == size.width) &&
-                (offScreenBuffer.getHeight(this) == size.height)))) {
-            offScreenBuffer = this.createImage(size.width, size.height);
+        if ((this.offScreenBuffer == null) ||
+                (!((this.offScreenBuffer.getWidth(this) == size.width) &&
+                (this.offScreenBuffer.getHeight(this) == size.height)))) {
+            this.offScreenBuffer = this.createImage(size.width, size.height);
         }
 
         // We need to use our buffer Image as a Graphics object:
-        gr = offScreenBuffer.getGraphics();
+        gr = this.offScreenBuffer.getGraphics();
 
         paint(gr); // Passes our off-screen buffer to our paint method, which,
         // unsuspecting, paints on it just as it would on the Graphics
         // passed by the browser or applet viewer.
-        g.drawImage(offScreenBuffer, 0, 0, this);
+        g.drawImage(this.offScreenBuffer, 0, 0, this);
         // And now we transfer the info in the buffer onto the
         // graphics context we got from the browser in one smooth motion.
     }
@@ -106,7 +104,7 @@ public class ImageCanvas extends Canvas {
         at.scale(rescale, rescale);
         AffineTransformOp rh = new AffineTransformOp(at,
                 AffineTransformOp.TYPE_BILINEAR);
-        graphics.drawImage(display, rh, 0, 0);
+        graphics.drawImage(this.display, rh, 0, 0);
     }
 
     /**
@@ -115,7 +113,16 @@ public class ImageCanvas extends Canvas {
      */
     public void setPixels(Image2D image) {
         Interval interval = image.getInterval();
-        display.setRGB(0, interval.yfrom, interval.totalImageWidth,
+        if (interval.totalImageHeight != my_HEIGHT || interval.totalImageWidth != my_WIDTH ) {
+            // just in case image format has unsuspectedly been changed
+            this.my_WIDTH  = interval.totalImageWidth; 
+            this.my_HEIGHT = interval.totalImageHeight;
+            this.display = new BufferedImage(my_WIDTH, my_HEIGHT,
+                    BufferedImage.TYPE_INT_RGB);
+            setPreferredSize(new Dimension(this.my_WIDTH,this.my_HEIGHT));
+
+        }
+        this.display.setRGB(0, interval.yfrom, interval.totalImageWidth,
             interval.yto - interval.yfrom, image.getPixels(), 0,
             interval.totalImageWidth);
         repaint();
@@ -123,7 +130,7 @@ public class ImageCanvas extends Canvas {
 
     /** Used to make the windows show there proper size */
     public Dimension getPreferedSize() {
-        return new Dimension(my_HEIGHT, my_WIDTH);
+        return new Dimension(this.my_HEIGHT, this.my_WIDTH);
     }
 
     public void setPreferredSize(Dimension preferredSize) {

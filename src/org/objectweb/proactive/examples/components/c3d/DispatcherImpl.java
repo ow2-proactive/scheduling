@@ -92,31 +92,31 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
     }
 
     /** Display a possible bound on this Component
-     * @return the component that is linked to this throught the bound labelled cItf */
-    public Object lookupFc(final String cItf) {
-        if (cItf.startsWith("dispatcher2engine")) {
-            return engines.get(cItf);
+     * @return the component that is linked to this throught the binding labelled interfaceName */
+    public Object lookupFc(final String interfaceName) {
+        if (interfaceName.startsWith("dispatcher2engine")) {
+            return engines.get(interfaceName);
         }
 
         return null;
     }
 
-    /** Attach a component to this dispatcher, expecting "dispatcher2engine" */
-    public void bindFc(final String cItf, final Object sItf) {
-        if (cItf.startsWith("dispatcher2engine")) {
-            this.engines.put(cItf, sItf);
+    /** Attach a component to this dispatcher, expecting the name "dispatcher2engine" */
+    public void bindFc(final String interfaceName, final Object serverInterface) {
+        if (interfaceName.startsWith("dispatcher2engine")) {
+            this.engines.put(interfaceName, serverInterface);
 
-            String name = cItf.substring("dispatcher2".length()) + "@" +
-                Integer.toHexString(sItf.hashCode());
-            addEngine((RenderingEngine) sItf, name);
+            String name = interfaceName.substring("dispatcher2".length()) + "@" +
+                Integer.toHexString(serverInterface.hashCode());
+            addEngine((RenderingEngine) serverInterface, name);
             turnOnEngine(name);
         }
     }
 
-    /** Dettach a component from this dispatcher, expecting "dispatcher2engine" */
-    public void unbindFc(final String cItf) {
-        if (cItf.startsWith("dispatcher2engine")) {
-            Object engine = this.engines.remove(cItf);
+    /** Detach a component from this dispatcher, expecting the interface name "dispatcher2engine" */
+    public void unbindFc(final String interfaceName) {
+        if (interfaceName.startsWith("dispatcher2engine")) {
+            Object engine = this.engines.remove(interfaceName);
             removeEngine((RenderingEngine) engine);
         }
     }

@@ -36,28 +36,37 @@ package org.objectweb.proactive.examples.c3d;
 public interface User {
 
     /** shows a String as a log */
-    public abstract void log(String s_message);
+    public void log(String s_message);
 
     /** Shows a String as a message to this user*/
-    public abstract void message(String s_message);
+    public void message(String s_message);
 
     /**
      * Informs the user that a new user has joined the party!!
      * @param  nUser The new user's ID
      * @param sName The new user's name
      */
-    public abstract void informNewUser(int nUser, String sName);
+    public void informNewUser(int nUser, String sName);
 
     /**
      * Informs the user that another user left
      * @param nUser The id of the old user
      */
-    public abstract void informUserLeft(String sName);
+    public void informUserLeft(String sName);
 
     /**
      * Display an interval of newly calculated pixels
      * @param newpix        The pixels as int array
      * @param interval        The interval
      */
-    public abstract void setPixels(Image2D image);
+    public void setPixels(Image2D image);
+    
+    
+    /**
+     * Reflect a change on the dispatcher host.
+     * @param os the Name of the OS supporting the dispatcher
+     * @param machine the name of the physical machine hosting the dispatcher
+     */
+    public void setDispatcherMachine(String machine, String os);
+
 }

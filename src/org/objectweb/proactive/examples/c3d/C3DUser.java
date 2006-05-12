@@ -30,21 +30,14 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Hashtable;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -52,11 +45,17 @@ import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 import org.objectweb.proactive.examples.c3d.gui.UserGUI;
-import org.objectweb.proactive.examples.c3d.gui.UserGUIImpl;
 import org.objectweb.proactive.examples.c3d.gui.WaitFrame;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
+
+import java.io.IOException;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import java.util.Hashtable;
 
 
 /**
@@ -66,13 +65,12 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  */
 public class C3DUser implements InitActive, java.io.Serializable, User,
     UserLogic {
-
     /** useful for showing information, if no GUI is available, or for error messages*/
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** reference to the dispatcher logic, for image generation and message forwarding */
     protected Dispatcher c3ddispatcher;
-    VirtualNode dispatcherNode;
+    protected VirtualNode dispatcherNode;
 
     /** AsyncRefto self, needed to add method on own queue */
     protected transient User me;
@@ -82,7 +80,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     /**
      * Number of this user in the set of users registered at the
-     * <code>C3DDispatcher</Code>, used to distinguish the action requests of
+     * <code>c3ddispatcher</Code>, used to distinguish the action requests of
      * several users
      */
     private int i_user;
@@ -95,70 +93,52 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     /** The values stored in the GUI are saved here when the GUI needs to migrate */
     private String[] savedGuiValues;
+    private String dispMachineAndOS;
 
     /** ProActive requirement : empty no-arg constructor*/
     public C3DUser() {
     }
 
-    public C3DUser(VirtualNode dispNode) {
-        this.dispatcherNode = dispNode;
+    public C3DUser(Dispatcher disp, String name) {
+        this.c3ddispatcher = disp;
+        this.userName = name;
     }
 
-    /** The initialization and linkage is made in this method, instead of using the constructor */
-    public void run() {
-        findDispatcher();
-
-        // register user to dispatcher, while asking user to be patient
-        WaitFrame wait = new WaitFrame("C3D : please wait!", "Please wait...",
-                "Waiting for information from Dispatcher");
-        int[] initialValues = c3ddispatcher.registerUser(this.me, this.userName);
-        this.i_user = initialValues[0];
-        int pictureWidth = initialValues[1];
-        int pictureHeight = initialValues[2];
-        wait.destroy();
-
-        // Create user Frame  
-        this.gui = new UserGUIImpl("C3D user display", (UserLogic) this.me,
-                pictureWidth, pictureHeight);
-        String[] values = new String[] {
-                "", "", Integer.toString(pictureWidth),
-                Integer.toString(pictureHeight)
-            };
-        this.gui.setValues(getMachineRelatedValues(), values);
-    }
-
-    public void findDispatcher() {
-        // active Object related fields
-        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
-
+    /** Returns the C3DUser constructor arguments, after a dialog has popped up */
+    private static Object[] getDispatcherAndUserName() {
         // ask user through Dialog for userName & host 
         String localHost = getLocalHostString();
-        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog(localHost,
-                this.dispatcherNode);
-        this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
-        setUserName(userAndHostNameDialog.getValidatedUserName());
-        if (this.c3ddispatcher == null) {
+        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog(localHost);
+        Dispatcher disp = userAndHostNameDialog.getValidatedDispatcher();
+
+        if (disp == null) {
             logger.error("Could not find a dispatcher. Closing.");
             System.exit(-1);
         }
+
+        return new Object[] { disp, userAndHostNameDialog.getValidatedUserName() };
     }
 
     /** Gets the name of the machine this is running on. */
-    protected String getLocalHostString() {
+    public static String getLocalHostString() {
         String localhost = "";
+
         try {
             String port = "";
             String protocol = System.getProperty(
                     "proactive.communication.protocol");
+
             if (!protocol.equals("jini") && !protocol.equals("ibis")) {
                 port = ":" +
                     System.getProperty("proactive." + protocol + ".port");
             }
+
             localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost()) +
                 port;
         } catch (UnknownHostException e) {
             localhost = "";
         }
+
         return localhost;
     }
 
@@ -170,10 +150,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
         this.c3ddispatcher.registerMigratedUser(i_user);
 
-        this.gui = new UserGUIImpl("C3D user display", (UserLogic) this.me,
-                Integer.parseInt(this.savedGuiValues[2]),
-                Integer.parseInt(this.savedGuiValues[3]));
-        this.gui.setValues(getMachineRelatedValues(), this.savedGuiValues);
+        this.gui = new UserGUI("C3D user display", (UserLogic) this.me);
+        this.gui.setValues(this.savedGuiValues);
     }
 
     /** Called just before migration, as specified in the initActivity :
@@ -187,17 +165,41 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     /**
      * Tells what are the operations to perform before starting the activity of the AO.
-     * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild
+     * Here, we state that if migration asked, procedure  is : saveData, migrate, rebuild.
+     * We also set some other variables.
      */
     public void initActivity(Body body) {
-        // FIXME : this test should be stripped, only put here to circumvent component bug
-        if (body == null) {
-            logger.error("in C3DUser.initActivity, Body is " + body);
-        } else {
+        if (body != null) { // FIXME: this is a component bug: sometimes body is null!    
+
             MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
             myStrategyManager.onArrival("rebuild");
             myStrategyManager.onDeparture("leaveHost");
         }
+
+        // register user to dispatcher, while asking user to be patient
+        WaitFrame wait = new WaitFrame("C3D : please wait!", "Please wait...",
+                "Waiting for information from Dispatcher");
+        // get the stub, which is a long operation, while the wait window is displayed 
+        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
+
+        int[] initialValues = this.c3ddispatcher.registerUser(this.me,
+                this.userName);
+        this.i_user = initialValues[0];
+
+        int pictureWidth = initialValues[1];
+        int pictureHeight = initialValues[2];
+
+        wait.destroy();
+
+        // Create user Frame  
+        this.gui = new UserGUI("C3D user display", (UserLogic) this.me);
+
+        String[] values = new String[] {
+                Integer.toString(pictureWidth), Integer.toString(pictureHeight),
+                "", ""
+            };
+        this.gui.setValues(values);
+        this.gui.setUserInfo(getMachineRelatedValues());
     }
 
     /** shows a String as a log */
@@ -253,8 +255,9 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
      * Exit the application
      */
     public void terminate() {
-        c3ddispatcher.unregisterConsumer(i_user);
+        this.c3ddispatcher.unregisterConsumer(i_user);
         this.gui.trash();
+
         try {
             org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
         } catch (IOException e) {
@@ -269,6 +272,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         ProActiveDescriptor proActiveDescriptor = null;
 
         ProActiveConfiguration.load();
+
         try {
             if (argv.length == 0) {
                 proActiveDescriptor = ProActive.getProactiveDescriptor();
@@ -277,36 +281,28 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
                         argv[0]);
             }
         } catch (Exception e) {
+            logger.error("Trouble loading descriptor file");
             e.printStackTrace();
             System.exit(-1);
         }
+
         proActiveDescriptor.activateMappings();
         VirtualNode user = proActiveDescriptor.getVirtualNode("User");
-        VirtualNode dispatcherN = proActiveDescriptor.getVirtualNode(
-                "Dispatcher");
-        Node node = null;
+        Object[] params = getDispatcherAndUserName();
+
         try {
-            node = user.getNode();
-        } catch (NodeException e1) {
-            e1.printStackTrace();
-            System.exit(-1);
-        }
-        Object[] params = { dispatcherN };
-        C3DUser c3duser = null;
-        try {
-            c3duser = (C3DUser) org.objectweb.proactive.ProActive.newActive(C3DUser.class.getName(),
-                    params, node);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
+            //C3DUser c3duser = (C3DUser) 
+            org.objectweb.proactive.ProActive.newActive(C3DUser.class.getName(),
+                params, user.getNode());
+        } catch (Exception e) {
+            logger.error("Problemn with C3DUser Active Object creation:");
             e.printStackTrace();
         }
-        c3duser.run();
     }
 
-    /** Ask the dispatcher to revert to original scene*/
+    /** Ask the dispatcher to revert to original scene */
     public void resetScene() {
-        c3ddispatcher.resetScene();
+        this.c3ddispatcher.resetScene();
     }
 
     /** Ask the dispatcher to add a sphere*/
@@ -314,31 +310,28 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         double radius = (Math.random()) * 10.0;
         Sphere sphere = new Sphere(Vec.random(20), radius);
         sphere.setSurface(Surface.random());
-        c3ddispatcher.addSphere(sphere);
+        this.c3ddispatcher.addSphere(sphere);
     }
 
     /** Displays the list of users connected to the dispatcher */
     public void getUserList() {
-        StringMutableWrapper list = c3ddispatcher.getUserList();
+        StringMutableWrapper list = this.c3ddispatcher.getUserList();
         gui.log("List of current users:\n" + list.toString());
-    }
-
-    public void showUserInfo() {
-        gui.showUserInfo();
     }
 
     /**  Send a mesage to a given other user, or to all */
     public void sendMessage(String message, String recipientName) {
         Integer talkId = (Integer) h_users.get(recipientName);
+
         if (talkId == null) {
             // BroadCast
             gui.writeMessage("<to all> " + message + '\n');
-            c3ddispatcher.userWriteMessageExcept(this.i_user,
+            this.c3ddispatcher.userWriteMessageExcept(this.i_user,
                 "[from " + this.userName + "] " + message);
         } else {
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
-            c3ddispatcher.userWriteMessage(talkId.intValue(),
+            this.c3ddispatcher.userWriteMessage(talkId.intValue(),
                 "[Private from " + this.userName + "] " + message);
         }
     }
@@ -349,21 +342,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
      *         then y radians along the y axis, and finally  z radians along the z axis
      */
     public void rotateScene(Vec rotationAngle) {
-        c3ddispatcher.rotateScene(i_user, rotationAngle);
-    }
-
-    /** returns the name of the machine on which this active object is currently */
-    private String[] getMachineRelatedValues() {
-        String hostName = "unknown";
-        try {
-            hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return new String[] {
-            this.userName, hostName, this.c3ddispatcher.getMachineName(),
-            this.c3ddispatcher.getOSString(),
-        };
+        this.c3ddispatcher.rotateScene(i_user, rotationAngle);
     }
 
     public void setUserName(String newName) {
@@ -372,5 +351,39 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     public String getUserName() {
         return this.userName;
+    }
+
+    public void setDispatcherMachine(String machine, String os) {
+        this.dispMachineAndOS = machine + "\n    " + os;
+
+        String guiInfoText = this.gui.getUserInfo();
+        int index = guiInfoText.lastIndexOf('\n');
+
+        if (index != -1) {
+            index = guiInfoText.lastIndexOf('\n', index);
+        }
+
+        if (index != -1) {
+            guiInfoText = guiInfoText.substring(0, index + 1) +
+                this.dispMachineAndOS;
+        } else {
+            guiInfoText += this.dispMachineAndOS;
+        }
+
+        this.gui.setUserInfo(guiInfoText);
+    }
+
+    /** returns the name of the machine on which this active object is currently */
+    private String getMachineRelatedValues() {
+        String hostName = "unknown";
+
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+
+        return "User\n   " + this.userName + " (" + hostName + ")" +
+        "\nDispatcher\n    " + this.dispMachineAndOS;
     }
 }

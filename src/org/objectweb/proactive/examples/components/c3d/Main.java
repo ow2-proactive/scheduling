@@ -43,11 +43,11 @@ public class Main {
     public static void main(final String[] args) throws Exception {
         if ((args.length != 2) && (args.length != 1)) {
             System.out.println(
-                "Parameters : [fractal_ADL_file] descriptor_file" +
-                "\n        the first file describes your components layout. " +
-                "\n                Default is " + DEFAULT_ADL +
-                "\n        the second file describes your deployment of computing nodes." +
-                "\n                You may want to try ../../../descriptors/components/C3D_all.xml");
+                "Parameters : descriptor_file [fractal_ADL_file] " +
+                "\n        The first file describes your deployment of computing nodes." +
+                "\n                You may want to try ../../../descriptors/components/C3D_all.xml"+
+                "\n        The second file describes your components layout. " +
+                "\n                Default is " + DEFAULT_ADL );
 
             return;
         }
@@ -59,8 +59,8 @@ public class Main {
             adl = DEFAULT_ADL;
             descriptor = args[0];
         } else {
-            adl = args[0];
-            descriptor = args[1];
+            descriptor = args[0];
+            adl = args[1];
         }
 
         Launcher.main(new String[] { "-fractal", adl, "m", descriptor });
