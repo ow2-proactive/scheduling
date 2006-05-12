@@ -37,14 +37,6 @@ import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 
-/**
- * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
- */
 public class Test extends FunctionalTest {
     public Test() {
         super("Lookup active", "Test register and lookup AOs");
@@ -54,9 +46,10 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-       A a = (A)  ProActive.newActive(A.class.getName(), new Object[] { "toto" });
-       a.register();
-      //  Thread.sleep(5000);
+        A a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
+        a.register();
+
+        //  Thread.sleep(5000);
     }
 
     /**
@@ -72,11 +65,27 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
+        // check lookup works
         String url = UrlBuilder.buildUrlFromProperties("localhost", "A");
         A a = (A) ProActive.lookupActive(A.class.getName(), url);
         Assertions.assertNotNull(a);
         Assertions.assertEquals(a.getName(), "toto");
-        return true;
-        //return ((a != null) && (a.getName().equals("toto")));
+
+        // check listActive contains the previous lookup
+        String host = UrlBuilder.buildUrlFromProperties("localhost", "");
+        String[] registered = ProActive.listActive(host);
+        Assertions.assertNotNull(registered);
+
+        for (int i = 0; i < registered.length; i++) {
+            if (registered[i].substring(registered[i].lastIndexOf('/'))
+                                 .equals("/A")) {
+                return true;
+            }
+        }
+
+        Assertions.assertTrue("Could not find registered object in list of objects",
+            false);
+
+        return false;
     }
 }
