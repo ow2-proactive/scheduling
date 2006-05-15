@@ -47,7 +47,7 @@ public class UserBag implements Serializable {
     }
 
     /**
-     * Does not erase previous equal key, only makes another pair with this key.
+     * Does not erase previous troika with equal key, only add another troika containing this key.
      */
     public void add(int key, User value, String name) {
         list.add(new Troika(key, value, name));
@@ -76,16 +76,16 @@ public class UserBag implements Serializable {
 
     /**
      * Returns the name of the FIRST occurence of this key in the Bag.
-     * @returns "" if no element corresponds, because I don't like null Strings.
+     * @returns null if no element corresponds, else returns the name of the correponding user.
      */
     public String getName(int key) {
         for (Iterator iter = list.iterator(); iter.hasNext();) {
-            Troika pair = (Troika) iter.next();
-            if (pair.key == key) {
-                return pair.name;
+            Troika troika = (Troika) iter.next();
+            if (troika.key == key) {
+                return troika.name;
             }
         }
-        return "";
+        return null;
     }
 
     /**
@@ -147,10 +147,10 @@ public class UserBag implements Serializable {
         User user;
         String name;
 
-        public Troika() {
+        Troika() {
         }
 
-        public Troika(int key, User value, String name) {
+        Troika(int key, User value, String name) {
             this.key = key;
             this.user = value;
             this.name = name;

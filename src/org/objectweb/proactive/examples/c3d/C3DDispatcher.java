@@ -359,8 +359,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
     /** Delivers newly computed pixels to users, and stores for future use. */
     private void setPixels(Image2D image) {
-        // TODO: this could be a group comm  : userGroup.setPixels(image);
         // Delivers the new pixels to all users
+        // this could be a group comm  : userGroup.setPixels(image);
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
             this.userBag.currentUser().setPixels(image);
@@ -377,7 +377,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
      * Rotate every object by the given angle
      */
     public void rotateScene(int i_user, Vec angle) {
-        // If there are more than one users, proceed with a vote. 
+        // If there is more than one user, proceed with a vote. 
         // i_user < 0 means the election trigerred the rotation  
         if ((i_user >= 0) & (this.userBag.size() > 1)) {
             this.election.vote(i_user, this.userBag.getName(i_user), angle);
@@ -481,7 +481,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     /** Register a user, so he can join the fun */
 
     //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
-    public int[] registerUser(User c3duser, String userName) {
+    public int registerUser(User c3duser, String userName) {
         c3duser.log("-> Remote call-back: dispatcher found, user registered");
         log("New user " + userName + "(" + this.lastUserID + ") has joined");
 
@@ -528,10 +528,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             election.setNbUsers(nbUsers);
         }
 
-        // return user_id, image_width & image_height;
-        int[] result = new int[] { this.lastUserID++, IMAGE_WIDTH, IMAGE_HEIGHT };
-
-        return result;
+        // return user_id
+        return this.lastUserID++ ;
     }
 
     public void registerMigratedUser(int userNumber) {

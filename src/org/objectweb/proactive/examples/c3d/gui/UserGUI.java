@@ -179,14 +179,14 @@ public class UserGUI implements ActionListener {
         messagePanel.setLayout(new BorderLayout());
 
         // The message Log Scroll
-        messageLogArea = new JTextArea("Users exchange messages here\n");
+        messageLogArea = new JTextArea("[Users exchange messages here]\n");
         messageLogArea.setEditable(false);
         JScrollPane messageLogScroll = new JScrollPane(this.messageLogArea);
         messageLogScroll.setPreferredSize(new Dimension(200, 180));
         messagePanel.add(messageLogScroll, BorderLayout.CENTER);
 
         // The typetext area, the combo, and the Send button
-        localMessageField = new JTextField("users type text here");
+        localMessageField = new JTextField("[Users type text here]");
         localMessageField.addActionListener(this);
 
         sendToComboBox = new JComboBox(new String[] { "BROADCAST" });
@@ -314,19 +314,37 @@ public class UserGUI implements ActionListener {
 
     /** Returns the important values which where shown on screen, like the log, the messages...*/
     public String[] getValues() {
+        String users="";
+        int max =  this.sendToComboBox.getItemCount() ;
+        for (int i = 1 ; i < max ; i++)  // Just don't save the BROADCAST value
+            users += this.sendToComboBox.getItemAt(i) + "\n";
         return new String[] {
-            this.localMessageField.getText(), 
+            this.logArea.getText(), 
             this.messageLogArea.getText(),
-            this.userInfoText
+            this.userInfoText,
+            users
         };
         // no need to store the users, as the dispatcher informs of them again!
     }
 
     /** Sets the given values to the different elements of the GUI */
     public void setValues(String[] values) {
-        this.localMessageField.setText(values[0]);
-        this.messageLogArea.setText(values[1]);
-        this.userInfoText = values[2];
+        if (values != null ) {
+            this.logArea.setText(values[0]);
+            this.messageLogArea.setText(values[1]);
+            
+            // restore also the users combo box!
+            String users = values[3];
+            while (true)  { 
+                int index = users.indexOf('\n');
+                if (index != -1) {
+                    this.sendToComboBox.addItem(users.substring(0,index));
+                }
+                else 
+                    break;
+                users = users.substring(index+1);
+            }  
+        }
     }
 
     public void showUserInfo() {

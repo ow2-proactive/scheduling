@@ -154,7 +154,7 @@ public class DispatcherGUI implements ActionListener {
      * The top part, stating name of program & machine name
      */
     private JComponent createInfoText() {
-        JPanel infoPanel = new JPanel(); // TODO : the box should have been enough, but the label overwrites the menu!!!
+        JPanel infoPanel = new JPanel(); // the box should have been enough, but the label overwrites the menu!!!
         Box box = Box.createVerticalBox();
         String localhostName = "";
         try {

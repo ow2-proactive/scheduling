@@ -44,14 +44,15 @@ import java.net.UnknownHostException;
 
 import javax.naming.NamingException;
 
-
+/** Overide the AO NameAndHostDialog, to use proper conponent lookup. */
 public class NameAndHostDialogForComponent extends NameAndHostDialog {
     private static final String COMPONENT_ALIAS = "Dispatcher";
 
-    public NameAndHostDialogForComponent(String localHost) {
-        super(localHost);  
+    public NameAndHostDialogForComponent() {
+        super();  
     }
 
+    /** Try to find a dispatcher, using the component methods, overiding the AO initial lookup.  */
     protected void tryTheLookup() {
         String hostName = null;
         try {

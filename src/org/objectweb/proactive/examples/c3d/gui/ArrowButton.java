@@ -97,8 +97,8 @@ public class ArrowButton extends JButton {
      * @return a variable size JPanel which contains the Fixed size button
      */
     public JComponent getJPanel() {
-        // TODO : this is way too complicated, it's equivalent to a BorderLayout.CENTER
-        // But it doesn't seem to work... And setLayout(null) doesn't center vertically
+        // This is way too complicated, it's equivalent to a BorderLayout.CENTER
+        // But BorderLayout.CENTER doesn't seem to work... And setLayout(null) doesn't center vertically
         Box box = Box.createVerticalBox();
         box.add(Box.createGlue());
         Box insidebox = Box.createHorizontalBox();

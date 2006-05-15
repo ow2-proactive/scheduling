@@ -72,7 +72,7 @@ public class Plane extends Primitive {
         if (t > mindiff) {
             Isect ip = new Isect();
             ip.t = t;
-            ip.enter = true; // TODO : I don't know what value to give to 'enter'.
+            ip.enter = true; // I don't know what value to give to 'enter'.
             ip.prim = this;
             return ip;
         }

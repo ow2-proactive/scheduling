@@ -47,19 +47,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 
-// FIXME can't work, because I haven't specified an object registry name
-// have to either list them all, or use the component method: name is hard coded... 
-
-/**
- * A dialog with two text fields, which handles incorrect entries.
- * Inspired from the java Swing Dialog tutorial
- */
+/** A dialog with two text fields, which handles incorrect entries.
+ * It is used to select a dispatcher host and a user name.
+ * Inspired from the java Swing Dialog tutorial */
 public class NameAndHostDialog extends JDialog implements ActionListener,
     PropertyChangeListener {
     private String userName = "Bob";
@@ -70,15 +68,18 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
     private String cancelButtonString = "Cancel";
     protected Dispatcher c3dDispatcher;
 
-    public NameAndHostDialog(String localHost) {
+    /** This is NOT an Active Object: constructor is configurable! */
+    public NameAndHostDialog() {
         super();
 
+        String localHostUrl = NameAndHostDialog.getLocalHostUrl();
+        
         setTitle("Welcome to the Collaborative 3D Environment.");
 
         this.userTextField = new JTextField(this.userName, 10);
         this.userTextField.addActionListener(this);
 
-        this.hostNameTextField = new JTextField(localHost, 10);
+        this.hostNameTextField = new JTextField(localHostUrl, 10);
         this.hostNameTextField.addActionListener(this);
 
         //Create an array of the text and components to be displayed.
@@ -119,12 +120,12 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         setVisible(true);
     }
 
-    /** This method handles events for the text field. */
+    /** Handles events for the text field. */
     public void actionPerformed(ActionEvent e) {
         this.optionPane.setValue(this.enterButtonString);
     }
 
-    /** This method reacts to state changes in the option pane. */
+    /** Reacts to state changes in the option pane. */
     public void propertyChange(PropertyChangeEvent event) {
         String prop = event.getPropertyName();
 
@@ -158,11 +159,25 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         }
     }
 
+    /** Really try to find a dispatcher, using the provided address in the hostNameTextField. */
     protected void tryTheLookup() {
         String url = this.hostNameTextField.getText();
         String hostName = null;
         String[] registeredObjects;
 
+        this.c3dDispatcher = null;
+        // First try with the provided url, if the user entered the exact url for the dispatcher
+        try {
+            this.c3dDispatcher = (Dispatcher) ProActive.lookupActive(C3DDispatcher.class.getName(), url);
+            setVisible(false);
+            return;
+        } catch (Exception e) {
+            //e.printStackTrace();
+            // do nothing, it's just not a correct dispatcher url
+        }        
+        
+        
+        // Second, check the url given does map to a machine, and get list of registered objects on it
         try {
             hostName = UrlBuilder.getHostNameFromUrl(url);
             registeredObjects = ProActive.listActive(url);
@@ -170,10 +185,10 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             treatException(e,
                 "Sorry, could not find a registered C3DDispatcher on host \"" +
                 hostName + "\".");
-
             return;
         }
 
+        // third, for every registered object, try to save it as a dispatcher
         for (int i = 0; i < registeredObjects.length; i++) {
             String name = UrlBuilder.getNameFromUrl(registeredObjects[i]);
 
@@ -185,13 +200,10 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
                     setVisible(false);
                     return;
                 } catch (ActiveObjectCreationException e) {
-                    System.err.println(e.getMessage());
                     treatException(e,
                         "Sorry, could not create stub for C3DDispatcher on host \"" +
                         hostName + "\".");
                 } catch (IOException e) {
-                    System.err.println(e.getMessage());
-                    //e.printStackTrace();
                 }
             }
         }
@@ -202,8 +214,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             hostName + "\".");
     }
 
-    /** Take action against failed connections to Dispatcher.
-     * In next versions, this will NOT use System.exit*/
+    /** Take action against failed connections to Dispatcher. */
     protected void treatException(Exception exception, String message) {
         this.hostNameTextField.selectAll();
         JOptionPane.showMessageDialog(NameAndHostDialog.this,
@@ -217,11 +228,36 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         return this.userName;
     }
 
-    /**
-     * @return a dispatcher if information provided was correct, and null if coudn't find one.
-     * It is up to the programmer to check for null values.
-     */
+    /** Get the dispatcher which was found on url provided by the user.
+     * @return a dispatcher if information provided was correct, and null if one wasn't properly selected.
+     * It is up to the programmer to check for null values. */
     public Dispatcher getValidatedDispatcher() {
         return this.c3dDispatcher;
     }
+    
+    
+    /** Gets the name of the machine this is running on. 
+     * @return a url which is suitable for looking up active objects. */
+    public static String getLocalHostUrl() {
+        String localhost = "";
+
+        try {
+            String port = "";
+            String protocol = System.getProperty(
+                    "proactive.communication.protocol");
+
+            if (!protocol.equals("jini") && !protocol.equals("ibis")) {
+                port = ":" +
+                    System.getProperty("proactive." + protocol + ".port");
+            }
+
+            localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost()) +
+                port;
+        } catch (UnknownHostException e) {
+            localhost = "";
+        }
+
+        return localhost;
+    }
+
 }

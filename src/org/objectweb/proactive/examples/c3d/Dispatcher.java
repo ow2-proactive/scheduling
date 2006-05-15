@@ -35,40 +35,37 @@ import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
 
 
-/** Services proposed by a Dispatcher, without all the GUI stuff */
+/** Services proposed by a Dispatcher Active Object, without all the GUI stuff */
 public interface Dispatcher {
 
-    /**
-     * Rotate every object by the given angle
-     */
-    public abstract void rotateScene(int i_user, Vec angles);
+    /** Rotate every object by the given angle */
+    public void rotateScene(int i_user, Vec angles);
 
-    public abstract void addSphere(Sphere s);
+    public void addSphere(Sphere s);
 
-    public abstract void resetScene();
+    public void resetScene();
 
     /** Register a user, so he can join the fun */
+    //SYNCHRONOUS CALL. All [active object calls back to caller] in this method happen AFTER the int is returned
+    public int registerUser(User c3duser, String userName);
 
-    //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
-    public abstract int[] registerUser(User c3duser, String userName);
-
-    public abstract void registerMigratedUser(int userNumber);
+    public void registerMigratedUser(int userNumber);
 
     /** removes user from userList, so he cannot receive any more messages or images */
-    public abstract void unregisterConsumer(int number);
+    public void unregisterConsumer(int number);
 
-    /** Get the list of users in an asynchronous call, entries being separated by \n */
-    public abstract StringMutableWrapper getUserList();
+    /** Get the list of users, entries being separated by \n */
+    public StringMutableWrapper getUserList();
 
     /** Find the name of the machine this Dispatcher is running on */
-    public abstract String getMachineName();
+    public String getMachineName();
 
     /** Find the name of the OS the Dispatcher is running on */
-    public abstract String getOSString();
+    public String getOSString();
 
     /** send message to all users except one */
-    public abstract void userWriteMessageExcept(int i_user, String s_message);
+    public void userWriteMessageExcept(int i_user, String s_message);
 
     /** Shows a message to a user*/
-    public abstract void userWriteMessage(int i_user, String s_message);
+    public void userWriteMessage(int i_user, String s_message);
 }

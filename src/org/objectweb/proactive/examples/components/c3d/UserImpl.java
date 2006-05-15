@@ -63,10 +63,8 @@ public class UserImpl extends C3DUser implements BindingController,User {
             logger.error(
             "User component could not find a dispatcher. Performing lookup");
             
-            String localHost = getLocalHostString();
-            
             // ask user through Dialog for userName & host
-            NameAndHostDialog userAndHostNameDialog = new NameAndHostDialogForComponent(localHost);
+            NameAndHostDialog userAndHostNameDialog = new NameAndHostDialogForComponent();
             this.c3ddispatcher = userAndHostNameDialog.getValidatedDispatcher();
             setUserName(userAndHostNameDialog.getValidatedUserName());
             
@@ -75,9 +73,6 @@ public class UserImpl extends C3DUser implements BindingController,User {
                 System.exit(-1);
             }
         }
-        
-        // active Object related fields
-        this.me = (User) org.objectweb.proactive.ProActive.getStubOnThis();
         
         if (getUserName() == null) { // just in case it was not yet set.
             setUserName("Bob");
