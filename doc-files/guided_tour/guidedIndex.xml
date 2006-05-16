@@ -31,17 +31,21 @@
     (Object-Oriented Single Program Multiple Data) programming paradigm. </para>
    </listitem><listitem>
    
-     <para>The guided tour is finished off by the complete N-Body example,
+     <para>The second-last part in the complete N-Body example,
       in <xref linkend="nbody"/>. This application is first written trivially, 
       then some speed-ups are inserted, to show how ProActive can help you. </para>
+  </listitem> <listitem>
+   
+     <para>Finally, we close the tutorial off by showing some components. 
+      In <xref linkend="C3D_component_example"/>, the C3D example is wrapped with components,
+      and is this way exposed as components. </para>
   </listitem> 
  </itemizedlist>
   
- <para> We hope this will help your  understanding of the library, and of the concepts driving it.</para>
+ <para> We hope this will help your understanding of the library and of the concepts driving it.</para>
 
-  <para>If you need further details on how the examples work, check the
-  ProActive <ulink
-  url="http://www-sop.inria.fr/oasis/ProActive/apps/index.html">applications</ulink>
+  <para>If you need further details on how the examples work, check the ProActive 
+   <ulink url="http://www-sop.inria.fr/oasis/ProActive/apps/index.html">applications</ulink>
   page.</para>
 
 </sect1>
