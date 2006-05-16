@@ -919,7 +919,7 @@
       <include name="util/*.java" />
     </javac>
 
-    <java classname="util.DocBookize" fork="false">
+    <java classname="util.DocBookize" fork="true">
       <classpath refid="project.classpath" />
       <arg value="${docs.tmp}/${docbookInputFile}" />   <!-- The xml file to parse -->
       <arg value="${src.dir}/${proactive.dir}/" />      <!-- the path for java file inclusion -->
