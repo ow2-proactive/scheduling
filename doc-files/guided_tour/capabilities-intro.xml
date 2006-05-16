@@ -284,7 +284,39 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
     </sect2>
 
     <sect2 >
-      <title>Look at the source code for the main classes</title>
+     <title>Wrapping Active Objects in Components</title>
+     
+     <para>You can also write components with the Fractive API, which is an implementation of Fractal in ProActive. 
+      You should check the part on components for more information (<xref linkend="ProActiveComponents"/>).
+      There is a long explanation of the C3D component version (<xref linkend="C3D_component_example"/>).
+      The visual aspect is very similar to the standard Active Object C3D version. That's on purpose,
+      to show how easy it is to transform code into components. If you want to run a components version of c3d, try this:</para>
+     <screen>scripts/unix/components$ ./c3d.sh
+scripts/windows/components$ c3d.bat</screen>
+     
+<para>The component binding is done through the Fractal ADL, which is a standard way of writing components 
+ through an xml file. You can have a visual representation with IC2D 
+ (start IC2D, menu->Components->Start the Fractal GUI). You should specify how to read the file. 
+ You have to enter: </para>     
+<itemizedlist>
+ <listitem>File->Storeage: <literal>ProActive/src</literal>.</listitem>
+ <listitem>File->Open:<literal>ProActive/src/org/objectweb/proactive/examples/c3d/adl/userAndComposite.fractal</literal>.</listitem>
+</itemizedlist>
+<figure>
+      <title>IC2D component explorer with the C3D example</title>
+      
+      <mediaobject>
+       <imageobject>
+        <imagedata contentwidth="100"
+                   fileref="components/pics/c3d_components.png"
+                   format="PNG" width="6in" />
+       </imageobject>
+      </mediaobject>
+        </figure>
+    </sect2>
+
+    <sect2 >
+     <title>Look at the source code for the main classes</title>
 
       <para>The main classes of this application are:</para>
 
@@ -306,9 +338,9 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         </listitem>
       </itemizedlist>
 
-      <para>Look at the method public void
-      processRotate(org.objectweb.proactive.Body body, String methodName,
-      Request r) that handles election of the next action to undertake.</para>
+      <para>In the Dispatcher, look at the method 
+       <literal>public void rotateScene(int i_user, Vec angle) </literal>
+       that handles election of the next action to undertake.</para>
     </sect2>
   </sect1>
 

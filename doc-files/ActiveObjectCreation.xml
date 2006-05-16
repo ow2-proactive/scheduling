@@ -1440,8 +1440,7 @@ if(result_from_method == null){
 
         public Result bar2 () {
          A a = newActive(A);
-        return a.foo();     // 
-<emphasis role="bold">**</emphasis> future is sent as a result
+        return a.foo();     //  <emphasis role="bold">**</emphasis> future is sent as a result
          }
 } //end of class B</programlisting></para>
     </sect2>

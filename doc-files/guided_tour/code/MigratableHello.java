@@ -1,5 +1,3 @@
-package org.objectweb.proactive.examples.hello;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.migration.MigrationException;

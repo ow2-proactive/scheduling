@@ -1,5 +1,3 @@
-package org.objectweb.proactive.examples.hello;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;

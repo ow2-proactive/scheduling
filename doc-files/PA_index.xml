@@ -90,7 +90,7 @@
     
     <abstract>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis
-      role="bold">GRID</emphasis> Java library for <emphasis
+      role="bold">GRID</emphasis> middleware Java library for <emphasis
       role="bold">parallel</emphasis>, <emphasis
       role="bold">distributed</emphasis>, and <emphasis
       role="bold">concurrent</emphasis> computing, also featuring <emphasis
@@ -138,45 +138,45 @@
        <itemizedlist>
           <listitem>
             <para>Typed <emphasis role="bold">Group</emphasis>
-            Communications</para>
+            Communications,</para>
           </listitem>
 
           <listitem>
-            <para><emphasis role="bold">OO SPMD</emphasis></para>
+            <para><emphasis role="bold">Object-Oriented SPMD</emphasis>,</para>
           </listitem>
 
           <listitem>
             <para>Distributed and Hierarchical <emphasis
-            role="bold">Components</emphasis></para>
+            role="bold">Components</emphasis>,</para>
           </listitem>
 
           <listitem>
-            <para><emphasis role="bold">Security</emphasis></para>
+            <para><emphasis role="bold">Security</emphasis>,</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">Fault Tolerance</emphasis> with
-            checkpointing</para>
+            checkpointing,</para>
           </listitem>
 
           <listitem>
-            <para>a <emphasis role="bold">P2P</emphasis> infrastructure</para>
-          </listitem>
-
-          <listitem>
-            <para>a Graphical User Interface <emphasis
-            role="bold">IC2D</emphasis></para>
+            <para>a <emphasis role="bold">P2P</emphasis> infrastructure,</para>
           </listitem>
 
           <listitem>
             <para>a powerful <emphasis role="bold">deployment</emphasis> model
-            based on XML descriptors</para>
+            based on XML descriptors,</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">File transfer</emphasis> capabilities
-            over the <emphasis role="bold">Grid</emphasis></para>
+            over the <emphasis role="bold">Grid</emphasis>,</para>
           </listitem>
+          
+          <listitem>
+           <para>a Graphical User Interface: <emphasis role="bold">IC2D</emphasis>.</para>
+          </listitem>
+          
         </itemizedlist>
        </para><para>
       <emphasis role="bold">ProActive</emphasis> is only made of
@@ -186,7 +186,9 @@
       Meta-Object Protocol, the library is itself extensible, making the
       system open for adaptations and optimizations. ProActive
       currently uses the <emphasis role="bold">RMI</emphasis> Java standard 
-      library as default portable transport layer.</para>
+      library as default portable transport layer, and also provides optimized 
+      RMI with <emphasis role="bold">IBIS</emphasis>, and 
+      <emphasis role="bold">HTTP transport</emphasis>.</para>
 
       <para><emphasis role="bold">ProActive</emphasis> features several
       optimizations improving performance. For instance, whenever two active
@@ -203,24 +205,24 @@
       
       <itemizedlist>
           <listitem>
-            <para>Web Service Exportation</para>
+            <para>Web Service Exportation,</para>
           </listitem>
 
           <listitem>
-            <para>HTTP Transport, RMI/SSH tunneling Transport</para>
+            <para>HTTP Transport, RMI/SSH tunneling Transport,</para>
           </listitem>
 
           <listitem>
-            <para>ssh, scp, rsh, rcp</para>
+            <para>ssh, scp, rsh, rcp,</para>
           </listitem>
 
           <listitem>
             <para>Globus GT2, GT3 and GT4, Unicore, GLite, ARC (NorduGrid),
-            GSI-SSH</para>
+            GSI-SSH,</para>
           </listitem>
 
           <listitem>
-            <para>LSF, PBS, Sun Grid Engine, OAR</para>
+            <para>LSF, PBS, Sun Grid Engine, OAR.</para>
           </listitem>
         </itemizedlist>
        </para>

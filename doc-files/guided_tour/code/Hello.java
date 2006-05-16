@@ -1,6 +1,4 @@
-package code;
 import org.objectweb.proactive.ProActive;
-
 
 public class Hello {
     private String name;

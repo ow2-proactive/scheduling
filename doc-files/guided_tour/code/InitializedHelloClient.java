@@ -1,5 +1,3 @@
-package org.objectweb.proactive.examples.hello;
-
 public class InitializedHelloClient {
     public static void main(String[] args) {
         InitializedHello myServer;

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="componentExamples">
-  <title>Examples</title>
+  <title>Component examples</title>
 
-  <para>3 examples are presented: code snippets for visualizing the transition
+  <para>Three examples are presented: code snippets for visualizing the transition
   between active objects and components, the 'hello world', from the Fractal
   tutorial, and C3D component version. The programming model is Fractal, and
-  one should refer to the Fractal documentation for detailed examples.</para>
+  one should refer to the Fractal documentation for other detailed examples.</para>
 
  <sect1  id="examples_html_From_objects_to_active_objects_to_distributed_components" >
     <title> From objects to active objects to distributed components</title>
@@ -16,22 +16,22 @@
     components are created from component definitions. Let us first consider
     the 'A' interface:</para>
 
-    <screen language="java">public interface A {
+    <programlisting language="java">public interface A {
   public String foo(); // dummy method
-} </screen>
+} </programlisting>
 
     <para>'AImpl' is the class implementing this interface:</para>
 
-    <screen>public class AImpl implements A {
+    <programlisting language="java">public class AImpl implements A {
  public AImpl() {}
  public String foo() {
  // do something
  }
-}  </screen>
+}  </programlisting>
 
     <para>The class is then instantiated in a standard way:</para>
 
-    <screen> A object = new AImpl(); </screen>
+    <programlisting language="java"> A object = new AImpl(); </programlisting>
 
     <para>Active objects are instantiated using factory methods from the
      ProActive class (see <xref linkend="HelloWorld"/>). 
@@ -39,11 +39,11 @@
     the active object, the location (node or virtual node), or a factory for
     meta-objects, using the appropriate factory method.</para>
 
-    <screen>A active_object = (A)ProActive.newActive(
+    <programlisting language="java">A active_object = (A)ProActive.newActive(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode, // location, could also be a virtual node
-);</screen>
+);</programlisting>
 
     <para>As components are also active objects in this implementation, they
     benefit from the same features, and are configurable in a similar way.
@@ -66,20 +66,20 @@
       fractal.provider system property, and uses this instance to get the
       bootstrap component):</para>
 
-      <screen> Component boot = Fractal.getBootstrapComponent(); </screen>
+      <programlisting language="java"> Component boot = Fractal.getBootstrapComponent(); </programlisting>
 
       <para>We then get the TypeFactory interface provided by this bootstrap
       component:</para>
 
-      <screen> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </screen>
+      <programlisting language="java"> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </programlisting>
 
       <para>We can then create the type of the first component, which only
       provides a A server interface named 'a':</para>
 
-      <screen>// type of the a component
+      <programlisting language="java">// type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType('a', 'A', false, false, false)
-}); </screen>
+}); </programlisting>
     </sect2>
 
     <sect2 >
@@ -89,11 +89,11 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       of its content. In this implementation, this is done through the
       ContentDescription class:</para>
 
-      <screen language="java">ContentDescription contentDesc = new ContentDescription(
+      <programlisting language="java">ContentDescription contentDesc = new ContentDescription(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode // location, could also be a virtual node
-); </screen>
+); </programlisting>
     </sect2>
 
     <sect2 >
@@ -102,21 +102,21 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       <para>Properties relative to the controller can be specified in the
       ControllerDescription:</para>
 
-      <screen language="java">ControllerDescription controllerDesc = new ControllerDescription(
+      <programlisting language="java">ControllerDescription controllerDesc = new ControllerDescription(
  'myName', // name of the component
  Constants.PRIMITIVE // the hierarchical type of the component
  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
-); </screen>
+); </programlisting>
 
       <para>Eventually, the component definition is instantiated using the
       standard Fractal API. This component can then be manipulated as any
       other Fractal component.</para>
 
-      <screen language="java">Component component = componentFactory.newFcInstance(
+      <programlisting language="java">Component component = componentFactory.newFcInstance(
  componentType, // type of the component (defining the client and server interfaces)
  controllerDesc, // implementation-specific description for the controller
  contentDesc // implementation-specific description for the content
-); </screen>
+); </programlisting>
     </sect2>
 
     <sect2 >
@@ -143,11 +143,11 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 
       <para>First, the type of the component is changed:</para>
 
-      <screen language="java">// type of the a component
+      <programlisting language="java">// type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType('a', 'A', false, false, false),
  tf.createFcItfType('requiredService', 'A', true, false, false)
-}); </screen>
+}); </programlisting>
 
       <para>The Service interface is the following:</para>
 
@@ -743,8 +743,8 @@ ssfully
         to attach other components</emphasis>.</para>
 
         <note>
-          <para>If you really have to keep these references
-          <literal>ProActive.getStubOnThis()</literal> these, you may do it,
+          <para>If you really have to keep these 
+           <literal>ProActive.getStubOnThis()</literal> references, you may,
           because components, (or at least their internals) really are Active
           Objects. But you should be extra careful. This "Active Object
           reference passing" should not happen between components, as they are
@@ -816,7 +816,7 @@ ssfully
         <para><example>
             <title>How to rename Virtual Nodes in ADL files</title>
 
-            <para>In the main ADL file<screen>  &lt;interface signature="java.lang.Runnable" role="server" name="r"/&gt;
+            <para>In the main ADL file<programlisting language="xml">  &lt;interface signature="java.lang.Runnable" role="server" name="r"/&gt;
 
 &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
  &lt;exportedVirtualNodes&gt;
@@ -827,9 +827,10 @@ ssfully
    &lt;/exportedVirtualNode&gt;
  &lt;/exportedVirtualNodes&gt;
 
-&lt;!-- Creating one user component --&gt;</screen>In the User ADL file</para>
+&lt;!-- Creating one user component --&gt;</programlisting>In the User ADL file</para>
 
-            <para><screen>&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
+            <para>
+<programlisting language="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
 
 &lt;!-- Recalling a renamed Virtual Node --&gt;
 &lt;exportedVirtualNodes&gt;
@@ -840,7 +841,7 @@ ssfully
   &lt;/exportedVirtualNode&gt;
 &lt;/exportedVirtualNodes&gt;
 
-&lt;controller desc="primitive"/&gt;</screen>If you add this code into the
+&lt;controller desc="primitive"/&gt;</programlisting>If you add this code into the
             adl, you are saying that the <literal>VirtualNode</literal> called
             <literal>UserVirtualNode</literal> (found in the deployment
             descriptor file the application is using) should be recognized by
@@ -900,24 +901,25 @@ this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");</programl
       <title>How to run this example</title>
 
       <para>There is only one access point for this example in the scripts
-      directory: <screen>scripts/unix/components$ ./c3d.sh
+      directory: </para>
+      <screen>scripts/unix/components$ ./c3d.sh
        --- Fractal C3D example ---------------------------------------------
        Parameters : [fractal_ADL_file] descriptor_file
        the first file describes your components layout.
        Default is org.objectweb.proactive.examples.components.c3d.adl.userAndComposite
        the second file describes your deployment of computing nodes.
        You may want to try ../../../descriptors/components/C3D_all.xml
-       ---------------------------------------------------------</screen></para>
+       ---------------------------------------------------------</screen>
 
       <para>You have there the way to start this example. If you only want to
-      start the Composite (Dispatcher + Renderer), try this (don't insert the new lines): 
+      start the Composite (Dispatcher + Renderer), try this (don't insert the new lines): </para>
       <screen>scripts/unix/components$ ./c3d.sh org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend \
-       ../../../descriptors/components/C3D_all.xml</screen></para>
+       ../../../descriptors/components/C3D_all.xml</screen> 
 
       <para>If you want to start only a User, you will be asked for the
-      address of a Dispatcher to which to connect to: 
+      address of a Dispatcher to which to connect to: </para>
       <screen>scripts/unix/components$ ./c3d.sh org.objectweb.proactive.examples.components.c3d.adl.UserImpl \
-       ../../../descriptors/components/C3D_all.xml</screen></para>
+       ../../../descriptors/components/C3D_all.xml</screen>
     </sect2>
 
     <sect2>

@@ -220,9 +220,8 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
       <para>Hello, the superclass, must be able to be serialized, in order to
       be transferred remotely. It does not have to implement directly
       java.io.Serializable, but its attributes should be serializable - or
-      transient. For more information on this topic, check the <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.html">
-      manual</ulink>.</para>
+      transient. For more information on this topic, check <xref linkend="Migration"/>
+      .</para>
     </sect2>
 
     <sect2 >
@@ -241,9 +240,7 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
       role="underline">by the active object itself</emphasis>. This explains
       why we have to write the moveTo method in the code of MigratableHello -
       i.e. a method that contains an explicit call to the migration primitive.
-      (cf <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Migration.html">
-      migration documentation</ulink>)</emphasis></para>
+      (cf <xref linkend="Migration"/> for migration documentation )</emphasis></para>
 
       <para>MigratableHello also implements a factory method for instanciating
       itself as an active object : <literal>static MigratableHello

@@ -1,5 +1,3 @@
-package org.objectweb.proactive.examples.hello;
-
 public class MigratableHelloClient {
     /** entry point for the program
      * @param args destination nodes

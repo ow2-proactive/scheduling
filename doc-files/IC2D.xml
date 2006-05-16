@@ -157,7 +157,7 @@
      
     <sect1>
      <title>Fractal GUI</title>
-     <para> You can find a Fractal GUI (menu->Fractal GUI)to edit your ADL files 
+     <para> You can find a Fractal GUI (menu->Components->Start the Fractal GUI) to edit your ADL files 
       in IC2D. This can only be done before deployment. </para>
     
      <para><figure>
