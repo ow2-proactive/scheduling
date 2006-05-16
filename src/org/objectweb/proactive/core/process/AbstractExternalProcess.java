@@ -311,7 +311,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     /**
-     * @see ExternalProcess.isRequiredFileTransferDeployOnNodeCreation()
+     * @see org.objectweb.proactive.core.process.ExternalProcess.isRequiredFileTransferDeployOnNodeCreation()
      */
     public boolean isRequiredFileTransferDeployOnNodeCreation() {
         return requiresFileTransferDeployOnNodeCreation;

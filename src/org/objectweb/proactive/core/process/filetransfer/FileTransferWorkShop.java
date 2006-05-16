@@ -335,8 +335,9 @@ public class FileTransferWorkShop implements Serializable {
     }
 
     /**
-     * Gives an array with all the FileDescriptions linked with this FTW.
-     * @return
+     * This method is used to get The fileDescription associated with
+     * this workshop.
+     * @return an array with all the FileDescriptions linked with this FTW.
      */
     public FileDescription[] getAllFileDescriptions(){
     

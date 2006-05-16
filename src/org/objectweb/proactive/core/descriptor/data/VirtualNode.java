@@ -258,7 +258,6 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * sets the size of the blocks in MB. The default value is 1MB. Increase this value to improove performance, decrease the value if the file transfer uses to much memory.
      * @param overlapping Says home many blocks to send in burst mode. Increase this value to improove performance,
      * decrase it to save memmory. The default value is 8.
-     * @return
      */
     public void setFileTransferParams(int fileBlockSize, int overlapping);
 }

@@ -143,7 +143,7 @@ public class FileTransferService implements Serializable,
      * This method will load a FileBlock from a file, starting from the specified offset.
      * @param filename
      * @param offset
-     * @return
+     * @return A file block loaded from the file and starting from the offest.
      * @throws IOException
      */
     public FileBlock getFileBlock(String filename, long offset, int bsize)
