@@ -96,15 +96,12 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     protected String buildMPICommand() {
         StringBuffer mpiSubCommand = new StringBuffer();
         mpiSubCommand.append(this.command_path).append(" ");
-
-        mpiSubCommand.append("-machinefile").append(" ");
         if (remotePath != null) {
-            mpiSubCommand.append(remotePath).append("/");
-        } else {
-            mpiSubCommand.append(localPath).append("/");
+        	mpiSubCommand.append("-machinefile").append(" ");
+        	mpiSubCommand.append(remotePath).append("/"); 
+        	mpiSubCommand.append(this.hostsFileName).append(" ");
+        	mpiSubCommand.append("-nolocal").append(" ");
         }
-        mpiSubCommand.append(this.hostsFileName).append(" ");
-        mpiSubCommand.append("-nolocal").append(" ");
 
         mpiSubCommand.append("-np").append(" ");
         mpiSubCommand.append(this.hostsNumber).append(" ");

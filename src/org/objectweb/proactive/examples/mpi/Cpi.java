@@ -71,13 +71,14 @@ public class Cpi {
             vnCpi.activate();
 
             MPISpmd mpiSpmd_01 = MPI.newMPISpmd(vnCpi);
+            System.out.println(mpiSpmd_01);
             MPIResult res = mpiSpmd_01.startMPI();
             logger.info("Result value: " + res.getReturnValue());
             vnCpi.killAll(false);
+            System.exit(0);
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
-            logger.error("Pb when reading descriptor");
+            logger.error("Error when reading descriptor");
         }
     }
 }
