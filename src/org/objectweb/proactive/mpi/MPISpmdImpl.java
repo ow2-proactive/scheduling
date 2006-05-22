@@ -42,6 +42,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 
 public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     private final static Logger MPI_IMPL_LOGGER = ProActiveLogger.getLogger(Loggers.MPI);
@@ -51,6 +54,21 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     /** the MPI Process that the Virtual Node references */
     private ExternalProcess mpiProcess = null;
+
+    /** the Virtual Node containing resources */
+    private VirtualNode vn;
+
+    /** the user SPMD classes name */
+    private ArrayList spmdClasses = null;
+
+    /** the user SPMD classes params */
+    private Hashtable spmdClassesParams;
+
+    /** the user classes name */
+    private ArrayList classes = null;
+
+    /** the user classes params */
+    private Hashtable classesParams;
 
     // empty no-args constructor 
     public MPISpmdImpl() {
@@ -68,8 +86,13 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             vn.activate();
         }
         if (vn.hasMPIProcess()) {
+            this.spmdClasses = new ArrayList();
+            this.classes = new ArrayList();
+            this.spmdClassesParams = new Hashtable();
+            this.classesParams = new Hashtable();
             this.mpiProcess = vn.getMPIProcess();
             this.name = vn.getName();
+            this.vn = vn;
         } else {
             throw new RuntimeException(
                 " ERROR: Cannot create MPISpmd object Cause: No MPI process attached with the virtual node " +
@@ -202,5 +225,66 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     public boolean isFinished() {
         return mpiProcess.isFinished();
+    }
+
+    public VirtualNode getVn() {
+        return vn;
+    }
+
+    public void newActiveSpmd(String cl) {
+        this.spmdClasses.add(cl);
+        ArrayList parameters = new ArrayList(2);
+        parameters.add(0, null);
+        parameters.add(1, null);
+        this.spmdClassesParams.put(cl, parameters);
+    }
+
+    public void newActiveSpmd(String cl, Object[] params) {
+        this.spmdClasses.add(cl);
+        ArrayList parameters = new ArrayList(2);
+
+        // index=0 => Object[] type
+        // index=1 => Object[][] type
+        parameters.add(0, params);
+        parameters.add(1, null);
+        this.spmdClassesParams.put(cl, parameters);
+    }
+
+    public void newActiveSpmd(String cl, Object[][] params) {
+        this.spmdClasses.add(cl);
+        ArrayList parameters = new ArrayList(2);
+
+        // index=0 => Object[] type
+        // index=1 => Object[][] type
+        parameters.add(0, null);
+        parameters.add(1, params);
+        this.spmdClassesParams.put(cl, parameters);
+    }
+
+    public void newActive(String cl, Object[] params, int rank) {
+        this.classes.add(cl);
+        ArrayList parameters = new ArrayList(2);
+
+        // index=0 => rank
+        // index=1 => Object[] type
+        parameters.add(0, new Integer(rank));
+        parameters.add(1, params);
+        this.classesParams.put(cl, parameters);
+    }
+
+    public ArrayList getSpmdClasses() {
+        return this.spmdClasses;
+    }
+
+    public Hashtable getSpmdClassesParams() {
+        return this.spmdClassesParams;
+    }
+
+    public ArrayList getClasses() {
+        return this.classes;
+    }
+
+    public Hashtable getClassesParams() {
+        return this.classesParams;
     }
 }

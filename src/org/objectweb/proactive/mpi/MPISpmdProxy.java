@@ -41,12 +41,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
 
-public class MPISpmdProxy implements MPISpmd {
+
+public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
     protected final static Logger MPI_PROXY_LOGGER = ProActiveLogger.getLogger(Loggers.MPI);
 
     /** the status of this MPISpmd object */
-    private transient String status = MPIConstants.MPI_DEFAULT_STATUS;
+    private String status = MPIConstants.MPI_DEFAULT_STATUS;
 
     /** the name of the MPISpmd object */
     private String name;
@@ -183,14 +186,13 @@ public class MPISpmdProxy implements MPISpmd {
     //
     // -- PRIVATE METHODS FOR SERIALIZATION -------------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IllegalMPIStateException {
-        target.killMPI();
-        ProActive.terminateActiveObject(target, true);
-        throw new IllegalMPIStateException(
-            "Copy's not allowed for MPI proxy object");
-    }
-
+    //    private void writeObject(java.io.ObjectOutputStream out)
+    //        throws IllegalMPIStateException {
+    //        target.killMPI();
+    //        ProActive.terminateActiveObject(target, true);
+    //        throw new IllegalMPIStateException(
+    //            "Copy's not allowed for MPI proxy object");
+    //    }
     private void setStatus(String status) {
         this.status = status;
     }
@@ -200,5 +202,41 @@ public class MPISpmdProxy implements MPISpmd {
                 (!status.equals(MPIConstants.MPI_KILLED))) {
             status = MPIConstants.MPI_FINISHED;
         }
+    }
+
+    public VirtualNode getVn() {
+        return this.target.getVn();
+    }
+
+    public void newActiveSpmd(String cl) {
+        this.target.newActiveSpmd(cl);
+    }
+
+    public ArrayList getSpmdClasses() {
+        return this.target.getSpmdClasses();
+    }
+
+    public void newActiveSpmd(String cl, Object[] params) {
+        this.target.newActiveSpmd(cl, params);
+    }
+
+    public void newActiveSpmd(String cl, Object[][] params) {
+        this.target.newActiveSpmd(cl, params);
+    }
+
+    public Hashtable getSpmdClassesParams() {
+        return this.target.getSpmdClassesParams();
+    }
+
+    public void newActive(String cl, Object[] params, int rank) {
+        this.target.newActive(cl, params, rank);
+    }
+
+    public ArrayList getClasses() {
+        return this.target.getClasses();
+    }
+
+    public Hashtable getClassesParams() {
+        return this.target.getClassesParams();
     }
 }

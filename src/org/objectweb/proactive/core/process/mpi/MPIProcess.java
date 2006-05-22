@@ -51,8 +51,6 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
      * Firsts parameters
      */
     private static final long serialVersionUID = 1L;
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
     protected static final String DEFAULT_HOSTSFILENAME_PATH = ".machinefile";
     protected static final String DEFAULT_MPICOMMAND_PATH = "/usr/bin/mpirun";
     protected static final String DEFAULT_FILE_LOCATION = System.getProperty(
@@ -127,8 +125,8 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
         if (remotePath != null) {
             ft.addFile(localPath + "/" + hostsFileName,
                 remotePath + "/" + hostsFileName);
-            // System.out.println(localPath + "/" + hostsFileName + " --> " +
-            //                     remotePath + "/" + hostsFileName);
+            //    System.out.println(localPath + "/" + hostsFileName + " --> " +
+            //                        remotePath + "/" + hostsFileName);
         }
 
         //        System.out.println(localPath + "/" + hostsFileName + " --> " +
