@@ -157,17 +157,19 @@ public class ExceptionMaskLevel {
         nbFutures--;
         FutureResult res = f.getFutureResult();
 
-        NonFunctionalException nfe = res.getNFE();
-        if ((nfe != null) && isExceptionTypeCaught(nfe.getClass())) {
-            synchronized (caughtExceptions) {
-                caughtExceptions.add(nfe);
+        if (res != null) {
+            NonFunctionalException nfe = res.getNFE();
+            if ((nfe != null) && isExceptionTypeCaught(nfe.getClass())) {
+                synchronized (caughtExceptions) {
+                    caughtExceptions.add(nfe);
+                }
             }
-        }
 
-        Throwable exception = f.getFutureResult().getExceptionToRaise();
-        if (exception != null) {
-            synchronized (caughtExceptions) {
-                caughtExceptions.add(exception);
+            Throwable exception = f.getFutureResult().getExceptionToRaise();
+            if (exception != null) {
+                synchronized (caughtExceptions) {
+                    caughtExceptions.add(exception);
+                }
             }
         }
 

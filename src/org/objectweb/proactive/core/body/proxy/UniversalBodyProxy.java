@@ -58,8 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
-public class UniversalBodyProxy extends AbstractBodyProxy
-    implements java.io.Serializable {
+public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle
@@ -240,8 +239,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         // is what the proxy is all about. This is why we know that the table that
         // can be accessed by using a static methode has this information.
         ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
-        sendRequest(methodCall, future,
-            LocalBodyStore.getInstance().getCurrentThreadBody());
+        try {
+            sendRequest(methodCall, future,
+                LocalBodyStore.getInstance().getCurrentThreadBody());
+        } catch (java.io.IOException ioe) {
+            ExceptionHandler.addResult((FutureProxy) future);
+            throw ioe;
+        }
     }
 
     protected void sendRequest(MethodCall methodCall, Future future,
