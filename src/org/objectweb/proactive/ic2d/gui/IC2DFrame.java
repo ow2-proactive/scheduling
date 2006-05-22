@@ -277,7 +277,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
     //
     private javax.swing.JFrame createEventListFrame(javax.swing.JPanel panel) {
         // Create the timeLine panel
-        final javax.swing.JFrame frame = new javax.swing.JFrame("Events lists");
+        final javax.swing.JFrame frame = new javax.swing.JFrame("Methods on Request Queues");
         frame.setLocation(new java.awt.Point(0, DEFAULT_HEIGHT));
         frame.setSize(new java.awt.Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT / 2));
         java.awt.Container c = frame.getContentPane();
@@ -493,7 +493,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         javax.swing.JMenu windowMenu = new javax.swing.JMenu("Windows");
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
-                    "Hide/Show EventsList windows");
+                    "Hide/Show Request Queue window");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         if (eventListsFrame.isVisible()) {

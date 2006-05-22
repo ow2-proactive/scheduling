@@ -110,7 +110,7 @@ public class MessageMonitoringMenu extends javax.swing.JMenu
         //
         // ViewEventList
         //
-        viewInEventListMenuItem = new javax.swing.JCheckBoxMenuItem("View in textual list",
+        viewInEventListMenuItem = new javax.swing.JCheckBoxMenuItem("View Request Queue",
                 controller.isViewedInEventList());
         viewInEventListMenuItem.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent event) {
