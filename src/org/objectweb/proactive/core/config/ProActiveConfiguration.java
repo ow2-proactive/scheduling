@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.core.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
@@ -42,16 +45,23 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * Configuration parameters may be overriden according to the following priorities:</br>
+ * > meaning "configuration parameters defined on the left override those defined on the right", we have: </br>
+ * JVM > custom config file > default config file
+ *
+ */
 public class ProActiveConfiguration {
     protected HashMap loadedProperties;
     protected HashMap addedProperties;
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
+    protected static boolean defaultConfigAlreadyLoaded = false;
+    protected static List jvmDefinedProperties = new ArrayList();
 
     private ProActiveConfiguration() {
         this.loadedProperties = new HashMap();
         this.addedProperties = new HashMap();
-        //setDefaultProActiveHome();
     }
 
     protected static synchronized void createConfiguration() {
@@ -70,16 +80,22 @@ public class ProActiveConfiguration {
      */
     public static void load() {
         if (!isLoaded) {
-            String filename = null;
-            if (System.getProperty("proactive.configuration") != null) {
-                filename = System.getProperty("proactive.configuration");
-            } else {
-                filename = ProActiveConfiguration.class.getResource(
-                        "ProActiveConfiguration.xml").toString();
-            }
-            ProActiveConfiguration.load(filename);
+            loadDefaultConfig();
             isLoaded = true;
         }
+    }
+
+    private static void loadDefaultConfig() {
+        String filename = null;
+        filename = ProActiveConfiguration.class.getResource(
+                "ProActiveConfiguration.xml").toString();
+        MasterFileHandler.createMasterFileHandler(filename,
+            ProActiveConfiguration.getConfiguration());
+        ProActiveConfiguration.getConfiguration().loadProperties();
+        if (System.getProperty("log4j.configuration") == null) {
+            loadDefaultLogger();
+        }
+        defaultConfigAlreadyLoaded = true;
     }
 
     /**
@@ -88,9 +104,12 @@ public class ProActiveConfiguration {
      */
     public static void load(String filename) {
         if (!isLoaded) {
+            if (!defaultConfigAlreadyLoaded) {
+                loadDefaultConfig();
+            }
             MasterFileHandler.createMasterFileHandler(filename,
                 ProActiveConfiguration.getConfiguration());
-            ProActiveConfiguration.getConfiguration().addProperties();
+            ProActiveConfiguration.getConfiguration().loadProperties();
             isLoaded = true;
         }
     }
@@ -114,17 +133,27 @@ public class ProActiveConfiguration {
     /**
      * Add the loaded properties to the system
      */
-    public void addProperties() {
-        //		we don't override existing value
+    public void loadProperties() {
         Iterator it = loadedProperties.keySet().iterator();
         String name = null;
         String value = null;
         while (it.hasNext()) {
             name = (String) it.next();
             value = (String) this.loadedProperties.get(name);
-            setProperty(name, value);
+            if (!defaultConfigAlreadyLoaded) {
+                // JVM parameters cannot be overriden
+                if (System.getProperty(name) == null) {
+                    System.setProperty(name, value);
+                } else {
+                    jvmDefinedProperties.add(name);
+                }
+            } else {
+                if (!jvmDefinedProperties.contains(name)) {
+                    // override default properties, except JVM defined properties
+                    System.setProperty(name, value);
+                }
+            }
         }
-        loadDefaultProperties();
     }
 
     //    /**
@@ -236,38 +265,14 @@ public class ProActiveConfiguration {
     //    }
 
     /**
-     * Sets mandatory properties if forgotten by users
-     */
-    private void loadDefaultProperties() {
-        setProperty("proactive.communication.protocol", "rmi");
-        setProperty("proactive.future.ac", "enable");
-        setProperty("schema.validation", "disable");
-        if (System.getProperty("log4j.configuration") == null) {
-            loadLogger();
-        }
-
-        setProperty("proactive.rmi.port", "1099");
-
-        setProperty("proactive.ft", "disable");
-        setProperty("proactive.ft.ttc", "30");
-    }
-
-    /**
      *
      */
-    private void loadLogger() {
+    private static void loadDefaultLogger() {
         //if logger is not defined create default logger with level info that logs
         // on the console
         Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
         logger.setAdditivity(false);
         logger.setLevel(Level.INFO);
         logger.addAppender(new ConsoleAppender(new PatternLayout()));
-    }
-
-    private void setProperty(String name, String value) {
-        if (System.getProperty(name) == null) {
-            System.setProperty(name, value);
-            this.addedProperties.put(name, value);
-        }
     }
 }

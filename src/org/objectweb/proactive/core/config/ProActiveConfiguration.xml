@@ -14,7 +14,7 @@
 		<prop key="pool_host_number" value="1"/>
 		<prop key="proactive.communication.protocol" value="rmi"/> 
 		<prop key="byteCodeManipulator" value="javassist"/>
-		<!-- <prop key="proactive.rmi.port" value="2005"/>-->
+		<prop key="proactive.rmi.port" value="1099"/>
 		<!--<prop key="proactive.http.port" value="2026"/> -->
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->
 		<prop key="ibis.serialization" value="sun"/>
@@ -36,6 +36,10 @@
 		<!-- <prop key="proactive.ssh.key_directory" value="/user/mlacage/home/.ssh/"/> -->
 		<!-- <prop key="proactive.ssh.port" value="22"/> -->
 		<!-- <prop key="proactive.ssh.username" value="mlacage"/> -->
+		
+		<prop key="proactive.ft" value="disable"/>
+		<prop key="proactive.ft.ttc" value="30"/>
+		
 		
 		<!-- ***************************************************** -->
 		<!-- P2P PROPERTIES VALUE -->
