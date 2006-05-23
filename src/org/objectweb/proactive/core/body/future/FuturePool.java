@@ -478,6 +478,10 @@ public class FuturePool extends Object implements java.io.Serializable {
             while (true) {
                 // if there is no AC to do, wait...
                 waitForAC();
+                // if body is dead, kill the thread
+                if (kill) {
+                    break;
+                }
                 while (owner == null) {
                     owner = LocalBodyStore.getInstance().getLocalBody(ownerBody);
                     // Associating the thred with the body
@@ -487,9 +491,6 @@ public class FuturePool extends Object implements java.io.Serializable {
                         owner = LocalBodyStore.getInstance().getLocalHalfBody(ownerBody);
                         LocalBodyStore.getInstance().setCurrentThreadBody(owner);
                     }
-                }
-                if (kill) {
-                    break;
                 }
 
                 // there are ACs to do !
