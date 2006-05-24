@@ -513,7 +513,8 @@ public class JavassistByteCodeStubBuilder {
     }
     
     private static void addSuperInterfaces(CtClass cl, List superItfs) throws NotFoundException {
-        if (!cl.isInterface()) {
+        if (!cl.isInterface() && !Modifier.isAbstract(cl.getModifiers())) {
+        	// inspect interfaces AND abstract classes
             return;
         }
         CtClass[] super_interfaces = cl.getInterfaces();
