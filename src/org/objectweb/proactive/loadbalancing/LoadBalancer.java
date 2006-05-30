@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.loadbalancing;
 
-import java.rmi.RemoteException;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -60,13 +63,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
-public class LoadBalancer {
+public class LoadBalancer implements ProActiveInternalObject {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
     protected boolean underloaded = false;
     protected LoadMonitor lm;
     protected double normalization = 1;
     protected double myLoad = 0;
-    protected double ranking = LoadBalancingConstants.RANKING_NORMALIZATION;
+    protected double ranking = 1;
+    protected Node myNode;
 
     /**
      * This method is called by the LoadMonitor, it updates the load state
@@ -114,18 +118,20 @@ public class LoadBalancer {
 
     /**
      * This method sends an active object to a destiny, choosing the active objects
-     * which implements <code>Balanceable</code> having the shortest queue.
+     * whom don't implement <code>ProActiveInternalObject</code> and having the shortest queue.
      * @param <code>destNode</code> Node destiny to send the active abject.
      * If this node is local, this method does nothing.
      * @return none
      */
-    public void sendActiveObjectsTo(Node destNode) throws RemoteException {
+    public void sendActiveObjectsTo(Node destNode) {
+    	
         if (NodeFactory.isNodeLocal(destNode)) {
             return;
         }
-
-        try {
-            BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
+        
+       try {
+        	
+        	BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
 
             if (knownBodies.size() < 1) {
                 return;
@@ -136,13 +142,12 @@ public class LoadBalancer {
             /** ******** Choosing the shortest service queue ******** */
             int minLength = Integer.MAX_VALUE;
             Body minBody = null;
-
             while (bodiesIterator.hasNext()) {
                 Body activeObjectBody = (Body) bodiesIterator.next();
                 Object testObject = activeObjectBody.getReifiedObject();
 
                 /********** Only some Active Objects can migrate *************/
-                boolean testSerialization = !(testObject instanceof LoadBalancer);
+                boolean testSerialization = !(testObject instanceof ProActiveInternalObject);
 
                 if (activeObjectBody.isAlive()) {
                     if (activeObjectBody.isActive() && testSerialization) {
@@ -156,21 +161,40 @@ public class LoadBalancer {
                 }
             }
 
+            Class params[] = {Node.class};
+
             /***********  we have the Active Object with shortest queue, so we send the migration call ********/
             if ((minBody != null) && minBody.isActive()) {
-                logger.debug("[Loadbalancer] Migrating from " +
-                    minBody.getNodeURL() + " to " +
+                logger.info("[Loadbalancer] Migrating from " +
+                    myNode.getNodeInformation().getURL() + " to " +
                     destNode.getNodeInformation().getURL());
-                ProActive.migrateTo(minBody, destNode, true);
+                
+//                minBody.updateLocation(minBody.getID(),minBody);
+//                Object stubOfminBody = ProActive.getStubForBody(minBody);
+//                Method m = stubOfminBody.getClass().getMethod("migrateTo",params);
+//                minBody.receiveFTMessage(null);
+//                m.invoke(stubOfminBody,new Node[]{destNode});
+
+                ProActive.migrateTo(minBody, destNode, false);
+//                minBody.updateLocation(minBody.getID(),null);
+                
             }
         } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        	logger.error("[LoadBalancer] "+e.getLocalizedMessage());
         } catch (SecurityException e) {
-            e.printStackTrace();
+        	logger.error("[LoadBalancer] Object doesn't have migrateTo method");
         } catch (MigrationException e) {
-
+        	logger.error("[LoadBalancer] Object can't migrate (?)");
             /** ****** if you cannot migrate, is not my business ********** */
-        }
+/*        } catch (IOException e) {
+        	logger.error("[LoadBalancer] Migrating Object can't update its location");
+		} catch (NoSuchMethodException e) {
+			logger.error("[LoadBalancer] Object doesn't have migrateTo method");
+		} catch (IllegalAccessException e) {
+			logger.error("[LoadBalancer] Illegal access to migrateTo method");
+		} catch (InvocationTargetException e) {
+			logger.error("[LoadBalancer] Invocation error on migrateTo method");
+*/		}
     }
 
     /**

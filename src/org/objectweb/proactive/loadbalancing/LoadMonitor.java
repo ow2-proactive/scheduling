@@ -33,9 +33,9 @@ package org.objectweb.proactive.loadbalancing;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
 
 
 /**
@@ -51,17 +51,20 @@ import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
  * @author Javier.Bustos@sophia.inria.fr
  *
  */
-public class LoadMonitor implements Runnable {
+public class LoadMonitor implements Runnable,ProActiveInternalObject {
     static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
     protected double load = 0;
     protected LoadBalancer lb;
 
     protected synchronized void calculateLoad() {
-    }
-    ;
+    };
+    
+	public synchronized void killMePlease() {
+		Thread.currentThread().interrupt();
+		}
+
     public void run() {
         Random r = new Random();
-        int i = 0;
         do {
             calculateLoad();
             lb.register(load);
@@ -69,7 +72,7 @@ public class LoadMonitor implements Runnable {
                 double sl;
                 sl = LoadBalancingConstants.UPDATE_TIME * r.nextDouble();
                 if (load > 0) {
-                    sl = sl * (1 - load);
+                    if (load < 1) sl = sl * (1 - load);
                     sl = sl + LoadBalancingConstants.MIGRATION_TIME;
                 }
                 Thread.sleep(Math.round(sl));
