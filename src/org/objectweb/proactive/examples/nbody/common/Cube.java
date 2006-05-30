@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -26,6 +26,12 @@
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
  *
+ *                  Nicolas    BUSSIERE
+ *                  Fabien     GARGNE
+ *                  Christian  KNOFF
+ *                  Julien     PUGLIESI
+ *
+ *
  * ################################################################
  */
 package org.objectweb.proactive.examples.nbody.common;
@@ -33,33 +39,69 @@ package org.objectweb.proactive.examples.nbody.common;
 import java.io.Serializable;
 
 
-public class Rectangle implements Serializable {
+public class Cube implements Serializable {
+
+    /** x-coordinate of the cube */
     public double x;
+
+    /** y-coordinate of the cube */
     public double y;
+
+    /** z-coordinate of the cube */
+    public double z;
+
+    /** width of the cube */
     public double width;
+
+    /** height of the cube */
     public double height;
 
-    public Rectangle() {
-    }
+    /** depth of the cube */
+    public double depth;
 
-    public Rectangle(double x, double y, double width, double height) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    /**
+     * Required by ProActive
+     */
+    public Cube() {
     }
 
     /**
-     * A rectangle spanning between the two given points
+     * Constructor of a new cube with the given arguments
+     * @param x x-coordinate of the cube
+     * @param y y-coordinate of the cube
+     * @param z z-coordinate of the cube
+     * @param width width of the cube
+     * @param height height of the cube
+     * @param depth depth of the cube
      */
-    public Rectangle(Point2D p, Point2D q) {
-        this.x = p.x;
-        this.y = p.y;
-        this.width = q.x - p.x;
-        this.height = q.y - p.y;
+    public Cube(double x, double y, double z, double width, double height,
+        double depth) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.width = width;
+        this.height = height;
+        this.depth = depth;
     }
 
+    /**
+     * Constructor of a new cube spanning between the three given points
+     * @param p Point in the bottom left corner in front
+     * @param q Point in the top right corner in front
+     * @param r Point in the bottom left corner in back
+     */
+    public Cube(Point3D p, Point3D q, Point3D r) {
+        this.x = p.x;
+        this.y = p.y;
+        this.z = p.z;
+        this.width = q.x - p.x;
+        this.height = q.y - p.y;
+        this.depth = r.z - p.z;
+    }
+
+    /** For displaying a Point3D */
     public String toString() {
-        return "x=" + x + " y=" + y + " width=" + width + " height=" + height;
+        return "x=" + x + " y=" + y + " y=" + y + " width=" + width +
+        " height=" + height + " depth=" + depth;
     }
 }

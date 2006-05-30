@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -24,28 +24,46 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s):
+ *
+
+ *  Contributor(s):  Nicolas  BUSSIERE
+ *                    Fabien  GARGNE
+ *                 Christian  KNOFF
+ *                    Julien  PUGLIESI
  *
  * ################################################################
  */
 package org.objectweb.proactive.examples.nbody.common;
 
-import java.io.Serializable;
+import java.util.Random;
 
 
-public class Point2D implements Serializable {
-    public double x = 0;
-    public double y = 0;
+/**
+ * $LastChangedDate: 2006-05-14 13:21:43 +0200 (Sun, 14 May 2006) $
+ * $LastChangedRevision: 31 $
+ *
+ *
+ *
+ * @author Nicolas BUSSIERE
+ *
+ */
+public class RandomFactory {
+    private static Random r = new Random();
 
-    public Point2D() {
+    /**
+     * @param max
+     * @return a double in the interval [ 0.0 , max [
+     */
+    public static double nextDouble(double max) {
+        return max * r.nextDouble();
     }
 
-    public Point2D(double a, double b) {
-        x = a;
-        y = b;
-    }
-
-    public String toString() {
-        return x + ", " + y;
+    /**
+     * @param min
+     * @param max
+     * @return a double in the interval [ min , max [
+     */
+    public static double nextDouble(double min, double max) {
+        return min + nextDouble(max - min);
     }
 }

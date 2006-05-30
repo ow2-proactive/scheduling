@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -26,14 +26,62 @@
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
  *
+ *                  Nicolas    BUSSIERE
+ *                  Fabien     GARGNE
+ *                  Christian  KNOFF
+ *                  Julien     PUGLIESI
+ *
+ *
  * ################################################################
  */
-package org.objectweb.proactive.examples.nbody.barneshut;
+package org.objectweb.proactive.examples.nbody.common;
+
+import java.io.Serializable;
 
 
-/**
- * An Exception which is thrown when the force between a Planet and a set of Planet is tried to be computed,
- * but the Planet is too close to the set, and the formula used would create a way too big approximation.
- */
-public class TooCloseBodiesException extends Exception {
+public class Point3D implements Serializable {
+
+    /** x-coordinate of the point */
+    public double x;
+
+    /** y-coordinate of the point */
+    public double y;
+
+    /** z-coordinate of the point */
+    public double z;
+
+    /**
+     * Required by ProActive
+     */
+    public Point3D() {
+    }
+
+    /**
+     * Creation of a new Point3D
+     * @param a x-coordinate of the point
+     * @param b y-coordinate of the point
+     * @param c z-coordinate of the point
+     */
+    public Point3D(double a, double b, double c) {
+        x = a;
+        y = b;
+        z = c;
+    }
+
+    /** For displaying a Point3D */
+    public String toString() {
+        return x + ", " + y + ", " + z;
+    }
+
+    public double getX() {
+        return this.x;
+    }
+
+    public double getY() {
+        return this.y;
+    }
+
+    public double getZ() {
+        return this.z;
+    }
 }

@@ -38,9 +38,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.examples.nbody.common.Cube;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 
 /**
@@ -70,7 +70,7 @@ public class Start {
 
         Object[][] constructorParams = new Object[totalNbBodies][3];
 
-        Rectangle universe = new Rectangle(-100, -100, 200, 200);
+        Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
         for (int i = 0; i < totalNbBodies; i++) {
             constructorParams[i][0] = new Integer(i);
             // coordinates between -100,-100 and 100,100

@@ -26,38 +26,38 @@
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
  *
+ *                  Nicolas    BUSSIERE
+ *                  Fabien     GARGNE
+ *                  Christian  KNOFF
+ *                  Julien     PUGLIESI
+ *
+ *
  * ################################################################
  */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.examples.nbody.common.Cube;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 
 
-/**
- * <P>
- * This starts the Barnes-Hut example. Domains are synchronized through an OO-spmd scheme,
- * and their relations are defined through a tree representing spacial extent. This relation
- * is built on the distance from one Planet to a Domain.
- * </P>
- *
- * @author  ProActive Team
- * @version 1.0,  2005/04
- * @since   ProActive 2.2
- */
 public class Start {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+
+    /** edge's size of the cube representing the universe */
+    public static final int UNIVERSE_CUBE_EDGE_SIZE = 200;
+
+    /** position of the cube representing the universe */
+    public static final int UNIVERSE_CUBE_POSITION = -100;
 
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
@@ -66,41 +66,122 @@ public class Start {
     public static void main(int totalNbBodies, int maxIter,
         Displayer displayer, Node[] nodes,
         org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        logger.info("RUNNING Barnes-Hut VERSION");
+        logger.info("[NBODY] RUNNING barnes-hut 3D VERSION");
 
-        // Create all the Domains, based on the tree structure
-        QuadTree tree = new QuadTree(totalNbBodies);
-        Vector info = tree.getInfo();
-        int size = tree.size();
+        logger.info("[NBODY] " + totalNbBodies + " Planets are deployed on " +
+            nodes.length + " possible nodes");
 
-        Object[][] constructorParams = new Object[size][3]; // the parameters passed to the Domain constructors
-        for (int i = 0; i < size; i++) {
-            constructorParams[i][0] = new Integer(i);
-            constructorParams[i][1] = (Info) info.get(i);
-            constructorParams[i][2] = killsupport;
+        // Creation of the universe
+        Cube universe = new Cube(UNIVERSE_CUBE_POSITION,
+                UNIVERSE_CUBE_POSITION, UNIVERSE_CUBE_POSITION,
+                UNIVERSE_CUBE_EDGE_SIZE, UNIVERSE_CUBE_EDGE_SIZE,
+                UNIVERSE_CUBE_EDGE_SIZE);
+
+        // Creation of all the planets
+        List lplanets = new ArrayList(totalNbBodies);
+        for (int i = 0; i < totalNbBodies; i++)
+            lplanets.add(new Planet(universe)); // the limits of planet's position is given by the cube universe
+
+        // For Deploying : 
+        // D = Domain
+        // O = OctTree
+        // M = Maestro
+        // BM = BigMaestro
+        // We distribute the objects like that :
+        // For exemple 20 computers
+        // D D D D D D D D O M D D D D D D D D O M D D D D O M... BM
+
+        // We create only one OctTree for 8 Domains
+        int nbOctTree = ((totalNbBodies - 1) / 8) + 1;
+        List listOctTree = new ArrayList(nbOctTree);
+
+        for (int i = 0; i < nbOctTree; i++) {
+            try {
+                // the creation
+                // it also initialise the OctTree
+                // creation of its sons and computation of the values of mass and mass center of
+                // all the tree's nodes
+                // useless boolean, just for pick up a different constructor
+                listOctTree.add((OctTree) ProActive.newActive(
+                        OctTree.class.getName(),
+                        new Object[] { lplanets, universe, new Boolean(true) },
+                        nodes[((10 * i) + 8) % nodes.length]));
+            } catch (ActiveObjectCreationException e) {
+                killsupport.abort(e);
+            } catch (NodeException e) {
+                killsupport.abort(e);
+            }
         }
-        Domain domainGroup = null;
+
+        // creation of the Domains
+        // the number of Domains is the same that the number of planets (bodies)
+        Domain[] domainArray = new Domain[totalNbBodies];
+        int cmp = -1; // for pick up the good OctTree
+        int fornod = -1; // for good node
+
         try {
-            // Create all the Domains, inside an SPMD Group, to enable barriers
-            domainGroup = (Domain) ProSPMD.newSPMDGroup(Domain.class.getName(),
-                    constructorParams, nodes);
-        } catch (ClassNotReifiableException e) {
-            killsupport.abort(e);
-        } catch (ClassNotFoundException e) {
-            killsupport.abort(e);
+            for (int i = 0; i < totalNbBodies; i++) {
+                fornod++;
+                if ((i % 8) == 0) {
+                    cmp++;
+                }
+                if ((fornod % 10) == 8) {
+                    fornod += 2;
+                }
+
+                domainArray[i] = (Domain) ProActive.newActive(Domain.class.getName(),
+                        new Object[] {
+                            new Integer(i), lplanets.get(i),
+                            listOctTree.get(cmp)
+                        }, nodes[fornod % nodes.length]);
+            }
         } catch (ActiveObjectCreationException e) {
             killsupport.abort(e);
         } catch (NodeException e) {
             killsupport.abort(e);
         }
 
-        logger.info("[NBODY] " + size + " domains are deployed");
+        // Create an array of Maestro, which will orchestrate the whole simulation, 
+        // each of them synchronize only 8 Domain
+        // and are themselves synchronized by the BigMaestro
+        Maestro[] maestroArray = new Maestro[nbOctTree];
 
-        // init Domains, with their possible neighbours, display, and quadtree
-        Group group = ProActiveGroup.getGroup(domainGroup);
-        Domain[] domainArray = (Domain[]) group.toArray(new Domain[] {  });
+        try {
+            for (int i = 0; i < nbOctTree; i++) {
+                maestroArray[i] = (Maestro) ProActive.newActive(Maestro.class.getName(),
+                        new Object[] { new Integer(i), domainArray, killsupport },
+                        nodes[((10 * i) + 9) % nodes.length]);
+            }
+        } catch (ActiveObjectCreationException e) {
+            killsupport.abort(e);
+        } catch (NodeException e) {
+            killsupport.abort(e);
+        }
 
-        domainGroup.init(domainArray, displayer, tree, maxIter);
-        // Within init, there are enough instructions to start computing the movement. 
+        // Create a BigMaestro, which will orchestrate the whole simulation, 
+        // synchronizing all the Maestro
+        BigMaestro bigMaestro = null;
+
+        try {
+            bigMaestro = (BigMaestro) ProActive.newActive(BigMaestro.class.getName(),
+                    new Object[] { maestroArray, new Integer(maxIter), killsupport },
+                    nodes[nodes.length - 1]);
+        } catch (ActiveObjectCreationException e) {
+            killsupport.abort(e);
+        } catch (NodeException e) {
+            killsupport.abort(e);
+        }
+
+        // init workers
+
+        // Initialisation of the Maestro
+        // For having a connection with the BigMaestro
+        for (int i = 0; i < nbOctTree; i++)
+            maestroArray[i].init(bigMaestro);
+
+        // Initialisation of all the Domain
+        // For having a connection with their Maestro (1 Maestro for 8 Domain)
+        for (int i = 0; i < totalNbBodies; i++)
+            domainArray[i].init(displayer, maestroArray[i / 8]);
     }
 }

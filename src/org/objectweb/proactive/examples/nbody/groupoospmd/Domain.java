@@ -156,9 +156,9 @@ public class Domain implements Serializable {
                 logger.info("Compute movement. " + iter);
             }
         } else {
-            this.display.drawBody((int) this.info.x, (int) info.y,
-                (int) info.vx, (int) info.vy, (int) info.mass,
-                (int) info.diameter, this.identification, this.hostName);
+            this.display.drawBody(this.info.x, this.info.y, this.info.z,
+                this.info.vx, this.info.vy, this.info.vz, (int) this.info.mass,
+                (int) this.info.diameter, this.identification, this.hostName);
         }
     }
 

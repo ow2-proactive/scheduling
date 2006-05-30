@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -26,6 +26,12 @@
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
  *
+ *                  Nicolas    BUSSIERE
+ *                  Fabien     GARGNE
+ *                  Christian  KNOFF
+ *                  Julien     PUGLIESI
+ *
+ *
  * ################################################################
  */
 package org.objectweb.proactive.examples.nbody.common;
@@ -39,6 +45,7 @@ import java.io.Serializable;
 public class Force implements Serializable {
     double x = 0;
     double y = 0;
+    double z = 0;
     final double G = 9.81;
     final double RMIN = 1;
 
@@ -55,7 +62,8 @@ public class Force implements Serializable {
         if (p2 != null) { // indeed, P2 null means no force must be added 
             double a = p2.x - p1.x;
             double b = p2.y - p1.y;
-            double length = Math.sqrt((a * a) + (b * b));
+            double c = p2.z - p1.z;
+            double length = Math.sqrt((a * a) + (b * b) + (c * c));
             if (length < (p1.diameter + p2.diameter)) {
                 length = p1.diameter + p2.diameter;
             }
@@ -65,6 +73,7 @@ public class Force implements Serializable {
             // Watch out : no minus sign : we want to have force of 2 on 1!
             this.x += (coeff * a);
             this.y += (coeff * b);
+            this.z += (coeff * c);
         }
     }
 
@@ -77,9 +86,11 @@ public class Force implements Serializable {
     public void add(Force f) {
         this.x += f.x;
         this.y += f.y;
+        this.z += f.z;
     }
 
     public String toString() {
-        return "<" + (int) this.x + " " + (int) this.y + ">";
+        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z +
+        ">";
     }
 }

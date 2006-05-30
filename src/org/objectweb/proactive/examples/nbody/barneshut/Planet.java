@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -26,70 +26,95 @@
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
  *
+ *                  Nicolas    BUSSIERE
+ *                  Fabien     GARGNE
+ *                  Christian  KNOFF
+ *                  Julien     PUGLIESI
+ *
+ *
  * ################################################################
  */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
+import java.io.Serializable;
+
+import org.objectweb.proactive.examples.nbody.common.Cube;
 
 
-public class Planet extends Info {
-    double vx;
-    double vy;
-    double diameter;
+/**
+ * The implementation of a physical body
+ */
+public class Planet implements Serializable {
+
+    /** Time step, the smaller the more precise the movement */
     private final double dt = 0.002;
 
+    /** Mass of the Planet */
+    public double mass;
+
+    /** Position of the Planet x */
+    public double x;
+
+    /** Position of the Planet y */
+    public double y;
+
+    /** Position of the Planet z */
+    public double z;
+
+    /** Velocity of the Planet x */
+    public double vx;
+
+    /** Velocity of the Planet y */
+    public double vy;
+
+    /** Velocity of the Planet z */
+    public double vz;
+
+    /** Diameter of the body, used by the Displayer */
+    public double diameter;
+
+    /**
+     * Required by ProActive, because this Object will be send as a parameter of a method on
+     * a distant Active Object.
+     */
     public Planet() {
     }
 
     /**
-     * Defines a random Planet in the given bounds.
-     * @param limits the rectangular bounds within which the Planet must be found.
-     * @param id : the unique id which serves as color code for the display.
+     * Builds one Planet within the given frame.
+     * @param limits the bounds which contain the Planet
      */
-    public Planet(Rectangle limits, int id) {
-        this.identification = id;
+    public Planet(Cube limits) {
+        // Positions random in the cube
         this.x = limits.x + (Math.random() * limits.width);
         this.y = limits.y + (Math.random() * limits.height);
+        this.z = limits.z + (Math.random() * limits.depth);
         this.mass = 1000 + (Math.random() * 100000);
-        //vx = 2000*(Math.random () -0.5 );  
-        //vy = 2000*(Math.random () -0.5 );
+        // Velocity null at the beginning
         this.vx = 0;
         this.vy = 0;
-
+        this.vz = 0;
+        // Diameter calculated in function of the planet's mass
+        // for more coherence
         this.diameter = (this.mass / 2000) + 3;
     }
 
-    public Planet(double x, double y, double vx, double vy, double mass) {
-        this.x = x;
-        this.y = y;
-        this.mass = mass;
-
-        this.vx = vx;
-        this.vy = vy;
-
-        this.diameter = (mass / 2000) + 3;
-        this.radius = 1; // smaller than any possible diameter, from equations above
-    }
-
     /**
-     * Move the planet, and define a new speed vector to assign to this planet, depending on the total
-     * force which is applied to it.
-     *      * @param force The total Force which pushes this planet on the local iteration.
+     *  Move the given Planet with the Force given as parameter.
+     *  @param force the force that causes the movement of the Planet
      */
     public void moveWithForce(Force force) {
         // Using f(t+dt) ~= f(t) + dt * f'(t)
-        this.x += (this.vx * dt);
-        this.y += (this.vy * dt);
-
-        // sum F  = mass * acc;
-        // a = sum F / mass 
-        this.vx += (this.dt * force.x); //  /mass removed, because muliplication removed as well
+        this.x += (this.dt * this.vx);
+        this.y += (this.dt * this.vy);
+        this.z += (this.dt * this.vz);
+        // Using the formulates :
+        // sum F  = mass * acc
+        // v' = a = sum F / mass
+        // We have removed / mass in the three next lines because * pl.mass 
+        //removed as well in the OctTree's class (fonction computeForce)
+        this.vx += (this.dt * force.x);
         this.vy += (this.dt * force.y);
-    }
-
-    public String toString() {
-        return "x= " + this.x + " y= " + this.y + " vx= " + this.vx + " vy=" +
-        this.vy;
+        this.vz += (this.dt * force.z);
     }
 }

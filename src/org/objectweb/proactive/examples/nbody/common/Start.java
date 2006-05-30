@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
@@ -83,6 +84,7 @@ public class Start implements Serializable {
         int input = 0;
         boolean display = true;
         boolean displayft = false;
+        boolean ddd = false;
         int totalNbBodies = 4;
         int maxIter = 10000;
         String xmlFileName;
@@ -100,6 +102,9 @@ public class Start implements Serializable {
             } else if (args[1].equals("-displayft")) {
                 displayft = true;
                 break;
+            } else if (args[1].equals("-3d")) {
+                ddd = true;
+                break;
             }
         case 3:
             totalNbBodies = Integer.parseInt(args[1]);
@@ -116,22 +121,37 @@ public class Start implements Serializable {
                 totalNbBodies = Integer.parseInt(args[2]);
                 maxIter = Integer.parseInt(args[3]);
                 break;
+            } else if (args[1].equals("-3d")) {
+                ddd = true;
+                totalNbBodies = Integer.parseInt(args[2]);
+                maxIter = Integer.parseInt(args[3]);
+                break;
             }
 
         // else : don't break, which means go to the default case
         default:
             usage();
         }
+
+        // testing java3d installation
+        if (ddd) {
+            try {
+                Class.forName("com.sun.j3d.utils.behaviors.mouse.MouseRotate");
+            } catch (ClassNotFoundException e) {
+                ddd = false;
+                logger.warn("Java 3D not installed, switching to 2D");
+            }
+        }
+
         logger.info("        Running with options set to " + totalNbBodies +
             " bodies, " + maxIter + " iterations, display " + display);
         xmlFileName = args[0];
 
-        logger.info(
-            " 1 : Simplest version, one-to-one communication and master");
-        logger.info(" 2 : group communication and master");
-        logger.info(" 3 : group communication, odd-even-synchronization");
-        logger.info(" 4 : group communication, oospmd synchronization");
-        logger.info(" 5 : Barnes-Hut, and oospmd");
+        logger.info(" 1: Simplest version, one-to-one communication and master");
+        logger.info(" 2: Group communication and master");
+        logger.info(" 3: Group communication, odd-even-synchronization");
+        logger.info(" 4: Group communication, oospmd synchronization");
+        logger.info(" 5: Barnes-Hut");
         logger.info("Choose which version you want to run [12345] : ");
         try {
             while (true) {
@@ -168,11 +188,21 @@ public class Start implements Serializable {
         Displayer displayer = null;
         if (display) {
             try {
-                displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
-                        new Object[] {
-                            new Integer(totalNbBodies), new Boolean(displayft),
-                            this
-                        }));
+                if (!ddd) {
+                    displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
+                            new Object[] {
+                                new Integer(totalNbBodies),
+                                new Boolean(displayft), this,
+                                new BooleanWrapper(false)
+                            }));
+                } else {
+                    displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
+                            new Object[] {
+                                new Integer(totalNbBodies),
+                                new Boolean(displayft), this,
+                                new BooleanWrapper(true)
+                            }));
+                }
             } catch (ActiveObjectCreationException e) {
                 abort(e);
             } catch (NodeException e) {
@@ -208,7 +238,7 @@ public class Start implements Serializable {
      * Shows what are the possible options to this program.
      */
     private void usage() {
-        String options = "[-nodisplay | -displayft] totalNbBodies maxIter";
+        String options = "[-nodisplay | -displayft | -3d] totalNbBodies maxIter";
         logger.info("        Usage : nbody.[bat|sh] " + options);
         logger.info(
             "        from the command line, it would be   java Start xmlFile " +
