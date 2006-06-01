@@ -122,9 +122,8 @@ public class Domain implements Serializable {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody((int) this.rock.x, (int) this.rock.y,
-                (int) this.rock.z, (int) this.rock.vx, (int) this.rock.vy,
-                (int) this.rock.vz, (int) this.rock.mass,
+            this.display.drawBody(this.rock.x, this.rock.y, this.rock.z,
+                this.rock.vx, this.rock.vy, this.rock.vz, (int) this.rock.mass,
                 (int) this.rock.diameter, this.identification, this.hostName);
         }
     }
