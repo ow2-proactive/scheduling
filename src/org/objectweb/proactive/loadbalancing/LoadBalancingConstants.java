@@ -65,7 +65,7 @@ public interface LoadBalancingConstants {
     /**
      * <code>STEAL_FACTOR</code>: Used to avoid similar CPUs rejections in work stealing.
      */
-    public static final double STEAL_FACTOR = 1.1;
+    public static final double STEAL_FACTOR = 1.2;
     
     /**
      * <code>SUBSET_SIZE</code>: Number of acquaintances requested for balancing.

@@ -18,6 +18,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
+import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -66,7 +67,7 @@ public class startLBoverP2P implements ProActiveInternalObject, NodeCreationEven
 	 */
 	public static void main(String[] args) throws AlreadyBoundException, ProActiveException {
 
-		Node n = NodeFactory.createNode("rmi://anaconda:2805/StartTest");
+		Node n = NodeFactory.createNode("rmi://psychoquack:2805/StartTest");
 		
 		startLBoverP2P start = (startLBoverP2P) ProActive.newActive(startLBoverP2P.class.getName(),null,n);
 		
@@ -84,7 +85,7 @@ public class startLBoverP2P implements ProActiveInternalObject, NodeCreationEven
 		VirtualNode vn=null;
 		arrivedNodes = new Vector();
 		try {
-			pad = ProActive.getProactiveDescriptor("TestIntegration.xml");
+			pad = ProActive.getProactiveDescriptor("TestLB.xml");
 			vn = pad.getVirtualNode("IntegrationTest");
 			((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
 			vn.activate();
@@ -100,7 +101,7 @@ public class startLBoverP2P implements ProActiveInternalObject, NodeCreationEven
 
         System.out.println("[TEST] Starting P2P Infranstructure");
 
-        String peersFile = "peers.file";
+        String peersFile = "/user/jbustos/home/peers.file";
         StartP2PService sp2ps = new StartP2PService(peersFile);
         try {
 			sp2ps.start();
@@ -163,7 +164,18 @@ public class startLBoverP2P implements ProActiveInternalObject, NodeCreationEven
 	while (it.hasNext()) {
 		((P2PLoadBalancer) it.next()).init();
 		}
-	
+
+	try {
+		Thread.sleep(1000*1);
+	} catch (InterruptedException e) {
+	}
+
+	try {
+		JacobiDispatcher jacobiTest = new JacobiDispatcher("400","25","3000",P2PService.getLocalP2PService());
+	} catch (ProActiveException e) {
+	} catch (Exception e) {
+	}
+
 }
 
     public void nodeCreated(NodeCreationEvent event) {
