@@ -8,7 +8,7 @@ SETLOCAL
 IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 call %PROACTIVE%\scripts\windows\init.bat
 set JAVA_CMD=%JAVA_CMD% -Dfractal.provider=org.objectweb.proactive.core.component.Fractive
-%JAVA_CMD% org.objectweb.proactive.examples.components.c3d.Main %1 %2 %3 
+%JAVA_CMD% org.objectweb.proactive.examples.components.StartFromADL %1 %2
 ENDLOCAL
 
 :end

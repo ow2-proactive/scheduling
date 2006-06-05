@@ -28,41 +28,25 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.components.c3d;
+package org.objectweb.proactive.examples.components;
 
 import org.objectweb.proactive.core.component.adl.Launcher;
 
 
-/**
- * This example is a C3D Component version.
- */
-public class Main {
-    private static final String DEFAULT_ADL = Main.class.getPackage().getName() +
-        ".adl.userAndComposite";
-
+/** This is a wrapper to start component applications from their ADL description+deployment descr. */
+public class StartFromADL {
     public static void main(final String[] args) throws Exception {
-        if ((args.length != 2) && (args.length != 1)) {
+        if (args.length != 2) {
             System.out.println(
-                "Parameters : descriptor_file [fractal_ADL_file] " +
+                "Parameters : descriptor_file fractal_ADL_file " +
                 "\n        The first file describes your deployment of computing nodes." +
-                "\n                You may want to try ../../../descriptors/components/C3D_all.xml"+
+                "\n                You may want to try ../../../descriptors/components/C3D_all.xml" +
                 "\n        The second file describes your components layout. " +
-                "\n                Default is " + DEFAULT_ADL );
-
-            return;
-        }
-
-        String adl;
-        String descriptor;
-
-        if (args.length == 1) {
-            adl = DEFAULT_ADL;
-            descriptor = args[0];
+                "\n                Try org.objectweb.proactive.examples.components.c3d.adl.userAndComposite");
         } else {
-            descriptor = args[0];
-            adl = args[1];
+            String descriptor = args[0];
+            String adl = args[1];
+            Launcher.main(new String[] { "-fractal", adl, "m", descriptor });
         }
-
-        Launcher.main(new String[] { "-fractal", adl, "m", descriptor });
     }
 }

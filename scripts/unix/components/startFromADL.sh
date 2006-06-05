@@ -11,6 +11,6 @@ fi
 
 JAVACMD=$JAVACMD" -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
 
-echo --- Fractal C3D example ---------------------------------------------
-$JAVACMD org.objectweb.proactive.examples.components.c3d.Main $*
+echo --- Fractal ADL Launcher --------------------------------
+$JAVACMD org.objectweb.proactive.examples.components.StartFromADL $*
 echo ---------------------------------------------------------
