@@ -35,7 +35,10 @@
 <screen>component name='client-wrapper' definition='org.objectweb.proactive.examples.c omponents.helloworld.ClientType'</screen>
       <para>Nesting is allowed for composite components and is done by adding other 'component'
  elements.</para>
-      <para>The <emphasis role="bold">binding</emphasis> element specifies bindings between interfaces of components ', and
+      
+<indexterm><primary>Binding</primary><secondary>adl</secondary></indexterm>
+
+<para>The <emphasis role="bold">binding</emphasis> element specifies bindings between interfaces of components ', and
  specifying 'this' as the name of the component refers to the current enclosing
  component.</para>
 <screen> binding client='this.r' server='client.r' </screen>

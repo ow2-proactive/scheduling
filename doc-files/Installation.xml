@@ -313,9 +313,10 @@
       </listitem>
 
       <listitem>
-        <para><literal>log4j.jar</literal> in <literal>lib</literal> directory
-        : <ulink
-        url="http://logging.apache.org/log4j/docs/manual.html">Log4j</ulink> is
+       
+       <indexterm><primary>Log4j</primary><secondary>command argument</secondary></indexterm>
+        <para><literal>log4j.jar</literal> in <literal>lib</literal> directory: 
+        <ulink url="http://logging.apache.org/log4j/docs/manual.html">Log4j</ulink> is
         the logging mechanism used in ProActive. You can define the way you
         want to log(console, file, GUI) by creating a log4j configuration
         file, like the one used in ProActive's example and located under
@@ -414,6 +415,8 @@
 
   <sect1>
     <title>Create a log4j configuration file</title>
+
+    <indexterm><primary>Log4j</primary><secondary>configuration</secondary></indexterm>
 
     <note><para>If you use the scripts provided with the distribution to
     run the examples an existing log4j file named <literal>proactive-log4j</literal> 

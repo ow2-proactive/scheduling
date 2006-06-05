@@ -116,7 +116,9 @@
         will encounter a serious bootstrapping problem or first contact
         problem: 'How can it connect to the P2P network?'</para>
 
-        <para>A solution for that is to use a specific protocol. ProActive
+       <indexterm><primary>JINI</primary><secondary>P2P</secondary></indexterm>
+       
+       <para>A solution for that is to use a specific protocol. ProActive
         provides an interface for a network-centric services protocol which is
         named JINI. JINI can be used for discovering services in a dynamic
         computing environment, such as a fresh peer which would like to join a
@@ -147,7 +149,8 @@
           </listitem>
 
           <listitem>
-            <para>With this list the fresh peer tries to contact each server.
+           <indexterm><primary>Acquaintance</primary><secondary>definition</secondary></indexterm>
+           <para>With this list the fresh peer tries to contact each server.
             When a server is reached the server is added to ithe fresh peer's
             list of known peers (acquaintances).</para>
           </listitem>
@@ -240,7 +243,10 @@
         neighbor is typically a peer close to it (IP address or
         geographically).</para>
 
-        <para>In the same way, this idea was selected to keep the ProActive
+       <indexterm><primary>Acquaintance</primary><secondary>List of</secondary></indexterm> 
+       <indexterm><primary>NOA</primary></indexterm> 
+       
+       <para>In the same way, this idea was selected to keep the ProActive
         P2P infrastructure up. All peers have to maintain a list of <emphasis
         role="bold">acquaintances</emphasis>. At the beginning, when a fresh
         peer has just joined the P2P infrastructure, it knows only peers from
@@ -311,6 +317,8 @@
         peers IP addresses or geographical location of the peers as an
         acquaintances criteria.</para>
 
+        <indexterm><primary>TTU</primary></indexterm> 
+        
         <para>As the P2P infrastructure is a dynamic environment, the list of
         acquaintances must also be dynamic. Many acquaintances could be
         unavailable and must be removed of the list. When the size of the list
@@ -371,7 +379,9 @@
           </listitem>
 
           <listitem>
-            <para>The <emphasis role="bold">Time To Live (TTL) infrastructure
+           <indexterm><primary>TTL</primary></indexterm> 
+ 
+           <para>The <emphasis role="bold">Time To Live (TTL) infrastructure
             parameter</emphasis>, in number of hops;</para>
           </listitem>
 
@@ -1106,8 +1116,8 @@
             </listitem>
 
             <listitem>
+              <indexterm><primary>Kill</primary><secondary>P2P deamon</secondary></indexterm>
               <para><emphasis role="bold">Kill the daemon</emphasis>:</para>
-
               <screen> $ProActive/p2p/build/p2pctl killdaemon [hostname] </screen>
             </listitem>
 

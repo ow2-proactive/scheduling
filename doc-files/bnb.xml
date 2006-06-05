@@ -313,6 +313,9 @@ Result futureResult = manager.start(); // this call is asynchronous</programlist
   <sect1  id="bnb_flowshop">
     <title> An Example: FlowShop</title>
 
+    <indexterm><primary>Flowshop</primary></indexterm>
+
+    
     <para>This example solves the permutation flowshop scheduling problem,
     with the monoobjective case. The main objective is to minimized the
     overall completion time for all the jobs, i.e. makespan. A flowshop

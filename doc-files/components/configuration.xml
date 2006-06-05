@@ -3,10 +3,6 @@
 <chapter id="configuration">
   <title>Configuration</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/configuration.html  -->
-
-  <para></para>
-
   <sect1  id="configuration_html_Controllers_and_interceptors" > 
     <title>Controllers and interceptors</title>
 
@@ -277,6 +273,7 @@ MyInputInterceptor
   <sect1  id="configuration_html_Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle">
     <title>Lifecycle: encapsulation of functional activity in component lifecycle</title>
 
+    <indexterm><primary>Lifeycle</primary><secondary>Components</secondary></indexterm>
     <para>In this implementation of the Fractal component model, Fractal
     components are active objects. Therefore it is possible to redefine
     their activity. In this context of component based programming, we

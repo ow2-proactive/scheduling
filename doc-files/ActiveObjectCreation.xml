@@ -3,8 +3,6 @@
 <chapter id="ActiveObjectCreation">
   <title>Active Objects: creation and advanced concepts</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ActiveObjectCreation.html  -->
-
   <para>Active objects are created on a per-object basis: an application can
   contain active as well as passive instances of a given class. In the
   remaining part of this section, we will consider that we want to create an
@@ -39,10 +37,13 @@
   and is based on the use of an existing object.</para>
 
   <sect1 >
-    <title>Instantiation-Based
-    Creation</title>
+    <title>Instantiation-Based Creation</title>
 
-    <para>When using instantiation based creation, any argument passed to the
+    <indexterm><primary>newActive</primary></indexterm>
+   
+    <indexterm><primary>Constructor</primary><secondary>empty no-args</secondary></indexterm>
+   
+   <para>When using instantiation based creation, any argument passed to the
     constructor of the reified object through
     <literal>ProActive.newActive</literal> is serialized and passed by copy to
     the object. This is because the model behind <emphasis
@@ -88,7 +89,10 @@
       because:</para>
 
       <itemizedlist>
-        <listitem>
+        
+       <indexterm><primary>Constructor</primary><secondary>newActive Arguments</secondary></indexterm>
+       
+       <listitem>
           <para>As the arguments of the constructor are stored in an array of
           type <literal>Object[]</literal>, primitive types have to be
           represented by their wrappers object type. In the example above, we
@@ -199,6 +203,8 @@
   <sect1  id="ActiveObjectCreation_html_activity">
     <title>Specifying the activity of an active object</title>
 
+    <indexterm><primary>Activity</primary><secondary>FIFO</secondary></indexterm>
+    
     <para>Customizing the activity of the active object is at the core of
     ProActive because it allows to specify fully the behavior of an active
     object. By default, an object turned into an active object serves its
@@ -541,6 +547,8 @@ public void terminate (){ hasToTerminate=true;}
   <sect1  id="ActiveObjectCreation_html_customize" >
     <title>Advanced: Customizing the Body of an Active Object</title>
 
+    <indexterm><primary>Body</primary></indexterm>
+    
     <sect2 >
       <title>Motivations</title>
 
@@ -1217,8 +1225,8 @@ ProActive.turnActive(
     <sect2  id="FutureObjectCreation_commonerror" >
       <title>Important Notes: Errors to avoid</title>
 
-      <para> there are few things to remember with asynchronous method call and futures, in order
-      to avoid annoying debugs:</para>
+      <para> There are few things to remember with asynchronous method calls and futures, in order
+      to avoid annoying debugging sessions:</para>
 
       <itemizedlist>
         <listitem>
@@ -1238,12 +1246,15 @@ ProActive.turnActive(
         </listitem>
 
         <listitem>
-          <para>Think to use <emphasis role="bold">wrappers</emphasis> instead
+          
+         <indexterm><primary>Wrappers</primary><secondary>Asynchronism</secondary></indexterm>
+         
+         <para>Think to use <emphasis role="bold">wrappers</emphasis> instead
           of primitive types or final classes for methods result type
           otherwise you will loose the asynchronism capabilities. For instance
           if one of your object has a method</para>
 
-          <programlisting language="java"> <emphasis role="bold"> int</emphasis> giveSolution(parameter) </programlisting>
+          <programlisting language="java"> <emphasis role="bold">int</emphasis> giveSolution(parameter) </programlisting>
 
           <para>calling this method with ProActive is sychronous. So to keep
           the asynchronism it is advised to use</para>
@@ -1302,7 +1313,7 @@ if(result_from_method == null){
           future is not yet available or the method returns null or <emphasis
           role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if the future is
           available, but result_from_method is <emphasis role="bold">never
-          null</emphasis></para>
+          null</emphasis>.</para>
         </listitem>
       </itemizedlist>
     </sect2>
@@ -1731,7 +1742,7 @@ if(result_from_method == null){
 
           <para>This is exactly like invoking a method on a local object of
           the same type. The user does not have to deal with catching
-          distribution-related exceptions like, for example, when using RMI or
+          distribution related exceptions like, for example, when using RMI or
           CORBA. Future versions of ProActive will provide an exception
           handler mechanism in order to process these exceptions in a separate
           place than the functional code. As class <literal>String</literal>

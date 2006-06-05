@@ -45,7 +45,10 @@ vg.f1();</programlisting></para>
   </sect1>
 
   <sect1  id="TypedGroupCommunication_html_Creation" >
-    <title>Creation of a Group</title>
+    
+   <indexterm><primary>Group</primary><secondary>Creation</secondary></indexterm>
+
+   <title>Creation of a Group</title>
 
     <para>Any object that is reifiable has the ability to be included in a
     group. Groups are created using the static method

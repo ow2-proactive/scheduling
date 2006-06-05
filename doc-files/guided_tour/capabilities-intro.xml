@@ -177,7 +177,7 @@
       </itemizedlist>
 
       <para><figure>
-          <title>The C3D application when a new user joins in</title>
+          <title>The C3D application when a new user joins in, seen with IC2D</title>
 
           <mediaobject>
             <imageobject>
@@ -512,15 +512,9 @@ scripts/windows/components$ c3d.bat</screen>
       <sect3 >
         <title>Understand the color codes</title>
 
-        <informaltable frame="none" colsep="0">
-         <tgroup cols="4">
-          <tbody>
-           <row>
-            <entry align="center" valign="middle">
-             <para><emphasis role="bold">Philosophers</emphasis></para>
-            </entry>
-            
-            <entry align="center"  valign="middle">
+<para> The pictures represent the state of the philosophers. They can be:</para>
+<itemizedlist>
+<listitem>
              <para>
               <inlinemediaobject>
                <imageobject>
@@ -529,8 +523,8 @@ scripts/windows/components$ c3d.bat</screen>
               </inlinemediaobject> 
               <emphasis role="bold">philosophing</emphasis>
              </para>
-            </entry>
-            <entry align="center">
+</listitem>
+<listitem>
              <para>
               <inlinemediaobject>
                <imageobject>
@@ -539,8 +533,8 @@ scripts/windows/components$ c3d.bat</screen>
               </inlinemediaobject>
               <emphasis role="bold">hungry, wants the fork!</emphasis>
              </para>
-            </entry>
-            <entry align="center">
+</listitem>
+<listitem>
              <para>
               <inlinemediaobject>
                <imageobject>
@@ -549,22 +543,13 @@ scripts/windows/components$ c3d.bat</screen>
               </inlinemediaobject>
               <emphasis role="bold">eating</emphasis>
              </para>
-            </entry>
-            
-           </row>
-          </tbody>
-         </tgroup>
-        </informaltable>
-        <informaltable frame="none" colsep="0">
-         <tgroup cols="3">
-          <tbody>
-           <row>
-            <entry align="center"  valign="middle">
-             <para><emphasis role="bold">Forks</emphasis></para>
-            </entry>
-            
-            <entry align="center"  valign="middle">
-             <para>
+</listitem>
+</itemizedlist>
+
+<para>The forks can have two states:</para>
+<itemizedlist>
+<listitem>
+         <para>
               <inlinemediaobject>
                <imageobject>
                 <imagedata fileref="guided_tour/pics/fork1.png" format="PNG" />
@@ -572,8 +557,8 @@ scripts/windows/components$ c3d.bat</screen>
               </inlinemediaobject>
               <emphasis role="bold">taken</emphasis>
              </para>
-            </entry>
-            <entry align="center" morerows="2" valign="middle">
+</listitem>
+<listitem>
              <para>
               <inlinemediaobject>
                <imageobject>
@@ -582,11 +567,9 @@ scripts/windows/components$ c3d.bat</screen>
               </inlinemediaobject>
               <emphasis role="bold">free</emphasis>
              </para>
-            </entry>
-           </row>
-          </tbody>
-         </tgroup  >
-        </informaltable  >
+</listitem>
+</itemizedlist>
+
       </sect3>
 
       <sect3 >
@@ -648,7 +631,7 @@ scripts/windows/components$ c3d.bat</screen>
           </informalfigure></para>
 
         <para>The ic2d GUI is started. It is composed of 2 panels: the main
-        panel and the events list panel</para>
+        panel and the request queue panel</para>
 
        <itemizedlist><listitem><para>Acquire your current machine</para></listitem></itemizedlist>
 

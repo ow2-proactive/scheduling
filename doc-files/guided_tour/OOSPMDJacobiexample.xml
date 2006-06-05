@@ -41,11 +41,11 @@
         <para>ProActive examples come with scripts to easily launch the
         execution under both Unix and Windows.For Jacobi, launch:</para>
 
-        <para><literal>ProActive/scripts/unix/jacobi.sh</literal></para>
+        <screen>ProActive/scripts/unix/jacobi.sh</screen>
 
         <para>or</para>
 
-        <para><literal>ProActive/scripts/windows/jacobi.bat</literal></para>
+        <screen>ProActive/scripts/windows/jacobi.bat</screen>
 
         <para>The computation stops after minimal difference is reached
         between two iterations (constant MINDIFF in class Jacobi.java), or
@@ -124,17 +124,17 @@
         <para>ProActive distribution comes with scripts to easily recompile
         the provided examples:</para>
 
-        <para><literal>linux&gt;ProActive/compile/build</literal></para>
+        <screen>linux&gt;ProActive/compile/build</screen>
 
         <para>or</para>
 
-        <para><literal>windows&gt;ProActive/compile/build.bat</literal></para>
+        <screen>windows&gt;ProActive/compile/build.bat</screen>
 
         <para>Several targets are provided (start build without arguments to
         obtain them). In order to recompile the Jacobi, just start the target
         that recompile all the examples:</para>
 
-        <para><literal>build examples</literal></para>
+        <screen>build examples</screen>
 
         <para>2 source files must appear as being recompiled.</para>
 
@@ -302,7 +302,7 @@
         <title>Adding a Method barrier for a step by step
         execution</title>
 
-        <para>Let say we would like to control step by step the execution of
+        <para>Let's say we would like to control step by step the execution of
         the SPMD code. We will add a barrier in the SubMatrix.java, and
         control the barrier from input in the Jacobi.java class.</para>
 
@@ -325,19 +325,21 @@ ProSPMD.barrier(st);</programlisting>
         samples of the code:</para>
 
        <programlisting language="java">while (true) {
-printMessageAndWait();
-matrix.keepOnGoing();
+  printMessageAndWait();
+  matrix.keepOnGoing();
 }
 ...
 
 private static void printMessageAndWait() {
 
-    java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
+    java.io.BufferedReader d = new java.io.BufferedReader(
+                                     new java.io.InputStreamReader(System.in));
     System.out.println(" --&gt; Press return key to continue");
     System.out.println(" or Ctrl c to stop.");
     try {
         d.readLine();
         } catch (Exception e) {
+        		e.printStackTrace();
         }</programlisting>
 
         <para>Recompile, and execute the code. Each iteration needs to be

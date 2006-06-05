@@ -3,11 +3,10 @@
 <chapter id="exceptions">
   <title>Exception Handling</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/exceptions.html  -->
+  <indexterm><primary>Exceptions</primary></indexterm>
 
   <sect1 >
-    <title>Exceptions and
-    Asynchrony</title>
+    <title>Exceptions and Asynchrony</title>
 
     <para>In the asynchronous environment provided by ProActive, exceptions
     cannot be handled the same as in a sequential environment. Let's see the
@@ -109,8 +108,7 @@
       the first example code in the second. Here is a sample session with the
       tool:</para>
 
-      <screen>$ ProActive/scripts/unix/trywithcatch.sh MyClass.java # A backup will be ma\
-de in MyClass.java~
+      <screen>$ ProActive/scripts/unix/trywithcatch.sh MyClass.java 
 --- ProActive TryWithCatch annotator -----------------------
 $ diff -u MyClass.java~ MyClass.java
 --- MyClass.java~
@@ -163,8 +161,7 @@ $ diff -u MyClass.java~ MyClass.java
   </sect1>
 
   <sect1 >
-    <title>Non-Functional
-    Exceptions</title>
+    <title>Non-Functional Exceptions</title>
 
     <sect2 >
       <title>Overview</title>

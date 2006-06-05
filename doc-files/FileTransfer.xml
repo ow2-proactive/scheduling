@@ -221,7 +221,9 @@ and implicitly inferred from the process information. --&gt;
 &lt;/processDefinition&gt;
 </screen></para>
 
-      <para>In the example above, <emphasis
+<indexterm><primary>CopyProtocol</primary></indexterm>
+
+<para>In the example above, <emphasis
       role="bold">fileTransferDeploy</emphasis> has an implicit refid. This
       means that the File Transfer definitions used will be inherited from the
       VirtualNode. The first element shown inside this tag corresponds to

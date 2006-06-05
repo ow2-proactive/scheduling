@@ -100,7 +100,7 @@
     <para><emphasis role="bold">IC2D permits to interactively and dynamically
     create new Jvms and Nodes.</emphasis></para>
 
-  <indexterm><primary>Migration</primary><secondary>drang-and-drop</secondary></indexterm>
+  <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
   
   
   <para><figure>
@@ -342,7 +342,10 @@
           </mediaobject>
         </figure></para>
 
-      <para>You can kill the applications launched with from a popupmenu in
+      
+       <indexterm><primary>Kill</primary><secondary>IC2D</secondary></indexterm>
+       
+       <para>You can kill the applications launched with from a popupmenu in
       the "activated applications" table.</para>
     </sect2>
   </sect1>

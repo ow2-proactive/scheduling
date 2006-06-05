@@ -42,7 +42,7 @@
 
   <para>Asynchronous method calls with returns lead to an emerging
    abstraction: <emphasis role="bold">futures</emphasis>, 
-        <indexterm><primary>futures</primary></indexterm>
+        <indexterm><primary>Future</primary></indexterm>
    the expected result of a given asynchronous
   method call. Futures turn out to be a very effective abstraction for large
   distributed systems, preserving both low coupling and high

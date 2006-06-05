@@ -19,10 +19,10 @@
   <title>Tutorial files : Adding activities and migration to HelloWorld</title>
   
   <para>The following files illustrate the tutorial. They are the results
-   of the addition of <itemizedlist>
+   of the addition of </para><itemizedlist>
     <listitem>migration capabilities</listitem>
     <listitem>init and end activities</listitem>
-   </itemizedlist>
+   </itemizedlist><para>
    to the helloworld example of <xref linkend="HelloWorld"/>.</para>
    
    

@@ -63,7 +63,7 @@
    <title>Creating the interfaces</title>
    
    <para>What we need to do is to extract the interfaces of the Objects,
-    ie the which methods are going to be called on the components. This
+    ie find which methods are going to be called on the components. This
     means find out what methods are called from outside the Active Object.
     You can do that by searching in the classes where the calls are made
     on active objects. For this, <emphasis role="bold">you have to know in
@@ -88,9 +88,12 @@
    
    <para>Why do we have to do that, replacing classes by interfaces?
     That's due to the way components work. When the components are going
-    to be bound, you're not binding the classes themselves, but proxies to
-    these classes. And these proxies implement the interfaces, and do not
-    extend the classes.</para>
+    to be bound, you're not binding the classes themselves (ie the 
+    container which performs operations), but [proxies to]
+    the interfaces presenting the behaviour available. 
+    And these proxies implement the interfaces, and do not
+    extend the classes. What is highlighted here is that components enforce
+    good code design by separating behaviours.</para>
   </sect2>
   
   <sect2 >
@@ -103,9 +106,8 @@
     go with the component. You have the binding interfaces to create,
     which basically say how to put together two Components, tell who is
     already attached, and how to separate them. These are the
-    <literal>lookupFc</literal>, <literal>bindFc</literal>,
-    <literal>unbindFc</literal>, and <literal>listFc</literal>
-    methods.</para>
+    <literal>lookupFc</literal>, <literal>listFc</literal>, <literal>bindFc</literal>
+    and <literal>unbindFc</literal> methods.</para>
    
    <para>This has been done in the <literal>*Impl</literal> files. Let's
     consider, for example, the UserImpl class (it is shown below).What you
@@ -116,18 +118,19 @@
     <literal>C3DUser</literal> code can now use this variable as if it was
     addressing the real Active Object. Just to be precise, we have to
     point out that you're going through proxies before reaching the
-    Component, then the Active Object. But this is hidden by the ProActive
+    Component, then the Active Object. This is hidden by the ProActive
     layer, all you should know is you're addressing a
     <literal>Dispatcher</literal>, and you're fine! The
-    <literal>findDispatcher</literal> method has only been added because
-    component lookup doesn't work like standard Active Object lookup.
+    <literal>findDispatcher</literal> method has been overridden because
+    component lookup doesn't work like standard Active Object lookup.</para>
+
     <example>
      <title>The UserImpl class, a component wrapper</title>
-     
      <programlisting language="java"><textobject>
        <textdata fileref="examples/components/c3d/UserImpl.java" />
       </textobject></programlisting>
-    </example></para>
+    </example>
+
   </sect2>
   
   <sect2 >
@@ -213,55 +216,59 @@
     for instance because it is kindly given to you by some other company,
     which wants to keep parts of its codebase secret. Let's say that the
     deployment descriptor you're using does not reference the proper
-    <literal>Virtual Nodes</literal>. How can you still deploy your
+    <literal>VirtualNodes</literal>. How can you still deploy your
     application in this case? Well, you have to
     <emphasis>rename</emphasis> those Nodes into the names that are
-    fitting to your application. Here's an example of how to do
-    that:</para>
+    fitting to your application. You should do that after the definition
+    of the interfaces that are defined inside the component. 
+    Here's an example of how to do that, renaming the externally provided 
+    name 'UserVirtualNode' to the name internally used by UserImpl 'User':</para>
    
-   <para><example>
+    <para>In the main ADL file (<literal>userAndComposite.fractal</literal>) </para>
+<programlisting language="xml">  &lt;component ... /&gt;
+       
+    &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
+    &lt;exportedVirtualNodes&gt;
+      &lt;exportedVirtualNode name="UserVirtualNode"&gt;
+        &lt;composedFrom&gt;
+           &lt;composingVirtualNode component="user" name="User"/&gt;
+        &lt;/composedFrom&gt;
+      &lt;/exportedVirtualNode&gt;
+    &lt;/exportedVirtualNodes&gt;
+       
+    &lt;!-- Creating one user component --&gt;</programlisting>
+
+     <para>In the User ADL file (<literal>UserImpl.fractal</literal>)</para>
+<example>
      <title>How to rename Virtual Nodes in ADL files</title>
-     
-     <para>In the main ADL file<programlisting language="xml">  &lt;interface signature="java.lang.Runnable" role="server" name="r"/&gt;
+     <programlisting language="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
        
-       &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
-       &lt;exportedVirtualNodes&gt;
-       &lt;exportedVirtualNode name="UserVirtualNode"&gt;
-       &lt;composedFrom&gt;
-       &lt;composingVirtualNode component="user" name="User"/&gt;
-       &lt;/composedFrom&gt;
-       &lt;/exportedVirtualNode&gt;
-       &lt;/exportedVirtualNodes&gt;
+    &lt;!-- Recalling a renamed Virtual Node --&gt;
+    &lt;exportedVirtualNodes&gt;
+      &lt;exportedVirtualNode name="User"&gt;
+        &lt;composedFrom&gt;
+          &lt;composingVirtualNode component="this" name="User"/&gt;
+        &lt;/composedFrom&gt;
+      &lt;/exportedVirtualNode&gt;
+    &lt;/exportedVirtualNodes&gt;
        
-       &lt;!-- Creating one user component --&gt;</programlisting>In the User ADL file</para>
-     
-     <para>
-      <programlisting language="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
-       
-       &lt;!-- Recalling a renamed Virtual Node --&gt;
-       &lt;exportedVirtualNodes&gt;
-       &lt;exportedVirtualNode name="User"&gt;
-       &lt;composedFrom&gt;
-       &lt;composingVirtualNode component="this" name="User"/&gt;
-       &lt;/composedFrom&gt;
-       &lt;/exportedVirtualNode&gt;
-       &lt;/exportedVirtualNodes&gt;
-       
-       &lt;controller desc="primitive"/&gt;</programlisting>If you add this code into the
+    &lt;controller desc="primitive"/&gt;</programlisting>
+</example>
+
+       <para>If you add this code into the
       adl, you are saying that the <literal>VirtualNode</literal> called
       <literal>UserVirtualNode</literal> (found in the deployment
       descriptor file the application is using) should be recognized by
       the application as if it was called
       <literal>User</literal>.</para>
-    </example></para>
    
-   <para><note>
-     <para>Above has been described the way to rename a
+     
+     <note><para>Above has been described the way to rename a
       <literal>VirtualNode</literal>; this can be used on packaged
       software, when the <literal>VirtualNodes</literal> provided do not
       fit the <literal>VirtualNodes</literal> needed by your
-      application.</para>
-    </note></para>
+      application.</para></note>
+     
   </sect2>
   
   <sect2>

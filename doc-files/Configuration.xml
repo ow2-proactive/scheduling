@@ -384,7 +384,10 @@
             </listitem>
 
             <listitem>
-              <para><emphasis role="bold">proactive.http.port</emphasis>
+              
+             <indexterm><primary>Http</primary><secondary>port</secondary></indexterm>
+
+             <para><emphasis role="bold">proactive.http.port</emphasis>
               represents the port number on which to start the HTTP server.
               Default is 2010. If this port is occupied by another
               application, the http server starts on the first free port(given

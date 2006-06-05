@@ -29,6 +29,8 @@
       </mediaobject>
     </figure>
 
+    <indexterm><primary>Bundles</primary><secondary>OSGI</secondary></indexterm>
+    
     <para><emphasis><emphasis role="bold">Bundles</emphasis></emphasis></para>
 
     <para>In order to be <emphasis role="bold">delivered and
@@ -55,6 +57,8 @@
       </listitem>
     </itemizedlist>
 
+    <indexterm><primary>Kill</primary><secondary>bundles</secondary></indexterm>
+    
     <para>Bundles can be plugged dynamically and their so called
     <emphasis>lifecycle</emphasis> can be managed through the framework (
     start, stop, update, ...).</para>

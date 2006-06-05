@@ -488,7 +488,9 @@
     </sect2>
 
     <sect2>
-      <title>VirtualNodes Acquisition</title>
+     <indexterm><primary>Acquisition</primary><secondary>VirtualNode</secondary></indexterm> 
+
+     <title>VirtualNodes Acquisition</title>
 
       <para>Descriptors provide the ability to acquire a VirtualNode already
       deployed by another application. Such VirtualNodes are defined in
@@ -611,7 +613,10 @@
     </sect2>
 
     <sect2>
-      <title>Acquisition</title>
+     
+     <indexterm><primary>Acquisition</primary><secondary>JVM</secondary></indexterm> 
+     
+     <title>Acquisition</title>
 
       <para>Descriptors give the ability to acquire JVMs instead of creating
       them. To do so, it must be specified in the <emphasis
@@ -826,6 +831,8 @@
     <sect2>
       <title>Local JVMs</title>
 
+      <indexterm><primary>LocalJVM</primary></indexterm>
+      
       <para>As said before, all processes are defined in the <emphasis
       role="bold">infrastructure</emphasis> part, under the <emphasis
       role="bold">processes</emphasis> tag. In the previous example, the
@@ -1226,6 +1233,8 @@
         <listitem>
           <para>LSF</para>
 
+          <indexterm><primary>Cluster</primary></indexterm>
+          
           <para>This protocol is used to create Nodes(JVMs) on a cluster.
           <emphasis role="bold">ProActive</emphasis> provides
           <literal>org.objectweb.proactive.core.process.lsf.LSFBSubProcess</literal>
@@ -1356,7 +1365,9 @@
 
         <listitem>
           <para>PBS</para>
-
+          
+          <indexterm><primary>Cluster</primary></indexterm>
+          
           <para>This protocol is used to create jobs on cluster managed by
           PBS, PBSPro or Torque. ProActive provides
           <literal>org.objectweb.proactive.core.process.pbs.PBSBSubProcess</literal>
@@ -1423,6 +1434,8 @@
         <listitem>
           <para>Sun Grid Engine</para>
 
+          <indexterm><primary>Cluster</primary></indexterm>
+          
           <para>This protocol is used to create jobs on cluster managed by Sun
           Grid Engine. ProActive provides
           <literal>org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess</literal>
@@ -1480,6 +1493,8 @@
 
         <listitem>
           <para>OAR:</para>
+
+          <indexterm><primary>Cluster</primary></indexterm>
 
           <para>OAR is a cluster protocol developed at INRIA Alpes and used on
           <ulink url="http://www.grid5000.fr">Grid5000</ulink>. ProActive
@@ -1539,10 +1554,11 @@
 
         <listitem>
           <para>PRUN:</para>
+          
+          <indexterm><primary>Cluster</primary></indexterm>
 
-          <para>PRUN is a cluster protocol develloped at Amsterdam to manage
-          their <ulink
-          url="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</ulink>.
+          <para>PRUN is a cluster protocol developed at Amsterdam to manage their 
+          <ulink url="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</ulink>.
           ProActive provides
           <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
           to use such protocol.</para>
@@ -1988,6 +2004,8 @@
   <sect1 >
     <title>Killing the application</title>
 
+    <indexterm><primary>Kill</primary><secondary>Nodes</secondary></indexterm>
+    
     <para>ProActive gives the ability to kill all JVMs and Nodes deployed with
      an XML descriptor with the method: killall(boolean softly) in class ProActiveDescriptor
      (this class's code is in <xref role="javaFileSrc" linkend ="core/descriptor/data/ProActiveDescriptor.java"/>) </para>
@@ -1995,9 +2013,9 @@
     <para><programlisting language="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
 pad.activateMappings();
---------------------------------------------
---------------------------------------------
---------------------------------------------
+
+...
+
 pad.killall(false);
 //----------- Kills every jvms deployed with the descriptor</programlisting></para>
 

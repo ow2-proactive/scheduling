@@ -157,7 +157,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 
 
       <para>And the AImpl class is:</para>
-
+      <indexterm><primary>Binding</primary><secondary>controller</secondary></indexterm>
       <programlisting language="java">// The modified AImpl class
 public class AImpl implements A, BindingController {
  Service service; // attribute corresponding to a client interface
