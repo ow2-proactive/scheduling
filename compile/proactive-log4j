@@ -18,7 +18,7 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.body = DEBUG, CONSOLE
 #log4j.logger.proactive.mop = DEBUG, CONSOLE
 #log4j.logger.proactive.groups = DEBUG, CONSOLE
-
+log4j.logger.proactive.sync_call = FATAL
 #log4j.logger.proactive.deployment = DEBUG, CONSOLE
 #log4j.logger.proactive.deployment.log = DEBUG, CONSOLE
 #log4j.logger.proactive.deployment.process = DEBUG, CONSOLE

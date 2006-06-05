@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.body.proxy;
 
+import java.lang.reflect.Method;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -46,6 +49,8 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -54,6 +59,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
+    private static Logger syncCallLogger = ProActiveLogger.getLogger(Loggers.SYNC_CALL);
+
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -100,7 +107,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
      * </UL>
      */
     public Object reify(MethodCall methodCall) throws Throwable {
-        
         Object cachedMethodResult = checkOptimizedMethod(methodCall);
         if (cachedMethodResult != null) {
             return cachedMethodResult;
@@ -108,8 +114,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         return invokeOnBody(methodCall);
     }
 
-  
-    private Object invokeOnBody(MethodCall methodCall) throws Exception, RenegotiateSessionException, Throwable {
+    private Object invokeOnBody(MethodCall methodCall)
+        throws Exception, RenegotiateSessionException, Throwable {
         // Now gives the MethodCall object to the body
         try {
             if (isOneWayCall(methodCall)) {
@@ -119,16 +125,18 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             if (isAsynchronousCall(methodCall)) {
                 return reifyAsAsynchronous(methodCall);
             }
+            syncCallLogger.warn("Synchronous method: " + methodCall.getReifiedMethod());
             return reifyAsSynchronous(methodCall);
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
                 e.getTargetException());
         }
     }
-    
+
     // optimization may be a local execution or a caching mechanism
     // returns null if not applicable
-    private Object checkOptimizedMethod(MethodCall methodCall) throws Exception, RenegotiateSessionException, Throwable {
+    private Object checkOptimizedMethod(MethodCall methodCall)
+        throws Exception, RenegotiateSessionException, Throwable {
         if (methodCall.getName().equals("equals") &&
                 (methodCall.getNumberOfParameter() == 1)) {
             Object arg = methodCall.getParameter(0);
@@ -141,11 +149,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             }
             return new Boolean(false);
         }
-        
+
         if (methodCall.getName().equals("hashCode") &&
                 (methodCall.getNumberOfParameter() == 0)) {
             if (cachedHashCode == null) {
-                return cachedHashCode = (Integer)invokeOnBody(methodCall);
+                return cachedHashCode = (Integer) invokeOnBody(methodCall);
             } else {
                 return cachedHashCode;
             }
@@ -191,7 +199,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             Class returnType = methodCall.getReifiedMethod().getReturnType();
 
             if (returnType.equals(java.lang.Void.TYPE)) {
-
                 /* A future for a void call is used to put the potential exception inside */
                 futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
                         null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);

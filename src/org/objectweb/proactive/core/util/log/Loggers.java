@@ -45,6 +45,7 @@ public interface Loggers {
     static final public String NODE = RUNTIME + ".node";
     static final public String BODY = "proactive.body";
     static final public String MOP = "proactive.mop";
+    public static final String SYNC_CALL = "proactive.sync_call";
     static final public String GROUPS = "proactive.groups";
     public static final String NFE = "proactive.nfe";
     public static final String HTTP_TRANSPORT = "proactive.communication.transport.http";
