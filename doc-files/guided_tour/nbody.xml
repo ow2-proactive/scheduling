@@ -147,7 +147,14 @@
  <listitem>Group communication, oospmd synchronization.</listitem>
  <listitem>Barnes-Hut.</listitem>
  </itemizedlist>
-         
+ 
+ <para>Mouse controls with the 3D GUI:</para>
+     
+     <itemizedlist>
+     	<listitem>Left click: rotating.</listitem>
+     	<listitem>Right click: moving the scene.</listitem>
+     	<listitem>Scroll whell: zoom in/out</listitem>
+     </itemizedlist>   
          
       </sect2>
       
