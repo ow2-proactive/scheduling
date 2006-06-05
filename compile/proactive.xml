@@ -846,14 +846,10 @@
 			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
 		</classpath>
 
-		<dtd publicId="-//OASIS//DTD DocBook XML V4.1.2//EN" location="dtd-4.1.2/docbookx.dtd" />
+		<dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN" location="dtd-4.2/docbookx.dtd" />
 		<dtd publicId="http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" location="dtd-4.2/docbookx.dtd" />
-		<dtd publicId="http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" location="dtd-4.1.2/docbookx.dtd" />
-
-		<entity publicId="http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" location="dtd-4.1.2/docbookx.dtd" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" location="html/chunk.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" location="html/docbook.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
 	</xmlcatalog>
 
@@ -877,13 +873,12 @@
 				</fileset>
 			</classpath>
 		</xslt>
+
 		<!-- Do the real conversion, docbook to pdf or html -->
 		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
 			<xmlcatalog refid="docbookcatalog" />
-			<param name="TODAY" expression="${TODAY}"/>
-			<!-- the date for the first page -->
-			<param name="VERSION" expression="${version}"/>
-			<!-- the version number, for the first page -->
+			<param name="TODAY" expression="${TODAY}"/>					<!-- the date for the first page -->
+			<param name="VERSION" expression="${version}"/>			<!-- the version number, for the first page -->
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
@@ -939,12 +934,9 @@
 
 		<java classname="util.DocBookize" fork="true">
 			<classpath refid="project.classpath" />
-			<arg value="${docs.tmp}/${docbookInputFile}" />
-			<!-- The xml file to parse -->
-			<arg value="${src.dir}/${proactive.dir}/" />
-			<!-- the path for java file inclusion -->
-			<arg value="${base}/descriptors/" />
-			<!-- the path for xml file inclusion -->
+			<arg value="${docs.tmp}/${docbookInputFile}" />		<!-- The xml file to parse -->
+			<arg value="${src.dir}/${proactive.dir}/" />			<!-- the path for java file inclusion -->
+			<arg value="${base}/descriptors/" />							<!-- the path for xml file inclusion -->
 		</java>
 	</target>
 
@@ -953,6 +945,10 @@
 	<!-- preprocessing for the manual: copy files and add tags to source code -->
 	<!-- ==================================================================== -->
 	<target name="docbookPreProcess">
+
+		<!-- as this file gets edited, make sure it's a fresh copy-->
+		<delete file="${docs.tmp}/${docs.mainFile}"/>  
+		
 		<!-- Copy the files needed for the html files (pics and maybe others) -->
 		<copy toDir="${docs.dir}/html/">
 			<fileset dir="${doc.src}">
