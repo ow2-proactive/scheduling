@@ -33,9 +33,14 @@ package org.objectweb.proactive.examples.nbody.common;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.media.j3d.Alpha;
 import javax.media.j3d.Appearance;
@@ -48,9 +53,12 @@ import javax.media.j3d.Material;
 import javax.media.j3d.RotationInterpolator;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.TransformGroup;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.vecmath.Color3f;
 import javax.vecmath.Point3d;
@@ -201,6 +209,10 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * Local Body (kind of proxy)
      */
     private LocalBody[] bodies;
+    private String[] bodyname;
+    private ArrayList names;
+    private  JComboBox protocol;
+    private JComboBox listVMs;
 
     //
     // --- PUBLIC METHODS -------------------------------------------------------------
@@ -210,16 +222,23 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * Initialisation of the frame
      * @param title Title of the GUI
      * @param nb number of body
-     * @param displayft (unknown)
+     * @param ft adds fault-tolerance interface.
      * @param killsupport (unknown)
      */
-    public NBody3DFrame(String title, Integer nb, Boolean displayft,
-        Start killsupport) {
+    public NBody3DFrame(String title, Integer nb, Boolean ft, Start killsupport) {
         super(title);
         this.killsupport = killsupport;
         this.firstMovement = true;
         this.mustDrawTraces = true;
         this.refreshPositionsThread = new RefreshPositionsThread();
+        boolean displayft = ft.booleanValue();
+        bodyname = new String[nb.intValue()];
+
+        names = new ArrayList(nb.intValue());
+        for (int i = 0; i < nb.intValue(); i++) {
+            names.add(i, " ");
+            bodyname[i] = "";
+        }
 
         //historique
         this.MAX_HISTO_SIZE = 200 / nb.intValue();
@@ -269,6 +288,35 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
 
         JPanel south = new JPanel();
         main.add(south, BorderLayout.SOUTH);
+
+        if (displayft) {
+            JPanel killingPanel = new JPanel(new GridLayout(1, 4));
+            protocol = new JComboBox(new Object[] { "rsh", "ssh" });
+            listVMs = new JComboBox();
+            //listVMs.addActionListener(this);
+            JLabel cmd = new JLabel(" killall java  ");
+            JButton kill = new JButton("Execute");
+            kill.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        try {
+                            Runtime.getRuntime()
+                                   .exec("" +protocol.getSelectedItem() +
+                                " " + listVMs.getSelectedItem() +
+                                " killall -KILL java");
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                });
+            killingPanel.add(protocol);
+            killingPanel.add(listVMs);
+            killingPanel.add(cmd);
+            killingPanel.add(kill);
+            killingPanel.setBorder(BorderFactory.createTitledBorder(
+                    "Execution control"));
+
+            south.add(killingPanel);
+        }
 
         traceButton = new JCheckBox();
         traceButton.setText("Plots");
@@ -343,6 +391,13 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
             this.refreshPositionsThread.start();
             this.setTraceVisible(this.traceButton.isSelected());
             this.firstMovement = false;
+        }
+
+        bodyname[identification] = hostName;
+        if (!names.contains(hostName)) {
+            this.names.remove(identification);
+            this.names.add(identification, hostName);
+            this.listVMs.addItem(hostName);
         }
     }
 

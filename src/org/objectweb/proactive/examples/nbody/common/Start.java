@@ -105,6 +105,10 @@ public class Start implements Serializable {
             } else if (args[1].equals("-3d")) {
                 ddd = true;
                 break;
+            }else if (args[1].equals("-3dft")) {
+            	displayft = true;
+                ddd = true;
+                break;
             }
         case 3:
             totalNbBodies = Integer.parseInt(args[1]);
@@ -123,6 +127,12 @@ public class Start implements Serializable {
                 break;
             } else if (args[1].equals("-3d")) {
                 ddd = true;
+                totalNbBodies = Integer.parseInt(args[2]);
+                maxIter = Integer.parseInt(args[3]);
+                break;
+            } else if (args[1].equals("-3dft")) {
+                ddd = true;
+                displayft = true;
                 totalNbBodies = Integer.parseInt(args[2]);
                 maxIter = Integer.parseInt(args[3]);
                 break;
@@ -238,7 +248,7 @@ public class Start implements Serializable {
      * Shows what are the possible options to this program.
      */
     private void usage() {
-        String options = "[-nodisplay | -displayft | -3d] totalNbBodies maxIter";
+        String options = "[-nodisplay | -displayft | -3d | -3dft] totalNbBodies maxIter";
         logger.info("        Usage : nbody.[bat|sh] " + options);
         logger.info(
             "        from the command line, it would be   java Start xmlFile " +

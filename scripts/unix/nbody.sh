@@ -11,7 +11,7 @@ CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
 
-if [ "$1" = "-displayft" ]
+if [ "$1" = "-displayft" -o "$1" = "-3dft" ]
 then
 echo ' **WARNING** : $PROACTIVE/descriptors/FaultTolerantWorkers.xml MUST BE SET WITH EXISTING HOSTNAMES !'
 export XMLDESCRIPTOR=$PROACTIVE/descriptors/FaultTolerantWorkers.xml
