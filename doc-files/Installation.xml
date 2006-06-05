@@ -431,8 +431,7 @@
   </sect1>
 
   <sect1 >
-    <title>ProActive and the Eclipse
-    IDE</title>
+    <title>ProActive and IDEs (Eclipse, ...)</title>
 
     <para>We highly recommend you to use the Eclispe IDE to develop your
     ProActive applications. You can get this tool on the <ulink
@@ -484,9 +483,6 @@
       </mediaobject>
     </informalfigure>
 
-    <para>All is now configured to create your ProActive application. Click on
-    the <emphasis role="bold">Finish</emphasis> button.</para>
-
     <para>You can see now on the navigator tab on the left side, that there is
     a new Project with the source and output folders you've just created
     :</para>
@@ -502,14 +498,37 @@
     <para>You are now able to create classes and packages that use the
     ProActive library.</para>
 
-    <para>We are currently developping an eclipse plugin that will help
+   <note><para>
+     There is one file which is problematic with Eclipse: 
+     <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal>.
+     If you have not installed java3d (<ulink url="http://java3d.dev.java.net/"/>), it will 
+     not compile (missing dependencies). So you should remove it from your project build. 
+     To do that, from the navigator view:
+     <itemizedlist>
+      <listitem>right-click on your ProActive project</listitem>
+      <listitem>properties</listitem>
+      <listitem>java build path</listitem>
+      <listitem>in the source tab, choose excluded, then edit </listitem>
+      <listitem>add <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></listitem>
+      <listitem>click ok.</listitem>
+     </itemizedlist>
+     With the ant file (when you run <literal>compile$ build compile</literal>),  
+     there are no problems. The script checks the java3d installation before compiling 
+     the 3d class. When java3d is not installed, the nbody example only works only in 2d.
+    </para></note>
+   
+   <para>All is now configured to create your ProActive application. Click on
+    the <emphasis role="bold">Finish</emphasis> button.</para>
+    
+   
+   <para>We are currently developping an eclipse plugin that will help
     developpers to create easily ProActive applications. Have a look 
     at the plugin documentation page, <xref linkend="plugin"/>.  </para>
+  
   </sect1>
 
   <sect1 >
-    <title>Troubleshooting and
-    support</title>
+    <title>Troubleshooting and support</title>
 
     <para>If you encounter any problem with installing ProActive and running
     the examples, please make sure you correctly followed all the steps
