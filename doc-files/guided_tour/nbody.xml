@@ -26,6 +26,18 @@
             </mediaobject>
           </figure>
 </para>
+
+        <para>
+          <figure>
+           <title>NBody screenshot, boasting the application GUI with Java3D installed</title>
+            <mediaobject>
+              <imageobject>
+                <imagedata fileref="guided_tour/pics/nbody/gui3d.png" format="PNG"/> 
+               </imageobject>
+            </mediaobject>
+          </figure>
+</para>
+
         <para>n-body is a classic problem. It consists in working out the position of bodies in space, which
  depend only on the gravitational forces that apply to them. A good introduction to the problem is
  given <ulink url="http://www.cs.berkeley.edu/%7Esouravc/cs267/nbody.htm">here</ulink>. You may find a
@@ -106,6 +118,39 @@
           </informaltable>
 </para>
       </sect2>
+      
+      
+            <sect2 >
+        <title>Usage</title>
+        <para>With script located in the folder <literal>ProActive/script/[unix|windows]</literal> do:</para>
+        
+         <screen>$ nbody.[bat|sh] [-nodisplay | -displayft | -3d | -3dft] totalNbBodies maxIter</screen>
+	<itemizedlist>
+		<listitem><para><emphasis role="bold">No parameter</emphasis> starting in default mode (2D).</para></listitem>
+		<listitem><para><emphasis role="bold">-nodisplay</emphasis> starting in console mode.</para></listitem>
+		<listitem><para><emphasis role="bold">-displayft</emphasis> starting with fault-tolerance configuration.</para></listitem>
+		<listitem><para><emphasis role="bold">-3d</emphasis> starting GUI in 3D, must have <ulink url="https://java3d.dev.java.net/" >Java3d</ulink> (&ge; 1.4) installed and also must have ProActive compiled with it installed.</para></listitem>
+		<listitem><para><emphasis role="bold">-3dft</emphasis> same as above with fault-tolerance configuration.</para></listitem>
+	</itemizedlist>
+	
+	<itemizedlist>
+		<listitem><emphasis role="bold">totalNbBodies</emphasis> is the total number of bodies, default is 4 bodies.</listitem>
+		<listitem><emphasis role="bold">maxIter</emphasis> is the maximun number of iterations, default is  10,000 iterations.</listitem>
+	</itemizedlist>         
+	
+        <para>Right after starting the application, users have to choose one algorithm for computing. The choice is between:</para>
+ 
+     <itemizedlist>     
+ <listitem>Simplest version, one-to-one communication and master.</listitem>
+ <listitem>Group communication and master.</listitem>
+ <listitem>Group communication, odd-even-synchronization.</listitem>
+ <listitem>Group communication, oospmd synchronization.</listitem>
+ <listitem>Barnes-Hut.</listitem>
+ </itemizedlist>
+         
+         
+      </sect2>
+      
       <sect2 >
         <title>Source files: ProActive/src/org/objectweb/proactive/examples/nbody</title>
         <para>This guided tour is based on the files you may find in the directory
