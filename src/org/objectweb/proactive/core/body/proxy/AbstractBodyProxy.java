@@ -122,10 +122,12 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 reifyAsOneWay(methodCall);
                 return null;
             }
-            if (isAsynchronousCall(methodCall)) {
+            String reason = methodCall.getSynchronousReason();
+            if (reason == null) {
                 return reifyAsAsynchronous(methodCall);
             }
-            syncCallLogger.warn("Synchronous method: " + methodCall.getReifiedMethod());
+            syncCallLogger.warn("SYNC: Synchronous Method Call: " + reason); 
+            syncCallLogger.warn(methodCall.getReifiedMethod());
             return reifyAsSynchronous(methodCall);
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),

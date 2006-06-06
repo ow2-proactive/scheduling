@@ -601,6 +601,37 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         boolean exceptions; // Does the method throws exceptions ? 
     }
 
+    public String getSynchronousReason() {
+    	String reason = null;
+        Method m = this.getReifiedMethod();
+        ReifiableAndExceptions cached = (ReifiableAndExceptions) REIF_AND_EXCEP.get(m);
+        if (cached == null) {
+
+            /* void is reifiable even though the check by the MOP would tell otherwise */
+            boolean reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
+            if (!reifiable) {
+                try {
+                    MOP.checkClassIsReifiable(m.getReturnType());
+                    reifiable = true;
+                } catch (ClassNotReifiableException e) {
+                	reason = e.getMessage();
+                }
+            }
+
+            boolean exceptions = m.getExceptionTypes().length != 0;
+            cached = new ReifiableAndExceptions();
+            cached.reifiable = reifiable;
+            cached.exceptions = exceptions;
+            REIF_AND_EXCEP.put(m, cached);
+        }
+
+        if (reason == null && cached.exceptions && !getMetadata().isExceptionAsynchronously()) {
+        	reason = "Declared exceptions not handled with ProActive.tryWithCatch()";
+        }
+
+        return reason;
+    }
+
     /**
      * Checks if the <code>Call</code> object can be
      * processed with a future semantics, i-e if its returned object
@@ -613,31 +644,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return true if and only if the method call is asynchronous
      */
     public boolean isAsynchronousWayCall() {
-        Method m = this.getReifiedMethod();
-        ReifiableAndExceptions cached = (ReifiableAndExceptions) REIF_AND_EXCEP.get(m);
-        if (cached == null) {
-
-            /* void is reifiable even though the check by the MOP would tell otherwise */
-            boolean reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
-            if (!reifiable) {
-                try {
-                    MOP.checkClassIsReifiable(m.getReturnType());
-                    reifiable = true;
-                } catch (ClassNotReifiableException e) {
-
-                    /* Not reifiable, we already know :) */
-                }
-            }
-
-            boolean exceptions = m.getExceptionTypes().length != 0;
-            cached = new ReifiableAndExceptions();
-            cached.reifiable = reifiable;
-            cached.exceptions = exceptions;
-            REIF_AND_EXCEP.put(m, cached);
-        }
-
-        return cached.reifiable &&
-        (!cached.exceptions || getMetadata().isExceptionAsynchronously());
+    	return getSynchronousReason() == null;
     }
 
     /**
