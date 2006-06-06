@@ -908,7 +908,7 @@ public class Daemon {
                     nextRun = true;
                 }
 
-            Daemon daemon = new Daemon(nextRun);
+            new Daemon(nextRun);
         } catch (Throwable t) {
             logger.error("Throwable:", t);
             System.exit(3);

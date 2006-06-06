@@ -142,7 +142,7 @@ public class Test extends FunctionalTest {
         }
 
         ProActive.tryWithCatch(Exception.class);
-        Exc res = r.futureExc();
+        r.futureExc();
         try {
             ProActive.tryWithCatch(Exception.class);
         } catch (Exception e) {
@@ -158,7 +158,7 @@ public class Test extends FunctionalTest {
         ProActive.tryWithCatch(Exception.class);
         try {
             r.voidExc();
-            Object f = r.futureExc();
+            r.futureExc();
             ProActive.endTryWithCatch();
         } catch (Exception e) {
             int size = ProActive.getAllExceptions().size();

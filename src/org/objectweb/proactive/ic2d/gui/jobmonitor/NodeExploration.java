@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.DefaultListModel;
 
@@ -112,16 +110,6 @@ public class NodeExploration implements JobMonitorConstants {
 
     /* url : "//host:port/object" */
     private ProActiveRuntime resolveURL(String url) {
-        Pattern p = Pattern.compile("(.*//)?([^:]+):?([0-9]*)/(.+)");
-        Matcher m = p.matcher(url);
-        if (!m.matches()) {
-            return null;
-        }
-
-        String host = m.group(2);
-        String port = m.group(3);
-        String object = m.group(4);
-
         try {
             return RuntimeFactory.getRuntime(url, UrlBuilder.getProtocol(url));
         } catch (Exception e) {

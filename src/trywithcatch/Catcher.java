@@ -26,7 +26,6 @@ public class Catcher {
 
     public void work() {
         File inputFile = new File(filename);
-        File outputFile;
         try {
             input = new FileInputStream(inputFile);
         } catch (IOException ioe) {
