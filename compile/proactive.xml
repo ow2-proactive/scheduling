@@ -423,7 +423,6 @@
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
-				<exclude name="${proactive.dir}/doc-files/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
 			</fileset>
 		</jar>
@@ -443,13 +442,12 @@
 				<include name="descriptors/**"/>
 				<include name="p2p/**" />
 				<exclude name="p2p/config/inria/**" />
-				<exclude name="${proactive.dir}/doc-files/**"/>
 				<exclude name="**/.svn" />
 			</fileset>
 		</copy>
 		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh"/>
 		<chmod file="${PAdist.dir}/compile/build" perm="755"/>
-		<!--        create zip version of ProActive without source     -->
+		<!--  create zip version of ProActive without source  -->
 		<zip zipfile="${dist.dir}/ProActive_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
 				<exclude name="src/**"/>
@@ -462,12 +460,19 @@
 		</zip>
 		<!--  create zip version of all ProActive docs    -->
 		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
-			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs">
-			</zipfileset>
+			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
 		</zip>
 		<!--  create zip versions of ProActive Manual    -->
-		<zip zipfile="${dist.dir}/ProActiveManualPdf.zip" basedir="${docs.dir}/pdf/" includes="ProActiveManual.pdf"/>
-		<zip zipfile="${dist.dir}/ProActiveManualHtml.zip" basedir="${docs.dir}/html/" includes=""/>
+		<zip zipfile="${dist.dir}/ProActiveManualPdf.zip">
+			<zipfileset dir="${docs.dir}/pdf/" includes="ProActiveManual.pdf" prefix="ProActive/docs/pdf"/>
+		</zip>
+		<zip zipfile="${dist.dir}/ProActiveManualMultipleHtml.zip" >
+			<zipfileset dir="${docs.dir}/html/" excludes="ProActiveManual.html" prefix="ProActive/docs/html"/>
+		</zip>
+		<zip zipfile="${dist.dir}/ProActiveManualSingleHtml.zip">
+			<zipfileset dir="${docs.dir}/html/" includes="**/*" excludes="**/*.html" prefix="ProActive/docs/html"/>
+			<zipfileset dir="${docs.dir}/html/" includes="ProActiveManual.html" prefix="ProActive/docs/html"/>
+		</zip>
 	</target>
 
 
@@ -848,6 +853,7 @@
 
 		<dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN" location="dtd-4.2/docbookx.dtd" />
 		<dtd publicId="http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" location="dtd-4.2/docbookx.dtd" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/profiling/profile.xsl" location="profiling/profile.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" location="html/chunk.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" location="html/docbook.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" location="fo/docbook.xsl" />
