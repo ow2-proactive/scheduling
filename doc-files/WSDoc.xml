@@ -135,7 +135,7 @@
         <para>Write your active object or your component in a classic way; for
         example:</para>
 
-        <programlisting language="java"> A a = (A)ProActive.newActive('A', new Object [] {}); </programlisting>
+        <programlisting lang="java"> A a = (A)ProActive.newActive('A', new Object [] {}); </programlisting>
       </listitem>
 
       <listitem>
@@ -146,7 +146,7 @@
           <listitem>
             <para>For an active object:</para>
 
-            <programlisting language="java"> <emphasis role="bold">ProActive.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
+            <programlisting lang="java"> <emphasis role="bold">ProActive.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
 
             <para>where:</para>
 
@@ -178,7 +178,7 @@
           <listitem>
             <para>For a component:</para>
 
-            <programlisting language="java"><emphasis role="bold">Proactive.exposeComponentAsWebService(Component component, String url, String componentName);  </emphasis></programlisting>
+            <programlisting lang="java"><emphasis role="bold">Proactive.exposeComponentAsWebService(Component component, String url, String componentName);  </emphasis></programlisting>
 
             <para>where:</para>
 
@@ -214,7 +214,7 @@
     <para>To undeploy an active object as a service, use the ProActive static
     method:</para>
 
-    <programlisting language="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
+    <programlisting lang="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
 
     <para>where:</para>
 
@@ -232,7 +232,7 @@
     <para>To undeploy a component you have to specify the component name and
     the component( needed to know the interfaces to undeploy):</para>
 
-    <programlisting language="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
+    <programlisting lang="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
   </sect1>
 
   <sect1 >
@@ -278,7 +278,7 @@
       <para>Let's start with a simple example, an Hello world active object
       exposed as a web service:</para>
 
-      <programlisting language="java">public class HelloWorld implements Serializable {
+      <programlisting lang="java">public class HelloWorld implements Serializable {
    public HelloWorld () {}
    public String helloWorld (String name) {
       return 'Hello world !';
@@ -333,7 +333,7 @@ ect []{});
           <para>Once the web reference is added, you can use the helloWorld
           service as an object and perform calls on it:</para>
 
-          <programlisting language="java">...
+          <programlisting lang="java">...
 localhost.helloWorld hw = new localhost.helloWorld();
 string s = hw.helloWorld ();
 ...</programlisting>
@@ -362,7 +362,7 @@ string s = hw.helloWorld ();
       in order to a C# client for example controls it. Only one instruction
       has been added in the main method:</para>
 
-      <programlisting language="java">ProActive.exposeAsWebService (dispatcher, 'C3DDispatcher',
+      <programlisting lang="java">ProActive.exposeAsWebService (dispatcher, 'C3DDispatcher',
                     'http://localhost:8080',  new String [] {
                     'rotateRight', 'getPicture', 'rotateLeft', 'rotateUp',
                     'rotateDown', 'getPixels', 'getPixelMax', 'waitForImage',

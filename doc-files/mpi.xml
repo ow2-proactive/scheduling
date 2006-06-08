@@ -431,12 +431,10 @@ and MPI process will raise an error.
 	<sect1 >
 		<title>
 			Usage example with several codes</title>
-
-Let's assume we want to interconnect together several modules (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are each one a parallel MPI code. 
-	
-	</sect1>
-
-
+		<para>
+			Let's assume we want to interconnect together several modules 
+			(VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are each one a parallel MPI code. 
+		</para>
 
 	<screen>
 import org.objectweb.proactive.ProActive;
@@ -536,7 +534,7 @@ CheckConvergency.killAll(false);
 
 				</screen>
 
-
+			</sect1>
 
 	<sect1 >
 		<title>

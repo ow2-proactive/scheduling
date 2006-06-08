@@ -132,7 +132,7 @@
     <para>The HelloActivator has to implements the BundleActivator
     interface.</para>
 
-    <programlisting language="java">        public class HelloActivator implements BundleActivator {
+    <programlisting lang="java">        public class HelloActivator implements BundleActivator {
                 ...
         } </programlisting>
 
@@ -143,7 +143,7 @@
     <literal>ProActiveService.newActive()</literal> method. Finally, we
     register our new service in the framework.</para>
 
-    <programlisting language="java"> public void start(BundleContext context) throws Exception {
+    <programlisting lang="java"> public void start(BundleContext context) throws Exception {
         this.context = context;
 
         /* gets the ProActive Service */

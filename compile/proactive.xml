@@ -846,13 +846,13 @@
 
 		<classpath>
 			<!-- Here are some possible paths for the xsl stylesheets, which are contained in docbook-xsl-1.69.1.tar.gz-->
-			<pathelement location="/usr/share/docbook-xsl-1.69.1" />
 			<pathelement location="/usr/local/docbook-xsl-1.69.1" />
 			<pathelement location="${base}/dev/lib/docbook/docbook-xsl-1.69.1.zip" />
 		</classpath>
 
 		<dtd publicId="-//OASIS//DTD DocBook XML V4.2//EN" location="dtd-4.2/docbookx.dtd" />
 		<dtd publicId="http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" location="dtd-4.2/docbookx.dtd" />
+
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/profiling/profile.xsl" location="profiling/profile.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/chunk.xsl" location="html/chunk.xsl" />
 		<entity publicid="http://docbook.sourceforge.net/release/xsl/1.69.1/html/docbook.xsl" location="html/docbook.xsl" />
@@ -944,6 +944,17 @@
 			<arg value="${src.dir}/${proactive.dir}/" />			<!-- the path for java file inclusion -->
 			<arg value="${base}/descriptors/" />							<!-- the path for xml file inclusion -->
 		</java>
+		
+		<java classname="util.Validate" fork="true">
+			<classpath refid="project.classpath" />
+			<classpath>
+				<fileset dir="${base}/dev/lib/docbook/">
+					<include name="*.jar" />
+				</fileset>
+			</classpath>
+			<arg value="${docs.tmp}/${docbookInputFile}" />
+		</java>
+		
 	</target>
 
 

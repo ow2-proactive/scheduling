@@ -74,9 +74,9 @@
         <para>Why don't the examples and compilation work under Windows?</para>
        </question>
        
-       <indexterm><primary>Microsoft Windows</primary><secondary>Running ProActive</secondary></indexterm>
-       
          <answer>
+					 <indexterm><primary>Microsoft Windows</primary><secondary>Running ProActive</secondary></indexterm>
+					 
         <para>It happens quite often, that the default installation
          directory under Windows is under Program Files which contains space.
          Then setting the JAVA_HOME environment variable to the install

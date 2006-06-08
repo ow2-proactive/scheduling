@@ -503,13 +503,13 @@
         </table></para>
     </sect2>
 
-    <sect2 >
-      
-     <indexterm><primary>Migration</primary><secondary>security</secondary></indexterm>
+    <sect2>
 
      <title>Migration and Negotiation</title>
 
-      <para>In large scale Grid applications, migration of activities is an
+		 <indexterm><primary>Migration</primary><secondary>security</secondary></indexterm>
+      
+		 <para>In large scale Grid applications, migration of activities is an
       important issue. The migration of Active Objects must not weaken the
       security policy being applied.</para>
 

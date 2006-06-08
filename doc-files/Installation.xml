@@ -27,10 +27,10 @@
           distribution you want to use</para>
         </listitem>
 
-        <indexterm><primary>Microsoft Windows</primary><secondary>scripts</secondary></indexterm>
           
         <listitem>
-          <para>Launch the scripts located in
+					<indexterm><primary>Microsoft Windows</primary><secondary>scripts</secondary></indexterm>
+					<para>Launch the scripts located in
           <literal>ProActive/scripts/unix</literal> or
           <literal>ProActive/scripts/windows</literal></para>
         </listitem>
@@ -51,15 +51,13 @@
         </listitem>
 
         <listitem>
+					<indexterm><primary>CLASSPATH</primary><secondary>configuration</secondary></indexterm>
           <para>Include in your <literal>CLASSPATH</literal> the following jar
           files <literal>ProActive/ProActive.jar, ProActive/lib/asm.jar,
           ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar,
           ProActive/lib/components/fractal.jar,
           ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
-
-        <indexterm><primary>CLASSPATH</primary><secondary>configuration</secondary></indexterm>
-
         
         <listitem>
           <para>Don't forget to launch the JVM with a <ulink
@@ -290,7 +288,7 @@
   <sect1 >
     <title>CLASSPATH to set when writing application using ProActive</title>
     
-    <indexterm significance="prefered"><primary>CLASSPATH</primary><secondary>to run ProActive</secondary></indexterm>
+    <indexterm significance="preferred"><primary>CLASSPATH</primary><secondary>to run ProActive</secondary></indexterm>
 
 
     <para><emphasis>Note that if you use the scripts provided with the
@@ -505,12 +503,12 @@
      not compile (missing dependencies). So you should remove it from your project build. 
      To do that, from the navigator view:
      <itemizedlist>
-      <listitem>right-click on your ProActive project</listitem>
-      <listitem>properties</listitem>
-      <listitem>java build path</listitem>
-      <listitem>in the source tab, choose excluded, then edit </listitem>
-      <listitem>add <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></listitem>
-      <listitem>click ok.</listitem>
+			 <listitem><para>right-click on your ProActive project</para></listitem>
+			 <listitem><para>properties</para></listitem>
+			 <listitem><para>java build path</para></listitem>
+			 <listitem><para>in the source tab, choose excluded, then edit </para></listitem>
+			<listitem><para>add <literal>src/org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java</literal></para></listitem>
+			<listitem><para>click ok.</para></listitem>
      </itemizedlist>
      With the ant file (when you run <literal>compile$ build compile</literal>),  
      there are no problems. The script checks the java3d installation before compiling 

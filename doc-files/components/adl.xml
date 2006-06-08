@@ -3,7 +3,7 @@
 <chapter id="adl">
  <title>Architecture Description Language</title>
  
- <indexterm significance="prefered"><primary>ADL</primary><secondary>definition</secondary></indexterm>
+ <indexterm significance="preferred"><primary>ADL</primary><secondary>definition</secondary></indexterm>
 
     <para> </para>
     <para>The Architecture Description Language (ADL) is used to configure and deploy

@@ -474,10 +474,10 @@
     <note><para>
       In order to have ProActive parse correctly the document, the following are mandatory:
       <itemizedlist>
-       <listitem> the <emphasis role="bold">ProActiveUserProperties</emphasis> tag, </listitem>
-       <listitem> the <emphasis role="bold">properties</emphasis> tag,  </listitem>
-       <listitem> and the model: &lt;prop <emphasis role="bold">key</emphasis>='somekey' 
-                    <emphasis role="bold">value</emphasis>='somevalue'/&gt;  </listitem>
+				<listitem><para> the <emphasis role="bold">ProActiveUserProperties</emphasis> tag, </para></listitem>
+				<listitem><para> the <emphasis role="bold">properties</emphasis> tag,  </para></listitem>
+				<listitem><para> and the model: &lt;prop <emphasis role="bold">key</emphasis>='somekey' 
+								<emphasis role="bold">value</emphasis>='somevalue'/&gt;  </para></listitem>
      </itemizedlist>
        
      </para></note>

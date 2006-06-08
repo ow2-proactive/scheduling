@@ -126,7 +126,7 @@
 
     <example>
      <title>The UserImpl class, a component wrapper</title>
-     <programlisting language="java"><textobject>
+     <programlisting lang="java"><textobject>
        <textdata fileref="examples/components/c3d/UserImpl.java" />
       </textobject></programlisting>
     </example>
@@ -182,7 +182,7 @@
   <para><example>
     <title>userAndComposite.fractal, a component ADL file</title>
     
-    <programlisting language="xml"><textobject>
+    <programlisting lang="xml"><textobject>
       <textdata fileref="examples/components/c3d/adl/userAndComposite.fractal" />
      </textobject></programlisting>
    </example></para>
@@ -225,7 +225,7 @@
     name 'UserVirtualNode' to the name internally used by UserImpl 'User':</para>
    
     <para>In the main ADL file (<literal>userAndComposite.fractal</literal>) </para>
-<programlisting language="xml">  &lt;component ... /&gt;
+<programlisting lang="xml">  &lt;component ... /&gt;
        
     &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
     &lt;exportedVirtualNodes&gt;
@@ -241,7 +241,7 @@
      <para>In the User ADL file (<literal>UserImpl.fractal</literal>)</para>
 <example>
      <title>How to rename Virtual Nodes in ADL files</title>
-     <programlisting language="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
+     <programlisting lang="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
        
     &lt;!-- Recalling a renamed Virtual Node --&gt;
     &lt;exportedVirtualNodes&gt;
@@ -284,12 +284,12 @@
     
     <para>The component Registration</para>
     
-    <para><programlisting language="java">Fractive.register(Fractive.getComponentRepresentativeOnThis(),
+    <para><programlisting lang="java">Fractive.register(Fractive.getComponentRepresentativeOnThis(),
       UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));</programlisting></para>
     
     <para>The Component lookup</para>
     
-    <para><programlisting language="java">ProActiveComponentRepresentative a = Fractive.lookup(
+    <para><programlisting lang="java">ProActiveComponentRepresentative a = Fractive.lookup(
       UrlBuilder.buildUrl(this.hostName, "Dispatcher", protocol, this.portNumber));
       this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");</programlisting></para>
    </example>

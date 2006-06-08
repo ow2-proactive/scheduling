@@ -35,9 +35,9 @@
               <para>lsf, pbs, sun grid engine, oar, prun</para>
             </listitem>
 
-            <indexterm><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
               
             <listitem>
+							<indexterm><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
               <para>globus(GT2, GT3 and GT4), unicore, glite, arc (nordugrid)</para>
             </listitem>
           </itemizedlist></para>
@@ -102,7 +102,7 @@
         <para><emphasis role="bold">Within a ProActive program, active objects
         are still created on Nodes</emphasis></para>
 
-        <para><programlisting language="java"> newActive(String, Object[], Node); </programlisting></para>
+        <para><programlisting lang="java"> newActive(String, Object[], Node); </programlisting></para>
       </listitem>
     </itemizedlist>
 
@@ -168,7 +168,7 @@
         Object(member of the group) is created on each nodes mapped to the
         VirtualNode given as parameter</emphasis></para>
 
-        <para><programlisting language="java">       newActiveAsGroup(String, Object[], VirtualNode);
+        <para><programlisting lang="java">       newActiveAsGroup(String, Object[], VirtualNode);
        turnActiveAsGroup(Object, String, VirtualNode); </programlisting></para>
       </listitem>
     </itemizedlist>
@@ -215,7 +215,7 @@
       <listitem>
         <para><emphasis role="bold">Example:</emphasis></para>
 
-        <para><programlisting language="xml"> &lt;ProActiveDescriptor
+        <para><programlisting lang="xml"> &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;                            
   &lt;componentDefinition&gt;
@@ -298,7 +298,7 @@
           <listitem>
             <para>Mapping one to one: 1 VN --&gt; 1 JVM</para>
 
-            <para><programlisting language="xml"> &lt;virtualNodesDefinition&gt;                                  
+            <para><programlisting lang="xml"> &lt;virtualNodesDefinition&gt;                                  
   &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>'/&gt;
  &lt;/virtualNodesDefinition&gt;
  &lt;deployment&gt;
@@ -488,11 +488,12 @@
     </sect2>
 
     <sect2>
-     <indexterm><primary>Acquisition</primary><secondary>VirtualNode</secondary></indexterm> 
 
      <title>VirtualNodes Acquisition</title>
 
-      <para>Descriptors provide the ability to acquire a VirtualNode already
+		 <indexterm><primary>Acquisition</primary><secondary>VirtualNode</secondary></indexterm> 
+      
+		 <para>Descriptors provide the ability to acquire a VirtualNode already
       deployed by another application. Such VirtualNodes are defined in
       <emphasis role="bold">VirtualNodes Acquisition</emphasis> tag as it is
       done for <emphasis role="bold">VirtualNodesDefinition</emphasis> except
@@ -526,7 +527,7 @@
       org.objectweb.proactive.core.descriptor.data.VirtualNode to update the
       value and to perform the lookup. Typical example of code:</para>
 
-      <programlisting language="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
+      <programlisting lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
 
       <para>//----------- Returns a ProActiveDescriptor object from the xml
       file</para>
@@ -553,14 +554,14 @@
       tags in the descriptor as well as programmatically using static methods
       provided in org.objectweb.Proactive class:</para>
 
-      <programlisting language="java">ProActive.registerVirtualNode(
+      <programlisting lang="java">ProActive.registerVirtualNode(
         VirtualNode virtualNode, 
         String registrationProtocol, 
         boolean replacePreviousBinding );          </programlisting>
 
-      <programlisting language="java">ProActive.lookupVirtualNode(String url, String protocol);          </programlisting>
+      <programlisting lang="java">ProActive.lookupVirtualNode(String url, String protocol);          </programlisting>
 
-      <programlisting language="java">ProActive.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
+      <programlisting lang="java">ProActive.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
     </sect2>
   </sect1>
 
@@ -614,11 +615,12 @@
 
     <sect2>
      
-     <indexterm><primary>Acquisition</primary><secondary>JVM</secondary></indexterm> 
      
      <title>Acquisition</title>
 
-      <para>Descriptors give the ability to acquire JVMs instead of creating
+		 <indexterm><primary>Acquisition</primary><secondary>JVM</secondary></indexterm> 
+      
+		 <para>Descriptors give the ability to acquire JVMs instead of creating
       them. To do so, it must be specified in the <emphasis
       role="bold">acquisition</emphasis> tag which service to use in oder to
       acquire the JVMs. Services will be described below, in the
@@ -1160,38 +1162,36 @@
  <para>When using <emphasis role="bold">processList tag</emphasis>,
  the <emphasis role="bold">class</emphasis> attribute can take 3 values: 
      <itemizedlist>
-      <listitem>
+      <listitem><para>
        org.objectweb.proactive.core.process.ssh.SSHProcessList 
        (see <xref role="javaFileSrc" linkend="core/process/ssh/SSHProcessList.java"/>),
-      </listitem><listitem>
+		 </para></listitem><listitem><para>
        org.objectweb.proactive.core.process.rsh.RSHProcessList
        (see <xref role="javaFileSrc" linkend="core/process/rsh/RSHProcessList.java"/>),
-    </listitem><listitem>
+		 </para></listitem><listitem><para>
        org.objectweb.proactive.core.process.rlogin.RLoginProcessList
        (see <xref role="javaFileSrc" linkend="core/process/rlogin/RLoginProcessList.java"/>),
-    </listitem>
+		 </para></listitem>
    </itemizedlist>
-          according to the protocol being used is ssh, rsh or rlogin. The
-          <emphasis role="bold">fixedName</emphasis> attribute is mandatory
-          and represents the fixed part shared by all machine's names. The
-          <emphasis role="bold">list</emphasis> attribute is also mandatory
-          and can take several forms: <emphasis role="bold">[m-n]</emphasis>
-          means from m to n with a step 1, <emphasis
-          role="bold">[m-n;k]</emphasis> means from m to n with a step k (m,
-          m+k, m+2k, ....), <emphasis role="bold">[m-n]^[x,y]</emphasis> means
-          from m to n exluding x and y, <emphasis
-          role="bold">[m-n]^[x,y-z]</emphasis> means from m to n exluding x
-          and values from y to z, <emphasis
-          role="bold">[m-n;k]^[x,y]</emphasis> same as before except that the
-          step is k. The <emphasis role="bold">padding</emphasis> attribute is
-          optional (default is 1) and represents the number of digits. Finally
-          the <emphasis role="bold">domain</emphasis> attribute is mandatory
-          and represents the last part shared by all machine's names. So in
-          the exemple above, a jvm is going to be created using ssh on
-          machines: node000.sophia.grid5000.fr,
-          node002.sophia.grid5000.fr,..., node098.sophia.grid5000.fr,
-          node100.sophia.grid5000.fr (note that step is 2) excluding machines:
-          node010.sophia.grid5000.fr and node020.sophia.grid5000.fr.</para>
+	 according to the protocol being used is ssh, rsh or rlogin. The
+	 <emphasis role="bold">fixedName</emphasis> attribute is mandatory
+	 and represents the fixed part shared by all machine's names. The
+	 <emphasis role="bold">list</emphasis> attribute is also mandatory
+	 and can take several forms: <emphasis role="bold">[m-n]</emphasis>
+	 means from m to n with a step 1, <emphasis role="bold">[m-n;k]</emphasis> 
+	 means from m to n with a step k (m, m+k, m+2k, ....), 
+	 <emphasis role="bold">[m-n]^[x,y]</emphasis> means from m to n exluding x and y, 
+	 <emphasis role="bold">[m-n]^[x,y-z]</emphasis> means from m to n exluding x
+	 and values from y to z, <emphasis role="bold">[m-n;k]^[x,y]</emphasis> same 
+	 as before except that the step is k. The <emphasis role="bold">padding</emphasis> 
+	 attribute is optional (default is 1) and represents the number of digits. Finally
+	 the <emphasis role="bold">domain</emphasis> attribute is mandatory
+	 and represents the last part shared by all machine's names. So in
+	 the exemple above, a jvm is going to be created using ssh on
+	 machines: node000.sophia.grid5000.fr,
+	 node002.sophia.grid5000.fr,..., node098.sophia.grid5000.fr,
+	 node100.sophia.grid5000.fr (note that step is 2) excluding machines:
+	 node010.sophia.grid5000.fr and node020.sophia.grid5000.fr.</para>
 
           <screen> ...........................                              
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
@@ -1568,7 +1568,7 @@
 
         <listitem>
          
-         <indexterm significance="prefered"><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
+         <indexterm significance="preferred"><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
  
          <para>GLOBUS</para>
 
@@ -1664,7 +1664,7 @@
         <listitem>
           <para>GLITE</para>
 
-          <indexterm significance="prefered"><primary>GLITE</primary><secondary>XML Descriptor</secondary></indexterm>
+          <indexterm significance="preferred"><primary>GLITE</primary><secondary>XML Descriptor</secondary></indexterm>
           
             <para>ProActive provides
           <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
@@ -1925,7 +1925,7 @@
     role="bold">P2PService</emphasis> service allows when using ProActive's
     P2P infrastructure to get as many jvms as desired.</para>
 
-    <programlisting language="xml"> &lt;?xml version='1.0' encoding='UTF-8'?&gt;                      
+    <programlisting lang="xml"> &lt;?xml version='1.0' encoding='UTF-8'?&gt;                      
  &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
@@ -2010,7 +2010,7 @@
      an XML descriptor with the method: killall(boolean softly) in class ProActiveDescriptor
      (this class's code is in <xref role="javaFileSrc" linkend ="core/descriptor/data/ProActiveDescriptor.java"/>) </para>
 
-    <para><programlisting language="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
+    <para><programlisting lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
 pad.activateMappings();
 
@@ -2040,11 +2040,9 @@ pad.killall(false);
     <para>In order to get familiar on how to create processes programmatically,
      see the Process package </para>
      
-    <blockquote>
-       <ulink url="../api/org/objectweb/proactive/core/process/package-summary.html">
-          <screen> org.objectweb.proactive.core.process</screen>
-       </ulink>
-    </blockquote>
+
+	 <screen><ulink 
+url="../api/org/objectweb/proactive/core/process/package-summary.html">org.objectweb.proactive.core.process</ulink></screen>
 
   </sect1>
 </chapter>

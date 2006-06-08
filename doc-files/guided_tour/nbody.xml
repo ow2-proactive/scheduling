@@ -129,31 +129,33 @@
 		<listitem><para><emphasis role="bold">No parameter</emphasis> starting in default mode (2D).</para></listitem>
 		<listitem><para><emphasis role="bold">-nodisplay</emphasis> starting in console mode.</para></listitem>
 		<listitem><para><emphasis role="bold">-displayft</emphasis> starting with fault-tolerance configuration.</para></listitem>
-		<listitem><para><emphasis role="bold">-3d</emphasis> starting GUI in 3D, must have <ulink url="https://java3d.dev.java.net/" >Java3d</ulink> (&ge; 1.4) installed and also must have ProActive compiled with it installed.</para></listitem>
+		<listitem><para><emphasis role="bold">-3d</emphasis> starting GUI in 3D, must have 
+				                    <ulink url="https://java3d.dev.java.net/" >Java3d</ulink> (&ge; 1.4) installed and also must have ProActive 
+														compiled with it installed.</para></listitem>
 		<listitem><para><emphasis role="bold">-3dft</emphasis> same as above with fault-tolerance configuration.</para></listitem>
 	</itemizedlist>
 	
 	<itemizedlist>
-		<listitem><emphasis role="bold">totalNbBodies</emphasis> is the total number of bodies, default is 4 bodies.</listitem>
-		<listitem><emphasis role="bold">maxIter</emphasis> is the maximun number of iterations, default is  10,000 iterations.</listitem>
+		<listitem><para><emphasis role="bold">totalNbBodies</emphasis> is the total number of bodies, default is 4 bodies.</para></listitem>
+		<listitem><para><emphasis role="bold">maxIter</emphasis> is the maximun number of iterations, default is  10,000 iterations.</para></listitem>
 	</itemizedlist>         
 	
         <para>Right after starting the application, users have to choose one algorithm for computing. The choice is between:</para>
  
      <itemizedlist>     
- <listitem>Simplest version, one-to-one communication and master.</listitem>
- <listitem>Group communication and master.</listitem>
- <listitem>Group communication, odd-even-synchronization.</listitem>
- <listitem>Group communication, oospmd synchronization.</listitem>
- <listitem>Barnes-Hut.</listitem>
+			 <listitem><para>Simplest version, one-to-one communication and master.</para></listitem>
+			 <listitem><para>Group communication and master.</para></listitem>
+			 <listitem><para>Group communication, odd-even-synchronization.</para></listitem>
+			 <listitem><para>Group communication, oospmd synchronization.</para></listitem>
+			 <listitem><para>Barnes-Hut.</para></listitem>
  </itemizedlist>
  
  <para>Mouse controls with the 3D GUI:</para>
      
      <itemizedlist>
-     	<listitem>Left click: rotating.</listitem>
-     	<listitem>Right click: moving the scene.</listitem>
-     	<listitem>Scroll whell: zoom in/out</listitem>
+			 <listitem><para>Left click: rotating.</para></listitem>
+			 <listitem><para>Right click: moving the scene.</para></listitem>
+			 <listitem><para>Scroll whell: zoom in/out</para></listitem>
      </itemizedlist>   
          
       </sect2>
@@ -202,7 +204,7 @@
  they can be modified to include other forces (for example, collision) in a simple manner, which
  would be spread to all the examples. A Planet is no more than a point in space, with velocity
  and mass - the diameter expresses the size to use for the display: </para>
-<programlisting language="java">
+<programlisting lang="java">
          public class Planet implements Serializable{
              public double mass;
              public double x,y,vx,vy;
@@ -242,7 +244,7 @@
  which reads command line parameters,  counting bodies and iterations, and 
  constructing the optional Displayer. Before choosing which example to run, it creates the nodes
  required by the simulation:</para>
-<programlisting language="java">         // Construct deployment-related variables: pad &amp; nodes
+<programlisting lang="java">         // Construct deployment-related variables: pad &amp; nodes
          descriptorPad = null;
          VirtualNode vnode;
          try { descriptorPad = ProActive.getProactiveDescriptor(xmlFileName); }
@@ -262,7 +264,7 @@
  <literal>Domain []</literal>, an <literal>Integer</literal>, and a 
  <literal>Start</literal> (it will be detailed later):</para>
 
-<programlisting language="java">         Object [] constructorParams ;
+<programlisting lang="java">         Object [] constructorParams ;
          constructorParams = {domainArray, new Integer(maxIter), killsupport} ;
          maestro = (Maestro) ProActive.newActive 
            ( Maestro.class.getName(), constructorParams , nodes[0] ) ;</programlisting>
@@ -280,7 +282,7 @@
         <para>This is the implementation of the simplest example of nbody. We defined the <literal>Planet</literal> to be a passive object, and it does nothing. It is a container for position,
  velocity and mass, as we've seen in the description given higher up. The real actors are the <literal>Domains</literal>, they do all the work. To every <literal>Planet</literal> in the universe, is
  associated a <literal>Domain</literal>, which is an <literal>Active Object</literal>. This  <literal>Domain</literal> contains the code to manage the communication of the possitions of the <literal>Planets</literal> during the simulation. They are created in the Start.java file:</para>
-<programlisting language="java">         Rectangle universe = new Rectangle (-100,-100,100,100);
+<programlisting lang="java">         Rectangle universe = new Rectangle (-100,-100,100,100);
          Domain [] domainArray = new Domain [totalNbBodies];
          for (int  i = 0 ; i &lt; totalNbBodies ; i++)  {
              Object [] constructorParams = new Object [] {
@@ -307,19 +309,19 @@
  in their constructor - this explains the use of the class <literal>Integer</literal>).</para>
         <para>The <literal>Domains</literal>, once created, are initialized, and then they synchronize themselves
  by all pinging the maestro, with the notifyFinished call:</para>
-<programlisting language="java">         // init workers, from the Start class
+<programlisting lang="java">         // init workers, from the Start class
          for (int i=0 ; i &lt; totalNbBodies ; i ++)
              domainArray[i].init(domainArray, displayer, maestro);
           // init method, defined within each worker
          </programlisting>
 
-         <programlisting language="java">          public void init(Domain [] domainArray, Displayer dp, Maestro master) {
+         <programlisting lang="java">          public void init(Domain [] domainArray, Displayer dp, Maestro master) {
                    this.neighbours = domainArray;
                    .....
                    maestro.notifyFinished();  // say we're ready to start
                    }</programlisting>
            
-                  <programlisting language="java">
+                  <programlisting lang="java">
          public void notifyFinished() {
              this.nbFinished ++;
              if (this.nbFinished == this.domainArray.length) {
@@ -339,7 +341,7 @@
  the other bodies, which need to be known to move the local <literal>Planet</literal>, at every time
  step. This is done using a push schema: instead of explicitly asking for information, this
  information is automatically issued:</para>
-<programlisting language="java">       public void sendValueToNeighbours() {
+<programlisting lang="java">       public void sendValueToNeighbours() {
             for (int i = 0 ; i &lt; this.neighbours.length ; i ++)
                if (i != this.identification) // don't notify self!
                    this.neighbours[i].setValue(this.info, this.identification);
@@ -368,7 +370,7 @@
  framework: first, create a Group (instead of having independant <literal>Active Objects</literal>)
 :</para>
         
-<programlisting language="java">           // in the Start class
+<programlisting lang="java">           // in the Start class
             Object [][] params = ...
             Domain  domainGroup = null;
             try {
@@ -388,12 +390,12 @@
  of the Domain class, the group is <emphasis role="bold">typed</emphasis> as <literal>Domain</literal>, and that's the reason
  why it's called a <emphasis role="bold">typed Group</emphasis>.</para>
         <para>Then, this group is passed as parameter to all the members of the Group, in just one call:</para>
-        <programlisting language="java">         // Still in the Start class
+        <programlisting lang="java">         // Still in the Start class
             domainGroup.init(domainGroup, displayer, maestro);
            </programlisting>
         <para>This method sets the local field as a copy of the passed parameter, and as such is unique, and
  we can play around with it without affecting the others. So let's remove the local <literal>Domain</literal> from the Group, to avoid having calls on self:</para>
-<programlisting language="java">               public void init(Domain domainGroup, Displayer dp, Maestro master) {
+<programlisting lang="java">               public void init(Domain domainGroup, Displayer dp, Maestro master) {
                  this.neighbours = domainGroup;
                  Group g = ProActiveGroup.getGroup(neighbours);
                  g.remove(ProActive.getStubOnThis()); // no need to send information to self
@@ -402,7 +404,7 @@
         <para>Remember that in the previous example, the neighbours where stocked in an array, and each was
  accessed in turn:</para>
         
-<programlisting language="java">         for (int i = 0 ; i &lt; this.neighbours.length ; i ++)
+<programlisting lang="java">         for (int i = 0 ; i &lt; this.neighbours.length ; i ++)
                if (i != this.identification) // don't notify self!
                this.neighbours[i].setValue(this.info, this.identification);</programlisting>
         <para>Well, that's BAAAAD, or at least inefficient! Replace this by the following code, because
@@ -423,7 +425,7 @@
  meantime, the local Domain does not change its iteration, because it is still waiting for more
  results, in the current iteration.</para>
         
-<programlisting language="java">         public void setValue(Planet inf, int receivedIter) {
+<programlisting lang="java">         public void setValue(Planet inf, int receivedIter) {
            if (this.iter == receivedIter) {
              this.currentForce.add(info, inf);
              this.nbReceived ++ ;
@@ -443,7 +445,7 @@
  The <literal>prematureValues</literal> Vector is the place where we put the values that arrive out of
  sync. When a value is early, it is queued there, and dequeued as soon as this <literal>Domain</literal>
  changes iteration.</para>
-<programlisting language="java">         public void sendValueToNeighbours()  {
+<programlisting lang="java">         public void sendValueToNeighbours()  {
                    reset();                  
                    this.iter++;
                    if (this.iter &lt; this.maxIter) {                           
@@ -465,7 +467,7 @@
  by inserting oospmd barriers, that can be thought as behaving like the maestro class, but faster.
  To create functional OOspmd Groups, there is a special instruction, which takes the same
  parameters as a newGroup instruction:</para>
-<programlisting language="java">         Object [][] params =  ...
+<programlisting lang="java">         Object [][] params =  ...
          Domain domainGroup = null;
          try {
               domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
@@ -475,7 +477,7 @@
  the Domains code, to do the synchronization. What happens is that each Domain hits the barrier
  call, and then waits for all the others to have reached it, before reading its request queue
  again.</para>
-<programlisting language="java"> public void sendValueToNeighbours() {
+<programlisting lang="java"> public void sendValueToNeighbours() {
     this.neighbours.setValue(this.info, this.identification);       
     ProSPMD.barrier('barrier' + this.iter);
     this.iter++;

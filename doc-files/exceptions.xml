@@ -12,7 +12,7 @@
     cannot be handled the same as in a sequential environment. Let's see the
     problem with exceptions and asynchrony in a piece of code:</para>
 
-    <programlisting language="java"> <emphasis role="bold">try</emphasis> {
+    <programlisting lang="java"> <emphasis role="bold">try</emphasis> {
      Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
      // ...
      doSomethingWith(r);
@@ -59,7 +59,7 @@
       <para>Let's reuse the previous example to see how to use these
       barriers</para>
 
-      <programlisting language="java"> <emphasis role="bold">ProActive.tryWithCatch(SomeException.class);</emphasis>
+      <programlisting lang="java"> <emphasis role="bold">ProActive.tryWithCatch(SomeException.class);</emphasis>
  <emphasis role="bold">try</emphasis> {
        Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
        // ...
@@ -189,7 +189,7 @@ $ diff -u MyClass.java~ MyClass.java
       <para>The NFE mechanism in ProActive calls user defined handlers when a
       NFE is thrown. A handler implements the following interface:</para>
 
-      <programlisting language="java">public interface NFEListener {
+      <programlisting lang="java">public interface NFEListener {
     public boolean handleNFE(NonFunctionalException e);
 }</programlisting>
 
@@ -214,7 +214,7 @@ $ diff -u MyClass.java~ MyClass.java
         <para>Here is an example about how to add a handler to an active
         object on its side (body):</para>
 
-        <programlisting language="java">ProActive.addNFEListenerOnAO(myAO, <emphasis
+        <programlisting lang="java">ProActive.addNFEListenerOnAO(myAO, <emphasis
             role="bold">new</emphasis> NFEListener() {
     <emphasis role="bold">public boolean</emphasis> handleNFE(NonFunctionalException nfe) {
         
@@ -229,19 +229,19 @@ $ diff -u MyClass.java~ MyClass.java
         <para>Handlers can also be added to the client side (proxy) of an
         active object with</para>
 
-        <programlisting language="java"> ProActive.addNFEListenerOnProxy(ao, handler) </programlisting>
+        <programlisting lang="java"> ProActive.addNFEListenerOnProxy(ao, handler) </programlisting>
 
         <para>or to a JVM with</para>
 
-        <programlisting language="java"> ProActive.addNFEListenerOnJVM(handler) </programlisting>
+        <programlisting lang="java"> ProActive.addNFEListenerOnJVM(handler) </programlisting>
 
         <para>and even to a group with</para>
 
-        <programlisting language="java"> ProActive.addNFEListenerOnGroup(group, handler) </programlisting>
+        <programlisting lang="java"> ProActive.addNFEListenerOnGroup(group, handler) </programlisting>
 
         <para>These handlers can also be removed with</para>
 
-        <programlisting language="java">ProActive.removeNFEListenerOnAO(ao, handler),
+        <programlisting lang="java">ProActive.removeNFEListenerOnAO(ao, handler),
 ProActive.removeNFEListenerOnProxy(ao, handler),
 ProActive.removeNFEListenerOnJVM(handler)
 ProActive.removeNFEListenerOnGroup(group, handler)</programlisting>
@@ -249,7 +249,7 @@ ProActive.removeNFEListenerOnGroup(group, handler)</programlisting>
         <para>It's also possible to define an handler only for some exception
         types, for example:</para>
 
-        <programlisting language="java">ProActive.addNFEListenerOnJVM(<emphasis role="bold">
+        <programlisting lang="java">ProActive.addNFEListenerOnJVM(<emphasis role="bold">
 new</emphasis> TypedNFEListener(
     SendRequestCommunicationException.<emphasis role="bold">class</emphasis>,
     <emphasis role="bold">new</emphasis> NFEListener() {  
@@ -264,7 +264,7 @@ new</emphasis> TypedNFEListener(
         elements from a ProActive group when trying to contact them. This can
         be achieved using the following construction:</para>
 
-        <programlisting language="java"> ProActive.addNFEListenerOnGroup(group, FailedGroupRendezVousException.AUTO_GROUP_PURGE); </programlisting>
+        <programlisting lang="java"> ProActive.addNFEListenerOnGroup(group, FailedGroupRendezVousException.AUTO_GROUP_PURGE); </programlisting>
 
         <para>Note that this currently works only for one-way calls.</para>
       </sect3>

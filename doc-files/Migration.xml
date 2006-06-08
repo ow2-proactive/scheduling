@@ -8,7 +8,7 @@
   <sect1 >
     <title>Migration Primitive</title>
 
-    <indexterm significance="prefered"><primary>Migration</primary></indexterm>
+    <indexterm significance="preferred"><primary>Migration</primary></indexterm>
     
       <para>The migration of an active object can be triggered by the active
     object itself, or by an external agent. In both cases a single primitive
@@ -77,7 +77,7 @@
     is an example of a method in an active object:</para>
 
     
-      <para><programlisting language="java">   public void moveTo(String t) {
+      <para><programlisting lang="java">   public void moveTo(String t) {
      try {
        ProActive.migrateTo(t);
      } catch (Exception e) {
@@ -96,7 +96,7 @@
     <title>Complete example</title>
 
     
-      <para><programlisting language="java">  import org.objectweb.proactive.ProActive;
+      <para><programlisting lang="java">  import org.objectweb.proactive.ProActive;
   public class SimpleAgent implements Serializable {
     public SimpleAgent() {
     }
@@ -169,7 +169,7 @@
     the standard method</para>
 
     
-     <programlisting language="java"> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </programlisting>
+     <programlisting lang="java"> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </programlisting>
     
 
     <para>See the <literal>Serializable</literal> interface in the standard

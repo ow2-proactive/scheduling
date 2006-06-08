@@ -27,7 +27,7 @@
     the Group Communication API is presented. More informations follow.</para>
 
     
-      <para><programlisting language="java">   // created at once, 
+      <para><programlisting lang="java">   // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
 A ag1 = (A) ProActiveGroup.newGroup( 'A', params, [nodes]);
@@ -46,11 +46,12 @@ vg.f1();</programlisting></para>
 
   <sect1  id="TypedGroupCommunication_html_Creation" >
     
-   <indexterm><primary>Group</primary><secondary>Creation</secondary></indexterm>
 
    <title>Creation of a Group</title>
 
-    <para>Any object that is reifiable has the ability to be included in a
+	 <indexterm><primary>Group</primary><secondary>Creation</secondary></indexterm>
+    
+	 <para>Any object that is reifiable has the ability to be included in a
     group. Groups are created using the static method
     <literal>ProActiveGroup.newGroup</literal>. The common superclass for all
     the group members has to be specified, thus giving the group a minimal
@@ -59,7 +60,7 @@ vg.f1();</programlisting></para>
     <para>Let us take a standard Java class:</para>
 
     
-      <para><programlisting language="java">class A { 
+      <para><programlisting lang="java">class A { 
   public A() {}
   public void foo (...) {...}
   public V bar (...) {...}
@@ -70,7 +71,7 @@ vg.f1();</programlisting></para>
     <para>Here are examples of some group creation operations:</para>
 
     
-      <para><programlisting language="java">   // Pre-construction of some parameters: 
+      <para><programlisting lang="java">   // Pre-construction of some parameters: 
    //   For constructors:
 Object[][] params = {{...} , {...} , ... };
    //   Nodes to identify JVMs to map objects
@@ -127,7 +128,7 @@ A ag3 = (A) ProActiveGroup.newGroup('A', params[],
     group:</para>
 
     
-      <para><programlisting language="java">   // definition of one standard Java object
+      <para><programlisting lang="java">   // definition of one standard Java object
    // and two active objects
 A a1 = new A();
 A a2 = (A) ProActive.newActive('A', paramsA[], node);
@@ -168,7 +169,7 @@ A ag1new = (A) gA.getGroupByType();</programlisting></para>
     mechanism implemented by ProActive is used.</para>
 
     
-      <para><programlisting language="java">   // A method call on a group, returning a result
+      <para><programlisting lang="java">   // A method call on a group, returning a result
 V vg = ag1.bar();
    // vg is a typed group of 'V': operation 
    // below is also a collective operation
@@ -194,7 +195,7 @@ vg.f1();</programlisting></para>
     <literal>waitAndGet</literal>. Here is an exemple:</para>
 
     
-      <para><programlisting language="java">   // A method call on a typed group
+      <para><programlisting lang="java">   // A method call on a typed group
 V vg = ag1.bar(); 
    // To wait and capture the first returned 
    // member of vg
@@ -233,7 +234,7 @@ ProActiveGroup.waitAll(vg);
     <literal>unsetScatterGroup</literal> is available.</para>
 
     
-      <para><programlisting language="java">   // Broadcast the group gb to all the members
+      <para><programlisting lang="java">   // Broadcast the group gb to all the members
    // of the group ag1:
 ag1.foo(gb);
    // Change the distribution mode of the 

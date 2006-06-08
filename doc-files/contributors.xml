@@ -5,9 +5,11 @@
 <dedication id="contributors">
     <title>Contributors and Contact Information</title>
 
-    <informaltable frame="none"> <tgroup cols="1"> <tbody> <row> <entry align="center">
+		<para><informaltable frame="none"> <tgroup cols="1"> <tbody> <row> <entry align="center">
 
-         <para><emphasis role="bold">Team Leader:</emphasis></para>
+         <para>
+					 
+					 <emphasis role="bold">Team Leader:</emphasis>
 
          <address>
      <personname><!--<honorific>Prof.</honorific>--><firstname>Denis</firstname> <surname>Caromel</surname></personname>
@@ -21,11 +23,11 @@
      <email>Denis.Caromel@inria.fr</email>
     </address>
    
-    
-  </entry> </row> </tbody> </tgroup> </informaltable>
+	</para>
+</entry> </row> </tbody> </tgroup> </informaltable>
 
         <!--   Oasis team and past contributors on two columns <==> in a two column table   -->
-     <informaltable colsep="0" frame="none" width="100%">
+     <informaltable colsep="0" frame="none" >
       <tgroup cols="2">
        <tbody>
         <row>
@@ -198,7 +200,7 @@
   </row>
  </tbody>
 </tgroup>
-  </informaltable>    
+</informaltable>    </para>
     
   <para><emphasis role="bold">Public questions/comments/discussions should
     be posted on the ProActive public mailing list</emphasis></para>
@@ -210,8 +212,6 @@
   <para><emphasis role="bold">Post bugs to ProActive bug-tracking system GForge</emphasis></para>
       <blockquote> <para><ulink url="http://gforge.inria.fr/tracker/?group_id=180"/> </para></blockquote> 
     
-     <!-- Voir mailing liste pour d'autres contributeurs, trouveurs de bugs, etc.
-          Liste a completer et a mettre à jour, a trier par ordre alphabetique -->
-    
+     <!-- List to be completed and kept up-to-date, sorted alphabeticly -->
     
    </dedication>

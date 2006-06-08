@@ -3,10 +3,12 @@
 <chapter id="IC2D">
   <title>IC2D: Interactive Control and Debugging of Distribution</title>
 
-  <indexterm><primary>IC2D</primary><secondary>Description</secondary></indexterm>
-  <indexterm><primary>Globus</primary><secondary>Monitoring</secondary></indexterm>
+  <para>
+		
+		<indexterm><primary>IC2D</primary><secondary>Description</secondary></indexterm>
+		<indexterm><primary>Globus</primary><secondary>Monitoring</secondary></indexterm>
 
-  <para><emphasis role="bold">IC2D</emphasis> is a <emphasis
+		<emphasis role="bold">IC2D</emphasis> is a <emphasis
   role="bold">graphical environment</emphasis> for remote monitoring and
   steering of <emphasis role="bold">distributed and grid
   applications</emphasis>. IC2D features <emphasis role="bold">graphical
@@ -100,10 +102,9 @@
     <para><emphasis role="bold">IC2D permits to interactively and dynamically
     create new Jvms and Nodes.</emphasis></para>
 
-  <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
-  
-  
-  <para><figure>
+		<indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
+
+		<para><figure>
         <title>A 'drag-and-drop' migration allows to graphically move running
         active objects</title>
 
@@ -153,10 +154,10 @@
     </informalfigure>
    </sect1>
 
-   <indexterm><primary>IC2D</primary><secondary>Fractal GUI</secondary></indexterm>
      
     <sect1>
      <title>Fractal GUI</title>
+		 <indexterm><primary>IC2D</primary><secondary>Fractal GUI</secondary></indexterm>
      <para> You can find a Fractal GUI (menu->Components->Start the Fractal GUI) to edit your ADL files 
       in IC2D. This can only be done before deployment. </para>
     

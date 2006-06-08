@@ -68,4 +68,15 @@
   <xsl:call-template name="inline.charseq"/>
 </xsl:template>
 
+
+<!-- This is an ugly hack: since no entity (&TODAY;) can be set on the saxon command-line, ie in the ant file, 
+      entities only known at run-time are specified in the docbook xml by a <systemitem role="foo"/>.
+     This template performs the replacement : (xml) <systemitem role="foo"/> <==> (ant file) <param name="foo" expression="foo_value"/> -->
+<xsl:template match="systemitem">
+   <xsl:choose>
+     <xsl:when test="@role='VERSION'">v<xsl:copy-of select="$VERSION"/></xsl:when>
+     <xsl:when test="@role='TODAY'"><xsl:copy-of select="$TODAY"/></xsl:when>
+   </xsl:choose>
+</xsl:template>
+
 </xsl:stylesheet>

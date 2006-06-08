@@ -59,7 +59,7 @@
     <sect2 >
       <title>API Definition</title>
 
-      <programlisting language="java">import org.objectweb.proactive.filetransfer;
+      <programlisting lang="java">import org.objectweb.proactive.filetransfer;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
@@ -95,7 +95,7 @@ static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>
       <emphasis>localhost</emphasis>@<emphasis
       role="bold">localDest</emphasis>, in the same fashion.</para>
 
-      <programlisting language="java">import org.objectweb.proactive.filetransfer
+      <programlisting lang="java">import org.objectweb.proactive.filetransfer
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
@@ -326,7 +326,7 @@ and implicitly inferred from the process information. --&gt;
         trigger the retrieval of all files associated with a
         VirtualNode.</para>
 
-        <para><programlisting language="java">import org.objectweb.proactive.core.descriptor.data;
+        <para><programlisting lang="java">import org.objectweb.proactive.core.descriptor.data;
 
 public FileWrapper <emphasis role="bold">VirtualNode.fileTransferRetrieve</emphasis>();</programlisting></para>
 
@@ -335,7 +335,7 @@ public FileWrapper <emphasis role="bold">VirtualNode.fileTransferRetrieve</empha
         virtual node using the <emphasis role="bold">pftp</emphasis>. The
         following shows an example:</para>
 
-        <programlisting language="java">import org.objectweb.proactive.core.descriptor.data;
+        <programlisting lang="java">import org.objectweb.proactive.core.descriptor.data;
 
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 

@@ -181,8 +181,8 @@
     <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
    </authorgroup>
     <title>A Theory of Distributed Object</title>
-    <publisher>Springer-Verlag</publisher>
-    <pubdate>2005</pubdate>
+		<publisher><publishername>Springer Verlag</publishername></publisher>
+		<pubdate>2005</pubdate>
   </biblioentry>
 
 

@@ -28,7 +28,7 @@
   <para>The code for creating a passive instance of <literal>A</literal> could
   be:</para>
 
-  <para><programlisting language="java"> A a = new A(26, "astring"); </programlisting></para>
+  <para><programlisting lang="java"> A a = new A(26, "astring"); </programlisting></para>
 
   <para>In <emphasis role="bold">ProActive</emphasis> there are two ways to
   create active objects. One way is to use
@@ -58,7 +58,7 @@
     be created properly, the reified object must have a declared empty no-args
     constructor.</para>
 
-    <programlisting language="java">    A a;
+    <programlisting lang="java">    A a;
     Object[] params = new Object[] { new Integer (26), "astring" };
     try {
       a = (A) ProActive.newActive("example.A", params);
@@ -113,7 +113,7 @@
         </listitem>
       </itemizedlist>
 
-      <programlisting language="java">    public A (int i) {
+      <programlisting lang="java">    public A (int i) {
         //
     }
     public A (Integer i) {
@@ -146,7 +146,7 @@
       <literal>Node</literal> object that points to an existing node. Here an
       example:</para>
 
-      <programlisting language="java">      a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/aNode");
+      <programlisting lang="java">      a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/aNode");
   or
       Node node = NodeFactory.getNode("rmi://pluto.inria.fr/aNode");
       a = (A) ProActive.newActive("example.A", params, node);</programlisting>
@@ -184,7 +184,7 @@
 
     <para>Code for object-based creation looks like this:</para>
 
-    <programlisting language="java">    A a = new A (26, "astring");
+    <programlisting lang="java">    A a = new A (26, "astring");
     a = (A) ProActive.turnActive(a);</programlisting>
 
     <para>As for <literal>newActive</literal>, the second parameter of
@@ -328,7 +328,7 @@ else
       <example>
         <title>Custom Init and Run</title>
 
-        <para><programlisting language="java">  import org.objectweb.proactive.*;
+        <para><programlisting lang="java">  import org.objectweb.proactive.*;
   public class A implements InitActive, RunActive {
         private String myName;
          public String getName() {
@@ -355,7 +355,7 @@ else
       <para><example>
           <title>Start, stop, suspend, restart a simulation algorithm in runActivity method</title>
 
-          <para><programlisting language="java">import org.objectweb.proactive.*;
+          <para><programlisting lang="java">import org.objectweb.proactive.*;
 public class Simulation implements RunActive {
       private boolean stoppedSimulation=false;
         private boolean startedSimulation=false
@@ -401,7 +401,7 @@ public class Simulation implements RunActive {
         <para>Even when an AO is busy doing its own work, it can remain
         reactive to external events (method calls). One just has to program
         non-blocking services to take into account external
-        inputs.<programlisting language="java">public class BusyButReactive implements RunActive {
+        inputs.<programlisting lang="java">public class BusyButReactive implements RunActive {
 public void  runActivity(Body body) {
 Service service = new Service(body);
 while ( ! hasToTerminate ) {
@@ -442,7 +442,7 @@ public void terminate (){ hasToTerminate=true;}
       activity is generic enough not to have to access the member variables of
       the reified object.</para>
 
-      <programlisting language="java">  import org.objectweb.proactive.*;
+      <programlisting lang="java">  import org.objectweb.proactive.*;
   public class LIFOActivity implements RunActive {
     // -- implements RunActive for serving request in a LIFO fashion
     public void runActivity(Body body) {
@@ -524,7 +524,7 @@ public void terminate (){ hasToTerminate=true;}
     <literal>pA</literal> that takes care of instantiating the active object
     and returns it. The code is:</para>
 
-    <programlisting language="java">  public class AA extends A {
+    <programlisting lang="java">  public class AA extends A {
     public static A createActiveA (int i, String s, Node node) {
       Object[] params = new Object[] {new Integer (i), s};
       try {
@@ -589,20 +589,18 @@ ProActive.turnActive(
   org.objectweb.proactive.core.body.MetaObjectFactory)</screen>
       
      <!-- Create links for the HTML manual -->
-     <ulink os="html"  url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">
-        <screen>ProActive.newActive(
+		 <screen><ulink os="html"  url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.newActive(
   java.lang.String, 
   java.lang.Object[],
   org.objectweb.proactive.core.node.Node, 
   org.objectweb.proactive.Active,  
-  org.objectweb.proactive.core.body.MetaObjectFactory)</screen></ulink>
+	org.objectweb.proactive.core.body.MetaObjectFactory)</ulink></screen>
                
-     <ulink os="html"  url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">
-        <screen>ProActive.turnActive(
+<screen><ulink os="html"  url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.turnActive(
   java.lang.Object,
   org.objectweb.proactive.core.node.Node,
   org.objectweb.proactive.Active,
-  org.objectweb.proactive.core.body.MetaObjectFactory)</screen></ulink>
+	org.objectweb.proactive.core.body.MetaObjectFactory)</ulink></screen>
 
     </sect2>
 
@@ -618,7 +616,7 @@ ProActive.turnActive(
       <literal>ProActiveMetaObjectFactory</literal> is a great time saver 
       as you only redefine what you really need to. Here is an example:</para>
 
-      <para><programlisting language="java">public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
+      <para><programlisting lang="java">public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
   private static final MetaObjectFactory instance = new MyMetaObjectFactory();
   protected MyMetaObjectFactory() {
     super();
@@ -656,7 +654,7 @@ ProActive.turnActive(
       factory when creating a new active object. If we take the same example
       as before we have:</para>
 
-      <programlisting language="java">  Object[] params = new Object[] {new Integer (26), "astring"};
+      <programlisting lang="java">  Object[] params = new Object[] {new Integer (26), "astring"};
   try {
     A a = (A) ProActive.newActive("example.AA", params, null, null, 
                                     MyMetaObjectFactory.newInstance());
@@ -667,7 +665,7 @@ ProActive.turnActive(
       <para>In the case of a <literal>turnActive</literal> we would
       have:</para>
 
-      <programlisting language="java">  A a = new A(26, "astring");
+      <programlisting lang="java">  A a = new A(26, "astring");
   a = (A) ProActive.turnActive(a, null, null, MyMetaObjectFactory.newInstance());</programlisting>
     </sect2>
   </sect1>
@@ -684,7 +682,7 @@ ProActive.turnActive(
     creates an active object of class <literal>B</literal> using a piece of
     code like this:</para>
 
-    <para><programlisting language="java">    B b;
+    <para><programlisting lang="java">    B b;
     Object[] params = {&lt;some parameters for the constructor&gt;};
     try {
       // We create an active instance of B on the current node
@@ -1254,12 +1252,12 @@ ProActive.turnActive(
           otherwise you will loose the asynchronism capabilities. For instance
           if one of your object has a method</para>
 
-          <programlisting language="java"> <emphasis role="bold">int</emphasis> giveSolution(parameter) </programlisting>
+          <programlisting lang="java"> <emphasis role="bold">int</emphasis> giveSolution(parameter) </programlisting>
 
           <para>calling this method with ProActive is sychronous. So to keep
           the asynchronism it is advised to use</para>
 
-          <programlisting language="java"> <emphasis role="bold">IntWrapper </emphasis>giveSolution(parameter) </programlisting>
+          <programlisting lang="java"> <emphasis role="bold">IntWrapper </emphasis>giveSolution(parameter) </programlisting>
 
           <para>In that case call to this method is asynchronous.</para>
 
@@ -1284,7 +1282,7 @@ ProActive.turnActive(
           above, so even if the method returns null, result_from_method cannot
           be null:</para>
 
-          <programlisting language="java">public class MyObject{
+          <programlisting lang="java">public class MyObject{
  public MyObject(){
  //empty constructor with no-args
  }
@@ -1302,7 +1300,7 @@ ProActive.turnActive(
 
           <para>On the caller side:</para>
 
-          <programlisting language="java">MyObject o = new MyObject();
+          <programlisting lang="java">MyObject o = new MyObject();
 Object result_from_method = o.getObject();
 if(result_from_method == null){
 ......
@@ -1421,7 +1419,7 @@ if(result_from_method == null){
       <para>The following piece of code shows both cases: passing a future as
       parameter or as a result.</para>
 
-      <para><programlisting language="java">class C {
+      <para><programlisting lang="java">class C {
 ....
         public static void main(String[] args){
         ......
@@ -1437,13 +1435,13 @@ if(result_from_method == null){
 
       <para>where</para>
 
-      <para><programlisting language="java">class A {
+      <para><programlisting lang="java">class A {
   ...
         public Result foo(){
         ...
         }
   ...
-} //end of class A</programlisting><parameter>and</parameter><programlisting language="java">class B {
+} //end of class A</programlisting><parameter>and</parameter><programlisting lang="java">class B {
 ...
          public Result bar (Result r) {
         ...
@@ -1591,7 +1589,7 @@ if(result_from_method == null){
           <title>A possible implementation for the <literal>Hello</literal>
           class:</title>
 
-          <para><programlisting language="java">public class Hello {
+          <para><programlisting lang="java">public class Hello {
   private String name;
   private String hi = "Hello world";
   private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -1694,7 +1692,7 @@ if(result_from_method == null){
         <example>
           <title>HelloClient.java</title>
 
-          <programlisting language="java">public class HelloClient {
+          <programlisting lang="java">public class HelloClient {
   public static void main(String[] args) {
     Hello myServer;
     String message;
@@ -1771,7 +1769,7 @@ if(result_from_method == null){
       server's URL. The code snippet which instantiates the Server in the same
       VM is the following:</para>
 
-      <programlisting language="java">if (args.length == 0) {
+      <programlisting lang="java">if (args.length == 0) {
   // There is no url to the server, so create an active server within this VM
   myServer = (Hello)org.objectweb.proactive.ProActive.newActive(
         Hello.class.getName(), new Object[]{"local"});

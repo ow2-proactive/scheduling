@@ -16,13 +16,13 @@
     components are created from component definitions. Let us first consider
     the 'A' interface:</para>
 
-    <programlisting language="java">public interface A {
+    <programlisting lang="java">public interface A {
   public String foo(); // dummy method
 } </programlisting>
 
     <para>'AImpl' is the class implementing this interface:</para>
 
-    <programlisting language="java">public class AImpl implements A {
+    <programlisting lang="java">public class AImpl implements A {
  public AImpl() {}
  public String foo() {
  // do something
@@ -31,7 +31,7 @@
 
     <para>The class is then instantiated in a standard way:</para>
 
-    <programlisting language="java"> A object = new AImpl(); </programlisting>
+    <programlisting lang="java"> A object = new AImpl(); </programlisting>
 
     <para>Active objects are instantiated using factory methods from the
      ProActive class (see <xref linkend="HelloWorld"/>). 
@@ -39,7 +39,7 @@
     the active object, the location (node or virtual node), or a factory for
     meta-objects, using the appropriate factory method.</para>
 
-    <programlisting language="java">A active_object = (A)ProActive.newActive(
+    <programlisting lang="java">A active_object = (A)ProActive.newActive(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode, // location, could also be a virtual node
@@ -66,17 +66,17 @@
       fractal.provider system property, and uses this instance to get the
       bootstrap component):</para>
 
-      <programlisting language="java"> Component boot = Fractal.getBootstrapComponent(); </programlisting>
+      <programlisting lang="java"> Component boot = Fractal.getBootstrapComponent(); </programlisting>
 
       <para>We then get the TypeFactory interface provided by this bootstrap
       component:</para>
 
-      <programlisting language="java"> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </programlisting>
+      <programlisting lang="java"> TypeFactory tf = (TypeFactory)boot.getFcInterface('type-factory'); </programlisting>
 
       <para>We can then create the type of the first component, which only
       provides a A server interface named 'a':</para>
 
-      <programlisting language="java">// type of the a component
+      <programlisting lang="java">// type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType('a', 'A', false, false, false)
 }); </programlisting>
@@ -89,7 +89,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       of its content. In this implementation, this is done through the
       ContentDescription class:</para>
 
-      <programlisting language="java">ContentDescription contentDesc = new ContentDescription(
+      <programlisting lang="java">ContentDescription contentDesc = new ContentDescription(
  AImpl, // signature of the base class
  new Object[] {}, // Object[]
  aNode // location, could also be a virtual node
@@ -102,7 +102,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       <para>Properties relative to the controller can be specified in the
       ControllerDescription:</para>
 
-      <programlisting language="java">ControllerDescription controllerDesc = new ControllerDescription(
+      <programlisting lang="java">ControllerDescription controllerDesc = new ControllerDescription(
  'myName', // name of the component
  Constants.PRIMITIVE // the hierarchical type of the component
  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
@@ -112,7 +112,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
       standard Fractal API. This component can then be manipulated as any
       other Fractal component.</para>
 
-      <programlisting language="java">Component component = componentFactory.newFcInstance(
+      <programlisting lang="java">Component component = componentFactory.newFcInstance(
  componentType, // type of the component (defining the client and server interfaces)
  controllerDesc, // implementation-specific description for the controller
  contentDesc // implementation-specific description for the content
@@ -143,7 +143,7 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 
       <para>First, the type of the component is changed:</para>
 
-      <programlisting language="java">// type of the a component
+      <programlisting lang="java">// type of the a component
 ComponentType aType = tf.createFcType(new InterfaceType[] {
  tf.createFcItfType('a', 'A', false, false, false),
  tf.createFcItfType('requiredService', 'A', true, false, false)
@@ -151,14 +151,14 @@ ComponentType aType = tf.createFcType(new InterfaceType[] {
 
       <para>The Service interface is the following:</para>
 
-      <programlisting language="java"><textobject>
+      <programlisting lang="java"><textobject>
         <textdata fileref="examples/components/helloworld/Service.java" />
        </textobject></programlisting>
 
 
       <para>And the AImpl class is:</para>
       <indexterm><primary>Binding</primary><secondary>controller</secondary></indexterm>
-      <programlisting language="java">// The modified AImpl class
+      <programlisting lang="java">// The modified AImpl class
 public class AImpl implements A, BindingController {
  Service service; // attribute corresponding to a client interface
  public AImpl() {}
@@ -533,7 +533,7 @@ ssfully
       <para>
       org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal</para>
 
-     <programlisting language="xml"><textobject>
+     <programlisting lang="xml"><textobject>
        <textdata fileref="examples/components/helloworld/helloworld-distributed-wrappers.fractal" />
       </textobject></programlisting>
  
@@ -541,28 +541,28 @@ ssfully
       <para>
       org.objectweb.proactive.examples.components.helloworld.ClientType.fractal</para>
 
-     <programlisting language="xml"><textobject>
+     <programlisting lang="xml"><textobject>
        <textdata fileref="examples/components/helloworld/ClientType.fractal" />
       </textobject></programlisting>
      
       <para>
       org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal</para>
 
-     <programlisting language="xml"><textobject>
+     <programlisting lang="xml"><textobject>
        <textdata fileref="examples/components/helloworld/ClientImpl.fractal" />
       </textobject></programlisting>
      
       <para>
       org.objectweb.proactive.examples.components.ServerType</para>
      
-     <programlisting language="xml"><textobject>
+     <programlisting lang="xml"><textobject>
        <textdata fileref="examples/components/helloworld/ServerType.fractal" />
       </textobject></programlisting>
       
      <para>
       org.objectweb.proactive.examples.components.helloworld.ServerImpl</para>
      
-     <programlisting language="xml"><textobject>
+     <programlisting lang="xml"><textobject>
        <textdata fileref="examples/components/helloworld/ServerImpl.fractal" />
       </textobject></programlisting>
         </sect2>

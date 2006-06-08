@@ -196,7 +196,7 @@
  <sect2 id="Code">
   <title>Code</title>
   
-  <para>Code sources should be written between PROGRAMLISTING tags (possiblibly language="java" or "xml" ). 
+  <para>Code sources should be written between PROGRAMLISTING tags (possiblibly lang="java" or "xml" ). 
    You don't have to write valid code, as the highlighting (done by LanguageToDocBook classes) is based on 
    regular expression replacement, and not on language grammars.
    If you want to show some program output, you can use SCREEN instead 
@@ -215,14 +215,14 @@
   
   <example>
    <title>JAVA program listing with file inclusion</title>
-   <programlisting language="java"><textobject>
+   <programlisting lang="java"><textobject>
      <textdata fileref="examples/hello/TinyHello.java" />
     </textobject></programlisting>
   </example>
   
   <example>
    <title>XML program listing with file inclusion</title>
-   <programlisting language="xml"><textobject>
+   <programlisting lang="xml"><textobject>
      <textdata fileref="examples/components/c3d/adl/UserImpl.fractal" />
     </textobject></programlisting>
   </example>
@@ -235,7 +235,7 @@
   <para> Here is some java code directly included in the docbook (you can 
   use CDATA to escape  &amp; and &lt;):  </para>
   
-  <programlisting language="java"><![CDATA[package util;
+  <programlisting lang="java"><![CDATA[package util;
                                                    
 import java.io.IOException;
                                                    
@@ -259,7 +259,7 @@ public class JavaToDocBook {
    
    <para>Here is an example of deployment descriptor that deploys 3 virtual nodes .</para>
    
-   <programlisting language="xml">  &lt;!-- Deoploying 3 virtual Nodes  --&gt;
+   <programlisting lang="xml">  &lt;!-- Deoploying 3 virtual Nodes  --&gt;
  &lt;ProActiveDescriptor&gt;                        
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;

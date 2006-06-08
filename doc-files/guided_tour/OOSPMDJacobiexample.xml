@@ -309,7 +309,7 @@
         <para>In class SubMatrix.java, add a Method
         <literal>barrier()</literal> of the form:</para>
 
-       <programlisting language="java">String[] st= new String[1];
+       <programlisting lang="java">String[] st= new String[1];
 st[0]="keepOnGoing";
 ProSPMD.barrier(st);</programlisting>
 
@@ -324,7 +324,7 @@ ProSPMD.barrier(st);</programlisting>
         <literal>keepOnGoing()</literal> on the SPMD group "matrix". Here are
         samples of the code:</para>
 
-       <programlisting language="java">while (true) {
+       <programlisting lang="java">while (true) {
   printMessageAndWait();
   matrix.keepOnGoing();
 }
@@ -516,7 +516,7 @@ private static void printMessageAndWait() {
         can be defined, for instance in order to specify different jvm
         configurations (e.g classpath, java path,...).</para>
 
-       <programlisting language="xml"> &lt;ProActiveDescriptor
+       <programlisting lang="xml"> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;  
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
@@ -576,7 +576,7 @@ private static void printMessageAndWait() {
         <para>Use IC2D to visualize the machines and the JVMs being launched
         on them.</para>
 
-       <programlisting language="xml"> &lt;ProActiveDescriptor
+       <programlisting lang="xml"> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;  
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;

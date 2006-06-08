@@ -112,20 +112,20 @@
 
         <para>Here is the initActivity method:</para>
 
-        <programlisting language="java">public void initActivity(Body body) {
+        <programlisting lang="java">public void initActivity(Body body) {
         System.out.println("I am about to start my activity");
 }         </programlisting>
 
         <para>Here is the endActivity method:</para>
 
-        <programlisting language="java">public void endActivity(Body body) {
+        <programlisting lang="java">public void endActivity(Body body) {
         System.out.println("I have finished my activity");
 }          </programlisting>
 
         <para>The following code shows how to terminate the activity of the
         active object:</para>
 
-       <programlisting language="java">public void terminate() throws IOException {
+       <programlisting lang="java">public void terminate() throws IOException {
         // the termination of the activity is done through a call on the
         // terminate method of the body associated to the current active object
         ProActive.getBodyOnThis().terminate();
@@ -287,13 +287,12 @@ windows&gt; java -Djava.security.policy=scripts\proactive.java.policy \
 
         <para>The migration is initiated by the moveTo method:</para>
 
-        <programlisting language="java">/** method for migrating
+        <programlisting lang="java">/** method for migrating
 * @param destination_node destination node
 */
 public void moveTo(String destination_node) {
         System.out.println("\n-----------------------------");
-        System.out.println("starting migration to node: " + destination_node\
-);
+        System.out.println("starting migration to node: " + destination_node);
         System.out.println("...");
         try {
                 // THIS MUST BE THE LAST CALL OF THE METHOD
@@ -429,15 +428,14 @@ cd ..       </screen>
         this operation is the initActivity method (from InitActive interface),
         that we override:</para>
 
-       <programlisting language="java">/**
+       <programlisting lang="java">/**
  * This method attaches a migration strategy manager to the current active object.
  * The migration strategy manager will help to define which actions to take before
  * and after migrating
  */
 public void initActivity(Body body) {
         // add a migration strategy manager on the current active object
-        migrationStrategyManager = new MigrationStrategyManagerImpl((Migrat\
-able) ProActive.getBodyOnThis());
+        migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) ProActive.getBodyOnThis());
         // specify what to do when the active object is about to migrate
         // the specified method is then invoked by reflection
         migrationStrategyManager.onDeparture('clean');
@@ -448,7 +446,7 @@ able) ProActive.getBodyOnThis());
         here, the method 'clean' will be called before the migration,
         conveniently killing the frame:</para>
 
-       <programlisting language="java">public void clean() {
+       <programlisting lang="java">public void clean() {
         System.out.println("killing frame");
         helloFrame.dispose();
         helloFrame = null;

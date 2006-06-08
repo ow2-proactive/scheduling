@@ -99,10 +99,8 @@
         Queue.</para>
       </listitem>
 
-      
-      <indexterm><primary>Queue</primary><secondary>Task Queue</secondary></indexterm>
-
       <listitem>
+				<indexterm><primary>Queue</primary><secondary>Task Queue</secondary></indexterm>
         <para><emphasis role="bold">Task Queue</emphasis>: provides Task in a
         specific order to the Manager.</para>
       </listitem>
@@ -224,7 +222,7 @@
         <para>Some class variables are provided by the API to help the user
         for keeping a code clear. See next their descriptions:</para>
 
-        <programlisting language="java">protected Result initLowerBound; // to store the lower bound
+        <programlisting lang="java">protected Result initLowerBound; // to store the lower bound
 protected Result initUpperBound; // to store the upper bound
 protected Object bestKnownSolution; // setted automaticaly by the API 
                                 // with the best current solution
@@ -244,20 +242,20 @@ protected Worker worker; // to interact with the API (see after)
             <para>Broadcasting a new better solution to all the other
             class:</para>
 
-            <programlisting language="java"> this.worker.setBestCurrentResult(newBetterSolution); </programlisting>
+            <programlisting lang="java"> this.worker.setBestCurrentResult(newBetterSolution); </programlisting>
           </listitem>
 
           <listitem>
             <para>Sending a set of sub-tasks for computing:</para>
 
-            <programlisting language="java"> this.worker.sendSubTasksToTheManager(subTaskList); </programlisting>
+            <programlisting lang="java"> this.worker.sendSubTasksToTheManager(subTaskList); </programlisting>
           </listitem>
 
           <listitem>
             <para>For a smarter split, checking that the task queue needs more
             tasks:</para>
 
-            <programlisting language="java"> BooleanWrapper workersAvailable = this.worker.isHungry(); </programlisting>
+            <programlisting lang="java"> BooleanWrapper workersAvailable = this.worker.isHungry(); </programlisting>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -294,7 +292,7 @@ protected Worker worker; // to interact with the API (see after)
       <para>Finally, it is the main entry point for starting, and controlling
       your computation.</para>
 
-      <programlisting language="java">Task task = new YourTask(someArguments);
+      <programlisting lang="java">Task task = new YourTask(someArguments);
 Manager manager =  ProActiveBranchNBound.newBnB(task,
                         nodes,
                         LargerQueueImpl.class.getName());
@@ -329,7 +327,7 @@ Result futureResult = manager.start(); // this call is asynchronous</programlist
 
     <para>Firstly, the <emphasis role="bold">Flowshop Task</emphasis>:</para>
 
-    <programlisting language="java">import org.objectweb.proactive.ProActive;
+    <programlisting lang="java">import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.branchnbound.core.Result;
 import org.objectweb.proactive.branchnbound.core.Task;
 import org.objectweb.proactive.branchnbound.core.exception.NoResultsExcepti\
@@ -351,7 +349,7 @@ public class FlowShopTask extends Task {
 
     <para>Computation <emphasis role="bold">bound</emphasis> methods:</para>
 
-    <programlisting language="java">// Compute the lower bound
+    <programlisting lang="java">// Compute the lower bound
 public void initLowerBound() {
   this.lowerBound = this.computeLowerBound(this.fs);
 }
@@ -362,7 +360,7 @@ public void initUpperBound() {
 
     <para>The <emphasis role="bold">split</emphasis> method:</para>
 
-    <programlisting language="java">public Vector split() {
+    <programlisting lang="java">public Vector split() {
   // Divide the set of permutations in 10 sub-tasks
   int nbTasks = 10;
   Vector tasks = new Vector(nbTasks);
@@ -375,7 +373,7 @@ public void initUpperBound() {
 
     <para>Then, the <emphasis role="bold">execute</emphasis> method:</para>
 
-    <programlisting language="java">public Result execute() {
+    <programlisting lang="java">public Result execute() {
        
   if (! this.iHaveToSplit()) {
   // Test all permutation

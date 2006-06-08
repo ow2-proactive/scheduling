@@ -210,11 +210,11 @@
 
     <sect2 >
       
-     <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
-
      <title>Drag-and-drop migration</title>
 
-      <para>From IC2D, you can drag-and-drop active objects from one JVM to
+		 <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
+      
+		 <para>From IC2D, you can drag-and-drop active objects from one JVM to
       another. Click the right button on a C3DRenderingEngine, and drag and
       drop it in another JVM. Observe the migration taking place.</para>
 
@@ -299,12 +299,11 @@ scripts/windows/components$ c3d.bat</screen>
  (start IC2D, menu->Components->Start the Fractal GUI). You should specify how to read the file. 
  You have to enter: </para>     
 <itemizedlist>
- <listitem>File->Storeage: <literal>ProActive/src</literal>.</listitem>
- <listitem>File->Open:<literal>ProActive/src/org/objectweb/proactive/examples/c3d/adl/userAndComposite.fractal</literal>.</listitem>
+	<listitem><para>File->Storeage: <literal>ProActive/src</literal>.</para></listitem>
+		<listitem><para>File->Open:<literal>ProActive/src/org/objectweb/proactive/examples/c3d/adl/userAndComposite.fractal</literal>.</para></listitem>
 </itemizedlist>
 <figure>
       <title>IC2D component explorer with the C3D example</title>
-      
       <mediaobject>
        <imageobject>
         <imagedata contentwidth="100"
@@ -637,10 +636,12 @@ scripts/windows/components$ c3d.bat</screen>
 
         <figure>
          <title>Monitoring new RMI host with IC2D</title>
+				 <mediaobject>
          <imageobject>
              <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png"
                          format="PNG" contentwidth="100" width="4in" />
          </imageobject>
+			   </mediaobject>
         </figure> 
         
         <para>It is possible to visualize the
@@ -671,11 +672,12 @@ scripts/windows/components$ c3d.bat</screen>
 
   <sect1 >
     
-   <indexterm><primary>Migration</primary><secondary>example</secondary></indexterm>
 
    <title>Migration of active objects</title>
 
-    <para>ProActive allows the transparent migration of objects between
+	 <indexterm><primary>Migration</primary><secondary>example</secondary></indexterm>
+     
+	 <para>ProActive allows the transparent migration of objects between
     virtual machines.</para>
 
     <para>A nice visual example is the penguin's one.</para>

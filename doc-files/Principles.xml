@@ -130,13 +130,13 @@
 
     <example>
       <title>Class-based Active Object</title>
-      <programlisting language="java">Object[] params = new Object[] { new Integer (26), "astring" };
+      <programlisting lang="java">Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) ProActive.newActive("example.A", params, node); </programlisting>
     </example>
     
     <example>
       <title>Instantiation-based Active Object</title>
-      <programlisting language="java">public class AA extends A implements Active {}
+      <programlisting lang="java">public class AA extends A implements Active {}
 Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
     </example>
@@ -147,7 +147,7 @@ A a = (A) ProActive.newActive("example.AA", params, node); </programlisting>
 
     <example>
       <title>Object-based Active Object</title>
-      <programlisting language="java">A a = new A (26, "astring");
+      <programlisting lang="java">A a = new A (26, "astring");
 a = (A) ProActive.turnActive(a, node) ; </programlisting>
     </example>
 
@@ -291,7 +291,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
 
       <example>
         <title>A possible implementation for the <literal>TinyHello</literal> class</title>
-        <programlisting language="java"><textobject>
+        <programlisting lang="java"><textobject>
             <textdata fileref="examples/hello/TinyHello.java" />
           </textobject></programlisting>
       </example>
@@ -319,7 +319,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
       <literal>TinyHello</literal> in the same VM is the following (in the
       <literal>main</literal> method):</para>
 
-      <programlisting language="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
+      <programlisting lang="java">        TinyHello tiny = (TinyHello) ProActive.newActive(
                 TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
             ); // which jvm should be used to hold the Active Object</programlisting>
@@ -339,7 +339,7 @@ a = (A) ProActive.turnActive(a, node) ; </programlisting>
       the way to call the <literal>sayHello</literal> method in this example
       is the following (in the <literal>main</literal> method):</para>
 
-      <programlisting language="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
+      <programlisting lang="java">        StringMutableWrapper received = tiny.sayHello(); // possibly remote call
         logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity</programlisting>
     </sect2>
 

@@ -58,6 +58,7 @@ import javax.xml.parsers.SAXParserFactory;
  * highlighted by the method highlight(String).  It is then fed back into the stream.
  */
 public class DocBookize extends DefaultHandler {
+    static boolean SHORT_LINES = false;
     private final String[] FILEPATH; // the possible places where to look for cited files
     private String programContent = null; // when reading programlisting, stores the characters for highlighting
     private BufferedWriter out; // the output stream, ie the initial file + decoration  
@@ -129,6 +130,7 @@ public class DocBookize extends DefaultHandler {
         print("<?xml version='1.0' encoding='UTF-8'?>\n");
         print(
             "<!-- DocBookize has been run to highlight keywords in code examples -->\n");
+        print("<!DOCTYPE book PUBLIC \"-//INRIA//DTD DocBook V4.2-Based Subset V0.1//EN\" \"http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.1/ProActiveManual.dtd\" >");
     }
 
     /** Default handler operation when end document is encountered */
@@ -144,7 +146,8 @@ public class DocBookize extends DefaultHandler {
     public void startElement(String namespaceURI, String localName,
         String realName, Attributes attrs) throws SAXException {
         String tagName = localName; // element name
-
+        boolean filerefChanged = false;
+        
         if ("".equals(tagName)) {
             tagName = realName; // namespaceAware = false
         }
@@ -188,6 +191,7 @@ public class DocBookize extends DefaultHandler {
                 }
 
                 if (aName.equals("linkend")) {
+                    filerefChanged = true;
                     fileRef = attrs.getValue(i);
                 }
 
@@ -204,14 +208,15 @@ public class DocBookize extends DefaultHandler {
                     this.srcFilesAlreadyAdded.add(fileRef);
 
                     String listing = new String();
-                    listing += ("<example id=\"" +
-                    fileRef.replaceAll("/", ".") + "\">");
-                    listing += (" <title os=\"html\" > <ulink url=\"" + fileRef + "\"> "+fileRef+"</ulink></title>");
-                    listing += (" <title os=\"pdf\" > " + fileRef + "</title>");
-                    listing += (" <programlisting os=\"pdf\" language=\"" + this.language +
-                    "\">");
+                    listing += ("<example id=\"" + fileRef.replaceAll("/", ".") + "\">");
+                    listing += (" <title> ");
+                    listing += (" <phrase os=\"html\" > <ulink url=\"" + fileRef + "\"> "+fileRef+"</ulink></phrase>");
+                    listing += (" <phrase os=\"pdf\" > " + fileRef + "</phrase>");
+                    listing += (" </title> ");
+                    listing += (" <programlisting os=\"pdf\" lang=\"" + this.language + "\">");
                     listing += (highlight(getFileContent(fileRef)));
                     listing += (" </programlisting>");
+                    listing += (" <para os=\"html\" /> ");  // don't leave the example empty if using html
                     listing += ("</example>");
 
                     if (this.srcContentsToAdd.containsKey(role)) {
@@ -238,10 +243,13 @@ public class DocBookize extends DefaultHandler {
 
                 print(' ' + aName);
                 print("=\"");
-                print(attrs.getValue(i));
-                print("\" ");
+                if (filerefChanged && aName.equals("linkend"))
+                    print(attrs.getValue(i).replaceAll("/", "."));
+                else
+                    print(attrs.getValue(i));
+                print("\"");
 
-                if (aName.toLowerCase().equals("language")) {
+                if (aName.toLowerCase().equals("lang")) {
                     this.language = attrs.getValue(i).toLowerCase();
                 }
 
@@ -307,7 +315,12 @@ public class DocBookize extends DefaultHandler {
             print(highlighted);
         }
 
-        print("</" + realName + ">");
+        // print also a newline to have reasonably lengthed lines but some scrren listings will be ill-formed.   
+        if (SHORT_LINES)
+            print("</" + realName + ">\n");
+        else
+            print("</" + realName + ">");
+
     }
 
     /** Default handler operation when a string of characters is encountered */

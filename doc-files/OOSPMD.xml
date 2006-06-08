@@ -51,7 +51,7 @@
     <para>Given a standard Java class:</para>
 
     
-      <para><programlisting language="java">class A { 
+      <para><programlisting lang="java">class A { 
   public A() {}
   public void foo (...) {...}
   public void bar (...) {...}
@@ -62,7 +62,7 @@
     <para>The spmd group is built as follow:</para>
 
     
-      <para><programlisting language="java">  Object[][] params = {{...} , {...} , ... }; 
+      <para><programlisting lang="java">  Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
   A agroup = (A) ProSPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
     
@@ -133,7 +133,7 @@
     barrier, here the method <emphasis role="bold">foo</emphasis>:</para>
 
     
-      <para><programlisting language="java">class A { 
+      <para><programlisting lang="java">class A { 
   public A() {}
   public void foo (...) {
     ...
@@ -150,7 +150,7 @@
     The spmd group is built as follow:</para>
 
     
-      <para><programlisting language="java">  Object[][] params = {{...} , {...} , ... }; 
+      <para><programlisting lang="java">  Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
   A agroup = (A) ProSPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
     
@@ -158,7 +158,7 @@
     <para>Here the main method of our application:</para>
 
     
-      <para><programlisting language="java">  agroup.foo();
+      <para><programlisting lang="java">  agroup.foo();
   agroup.bar();</programlisting></para>
     
 
@@ -200,18 +200,15 @@
     
     See the javadoc of the topology package for more information:</para>
    
-   <blockquote> 
-    <ulink url="../api/org/objectweb/proactive/core/group/topology/package-summary.html">
-       <screen>org.objectweb.proactive.core.group.topology</screen>
-      </ulink>
-   </blockquote>
+		 <screen><ulink
+ url="../api/org/objectweb/proactive/core/group/topology/package-summary.html">org.objectweb.proactive.core.group.topology</ulink></screen>
    
     <para>Like for the Total barrier, the string parameter represents a unique
     identity name for the barrier. The second parameter is the group of
     neighbors built by the programmer. Here is an example:</para>
 
     
-      <para><programlisting language="java"> ProSPMD.barrier('MyString', neighborGroup); </programlisting></para>
+      <para><programlisting lang="java"> ProSPMD.barrier('MyString', neighborGroup); </programlisting></para>
     
 
     <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use of the
@@ -236,7 +233,7 @@
     methods. The order of the methods does not matter. For example:</para>
 
     
-      <para><programlisting language="java"> ProSPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
+      <para><programlisting lang="java"> ProSPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
     
 
     <para>The caller will stop and wait for the three methods. bar or gee can
@@ -244,7 +241,7 @@
     wait for gee, three calls can be successively done:</para>
 
     
-      <para><programlisting language="java">   ProSPMD.barrier({'foo'});
+      <para><programlisting lang="java">   ProSPMD.barrier({'foo'});
    ProSPMD.barrier({'bar'});
    ProSPMD.barrier({'gee'}); </programlisting></para>
     
@@ -259,7 +256,7 @@
    
     Barriers are not triggered at the place they are declared in the code. 
     Instead, they are run at the end of the method. Look at this code:</para>
-    <programlisting language="java">public void MyMethodWithBarrier () {
+    <programlisting lang="java">public void MyMethodWithBarrier () {
     foo();
     ProSPMD.barrier("barrier");
     bar();
@@ -276,7 +273,7 @@
   
   <para>To enforce the barrier, you should make the barrier the last action 
    of your method, or you can use this trick:</para>
-  <programlisting language="java">    foo();
+  <programlisting lang="java">    foo();
     ProSPMD.barrier("barrier");
     this.asyncRefToSelf.bar();</programlisting>
     

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
-  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V4.2-Based Subset V0.1//EN" 
+     "http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.1/ProActiveManual.dtd" [
 <!ENTITY contributors SYSTEM "contributors.xml">
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
@@ -49,8 +49,8 @@
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
 ]>
 <book>
-  <bookinfo>
-    <title>ProActive v3.1 Documentation</title>
+	<bookinfo>
+    <title>ProActive <systemitem role="VERSION"/> Documentation</title>
 
     <subtitle>A Comprehensive Solution for Grid Computing</subtitle>
 
@@ -81,10 +81,10 @@
     <revhistory>  
     <revision>
         <revnumber>3.1</revnumber>
-        <date>2006-04-12</date>
+        <date>2006-06-30</date>
     </revision>
     <revision>
-        <revnumber>3.01</revnumber>
+        <revnumber>3.0.1</revnumber>
         <date>2005-12-16</date>
     </revision>
     </revhistory>
@@ -237,8 +237,8 @@
     &Principles;
     &Installation; 
   </part>
-   
- <part id="ProActiveGuidedTour">
+ 
+	<part id="ProActiveGuidedTour">
    <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
@@ -304,7 +304,7 @@
     &devFaultTolerance;
     &MOP;
    </part>
-   
+     
    <part id="backMattersPart">
     <title>Back matters</title>
     &FAQ;   

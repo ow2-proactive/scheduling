@@ -1246,7 +1246,7 @@
       will notify a 'listener' (one of your class), every time a new node is
       available.</para>
 
-      <programlisting language="java"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor('myP2PXmlDescriptor.xml');
+      <programlisting lang="java"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor('myP2PXmlDescriptor.xml');
  // getting virtual node 'p2pvn' defined in the ProActive Deployement Descriptor
  VirtualNode vn = pad.getVirtualNode('p2pvn');
  
@@ -1264,7 +1264,7 @@
       org.objectweb.proactive.core.event. For example, this method will be
       called every time a new host is acquired:</para>
 
-      <programlisting language="java"> public void nodeCreated(NodeCreationEvent event) 
+      <programlisting lang="java"> public void nodeCreated(NodeCreationEvent event) 
  {
  // get the node
  Node newNode = event.getNode();
@@ -1322,7 +1322,7 @@
       <para>The next little sample of code explains how, from an application,
       you can start a P2P Service and get nodes:</para>
 
-      <programlisting language="java">import org.objectweb.proactive.ProActive;
+      <programlisting lang="java">import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
