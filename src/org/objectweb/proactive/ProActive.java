@@ -2114,4 +2114,13 @@ public class ProActive {
     public static void exitFailure() {
     	System.exit(1);
     }
+
+    /**
+     * After this call, when the JVM has no more active objects
+     * it will be killed.
+     *
+     */
+    public void enableExitOnEmpty() {
+    	LocalBodyStore.getInstance().enableExitOnEmpty();
+    }
 }
