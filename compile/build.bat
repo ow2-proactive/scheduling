@@ -29,3 +29,4 @@ goto end
 
 
 :end
+set WHEN_NO_ARGS=
