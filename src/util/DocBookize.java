@@ -32,6 +32,7 @@ package util;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.BufferedReader;
@@ -57,7 +58,7 @@ import javax.xml.parsers.SAXParserFactory;
  * until a tag <programmlisting> or <screen> is found. The data inside the tags is then
  * highlighted by the method highlight(String).  It is then fed back into the stream.
  */
-public class DocBookize extends DefaultHandler {
+public class DocBookize extends DefaultHandler implements LexicalHandler {
     static boolean SHORT_LINES = false;
     private final String[] FILEPATH; // the possible places where to look for cited files
     private String programContent = null; // when reading programlisting, stores the characters for highlighting
@@ -93,8 +94,8 @@ public class DocBookize extends DefaultHandler {
 
         String fileToBeautify = argv[0];
         System.out.println(
-            "Beautifying code examples within <programlisting> tags in " +
-            fileToBeautify);
+            "[INFO] Beautifying code examples within <programlisting> tags (" +
+            fileToBeautify + ")");
 
         // Create SAX machinery 
         File inputFile = new File(fileToBeautify);
@@ -103,10 +104,16 @@ public class DocBookize extends DefaultHandler {
         argv[0] = inputFile.getParent() + "/"; // the directory of file to beautify
 
         DocBookize handler = new DocBookize(fileToBeautify + ".tmp", argv);
+
         SAXParserFactory factory = SAXParserFactory.newInstance();
+
+        factory.setNamespaceAware(true);
 
         try {
             SAXParser saxParser = factory.newSAXParser();
+            saxParser.getXMLReader()
+                     .setProperty("http://xml.org/sax/properties/lexical-handler",
+                handler);
             // parse the file, using DocBookize.methods to handle tags
             saxParser.parse(inputFile, handler);
 
@@ -130,7 +137,6 @@ public class DocBookize extends DefaultHandler {
         print("<?xml version='1.0' encoding='UTF-8'?>\n");
         print(
             "<!-- DocBookize has been run to highlight keywords in code examples -->\n");
-        print("<!DOCTYPE book PUBLIC \"-//INRIA//DTD DocBook V4.2-Based Subset V0.1//EN\" \"http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.1/ProActiveManual.dtd\" >");
     }
 
     /** Default handler operation when end document is encountered */
@@ -147,7 +153,7 @@ public class DocBookize extends DefaultHandler {
         String realName, Attributes attrs) throws SAXException {
         String tagName = localName; // element name
         boolean filerefChanged = false;
-        
+
         if ("".equals(tagName)) {
             tagName = realName; // namespaceAware = false
         }
@@ -208,15 +214,19 @@ public class DocBookize extends DefaultHandler {
                     this.srcFilesAlreadyAdded.add(fileRef);
 
                     String listing = new String();
-                    listing += ("<example id=\"" + fileRef.replaceAll("/", ".") + "\">");
+                    listing += ("<example id=\"" +
+                    fileRef.replaceAll("/", ".") + "\">");
                     listing += (" <title> ");
-                    listing += (" <phrase os=\"html\" > <ulink url=\"" + fileRef + "\"> "+fileRef+"</ulink></phrase>");
-                    listing += (" <phrase os=\"pdf\" > " + fileRef + "</phrase>");
+                    listing += (" <phrase os=\"html\" > <ulink url=\"" +
+                    fileRef + "\"> " + fileRef + "</ulink></phrase>");
+                    listing += (" <phrase os=\"pdf\" > " + fileRef +
+                    "</phrase>");
                     listing += (" </title> ");
-                    listing += (" <programlisting os=\"pdf\" lang=\"" + this.language + "\">");
+                    listing += (" <programlisting os=\"pdf\" lang=\"" +
+                    this.language + "\">");
                     listing += (highlight(getFileContent(fileRef)));
                     listing += (" </programlisting>");
-                    listing += (" <para os=\"html\" /> ");  // don't leave the example empty if using html
+                    listing += (" <para os=\"html\" /> "); // don't leave the example empty if using html
                     listing += ("</example>");
 
                     if (this.srcContentsToAdd.containsKey(role)) {
@@ -243,10 +253,13 @@ public class DocBookize extends DefaultHandler {
 
                 print(' ' + aName);
                 print("=\"");
-                if (filerefChanged && aName.equals("linkend"))
+
+                if (filerefChanged && aName.equals("linkend")) {
                     print(attrs.getValue(i).replaceAll("/", "."));
-                else
+                } else {
                     print(attrs.getValue(i));
+                }
+
                 print("\"");
 
                 if (aName.toLowerCase().equals("lang")) {
@@ -316,11 +329,11 @@ public class DocBookize extends DefaultHandler {
         }
 
         // print also a newline to have reasonably lengthed lines but some scrren listings will be ill-formed.   
-        if (SHORT_LINES)
+        if (SHORT_LINES) {
             print("</" + realName + ">\n");
-        else
+        } else {
             print("</" + realName + ">");
-
+        }
     }
 
     /** Default handler operation when a string of characters is encountered */
@@ -451,5 +464,30 @@ public class DocBookize extends DefaultHandler {
         }
 
         return result;
+    }
+
+    public void startDTD(String baseElement, String publicId, String systemId)
+        throws SAXException {
+        // also include in the output the dtd in original file.
+        print("<!DOCTYPE " + baseElement + " PUBLIC \"" + publicId + "\" \"" +
+            systemId + "\">\n");
+    }
+
+    public void endDTD() throws SAXException {
+    }
+
+    public void comment(char[] s, int i, int j) throws SAXException {
+    }
+
+    public void startCDATA() throws SAXException {
+    }
+
+    public void endCDATA() throws SAXException {
+    }
+
+    public void startEntity(String ent) throws SAXException {
+    }
+
+    public void endEntity(String ent) throws SAXException {
     }
 }

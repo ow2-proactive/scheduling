@@ -241,7 +241,7 @@ import java.io.IOException;
                                                    
 /** Just a dummy class. */
 
-public class JavaToDocBook {
+public class Dummy {
                                                    
   /** Just the method description 
    * @param fileToConvert the name of the file to convert 
@@ -259,7 +259,7 @@ public class JavaToDocBook {
    
    <para>Here is an example of deployment descriptor that deploys 3 virtual nodes .</para>
    
-   <programlisting lang="xml">  &lt;!-- Deoploying 3 virtual Nodes  --&gt;
+   <programlisting lang="xml">  &lt;!-- Deploying 3 virtual Nodes  --&gt;
  &lt;ProActiveDescriptor&gt;                        
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
@@ -366,12 +366,14 @@ public class JavaToDocBook {
    tags I recommend to use are the ones described in the section above (those 
    which are used in this tutorial), namely
    <itemizedlist>
-    <listitem> <para> chapter, sect*, para, emphasis, link, ulink </para> </listitem>
-    <listitem> <para> figure, informalfigure, mediaobject , imagedata </para> </listitem>
-    <listitem> <para> itemizedlist and orderedlist </para> </listitem>
-    <listitem> <para> screen and literal </para> </listitem>
-   </itemizedlist>
-  </para>
+     <listitem> <para>part, appendix, chapter, sect*, title, para, emphasis, xref, ulink</para> </listitem>
+     <listitem> <para>table, figure, caption, informalfigure, informaltable </para> </listitem>
+     <listitem> <para>itemizedlist and orderedlist, listitem</para> </listitem>
+     <listitem> <para>example, programlisting, screen, blockquote, and literal</para> </listitem>
+     <listitem> <para>The others that you might come along, albeit less frequently, are 
+       citation, email, indexterm, inlinemediaobject, note, answer, question, subscript, superscript  </para> </listitem>
+   </itemizedlist>  
+   </para>
 </sect1>
 
 <sect1 id="DocBookCustomization">
@@ -481,6 +483,24 @@ public class JavaToDocBook {
    I'm sorry but I have not found a way to trace the call tree of a method, 
    ie knowing exactly where it comes from. Have to do without!
   </para>
+ </sect2>
+ 
+ <sect2>
+  <title id="customizingTheDTD">DocBook subset: the dtd</title>
+  
+  <para>The dtd is the file detailling which are the allowed tags in our
+   DocBook subset. Some tags have been removed, to make it easier to
+   manage. Please refer to the file called
+   <literal>doc-files/ProActiveManual.dtd</literal> to know how much
+   freedom you have been granted. </para>
+  
+  <para>When you run the manual generation through the ant tasks, the xml
+   is checked for validity. The message you should see is 
+   <screen>XML is VALID and complies to dtd in ../docs/tmp/PA_index.xml</screen></para>
+  
+  <para>If you happen to modify the dtd, you should put also copy it on
+   the web, on <literal>/proj/oasis/www/proactive/doc/dtd/$version/</literal> or else
+   the previous one will always be used. </para>
  </sect2>
  
  <sect2>

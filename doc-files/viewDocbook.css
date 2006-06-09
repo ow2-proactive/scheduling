@@ -199,20 +199,7 @@ caption {
 textdata {
     display: inline;
 }
-
-
-blockquote {
-    display: block;
-    margin: 1.33ex 10ex; 
-}
-
-blockquote > title {
-    font-style: italic;
-    font-weight: normal;
-    text-align: center;
-    margin: 0; /* content of blockquote already has a margin */
-}
-       
+      
 attribution {
     display: block;
     text-align: right;

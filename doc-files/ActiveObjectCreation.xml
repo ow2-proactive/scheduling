@@ -1435,13 +1435,17 @@ if(result_from_method == null){
 
       <para>where</para>
 
-      <para><programlisting lang="java">class A {
+<programlisting lang="java">class A {
   ...
         public Result foo(){
         ...
         }
   ...
-} //end of class A</programlisting><parameter>and</parameter><programlisting lang="java">class B {
+} //end of class A</programlisting> 
+
+<para>and</para>
+
+<programlisting lang="java">class B {
 ...
          public Result bar (Result r) {
         ...
@@ -1451,7 +1455,7 @@ if(result_from_method == null){
          A a = newActive(A);
         return a.foo();     //  <emphasis role="bold">**</emphasis> future is sent as a result
          }
-} //end of class B</programlisting></para>
+} //end of class B</programlisting>
     </sect2>
 
     <sect2 >

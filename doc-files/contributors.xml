@@ -204,13 +204,13 @@
     
   <para><emphasis role="bold">Public questions/comments/discussions should
     be posted on the ProActive public mailing list</emphasis></para>
-    <blockquote> <para><email>proactive@objectweb.org</email> </para></blockquote> 
+      <para><email>proactive@objectweb.org</email> </para> 
     
   <para><emphasis role="bold">Mailing list archive at</emphasis></para>
-      <blockquote> <para><ulink url="http://www.objectweb.org/wws/arc/proactive"/> </para></blockquote> 
+        <para><ulink url="http://www.objectweb.org/wws/arc/proactive"/> </para> 
     
   <para><emphasis role="bold">Post bugs to ProActive bug-tracking system GForge</emphasis></para>
-      <blockquote> <para><ulink url="http://gforge.inria.fr/tracker/?group_id=180"/> </para></blockquote> 
+       <para><ulink url="http://gforge.inria.fr/tracker/?group_id=180"/> </para> 
     
      <!-- List to be completed and kept up-to-date, sorted alphabeticly -->
     
