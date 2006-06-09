@@ -46,7 +46,7 @@
         <para>In short, one considers several bodies (sometimes called particles) in space, where the only
  force is due to gravity. When only two bodies are at hand, this is expressed as</para>
         <para>
-          <informaltable frame="none">
+         <informaltable colsep="0" frame="none" >
             <tgroup cols="2">
               <tbody>
                 <row>
@@ -218,7 +218,7 @@
  your ProActive classes implement Serializable. For example, migration requires everything to
  implement it, fault-tolerance also.... </para>
             <para>The Force class is just the implementation of what a physical force really
-             is. It is the implementation of a 2D vector, with the method add following the
+             is. It is the implementation of a 3D vector, with the method add following the
              physics rule</para>
              
             <para>
@@ -234,10 +234,8 @@
              
           </listitem>
           <listitem>
-            <para> Point2D.java and Rectangle.java are helper files. They simply implement what a point in
- space looks like, and what a rectangle is. They were created to avoid the trouble of using the
- standard java java.awt.geom.Point2D and java.awt.geom.Rectangle2D, which carry a bit too much
- overhead, and also to have them Serializable.</para>
+            <para> Point3D.java and Cube.java are helper files. They simply implement what a point in
+ space looks like, and what a region of space is. Of course, they were created as being Serializable.</para>
           </listitem>
           <listitem>
             <para> And finally, the Start.java acts as the wrapper for the main() method. There is a part
