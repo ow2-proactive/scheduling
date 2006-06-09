@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Dispatcher" property="unique_singleAO"/>
@@ -54,12 +57,20 @@
 			<processDefinition id="linuxJVM1">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="/net/home/rquilici/ProActive/classes"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/bcel.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/asm.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/jini-core.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/jini-ext.jar"/>
-						<absolutePath  value="/net/home/rquilici/ProActive/lib/reggie.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						
+						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/jini-core.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/jini-ext.jar"/>
+						<absolutePath  value="${PROACTIVE_HOME}/lib/reggie.jar"/>
+						
+						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="/usr/local/jdk1.4.0/bin/java"/>

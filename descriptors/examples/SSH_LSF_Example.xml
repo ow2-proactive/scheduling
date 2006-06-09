@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="plugtest" timeout="160000"/>
@@ -26,24 +29,24 @@
 			<processDefinition id="localJVM1">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/ProActive.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/asm.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/log4j.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/fractal.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/xercesImpl.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/bouncycastle.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/jsch.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/javassist.jar"/>
-						<absolutePath value="/net/home/plugtest/ProActive/lib/nqueen.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="/net/home/plugtest/j2sdk1.4.2_05/bin/java"/>
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/net/home/plugtest/ProActive/scripts/proactive.java.policy"/>
+						<absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/>
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/net/home/plugtest/ProActive/scripts/proactive-log4j"/>
+						<absolutePath value="${PROACTIVE_HOME}/scripts/proactive-log4j"/>
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter value="-Dproactive.communication.protocol=rmissh"/>

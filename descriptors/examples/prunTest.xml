@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="prunNode"/>
@@ -26,29 +29,36 @@
 			<processDefinition id="linuxJVM1">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/classes"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/componets/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/nqueen.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
+						
+						<absolutePath value="${PROACTIVE_HOME}/lib/jini-core.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/jini-ext.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/lib/reggie.jar"/>
+						
+						<absolutePath value="${PROACTIVE_HOME}/classes"/>
 						<absolutePath value="/home1/fabrice/workIbis/Ibis/classes"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/bcel.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/asm.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/jini-core.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/jini-ext.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/reggie.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/log4j.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="/usr/local/sun-java/jdk1.4/bin/java"/>
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive.java.policy"/>
+						<absolutePath value="/${PROACTIVE_HOME}scripts/unix/proactive.java.policy"/>
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive-log4j"/>
+						<absolutePath value="${PROACTIVE_HOME}/scripts/unix/proactive-log4j"/>
 					</log4jpropertiesFile>
 					<jvmParameters>
 						<parameter value="-DXXXXXXXXX=YYYYYYYY "/>
-						<parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib "/>
-						<parameter value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
+						<parameter value="-Djava.library.path=${PROACTIVE_HOME}/lib "/>
+						<parameter value="-Dproactive.configuration=${PROACTIVE_HOME}/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
