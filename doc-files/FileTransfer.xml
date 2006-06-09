@@ -3,7 +3,7 @@
 <chapter id="FileTransfer">
   <title>ProActive File Transfer Model</title>
 
-  <sect1  id="FileTransfer_html_intro">
+  <sect1 id="FileTransfer_html_intro">
     <title>Introduction and Concepts</title>
 
     <para>Currently we provide support for the following type of
@@ -53,21 +53,21 @@
     </itemizedlist>
   </sect1>
 
-  <sect1  id="dbdoclet.id.FileTransfer_html_objectives">
+  <sect1 id="dbdoclet.id.FileTransfer_html_objectives">
     <title>File Transfer API</title>
 
-    <sect2 >
+    <sect2>
       <title>API Definition</title>
 
       <programlisting lang="java">import org.objectweb.proactive.filetransfer;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 
-static public BooleanWrapper <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
-static public BooleanWrapper <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File<emphasis
+static public FileVector <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
+static public FileVector <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File<emphasis
           role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);
-static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);
-static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File<emphasis
+static public FileVector <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);
+static public FileVector <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File<emphasis
           role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);</programlisting>
 
       <para>These methods can be used to put and get files on a remote Node
@@ -79,7 +79,7 @@ static public FileWrapper <emphasis role="bold">FileTransfer.pullFile</emphasis>
       calls and futures</emphasis> section of this manual.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>How to use the API</title>
 
       <para>In the following example, a Node is deployed using a descriptor
@@ -107,13 +107,13 @@ Node[] examplenode = testVNode.getNodes();
 
 File localSource = new File("/local/source/path/file");
 File remoteDest = new File("/remote/destination/path/file");
-<emphasis role="bold">BooleanWrapper bw=FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
-<emphasis role="bold">bw.booleanValue();</emphasis>  //wait-by-neccessity for push to finish
+<emphasis role="bold">FileVector filePushed =FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
+<emphasis role="bold">filePushed.waitForAll();</emphasis>  //wait for push to finish
 
 File remoteSource = new File("/remote/source/path/file");
 File localDest = new File("/local/destination/path/file");
-<emphasis role="bold">FileWrapper filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);
-File files[] = filePulled.getFiles(); <emphasis>//wait-by-neccessity for pull to finish
+<emphasis role="bold">FileVector filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);
+File  file = filePulled.getFile(0); <emphasis>//wait for pull to finish
 </emphasis></emphasis></programlisting>
     </sect2>
   </sect1>
@@ -221,9 +221,11 @@ and implicitly inferred from the process information. --&gt;
 &lt;/processDefinition&gt;
 </screen></para>
 
-<indexterm><primary>CopyProtocol</primary></indexterm>
+      <indexterm>
+        <primary>CopyProtocol</primary>
+      </indexterm>
 
-<para>In the example above, <emphasis
+      <para>In the example above, <emphasis
       role="bold">fileTransferDeploy</emphasis> has an implicit refid. This
       means that the File Transfer definitions used will be inherited from the
       VirtualNode. The first element shown inside this tag corresponds to
@@ -356,14 +358,15 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
     </sect2>
   </sect1>
 
-  <sect1  id="dbdoclet.id.FileTransfer_html_design" xreflabel="FileTransfer Design" >
+  <sect1 id="dbdoclet.id.FileTransfer_html_design"
+         xreflabel="FileTransfer Design">
     <title>Advanced: FileTransfer Design</title>
 
     <para>This section provides internal details and information on how the
     File Transfer is implemented. Reading the following section to use the
     File Transfer mechanisms provided by ProActive is not necessary.</para>
 
-    <sect2 >
+    <sect2>
       <title>Abstract Definition (High level)</title>
 
       <para>This definitions can be referenced from a VirtualNode. They
@@ -388,7 +391,7 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
       definition name.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Concrete Definition (Low level)</title>
 
       <para>These definitions contain more architecture specific information,
@@ -417,7 +420,7 @@ File f[]=<emphasis role="bold">fw.getFiles()</emphasis> //wait-for-files to arri
       overridden if specified.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>How Deployment File Transfer Works</title>
 
       <figure>
