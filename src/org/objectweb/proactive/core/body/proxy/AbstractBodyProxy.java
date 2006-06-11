@@ -31,7 +31,11 @@
 package org.objectweb.proactive.core.body.proxy;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
@@ -114,6 +118,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         return invokeOnBody(methodCall);
     }
 
+    private static Set loggedSyncCalls = Collections.synchronizedSet(new HashSet());
+
     private Object invokeOnBody(MethodCall methodCall)
         throws Exception, RenegotiateSessionException, Throwable {
         // Now gives the MethodCall object to the body
@@ -126,8 +132,13 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             if (reason == null) {
                 return reifyAsAsynchronous(methodCall);
             }
-            syncCallLogger.warn("SYNC: Synchronous Method Call: " + reason); 
-            syncCallLogger.warn(methodCall.getReifiedMethod());
+            if (syncCallLogger.isEnabledFor(Level.WARN)) {
+                String msg = "SYNC: Synchronous Method Call: " + reason +
+                       System.getProperty("line.separator") + methodCall.getReifiedMethod();
+                if (loggedSyncCalls.add(msg)) {
+                    syncCallLogger.warn(msg); 
+                }
+            }
             return reifyAsSynchronous(methodCall);
         } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
