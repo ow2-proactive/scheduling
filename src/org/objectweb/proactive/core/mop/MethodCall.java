@@ -598,38 +598,39 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     /* Used in the REIF_AND_EXCEP cache */
     static class ReifiableAndExceptions {
         boolean reifiable; // Is the method return type reifiable ?
-        boolean exceptions; // Does the method throws exceptions ? 
+        boolean exceptions; // Does the method throws exceptions ?
+        String reason; // Why is the method synchronous ? null if it is asynchronous
     }
 
     public String getSynchronousReason() {
-    	String reason = null;
         Method m = this.getReifiedMethod();
         ReifiableAndExceptions cached = (ReifiableAndExceptions) REIF_AND_EXCEP.get(m);
         if (cached == null) {
-
+            cached = new ReifiableAndExceptions();
             /* void is reifiable even though the check by the MOP would tell otherwise */
-            boolean reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
-            if (!reifiable) {
+            cached.reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
+            if (!cached.reifiable) {
                 try {
                     MOP.checkClassIsReifiable(m.getReturnType());
-                    reifiable = true;
+                    cached.reifiable = true;
                 } catch (ClassNotReifiableException e) {
-                	reason = e.getMessage();
+                    cached.reason = e.getMessage();
                 }
             }
 
-            boolean exceptions = m.getExceptionTypes().length != 0;
-            cached = new ReifiableAndExceptions();
-            cached.reifiable = reifiable;
-            cached.exceptions = exceptions;
+            cached.exceptions = m.getExceptionTypes().length != 0;
+            if (cached.exceptions) {
+                cached.reason = "The method can throw a checked exception";
+            }
             REIF_AND_EXCEP.put(m, cached);
         }
 
-        if (reason == null && cached.exceptions && !getMetadata().isExceptionAsynchronously()) {
-        	reason = "Declared exceptions not handled with ProActive.tryWithCatch()";
+        if (cached.reifiable && cached.exceptions && getMetadata().isExceptionAsynchronously()) {
+                /* ProActive.tryWithCatch() is used, so this call is asynchronous */
+        	return null;
         }
 
-        return reason;
+        return cached.reason;
     }
 
     /**
