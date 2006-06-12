@@ -1,6 +1,7 @@
 package nonregressiontest.filetransfer;
 
 import java.io.File;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -8,9 +9,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.filetransfer.FileVector;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
@@ -119,15 +120,15 @@ public class TestDeployRetrieve extends FunctionalTest {
         	logger.debug("Retrieving test files");
         }
 		long initRetrieve=System.currentTimeMillis();
-        FileWrapper fileWrapper = testVNode.fileTransferRetrieve(); //async
-        File file[] = fileWrapper.getFiles(); //sync here
+        FileVector fileVector = testVNode.fileTransferRetrieve(); //async
+        fileVector.waitForAll(); //sync here
         long finitRetrieve=System.currentTimeMillis();
         
         if(logger.isDebugEnabled()){
-        	logger.debug("Retrieved "+file.length+" files from VirtualNode "+testVNode.getName()+" in "+(finitRetrieve-initRetrieve)+"[ms]");
+        	logger.debug("Retrieved "+fileVector.size()+" files from VirtualNode "+testVNode.getName()+" in "+(finitRetrieve-initRetrieve)+"[ms]");
         }
         
-        Assertions.assertTrue(file.length==2);
+        Assertions.assertTrue(fileVector.size()==2);
         
         fileRetrieved = new File(fileRetrieved.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());
         fileRetrieved2 = new File(fileRetrieved2.getAbsoluteFile()+"-"+node[0].getNodeInformation().getName());

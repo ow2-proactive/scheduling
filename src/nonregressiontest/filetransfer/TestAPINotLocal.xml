@@ -3,16 +3,22 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/home/mleyton/ProActive/descriptors/DescriptorSchema.xsd">
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
-		<descriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
+		<descriptorVariable name="JAVA_HOME" value="/auto/pollux/u/pollux/home/mleyton/NOSAVE/jdk1.5.0_05"/>
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="test" />
+			<virtualNode name="testPush" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="test">
+				<jvmSet>
+					<vmName value="sshJVMNode"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="testPush">
 				<jvmSet>
 					<vmName value="sshJVMNode"/>
 				</jvmSet>
@@ -28,7 +34,12 @@
 				<creation>
 					<processReference refid="sshProcess"/>
 				</creation>
-			</jvm>			
+			</jvm>
+			<jvm name="sshJVMNodePush">
+				<creation>
+					<processReference refid="sshProcessPush"/>
+				</creation>
+			</jvm>		
 		</jvms>
 	</deployment>
 	<fileTransferDefinitions>
@@ -44,13 +55,18 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="sea">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="anaconda">
+					<processReference refid="remoteJVM"/> <!--  change to remoteJVM when testing from eclipse to avoid "Word to long" error -->
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="sshProcessPush">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="fiacre">
 					<processReference refid="remoteJVM"/> <!--  change to remoteJVM when testing from eclipse to avoid "Word to long" error -->
 				</sshProcess>
 			</processDefinition>
 			<processDefinition id="remoteJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath>
+					
 				<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>
@@ -62,9 +78,10 @@
 						<absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
 					</classpath>
+					<javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath>
 					<log4jpropertiesFile><absolutePath value="${PROACTIVE_HOME}/compile/proactive-log4j"/></log4jpropertiesFile>
-					<policyFile><absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/></policyFile>
 					<jvmParameters><parameter value="-Dproactive.rmi.port=7199" /></jvmParameters>
+					<policyFile><absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/></policyFile>
 				</jvmProcess>			
 			</processDefinition>
 			<processDefinition id="localJVM">

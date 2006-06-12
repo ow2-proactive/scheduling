@@ -14,24 +14,26 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+import org.objectweb.proactive.filetransfer.FileTransfer;
+import org.objectweb.proactive.filetransfer.FileVector;
 
 import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
-
 
 public class TestAPI extends FunctionalTest {
     static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger(
             "nonregressiontest");
-    private static String XML_LOCATION = TestAPI.class.getResource(
-            "/nonregressiontest/filetransfer/TestAPI.xml").getPath();
+    private static String XML_LOCATION = TestAPI.class.getResource("/nonregressiontest/filetransfer/TestAPI.xml").getPath();
+    //private static String XML_LOCATION = TestAPI.class.getResource("/nonregressiontest/filetransfer/TestAPINotLocal.xml").getPath();
+    private static int FILE_SIZE = 16; //MB
+    
     ProActiveDescriptor pad;
     File fileTest = new File("/tmp/ProActiveTestFile.dat");
     File filePushed = new File("/tmp/ProActiveTestPushed.dat");
     File filePulled = new File("/tmp/ProActiveTestPulled.dat");
-    FileWrapper filePulledWrapper;
+    File fileFuturePushed = new File("/tmp/ProActiveTestFuturePushed.dat");
+    FileVector filePulledWrapper; 
 
     public TestAPI() {
         super("File Transfer API: File Push and File Pull",
@@ -39,29 +41,33 @@ public class TestAPI extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        long fileTestSum = checkSum(fileTest);
+        
+    	long fileTestSum = checkSum(fileTest);
         long filePulledSum = checkSum(filePulled);
         long filePushedSum = checkSum(filePushed);
-
+        long fileFuturePushedSum = checkSum(fileFuturePushed);
+        
         if (logger.isDebugEnabled()) {
-            logger.debug("CheckSum TestFile  =" + fileTestSum);
-            logger.debug("CheckSum PushedFile=" + filePushedSum);
-            logger.debug("CheckSum PulledFile=" + filePulledSum);
+            logger.debug("CheckSum TestFile              =" + fileTestSum);
+            logger.debug("CheckSum PushedFile            =" + filePushedSum);
+            logger.debug("CheckSum PulledFile            =" + filePulledSum);
+            logger.debug("CheckSum PushedFileWhilePulling=" + fileFuturePushedSum);
         }
 
-        return (fileTestSum == filePulledSum) &&
-        (fileTestSum == filePulledSum);
+        return (fileTestSum == filePushedSum) &&
+        (fileTestSum == filePulledSum) &&(fileTestSum == fileFuturePushedSum);
+       
     }
 
     public void initTest() throws Exception {
         cleanIfNecessary();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating 10Mb random test file in /tmp");
+            logger.debug("Creating "+FILE_SIZE+"MB random test file in /tmp");
         }
 
         //creates a new 10MB test file
-        createRandomContentFile(fileTest.getAbsolutePath(), 10);
+        createRandomContentFile(fileTest.getAbsolutePath(), FILE_SIZE);
     }
 
     public void endTest() throws Exception {
@@ -80,16 +86,30 @@ public class TestAPI extends FunctionalTest {
         pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
+        VirtualNode testVNodePush = pad.getVirtualNode("testPush");
+        
         testVNode.activate();
+        testVNodePush.activate();
+        
         Node[] testnode = testVNode.getNodes();
-        BooleanWrapper bw = org.objectweb.proactive.filetransfer.FileTransfer.pushFile(testnode[0],
+        Node[] testnodePush = testVNodePush.getNodes();
+        
+        FileVector fw = FileTransfer.pushFile(testnode[0],
             fileTest, filePushed);
-        Assertions.assertTrue(bw.booleanValue());
-		
-        filePulledWrapper = org.objectweb.proactive.filetransfer.FileTransfer.pullFile(testnode[0],fileTest, filePulled);
-        File pulled[]= filePulledWrapper.getFiles();
-        Assertions.assertTrue(pulled.length==1);
-        Assertions.assertTrue(pulled[0].equals(filePulled));
+        Assertions.assertTrue(fw.getFile(0).equals(filePushed)); //wait-by-necessity
+        
+        filePulledWrapper = FileTransfer.pullFile(testnode[0],filePushed, filePulled);
+        
+        //Thread.sleep(1000);
+        //filePulledWrapper.waitForAll(); //sync line
+        //System.out.println("Finished wiating");
+        FileVector pushedWhilePulling = FileTransfer.pushFile(testnodePush[0], filePulledWrapper, fileFuturePushed);
+
+        Assertions.assertTrue(filePulledWrapper.size()==1);
+        Assertions.assertTrue(filePulledWrapper.getFile(0).equals(filePulled)); //wait-by-necessity
+        
+        Assertions.assertTrue(pushedWhilePulling.size()==1);
+        Assertions.assertTrue(pushedWhilePulling.getFile(0).equals(fileFuturePushed)); //wait-by-necessity
     }
 
     /**
@@ -136,26 +156,20 @@ public class TestAPI extends FunctionalTest {
      */
     private void cleanIfNecessary() {
         if (filePushed.exists()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old test file:" + filePushed.getName());
-            }
             filePushed.delete();
         }
 
         if (filePulled.exists()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old file:" + filePulled.getName());
-            }
             filePulled.delete();
+        }
+        
+        if (fileFuturePushed.exists()) {
+            fileFuturePushed.delete();
         }
 
         if (fileTest.exists()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old randomly generated file:" +
-                    fileTest.getName());
-            }
             fileTest.delete();
-        }
+        }     
     }
 
     /**

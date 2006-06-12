@@ -3,6 +3,7 @@
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="test"/>
+			<virtualNode name="testPush" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -12,6 +13,11 @@
 					<vmName value="JvmNode"/>
 				</jvmSet>
 			</map>
+			<map virtualNode="testPush">
+				<jvmSet>
+					<vmName value="JvmNodePush"/>
+				</jvmSet>
+			</map>
 		</mapping>
 		<jvms>
 			<jvm name="JvmNode">
@@ -19,11 +25,21 @@
 					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
+			<jvm name="JvmNodePush">
+				<creation>
+					<processReference refid="localJVMPush"/>
+				</creation>
+			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>	
+		</processes>
+		<processes>
+			<processDefinition id="localJVMPush">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>	
 		</processes>
