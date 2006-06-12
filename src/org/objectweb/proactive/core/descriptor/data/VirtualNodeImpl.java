@@ -78,8 +78,9 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.filetransfer.FileTransfer;
+import org.objectweb.proactive.filetransfer.FileVector;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -721,10 +722,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             increaseNodeIndex();
 
             //wait for pending file transfer
-            BooleanWrapper bw = (BooleanWrapper) fileTransferDeployedStatus.get(node.getNodeInformation()
+            FileVector fw = (FileVector) fileTransferDeployedStatus.get(node.getNodeInformation()
                                                                                     .getName());
-            if (bw != null) {
-                bw.booleanValue(); //wait-by-necessity
+            if (fw != null) {
+                fw.waitForAll(); //wait-by-necessity
             }
             return node;
         } else {
@@ -1329,8 +1330,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         Collection c = fileTransferDeployedStatus.values();
         Iterator it = c.iterator();
         while (it.hasNext()) {
-            BooleanWrapper bw = (BooleanWrapper) it.next();
-            bw.booleanValue(); //wait-by-necessity
+            FileVector fw = (FileVector) it.next();
+            fw.waitForAll(); //wait-by-necessity
         }
 
         return;
@@ -1572,9 +1573,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         nbCreatedNodes++;
 
         //Performe FileTransferDeploy (if needed)       
-        BooleanWrapper bw = fileTransferDeploy(node);
+        FileVector fw = fileTransferDeploy(node);
         this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
-            bw);
+            fw);
 
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
@@ -1714,10 +1715,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
      */
-    public FileWrapper fileTransferRetrieve()
+    public FileVector fileTransferRetrieve()
         throws IOException, ProActiveException {
         Node[] nodes;
-        FileWrapper fileWrapper = new FileWrapper();
+        FileVector fileVector = new FileVector();
         try {
             nodes = getNodes();
         } catch (NodeException e) {
@@ -1772,7 +1773,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             long init = System.currentTimeMillis();
-            fileWrapper.addFileWrapper(FileTransferService.pullFiles(nodes[i],
+            fileVector.add(FileTransfer.pullFiles(nodes[i],
                     srcFile, dstFile, fileBlockSize, overlapping));
 
             if (FILETRANSFER_LOGGER.isDebugEnabled()) {
@@ -1781,7 +1782,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
 
-        return fileWrapper;
+        return fileVector;
     }
 
     /**
@@ -1792,7 +1793,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * is transfered using the FileTransfer API.
      * @param node The node that the files will be transfered to.
      */
-    private BooleanWrapper fileTransferDeploy(Node node) {
+    private FileVector fileTransferDeploy(Node node) {
+    	FileVector fileWrapper = new FileVector();
+    	
         if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
             DEPLOYMENT_FILETRANSFER_LOGGER.debug(
                 "File Transfer Deploy files for node" +
@@ -1802,13 +1805,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String vmName = node.getNodeInformation().getDescriptorVMName();
         VirtualMachine vm = getVirtualMachine(vmName);
 
+        
         if (vm == null) {
             if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
                 DEPLOYMENT_FILETRANSFER_LOGGER.debug("No VM found with name: " +
                     vmName + " for node: " +
                     node.getNodeInformation().getName());
             }
-            return new BooleanWrapper(false);
+            return fileWrapper;
         }
 
         //TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
@@ -1819,7 +1823,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     "No Process linked with VM: " + vmName + " for node: " +
                     node.getNodeInformation().getName());
             }
-            return new BooleanWrapper(false);
+            return fileWrapper;
         }
 
         //if the process handled the FileTransfer we have nothing to do
@@ -1828,7 +1832,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 DEPLOYMENT_FILETRANSFER_LOGGER.debug(
                     "No ProActive FileTransfer API is required for this node.");
             }
-            return new BooleanWrapper(true);
+            return fileWrapper;
         }
 
         FileTransferWorkShop ftwDeploy = eProcess.getFileTransferWorkShopDeploy();
@@ -1838,7 +1842,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 " file(s)");
         }
 
-        BooleanWrapper bw = new BooleanWrapper(false);
         File[] filesSrc = new File[fd.length];
         File[] filesDst = new File[fd.length];
         for (int j = 0; j < fd.length; j++) {
@@ -1849,8 +1852,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         try {
-            bw = FileTransferService.pushFiles(node, filesSrc, filesDst,
-                    fileBlockSize, overlapping);
+            fileWrapper.add(FileTransfer.pushFiles(node, filesSrc, filesDst,  fileBlockSize, overlapping));
         } catch (Exception e) {
             logger.error("Unable to pushFile files to node " +
                 node.getNodeInformation().getName());
@@ -1860,7 +1862,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
 
-        return bw;
+        return fileWrapper;
     }
 
     public void setFileTransferParams(int fileBlockSize, int overlapping) {

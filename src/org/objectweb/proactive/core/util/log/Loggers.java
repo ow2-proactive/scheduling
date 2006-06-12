@@ -115,4 +115,9 @@ public interface Loggers {
     static final public String MPI = "proactive.mpi";
     static final public String MPI_DEPLOY = ".deploy";
     
+    static final public String SKELETONS = CORE+".skeletons";
+    static final public String SKELETONS_STRUCTURE = SKELETONS+".structure";
+    static final public String SKELETONS_MANAGER = SKELETONS+".manager";
+    static final public String SKELETONS_KERNEL = SKELETONS+".kernel";
+    
 }

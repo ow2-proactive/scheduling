@@ -1,15 +1,3 @@
-package org.objectweb.proactive.core.filetransfer;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-
 /*
  * ################################################################
  *
@@ -37,106 +25,166 @@ import java.util.HashMap;
  *
  * ################################################################
  */
+package org.objectweb.proactive.core.filetransfer;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedInputStream;
+
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 
 
 /**
- * @author The ProActive Team 09/2005
+ * This class is intented to be used a service active object for performing
+ * file transfer operations.
+ * 
+ * This class is not serializable on purpose.
+ * 
+ * @author The ProActive Team 09/2005 (mleyton)
  *
  */
-public class FileTransferService implements Serializable,
-    ProActiveInternalObject {
+public class FileTransferService implements ProActiveInternalObject {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = 8;
-	public static final int DEFAULT_BUFFER_SIZE=512*1024;
-	
+    public static final int DEFAULT_BUFFER_SIZE = 512 * 1024; //Bytes
     protected HashMap readBufferMap; //Map for storing the opened reading sockets
     protected HashMap writeBufferMap; //Map for storing the opened output sockets
+    protected FileForwarder forwardFile; 
     
     public FileTransferService() {
-    	readBufferMap = new HashMap();
-    	writeBufferMap = new HashMap();
+        readBufferMap = new HashMap();
+        writeBufferMap = new HashMap();
+        forwardFile = new FileForwarder(this);
     }
 
-    public LongWrapper openRead(File f){
-    	
-    	try {
-			BufferedInputStream bis = new BufferedInputStream(new FileInputStream(f.getAbsolutePath()),DEFAULT_BUFFER_SIZE);
-			readBufferMap.put(f,bis);
-		} catch (FileNotFoundException e) {
-			logger.error("Unable to open file: "+f.getAbsolutePath());
-			return new LongWrapper(0);
-			
-		}
-		return new LongWrapper(f.length());
-		
+    public LongWrapper getFileLength(File f) {
+        return new LongWrapper(f.length());
     }
-    
-    /**
-     * Opens a buffer reader for File f.
-     * @param f  The file for which a buffer read will be opened
-     * @return Length of the file
-     */
-    public BooleanWrapper openWrite(File f){
-    	try {
-    		BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(f.getAbsolutePath()),DEFAULT_BUFFER_SIZE);
-			writeBufferMap.put(f,bos);
-		} catch (FileNotFoundException e) {
-			logger.error("Unable to open file: "+f.getAbsolutePath());
-			return new BooleanWrapper(false);
-		}
 
-		return new BooleanWrapper(true);
+    public BooleanWrapper canRead(File f) {
+        return new BooleanWrapper(f.canRead());
     }
+
+    public BooleanWrapper openWrite(File file) {
+		return new BooleanWrapper(getWritingBuffer(file, false) != null);
+	}
     
-    public void closeRead(File f){
-    	BufferedInputStream bis = (BufferedInputStream) readBufferMap.remove(f);
-    	try {
-    		if(bis!=null) bis.close();
-		} catch (IOException e) {}
-    	
-    }
-    
-    public void closeWrite(File f){
-    	BufferedOutputStream bos = (BufferedOutputStream) writeBufferMap.remove(f);
-    	try {
-    		if(bos!=null) bos.close();
-    	} catch (IOException e) {}
-    }
-    
-    /**
-     * This method will save the specified FileBlock.
-     * @param fileblock
-     */
-    public void saveFileBlock(FileBlock fileblock) throws IOException {
-        //remote verification
-        File f = new File(fileblock.getDstFilename());
-        if (f.exists() && !f.canWrite()) {
-            logger.error("Can't write to: " + fileblock.getDstFilename());
-            throw new IOException("Can't write to: " +
-                fileblock.getDstFilename());
+	public BooleanWrapper canWrite(File file, boolean append) {
+		return new BooleanWrapper(getWritingBuffer(file, append) != null);
+	}
+	
+	private BufferedOutputStream getWritingBuffer(File f) {
+		return getWritingBuffer(f, false);
+	}
+	
+    protected synchronized BufferedOutputStream getWritingBuffer(File f, boolean append) {
+        if (!writeBufferMap.containsKey(f)) {
+            try {
+                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(
+                            f.getAbsolutePath(), append), DEFAULT_BUFFER_SIZE);
+                writeBufferMap.put(f, bos);
+            } catch (FileNotFoundException e) {
+                logger.error("Unable to open file: " + f.getAbsolutePath());
+                return null;
+            }
         }
 
-        BufferedOutputStream bos = (BufferedOutputStream)writeBufferMap.get(f);
-        fileblock.saveCurrentBlock(bos);
+        return (BufferedOutputStream) writeBufferMap.get(f);
     }
 
-    public void saveFileBlockWithoutThrowingException(FileBlock fileblock) {
+    private synchronized BufferedInputStream getReadingBuffer(File f) {
+        if (!readBufferMap.containsKey(f)) {
+            try {
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(
+                            f.getAbsolutePath()), DEFAULT_BUFFER_SIZE);
+                readBufferMap.put(f, bis);
+            } catch (FileNotFoundException e) {
+                logger.error("Unable to open file: " + f.getAbsolutePath());
+                return null;
+            }
+        }
+
+        return (BufferedInputStream) readBufferMap.get(f);
+    }
+
+    public synchronized void closeRead(File f) {
+        BufferedInputStream bis = (BufferedInputStream) readBufferMap.remove(f);
         try {
-            saveFileBlock(fileblock);
+            if (bis != null) {
+                bis.close();
+            }
         } catch (IOException e) {
         }
+    }
+
+    public synchronized BooleanWrapper closeWrite(File f) {
+        BufferedOutputStream bos = (BufferedOutputStream) writeBufferMap.remove(f);
+        try {
+            if (bos != null) {
+                bos.close();
+            }
+        } catch (IOException e) {
+        	return new BooleanWrapper(false);
+        }
+        
+        return new BooleanWrapper(true);
+    }
+
+    /**
+     * This method will save the specified FileBlock.
+     * @param block
+     */
+    public void saveFileBlock(File dstFile, FileBlock block) throws IOException {
+        
+        BufferedOutputStream bos = getWritingBuffer(dstFile);
+        block.saveCurrentBlock(bos);
+    }
+
+    public void saveFileBlockWithoutThrowingException(File dstFile, FileBlock block) {
+        
+        BufferedOutputStream bos = getWritingBuffer(dstFile);
+        try {
+			block.saveCurrentBlock(bos);
+		} catch (IOException e) {
+			//ignore exception
+		}
+    }
+    
+    public void saveFileBlockAndForward(File dstFile, FileBlock block) throws IOException {
+        
+        this.forwardFile.handleNewRequests(dstFile);
+        this.forwardFile.forward(dstFile,block);
+        
+        BufferedOutputStream bos = getWritingBuffer(dstFile);
+        block.saveCurrentBlock(bos);
+    }
+
+    public void saveFileBlockAndForwardWithoutThrowingException(File dstFile, FileBlock block) {
+        
+        this.forwardFile.handleNewRequests(dstFile);
+        this.forwardFile.forward(dstFile,block);
+        
+        BufferedOutputStream bos = getWritingBuffer(dstFile);
+        try {
+			block.saveCurrentBlock(bos);
+		} catch (IOException e) {
+			//ignore exception
+		}
     }
 
     /**
@@ -144,418 +192,293 @@ public class FileTransferService implements Serializable,
      * @param filename
      * @param offset
      * @return A file block loaded from the file and starting from the offest.
-     * @throws IOException
      */
-    public FileBlock getFileBlock(String filename, long offset, int bsize)
-        throws IOException {
-        //remote verification
-        File f = new File(filename);
-        if (!f.canRead()) {
-            logger.error("Can't read or doesn't exist: " + filename);
-            throw new IOException("Can't read or doesn't exist: " + filename);
-        }
+    public FileBlock getFileBlock(File file, long offset, int bsize){
 
-        FileBlock newBlock = new FileBlock(filename, offset, bsize);
-        BufferedInputStream bis = (BufferedInputStream)readBufferMap.get(f);
-        newBlock.loadNextBlock(bis);
-
+        FileBlock newBlock = new FileBlock(offset, bsize);
+        BufferedInputStream bis = getReadingBuffer(file);
+        try {
+			newBlock.loadNextBlock(bis);
+		} catch (IOException e) {
+			newBlock.setException(e);
+		}
         return newBlock;
     }
 
-    public BooleanWrapper sendFiles(FileTransferService ftsRemote,
-        File[] srcFile, File[] dstFile, int bsize, int numFlyingBlocks) {
-        if (srcFile.length != dstFile.length) {
-            logger.error(
-                "Error, destination and source file lists do not match in length");
-            return new BooleanWrapper(false);
-        }
-        String remoteHostName="";
-        if (logger.isDebugEnabled()){
-        	remoteHostName=ftsRemote.getHostName();
-        }
-        
-        BooleanWrapper bw;
-        for (int i = 0; i < srcFile.length; i++) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Sending file: local@" +
-                    srcFile[i].getAbsolutePath() + " -> " +
-                    remoteHostName + "@" +
-                    dstFile[i].getAbsolutePath());
-            }
-
-            bw = sendFile(ftsRemote, srcFile[i], dstFile[i], bsize,
-                    numFlyingBlocks);
-            //sync, only send one file at a time    		
-            if (!bw.booleanValue()) {
-                return new BooleanWrapper(false);
-            }
-        }
-
-        return new BooleanWrapper(true);
-    }
-
-    private BooleanWrapper sendFile(FileTransferService ftsRemote,
-        File srcFile, File dstFile, int bsize, int numFlyingBlocks) {
+    /**
+     * This method handles the sending of a file.
+     * @param ftsRemote The remote FileTransferService object that will receive the file.
+     * @param srcFile The local source of the file.
+     * @param dstFile The remote destination of the file.
+     * @param bsize The size of the blocks the file will be split into.
+     * @param numFlyingBlocks The number of simultaneous blocks that will be sent.
+     * @return The result status of the operation.
+     */ 
+    public OperationStatus sendFile(FileTransferService ftsRemote, File srcFile,File dstFile, int bsize, int numFlyingBlocks) {
         long init = System.currentTimeMillis();
         long numBlocks = 0;
-
+        
         //Open the local reading buffer
-       	BufferedInputStream bis;
-		try {
-			bis = new BufferedInputStream(new FileInputStream(srcFile.getAbsoluteFile()),DEFAULT_BUFFER_SIZE);
-		} catch (FileNotFoundException e1) {
-			logger.error("Can not open for sending:"+srcFile.getAbsoluteFile());
-			logger.error(e1.getMessage());
-			return new BooleanWrapper(false);
-		}
-
-		long totalNumBlocks=Math.round(Math.ceil((double)srcFile.length()/bsize));
+        BufferedInputStream bis=getReadingBuffer(srcFile);
+       	if(bis==null){
+            return new OperationStatus(new ProActiveException("Can not open for sending:" + srcFile.getAbsoluteFile()));
+       	}
+       	
+        long totalNumBlocks = Math.round(Math.ceil((double) srcFile.length() / bsize));
         if (totalNumBlocks == 0) {
-            logger.error("Can not send an empty File:" +
-                srcFile.getAbsolutePath());
-            try {bis.close();} catch (IOException e) {}
-            return new BooleanWrapper(false);
+            closeRead(srcFile);
+            return new OperationStatus(new ProActiveException("Can not send an empty File:" + srcFile.getAbsolutePath()));
         }
-		
-		//Open the remote writting buffer
-		BooleanWrapper bw = ftsRemote.openWrite(dstFile);
-		if(bw.booleanValue() !=true){
-			logger.error("Unable to open remote file for writting"+dstFile.getAbsolutePath());
-			try {bis.close();} catch (IOException e) {}
-			return new BooleanWrapper(false);
-		}
-		
-        FileBlock fileBlock = new FileBlock(srcFile.getAbsolutePath(), 0, bsize);
-        fileBlock.setDstFilename(dstFile.getAbsolutePath());
+
+       	BooleanWrapper bw = ftsRemote.openWrite(dstFile);
+       	if (bw.booleanValue() != true) {
+        	closeRead(srcFile);
+            return new OperationStatus(new ProActiveException("Unable to open remote file for writting: " +dstFile.getAbsolutePath()));
+        }
+
+        FileBlock fileBlock = new FileBlock(0, bsize);
         while (numBlocks < (totalNumBlocks - 1)) {
-            //Exceptions can happen here
-            try {
-                for (int i = 0;
-                        (i < numFlyingBlocks) &&
-                        (numBlocks < (totalNumBlocks - 1)); i++) {
-                    fileBlock.loadNextBlock(bis);
-                    //logger.debug("Num Block: "+numBlocks+"/"+fileBlock.getNumberOfBlocks()+" offset="+fileBlock.getOffset());
-                    if (i == (numFlyingBlocks - 1)) { //rendevouz the burst, so the remote AO will not be clogged
-                        ftsRemote.saveFileBlock(fileBlock);
-                    } else { //simply burst
-                        ftsRemote.saveFileBlockWithoutThrowingException(fileBlock); //remote (async) invocation
-                    }
-                    numBlocks++;
-                }
-            } catch (IOException ioe) {
-                logger.error("Can not send File to:" + ftsRemote.getHostName());
-                logger.error(ioe.getMessage());
-                return new BooleanWrapper(false);
-            }
+        	for (int i = 0; (i < numFlyingBlocks) && (numBlocks < (totalNumBlocks - 1)); i++) {
+        		try{
+        			fileBlock.loadNextBlock(bis);
+
+        			if (i == (numFlyingBlocks - 1)) { //rendevouz the burst, so the remote AO will not be drowned
+        				ftsRemote.saveFileBlockAndForward(dstFile,fileBlock);
+        			} else { //simply burst
+        				ftsRemote.saveFileBlockAndForwardWithoutThrowingException(dstFile,fileBlock); //remote (async) invocation
+        			}
+        			numBlocks++;
+        		} catch (IOException e) {
+        			ftsRemote.closeForwardingService(dstFile,e); 
+        			return new OperationStatus(new ProActiveException("Can not send file block to:" + ProActive.getActiveObjectNodeUrl(ftsRemote),e));
+        		}
+        	}
         }
 
         //Handle a rendevouz with last block here!
         try {
             fileBlock.loadNextBlock(bis);
-            ftsRemote.saveFileBlock(fileBlock);
+            ftsRemote.saveFileBlock(dstFile,fileBlock);
             numBlocks++;
         } catch (IOException e) {
-            logger.error("Can not send File to:" + ftsRemote.getHostName());
-            logger.error(e.getMessage());
-            return new BooleanWrapper(false);
+        	ftsRemote.closeForwardingService(dstFile,e); 
+            return new OperationStatus(new ProActiveException("Can not send File to:" + ProActive.getActiveObjectNodeUrl(ftsRemote),e));
         }
 
         //Close the remote/local buffers
-        ftsRemote.closeWrite(dstFile);
-        try { bis.close(); } catch (IOException e) {}
+        ProActive.waitFor(ftsRemote.closeWrite(dstFile));
+        closeRead(srcFile);
+        ftsRemote.closeForwardingService(dstFile); //sync-call
         
         if (logger.isDebugEnabled()) {
             long fin = System.currentTimeMillis();
             long delta = (fin - init);
-            logger.debug("File sent using " + numBlocks + " blocks,  in: " +
+            logger.debug("File "+dstFile.getAbsolutePath()+" sent using " + numBlocks + " blocks,  in: " +
                 delta + "[ms]");
         }
 
-        //TODO Here we could register this FTS AO into a Node or RunTime pool for reuse!
-        return new BooleanWrapper(true);
+        return new OperationStatus();
     }
 
-    public FileWrapper receiveFiles(FileTransferService ftsRemote,
-        File[] srcFile, File[] dstFile, int bsize, int numFlyingBlocks) {
-        if (srcFile.length != dstFile.length) {
-            logger.error(
-                "Error, destination and source file lists do not match in length");
-        }
+	public void closeForwardingService(File dstFile) {
+		this.forwardFile.closeForwardingService(dstFile);
+	}
 
-        String remoteHostName="";
-        if (logger.isDebugEnabled()){
-        	remoteHostName=ftsRemote.getHostName();
-        }
-        
-        FileWrapper fw = new FileWrapper();
-        for (int i = 0; i < srcFile.length; i++) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Receiving file: " +
-                	remoteHostName + "@" +
-                    srcFile[i].getAbsolutePath() + " -> local@" +
-                    dstFile[i].getAbsolutePath());
-            }
-            
-            //sync, same thread execute
-            File f = receiveFile(ftsRemote, srcFile[i], dstFile[i],
-                    bsize, numFlyingBlocks);
+    public void closeForwardingService(File dstFile, Exception e) {
+		this.forwardFile.closeForwardingService(dstFile, e);
+	}
 
-            //ProActive.waitFor(f);
-            fw.addFile(f);
-        }
-        return fw;
-    }
-
-    private File receiveFile(FileTransferService ftsRemote, File srcFile,
-        File dstFile, int bsize, int numFlyingBlocks) {
-        long init = System.currentTimeMillis();
+    /**
+     * This method handles the reception of a file.
+     * @param ftsRemote The remote FileTransferService object that will send the file.
+     * @param srcFile The remote source of the file.
+     * @param dstFile The local destination of the file.
+     * @param bsize The size of the blocks the file will be split into.
+     * @param numFlyingBlocks The number of simultaneous blocks that will be received.
+     * @return The result status of the operation.
+     */ 
+	public OperationStatus receiveFile(FileTransferService ftsRemote, File srcFile, File dstFile, int bsize, int numFlyingBlocks) {
         long numBlocks = 0;
+		long init = System.currentTimeMillis();
 
-        //Open local writting buffer
-       	BufferedOutputStream bos;
-		try {
-			bos = new BufferedOutputStream(new FileOutputStream(dstFile.getAbsoluteFile()),DEFAULT_BUFFER_SIZE);
-		} catch (FileNotFoundException e1) {
-			logger.error("Can not open local file for writing:"+dstFile.getAbsoluteFile());
-			logger.error(e1.getMessage());
-			return dstFile;
-		}
+        LongWrapper length = ftsRemote.getFileLength(srcFile);
+        if (length.longValue() <= 0) {
+            closeWrite(dstFile);
+            OperationStatus fc = new OperationStatus(new Exception("Unable to open remote file for reading:" + srcFile.getAbsolutePath()));
+            return fc;
+        }
         
-        //Open remote buffer for reading
- 		LongWrapper length = ftsRemote.openRead(srcFile);
-		if(length.longValue() <= 0){
-			logger.error("Unable to open remote file for reading:" +srcFile.getAbsolutePath());
-			try {bos.close();} catch (IOException e) {}
-			return dstFile;
-		}
-
-		long totalNumBlocks = Math.round(Math.ceil((double)length.longValue()/bsize));
-		
+        long totalNumBlocks = Math.round(Math.ceil((double) length.longValue() / bsize));
         FileBlock[] flyingBlocks = new FileBlock[numFlyingBlocks];
         while (numBlocks < totalNumBlocks) {
             int i;
-
-            ProActive.tryWithCatch(IOException.class);
-            try {
-                for (i = 0;
-                        (i < flyingBlocks.length) &&
-                        (numBlocks < totalNumBlocks); i++) {
-                    flyingBlocks[i] = ftsRemote.getFileBlock(srcFile.getAbsolutePath(),
-                            bsize * numBlocks, bsize); //async call
-                    numBlocks++;
-                }
-            } catch (IOException e) {
-                logger.error("Error, unable to get File:" +
-                    srcFile.getAbsolutePath() + " from " +
-                    ftsRemote.getHostName());
-                return dstFile;
-            } finally {
-                ProActive.removeTryWithCatch(); //Wait for exceptions here
+            
+            for (i = 0; (i < flyingBlocks.length) && (numBlocks < totalNumBlocks); i++) {
+            	flyingBlocks[i] = ftsRemote.getFileBlock(srcFile, bsize * numBlocks, bsize); //async call
+            	numBlocks++;
             }
-
+            
+            forwardFile.handleNewRequests(dstFile);
+            forwardFile.forward(dstFile,flyingBlocks);
+            
             //here we sync (wait-by-necessity)                
             for (int j = 0; j < i; j++) {
-                flyingBlocks[j].setDstFilename(dstFile.getAbsolutePath());
-                flyingBlocks[j].saveCurrentBlock(bos);
+            	if(flyingBlocks[j].hasException()){
+            		Exception e= flyingBlocks[j].getException();
+            		forwardFile.closeForwardingService(dstFile,e);
+            		return new OperationStatus(e);
+            	}
+            	try {
+					saveFileBlock(dstFile,flyingBlocks[j]);
+				} catch (IOException e) {
+					forwardFile.closeForwardingService(dstFile,e);
+					return new OperationStatus(e);
+				}
             }
         }
 
-        //close local and remote buffers
-        ftsRemote.closeRead(srcFile);
-        try {bos.close();} catch (IOException e) {}
+        //close remote and local buffers
+        ftsRemote.closeRead(srcFile); //async-call
+        closeWrite(dstFile);
         
+        forwardFile.closeForwardingService(dstFile); //sync-call
+
         if (logger.isDebugEnabled()) {
             long fin = System.currentTimeMillis();
             long delta = (fin - init);
-            logger.debug("File received using " + numBlocks + " blocks,  in: " +
+            logger.debug("File "+dstFile.getAbsolutePath()+" received using " + numBlocks + " blocks,  in: " +
                 delta + "[ms]");
         }
 
-        //TODO Here we could register this FTS AO into a Node or RunTime pool for reuse!
-        return dstFile;
+        return new OperationStatus();
     }
 
-    public static FileWrapper pullFile(Node node, File srcFile, File dstFile)
-        throws IOException, ProActiveException {
-        return pullFile(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
+	/*
+    public void putInThePool(FileTransferService me) {
+        FileTransferEngine.getFileTransferEngine().putFTS(me);
+    }
+    */
+	
+    public OperationStatus sendFile(FileTransferService remoteFTS, File srcFile,
+        File dstFile) {
+        return sendFile(remoteFTS, srcFile, dstFile,
+            FileBlock.DEFAULT_BLOCK_SIZE, DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
+    }
+    
+    /**
+     * This method is ment to be used as an immediate service method to enque new file transfer objects.
+     * @param fti
+     */
+    public void requestFileTransfer(FileTransferRequest fti) {
+        forwardFile.requestFileTransfer(fti);
     }
 
-    public static FileWrapper pullFile(Node node, File srcFile, File dstFile,
-        int bsize, int numFlyingBlocks) throws IOException, ProActiveException {
-        File[] src = new File[1];
-        File[] dst = new File[1];
-        src[0] = srcFile;
-        dst[0] = dstFile;
-
-        return pullFiles(node, src, dst, bsize, numFlyingBlocks);
+    /**
+     * This method removes pending request file transfers that were never processed.
+     * It is intented to be called on as an immediate service.
+     * @param srcFile The source file for which the file transfers are pending.
+     * @return true if there were file transfer requests for the srcFile that were never processed.
+     */
+    public OperationStatus getFileTransferRequestStatus(FileTransferRequest fti) {
+        return forwardFile.getFileTransferRequestStatus(fti);
     }
 
-    public static FileWrapper pullFiles(Node node, File[] srcFile,
-        File[] dstFile) throws IOException, ProActiveException {
-        return pullFiles(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
-    }
+    /**
+     * This method will handle a file transfer request. If the file
+     * concerned in the operation is still in transit, then this method
+     * will try to active file transfer forwarding. If the file transfer 
+     * forwarding is not used, then this method will handle the file
+     * transfer using a normal file transfer operation.
+     *  
+     * @param meFTS The active object that was called upon this method.
+     * @param ftr The file transfer request to perform.
+     * @param parentOpStat The future of the result operation of the parent. If
+     * the parent operation fails, this implies this operation will also fail.
+     * @return The result of the operation.
+     */
+    public OperationStatus submitFileTransferRequest(FileTransferService meFTS,
+        FileTransferRequest ftr, OperationStatus parentOpStat) {
+        FileTransferService srcFTS = ftr.getSourceFTS();
 
-    public static FileWrapper pullFiles(Node node, File[] srcFile,
-        File[] dstFile, int bsize, int numFlyingBlocks)
-        throws IOException, ProActiveException {
-    	
-        if (srcFile.length != dstFile.length) {
-            throw new ProActiveException(
-                "Error, destination and source file lists do not match in length");
-        }
-    	if(srcFile.length==0) return new FileWrapper();
-    	
-        for (int i = 0; i < srcFile.length; i++) {
+        OperationStatus opstat=null;
 
-            //local verification
-            if (dstFile[i].exists() && !dstFile[i].canWrite()) {
-                logger.error("Can't write to " + dstFile[i].getAbsoluteFile());
-                throw new IOException("Can't write to " +
-                    dstFile[i].getAbsoluteFile());
+        //if the future is allready here, don't bother making a request for the file transfer
+        if (ProActive.isAwaited(parentOpStat)) {
+        	if(logger.isDebugEnabled()){
+        		logger.debug("File transfer request will be handled using forwarding");
+        	}
+            srcFTS.requestFileTransfer(ftr); //immediate service call
+            ProActive.waitFor(parentOpStat);//we wait for the original file transfer to finish
+            if(parentOpStat.hasException()){ //if the original file transfer had an error we propagate it
+            	srcFTS.getFileTransferRequestStatus(ftr); //we need to remove the desubmit the ftr
+            	return parentOpStat; 
             }
+            
+            opstat = srcFTS.getFileTransferRequestStatus(ftr); //immediate service call
+            if(opstat.hasException()) return opstat; //error was encountered
         }
-        try {
-            //TODO Possible optimization is to keep these AO in pools.
-            FileTransferService ftsRemote = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
-                    null, node);
 
-            FileTransferService ftsLocal = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
-                    null);
+        //If the file was not handled by the forwarding AO, then we take care of it here.
+        if (opstat ==null || opstat.isPending()) {
+        	if(logger.isDebugEnabled()){
+        		logger.debug("File transfer request will be handled directly");
+        	}
+	
+        	String myNodeURL=ProActive.getActiveObjectNodeUrl(meFTS);
+        	String srcNodeURL=ProActive.getActiveObjectNodeUrl(ftr.getSourceFTS());
 
-            //We ask the remote AO to send the file to us
-            //futureFile = ftsRemote.sendFiles(ftsLocal, srcFile, dstFile, bsizem, numFlyingBlocks); 
-            return ftsLocal.receiveFiles(ftsRemote, srcFile, dstFile, bsize,
-                numFlyingBlocks);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ProActiveException(
-                "Unable to connect or use ProActive Node: " + node);
+        	//If the file is not here, we get a FTS AO in the source node.
+        	if(!myNodeURL.equals(srcNodeURL)){
+        		try {
+					srcFTS = FileTransferEngine.getFileTransferEngine().getFTS(srcNodeURL);
+					opstat = srcFTS.sendFile(ftr.getDestinationFTS(), ftr.getSrcFile(),ftr.getDstFile());
+					ftr.setSourceFTS(srcFTS);
+				} catch (Exception e) {
+					return new OperationStatus( new ProActiveException("Unable to create File Transfer Service on node: "+ srcNodeURL, e));
+				}
+        	}
+        	else{ //If the file is in this node, we send it from this Active Object
+        		opstat=sendFile(ftr.getDestinationFTS(), ftr.getSrcFile(),ftr.getDstFile());
+        		ftr.setSourceFTS(meFTS);
+        	}
         }
+        return opstat;
     }
 
-    public static BooleanWrapper pushFile(Node node, File srcFile, File dstFile)
-        throws IOException, ProActiveException {
-        return pushFile(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
+    /**
+     * Gets a checksum on the specified file
+     * @param file The file to be checksumed.
+     * @return The checksum.
+     * @throws IOException
+     */
+    public long checkSum(File file) throws IOException {
+        // Compute Adler-32 checksum
+        CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
+                    file.getAbsoluteFile()), new Adler32());
+        byte[] tempBuf = new byte[1024 * 1024]; //1MB loops
+        while (cis.read(tempBuf) >= 0)
+            ;
+
+        return cis.getChecksum().getValue();
     }
-
-    public static BooleanWrapper pushFile(Node node, File srcFile,
-        File dstFile, int bsize, int numFlyingBlocks)
-        throws IOException, ProActiveException {
-        File[] src = new File[1];
-        File[] dst = new File[1];
-        src[0] = srcFile;
-        dst[0] = dstFile;
-
-        return pushFiles(node, src, dst, bsize, numFlyingBlocks);
-    }
-
-    public static BooleanWrapper pushFiles(Node node, File[] srcFile,
-        File[] dstFile) throws IOException, ProActiveException {
-        return pushFiles(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
-    }
-
-    public static BooleanWrapper pushFiles(Node node, File[] srcFile,
-        File[] dstFile, int bsize, int numFlyingBlocks)
-        throws IOException, ProActiveException {
-        if (srcFile.length != dstFile.length) {
-            throw new ProActiveException(
-                "Error, destination and source file lists do not match in length");
-        }
-        
-        if(srcFile.length==0) return new BooleanWrapper(true);
-
-        for (int i = 0; i < srcFile.length; i++) {
-
-            //local verification
-            if (!srcFile[i].canRead()) {
-                logger.error("Can't read or doesn't exist: " +
-                    srcFile[i].getAbsoluteFile());
-                throw new IOException("Can't read or doesn't exist: " +
-                    srcFile[i].getAbsoluteFile());
-            }
-        }
-        try {
-            //Could be improoved using a pool
-            //Node localnode=NodeFactory.getDefaultNode();
-            //FileTransferService ftsRemote= node.getFileTransferServiceFromPool();
-            //FileTransferService ftsLocal = localnode.getFileTransferServiceFromPool();
-            //if(ftsRemote ==null ) throw new Exception("Unable to get remote File transfer service");
-            //if(ftsLocal ==null ) throw new Exception("Unable to get local File transfer service");
-            FileTransferService ftsLocal = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
-                    null);
-            FileTransferService ftsRemote = (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
-                    null, node);
-
-            //We ask the local AO to send the file to the remote AO
-            return ftsLocal.sendFiles(ftsRemote, srcFile, dstFile, bsize,
-                numFlyingBlocks); //this call is asynchronous
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ProActiveException(
-                "Unable to connect or use ProActive Node: " + node);
-        }
-    }
-
-    /** The Active Object creates and returns information on its location
-     * @return a StringWrapper which is a Serialized version, for asynchrony */
+    
+    /** Returns a hello world string with the hostname and the time.
+     *  It is used for debugging.
+     * @return a String with the hostname and the time*/
     public String sayHello() {
         return "Hello World from " + getHostName() + " at " +
         new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
     }
 
-    /** finds the name of the local machine */
+    /**
+     * Used for debugin. Returns the hostname.
+     * @return The host name.
+     */
     public String getHostName() {
         try {
             return java.net.InetAddress.getLocalHost().toString();
         } catch (Exception e) {
             return "unknown";
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-        String filenameSrcA = "/home/mleyton/test/Test";
-        String filenameSrcB = "/home/mleyton/test/Test-out";
-        String filenamePushed = "/home/mleyton/test/TestPushed.ps";
-        String filenamePulled = "/home/mleyton/test/TestPulled.ps";
-
-        File fileSrcA = new File(filenameSrcA);
-
-        File fileSrcB = new File(filenameSrcB);
-
-        //clean if necessary
-        File filePushed = new File(filenamePushed);
-        if (filePushed.exists()) {
-            System.out.println("Deleting old file:" + filePushed.getName());
-            filePushed.delete();
-        }
-
-        //clean if necessary
-        File filePulled = new File(filenamePulled);
-        if (filePulled.exists()) {
-            System.out.println("Deleting old file:" + filePulled.getName());
-            filePulled.delete();
-        }
-
-        try {
-            ProActiveDescriptor pad = ProActive.getProactiveDescriptor(
-                    "/home/mleyton/test/SimpleDescriptor.xml");
-
-            VirtualNode testVNode = pad.getVirtualNode("test");
-            testVNode.activate();
-            Node[] testnode = testVNode.getNodes();
-
-            pushFile(testnode[0], fileSrcA, filePushed);
-            pullFile(testnode[0], fileSrcB, filePulled);
-
-            pad.killall(true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        System.exit(0);
     }
 }

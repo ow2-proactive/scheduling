@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+import org.objectweb.proactive.filetransfer.FileVector;
 
 import java.io.File;
 import java.io.IOException;
@@ -238,7 +238,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      *
      * @return An array of FileWrapper (Futures) with the retrieved files.
      */
-    public FileWrapper fileTransferRetrieve() throws ProActiveException, IOException;
+    public FileVector fileTransferRetrieve() throws ProActiveException, IOException;
     
     /**
      *
