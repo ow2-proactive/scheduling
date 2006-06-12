@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="TroubleShooting">
+  <title>ProActive Trouble Shooting</title>
+
+  <para>In this section we present common problems encountered while trying to
+  use ProActive. For further assistance, please post your question on the
+  ProActive mailing list <ulink
+  url="http://forge.objectweb.org/mail/?group_id=7">proactive@objectweb.org
+  </ulink>.</para>
+
+  <sect1 id="TroubleShooting_html_loggers">
+    <title>Enabling the loggers</title>
+
+    <para>To enable the debuging logger the following log file can be
+    used:</para>
+
+    <screen>-Dlog4j.configuration=file:ProActive/compile/proactive-log4j</screen>
+
+    <para>In this file, the relevant loggers can be uncommented (by removing
+    the leading #). For example, the <emphasis>deployment</emphasis> loggers
+    are activated with the following lines:</para>
+
+    <screen>log4j.logger.proactive.deployment = DEBUG, CONSOLE
+log4j.logger.proactive.deployment.log = DEBUG, CONSOLE
+log4j.logger.proactive.deployment.process = DEBUG, CONSOLE</screen>
+  </sect1>
+
+  <sect1 id="dbdoclet.id.TroubleShooting_hostname_ip">
+    <title>Hostname and IP Address</title>
+
+    <para>To function properly, ProActive requires machines to have a
+    correctly configured hostname and domain name. If the names of a machines
+    is not properly configured, then remote nodes will be unable to locate the
+    machine.</para>
+
+    <para>To test if the involved machines are properly configured, in L(U)nix
+    you can run the following commands:</para>
+
+    <screen>$&gt;hostname
+localhost     //This is an error!
+
+$&gt;hostname -i
+127.0.0.1     //This is an error!</screen>
+
+    <para><emphasis role="bold">hostname</emphasis> should print the hostname
+    of the machine as known by the other hosts, and <emphasis
+    role="bold">hostname -i</emphasis> should return the network interface
+    accessible by other machines.</para>
+  </sect1>
+
+  <sect1 id="dbdoclet.id.TroubleShooting_dns">
+    <title>Domaine name resolution problems</title>
+
+    <para>To work around misconfigured domain names ProActive can be activated
+    to use IP adresses through the following java property:</para>
+
+    <screen>-Dproactive.useIPaddress=true</screen>
+
+    <para>This property should be given as parameter to java virtual machines
+    deployed on machines who's names can not be properly resolved.</para>
+  </sect1>
+
+  <sect1 id="dbdoclet.id.TroubleShooting_rmi_tunneling">
+    <title>RMI Tunneling</title>
+
+    <para>ProActive provides rmi tunneling through ssh for crossing firewalls
+    that only allow ssh connections. Things to verify when using rmissh
+    tunneling:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>ProActlive/lib/jsch.jar must be uncluded in the classpath of the
+        concerned machines.</para>
+      </listitem>
+
+      <listitem>
+        <para>The jvm that is only accesible with ssh must be started using:
+        <emphasis
+        role="bold">-Dproactive.communication.protocol=rmissh</emphasis></para>
+      </listitem>
+
+      <listitem>
+        <para>A key without a passhprase must be installed on the machine
+        accepting connections with ssh. It should be possible to log into the
+        site without using an ssh-agent and without providing a
+        password.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+
+  <sect1 id="dbdoclet.id.TroubleShooting_public_remote_method_calls">
+    <title>Public remote methods calls</title>
+
+    <para>Methods that will be called remotely on an active object must be
+    public. While java will impose this restriction between classes of
+    different types, this problem usually takes place when invoking a remote
+    method on an object of the same type.</para>
+
+    <screen>class A{
+
+  <emphasis>public</emphasis> void foo(A a){ 
+   ...
+   a.bar();           //This call will not be handled by the remote active object!!!
+   ...
+  }
+
+  <emphasis>private</emphasis> void bar(){  //To fix this, change this method to public.
+   ...
+  }
+}</screen>
+  </sect1>
+</chapter>

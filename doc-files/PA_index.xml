@@ -4,6 +4,7 @@
 <!ENTITY contributors SYSTEM "contributors.xml">
 <!ENTITY Principles SYSTEM "Principles.xml">
 <!ENTITY Installation SYSTEM "Installation.xml">
+<!ENTITY TroubleShooting SYSTEM "TroubleShooting.xml">
 <!ENTITY ProActiveBasis SYSTEM "ProActiveBasis.xml">
 <!ENTITY AOCreation SYSTEM "ActiveObjectCreation.xml">
 <!ENTITY TypedGroupCommunication SYSTEM "TypedGroupCommunication.xml">
@@ -235,7 +236,8 @@
   <part id="ProActiveIntroduction">
     <title>Introduction</title>
     &Principles;
-    &Installation; 
+    &Installation;
+    &TroubleShooting;
   </part>
  
 	<part id="ProActiveGuidedTour">
