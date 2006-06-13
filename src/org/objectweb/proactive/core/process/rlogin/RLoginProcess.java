@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 public class RLoginProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_RLOGINPATH = "/usr/bin/rlogin ";
     private boolean exitAfterCommand;
-
+    private String username;
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -157,7 +157,13 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildRLoginCommand() {
-        return DEFAULT_RLOGINPATH + hostname + " ";
+    	String command;
+    	if(this.username == null) {
+    		command = DEFAULT_RLOGINPATH + hostname + " ";
+    	}else {
+    		command = DEFAULT_RLOGINPATH + "-l " + username + " " + hostname + " ";
+    	}
+    	return command;
     }
 
     protected void internalStartProcess(String command)
@@ -167,6 +173,14 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
             outputMessageSink.setMessage(null);
         }
     }
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
     //
     // -- PRIVATE METHODS -----------------------------------------------

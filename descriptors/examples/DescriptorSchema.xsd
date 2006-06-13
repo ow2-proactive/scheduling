@@ -894,6 +894,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess" />
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional" />
 		<xs:attribute name="hostname" type="xs:string" use="required" />
+		<xs:attribute name="username" type="xs:string" use="optional" />
 	</xs:complexType>
 	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
 	<xs:complexType name="BsubProcessType">
