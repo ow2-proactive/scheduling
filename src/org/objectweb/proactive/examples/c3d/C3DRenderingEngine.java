@@ -65,7 +65,7 @@ public class C3DRenderingEngine implements java.io.Serializable,
     private Vec tmpVec = new Vec();
 
     // used by toString to show a better value than C3DRenderingEngine@11d2572 
-    protected String name;
+    protected String name = "name not set";
 
     /** Default constructor needed by ProActive */
     public C3DRenderingEngine() {

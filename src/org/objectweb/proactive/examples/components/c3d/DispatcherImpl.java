@@ -67,7 +67,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
     ComponentRunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    // component bindings
+    // Engine component bindings
     private Hashtable engines = new Hashtable();
 
     /** The no-argument Constructor as commanded by ProActive; otherwise unused */
@@ -76,7 +76,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
 
     // binding control
 
-    /** Returns the name of all the interfaces that can be bound.*/
+    /** Returns the name of all the interfaces that have been bound.*/
     public String[] listFc() {
         Vector v = new Vector();
 
@@ -91,7 +91,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
         //      return new String [] {"dispatcher2engine"};
     }
 
-    /** Display a possible bound on this Component
+    /** Find a possible bound on this Component.
      * @return the component that is linked to this throught the binding labelled interfaceName */
     public Object lookupFc(final String interfaceName) {
         if (interfaceName.startsWith("dispatcher2engine")) {
@@ -106,8 +106,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
         if (interfaceName.startsWith("dispatcher2engine")) {
             this.engines.put(interfaceName, serverInterface);
 
-            String name = interfaceName.substring("dispatcher2".length()) + "@" +
-                Integer.toHexString(serverInterface.hashCode());
+            String name = interfaceName.substring("dispatcher2".length()) +
+                "@" + Integer.toHexString(serverInterface.hashCode());
             addEngine((RenderingEngine) serverInterface, name);
             turnOnEngine(name);
         }
@@ -123,15 +123,11 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
 
     /** This is the activity of the component.
      * the activity of the component has been initialized and started, now
-     * what we have to do is to manage the life cycle, i.e.
-     * start and stop the activity.
+     * what we have to do is to manage the life cycle, i.e. start and stop the activity
+     * that can be redefined on the reified object.
      * In this redefinition, initActivity and endActivity of the Active Object
      * are only called once. The default behavior is to call them each time the component
-     * is stopped, and restarted.
-     * this is the default activity of the active object
-     * the activity of the component has been initialized and started, now
-     * what we have to do is to manage the life cycle, i.e. start and stop the
-     * activity that can be redefined on the reified object.      */
+     * is stopped, and restarted. */
     public void runComponentActivity(Body body) {
         boolean initActivityHasBeenRun = false;
 
