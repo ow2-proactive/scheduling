@@ -119,7 +119,13 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
 
             // rename output file to first name ==> overwrite
             File resultFile = handler.getOutputFile();
-            resultFile.renameTo(inputFile);
+            if (! inputFile.delete() ) { 
+                throw new IOException("Could not delete file " + inputFile +".");
+                }
+            if (! resultFile.renameTo(inputFile) ){
+                throw new IOException("Could not rename file "+ resultFile + " to " + inputFile +".");
+            }
+            
         } catch (Throwable t) {
             t.printStackTrace();
         }

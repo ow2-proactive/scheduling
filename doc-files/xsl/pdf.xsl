@@ -8,6 +8,9 @@
  <xsl:import href="common.xsl" />
 
 
+<xsl:attribute-set name="table.properties">
+  <xsl:attribute name="keep-together.within-page">always</xsl:attribute>
+</xsl:attribute-set>
 
  <!--  Changing font sizes -->
  <xsl:param name="monospace.font.family">Helvetica</xsl:param>

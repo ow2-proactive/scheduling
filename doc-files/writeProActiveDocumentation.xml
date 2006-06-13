@@ -357,19 +357,18 @@ public class Dummy {
    ourselves to a subset of docbook, because we want a uniform doc style, and
    want maintainable doc. To achieve this goal, we require minimum learning
    investment from our PA developers, who are meant to be coding, not spend
-   there time writing doc. So you still want to add a fancy feature? Well, you
+   their time writing doc. So you still want to add a fancy feature? Well, you
    can, as long as you describe how to use this new tag in this howto, and be
    extra careful with the pdf output.</para>
   
-  <para>There will be a schema specifying which are the allowed tags. For now,
-   all is legal, as I haven't gotten down to writing this yet. Nonetheless, the
-   tags I recommend to use are the ones described in the section above (those 
-   which are used in this tutorial), namely
+  <para>There is a schema specifying which are the allowed tags. You can only use the
+   tags which this dtd allows. If you want more freedom, refer to <xref linkend="customizingTheDTD"/>.
+   For now, you can use the following tags: 
    <itemizedlist>
-     <listitem> <para>part, appendix, chapter, sect*, title, para, emphasis, xref, ulink</para> </listitem>
+     <listitem> <para>part, appendix, chapter, sect[1-5], title, para, emphasis, xref, ulink</para> </listitem>
      <listitem> <para>table, figure, caption, informalfigure, informaltable </para> </listitem>
      <listitem> <para>itemizedlist and orderedlist, listitem</para> </listitem>
-     <listitem> <para>example, programlisting, screen, blockquote, and literal</para> </listitem>
+     <listitem> <para>example, programlisting, screen, and literal</para> </listitem>
      <listitem> <para>The others that you might come along, albeit less frequently, are 
        citation, email, indexterm, inlinemediaobject, note, answer, question, subscript, superscript  </para> </listitem>
    </itemizedlist>  

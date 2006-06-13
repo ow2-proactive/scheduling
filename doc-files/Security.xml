@@ -362,23 +362,11 @@
 
       <para>During execution, each activity (Active Object) is always included
       in a <emphasis>Node</emphasis> (due to the Virtual Node mapping) and at
-      least in one <emphasis>Domain</emphasis>, the one used to launch a JVM (
-      <inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="security_images/img9.png" format="PNG" />
-          </imageobject>
-        </inlinemediaobject> ). 
-        <xref linkend="HierarchicalSecurityLevels"/>
+      least in one <emphasis>Domain</emphasis>, the one used to launch a JVM 
+      (D<subscript>0</subscript>).   <xref linkend="HierarchicalSecurityLevels"/>
       hierarchically represents the security rules that can be activated at
-      execution: from the top, hierarchical domains ( <inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="security_images/img10.png" format="PNG" />
-          </imageobject>
-        </inlinemediaobject> ) to <inlinemediaobject>
-          <imageobject>
-            <imagedata fileref="security_images/img9.png" format="PNG" />
-          </imageobject>
-        </inlinemediaobject> ), the virtual node policy (VN), and the Object
+      execution: from the top, hierarchical domains 
+      (D<subscript>1</subscript> to D<subscript>0</subscript>), the virtual node policy (VN), and the Object
       (O) policy. Of course, such policies can be inconsistent, and there must
       be clear principles to combine the various sets of rules.</para>
 
@@ -440,67 +428,24 @@
       agreed security policy includes confidentiality, the two entities
       negotiate a session key.</para>
 
-     <para><table id="Result_of_security_negotiations">
+     <table id="Result_of_security_negotiations" frame="none">
           <title>Result of security negotiations</title>
-
-          <tgroup cols="5">
+          <tgroup cols="1">
             <tbody>
               <row>
-                <entry></entry>
-
-                <entry></entry>
-
-                <entry align="center" nameend="c5" namest="c3"
-                valign="middle"><para>Entity A</para></entry>
-              </row>
-
-              <row>
-                <entry></entry>
-
-                <entry></entry>
-
-                <entry><para>Required (+)</para></entry>
-
-                <entry><para>Optional (?)</para></entry>
-
-                <entry><para>Disallowed (-)</para></entry>
-              </row>
-
-              <row>
-                <entry align="center" morerows="2"
-                valign="middle"><para>Entity B</para></entry>
-
-                <entry><para>Required (+)</para></entry>
-
-                <entry><para>+</para></entry>
-
-                <entry><para>+</para></entry>
-
-                <entry><para>Error</para></entry>
-              </row>
-
-              <row>
-                <entry><para>Optional (?)</para></entry>
-
-                <entry><para>+</para></entry>
-
-                <entry><para>?</para></entry>
-
-                <entry><para>-</para></entry>
-              </row>
-
-              <row>
-                <entry><para>Disallowed (-)</para></entry>
-
-                <entry><para>Error</para></entry>
-
-                <entry><para>-</para></entry>
-
-                <entry><para>-</para></entry>
+                <entry align="center"> 
+                 <para><informalfigure id="SecurityNegotiation">
+                  <mediaobject>
+                   <imageobject>
+                    <imagedata fileref="security_images/negotiation.png" format="PNG" />
+                   </imageobject>
+                  </mediaobject>
+                 </informalfigure></para>
+                </entry>
               </row>
             </tbody>
           </tgroup>
-        </table></para>
+        </table>
     </sect2>
 
     <sect2>
