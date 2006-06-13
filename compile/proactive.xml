@@ -518,7 +518,22 @@
 	<!-- ================================================================ -->
 	<!--            Create docs, which is the javadoc + manual            -->
 	<!--  =============================================================== -->
-	<target name="docs" depends="javadoc, manual" description="Construct the javadoc and the manual"/>
+	<target name="docs" depends="java2html, javadoc, manual" description="Construct the javadoc and the manual"/>
+
+
+	<!-- ================================================================ -->
+	<!--            Make the java files readable on the web               -->
+	<!--  =============================================================== -->
+	<target name="java2html" >
+		<echo message="Converting java to html..."/>
+		<java jar="${base}/dev/lib/j2h.jar" fork="true">
+			<arg line="-d ${docs.dir}/ProActive_src_html"/>
+			<arg line="-js ${src.dir}/${proactive.dir}"/>
+			<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api"/>
+			<arg line="-t 2 -n '${name} source code'"/>
+		</java>
+ 
+	</target>
 
 
 	<!-- ================================================================ -->
@@ -941,6 +956,7 @@
 		<java classname="util.DocBookize" fork="true">
 			<classpath refid="project.classpath" />
 			<arg value="${docs.tmp}/${docbookInputFile}" />		<!-- The xml file to parse -->
+			<arg value="ProActive_src_html/${proactive.dir}/" />		<!-- The path to find java files in html -->
 			<arg value="${src.dir}/${proactive.dir}/" />			<!-- the path for java file inclusion -->
 			<arg value="${base}/descriptors/" />							<!-- the path for xml file inclusion -->
 		</java>
@@ -1034,10 +1050,13 @@
 	<!-- ==================================================================== -->
 	<target name="manual"
     description="Build all the different manual version: html, pdf... " 
-    depends="manualSingleHtml,manualHtml,manualPdf" >
+    depends="java2html,manualSingleHtml,manualHtml,manualPdf" >
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
 		<delete dir="${docs.tmp}" />
+		<copy todir="${docs.dir}/examples" >  <!-- XML descriptor examples also available -->
+			<fileset dir="${base}/descriptors/examples"/>
+		</copy>
 	</target>
 
 </project>
