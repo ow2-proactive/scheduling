@@ -16,6 +16,7 @@
 			<unitTest exclude="no" class="nonregressiontest.node.localnode.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.stubgeneration.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.stubinterface.Test" />
+			<unitTest exclude="no" class="nonregressiontest.stub.abstractclass.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.newactive.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
