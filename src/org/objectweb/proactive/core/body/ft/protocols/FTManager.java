@@ -405,4 +405,12 @@ public abstract class FTManager implements java.io.Serializable {
      * @return depend on the message meaning
      */
     public abstract Object handleFTMessage(FTMessage fte);
+    
+    /**
+     * This method is called after a migration to update the object's location
+     * @author Javier Bustos
+     * @param ownerID the UniversalID of the caller
+     * @param remoteBodyAdapter the remotBodyAdapter of the caller
+     */
+    public void updateLocationAtServer(UniqueID ownerID, UniversalBody remoteBodyAdapter) {}
 }

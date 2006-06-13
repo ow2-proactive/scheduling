@@ -559,6 +559,16 @@ public class FTManagerCIC
         return 0;
     }
 
+    public void updateLocationAtServer(UniqueID ownerID, UniversalBody remoteBodyAdapter) {
+        try {
+            // update servers
+            this.location.updateLocation(ownerID, remoteBodyAdapter);
+//            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
+        } catch (RemoteException e) {
+            logger.error("Unable to connect with location server");
+            e.printStackTrace();
+        }
+    }
     /*
      * search for an awaited request from r.source.
      * if any, unfreeze ar and remove it from awaitedRequests list.
