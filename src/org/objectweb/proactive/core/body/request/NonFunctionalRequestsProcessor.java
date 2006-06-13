@@ -63,7 +63,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 	
 	/**
 	 * Returns the oldest and most priority non functional request 
-	 * @param remove=true means that the request has to be removed from the lists
+	 * @param remove =true means that the request has to be removed from the lists
 	 * @return the non functional request with the highest priority : the first in the list.
 	 */
 	public synchronized Request getOldestPriorityNFRequest(boolean remove) {
@@ -86,7 +86,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 	
 	/**
 	 * Returns the yougest and most priority non functional request 
-	 * @param remove=true means that the request has to be removed from the lists
+	 * @param remove =true means that the request has to be removed from the lists
 	 * @return the youngest priority request
 	 */
 	public synchronized Request getYoungestPriorityNFRequest(boolean remove) {

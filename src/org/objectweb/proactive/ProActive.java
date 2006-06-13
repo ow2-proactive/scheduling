@@ -1690,7 +1690,6 @@ public class ProActive {
      * @param immediate if this boolean is true, this method is served as an immediate service.
      * The active object dies immediatly. Else, the kill request is served as a normal request, it
      * is put on the request queue.
-     * @throws
      */
     public static void terminateActiveObject(Object ao, boolean immediate) {
         Proxy proxy = ((StubObject) ao).getProxy();

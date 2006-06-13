@@ -180,8 +180,6 @@ public interface ProActiveGenericFactory extends GenericFactory {
      * @param contentDesc
      *            description of the content part of the component to be
      *            created. This description is implementation specific.
-     * @param virtualNode
-     *            the virtual node where to create the components.
      * @return an list of {@link Component} interfaces of the created
      *         components.
      * @throws InstantiationException

@@ -105,5 +105,5 @@ public class NonFunctionalServices {
      * then intercepted by BodyImpl.serve() which calls AbstractBody.terminate(). 
      * @param proxy
      */
-    public void _terminateAOImmediately(Proxy p) {}
+    public void _terminateAOImmediately(Proxy proxy) {}
 }

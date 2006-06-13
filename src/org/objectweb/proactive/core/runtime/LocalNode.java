@@ -195,7 +195,7 @@ public class LocalNode {
 
     /**
      * Unregisters the specified <code>UniqueID</code> from the node
-     * @param bodyID. The <code>UniqueID</code> to remove
+     * @param bodyID The <code>UniqueID</code> to remove
      */
     public void unregisterBody(UniqueID bodyID) {
         activeObjectsId.remove(bodyID);
@@ -204,7 +204,7 @@ public class LocalNode {
     /**
      * Registers the specified body in the node. In fact it is the <code>UniqueID</code>
      * of the body that is attached to the node.
-     * @param body. The body to register
+     * @param bodyID The body to register
      */
     public void registerBody(UniqueID bodyID) {
         activeObjectsId.add(bodyID);
