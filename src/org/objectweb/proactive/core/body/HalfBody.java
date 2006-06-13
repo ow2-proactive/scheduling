@@ -270,7 +270,7 @@ public class HalfBody extends AbstractBody {
          * @return a unique identifier that can be used to tag a future, a request.
          */
         private synchronized long getNextSequenceID() {
-            return ++absoluteSequenceID;
+            return bodyID.toString().hashCode() + ++absoluteSequenceID;
         }
     }
 
