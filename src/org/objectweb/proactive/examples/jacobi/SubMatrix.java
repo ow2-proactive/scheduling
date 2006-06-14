@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
+import org.objectweb.proactive.examples.myjacobi.Jacobi;
 
 
 public class SubMatrix implements Serializable{
@@ -143,31 +144,29 @@ public class SubMatrix implements Serializable{
      * communication with other submatrix
      */
     public void internalCompute() {
-        int index = this.width + 2;
-        double current;
-        double diff = Jacobi.MINDIFF + 1;
-        double b;
-        double n;
-        double a;
-        b = this.old[index - 1];
-        n = this.old[index];
-        a = this.old[index + 1];
-        for (int y = 1; y < (this.height - 1); y++) {
-            for (int x = 1; x < (this.width - 1); x++) {
-                current = (b + a + this.old[index - this.width] +
-                    this.old[index + this.width]) / 4;
-                this.current[index] = current;
-                diff = Math.abs(current - n);
-                if (diff < this.minDiff) {
-                    this.minDiff = diff;
-                }
-                b = n;
-                n = a;
-                a = this.old[index + 1];
-                index++;
-            }
-            index += 2;
-        }
+		int index = this.width + 1;
+		double current;
+		double diff = Jacobi.MINDIFF + 1;
+		double west;
+		double center; 
+		double east;
+		for (int y = 1; y < (this.height - 1); y++) {
+		    for (int x = 1; x < (this.width - 1); x++) {
+				center = old[index];
+				west = old[index - 1];
+				east = old[index + 1];
+				current = (west + east + this.old[index - this.width] +
+				        this.old[index + this.width]) / 4;
+				this.current[index] = current;
+				diff = Math.abs(current - center);
+				if (diff < this.minDiff ) {
+					this.minDiff = diff;
+				}
+				
+				index++;
+		     }
+		    index += 2;
+		}
     }
 
     /**
@@ -393,7 +392,8 @@ public class SubMatrix implements Serializable{
         double[] line = new double[this.height];
         int index = 0;
         for (int i = 0; i < this.height; i++) {
-            line[i] = this.old[index + this.width];
+            line[i] = this.old[index];
+            index += this.width;
         }
         return line;
     }
@@ -404,9 +404,10 @@ public class SubMatrix implements Serializable{
      */
     private double[] buildEastBorder() {
         double[] line = new double[this.height];
-        int index = this.width;
+        int index = this.width - 1;
         for (int i = 0; i < this.height; i++) {
-            line[i] = this.old[index + this.width];
+            line[i] = this.old[index];
+            index += this.width;
         }
         return line;
     }
