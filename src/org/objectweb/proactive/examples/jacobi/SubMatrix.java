@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
-import org.objectweb.proactive.examples.myjacobi.Jacobi;
 
 
 public class SubMatrix implements Serializable{
