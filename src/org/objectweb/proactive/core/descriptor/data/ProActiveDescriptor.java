@@ -30,8 +30,13 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
+import org.objectweb.proactive.core.descriptor.services.TechnicalServiceWrapper;
+import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -41,9 +46,6 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.PolicyServer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -366,4 +368,14 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public void addServiceToSequenceList(
         AbstractSequentialListProcessDecorator sequentialListProcess,
         String string);
+
+    /**
+     * Add a technical service.
+     * @param tsParsed id, class, and args.
+     */
+    public void addTechnicalService(TechnicalServiceXmlType tsParsed)
+        throws Exception;
+
+    public TechnicalServiceWrapper getTechnicalService(
+        String technicalServiceId);
 }

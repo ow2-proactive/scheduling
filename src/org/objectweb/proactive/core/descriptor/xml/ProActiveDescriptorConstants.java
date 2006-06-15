@@ -185,4 +185,8 @@ public interface ProActiveDescriptorConstants {
     public static final String FILE_TRANSFER_SRC_INFO_TAG = "sourceInfo";
     public static final String FILE_TRANSFER_DST_INFO_TAG = "destinationInfo";
     public static final String FILE_TRANSFER_IMPLICT_KEYWORD = "implicit";
+    public static final String TECHNICAL_SERVICE_ID = "technicalServiceId";
+    public static final String TECHNICAL_SERVICES_TAG = "technicalServices";
+    public static final String TECHNICAL_SERVICES_DEF_TAG = "technicalServiceDefinition";
+    public static final String TECHNICAL_SERVICE_ARG_TAG = "arg";
 }

@@ -287,5 +287,82 @@
    </biblioset>
   </biblioentry>
 
+	<biblioentry role="inproceedings" id="CDD06c">
+		<abbrev id="CDD06c.abbrev">CDD06c</abbrev>
+		<biblioset role="article">
+			<authorgroup>
+				<author>
+					<firstname>Denis</firstname>
+					<surname>Caromel</surname>
+				</author>
+				<author>
+					<firstname>Christian</firstname>
+					<surname>Delbe</surname>
+				</author>
+				<author>
+					<firstname>Alexandre</firstname>
+					<surname>di Costanzo</surname>
+				</author>
+			</authorgroup>
+			<title>
+				Peer-to-Peer and Fault-Tolerance: Towards Deployment
+				Based Technical Services
+			</title>
+		</biblioset>
+		<biblioset role="proceedings">
+			<confgroup>
+				<conftitle>
+					Second CoreGRID Workshop on Grid and Peer to Peer
+					Systems Architecture
+				</conftitle>
+				<address>Paris, France</address>
+			</confgroup>
+			<pubdate>January 2006</pubdate>
+		</biblioset>
+	</biblioentry>
+
+	<biblioentry role="inproceedings" id="CCDMCompFrame06">
+		<abbrev id="CCDMCompFrame06.abbrev">CCDMCompFrame06</abbrev>
+		<biblioset role="article">
+			<authorgroup>
+				<author>
+					<firstname>Denis</firstname>
+					<surname>Caromel</surname>
+				</author>
+				<author>
+					<firstname>Alexandre</firstname>
+					<surname>di Costanzo</surname>
+				</author>
+				<author>
+					<firstname>Christian</firstname>
+					<surname>Delbe</surname>
+				</author>
+				<author>
+					<firstname>Matthieu</firstname>
+					<surname>Morel</surname>
+				</author>
+			</authorgroup>
+			<title>
+				Dynamically-Fulfilled Application Constraints through
+				Technical Services - Towards Flexible Component
+				Deployments
+			</title>
+		</biblioset>
+		<biblioset role="proceedings">
+			<confgroup>
+				<conftitle>
+					Proceedings of HPC-GECO/CompFrame 2006, HPC Grid
+					programming Environments and COmponents - Component
+					and Framework Technology in High-Performance and
+					Scientific Computing
+				</conftitle>
+				<address>Paris, France</address>
+			</confgroup>
+			<pubdate>June 2006</pubdate>
+			<publisher>
+				<publishername>IEEE</publishername>
+			</publisher>
+		</biblioset>
+	</biblioentry>
   
 </bibliography>

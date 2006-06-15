@@ -30,12 +30,20 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
+import org.objectweb.proactive.core.descriptor.services.TechnicalServiceWrapper;
+import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -52,12 +60,6 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -118,6 +120,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     //  public X509Certificate creatorCertificate;
     public String securityFile;
+    private HashMap technicalServiceMapping;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -134,6 +137,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         variableContract = new VariableContract();
         this.url = url;
         mainDefined = false;
+        this.technicalServiceMapping = new HashMap();
     }
 
     //
@@ -944,5 +948,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      */
     public VariableContract getVariableContract() {
         return this.variableContract;
+    }
+
+    public void addTechnicalService(TechnicalServiceXmlType tsParsed)
+        throws Exception {
+        TechnicalService ts = (TechnicalService) tsParsed.getType().newInstance();
+        ((TechnicalService) ts).init(tsParsed.getArgs());
+        ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
+    }
+
+    public TechnicalServiceWrapper getTechnicalService(
+        String technicalServiceId) {
+        TechnicalServiceWrapper ts = (TechnicalServiceWrapper) this.technicalServiceMapping.get(technicalServiceId);
+
+        if (ts == null) {
+            ts = new TechnicalServiceWrapper();
+            this.technicalServiceMapping.put(technicalServiceId, ts);
+        }
+
+        return ts;
     }
 }

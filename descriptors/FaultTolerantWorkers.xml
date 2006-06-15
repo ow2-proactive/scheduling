@@ -85,6 +85,26 @@
 		<processes>
 			<processDefinition id="jvmProcess">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+	<classpath>
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/asm.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/bouncycastle.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/components/fractal.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/log4j.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/ProActive.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/xercesImpl.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/jsch.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/lib/javassist.jar" />
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/classes" />
+					</classpath>
+	<javaPath>
+						<absolutePath value="/user/adicosta/home/Developer/jdk1.5.0_03/bin/java" />
+					</javaPath>
+	<policyFile>
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="/user/adicosta/home/ProActive_NBODY3D/scripts/proactive-log4j" />
+					</log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>
 			<!-- HOSTNAMES MUST BE SET HERE -->
@@ -104,7 +124,7 @@
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli4">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="lo">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
@@ -114,7 +134,7 @@
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli6">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amstel">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="duff">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
@@ -129,12 +149,12 @@
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed1">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="galpage">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed2">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amda">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="waha">
 					<processReference refid="jvmProcess"/>
 				</rshProcess>
 			</processDefinition>
@@ -143,7 +163,7 @@
 			<serviceDefinition id="appli">
 				<faultTolerance>
 					<protocol type="cic"></protocol>
-					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
+					<globalServer url="rmi://trinidad:7788/FTServer"></globalServer>
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
@@ -151,8 +171,8 @@
 			<serviceDefinition id="ressource">
 				<faultTolerance>
 					<protocol type="cic"></protocol>
-					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
-					<resourceServer url="rmi://trinidad:1334/FTServer"></resourceServer>
+					<globalServer url="rmi://trinidad:7788/FTServer"></globalServer>
+					<resourceServer url="rmi://trinidad:7788/FTServer"></resourceServer>
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>

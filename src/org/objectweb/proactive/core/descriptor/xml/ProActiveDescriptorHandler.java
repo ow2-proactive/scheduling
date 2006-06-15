@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
+
 /**
  * This class receives deployment events
  *
@@ -54,12 +55,13 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public ProActiveDescriptorHandler(String xmlDescriptorUrl, VariableContract variableContract) {
+    public ProActiveDescriptorHandler(String xmlDescriptorUrl,
+        VariableContract variableContract) {
         super(false);
         proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
-    	//keep a reference of the variable contract for future use
+        //keep a reference of the variable contract for future use
         proActiveDescriptor.setVariableContract(variableContract);
-    	
+
         addHandler(MAIN_DEFINITION_TAG,
             new MainDefinitionHandler(proActiveDescriptor));
         addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
@@ -67,6 +69,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             new InfrastructureHandler(proActiveDescriptor));
         addHandler(FILE_TRANSFER_DEFINITIONS_TAG,
             new FileTransferDefinitionsHandler(proActiveDescriptor));
+        addHandler(TECHNICAL_SERVICES_TAG,
+            new TechnicalServicesHandler(proActiveDescriptor));
         addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
         {
             PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
@@ -108,7 +112,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         throws java.io.IOException, org.xml.sax.SAXException {
         //static method added to replace main method
         try {
-            InitialHandler h = new InitialHandler(xmlDescriptorUrl, variableContract);
+            InitialHandler h = new InitialHandler(xmlDescriptorUrl,
+                    variableContract);
             String uri = xmlDescriptorUrl;
             org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
                         uri), h);
@@ -116,7 +121,6 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             return (ProActiveDescriptorHandler) h.getResultObject();
         } catch (org.xml.sax.SAXException e) {
             //e.printStackTrace();
-        	
             logger.fatal(
                 "a problem occurs when getting the ProActiveDescriptorHandler");
             throw e;
@@ -128,12 +132,11 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     //
     public Object getResultObject() throws org.xml.sax.SAXException {
         //copy xmlproperties into the pad
-    	//proActiveDescriptor.setVariableContract(XMLProperties.xmlproperties.duplicate());
-    	
+        //proActiveDescriptor.setVariableContract(XMLProperties.xmlproperties.duplicate());
+
         //Release lock on static global variable XMLProperties
-    	//XMLProperties.xmlproperties.clear();
-    	//XMLProperties.xmlproperties.releaseLock();
-    	
+        //XMLProperties.xmlproperties.clear();
+        //XMLProperties.xmlproperties.releaseLock();
         return proActiveDescriptor;
     }
 
@@ -146,13 +149,14 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     //
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
-    	/*
-    	if(name.equals(VARIABLES_TAG)){
-	    	//Check XMLProperties Runtime
-	    	if(!org.objectweb.proactive.core.xml.XMLProperties.xmlproperties.checkContract())
-	    		throw new SAXException("Variable contract breached");
-    	}
-    	*/
+
+        /*
+            if(name.equals(VARIABLES_TAG)){
+                    //Check XMLProperties Runtime
+                    if(!org.objectweb.proactive.core.xml.XMLProperties.xmlproperties.checkContract())
+                            throw new SAXException("Variable contract breached");
+            }
+            */
     }
 
     //
@@ -169,9 +173,11 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         // line added to return a ProactiveDescriptorHandler object
         private ProActiveDescriptorHandler proActiveDescriptorHandler;
 
-        private InitialHandler(String xmlDescriptorUrl, VariableContract variableContract) {
+        private InitialHandler(String xmlDescriptorUrl,
+            VariableContract variableContract) {
             super();
-            proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl, variableContract);
+            proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl,
+                    variableContract);
             this.addHandler(PROACTIVE_DESCRIPTOR_TAG, proActiveDescriptorHandler);
         }
 
@@ -236,13 +242,19 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             }
             String fileTransferDeployName = attributes.getValue(FILE_TRANSFER_DEPLOY_TAG);
             if (checkNonEmpty(fileTransferDeployName)) {
-                vn.addFileTransferDeploy(pad.getFileTransfer(fileTransferDeployName));
+                vn.addFileTransferDeploy(pad.getFileTransfer(
+                        fileTransferDeployName));
             }
             String fileTransferRetrieveName = attributes.getValue(FILE_TRANSFER_RETRIEVE_TAG);
             if (checkNonEmpty(fileTransferRetrieveName)) {
-                vn.addFileTransferRetrieve(pad.getFileTransfer(fileTransferRetrieveName));
+                vn.addFileTransferRetrieve(pad.getFileTransfer(
+                        fileTransferRetrieveName));
             }
-            
+            String technicalServiceId = attributes.getValue(TECHNICAL_SERVICE_ID);
+            if (checkNonEmpty(technicalServiceId)) {
+                vn.addTechnicalService(pad.getTechnicalService(
+                        technicalServiceId));
+            }
         }
     } // end inner class VirtualNodeHandler
 

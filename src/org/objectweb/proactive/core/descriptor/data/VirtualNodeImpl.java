@@ -48,13 +48,14 @@ import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
+import org.objectweb.proactive.core.descriptor.services.TechnicalServiceWrapper;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
-import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -101,7 +102,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
-    private final static Logger MPI_LOGGER = ProActiveLogger.getLogger(Loggers.MPI_DEPLOY);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     private final static Logger DEPLOYMENT_FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     public static int counter = 0;
@@ -185,7 +185,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     // Security 
     private ProActiveSecurityManager proactiveSecurityManager;
-    private String policyServerFile;
     protected String jobID = ProActive.getJobId();
 
     // FAULT TOLERANCE
@@ -202,6 +201,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     // MPI Process
     ExternalProcess mpiProcess = null;
+    private TechnicalService technicalService;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -723,7 +723,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             //wait for pending file transfer
             FileVector fw = (FileVector) fileTransferDeployedStatus.get(node.getNodeInformation()
-                                                                                    .getName());
+                                                                            .getName());
             if (fw != null) {
                 fw.waitForAll(); //wait-by-necessity
             }
@@ -1577,6 +1577,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
             fw);
 
+        if (this.technicalService != null) {
+            this.technicalService.apply(node);
+        }
+
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
 
@@ -1698,6 +1702,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         nbCreatedNodes++;
         nodeCreated = true;
 
+        if (this.technicalService != null) {
+            this.technicalService.apply(newNode);
+        }
+
         //notify all listeners that a node has been created
         notifyAll();
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, newNode,
@@ -1773,8 +1781,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             long init = System.currentTimeMillis();
-            fileVector.add(FileTransfer.pullFiles(nodes[i],
-                    srcFile, dstFile, fileBlockSize, overlapping));
+            fileVector.add(FileTransfer.pullFiles(nodes[i], srcFile, dstFile,
+                    fileBlockSize, overlapping));
 
             if (FILETRANSFER_LOGGER.isDebugEnabled()) {
                 FILETRANSFER_LOGGER.debug("Returned pullFiles in:" +
@@ -1794,8 +1802,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @param node The node that the files will be transfered to.
      */
     private FileVector fileTransferDeploy(Node node) {
-    	FileVector fileWrapper = new FileVector();
-    	
+        FileVector fileWrapper = new FileVector();
+
         if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
             DEPLOYMENT_FILETRANSFER_LOGGER.debug(
                 "File Transfer Deploy files for node" +
@@ -1805,7 +1813,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String vmName = node.getNodeInformation().getDescriptorVMName();
         VirtualMachine vm = getVirtualMachine(vmName);
 
-        
         if (vm == null) {
             if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
                 DEPLOYMENT_FILETRANSFER_LOGGER.debug("No VM found with name: " +
@@ -1852,7 +1859,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         try {
-            fileWrapper.add(FileTransfer.pushFiles(node, filesSrc, filesDst,  fileBlockSize, overlapping));
+            fileWrapper.add(FileTransfer.pushFiles(node, filesSrc, filesDst,
+                    fileBlockSize, overlapping));
         } catch (Exception e) {
             logger.error("Unable to pushFile files to node " +
                 node.getNodeInformation().getName());
@@ -1868,5 +1876,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public void setFileTransferParams(int fileBlockSize, int overlapping) {
         this.fileBlockSize = fileBlockSize;
         this.overlapping = overlapping;
+    }
+
+    public void addTechnicalService(TechnicalServiceWrapper technicalWrapper) {
+        this.technicalService = technicalWrapper;
     }
 }

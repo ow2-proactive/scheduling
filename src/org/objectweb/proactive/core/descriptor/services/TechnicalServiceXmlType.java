@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2005 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,29 +32,60 @@ package org.objectweb.proactive.core.descriptor.services;
 
 import java.util.Map;
 
-import org.objectweb.proactive.core.node.Node;
 
+public class TechnicalServiceXmlType {
+    private String id;
+    private Class type;
+    private Map args;
 
-/**
- * <p>Interface to implement for defining  a Technical Service.</p>
- * <b>Definition of Technical Service:</b>
- * <p>A Technical Service is a non-functional requirement that may be dynamically
- * fulfilled at runtime by updating the configuration of selected resources (here a
- * ProActive Node).</p>
- * @author Alexandre di Costanzo
- *
- */
-public interface TechnicalService {
+    public TechnicalServiceXmlType() {
+    }
 
-    /**
-     * Initialize the Technical Service with its argument values.
-     * @param argValues values of the Technical Service arguments.
-     */
-    public abstract void init(Map argValues);
+    public TechnicalServiceXmlType(String id, Class type, Map args) {
+        this.id = id;
+        this.type = type;
+        this.args = args;
+    }
 
     /**
-     * Initialize the given node with the Technical Service.
-     * @param node the node where to apply the Technical Service.
+    * @return Returns the args.
+    */
+    public Map getArgs() {
+        return args;
+    }
+
+    /**
+     * @param args The args to set.
      */
-    public abstract void apply(Node node);
+    public void setArgs(Map args) {
+        this.args = args;
+    }
+
+    /**
+     * @return Returns the id.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id The id to set.
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return Returns the type.
+     */
+    public Class getType() {
+        return type;
+    }
+
+    /**
+     * @param type The type to set.
+     */
+    public void setType(Class type) {
+        this.type = type;
+    }
 }

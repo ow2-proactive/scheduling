@@ -21,6 +21,7 @@
 <!ENTITY FileTransfer SYSTEM "FileTransfer.xml">
 <!ENTITY SSHTunneling SYSTEM "SSHTunneling.xml">
 <!ENTITY faultTolerance SYSTEM "faultTolerance.xml">
+<!ENTITY technicalService SYSTEM "technicalService.xml">
 <!ENTITY intro SYSTEM "components/intro.xml">
 <!ENTITY implementation SYSTEM "components/implementation.xml">
 <!ENTITY conformance SYSTEM "components/conformance.xml">
@@ -93,6 +94,7 @@
     &FileTransfer;
     &SSHTunneling;
     &faultTolerance;
+    &technicalService;
    </part>
    
    <part id="ProActiveComponents">
