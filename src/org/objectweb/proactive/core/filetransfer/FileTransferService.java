@@ -189,8 +189,9 @@ public class FileTransferService implements ProActiveInternalObject {
 
     /**
      * This method will load a FileBlock from a file, starting from the specified offset.
-     * @param filename
-     * @param offset
+     * @param file The file to read from
+     * @param offset The offset of the file
+     * @param bsize The size of the block to read.
      * @return A file block loaded from the file and starting from the offest.
      */
     public FileBlock getFileBlock(File file, long offset, int bsize){
@@ -373,12 +374,6 @@ public class FileTransferService implements ProActiveInternalObject {
         forwardFile.requestFileTransfer(fti);
     }
 
-    /**
-     * This method removes pending request file transfers that were never processed.
-     * It is intented to be called on as an immediate service.
-     * @param srcFile The source file for which the file transfers are pending.
-     * @return true if there were file transfer requests for the srcFile that were never processed.
-     */
     public OperationStatus getFileTransferRequestStatus(FileTransferRequest fti) {
         return forwardFile.getFileTransferRequestStatus(fti);
     }
