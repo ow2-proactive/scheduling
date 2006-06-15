@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="extends"><title>0.6 Extends the API</title>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/extends.html  -->
+  
+    <para> Thanks to the structure of the API, with many <emphasis role="bold">Interfaces</emphasis> and <emphasis role="bold">Abstracts</emphasis> classes,
+ you can easily extends the API for you needs.</para>
+    <para>For more details about this, you can the class: ProActiveManager, ProActiveFuncTest or
+ ProActiveBenchmark which they are extends the API.</para>
+    <para>The choice of XML to export results can to help you with XSLT to export and format results for
+ you needs.</para>
+    <para>The logger <emphasis role="bold">log4j</emphasis> is also configurable like you want.</para>
+  
+</chapter>

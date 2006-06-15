@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
+<chapter id="intro"><title>Components introduction</title>
+
+ <indexterm><primary>Component</primary></indexterm>
+    
+<para>Computing Grids and Peer-to-Peer networks are inherently heterogeneous and
+ distributed, and for this reason they drive new technological challenges: complexity in the
+ design of applications, complexity of deployment, reusability and performance issues. The
+ objective of our work is to provide an answer to these problems through the implementation for
+ ProActive of an extensible, dynamical and hierarchical component model, 
+ <ulink url="http://fractal.objectweb.org">Fractal</ulink>. This document is an overview of the implementation of
+ Fractal with ProActive. First, it explains the goals and the reasons for a new implementation of
+ the Fractal model. Second, it shows the extensions to the model and the conformance to the
+ Fractal specification. The third section is a word on the current Architecture Description
+ Language. The fourth section goes through some examples to illustrate the use of the API and the
+ distribution of components. The final section is about our forthcoming research work. You can
+ also get an overview of the architecture of this implementation 
+ in <xref linkend="componentArchitecture"/>.</para>
+    
+<note><para>
+  For a general overview of our work , you can also refer to the paper 
+  <citation><xref linkend="BCM03" endterm="BCM03.abbrev"/></citation>.
+</para></note>
+  
+</chapter>

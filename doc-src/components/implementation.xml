@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
+<chapter id="implementation"><title>An implementation of the Fractal component model with ProActive</title>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/implementation.html  -->
+<!--     <para> </para> -->
+    <para>Fractal defines a general conceptual model, along with a programming
+ application interface (API) in Java. According to the official documentation, the Fractal
+ component model is '<emphasis>a modular and extensible component model that can be used with
+ various programming languages to design, implement, deploy and reconfigure various systems and
+ applications, from operating systems to middleware platforms and to graphical user
+ interfaces</emphasis>'.</para>
+    <para>There is a reference implementation, called Julia.</para>
+    <para>We first tried to use Julia to manipulate active objects (the fundamental
+ entities in ProActive), but we wouldn't have been able to reuse the features of the Proactive
+ library, because of the architectures of the libraries.</para>
+    <para>
+ Julia manipulates a base class by modifying the bytecode or adding interception objects to it. On
+ the other hand, ProActive is based on a meta-object protocol and provides a reference to an
+ active object through a typed stub. If we wanted to use active objects with Julia, the Julia
+ runtime would try to manipulate the stub, and not the active object itself. And if trying to
+ force Julia to work on the same base object than ProActive, the control flow could not traverse
+ both ProActive and Julia.</para>
+    <para>
+ Eventually, re-implementing ProActive using Julia could be a solution (a starting point could be
+ the 'protoactive' example of Julia), but this would imply a full refactoring of the
+ library, and therefore quite a few resources...</para>
+    <para>
+ More generally speaking, Julia is designed to work with standard objects, but not with the active
+ objects of ProActive. Some features (see next section) would not be reusable using Julia with
+ ProActive active objects.</para>
+    <para>
+ Therefore, we had to go for our own implementation.</para>
+    <para>This implementation is different from Julia both in its objectives and in
+ the programming technniques. As previously stated, we target Grid and P2P environments. The
+ programming techniques and the architecture of the implementation is described in a following
+ section.</para>
+    <sect1 >
+      <title>Specific features of this implementation</title>
+      <para>The combination of the Fractal model with the ProActive library leverages
+ the capabilities of both of them.</para>
+      <sect2 >
+        <title>Distribution</title>
+        <para>Distribution is achieved in a transparent manner over the Java RMI protocol thanks to the use
+ of a stub/proxy pattern. Components are manipulated indifferently of their location (local or on
+ a remote JVM).</para>
+      </sect2>
+      <sect2 >
+        <title>Deployment framework</title>
+        <para>ProActive provides a deployment framework for creating a distributed component system. Using a
+ configuration file and the concept of virtual nodes, this framework:</para>
+        <orderedlist>
+          <listitem>
+            <para> connects to remote hosts using supported protocols, such as rsh, rlogin, ssh, globus, lsf
+ etc...</para>
+          </listitem>
+          <listitem>
+            <para> creates JVMs on these hosts</para>
+          </listitem>
+          <listitem>
+            <para> instantiates components on these newly created JVMs</para>
+          </listitem>
+</orderedlist>
+      </sect2>
+      <sect2 >
+        <title>Activities</title>
+        <para>A fundamental concept of the ProActive library is this of Active Objects 
+         (see <xref linkend="ProActiveBasis"/>), where activities can actually be 
+         redefined (see also <xref linkend="ActiveObjectCreation"/>)
+         to customize their <emphasis role="bold">behavior</emphasis>.</para>
+      </sect2>
+      <sect2 >
+        <title>Asynchronous method calls with futures</title>
+        <para>Asynchronous method calls with transparent futures is a core feature of ProActive
+         (<xref  linkend="FutureObjectCreation"/>), and it allows concurrent processing. Indeed, suppose
+ a caller invokes a method on a callee. This method returns a result on a component. With
+ synchronous method calls, the flow of execution of the caller is blocked until the result of the
+ method called is received. In the case of intensive computations, this can be relatively long.
+ With asynchronous method calls, the caller gets a future object and will continue its tasks until
+ it really uses the result of the method call. The process is then blocked (it is called
+ wait-by-necessity) until the result has effectively been calculated.</para>
+      </sect2>
+    </sect1>
+  
+</chapter>

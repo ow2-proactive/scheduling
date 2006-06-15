@@ -1,0 +1,1153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/ReferenceCard.html  -->
+<appendix id="ReferenceCard">
+  <title>Reference Card</title>
+
+  <para><emphasis role="bold">ProActive</emphasis> is a Java library for
+  <emphasis role="bold">parallel</emphasis>, <emphasis
+  role="bold">distributed</emphasis>, and <emphasis
+  role="bold">concurrent</emphasis> computing, also featuring <emphasis
+  role="bold">mobility</emphasis> and <emphasis
+  role="bold">security</emphasis> in a uniform framework. <emphasis
+  role="bold">ProActive</emphasis> provides a comprehensive API and a
+  graphical interface. The library is based on an Active Object pattern that
+  is a uniform way to encapsulate:</para>
+
+  <informaltable frame="none" colsep="0">
+    <tgroup cols="2">
+      <tbody>
+        <row>
+          <entry align="left" valign="middle"><para> <itemizedlist>
+              <listitem>
+                <para><emphasis role="bold">a remotely</emphasis> accessible
+                object,</para>
+              </listitem>
+
+              <listitem>
+                <para>a <emphasis role="bold">thread</emphasis> as an
+                asynchronous activity,</para>
+              </listitem>
+
+              <listitem>
+                <para>an <emphasis role="bold">actor</emphasis> with its own
+                script,</para>
+              </listitem>
+            </itemizedlist> </para></entry>
+
+          <entry align="left" valign="middle"><para> <itemizedlist>
+              <listitem>
+                <para>a <emphasis role="bold">server</emphasis> of incoming
+                requests,</para>
+              </listitem>
+
+              <listitem>
+                <para>a <emphasis role="bold">mobile</emphasis> and
+                potentially secure entity,</para>
+              </listitem>
+
+              <listitem>
+                <para>a <emphasis role="bold">component</emphasis> with server
+                and client interfaces.</para>
+              </listitem>
+            </itemizedlist> </para></entry>
+        </row>
+      </tbody>
+    </tgroup>
+  </informaltable>
+
+  <para><emphasis role="bold">ProActive</emphasis> is only made of standard
+  Java classes, and requires <emphasis role="bold">no changes to the Java
+  Virtual Machine</emphasis>. Overall, it simplifies the programming of
+  applications distributed over Local Area Network (LAN), Clusters, Intranet
+  or Internet GRIDs.</para>
+
+  <sect1>
+    <title>Main concepts and definitions</title>
+
+    <para><itemizedlist>
+        
+
+      <listitem>
+				<indexterm><primary>Active Object</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Active Objects (AO):</emphasis> a remote
+          object, with its own thread, receiving calls on its public
+          methods</para>
+        </listitem>
+
+
+        <listitem>
+					<indexterm><primary>Activity</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">FIFO activity:</emphasis> an AO, by
+          default, executes the request it receives one after the other, in
+          the order they were received</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">No-sharing:</emphasis> standard Java
+          objects cannot be referenced from 2 AOs, ensured by deep-copy of
+          constructor params, method params, and results</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Asynchronous Communications:</emphasis>
+          method calls towards AOs are asynchronous</para>
+        </listitem>
+
+        
+          <listitem>
+						<indexterm><primary>Future</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Future:</emphasis> the result of a
+          non-void asynchronous method call</para>
+        </listitem>
+
+        <listitem>
+					<indexterm><primary>Request</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Request:</emphasis> the occurrence of a
+          method call towards an AO</para>
+        </listitem>
+
+          
+        <listitem>
+					<indexterm><primary>Service</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Service:</emphasis> the execution by an
+          AO of a request</para>
+        </listitem>
+
+        <listitem>
+					<indexterm><primary>Reply</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Reply:</emphasis> after a service, the
+          method result is sent back to the caller</para>
+        </listitem>
+
+          
+        <listitem>
+					<indexterm><primary>Wait-by-necessity</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Wait-by-necessity:</emphasis> automatic
+          wait upon the use of a still awaited future</para>
+        </listitem>
+
+        
+          <listitem>
+						<indexterm><primary>Automatic Continuation</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Automatic Continuation:</emphasis>
+          transmission of futures and replies between AO and JVMs</para>
+        </listitem>
+
+
+        <listitem>
+					<indexterm><primary>Migration</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Migration:</emphasis> an AO moving from
+          one JVM to another, computational weak mobility: the AO decides to
+          migrate and stack is lost</para>
+        </listitem>
+
+          
+        <listitem>
+					<indexterm><primary>Group</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Group:</emphasis> a typed group of
+          objects or AOs. Methods are called in parallel on all group
+          members.</para>
+        </listitem>
+
+          
+        <listitem>
+					<indexterm><primary>Component</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Component:</emphasis> made of AOs, a
+          component defines server and client interfaces</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Primitive Component:</emphasis> directly
+          made of Java code and AOs</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Composite Component:</emphasis> contains
+          other components (primitives or composites)</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Parallel Component:</emphasis> a
+          composite that is using groups to multicast calls to inner
+          components</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Security:</emphasis> X.509
+          Authentication, Integrity, and Confidentiality defined at deployment
+          in an XML file on entities such as communications, migration,
+          dynamic code loading.</para>
+        </listitem>
+
+        <listitem>
+					<indexterm><primary>Virtual Node</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Virtual Node (VN):</emphasis> an
+          abstraction (a string) representing where to locate AOs at
+          creation</para>
+        </listitem>
+          
+        <listitem>
+					<indexterm><primary>Deployment descriptor</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Deployment descriptor:</emphasis> an XML
+          file where a mapping VN --&gt; JVMs --&gt; Machine is
+          specified.</para>
+        </listitem>
+
+        <listitem>
+					<indexterm><primary>Node</primary><secondary>definition</secondary></indexterm>
+          <para><emphasis role="bold">Node:</emphasis> the result of mapping a
+          VN to a set of JVMs. After activation, a VN contains a set of nodes,
+          living in a set of JVMs.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">IC2D:</emphasis> Interactive Control and
+          Debugging of Distribution: a Graphical environment for monitoring
+          and steering Grid applications</para>
+        </listitem>
+      </itemizedlist></para>
+  </sect1>
+
+  <sect1>
+    <title>Main principles: asynchronous method calls and implicit
+    futures</title>
+
+    <para><programlisting lang="java">A a = (A) ProActive.newActive('A', params, node);
+   // Create an active Object of type A in the JVM specified by Node
+a.foo (param); 
+   // A one way typed asynchronous communication towards the (remote) AO a
+   // A request is sent to a,
+v = a.bar (param);
+   // A typed asynchronous communication with result.
+   // v is first an awaited Future, to be transparently filled up after
+   // service of the request, and reply
+...
+v.gee (param);
+   // Use of the result of an asynchronous call.
+   // If v is still an awaited future, it triggers an automatic 
+   // wait: Wait-by-necessity</programlisting></para>
+  </sect1>
+
+  <sect1>
+    <title>Explicit Synchronization</title>
+
+    <para><programlisting lang="java"><emphasis role="bold"> boolean </emphasis>isAwaited(Object);
+   // Returns True if the object is still an awaited Future 
+
+ <emphasis role="bold">void </emphasis> waitFor(Object);
+   // Blocks until the object is no longer awaited
+   // A request is sent to a,
+
+ <emphasis role="bold">void </emphasis> waitForAll(Vector);
+   // Blocks until all the objects in Vector are no longer awaited  
+
+
+ <emphasis role="bold">int </emphasis>waitForAny(Vector);
+   // Blocks until one of the objects in Vector is no longer awaited.
+   // Returns the index of the available future.</programlisting></para>
+  </sect1>
+
+  <sect1>
+    <title>Programming AO Activity and services</title>
+
+    <para>When an AO must implement an activity that is not FIFO, the
+    RunActive interface has to be implemented: it specifies the AO behavior in
+    the method named runActivity():</para>
+
+    <para><programlisting lang="java"><emphasis role="bold">Interface </emphasis>RunActive <emphasis
+          role="bold">
+void</emphasis> runActivity(Body body) 
+    // The activity of the active object instance of the current class</programlisting>Example:</para>
+
+    <para><programlisting><emphasis role="bold">public class </emphasis>A <emphasis
+          role="bold">implements</emphasis> RunActive { 
+  // Implements RunActive for programming a specific behavior 
+
+  // runActivity() is automatically called when such an AO is created <emphasis
+          role="bold">
+  public void </emphasis> runActivity(Body body) { 
+    Service service = new Service(body); 
+    while ( terminate ) { 
+        ... // Do some activity on its own 
+        ... 
+        ... // Do some services, e.g. a FIFO service on method named foo 
+        service.serveOldest('foo'); 
+        ... 
+        } 
+    } 
+}</programlisting>Two other interfaces can also be specified:</para>
+
+    <para><programlisting lang="java"><emphasis role="bold">Interface </emphasis>InitActive <emphasis
+          role="bold">
+void </emphasis> initActivity(Body body) 
+    // Initializes the activity of the active object. 
+    // not called in case of restart after migration 
+    // Called before runActivity() method, and only once: <emphasis
+          role="bold">
+
+Interface </emphasis>EndActive <emphasis role="bold">
+void </emphasis> endActivity(Body body) 
+    // Finalizes the active object after the activity stops by itself. 
+    // Called after the execution of runActivity() method, and only once: 
+    // not called before a migration</programlisting></para>
+  </sect1>
+
+  <sect1>
+    <title>Reactive Active Object</title>
+
+    <para>Even when an AO is busy doing its own work, it can remain reactive
+    to external events (method calls). One just has to program non-blocking
+    services to take into account external inputs.</para>
+
+    <para><programlisting lang="java"><emphasis role="bold">public class </emphasis>BusyButReactive <emphasis
+          role="bold">implements</emphasis> RunActive { <emphasis role="bold">
+
+    public void </emphasis> runActivity(Body body) { 
+       Service service = new Service(body); 
+       while ( ! hasToTerminate ) { 
+             ... 
+             // Do some activity on its own ... 
+             ... 
+             // Non blocking service ... 
+             service.serveOldest('changeParameters', 'terminate'); 
+             ... 
+             } 
+       }   <emphasis role="bold">    
+ 
+    public void </emphasis> changeParameters () {
+             ...... 
+             // change computation parameters
+             }    
+
+    <emphasis role="bold">public void </emphasis> terminate (){ 
+             hasToTerminate=true;
+             } 
+    }</programlisting></para>
+
+    <para>It also allows one to specify explicit termination of AOs (there is
+    currently no Distributed Garbage Collector). Of course, the reactivity is
+    up to the length of going around the loop. Similar techniques can be used
+    to start, suspend, restart, and stop AOs.</para>
+  </sect1>
+
+  <sect1>
+    <title>Service methods</title>
+
+    <para><emphasis role="bold">Non-blocking services:</emphasis> returns
+    immediately if no matching request is pending</para>
+
+    <para><programlisting lang="java"><emphasis role="bold">void </emphasis>serveOldest(); 
+// Serves the oldest request in the request queue <emphasis role="bold">
+
+void </emphasis> serveOldest(String methodName) 
+// Serves the oldest request aimed at a method of name methodName <emphasis
+          role="bold">
+
+void </emphasis>serveOldest(RequestFilter requestFilter) 
+// Serves the oldest request matching the criteria given be the filter</programlisting></para>
+
+    <para><emphasis role="bold">Blocking services:</emphasis> waits until a
+    matching request can be served</para>
+
+    <programlisting lang="java"><emphasis role="bold">void </emphasis>blockingServeOldest(); 
+// Serves the oldest request in the request queue <emphasis role="bold">
+
+void </emphasis> blockingServeOldest(String methodName) 
+
+// Serves the oldest request aimed at a method of name methodName <emphasis
+        role="bold">
+
+void </emphasis>blockingServeOldest(RequestFilter requestFilter) 
+// Serves the oldest request matching the criteria given be the filter</programlisting>
+
+    <para><emphasis role="bold">Blocking timed services:</emphasis> wait a
+    matching request at most a time given in ms</para>
+
+    <programlisting lang="java"><emphasis role="bold">void </emphasis>blockingServeOldest (long timeout) 
+// Serves the oldest request in the request queue. 
+// Returns after timeout (in ms) if no request is available 
+ <emphasis role="bold">
+void </emphasis> blockingServeOldest(String methodName, long timeout) 
+// Serves the oldest request aimed at a method of name methodName 
+// Returns after timeout (in ms) if no request is available <emphasis
+        role="bold">
+
+void </emphasis>blockingServeOldest(RequestFilter requestFilter) 
+// Serves the oldest request matching the criteria given be the filter</programlisting>
+
+    <para><emphasis role="bold">Waiting primitives:</emphasis></para>
+
+    <programlisting lang="java">void waitForRequest(); 
+// Wait until a request is available or until the body terminates 
+
+void  waitForRequest(String methodName); 
+// Wait until a request is available on the given method name, 
+// or until the body terminates</programlisting>
+
+    <para><emphasis role="bold">Others:</emphasis></para>
+
+    <programlisting lang="java"><emphasis role="bold">void </emphasis>fifoServing(); 
+// Start a FIFO service policy. Call does not return. In case of 
+// a migration, a new runActivity() will be started on the new site <emphasis
+        role="bold">
+
+void </emphasis> lifoServing() 
+// Invoke a LIFO policy. Call does not return. In case of 
+// a migration, a new runActivity() will be started on the new site <emphasis
+        role="bold">
+
+void </emphasis> serveYoungest() 
+// Serves the youngest request in the request queue <emphasis role="bold">
+
+void </emphasis> flushAll() 
+// Removes all requests in the pending queue</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>Active Object Creation:</title>
+
+    <para><programlisting lang="java">Object newActive(String classname, Object[] constructorParameters,Node node);
+   // Creates a new AO of type classname. The AO is located on the given node,
+   // or on a default node in the local JVM if the given node is nul
+
+Object newActive(String classname,Object[] constructorParameters,VirtualNode virtualnode);
+   // Creates a new set of AO of type classname.
+   // The AO are located on each JVMs the Virtual Node is mapped onto
+
+Object turnActive(Object, Node node);
+   // Copy an existing Java object and turns it into an AO.
+   // The AO is located on the given node, or on a default node in </programlisting></para>
+  </sect1>
+
+  <sect1>
+    <title>Groups:</title>
+
+    <para><programlisting lang="java">A ga = (A) ProActiveGroup.newGroup( 'A', params, nodes);
+   // Created at once a group of AO of type 'A' in the JVMs specified 
+   // by nodes. ga is a Typed Group of type 'A'. 
+   // The number of AO being created matches the number of param arrays.
+   // Nodes can be a Virtual Node defined in an XML descriptor */
+ga.foo(...);
+   // A general group communication without result.
+   // A request to foo is sent in parallel to AO in group ga  */
+V gv = ga.bar(...);
+   // A general group communication with a result.
+   // gv is a typed group of 'V', which is first a group
+   // of awaited Futures, to be filled up asynchronously 
+gv.gee (...);
+   // Use of the result of an asynchronous group call. It is also a  
+   // collective operation: gee method is called in parallel on each object\
+ in group. 
+   // Wait-by-necessity occurs when results are awaited */
+Group ag = ProActiveGroup.getGroup(ga);
+   // Get the group representation of a typed group
+ag.add(o);
+   // Add object in the group ag. o can be a standard Java object or an AO,
+   // and in any case must be of a compatible type 
+ag.remove(index)
+   // Removes the object at the specified index
+A ga2 = (A) ag.getGroupByType();
+   // Returns to the typed view of a group
+   
+<emphasis role="bold">void</emphasis> setScatterGroup(g);
+   // By default, a group used as a parameter of a group communication
+   // is sent to all as it is (deep copy of the group).
+   // When set to scatter, upon a group call (ga.foo(g)) such a scatter 
+   // parameter is dispatched in a round robing fashion to AOs in the
+   // target group, e.g. upon ga.foo(g) */  
+     
+<emphasis role="bold">void </emphasis> unsetScatterGroup(g);
+   // Get back to the default: entire group transmission in all group
+   // communications, e.g. upon ga.foo(g) */</programlisting></para>
+  </sect1>
+
+  <sect1>
+    <title>Explicit Group Synchronizations</title>
+
+    <para>Methods both in Interface Group, and static in class
+    ProActiveGroup</para>
+
+    <programlisting><emphasis role="bold">boolean </emphasis> ProActiveGroup.allAwaited (Object); 
+// Returns True if object is a group and all members are still awaited <emphasis
+        role="bold">
+
+boolean </emphasis>ProActiveGroup.allArrived (Object); 
+// Returns False only if at least one member is still awaited <emphasis
+        role="bold">
+
+void </emphasis> ProActiveGroup.waitAll (Object); 
+// Wait for all the members in group to arrive (all no longer awaited) <emphasis
+        role="bold">
+
+void </emphasis> ProActiveGroup.waitN (Object, int nb); 
+// Wait for at least nb members in group to arrive
+<emphasis role="bold">
+int </emphasis> ProActiveGroup.waitOneAndGetIndex (Object); 
+// Waits for at least one member to arrived, and returns its index</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>OO SPMD</title>
+
+    <para><programlisting lang="java">A spmdGroup  =  (A) ProSPMD.newSPMDGroup('A', params, nodes);
+   // Creates an SPMD group and creates all members with params on the nodes.
+   // An SPMD group is a typed group in which every member has a reference to
+   // the others (the SPMD group itself).
+
+A mySpmdGroup = (A) ProSPMD.getSPMDGroup();
+   // Returns the SPMD group of the activity.
+
+int rank = ProSPMD.getMyRank();
+   // Returns the rank of the activity in its SPMD group.
+
+ProSPMD.barrier('barrierID');
+   // Blocks the activity (after the end of the current service) until all
+   // other members of the SPMD group invoke the same barrier. 
+   // Three barriers are available: total barrier, neighbors based barrier
+   // and method based barrier. </programlisting></para>
+  </sect1>
+
+  <sect1>
+    <title>Migration</title>
+
+    <para>Methods both in Interface Group, and static in class
+    ProActiveGroup</para>
+
+    <programlisting lang="java"><emphasis role="bold">void </emphasis> migrateTo(Object o); 
+// Migrate the current AO to the same JVM as the AO <emphasis role="bold">
+
+void </emphasis> void migrateTo(String nodeURL); 
+// Migrate the current AO to JVM given by the node URL 
+<emphasis role="bold">
+int </emphasis> void migrateTo(Node node); 
+// Migrate the current AO to JVM given by the node</programlisting>
+
+    <para>To initiate the migration of an object from outside, define a public
+    method, that upon service will call the static migrateTo primitive:</para>
+
+    <programlisting lang="java"><emphasis role="bold">public void </emphasis>moveTo(Object) { 
+<emphasis role="bold">  try</emphasis>{ ProActive.migrateTo(t); } <emphasis
+        role="bold">
+  catch</emphasis> (Exception e) { 
+    e.printStackTrace(); 
+    logger.info('Cannot migrate.'); 
+  } 
+} <emphasis role="bold">
+
+void </emphasis>onDeparture(String MethodName); 
+// Specification of a method to execute before migration <emphasis role="bold">
+
+void </emphasis> onArrival(String MethodName); 
+// Specification of a method to execute after migration, upon the 
+// arrival in a new JVM <emphasis role="bold">
+
+void </emphasis>setMigrationStrategy(MigrationStrategy); 
+// Specifies a migration itinerary <emphasis role="bold">
+
+void </emphasis>migrationStrategy.add(Destination); 
+// Adds a JVM destination to an itinerary <emphasis role="bold">
+
+void </emphasis>migrationStrategy.remove(Destination d) ; 
+// Remove a JVM destination in an itinerary</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>Components</title>
+
+    <para>Components are formed from AOs, a component is linked and
+    communicates with other remote components. A component can be composite,
+    made of other components, and as such itself distributed over several
+    machines. Component systems are defined in XML files (ADL: Architecture
+    Description Language); these files describe the definition, the assembly,
+    and the bindings of components.</para>
+   
+   <indexterm><primary>ADL</primary></indexterm>
+
+    <para>Components follow the Fractal hierarchical component model
+    specification and API, see http://fractal.objectweb.org</para>
+
+    <para>The following methods are specific to ProActive.</para>
+
+    <para>In the class org.objectweb.proactive.ProActive:</para>
+
+    <programlisting lang="java">Component newActiveComponent('A', params, VirtualNode, ComponentParameters); 
+// Creates a new ProActive component from the specified class A. 
+// The component is distributed on JVMs specified by the Virtual Node 
+// The ComponentParameters defines the configuration of a component: 
+// name of component, interfaces (server and client), etc. 
+// Returns a reference to a component, as defined in the Fractal API</programlisting>
+
+    <para>In the class org.objectweb.proactive.core.component.Fractive:</para>
+
+    <programlisting lang="java">ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature); 
+// This method is used in primitive components. 
+// It generates a client collective interface named itfName, and typed as itfSignature. 
+// This collective interface is a typed ProActive group.</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>Security:</title>
+
+    <para>An X.509 Public Key Infrastructure (PKI) allowing communication
+    Authentication, Integrity, and Confidentiality (AIC) to be configured in
+    an XML security file, at deployment, outside any source code. Security is
+    compatible with mobility, allows for hierarchical domain specificationand
+    dynamically negotiated policies.</para>
+
+    <para><emphasis role="bold">Example of specification:</emphasis></para>
+
+    <programlisting lang="XML">&lt;Rule&gt; 
+ &lt;From&gt;
+  &lt;Entity type='VN' name='VN1'/&gt; 
+ &lt;/From&gt;
+  &lt;To&gt; 
+   &lt;Entity type='VN' name='VN2'/&gt; 
+  &lt;/To&gt; 
+  &lt;Communication&gt; 
+   &lt;Request value='authorized'&gt; 
+    &lt;Attributes authentication='required' integrity='required' confidentiality='optional'/&gt; 
+   &lt;/Request&gt; 
+  &lt;/Communication&gt; 
+  &lt;Migration&gt;denied&lt;/Migration&gt; 
+  &lt;AOCreation&gt;denied&lt;/AOCreation&gt; 
+&lt;/Rule&gt;</programlisting>
+
+    <para>This rule specifies that: from Virual Node 'VN1' to the VN 'VN2',
+    the communications (requests) are authorized, provided authentication and
+    integrity are being used, while confidentiality is optional. Migration and
+    AO creation are not authorized.</para>
+  </sect1>
+
+  <sect1>
+    <title>Deployment</title>
+
+    <para>Virtual Nodes (VN) allow one to specify the location where to create
+    AOs. A VN is uniquely identified as a String, is defined in an XML
+    Deployment Descriptor where it is mapped onto JVMs. JVMs are themselves
+    mapped onto physical machines: VN --&gt; JVMs --&gt; Machine. Various
+    protocols can be specified to create JVMs onto machines (ssh, Globus, LSF,
+    PBS, rsh, rlogin, Web Services, etc.). After activation, a VN contains a
+    set of nodes, living in a set of JVMs. Overall, VNs and deployment
+    descriptors allow to abstract away from source code: machines, creation,
+    lookup and registry protocols.</para>
+
+    <para><emphasis role="bold">Descriptor example: creates one jvm on the
+    local machine</emphasis></para>
+
+    <para><programlisting lang="xml">&lt;ProActiveDescriptor xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
+      xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
+
+  &lt;virtualNodesDefinition&gt;
+    &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>'/&gt;  &lt;!-- Name of the Virtual Node that will be used in program source --&gt;
+  &lt;/virtualNodesDefinition&gt;
+  &lt;componentDefinition/&gt;
+    &lt;deployment&gt;
+      &lt;mapping&gt;
+      &lt;!-- This part contains the mapping VNs -- JVMs --&gt;
+        &lt;map virtualNode='<emphasis role="bold">Dispatcher</emphasis>'&gt;
+          &lt;jvmSet&gt;
+             &lt;vmName value='<emphasis role="bold">Jvm1</emphasis>'/&gt;             &lt;!-- Virtual Node Dispatcher is mapped onto Jvm1 --&gt;
+          &lt;/jvmSet&gt;
+        &lt;/map&gt;
+      &lt;/mapping&gt;
+      &lt;jvms&gt;
+        &lt;jvm name='<emphasis role="bold">Jvm1</emphasis>'&gt;
+        &lt;!-- This part defines how the jvm will be obtained: creation or
+             acquisition: creation in this example --&gt;
+          &lt;creation&gt;
+            &lt;processReference refid='<emphasis role="bold">creationProcess</emphasis>'/&gt;
+            &lt;!-- Jvm1 will be created using creationProcess defined below --&gt;
+          &lt;/creation&gt;
+        &lt;/jvm&gt;
+      &lt;/jvms&gt;
+    &lt;/deployment&gt;
+    &lt;infrastructure&gt;
+      &lt;processes&gt;
+        &lt;processDefinition id='<emphasis role="bold">creationProcess</emphasis>'&gt;
+         &lt;!-- Definition of creationProcess referenced above --&gt;
+          &lt;jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcess'/&gt;
+         &lt;!-- creationProcess is a jvmProcess. The jvm will be created on
+              the local machine using default settings (classpath, java path,...)  --&gt;
+        &lt;/processDefinition&gt;
+      &lt;/processes&gt;
+    &lt;/infrastructure&gt;
+  &lt;componentDefinition&gt;
+&lt;/ProActiveDescriptor&gt;     </programlisting></para>
+
+    <para><emphasis role="bold">Deployment API</emphasis></para>
+
+    <programlisting lang="java">ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String File); 
+// Returns a ProActiveDescriptor object from the xml 
+// descriptor file name 
+
+pad.activateMapping(String VN); 
+// Activates the given Virtual Node: launches or acquires 
+// all the JVMs the VN is mapped onto
+
+pad.activateMappings(); 
+// Activates all VNs defined in the ProActiveDescriptor 
+
+VirtualNode vn = pad.getVirtualNode(String) 
+// Created  at once a group of AO of type 'A' in the JVMs specified 
+// by the given vn. The Virtual Node is automatically activated if not 
+// explicitly done before 
+
+Node[] n = vn.getNodes(); 
+// Returns all nodes mapped to the target Virtual Node 
+
+Object[] n[0].getActiveObjects(); 
+// Returns a reference to all AOs deployed on the target Node 
+
+ProActiveRuntime part = n[0].getProActiveRuntime(); 
+// Returns a reference to the ProActive Runtime (the JVM) where the 
+// node has been created 
+
+pad.killall(boolean softly); 
+// Kills all the JVMs deployed with the descriptor 
+// not softly: all JVMs are killed abruptely 
+// softly: all JVMs that originated the creation of a rmi registry 
+// wait until registry is empty before dying</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>Exceptions</title>
+
+    <para><emphasis role="bold">Functional exceptions with
+    asynchrony</emphasis></para>
+
+    <programlisting lang="java">ProActive.tryWithCatch(MyException.class);
+// Just before the <emphasis role="bold">try</emphasis> 
+<emphasis role="bold">try</emphasis> { 
+    // Some asynchronous calls with exceptions 
+    // One can use ProActive.throwArrivedException() and 
+    // ProActive.waitForPotentialException() here 
+     ProActive.endTryWithCatch();
+     // At the end of the <emphasis role="bold">try</emphasis> 
+    } <emphasis role="bold">catch</emphasis> (MyException e) { 
+    // ... 
+    } <emphasis role="bold">finally</emphasis> { 
+       ProActive.removeTryWithCatch();
+    // At the beginning of the <emphasis role="bold">finally</emphasis> }</programlisting>
+
+    <para><emphasis role="bold">Non-Functional Exceptions</emphasis></para>
+
+    <para>Adding a handler to an active object on its side:</para>
+
+    <programlisting lang="java">ProActive.addNFEListenerOnAO(myAO, <emphasis
+        role="bold">new</emphasis> NFEListener() { <emphasis role="bold">
+
+  public boolean</emphasis> handleNFE(NonFunctionalException nfe) { 
+      // Do something with the exception... 
+      // Return true if we were able to handle it
+      <emphasis role="bold">return true</emphasis>; 
+     } 
+  });</programlisting>
+
+    <para>Handlers can also be added to the client side of an active object
+    with</para>
+
+    <programlisting lang="java">ProActive.addNFEListenerOnProxy(ao, handler)</programlisting>
+
+    <para>or to a JVM with</para>
+
+    <programlisting lang="java">ProActive.addNFEListenerOnJVM(handler)</programlisting>
+
+    <para>These handlers can also be removed with</para>
+
+    <programlisting lang="java">ProActive.removeNFEListenerOnAO(ao, handler),
+ProActive.removeNFEListenerOnProxy(ao, handler),
+ProActive.removeNFEListenerOnJVM(handler)</programlisting>
+
+    <para>It's possible to define an handler only for some exception types,
+    for example:</para>
+
+    <programlisting lang="java">ProActive.addNFEListenerOnJVM(<emphasis
+        role="bold">new</emphasis> TypedNFEListener(
+    SendRequestCommunicationException.<emphasis role="bold">class</emphasis>,
+    <emphasis role="bold">new</emphasis> NFEListener() { 
+         <emphasis role="bold">public boolean</emphasis> handleNFE(NonFunctionalException e) { 
+            // Do something with the SendRequestCommunicationException... 
+            // Return true if we were able to handle it <emphasis role="bold">
+            return true</emphasis>; 
+            } }
+    ));</programlisting>
+
+    <para>The behaviour of the default handler (if none could handle the
+    exception) is to throw the exception if it's on the proxy side, or log it
+    if it's on the body side.</para>
+  </sect1>
+
+  <sect1>
+    <title>Export Active Objects as Web services</title>
+
+    <para>ProActive allows active objects exportation as web services. The
+    service is deployed onto a Jakarta Tomcat web server with a given url. It
+    is identified by its urn, an unique id of the service. It is also possible
+    to choose the exported methods of the object.</para>
+
+    <para>The WSDL file matching the service will be accesible at
+    http://localhost:8080/servlet/wsdl?id=a for a service which name is 'a'
+    and which id deployed on a web server which location is
+    http://localhost:8080.</para>
+
+    <programlisting lang="java">A a = (A) ProActive.newActive('A', new Object []{}); 
+       // Constructs an active object 
+
+String [] methods = new String [] {'foo',  'bar'}; 
+//A String array containing the exported methods
+
+ProActive.exposeAsWebService(a,'http://localhost:8080','a',methods);
+//Export the active object as a web service
+
+ProActive.unExposeAsWebService('a', 'http://localhost:8080'); 
+//Undeploy the service 'a' on the web server located at http://localhost:8080</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>Deploying a fault-tolerant application</title>
+
+    <para>ProActive can provide fault-tolerance capabilities through two
+    differents protocols: a Communication-Induced Checkpointing protocol (CIC)
+    or a pessimistic message logging protocol (PML). Making a ProActive
+    application fault-tolerant is <emphasis role="bold">fully
+    transparent</emphasis>; active objects are turned fault-tolerant using
+    Java properties that can be set in the deployment descriptor. The
+    programmer can select <emphasis>at deployment time</emphasis> the most
+    adapted protocol regarding the application and the execution
+    environment.</para>
+
+    <para><emphasis role="bold">A Fault-tolerant deployment
+    descriptor</emphasis></para>
+
+    <para><programlisting lang="xml">&lt;ProActiveDescriptor&gt; 
+   ...
+   &lt;virtualNodesDefinition&gt; 
+     &lt;virtualNode name='NonFT-Workers' property='multiple'/&gt; 
+     &lt;virtualNode name='FT-Workers' property='multiple' ftServiceId='appli'/&gt;
+   &lt;/virtualNodesDefinition&gt; 
+   ... 
+   &lt;serviceDefinition id='appli'&gt;
+     &lt;faultTolerance&gt; 
+       
+            &lt;!-- Protocol selection: cic or pml --&gt;
+       &lt;protocol type='cic' /&gt;   
+
+           &lt;!-- URL of the fault-tolerance server --&gt;   
+       &lt;globalServer url='rmi://localhost:1100/FTServer'/&gt;
+
+        &lt;!-- URL of the resource server; all the nodes mapped on this virtual 
+             node will be registred in as resource nodes for recovery --&gt;       
+       &lt;resourceServer url='rmi://localhost:1100/FTServer'/&gt;
+
+         &lt;!--  Average time in seconds between two consecutive checkpoints for each object --&gt;
+       &lt;ttc value='5'/&gt; 
+     &lt;/faultTolerance&gt; 
+   &lt;/serviceDefinition&gt; 
+  &lt;/services&gt; 
+  ...
+&lt;/ProActiveDescriptor&gt;</programlisting></para>
+
+    <para><emphasis role="bold">Starting the fault-tolerance
+    server</emphasis></para>
+
+    <para>The global fault-tolerance server can be launched using the
+    ProActive/scripts/[unix|windows]/FT/startGlobalFTServer.[sh|bat] script,
+    with 5 optional parameters:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>the protocol: <literal>-proto [cic|pml]</literal>. Default value
+        is cic.</para>
+      </listitem>
+
+      <listitem>
+        <para>the server name: <literal>-name [serverName]</literal>. Default
+        name is FTServer.</para>
+      </listitem>
+
+      <listitem>
+        <para>the port number: <literal>-port [portNumber]</literal>. Default
+        port number is 1100.</para>
+      </listitem>
+
+      <listitem>
+        <para>the fault detection period: <literal>-fdperiod
+        [periodInSec]</literal>, the time between two consecutive fault
+        detection scanning. Default value is 10 sec.</para>
+      </listitem>
+
+      <listitem>
+        <para>the URL of a p2p service that can be used by the resource
+        server: <literal>-p2p [serviceURL]</literal>. No default value.</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+
+  <sect1>
+    <title>Peer-to-Peer Infrastructure</title>
+
+    <para>This aims to help you to create a P2P infrastructure over your
+    desktop workstations network. It is self-organized and configurable. The
+    infrastructure maintains a dynamic JVMs network for deploying
+    computational applications.</para>
+
+    <para><emphasis  role="bold">Deploying the
+    Infrastructure:</emphasis></para>
+
+    <para>Firstly, you have to start P2P Services on each shared
+    machine:</para>
+
+    <para><screen>$ cd ProActive/scripts/unix/p2p</screen></para>
+
+    <para><screen>$ ./startP2PService [-acq acquisitionMethod] [-port portNumber] [-s Peer ...]</screen></para>
+
+    <para>With that parameters (all are optionals):</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>-acq is the ProActive Runtime communication protocol used by the
+        peer. Examples: rmi, http, ibis,... By default it is rmi.</para>
+      </listitem>
+
+      <listitem>
+        <para>-port is the port number where the P2P Service listens. By
+        default it is 2410.</para>
+      </listitem>
+
+      <listitem>
+        <para>-s specify addresses of peers which are used to join the P2P
+        infrastructure. Example: rmi://applepie.proactive.org:8080</para>
+      </listitem>
+    </itemizedlist>
+
+    <para><emphasis role="bold">A simple example:</emphasis> <screen>first.peer.host$ ./startP2PService.sh</screen>
+    <screen>second.peer.host$ ./startP2PService.sh -s //first.peer.host</screen>
+    <screen>third.peer.host$ ./startP2PService.sh -s //second.peer.host</screen></para>
+
+    <para><emphasis  role="bold">Acquiring Nodes:</emphasis></para>
+
+    <para>Now you have a P2P Infrastructure running, you might want to deploy
+    your ProActive application on it. That is simple, just modify the XML
+    deployment descriptor:</para>
+
+    <programlisting lang="xml">... 
+&lt;jvms&gt; 
+  &lt;jvm name='Jvm1'&gt; 
+     &lt;acquisition&gt;
+       &lt;serviceReference refid='p2plookup'/&gt; 
+    &lt;/acquisition&gt;
+  &lt;/jvm&gt; 
+ ... 
+&lt;/jvms&gt; 
+... 
+&lt;infrastructure&gt; 
+  ...
+  &lt;services&gt; 
+    &lt;serviceDefinition id='p2plookup'&gt; 
+      &lt;P2PService nodesAsked='2' acq='rmi' port='6666'&gt; 
+        &lt;peerSet&gt;
+          &lt;peer&gt;//second.peer.host&lt;/peer&gt; 
+        &lt;/peerSet&gt;
+     &lt;/P2PService&gt; 
+   &lt;/serviceDefinition&gt; 
+   ... 
+ &lt;/services&gt; 
+ ...
+&lt;/infrastructure&gt; 
+...</programlisting>
+
+    <para>In the <emphasis role="bold">nodesAsked</emphasis> argument, a
+    special value <emphasis role="bold">MAX</emphasis> is allowed. When it is
+    used, the P2P infrastructure returns the maximun number of nodes avilable,
+    and continue while the application running to return new nodes to the
+    application. To use all the benefit of that feature, you might add a nodes
+    creation event listener to your application.</para>
+
+    <para><emphasis role="bold">Usage Example:</emphasis></para>
+
+    <programlisting lang="java">// getting the p2p virtual node 
+VirtualNode vn = pad.getVirtualNode('p2pvn'); 
+
+// adding 'this' as a listener
+((VirtualNodeImpl) vn).addNodeCreationEventListener(<emphasis role="bold">this</emphasis>); 
+
+// then activate the virtual node 
+vn.activate();</programlisting>
+
+    <para>'this' has to implement the NodeCreationEventListener
+    interface:</para>
+
+    <programlisting lang="java"><emphasis role="bold">public void</emphasis>
+    nodeCreated(NodeCreationEvent event) { 
+        // get the node Node 
+        newNode = event.getNode(); 
+        // now you can create an active object on your node.
+    }</programlisting>
+  </sect1>
+
+  <sect1>
+    <title>Branch and Bound API</title>
+
+    <para>Firstly, create your own task:</para>
+
+    <programlisting lang="java"><emphasis role="bold">import</emphasis> org.objectweb.proactive.branchnbound.core.Task; <emphasis
+        role="bold">
+
+public class</emphasis> YourTask <emphasis role="bold">extends</emphasis> Task { 
+   <emphasis role="bold">
+  public</emphasis> Result execute() { 
+     // Your code here for computing a solution 
+   } <emphasis role="bold">
+
+  public</emphasis> Vector split() { 
+    // Your code for generating sub-tasks 
+    } 
+ 
+  <emphasis role="bold">public Result</emphasis> gather(Result[] results) { 
+    // Override optional 
+    // Default behavior based on the smallest gave by the compareTo 
+    } <emphasis role="bold">
+
+  public void</emphasis> initLowerBound() { 
+    // Your code here for computing a lower bound 
+    } <emphasis role="bold">
+
+  public void</emphasis> initUpperBound() { 
+    // Your code here for computing a lower bound 
+    } 
+
+  <emphasis role="bold">public int</emphasis> compareTo(Object arg) { 
+     // Strongly recommended to override this method 
+     // with your behavior 
+     } 
+
+}</programlisting>
+
+    <para>How to interact with the framework from inside a task:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Some class variables:</para>
+
+        <programlisting lang="java"><emphasis role="bold">protected</emphasis> Result initLowerBound; 
+  // to store your lower bound
+
+<emphasis role="bold">protected</emphasis> Result initUpperBound; 
+  // to store you upper bound
+
+<emphasis role="bold">protected</emphasis> Object bestKnownSolution; 
+  // set by the framework with the best current solution
+
+<emphasis role="bold">protected</emphasis> Worker worker; 
+  // to interact with the framework (see below)</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Interact with the framework (inside a Task):</para>
+
+        <programlisting lang="java"><emphasis role="bold">this</emphasis>.worker.setBestCurrentResult(newBestSolution); 
+  // the worker will broadcast the solution in all Tasks
+
+<emphasis role="bold">this</emphasis>.worker.sendSubTasksToTheManager(subTaskList); 
+  // send a set of sub-tasks for computation to the framework
+
+BooleanWrapper workersAvailable = <emphasis role="bold">this</emphasis>.worker.isHungry(); 
+// for a smart split, check for free workers</programlisting>
+      </listitem>
+    </itemizedlist>
+
+    <para>Secondly, choose your task queue:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>BasicQueueImpl: execute task in FIFO order.</para>
+      </listitem>
+
+      <listitem>
+        <para>LargerQueueIml: execute task in larger order.</para>
+      </listitem>
+
+      <listitem>
+        <para>Extend TaskQueue: your own one.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Finally, start the compution:</para>
+
+    <programlisting lang="java">Task task = <emphasis role="bold">new</emphasis> YourTask(someArguments); 
+Manager manager = ProActiveBranchNBound.newBnB(task, nodes, LargerQueueImpl.class.getName()); 
+
+Result futureResult = manager.start();
+    // this call is asynchronous ...</programlisting>
+
+    <para>Keep in mind that is only 'initLower/UpperBound' and 'split' methods
+    are called on the root task. The 'execute' method is called on the root
+    task's splitted task. Here the methods order execution:</para>
+
+    <orderedlist>
+      <listitem>
+        <para>rootTask.initLowerBound(); // compute a first lower bound</para>
+      </listitem>
+
+      <listitem>
+        <para>rootTask.initUpperBound(); // compute a first upper bound</para>
+      </listitem>
+
+      <listitem>
+        <para>Task splitted = rootTask.split(); // generate a set of
+        tasks</para>
+      </listitem>
+
+      <listitem>
+        <para><emphasis role="bold">for</emphasis> i <emphasis
+        role="bold">in</emphasis> splitted <emphasis role="bold">do in
+        parallel</emphasis></para>
+
+        <programlisting lang="java">splitted[i].initLowerBound();
+splitted[i].initUpperBound();
+Result ri = splitted.execute();</programlisting>
+      </listitem>
+
+      <listitem>
+        <para>Result final = rootTask.gather(Result[] ri); // gathering all
+        result</para>
+      </listitem>
+    </orderedlist>
+  </sect1>
+
+  <sect1>
+    <title>File Transfer Deployment</title>
+
+    <para>File Transfer Deployment is a tool for transfering files at
+    deployment time. This files are specified using the ProActive XML
+    Deployment Descriptor in the following way:</para>
+
+    <para><programlisting lang="xml">&lt;VirtualNode name='exampleVNode' <emphasis
+          role="bold">FileTransferDeploy</emphasis>='<emphasis role="bold">example</emphasis>'/&gt;
+....
+&lt;/deployment&gt;
+&lt;<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
+  &lt;<emphasis role="bold">FileTransfer</emphasis> id='<emphasis role="bold">example</emphasis>'&gt;
+      &lt;<emphasis role="bold">file</emphasis> src='hello.dat' dest='world.dat'/&gt;
+      &lt;<emphasis role="bold">dir</emphasis> src='exampledir' dest='exampledir'/&gt;
+  &lt;/<emphasis role="bold">FileTransfer</emphasis>&gt;
+  ...
+&lt;/<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
+&lt;infrastructure&gt;
+....
+&lt;processDefinition id='xyz'&gt;
+  &lt;sshProcess&gt;...
+    &lt;<emphasis role="bold">FileTransferDeploy</emphasis>='<emphasis
+          role="bold">implicit</emphasis>'&gt; 
+&lt;!-- referenceID or keyword 'implicit' (inherit)--&gt;
+      &lt;<emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, scp, rcp&lt;/<emphasis
+          role="bold">copyProtocol</emphasis>&gt;
+      &lt;<emphasis role="bold">sourceInfo</emphasis> prefix='/home/user'/&gt;
+      &lt;<emphasis role="bold">destinationInfo</emphasis> prefix='/tmp' hostname='foo.org' username='smith' /&gt;
+    &lt;/<emphasis role="bold">FileTransferDeploy</emphasis>&gt;
+  &lt;/sshProcess&gt;
+&lt;/processDefinition&gt;
+...</programlisting></para>
+  </sect1>
+</appendix>

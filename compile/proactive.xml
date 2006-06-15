@@ -12,7 +12,7 @@
 	<property name="classes.dir" value="${base}/classes"/>
 	<property name="classlibs.dir" value="${base}/classlibs"/>
 	<property name="dist.dir" value="${base}/dist"/>
-	<property name="doc.src" value="${base}/doc-files"/>
+	<property name="doc.src" value="${base}/doc-src"/>
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="docs.tmp" value="${docs.dir}/tmp" />
 	<property name="docs.mainFile" value="PA_index.xml" />
@@ -360,7 +360,6 @@
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
-				<exclude name="${proactive.dir}/doc-files/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
 			</fileset>
 		</jar>

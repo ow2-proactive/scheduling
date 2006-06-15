@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="howto"><title>3. How to create a Test Suite with interlinked Tests</title>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/howto.html  -->
+  
+    <para> In this part we will not explain how to write a simple test, for this see <ulink url="first_test.xml">Your first Test</ulink> section.</para>
+    <sect1 remap="h2">
+      <title>Description of our Test</title>
+      <para>In first step, we will test a ProActive Group creation with 3 Agents, and after this creation
+ we will test the Agents migration by a group communication.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title>Root Test: ProActive Group Creation</title>
+      <sect2 remap="h3">
+        <title>A simply ProActiveTest</title>
+        <para>Create a new class who extends <emphasis role="bold">testsuite.test.ProActiveFunctionalTest</emphasis>, it is an
+ abstract class.</para>
+        <para>See this template code:</para>
+<screen>
+<literal>
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+import java.io.Serializable;
+public class TestGroupCreation extends ProActiveFunctionalTest
+    implements Serializable {
+    public TestGroupCreation() {
+        super(null, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    public TestGroupCreation(Node node) {
+        super(node, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    public void action() throws Exception {
+    }
+    public boolean postConditions() throws Exception {
+    }
+    public boolean preConditions() throws Exception {
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+}</literal>
+</screen>
+        <para>Next we will simply test in preconditions if the node exists (different of null):</para>
+<screen>
+<literal>
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }</literal>
+</screen>
+        <para>Now we will implement the action method to create a ProActive Group with 3 Agent 
+         (see the Agent code at the end of this chapter - <xref linkend="agent"/>):</para>
+<screen>
+<literal>
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+public class TestGroupCreation extends ProActiveFunctionalTest
+    implements Serializable {
+     private Agent group = null;
+ 
+    // ...
+  public void action() throws Exception {
+             createGroupAgent();
+ }
+   
+    private void createGroupAgent() throws Exception {
+          Object[][] params = {
+                       { 'Agent0' },
+                       { 'Agent1' },
+                       { 'Agent2' }
+                };
+          Node node = getNode();
+              Node[] nodes = { node };
+            group = (Agent) ProActiveGroup.newGroup(Agent.class.getName(), params,
+              nodes);
+     }
+       // ...
+}</literal>
+</screen>
+        <para><emphasis role="bold">Remarks:</emphasis> We use an external method to create the group is for the simple reason of we
+ use this code after in another method.</para>
+        <para><emphasis role="bold">Remarks:</emphasis> We don't explain the Agent code because it is a ProActive example.</para>
+        <para>For the postconditions we will test if the group containts 3 elements and they are in the good
+ node:</para>
+<screen>
+<literal>
+    public boolean postConditions() throws Exception {
+        if (group == null) {
+            return false;
+        } else {
+            Group agentGroup = ProActiveGroup.getGroup(group);
+            if (agentGroup.size() != 3) {
+                return false;
+            } else {
+                Agent agent0 = (Agent) agentGroup.get(0);
+                Agent agent1 = (Agent) agentGroup.get(1);
+                Agent agent2 = (Agent) agentGroup.get(2);
+                String nodeURL = getNode().getNodeInformation().getURL()
+                                     .toUpperCase();
+                return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent2.getNodeName().compareTo(nodeURL) == 0);
+            }
+        }
+    }</literal>
+</screen>
+        <para>This class is now readi for a standalone use.</para>
+      </sect2>
+      <sect2 remap="h3">
+        <title>Action method for interlinked mode</title>
+        <para>Now, we will add a new <emphasis role="bold">action</emphasis> method who <emphasis role="bold">return</emphasis> a ProActive Group:</para>
+<screen>
+<literal>
+    public Agent action(Object o) throws Exception {
+        createGroupAgent();
+        return this.group;
+    }</literal>
+</screen>
+        <para>This method return an Agent (who is the group) and have one argument: o. This argument will
+ not use , we must to put this argument is for have a different method signature from
+ action().</para>
+        <para>Our test for group creation is now ready.</para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>An independant Test: A Group migration</title>
+      <para>All the code is the same of the precedant class unexcepted for the actions methods and for the
+ method to create group of course.</para>
+      <sect2 remap="h3">
+        <title>The default action method</title>
+        <para>In this test we can't run this method in a standalone test, but for other maybe you can.
+ It is just for this test.</para>
+<screen>
+<literal>
+    public void action() throws Exception {
+        throw new Exception('This test doesn't work in standalone mode');
+    }</literal>
+</screen>
+      </sect2>
+      <sect2 remap="h3">
+        <title>The action method for interlinked tests</title>
+        <para>The result of the precedent test is an Agent, so the argument will be an Agent. This test have
+ no result but we must to return an Object here it is null because the API use the reflection
+ mechanism of Java.</para>
+<screen>
+<literal>
+    public Object action(Agent group) throws Exception {
+        this.group = group;
+        this.group.moveTo(getNode().getNodeInformation().getURL());
+        return null;
+    }</literal>
+</screen>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>Run your tests</title>
+      <para>Create a simple <emphasis role="bold">ProActiveFuncTestManager</emphasis> with a <emphasis role="bold">main</emphasis>:</para>
+<screen>
+<literal>
+import testsuite.manager.ProActiveFuncTestManager;
+public class Manager extends ProActiveFuncTestManager {
+    public Manager(String name, String description) {
+        super(name, description);
+    }
+    public static void main(String[] args) {
+        Manager manager = new Manager('Migration Tests',
+                'Create a group and migrate its objects.');
+    }
+}</literal>
+</screen>
+      <para>Create a new Group (testsuite.group.Group) in our main:</para>
+<screen>
+<literal>
+import testsuite.group.Group;
+    // ...
+      
+    Group group = new Group('Group Migration',
+                'Migration on an active group objects.');
+ // ...</literal>
+</screen>
+      <para>Create and add the 2 precends tests in the group:</para>
+<screen>
+<literal>
+ // ...
+      
+    TestGroupCreation creation = new TestGroupCreation(manager.getLocalVMNode());
+        group.add(creation);
+        TestGroupMigration migration = new TestGroupMigration(manager.getRemoteVMNode());
+        group.add(migration);
+     
+    // ...</literal>
+</screen>
+      <para>Specify the ancestor test of migration is creation:</para>
+<screen>
+<literal>
+ // ...
+  FunctionalTest[] params = { creation };
+             migration.setTests(params);
+         
+    // ...</literal>
+</screen>
+      <para>You can see in the <ulink url="descriptor.xml">configuration file part</ulink> how to do this by a
+ configuration file.</para>
+      <para><emphasis role="bold">Warning:</emphasis> Don't forget to write a prop file with the name of the remote host.</para>
+      <para>Add the group and launch the test:</para>
+<screen>
+<literal>
+ // ...
+      
+    manager.add(group);
+        manager.execute(group, migration, true);
+ 
+    // ...</literal>
+</screen>
+      <para><emphasis role="bold">Warning:</emphasis> when you use a ProActiveManager you must to had <emphasis role="bold">System.exit(0)</emphasis> at the
+ end of the <emphasis role="bold">main</emphasis> method. If don't do that, the manager can't properly.</para>
+      <sect2 remap="h3">
+        <title>An example of results for this test with verbatim option</title>
+<screen>
+<literal>
+8/26/03 12:40:47.407 [MESSAGE] Local hostname: amda.inria.fr
+8/26/03 12:40:47.408 [MESSAGE] Remote hostname: owenii
+8/26/03 12:40:47.498 [MESSAGE] Starting with interlinked Tests ...
+8/26/03 12:40:47.498 [MESSAGE] Init Manager with success
+8/26/03 12:40:48.547 [RESULT] Group Creation: Test run with success [SUCCESS]
+8/26/03 12:40:50.149 [RESULT] Group Migration: Test run with success [SUCCESS]
+8/26/03 12:40:50.149 [RESULT] Group: Group Migration Runs: 2 Errors: 0 [SUCCESS]
+8/26/03 12:40:50.243 [MESSAGE] ... Finish</literal>
+</screen>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>All the code</title>
+      <informaltable frame="all">
+        <tgroup cols="1">
+          <colspec colname="c1" colwidth="100*"/>
+          <tbody>
+            <row>
+              <entry align="center" valign="middle"><para><emphasis role="bold">Manager.prop</emphasis></para></entry>
+            </row>
+            <row>
+              <entry><para>
+<screen> RemoteHostname=owenii </screen>
+</para></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <informaltable frame="all">
+        <tgroup cols="1">
+          <colspec colname="c1" colwidth="100*"/>
+          <tbody>
+            <row>
+              <entry align="center" valign="middle"><para><emphasis role="bold">Manager.java</emphasis></para></entry>
+            </row>
+            <row>
+              <entry><para>
+<screen>
+ 
+<literal>
+import testsuite.group.Group;
+import testsuite.manager.ProActiveFuncTestManager;
+public class Manager extends ProActiveFuncTestManager {
+    public Manager(String name, String description) {
+        super(name, description);
+    }
+    public static void main(String[] args) {
+        Manager manager = new Manager('Migration Tests',
+                'Create a group and migrate its objects.');
+        Group group = new Group('Group Migration',
+                'Migration on an active group objects.');
+        TestGroupCreation creation = new TestGroupCreation(manager.getLocalVMNode());
+        group.add(creation);
+        TestGroupMigration migration = new TestGroupMigration(manager.getRemoteVMNode());
+        group.add(migration);
+        FunctionalTest[] params = { creation };
+        migration.setTests(params);
+        manager.add(group);
+        manager.execute(group, migration, true);
+        manager.setVerbatim(true);
+        manager.getResults().toOutPutStream(System.out);
+        System.exit(0);
+    }
+}
+  </literal>
+</screen>
+</para></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <informaltable frame="all">
+        <tgroup cols="1">
+          <colspec colname="c1" colwidth="100*"/>
+          <tbody>
+            <row>
+              <entry align="center" valign="middle"><para><emphasis role="bold">TestGroupMigration.java</emphasis></para></entry>
+            </row>
+            <row>
+              <entry><para>
+<screen>
+ 
+<literal>
+ import java.io.Serializable;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+public class TestGroupMigration extends ProActiveFunctionalTest
+    implements Serializable {
+    private Agent group = null;
+    public TestGroupMigration() {
+        super(null, 'Group Migration',
+            'Migrate all Group Element in a specified node.');
+    }
+    public TestGroupMigration(Node node) {
+        super(node, 'Group Migration',
+            'Migrate all Group Element in a specified node.');
+    }
+    public boolean postConditions() throws Exception {
+        if (group == null) {
+            return false;
+        } else {
+            Group agentGroup = ProActiveGroup.getGroup(group);
+            if (agentGroup.size() != 3) {
+                return false;
+            } else {
+                Agent agent0 = (Agent) agentGroup.get(0);
+                Agent agent1 = (Agent) agentGroup.get(1);
+                Agent agent2 = (Agent) agentGroup.get(2);
+                String nodeURL = getNode().getNodeInformation().getURL()
+                                     .toUpperCase();
+                return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent2.getNodeName().compareTo(nodeURL) == 0);
+            }
+        }
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    public void action() throws Exception {
+        throw new Exception('This test doesn't work in standalone mode');
+    }
+    public Object action(Agent group) throws Exception {
+        this.group = group;
+        this.group.moveTo(getNode().getNodeInformation().getURL());
+        return null;
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+}
+ </literal>
+</screen>
+</para></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <informaltable frame="all">
+        <tgroup cols="1">
+          <colspec colname="c1" colwidth="100*"/>
+          <tbody>
+            <row>
+              <entry align="center" valign="middle"><para><emphasis role="bold">TestGroupCreation.java</emphasis></para></entry>
+            </row>
+            <row>
+              <entry><para>
+<screen>
+ 
+<literal>
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+import java.io.Serializable;
+public class TestGroupCreation extends ProActiveFunctionalTest
+    implements Serializable {
+    private Agent group = null;
+    public TestGroupCreation() {
+        super(null, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    public TestGroupCreation(Node node) {
+        super(node, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    // Default action method
+    public void action() throws Exception {
+        createGroupAgent();
+    }
+    // For interlinked tests action method
+    public Agent action(Object o) throws Exception {
+        createGroupAgent();
+        return this.group;
+    }
+    private void createGroupAgent() throws Exception {
+        Object[][] params = {
+            { 'Agent0' },
+            { 'Agent1' },
+            { 'Agent2' }
+        };
+        Node node = getNode();
+        Node[] nodes = { node };
+        group = (Agent) ProActiveGroup.newGroup(Agent.class.getName(), params,
+                nodes);
+    }
+    public boolean postConditions() throws Exception {
+        if (group == null) {
+            return false;
+        } else {
+            Group agentGroup = ProActiveGroup.getGroup(group);
+            if (agentGroup.size() != 3) {
+                return false;
+            } else {
+                Agent agent0 = (Agent) agentGroup.get(0);
+                Agent agent1 = (Agent) agentGroup.get(1);
+                Agent agent2 = (Agent) agentGroup.get(2);
+                String nodeURL = getNode().getNodeInformation().getURL()
+                                     .toUpperCase();
+                return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent2.getNodeName().compareTo(nodeURL) == 0);
+            }
+        }
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+}</literal>
+</screen>
+</para></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+      <informaltable frame="all">
+        <tgroup cols="1">
+          <colspec colname="c1" colwidth="100*"/>
+          <tbody>
+            <row>
+              <entry align="center" valign="middle"><para><emphasis role="bold">Agent.java</emphasis></para></entry>
+            </row>
+            <row>
+              <entry><para>
+<screen>
+ 
+<literal>
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.RunActive;
+public class Agent implements InitActive, RunActive, EndActive,
+    java.io.Serializable {
+    private String name;
+    private String nodename;
+    private String hostname;
+    public Agent() {
+    }
+    public Agent(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        try {
+            //return the name of the Host
+            return java.net.InetAddress.getLocalHost().getHostName()
+                                       .toUpperCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 'getName failed';
+        }
+    }
+    public String getNodeName() {
+        try {
+            //return the name of the Node  
+            return ProActive.getBodyOnThis().getNodeURL().toUpperCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 'getNodeName failed';
+        }
+    }
+    public void moveTo(String nodeURL) {
+        try {
+            System.out.println(' I am going to migate');
+            ProActive.migrateTo(nodeURL);
+            System.out.println('migration done');
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void endBodyActivity() {
+        ProActive.getBodyOnThis().terminate();
+    }
+    public void initActivity(Body body) {
+        System.out.println('Initialization of the Activity');
+    }
+    public void runActivity(Body body) {
+        org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+        while (body.isActive()) {
+            // The synchro policy is FIFO
+            service.blockingServeOldest();
+        }
+    }
+    public void endActivity(Body body) {
+        System.out.println('End of the activity of this Active Object');
+    }
+}
+ </literal>
+</screen>
+</para></entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </informaltable>
+    </sect1>
+  
+</chapter>

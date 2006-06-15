@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter id="format"><title>0.3 Results</title>
+<!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/test_documentation/format.html  -->
+  
+    <para> This section describes, how to format the Results of the tests.</para>
+    <sect1 remap="h2">
+      <title>What is a Result?
+      </title>
+      <para>In this API, the result concept is two things:</para>
+      <itemizedlist>
+        <listitem>
+          <para> A real result: the test successes or fails, the benchmark runs in  2.0ms</para>
+        </listitem>
+        <listitem>
+          <para> Like a logger to log error, message, ...</para>
+        </listitem>
+</itemizedlist>
+    </sect1>
+    <sect1 remap="h2">
+      <title>What we don't use a real logger API?</title>
+      <para>The problem with a real logger (like log4J) is we don't have the notion of
+ results.</para>
+      <para>In the TestSuite APi we decide to split logs of the program and results.</para>
+      
+    </sect1>
+    <sect1 remap="h2">
+      <title>Structure of Results classes in TestSuite</title>
+      <para>There is a super-class abstract: <emphasis role="bold">AbstractResult</emphasis> where there is the bare essentials to
+ specify a Result:</para>
+      <itemizedlist>
+        <listitem>
+          <para> The type of the result, in order of increase importance:</para>
+        </listitem>
+        <listitem>
+          <para>
+            <itemizedlist>
+              <listitem>
+                <para><emphasis role="bold">INFO</emphasis>: an information message to debug</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">MSG</emphasis>: a message to debbug</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">RESULT</emphasis>: a none important result, typically a  middle result</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">IMP_MSG</emphasis>: an important message</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">GLOBAL_RESULT</emphasis>: an important result, typically a group result</para>
+              </listitem>
+              <listitem>
+                <para><emphasis role="bold">ERROR</emphasis>: typically an error in out Test method, for example: can't init a
+ group</para>
+              </listitem>
+</itemizedlist>
+</para>
+        </listitem>
+        <listitem>
+          <para> A message to describe the result</para>
+        </listitem>
+        <listitem>
+          <para> An exception to show the stack trace of an error</para>
+        </listitem>
+        <listitem>
+          <para> Time of creation of the result</para>
+        </listitem>
+</itemizedlist>
+      <para>There are two classes who implements this abstract class:</para>
+      <para>
+        <informalfigure>
+          <mediaobject>
+            <imageobject>
+              <imagedata fileref="test_documentation/Files/result2.gif" format="GIF"/>            </imageobject>
+            <imageobject>
+              <imagedata fileref="test_documentation/Files/result2.png" format="PNG"/>            </imageobject>
+          </mediaobject>
+        </informalfigure>
+</para>
+      <para><emphasis role="bold">AbstractResult</emphasis> is only abstract to make generic formating, so <emphasis role="bold">TestResult</emphasis> can
+ print itself like a Java String and a XML node. <emphasis role="bold">BenchmarkResult</emphasis> add a time result to
+ print.</para>
+    </sect1>
+    <sect1 remap="h2">
+      <title>How to export results</title>
+      <para>In TestSuite API, the results are stocked in <emphasis role="bold">ResultsCollection</emphasis>, there are two classes
+ who contains a ResultCollection:</para>
+      <itemizedlist>
+        <listitem>
+          <para> Manager</para>
+        </listitem>
+        <listitem>
+          <para> Group</para>
+          
+        </listitem>
+</itemizedlist>
+      <para>These classes implements the <emphasis role="bold">ResultsExporter</emphasis> interface. After the execution of your
+ Manager you can choose where and how to print results:</para>
+<screen> yourManager.toXXX();  </screen>
+      <para>Where toXXX() is:</para>
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">String toString()</emphasis>: return all results, if <literal>yourManager.setVerbatim(true)</literal>, as a String else only results who the level &gt;=
+ IMP_MSG</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">void toPrintWriter(PrintWriter out)</emphasis>: return all results, if <literal>yourManager.setVerbatim(true)</literal>, in out else only results who the level &gt;=
+ IMP_MSG</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">void toOutPutStream(OutputStream out)</emphasis>: return all results, if <literal>yourManager.setVerbatim(true)</literal>, in out else only results who the level &gt;=
+ IM_MSG</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">Document toXML()</emphasis>: return all results, in a DOM tree, it is useful to transform, to
+ format, to operate, ... results like you want.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis role="bold">void toHTML(File location)</emphasis>: return all results, in location file like an HTML
+ document. To do this the API export the results in a DOM tree, with the precedent method, and
+ transform the XML with XSLT into a HTML file.</para>
+        </listitem>
+</itemizedlist>
+      <sect2 remap="h3">
+        <title>About the Manager Verbatim option</title>
+        <para>In Manager you can modify this by:</para>
+<screen>yourManager.setVerbatim(true/false)  </screen>
+        <para>If Verbatim value is:</para>
+        <itemizedlist>
+          <listitem>
+            <para><emphasis role="bold">true</emphasis>: All results types could be show.</para>
+          </listitem>
+          <listitem>
+            <para><emphasis role="bold">false</emphasis>: Only results with a level &gt;= IMP_MSG could be show. In concrete terms, on
+ your output you have only the messages from the Manager, final result of group and th
+ errors.</para>
+          </listitem>
+</itemizedlist>
+        <para>By default Verbatim is at <emphasis role="bold">false</emphasis></para>
+        <para>This option has no effect on XML and HTML exports.</para>
+        <para>To see the value of Verbatim:</para>
+<screen>  yourManager.isVerbatim() </screen>
+      </sect2>
+      <sect2 remap="h3">
+        <title>By the file configurator</title>
+        <para>See the <ulink url="descriptor.xml">configuration file part</ulink> for more details to configure
+ results output by the file descriptor.</para>
+      </sect2>
+    </sect1>
+    <sect1 remap="h2">
+      <title>Format Results like you want</title>
+      <para>If you export your results in a XML DOM tree, with <literal>toXML()</literal> method, you can use
+ XSLT to create new formats.</para>
+    </sect1>
+  
+</chapter>

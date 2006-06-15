@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+
+<!-- Converted from latex bib format with bibdb v0.1, from Sylvain Schmitz -->
+<!-- http://charybde.homeunix.org/~schmitz/code/bibdb/ -->
+
+<bibliography id="Bibliography">
+
+  <biblioentry role="inproceedings" id="iccs05">
+    <abbrev id="iccs05.abbrev">ACC05</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Isabelle</firstname><surname>Attali</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Arnaud</firstname><surname>Contes</surname></author>
+  </authorgroup>
+      <title>Deployment-based security for grid applications</title>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>The International Conference on Computational Science (ICCS 2005), Atlanta, USA, May 22-25</conftitle>
+      </confgroup>
+      <subtitle role="series">LNCS</subtitle>
+      <pubdate>2005</pubdate>
+      <publisher><publishername>Springer Verlag</publishername></publisher>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="BBC02">
+    <abbrev id="BBC02.abbrev">BBC02</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Laurent</firstname><surname>Baduel</surname></author>
+   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+  </authorgroup>
+      <title>Efficient, Flexible, and Typed Group Communications in Java</title>
+      <pagenums>28--36</pagenums>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Joint ACM Java Grande - ISCOPE 2002 Conference</conftitle>
+       <address>Seattle</address>
+      </confgroup>
+      <pubdate>2002</pubdate>
+      <publisher><publishername>ACM Press</publishername></publisher>
+    </biblioset>
+    <bibliomisc role="note">ISBN 1-58113-559-8</bibliomisc>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="baduel05object">
+    <abbrev id="baduel05object.abbrev">BBC05</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Laurent</firstname><surname>Baduel</surname></author>
+   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+  </authorgroup>
+      <title>Object-Oriented SPMD</title>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Proceedings of Cluster Computing and Grid</conftitle>
+       <address>Cardiff, United Kingdom</address></confgroup>
+      <pubdate>May 2005</pubdate>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="europar2005delbe">
+    <abbrev id="europar2005delbe.abbrev">BCDH05</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Christian</firstname><surname>Delbe</surname></author>
+   <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+  </authorgroup>
+      <title>A hybrid message logging-cic protocol for constrained checkpointability</title>
+      <pagenums>644--653</pagenums>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Proceedings of EuroPar2005</conftitle>
+       <address>Lisbon, Portugal</address>
+      </confgroup>
+      <subtitle role="series">LNCS</subtitle>
+      <pubdate>August-September 2005</pubdate>
+      <publisher><publishername>Springer Verlag</publishername></publisher>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="hpcn2000Vayssiere">
+    <abbrev id="hpcn2000Vayssiere.abbrev">BCHV00</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
+   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+  </authorgroup>
+      <title>Communicating mobile active objects in java</title>
+      <pagenums>633--643</pagenums>
+      <bibliosource class="uri">http://www-sop.inria.fr/oasis/Julien.Vayssiere/publications/18230633.pdf</bibliosource>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Proceedings of HPCN Europe 2000</conftitle>
+      </confgroup>
+      <subtitle role="series">LNCS 1823</subtitle>
+      <pubdate>May 2000</pubdate>
+      <publisher><publishername>Springer Verlag</publishername></publisher>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="DescriptorHpdc2002">
+    <abbrev id="DescriptorHpdc2002.abbrev">BCM+02</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Lionel</firstname><surname>Mestre</surname></author>
+   <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
+   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+  </authorgroup>
+      <title>Interactive and descriptor-based deployment of object-oriented grid applications</title>
+      <pagenums>93--102</pagenums>
+      <bibliosource class="uri">http://www-sop.inria.fr/oasis/Julien.Vayssiere/publications/hpdc2002vayssiere.pdf</bibliosource>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Proceedings of the 11th IEEE International Symposium on High Performance Distributed Computing</conftitle>
+       <address>Edinburgh, Scotland</address>
+      </confgroup>
+      <pubdate>July 2002</pubdate>
+      <publisher><publishername>IEEE Computer Society</publishername></publisher>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="BCM03">
+    <abbrev id="BCM03.abbrev">BCM03</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Francoise</firstname><surname>Baude</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Matthieu</firstname><surname>Morel</surname></author>
+  </authorgroup>
+      <title>From distributed objects to hierarchical grid components</title>
+      <bibliosource class="uri">http://www-sop.inria.fr/oasis/ProActive/doc/HierarchicalGridComponents.pdf</bibliosource>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>International Symposium on Distributed Objects and Applications (DOA), Catania, Sicily, Italy, 3-7  November</conftitle>
+       <address>Springer Verlag</address>
+      </confgroup>
+      <pubdate>2003</pubdate>
+      <publisher><publishername>Lecture Notes in Computer Science, LNCS</publishername></publisher>
+    </biblioset>
+    <bibliomisc role="note">ISBN ??</bibliomisc>
+  </biblioentry>
+
+  <biblioentry role="article" id="caromel93toward">
+    <abbrev id="caromel93toward.abbrev">Car93</abbrev>
+    <biblioset role="article">
+      <author>
+       <firstname>Denis</firstname><surname>Caromel</surname></author>
+      <title>Toward a method of object-oriented concurrent programming</title>
+      <pagenums>90--102</pagenums>
+      <bibliosource class="uri">citeseer.nj.nec.com/300829.html</bibliosource>
+    </biblioset>
+    <biblioset role="journal">
+      <title>Communications of the ACM</title>
+      <volumenum>36</volumenum><issuenum>9</issuenum>
+      <pubdate>1993</pubdate>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="book" id="TDO-book">
+    <abbrev id="TDO-book.abbrev">CH05</abbrev>
+  <authorgroup>
+    <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+    <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+   </authorgroup>
+    <title>A Theory of Distributed Object</title>
+		<publisher><publishername>Springer Verlag</publishername></publisher>
+		<pubdate>2005</pubdate>
+  </biblioentry>
+
+
+  <biblioentry role="inproceedings" id="CHSPOPL04">
+    <abbrev id="CHSPOPL04.abbrev">CHS04</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Ludovic</firstname><surname>Henrio</surname></author>
+   <author><firstname>Bernard</firstname><surname>Serpette</surname></author>
+  </authorgroup>
+      <title>Asynchronous and deterministic objects</title>
+      <pagenums>123--134</pagenums>
+      <bibliosource class="doi">http://doi.acm.org/10.1145/964001.964012</bibliosource>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Proceedings of the 31st ACM Symposium on Principles of Programming Languages</conftitle>
+      </confgroup>
+      <pubdate>2004</pubdate>
+      <publisher><publishername>ACM Press</publishername></publisher>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="inproceedings" id="ckv98tscmj">
+   <abbrev id="ckv98tscmj.abbrev">CKV98a</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>W.</firstname><surname>Klauser</surname></author>
+   <author><firstname>Julien</firstname><surname>Vayssiere</surname></author>
+  </authorgroup>
+      <title>Towards seamless computing and metacomputing in java</title>
+      <pagenums>1043--1061</pagenums>
+      <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/javallCPE.ps</bibliosource>
+    </biblioset>
+    <biblioset role="proceedings">
+      <confgroup>
+       <conftitle>Concurrency Practice and Experience</conftitle>
+      </confgroup>
+      <editor><firstname>Geoffrey C.</firstname><surname>Fox</surname></editor>
+      <volumenum>10, (11--13)</volumenum>
+      <pubdate>September-November 1998</pubdate>
+      <publisher><publishername>Wiley and Sons, Ltd.</publishername></publisher>
+    </biblioset>
+  </biblioentry>
+
+    <biblioentry role="inproceedings" id="huet04high">
+    <abbrev id="huet04high.abbrev">HCB04</abbrev>
+    <biblioset role="article">
+  <authorgroup>
+   <author><firstname>Fabrice</firstname><surname>Huet</surname></author>
+   <author><firstname>Denis</firstname><surname>Caromel</surname></author>
+   <author><firstname>Henri E.</firstname><surname>Bal</surname></author>
+  </authorgroup>
+      <title>A High Performance Java Middleware with a Real Application</title>
+      <bibliosource class="uri">http://www-sop.inria.fr/oasis/proactive/doc/sc2004.pdf</bibliosource>
+     </biblioset>
+    <biblioset role="proceedings">
+      <confgroup><conftitle>Proceedings of the Supercomputing conference</conftitle>
+      <address>Pittsburgh, Pensylvania, USA</address>
+     </confgroup>
+      <pubdate>November 2004</pubdate>
+    </biblioset>
+  </biblioentry>
+
+  <biblioentry role="techreport" id="BCDH04">
+   <abbrev id="BCDH04.abbrev">BCDH04</abbrev>
+  <authorgroup>
+   <author><firstname>F.</firstname><surname>Baude</surname></author>
+   <author><firstname>D.</firstname><surname>Caromel</surname></author>
+   <author><firstname>C.</firstname><surname>Delbe</surname></author>
+    <author><firstname>L.</firstname><surname>Henrio</surname></author>
+   </authorgroup>
+    <title>A fault tolerance protocol for asp calculus : Design and proof</title>
+    <bibliosource class="uri">http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf</bibliosource>
+    <bibliomisc role="type">Technical ReportRR-5246</bibliomisc>
+    
+    <orgname>INRIA</orgname>
+    <pubdate>2004</pubdate>
+  </biblioentry>
+
+  
+  <biblioentry role="inproceedings" id="foster98security">
+   <abbrev id="foster98security.abbrev">FKTT98</abbrev>
+   <biblioset role="article">
+    <authorgroup>
+      <author><firstname>Ian T.</firstname><surname>Foster</surname></author>
+      <author><firstname>Carl</firstname><surname>Kesselman</surname></author>
+      <author><firstname>Gene</firstname><surname>Tsudik</surname></author>
+      <author><firstname>Steven</firstname><surname>Tuecke</surname></author>
+    </authorgroup>
+    <title>A security architecture for computational grids</title>
+    <pagenums>83--92</pagenums>
+    <bibliosource class="uri">citeseer.ist.psu.edu/foster98security.html</bibliosource>
+   </biblioset>
+   <biblioset role="proceedings">
+    <confgroup>
+       <conftitle>ACM Conference on Computer and Communications Security</conftitle>
+    </confgroup>
+    <pubdate>1998</pubdate>
+   </biblioset>
+  </biblioentry>
+
+  
+</bibliography>
