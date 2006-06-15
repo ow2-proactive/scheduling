@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="AddingAFileTransferProtocol"><title>How to add a new FileTransfer CopyProtocol</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/development/FileTransfer.html  -->
   

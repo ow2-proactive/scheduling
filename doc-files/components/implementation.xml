@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="implementation"><title>An implementation of the Fractal component model with ProActive</title>
 <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/components/implementation.html  -->
 <!--     <para> </para> -->
