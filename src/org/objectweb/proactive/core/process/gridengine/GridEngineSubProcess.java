@@ -266,13 +266,26 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     protected String buildCommand() {
         StringBuffer qsubCommand = new StringBuffer();
 
-        qsubCommand.append(command_path).append(" ");
-        if(this.queueName !=null && this.queueName.length()>0){
-        	qsubCommand.append("-q ").append(queueName).append(" ");
+        qsubCommand.append(command_path).append(" -S /bin/bash  ");
+        if ((this.queueName != null) && (this.queueName.length() > 0)) {
+            qsubCommand.append("-q ").append(queueName).append(" ");
         }
-        qsubCommand.append("-S /bin/bash  ");
-        qsubCommand.append("-pe ").append(parallelEnvironment).append(" ");
-        qsubCommand.append(hostNumber).append(" ");
+
+        if ((this.outputFile != null) && (this.outputFile.length() > 0)) {
+            qsubCommand.append("-o ").append(outputFile).append(" ");
+        }
+
+        if ((this.parallelEnvironment != null) &&
+                (this.parallelEnvironment.length() > 0)) {
+            qsubCommand.append("-pe ").append(parallelEnvironment).append(" ");
+        }
+
+        if ((this.hostNumber != null) && (this.hostNumber.length() > 0)) {
+            qsubCommand.append(hostNumber).append(" ");
+        } else {
+            qsubCommand.append("1").append(" ");
+        }
+
         qsubCommand.append(scriptLocation).append(" ");
         qsubCommand.append(targetProcess.getCommand());
 
