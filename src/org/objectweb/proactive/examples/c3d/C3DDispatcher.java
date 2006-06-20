@@ -409,7 +409,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         try {
             ProActive.register(ProActive.getStubOnThis(),
-                "//localhost/" + "Dispatcher");
+                "//" + InetAddress.getLocalHost().getHostName() + "/" + "Dispatcher");
         } catch (IOException ioe) {
             logger.error("Coudn't register the Dispatcher! " +
                 ioe.getMessage());
