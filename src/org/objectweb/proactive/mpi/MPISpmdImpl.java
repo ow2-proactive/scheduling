@@ -33,6 +33,7 @@ package org.objectweb.proactive.mpi;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.AbstractExternalProcess;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -49,26 +50,27 @@ import java.util.Hashtable;
 public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     private final static Logger MPI_IMPL_LOGGER = ProActiveLogger.getLogger(Loggers.MPI);
 
-    /** the name of the MPISpmd object */
+    /**  name of the MPISpmd object */
     private String name;
 
-    /** the MPI Process that the Virtual Node references */
+    /**  MPI Process that the Virtual Node references */
     private ExternalProcess mpiProcess = null;
 
-    /** the Virtual Node containing resources */
+    /**  Virtual Node containing resources */
     private VirtualNode vn;
 
-    /** the user SPMD classes name */
+    /** user SPMD classes name */
     private ArrayList spmdClasses = null;
 
-    /** the user SPMD classes params */
+    /** user SPMD classes params */
     private Hashtable spmdClassesParams;
 
-    /** the user classes name */
+    /** user classes name */
     private ArrayList classes = null;
 
-    /** the user classes params */
+    /** user classes params */
     private Hashtable classesParams;
+    private Object[] classesParamsByRank;
 
     // empty no-args constructor 
     public MPISpmdImpl() {
@@ -76,8 +78,9 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
 
     /**
      * API method for creating a new MPISPMD object from an existing Virtual Node
+     * @throws NodeException
      */
-    public MPISpmdImpl(VirtualNode vn) throws RuntimeException {
+    public MPISpmdImpl(VirtualNode vn) throws RuntimeException, NodeException {
         MPI_IMPL_LOGGER.debug(
             "[MPISpmd object] creating MPI SPMD active object: " +
             vn.getName());
@@ -90,18 +93,19 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             this.classes = new ArrayList();
             this.spmdClassesParams = new Hashtable();
             this.classesParams = new Hashtable();
+            this.classesParamsByRank = new Object[vn.getNodes().length];
             this.mpiProcess = vn.getMPIProcess();
             this.name = vn.getName();
             this.vn = vn;
         } else {
             throw new RuntimeException(
-                " ERROR: Cannot create MPISpmd object Cause: No MPI process attached with the virtual node " +
+                "!!! ERROR: Cannot create MPISpmd object Cause: No MPI process attached with the virtual node " +
                 vn.getName());
         }
     }
 
     /**
-     * API method for starting MPI program
+     * API method for starting the MPI program
      * @return MPIResult
      */
     public MPIResult startMPI() {
@@ -112,20 +116,24 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             mpiProcess.waitFor();
             result.setReturnValue(mpiProcess.exitValue());
             return result;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            MPI_IMPL_LOGGER.error("ERROR: cannot wait for MPI process " +
-                this.name);
+            //} catch (InterruptedException e) {
+            //    e.printStackTrace();
+            //    MPI_IMPL_LOGGER.error("ERROR: cannot wait for MPI process " +
+            //        this.name);
         } catch (IOException e) {
             e.printStackTrace();
-            MPI_IMPL_LOGGER.error("ERROR: cannot start MPI process " +
-                this.name + " with command " + mpiProcess.getCommand());
+            MPI_IMPL_LOGGER.error(
+                "!!! ERROR startMPI: cannot start MPI process " + this.name +
+                " with command " + mpiProcess.getCommand());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     /**
-     * API method for reStarting MPI program
+     * API method for reStarting the MPI program - run a new computation independently
+     * if the first one is currently running
      * @return MPIResult
      */
     public MPIResult reStartMPI() {
@@ -137,6 +145,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     /**
      * API method for killing MPI program -
      * Kills the MPI program. The MPI program represented by this MPISpmd object is forcibly terminated.
+     * Only the computation is killed, the MPISpmd object is still alive (the computation can be reStarted).
      */
     public boolean killMPI() {
         MPI_IMPL_LOGGER.debug("[MPISpmd Object] Kill MPI Process ");
@@ -156,7 +165,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             mpiProcess.stopProcess();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            MPI_IMPL_LOGGER.error("ERROR: cannot kill MPI process " +
+            MPI_IMPL_LOGGER.error("!!! ERROR killMPI: cannot kill MPI process " +
                 this.name);
         }
         return false;
@@ -231,45 +240,73 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         return vn;
     }
 
+    //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
+    //  --+----+---- methods for the future wrapping with control ----+----+----
+    //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
     public void newActiveSpmd(String cl) {
-        this.spmdClasses.add(cl);
-        ArrayList parameters = new ArrayList(2);
-        parameters.add(0, null);
-        parameters.add(1, null);
-        this.spmdClassesParams.put(cl, parameters);
+        if (spmdClasses.contains(cl) || classes.contains(cl)) {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                " class has already been added to the list of user classes to instanciate ");
+        } else {
+            this.spmdClasses.add(cl);
+            ArrayList parameters = new ArrayList(2);
+            parameters.add(0, null);
+            parameters.add(1, null);
+            this.spmdClassesParams.put(cl, parameters);
+        }
     }
 
     public void newActiveSpmd(String cl, Object[] params) {
-        this.spmdClasses.add(cl);
-        ArrayList parameters = new ArrayList(2);
+        if (spmdClasses.contains(cl) || classes.contains(cl)) {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                " class has already been added to the list of user classes to instanciate ");
+        } else {
+            this.spmdClasses.add(cl);
 
-        // index=0 => Object[] type
-        // index=1 => Object[][] type
-        parameters.add(0, params);
-        parameters.add(1, null);
-        this.spmdClassesParams.put(cl, parameters);
+            ArrayList parameters = new ArrayList(2);
+
+            // index=0 => Object[] type
+            // index=1 => Object[][] type
+            parameters.add(0, params);
+            parameters.add(1, null);
+            this.spmdClassesParams.put(cl, parameters);
+        }
     }
 
     public void newActiveSpmd(String cl, Object[][] params) {
-        this.spmdClasses.add(cl);
-        ArrayList parameters = new ArrayList(2);
+        if (spmdClasses.contains(cl) || classes.contains(cl)) {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                " class has already been added to the list of user classes to instanciate ");
+        } else {
+            this.spmdClasses.add(cl);
+            ArrayList parameters = new ArrayList(2);
 
-        // index=0 => Object[] type
-        // index=1 => Object[][] type
-        parameters.add(0, null);
-        parameters.add(1, params);
-        this.spmdClassesParams.put(cl, parameters);
+            // index=0 => Object[] type
+            // index=1 => Object[][] type
+            parameters.add(0, null);
+            parameters.add(1, params);
+            this.spmdClassesParams.put(cl, parameters);
+        }
     }
 
-    public void newActive(String cl, Object[] params, int rank) {
-        this.classes.add(cl);
-        ArrayList parameters = new ArrayList(2);
-
-        // index=0 => rank
-        // index=1 => Object[] type
-        parameters.add(0, new Integer(rank));
-        parameters.add(1, params);
-        this.classesParams.put(cl, parameters);
+    public void newActive(String cl, Object[] params, int rank)
+        throws ArrayIndexOutOfBoundsException {
+        if (spmdClasses.contains(cl) ||
+                (classes.contains(cl) &&
+                (rank < this.classesParamsByRank.length) &&
+                (this.classesParamsByRank[rank] != null))) {
+            MPI_IMPL_LOGGER.info("!!! ERROR newActive: " + cl +
+                " class has already been added to the list of user classes to instanciate ");
+        } else if (rank < this.classesParamsByRank.length) {
+            if (!classes.contains(cl)) {
+                this.classes.add(cl);
+            }
+            this.classesParamsByRank[rank] = params;
+            this.classesParams.put(cl, this.classesParamsByRank);
+        } else {
+            throw new ArrayIndexOutOfBoundsException("Rank " + rank +
+                " is out of range while trying to instanciate class " + cl);
+        }
     }
 
     public ArrayList getSpmdClasses() {

@@ -98,22 +98,23 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         } else {
             ProActive.terminateActiveObject(target, true);
             throw new IllegalMPIStateException(
-                "ERROR: cannot start MPI process " + this.name +
+                "!!! ERROR: cannot start MPI process " + this.name +
                 " Caused by: MPI process has already been started once ");
         }
     }
 
     /**
-     * API method for reStarting MPI program
+     * API method for reStarting MPI program - run a new computation independently
+     * if the first one is currently running
      * @return MPIResult
      */
     public MPIResult reStartMPI() throws IllegalMPIStateException {
         MPI_PROXY_LOGGER.debug(
             "[MPI Proxy] call reStart method on active object ");
         MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
-        // check if program has already finished and change status if yes
+        // check if program is already finished and change status if yes
         checkTerminationStatus();
-        // UNSTARTED/DEFAULT status
+        // UNSTARTED
         if (!status.equals(MPIConstants.MPI_UNSTARTED)) {
             setStatus(MPIConstants.MPI_RUNNING);
             target.reinitProcess();
@@ -121,7 +122,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         } else {
             ProActive.terminateActiveObject(target, true);
             throw new IllegalMPIStateException(
-                "ERROR: cannot restart MPI process " + this.name +
+                "!!! ERROR: cannot restart MPI process " + this.name +
                 " Caused by: no mpi process has been started once before");
         }
     }
@@ -147,7 +148,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         else {
             ProActive.terminateActiveObject(target, true);
             throw new IllegalMPIStateException(
-                "ERROR: cannot kill MPI process " + this.name +
+                "!!! ERROR: cannot kill MPI process " + this.name +
                 " Caused by: no mpi process has been started once before!");
         }
     }
@@ -208,12 +209,11 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         return this.target.getVn();
     }
 
+    //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
+    //  --+----+---- methods for the future wrapping with control ----+----+----
+    //  ----+----+----+----+----+----+----+----+----+----+----+-------+----+----
     public void newActiveSpmd(String cl) {
         this.target.newActiveSpmd(cl);
-    }
-
-    public ArrayList getSpmdClasses() {
-        return this.target.getSpmdClasses();
     }
 
     public void newActiveSpmd(String cl, Object[] params) {
@@ -224,10 +224,6 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         this.target.newActiveSpmd(cl, params);
     }
 
-    public Hashtable getSpmdClassesParams() {
-        return this.target.getSpmdClassesParams();
-    }
-
     public void newActive(String cl, Object[] params, int rank) {
         this.target.newActive(cl, params, rank);
     }
@@ -236,7 +232,15 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
         return this.target.getClasses();
     }
 
+    public ArrayList getSpmdClasses() {
+        return this.target.getSpmdClasses();
+    }
+
     public Hashtable getClassesParams() {
         return this.target.getClassesParams();
+    }
+
+    public Hashtable getSpmdClassesParams() {
+        return this.target.getSpmdClassesParams();
     }
 }

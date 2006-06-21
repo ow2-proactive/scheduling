@@ -45,7 +45,8 @@ public interface MPISpmd {
     public MPIResult startMPI();
 
     /**
-     * API method for reStarting MPI program
+     * API method for reStarting MPI program - run a new computation independently
+     * if the first one is currently running
      * @return MPIResult
      */
     public MPIResult reStartMPI();

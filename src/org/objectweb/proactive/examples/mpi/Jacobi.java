@@ -73,12 +73,13 @@ public class Jacobi {
             MPISpmd mpiSpmd_01 = MPI.newMPISpmd(vnJacobi);
             System.out.println(mpiSpmd_01);
             MPIResult res = mpiSpmd_01.startMPI();
-            logger.info("Result value: " + res.getReturnValue());
+            logger.info("[JACOBI] Result value: " + res.getReturnValue());
+
             vnJacobi.killAll(false);
             System.exit(0);
         } catch (ProActiveException e) {
             e.printStackTrace();
-            logger.error("Error when reading descriptor");
+            logger.error("!!! Error when reading descriptor");
         }
     }
 }
