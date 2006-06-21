@@ -116,10 +116,6 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             mpiProcess.waitFor();
             result.setReturnValue(mpiProcess.exitValue());
             return result;
-            //} catch (InterruptedException e) {
-            //    e.printStackTrace();
-            //    MPI_IMPL_LOGGER.error("ERROR: cannot wait for MPI process " +
-            //        this.name);
         } catch (IOException e) {
             e.printStackTrace();
             MPI_IMPL_LOGGER.error(
