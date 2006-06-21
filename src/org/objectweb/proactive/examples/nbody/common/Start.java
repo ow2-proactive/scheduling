@@ -147,7 +147,8 @@ public class Start implements Serializable {
         if (ddd) {
             try {
                 Class.forName("com.sun.j3d.utils.behaviors.mouse.MouseRotate");
-            } catch (ClassNotFoundException e) {
+                Class.forName("org.objectweb.proactive.examples.nbody.common.NBody3DFrame");
+            } catch (Exception e) {
                 ddd = false;
                 logger.warn("Java 3D not installed, switching to 2D");
             }
