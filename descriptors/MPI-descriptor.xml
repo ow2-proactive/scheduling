@@ -2,12 +2,12 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="CPI" />
+			<virtualNode name="JacobiMPI" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
-			<map virtualNode="CPI">
+			<map virtualNode="JacobiMPI">
 				<jvmSet>
 					<vmName value="Jvm1" />
 				</jvmSet>
@@ -34,11 +34,11 @@
 			</processDefinition>
 
 			<!-- MPI PROCESSES -->
-			<processDefinition id="mpiCPI">
-				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi" >
+			<processDefinition id="mpiJacobiProcess">
+				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="jacobi" >
 					<commandPath value="/usr/bin/mpirun" />
 					<mpiOptions>
-						<processNumber>5</processNumber>
+						<processNumber>4</processNumber>
 						<localRelativePath>
 							<relativePath origin="user.home" value="/ProActive/src/org/objectweb/proactive/examples/mpi" />
 						</localRelativePath>
@@ -50,7 +50,7 @@
 			<processDefinition id="dpsLocalProcess">
 				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="localJVM" />
-					<processReference refid="mpiCPI" />
+					<processReference refid="mpiJacobiProcess" />
 				</dependentProcessSequence>
 			</processDefinition>
 		</processes>
