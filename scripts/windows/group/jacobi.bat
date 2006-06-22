@@ -1,6 +1,6 @@
 @echo off
 echo. 
-echo --- C3D ---------------------------------------------
+echo --- Jacobi : nodes initialization ---------------------------------------------
 
 goto doit
 
