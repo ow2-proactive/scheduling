@@ -48,7 +48,7 @@
 		<!-- Acquisition method -->
 		<prop key="proactive.p2p.acq" value="rmi" />
 		<!-- Port number -->
-		<prop key="proactive.p2p.port" value="6699" />
+		<prop key="proactive.p2p.port" value="6444" />
 		<!-- NOA is in number of peers -->
 		<prop key="proactive.p2p.noa" value="3" />
 		<!-- TTU is in ms -->
