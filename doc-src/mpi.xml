@@ -121,7 +121,7 @@ An MPISpmd object is regarded as an MPI code wrapper. It has the following featu
 						<para>
 							<emphasis role="bold">MPISpmd object creation methods</emphasis>
 						</para>
-						<programlisting language="java">import org.objectweb.proactive.mpi;
+						<programlisting lang="java">import org.objectweb.proactive.mpi;
 
 /**
  * creates an <emphasis role="bold">MPISpmd object</emphasis> from a Virtual Node which represents the deployment of an MPI code.
@@ -138,7 +138,7 @@ static public MPISpmd <emphasis role="bold">MPI.newMPISpmd</emphasis>(VirtualNod
 						<para>
 							<emphasis role="bold">MPISpmd object control methods</emphasis>
 						</para>
-						<programlisting language="java">
+						<programlisting lang="java">
 /**
  * Triggers the process execution represented by the MPISpmd object on the resources previously
  * allocated. This method call is an asynchronous request, thus the call does not
@@ -152,7 +152,7 @@ static public MPISpmd <emphasis role="bold">MPI.newMPISpmd</emphasis>(VirtualNod
 public <emphasis role="bold">MPIResult startMPI</emphasis>();</programlisting>
 
 
-						<programlisting language="java">
+						<programlisting lang="java">
 /**
  * Restarts the process represented by the MPISpmd object on the same resources. This process has
  * to previously been started once with the start method, otherwise the method throws an
@@ -163,7 +163,7 @@ public <emphasis role="bold">MPIResult startMPI</emphasis>();</programlisting>
 
 public <emphasis role="bold">MPIResult reStartMPI</emphasis>();</programlisting>
 
-						<programlisting language="java">
+						<programlisting lang="java">
 /** 
  * Stops the process represented by the MPISpmd object. 
  * It returns true if the process was running when it has been killed, false otherwise.
@@ -171,14 +171,14 @@ public <emphasis role="bold">MPIResult reStartMPI</emphasis>();</programlisting>
 
 public boolean <emphasis role="bold">killMPI</emphasis>();</programlisting>
 
-						<programlisting language="java">
+						<programlisting lang="java">
 /**
  * Returns the current status of the MPISpmd object. The different status are listed below.
  */
 
 public String <emphasis role="bold">getStatus</emphasis>();</programlisting>
 
-						<programlisting language="java">
+						<programlisting lang="java">
 /**
  * Add or modify the MPI command parameters. It allows users to specify arguments to the MPI code.
  */
@@ -194,7 +194,7 @@ public String <emphasis role="bold">setCommandArguments</emphasis>(String argume
  a future on an MPIResult object that does not block application as long as no method is called on this MPIResult object.
 On the contrary, application is blocked until the MPIResult object is updated and so available.
 The following method gets the exit value of the MPI program.</para>
-						<programlisting language="java">
+						<programlisting lang="java">
 /**
  * Returns the exit value of the MPI program. 
  * By usual convention, the value 0 indicates normal termination.
@@ -208,7 +208,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
 							<emphasis role="bold">MPISpmd object status</emphasis>
 						</para>
 
-						<programlisting language="java">import org.objectweb.proactive.mpi;
+						<programlisting lang="java">import org.objectweb.proactive.mpi;
 
 <emphasis role="bold">ProActiveMPIConstants.MPI_UNSTARTED</emphasis>; // default status - after MPISpmd object creation
 <emphasis role="bold">ProActiveMPIConstants.MPI_RUNNING</emphasis>;   // after MPISpmd object has been started or restarted
@@ -255,7 +255,7 @@ These few lines show how to execute the MPI executive <emphasis role="bold">jaco
 No modification have to be made to the source code. 
 				</para>
 
-				<programlisting language="java">
+				<programlisting lang="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -428,7 +428,7 @@ and MPI process will raise an error.
 
 Let's assume we want to interconnect together several modules (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are each one a parallel MPI binary code. 
 	
-	<programlisting language="java">
+	<programlisting lang="java">
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
