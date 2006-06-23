@@ -120,4 +120,11 @@ public interface Loggers {
     static final public String SKELETONS_MANAGER = SKELETONS+".manager";
     static final public String SKELETONS_KERNEL = SKELETONS+".kernel";
     
+    // Scilab loggers
+    public static final String SCILAB = "proactive.scilab";
+    public static final String SCILAB_DEPLOY = SCILAB + ".deploy";
+    public static final String SCILAB_SERVICE = SCILAB + ".service";
+    public static final String SCILAB_WORKER = SCILAB + ".worker";
+    public static final String SCILAB_TASK = SCILAB + ".task";
+
 }
