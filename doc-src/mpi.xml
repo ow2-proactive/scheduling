@@ -15,7 +15,7 @@ to be embedded within ProActive. The proposed wrapping permits users to develop 
 using some MPI legacy codes.</para>
 
 	<para>On the other hand, we propose a <emphasis role="bold">wrapping</emphasis> method <emphasis role="bold"> with control</emphasis>
-designed to let SPMD processes associated with one code communicate with the SPMD processors associated with another simulation code.
+(currently under development) designed to let SPMD processes associated with one code communicate with the SPMD processors associated with another simulation code.
 This feature adds the parallel capability of MPI on the Grid with the support of ProActive for inter-process communication between
 MPI processes at different Grid point. A special feature of the proposed wrapping is the support of "MPI&lt;->User Java application" communications
 which permit users to exchange data towards its proper classes.</para>
@@ -54,28 +54,31 @@ without worrying about resources selections, resource locations and types, or ma
 			<itemizedlist>
 
 				<listitem>
+
 					<para>
-						<emphasis role="bold">(1) File Transfer</emphasis>
+						<emphasis role="bold">File Transfer [using file descriptor]</emphasis>
 					</para>
 
 					<para>The primary objective is to provide user an automatic deployment of his application 
-through a file deployment descriptor. In fact, ProActive provides support for File Transfer. In this way, user can
+<emphasis role="bold">through an XML file deployment descriptor</emphasis>. In fact, ProActive provides support for File Transfer. In this way, user can
 transfer MPI application <emphasis role="bold">input data</emphasis> and/or MPI <emphasis role="bold">application code</emphasis> to the remote host. The File Transfer happens before the user launches his application.
 For more details about File Transfer see  <xref linkend="FileTransfer_html_intro" />.
 		</para>
 				</listitem>
 				<listitem>
+
 					<para>
-						<emphasis role="bold">(2) Asking for resources</emphasis>
+						<emphasis role="bold">Asking for resources [using file descriptor]</emphasis>
 					</para>
-					<para>User describes MPI job requirements in the file deployment descriptor using a Virtual Node.
+					<para>User describes MPI job requirements in the <emphasis role="bold">file deployment descriptor</emphasis> using a Virtual Node.
 He gets back a set of Nodes corresponding to the remote available hosts for the MPI Job execution.
-For more details (or usage example) about resources booking, have a look to section <emphasis role="bold">"27.4 Using the Simple Wrapping Infrastructure" </emphasis>.
+For more details (or usage example) about resources booking, have a look at section <emphasis role="bold">"27.4 Using the Simple Wrapping Infrastructure" </emphasis>.
 				</para>
 				</listitem>
 				<listitem>
+
 					<para>
-						<emphasis role="bold">(3) Control MPI process using the MPI API</emphasis>
+						<emphasis role="bold">Control MPI process [using ProActive API]</emphasis>
 					</para>
 					<para>After deployment, user obtains the Virtual Node containing resources required for the MPI job, that is a set of Nodes.
 The MPI API provides user with the ability to create an <emphasis role="bold">MPISpmd object</emphasis> from the Virtual Node obtained. 
@@ -187,7 +190,7 @@ public String <emphasis role="bold">setCommandArguments</emphasis>(String argume
 						<para>
 							<emphasis role="bold">MPIResult object </emphasis>
 						</para>
-						<para> An MPIResult object is obtained with the startMPI/reStartMPI methods call. Rather, these methods return
+						<para> An MPIResult object is obtained with the <emphasis role="bold">startMPI/reStartMPI</emphasis> methods call. Rather, these methods return
  a future on an MPIResult object that does not block application as long as no method is called on this MPIResult object.
 On the contrary, application is blocked until the MPIResult object is updated and so available.
 The following method gets the exit value of the MPI program.</para>
@@ -215,33 +218,31 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
  It provides the guarantee of application consistency and a better control of the application
  in case of multiple MPISpmd objects.</para>
 
-					</listitem>
-				</itemizedlist>
-			</sect3>
-			<sect3>
-				<!-- ///// Using the API \\\\ -->
-				<title>Using the API</title>
-
-
 				<para>
-
 					<figure>
 						<title>State transition diagram</title>
 						<mediaobject>
 							<imageobject>
-								<imagedata fileref="mpi_files/status.png" format="PNG" width="6in" />
+								<imagedata fileref="mpi_files/status.png" format="PNG" />
 							</imageobject>
 						</mediaobject>
 					</figure>
 				</para>
-				<para>
-					<emphasis role="bold">How to write an application with the API? </emphasis>
-				</para>
-				<para> Import the package <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>. In an attempt to keep application consistency, the MPISpmd object makes use of status.
+					</listitem>
+				</itemizedlist>
+			</sect3>
+</sect2>
+			<sect2>
+				<!-- ///// How to write an application with the API \\\\ -->
+				<title>How to write an application with the API</title>
+
+				<para>First finalize the xml file descriptor to specify files which have to be transfered on the remote hosts and resources requirement
+as it is explained in the next section <xref linkend="Using_the_MPI_Infrastructure"/>.
+Then import the package <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>. In an attempt to keep application consistency, the MPISpmd object makes use of status.
 It garantees that either the method call on object is coherent or an exception is thrown. 
 Especially the exception is an <emphasis role="bold">IllegalMPIStateException</emphasis> that signals a method which has been called at an illegal or inappropriate time.
 In other words, an application is not in an appropriate state for the requested operation.</para>
-				<para>
+<para>
 An application does not require to declare in its throws clause because IllegalMPIStateException is a subclass of RuntimeException.
 The graph above presents a kind of finite state machine or finite automaton, that is a model of behavior composed of<emphasis role="bold"> states</emphasis> (status of the MPISpmd object) and 
 <emphasis role="bold">transition actions</emphasis> (methods of the API). Once the MPISpmd object is created, the object enters in the initial state: <emphasis role="bold">ProActiveMPIConstants.MPI_UNSTARTED</emphasis>.
@@ -249,9 +250,9 @@ The graph above presents a kind of finite state machine or finite automaton, tha
 
 
 				<para>
-					<emphasis role="bold">Sample of code: </emphasis> 
-These few lines show how to execute an MPI job and get its return value once finished. 
-
+					<emphasis role="bold">Sample of code (available in the release) </emphasis> 
+These few lines show how to execute the MPI executive <emphasis role="bold">jacobi</emphasis> and to get its return value once finished.
+No modification have to be made to the source code. 
 				</para>
 
 				<programlisting language="java">
@@ -261,35 +262,35 @@ These few lines show how to execute an MPI job and get its return value once fin
 // load the file desciptor 
 ProActiveDescriptor pad = ProActive.getProactiveDescriptor('file:descriptor.xml');
 
-// get the Virtual Node which references the MPI code you want to execute
-VirtualNode vnCpi = pad.getVirtualNode('CPI');
+// get the Virtual Node which references the jacobi MPI code you want to execute
+VirtualNode jacobiVN = pad.getVirtualNode('JACOBIVN');
 
 // activate Virtual Node (it's not mandatory because the MPI.newMPISpmd method does
 // it automatically if it has not been already done)
-vnCpi.activate();
+jacobiVN.activate();
 
 // create the MPISpmd object with the Virtual Node
-<emphasis role="bold">MPISpmd</emphasis> mySpmd = <emphasis role="bold">MPI.newMPISpmd(vnCpi);</emphasis>
+<emphasis role="bold">MPISpmd</emphasis> jacobiSpmd = <emphasis role="bold">MPI.newMPISpmd(jacobiVN);</emphasis>
 
-// trigger MPI code execution and get future on MPIResult
-<emphasis role="bold">MPIResult</emphasis> myResult = mySpmd.<emphasis role="bold">startMPI();</emphasis>
+// trigger jacobi mpi code execution and get future on MPIResult
+<emphasis role="bold">MPIResult</emphasis> jacobiResult = jacobiSpmd.<emphasis role="bold">startMPI();</emphasis>
 
 // print current status
-logger.info("Current status: "+mySpmd.<emphasis role="bold">getStatus()</emphasis>);
+logger.info("Current status: "+jacobiSpmd.<emphasis role="bold">getStatus()</emphasis>);
 
 
-// get return value (block the thread until the myResult is available)
-logger.info("Return value: "+myResult.<emphasis role="bold">getReturnValue()</emphasis>);
+// get return value (block the thread until the jacobiResult is available)
+logger.info("Return value: "+jacobiResult.<emphasis role="bold">getReturnValue()</emphasis>);
 
 // print the MPISpmd object caracteristics (name, current status, processes number ...)
-logger.info(<emphasis role="bold">mySpmd</emphasis>);
+logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 
 ...
 	</programlisting>
-			</sect3>
+
 		</sect2>
 
-		<sect2>
+		<sect2 id="Using_the_MPI_Infrastructure">
 			<!-- ///// Using the Infrastructure \\\\ -->
 			<title>
 			Using the Infrastructure</title>
@@ -303,20 +304,20 @@ logger.info(<emphasis role="bold">mySpmd</emphasis>);
 					<para>
 						<emphasis role="bold">File Transfer: </emphasis> specify all the files which
  have to be transferred on the remote host like <emphasis role="bold">binary code</emphasis> and <emphasis role="bold">input data</emphasis>. 
-In the following example, "cpi" is the binary of the MPI program.
+In the following example, <emphasis role="bold">jacobi</emphasis> is the binary of the MPI program.
 For further details about File Transfer see <xref linkend="FileTransfer_html_intro" />.
 				</para>
 					<screen>&lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
-    &lt;virtualNode name="CPI" /&gt;
+    &lt;virtualNode name="<emphasis role="bold">JACOBIVN</emphasis>" /&gt;
    &lt;/virtualNodesDefinition&gt;
   &lt;/componentDefinition&gt;
   &lt;deployment&gt;
    ...
   &lt;/deployment&gt;
   &lt;fileTransferDefinitions&gt;
-   &lt;fileTransfer id="<emphasis role="bold">mpiCodeTransfer</emphasis>"&gt;
-    &lt;file src="cpi" dest="cpi" /&gt;
+   &lt;fileTransfer id="<emphasis role="bold">jacobiCodeTransfer</emphasis>"&gt;
+    &lt;file src="jacobi" dest="jacobi" /&gt;
    &lt;/fileTransfer&gt;
   &lt;/fileTransferDefinitions&gt;
 </screen>
@@ -339,8 +340,8 @@ first define the process used to join the remote host on which resources will be
 								<screen>&lt;processDefinition id="sshProcess"&gt;
    &lt;sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="nef.inria.fr"
 		 username="user"&gt;
-    &lt;processReference refid="<emphasis role="bold">dependentProcessCPI</emphasis>"  /&gt;
-	&lt;fileTransferDeploy refid="<emphasis role="bold">mpiCodeTransfer</emphasis>"&gt;
+    &lt;processReference refid="<emphasis role="bold">jacobiDependentProcess</emphasis>"  /&gt;
+	&lt;fileTransferDeploy refid="<emphasis role="bold">jacobiCodeTransfer</emphasis>"&gt;
 	  &lt;copyProtocol&gt;scp&lt;/copyProtocol&gt;
 	   &lt;sourceInfo prefix=<emphasis role="bold">"/user/user/home/ProActive/src/org/objectweb/proactive/examples/mpi"</emphasis> /&gt;
 	   &lt;destinationInfo prefix=<emphasis role="bold">"/home/user/MyApp"</emphasis> /&gt;
@@ -358,10 +359,10 @@ be imperatively a <emphasis role="bold">DependentProcess</emphasis>, that is to 
 The following lines express that the mpiProcess is dependent on the resources allocated by the pbsProcess.
 				</para>
 								<screen>
-&lt;processDefinition id=<emphasis role="bold">"dependentProcessCPI"</emphasis>&gt;
+&lt;processDefinition id=<emphasis role="bold">"jacobiDependentProcess"</emphasis>&gt;
    &lt;<emphasis role="bold">dependentProcessSequence</emphasis> class='<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcess</emphasis>"&gt;
-	&lt;processReference refid=<emphasis role="bold">"pbsProcess"</emphasis> /&gt;
-	&lt;processReference refid=<emphasis role="bold">"mpiProcess"</emphasis> /&gt;
+	&lt;processReference refid=<emphasis role="bold">"jacobiPBSProcess"</emphasis> /&gt;
+	&lt;processReference refid=<emphasis role="bold">"jacobiMPIProcess"</emphasis> /&gt;
    &lt;<emphasis role="bold">/dependentProcessSequence</emphasis>&gt;
   &lt;/processDefinition&gt;
 </screen>
@@ -372,7 +373,7 @@ The following lines express that the mpiProcess is dependent on the resources al
  note that you can use any services defined in ProActive to allocate resources instead of the PBS one.
 				</para>
 								<screen>
-&lt;processDefinition id=<emphasis role="bold">"pbsProcess"</emphasis>&gt;
+&lt;processDefinition id=<emphasis role="bold">"jacobiPBSProcess"</emphasis>&gt;
   &lt;pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess"&gt;
 	&lt;processReference refid="jvmProcess" /&gt;
 	&lt;commandPath value="/opt/torque/bin/qsub" /&gt;
@@ -401,8 +402,8 @@ In the case of remote application, if the remote path field is not set, the host
 and MPI process will raise an error.
 
 				</para>
-					<screen>&lt;processDefinition id=<emphasis role="bold">"mpiProcess"</emphasis>&gt;
- &lt;<emphasis role="bold">mpiProcess</emphasis> class="<emphasis role="bold">org.objectweb.proactive.core.process.mpi.MPIDependentProcess</emphasis>" mpiFileName="cpi"
+					<screen>&lt;processDefinition id=<emphasis role="bold">"jacobiMPIProcess"</emphasis>&gt;
+ &lt;<emphasis role="bold">mpiProcess</emphasis> class="<emphasis role="bold">org.objectweb.proactive.core.process.mpi.MPIDependentProcess</emphasis>" mpiFileName="<emphasis role="bold">jacobi</emphasis>"
 	mpiCommandOptions="input_file.dat output_file.dat"&gt;
   &lt;commandPath value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun" /&gt;
   &lt;mpiOptions&gt;
@@ -425,7 +426,7 @@ and MPI process will raise an error.
 			<title>
 			Example with several codes</title>
 
-Let's assume we want to interconnect together several modules (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are each one a parallel MPI code. 
+Let's assume we want to interconnect together several modules (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are each one a parallel MPI binary code. 
 	
 	<programlisting language="java">
 import org.objectweb.proactive.ProActive;
