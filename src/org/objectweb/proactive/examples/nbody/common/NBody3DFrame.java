@@ -211,7 +211,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
     private LocalBody[] bodies;
     private String[] bodyname;
     private ArrayList names;
-    private  JComboBox protocol;
+    private JComboBox protocol;
     private JComboBox listVMs;
 
     //
@@ -300,8 +300,8 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
                     public void actionPerformed(ActionEvent evt) {
                         try {
                             Runtime.getRuntime()
-                                   .exec("" +protocol.getSelectedItem() +
-                                " " + listVMs.getSelectedItem() +
+                                   .exec("" + protocol.getSelectedItem() + " " +
+                                listVMs.getSelectedItem() +
                                 " killall -KILL java");
                         } catch (IOException e1) {
                             e1.printStackTrace();
@@ -397,7 +397,9 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
         if (!names.contains(hostName)) {
             this.names.remove(identification);
             this.names.add(identification, hostName);
-            this.listVMs.addItem(hostName);
+            if (this.listVMs != null) {
+                this.listVMs.addItem(hostName);
+            }
         }
     }
 
