@@ -44,6 +44,8 @@
 <!ENTITY guidedComp SYSTEM "guided_tour/to_components.xml">
 <!ENTITY conclusion SYSTEM "guided_tour/conclusion.xml">
 <!ENTITY writeDoc SYSTEM "writeProActiveDocumentation.xml">
+<!ENTITY writeDoc SYSTEM "developingConventions.xml">
+<!ENTITY testSuiteAPI SYSTEM "testSuiteAPI.xml">
 <!ENTITY DescriptorProcess SYSTEM "development/DescriptorProcess.xml">
 <!ENTITY devFileTransfer SYSTEM "development/AddingAFileTransferProtocol.xml">
 <!ENTITY devFaultTolerance SYSTEM "development/AddingAFaultToleranceProtocol.xml">
@@ -126,6 +128,8 @@
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
     &writeDoc;
+    &developingConventions;
+    &testSuiteAPI;
     &DescriptorProcess;
     &devFileTransfer;
     &devFaultTolerance;
@@ -139,6 +143,6 @@
     &srcCodeAppendix; 
     &biblio;
     <index id="keywordIndex"/>
-   </part> 
+   </part>
 
  </book>

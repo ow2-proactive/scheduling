@@ -1,0 +1,2083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="testSuiteAPI">
+  <title>ProActive Test Suite API</title>
+
+  <para>This tour is a practical introduction to create, run and manage tests
+  or benchmarks.</para>
+
+  <para>First you will get an API's description with its features.</para>
+
+  <para>Second, you will be guided through some examples of tests and
+  benchmarks.</para>
+
+  <sect1 id="structure">
+    <title>Structure of the API</title>
+
+    <sect2 >
+      <title>Goals of the API</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>Benchmarks on ProActive</para>
+        </listitem>
+
+        <listitem>
+          <para>Functional Tests framework</para>
+        </listitem>
+
+        <listitem>
+          <para>Interlinked Tests</para>
+        </listitem>
+
+        <listitem>
+          <para>Automatic results generation</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2 >
+      <title>Functional Tests &amp; Benchmarks</title>
+
+      <sect3 >
+        <title>Test definition</title>
+
+        <para>A Test runs successfully of:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>Its <emphasis role="bold">Pre-Conditions</emphasis> are
+            verified</para>
+          </listitem>
+
+          <listitem>
+            <para>Its <emphasis role="bold">action</emphasis> method runs with
+            no Java Exception</para>
+          </listitem>
+
+          <listitem>
+            <para>Its <emphasis role="bold">Post-Conditions</emphasis> are
+            also verified</para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+
+      <sect3 >
+        <title>Benchmark definition</title>
+
+        <para>Benchmark is a Test, its result is a time.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Interlinked Functional Tests</title>
+
+        <para>First, we specify parents Tests.</para>
+
+        <para>To do this, just overload Action method with needed inputs and
+        outputs, after, with the Java reflection mechanism we found the first
+        good Action method to execute the Test.</para>
+
+       <para><emphasis>Mechanism in details</emphasis></para>
+
+          <para>In standalone mode the test runs with this method:</para>
+
+          <screen> void action() throws Exception;  </screen>
+
+          <para>In interlinked mode, the developer must to add a similar
+          method in his code Test:</para>
+
+          <screen>  A action(B toto, C tutu, …) throws Exception; </screen>
+
+          <para>Where <emphasis>toto</emphasis> is the result output of the
+          first parent of this test and <emphasis>tutu</emphasis> the result
+          output of second parent, … <emphasis>A</emphasis> is the type of
+          result output of this Test.</para>
+
+         <para><emphasis>Reflection code</emphasis></para>
+
+            <para>Find the first action method:</para>
+
+            <programlisting lang="java"> Method[] methods = getClass().getMethods();
+            Method actionWithParams = null;
+            for (int i = 0; i &lt; methods.length; i++) {
+                if ((methods[i].getName().compareTo('action') == 0) &amp;&amp;
+                        (methods[i].getReturnType().getName().compareTo('void') != 0)) {
+                    actionWithParams = methods[i];
+                    break;
+                }
+            }</programlisting>
+
+            <para>Array of params type:</para>
+
+            <programlisting lang="java">            if (actionWithParams != null) {
+                Object[] args = null;
+                if (tests != null) {
+                    args = new Object[tests.length];
+                    for (int i = 0; i &lt; tests.length; i++)
+                        args[i] = tests[i].getOut();
+                } else {
+                    args = new Object[1];
+                    args[0] = null;
+                }</programlisting>
+
+            <para>Call the method:</para>
+
+            <screen> out = actionWithParams.invoke(this, args); </screen>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Group</title>
+
+      <para>What is a Group of Tests?</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Collection of Tests</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>What is the role of a Group?</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Initialise and cleanup all Tests</para>
+        </listitem>
+
+        <listitem>
+          <para>Collect Results</para>
+        </listitem>
+
+        <listitem>
+          <para>Add, remove, … Tests like a Java Collection</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2 >
+      <title>Manager</title>
+
+      <para>What is a Manager in Testsuite API?</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Collection of Groups</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>What is the role of a Manager?</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Initialise and launch all Tests</para>
+        </listitem>
+
+        <listitem>
+          <para>Collect and format Results</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>We have different types of Manager to better manage of specialised
+      Tests or Benchmarks:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>BenchmarkManager</para>
+        </listitem>
+
+        <listitem>
+          <para>ProActiveBenchManager</para>
+        </listitem>
+
+        <listitem>
+          <para>FunctionalTestManager</para>
+        </listitem>
+
+        <listitem>
+          <para>ProActiveFuncTestManager</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+  </sect1>
+
+  <sect1 id="timer">
+    <title>Timer for the Benchmarks</title>
+
+    <para>In this API, it is the benchmark programmer who make the measure, he
+    can simply use: <literal>System.currentTimeMillis()</literal> of Java.
+    This method is in the wrong !</para>
+
+    <para>If you want to change the method to make measure you must to modify
+    the code of all your Benchmarks.</para>
+
+    <sect2 >
+      <title>The solution</title>
+
+      <para>To solve this problem, we have chosen an interface:
+      <literal>Timeable</literal></para>
+
+      <programlisting lang="java">package testsuite.timer;
+public interface Timeable {
+    // Start the timer
+    public void start();
+    // Stop the timer
+    public void stop();
+    // Get the total time, measured
+    public long getCumulatedTime();
+    // To print the time unit
+    public String getUnit();
+}</programlisting>
+
+      <para>By default the API provides two timer which of implement this
+      interface:</para>
+
+      <para>To make measure in milliseconds:
+      <emphasis>testsuite.timer.ms.MsTimer</emphasis></para>
+
+      <para>To make measure in microseconds:
+      <emphasis>testsuite.timer.micro.MicroTimer</emphasis></para>
+
+      <para>By implementing the interface you can easily create new timer for
+      more performents for you needs.</para>
+    </sect2>
+
+    <sect2 >
+      <title>How to use Timer in Benchmarck?</title>
+
+      <para>Use <emphasis role="bold">this.timer</emphasis> like this:</para>
+
+      <programlisting lang="java">public long action() throws Exception {
+        String className = ReifiableObject.class.getName();
+        Node node = getNode();
+        this.timer.start();
+        object = (ReifiableObject) ProActive.newActive(className, null, node);
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
+    }</programlisting>
+    </sect2>
+
+    <sect2 >
+      <title>How to configure the Manager with your Timer?</title>
+
+      <para>By a prop file or a XML file:</para>
+
+      <screen>        &lt;prop key="Timer" value="testsuite.timer.micro.MicroTimer"/&gt;
+        Timer=testsuite.timer.micro.MicroTimer</screen>
+
+      <para>Or by the code:</para>
+
+      <screen>yourManager.setTimer('class.name.YourTimer');</screen>
+    </sect2>
+  </sect1>
+
+  <sect1 id="format">
+    <title>Results</title>
+
+    <para>This section describes, how to format the Results of the
+    tests.</para>
+
+    <sect2 >
+      <title>What is a Result?</title>
+
+      <para>In this API, the result concept is two things:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>A real result: the test successes or fails, the benchmark runs
+          in 2.0ms</para>
+        </listitem>
+
+        <listitem>
+          <para>Like a logger to log error, message, ...</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2 >
+      <title>What we don't use a real logger API?</title>
+
+      <para>The problem with a real logger (like log4J) is we don't have the
+      notion of results.</para>
+
+      <para>In the TestSuite APi we decide to split logs of the program and
+      results.</para>
+    </sect2>
+
+    <sect2 >
+      <title>Structure of Results classes in TestSuite</title>
+
+      <para>There is a super-class abstract: <emphasis
+      role="bold">AbstractResult</emphasis> where there is the bare essentials
+      to specify a Result:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>The type of the result, in order of increase
+          importance:</para>
+        </listitem>
+
+        <listitem>
+          <para><itemizedlist>
+              <listitem>
+                <para><emphasis role="bold">INFO</emphasis>: an information
+                message to debug</para>
+              </listitem>
+
+              <listitem>
+                <para><emphasis role="bold">MSG</emphasis>: a message to
+                debbug</para>
+              </listitem>
+
+              <listitem>
+                <para><emphasis role="bold">RESULT</emphasis>: a none
+                important result, typically a middle result</para>
+              </listitem>
+
+              <listitem>
+                <para><emphasis role="bold">IMP_MSG</emphasis>: an important
+                message</para>
+              </listitem>
+
+              <listitem>
+                <para><emphasis role="bold">GLOBAL_RESULT</emphasis>: an
+                important result, typically a group result</para>
+              </listitem>
+
+              <listitem>
+                <para><emphasis role="bold">ERROR</emphasis>: typically an
+                error in out Test method, for example: can't init a
+                group</para>
+              </listitem>
+            </itemizedlist></para>
+        </listitem>
+
+        <listitem>
+          <para>A message to describe the result</para>
+        </listitem>
+
+        <listitem>
+          <para>An exception to show the stack trace of an error</para>
+        </listitem>
+
+        <listitem>
+          <para>Time of creation of the result</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>There are two classes which implements this abstract class:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">AbstractResult</emphasis> is only
+          abstract to make generic formating, so <emphasis
+          role="bold">TestResult</emphasis> can print itself like a Java
+          String and a XML node.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">BenchmarkResult</emphasis> add a time
+          result to print.</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2 >
+      <title>How to export results</title>
+
+      <para>In TestSuite API, the results are stocked in <emphasis
+      role="bold">ResultsCollection</emphasis>, there are two classes who
+      contains a ResultCollection:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Manager</para>
+        </listitem>
+
+        <listitem>
+          <para>Group</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>These classes implements the <emphasis
+      role="bold">ResultsExporter</emphasis> interface. After the execution of
+      your Manager you can choose where and how to print results:</para>
+
+      <screen> yourManager.toXXX();  </screen>
+
+      <para>Where toXXX() is:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis role="bold">String toString()</emphasis>: return all
+          results, if <literal>yourManager.setVerbatim(true)</literal>, as a
+          String else only results who the level &gt;= IMP_MSG</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">void toPrintWriter(PrintWriter
+          out)</emphasis>: return all results, if
+          <literal>yourManager.setVerbatim(true)</literal>, in out else only
+          results who the level &gt;= IMP_MSG</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">void toOutPutStream(OutputStream
+          out)</emphasis>: return all results, if
+          <literal>yourManager.setVerbatim(true)</literal>, in out else only
+          results who the level &gt;= IM_MSG</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">Document toXML()</emphasis>: return all
+          results, in a DOM tree, it is useful to transform, to format, to
+          operate, ... results like you want.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">void toHTML(File location)</emphasis>:
+          return all results, in location file like an HTML document. To do
+          this the API export the results in a DOM tree, with the precedent
+          method, and transform the XML with XSLT into a HTML file.</para>
+        </listitem>
+      </itemizedlist>
+
+      <sect3 >
+        <title>About the Manager Verbatim option</title>
+
+        <para>In Manager you can modify this by:</para>
+
+        <screen>yourManager.setVerbatim(true/false)  </screen>
+
+        <para>If Verbatim value is:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><emphasis role="bold">true</emphasis>: All results types
+            could be show.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">false</emphasis>: Only results with a
+            level &gt;= IMP_MSG could be show. In concrete terms, on your
+            output you have only the messages from the Manager, final result
+            of group and th errors.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>By default Verbatim is at <emphasis
+        role="bold">false</emphasis></para>
+
+        <para>This option has no effect on XML and HTML exports.</para>
+
+        <para>To see the value of Verbatim:</para>
+
+        <screen>  yourManager.isVerbatim() </screen>
+      </sect3>
+
+      <sect3 >
+        <title>By the file configurator</title>
+
+        <para>See the <ulink url="descriptor.xml">configuration file
+        part</ulink> for more details to configure results output by the file
+        descriptor.</para>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Format Results like you want</title>
+
+      <para>If you export your results in a XML DOM tree, with
+      <literal>toXML()</literal> method, you can use XSLT to create new
+      formats.</para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="logs">
+    <title>Logs</title>
+
+    <para>TestSuite API offers to tests developers a log system, to tace or
+    debug their tests.</para>
+
+    <sect2 >
+      <title>Which logger?</title>
+
+      <para>As in ProActive API we choose <ulink
+      url="http://jakarta.apache.org/log4j/">Jakarta Log4J</ulink> like
+      logger.</para>
+    </sect2>
+
+    <sect2 >
+      <title>How it works in TestSuite API?</title>
+
+      <para>A static logger is create in Manager, all Groups and Tests who are
+      added in the Manager have a reference to this logger.</para>
+
+      <para>By default all logs are written in a simple text file: <emphasis
+      role="bold">$HOME/tests.log</emphasis></para>
+
+      <para>With this file, it very easy to debug your test. You can also,
+      with Log4J, specify a different place and different format for your
+      logs. For more details see the next part.</para>
+    </sect2>
+
+    <sect2 >
+      <title>How to use it?</title>
+
+      <sect3 >
+        <title>Log your code</title>
+
+        <para>To add logs in your Test code it is very easy: you can directly
+        use the variable <emphasis role="bold">logger</emphasis> or the getter
+        <emphasis role="bold">getLogger()</emphasis>. This is a <emphasis
+        role="bold">org.apache.log4j.Logger</emphasis></para>
+
+
+          <para>In your Test code just add logs like this:</para>
+
+          <programlisting lang="java">if (logger.isDebugEnabled())
+     logger.debug('A debug message ...');</programlisting>
+
+          <para>For more information about use logger see the <ulink
+          url="http://jakarta.apache.org/log4j/docs/manual.html">log4J
+          manual</ulink>.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Configure the logger</title>
+
+        <para>By default all logs with a level higher than INFO are written in
+        <emphasis role="bold">$HOME/tests.log</emphasis>.</para>
+
+        <para>But you can configure the format and plac where you want to get
+        logs.</para>
+
+        <para>The log4j environment is fully configurable programmatically.
+        However, it is far more flexible to configure log4j using
+        configuration files. Currently, configuration files can be written in
+        XML or in Java properties (key=value) format.</para>
+
+        <para>You can also configure the logger by the <ulink
+        url="descriptor.xml">configuration file</ulink>.</para>
+
+        <para>Use default configuration of log4J. Add this code Manager
+          constructor:</para>
+
+         <programlisting lang="java">// Set up a simple configuration that logs on the console.
+ BasicConfigurator.configure();</programlisting>
+
+          <para>An another example to write logs in an HTML file:</para>
+
+          <programlisting lang="java">  public YourManager() {
+        super('Function calls', 'Alpha version');
+        HTMLLayout layout = new HTMLLayout();
+        WriterAppender appender = null;
+        try {
+            FileOutputStream output = new FileOutputStream(
+                    '/net/home/adicosta/output2.html');
+            appender = new WriterAppender(layout, output);
+        } catch (Exception e) {
+        }
+        logger.addAppender(appender);
+        logger.setLevel(Level.DEBUG);
+    }</programlisting>
+
+          <para>For more information about logger configuration see the <ulink
+          url="http://jakarta.apache.org/log4j/docs/manual.html">log4J
+          manual</ulink>.</para>
+      </sect3>
+    </sect2>
+  </sect1>
+
+  <sect1 id="descriptor">
+    <title>Configuration File</title>
+
+    <sect2 >
+      <title>How many configuration files you need?</title>
+
+      <itemizedlist>
+        <listitem>
+          <para>You can have just no file.</para>
+        </listitem>
+
+        <listitem>
+          <para>One file to configure the Manager.</para>
+        </listitem>
+
+        <listitem>
+          <para><emphasis role="bold">One file for the Manager and all its
+          Tests (recommended).</emphasis></para>
+        </listitem>
+
+        <listitem>
+          <para>One file for the Manager and one file for each Tests.</para>
+        </listitem>
+
+        <listitem>
+          <para>No file for the Manager and one file for each Tests.</para>
+        </listitem>
+      </itemizedlist>
+    </sect2>
+
+    <sect2 >
+      <title>A simple Java Properties file</title>
+
+      <para>With this file you can configure Manager's properties and Tests
+      properties. You can have just one file for the Manager and all Tests or
+      just one for the Manager and one file for each Tests.</para>
+
+      <para>By default the name of this file is the class name of the Manager
+      or the Test which it is associated with <emphasis>.prop</emphasis> as
+      file extention. For example:</para>
+
+      <para><emphasis>ManagerToto.class &lt;-&gt;
+      ManagerToto.prop</emphasis></para>
+
+      <sect3 >
+        <title>How to use it?</title>
+
+        <para>It is very simple to use it. Just do like this example:</para>
+
+        <para>You have a private variable in your Manager or Test:</para>
+
+        <screen> private int packetSize = 1024;</screen>
+
+        <para>First add a setter of which it take a <emphasis
+        role="bold">String</emphasis> in input:</para>
+
+        <programlisting lang="java">     public void setPacketSize(String value){
+          this.packetSize = Integer.parseInt(value);
+        }</programlisting>
+
+        <para>Next, int the prop file:</para>
+
+        <screen> PacketSize=2048 </screen>
+
+        <para><emphasis role="bold">Warning:</emphasis> the key in the prop
+        file must be the same of the setter name without the prefix
+        set.</para>
+
+        <para>Now, to load the prop file:</para>
+
+        <screen>        // Level: Manager
+        // At the execution load properties
+        manager.execute(yes);
+        // To load properties from differents  types of sources
+        manager.loadAttributes();
+        manager.loadAttributes(java.io.File propFile);
+        manager.loadAttributes(java.util.Properties javaProp);
+        // Level: Test
+        
+        // To load properties from differents  types of sources
+        test.loadAttributes();
+        test.loadAttributes(java.io.File propFile);
+        test.loadAttributes(java.util.Properties javaProp);</screen>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>A XML properties file</title>
+
+      <para>To configure all from just one file.</para>
+
+      <para>Like a simple prop file this one must be have the same name of the
+      Manager class:</para>
+
+      <screen> YourManager &lt;-&gt; YourManager.xml </screen>
+
+      <sect3 >
+        <title>The structure of the XML document</title>
+
+        <programlisting lang="xml">&lt;Manager&gt;
+  &lt;name&gt;A Manager &lt;/name&gt;
+  &lt;description&gt;Try XML descriptor file. &lt;/description&gt;
+  &lt;!-- by default nbRuns is 1, but for benchmarks you can change it --&gt;
+  &lt;nbRuns&gt;100 &lt;/nbRuns&gt;
+&lt;/Manager&gt;</programlisting>
+      </sect3>
+
+      <sect3 >
+        <title>Add a simple group of tests</title>
+
+        <programlisting lang="xml">&lt;simpleGroup name="A simple Group" description="just for test."&gt;
+      &lt;unitTest class="test.objectcreation.TestNewActive"/&gt;
+      &lt;unitTest class="test.groupmigration.TestGroupCreation"/&gt;
+      &lt;unitTest class="test.groupmigration.TestGroupCreation"/&gt;
+      &lt;unitTest class="test.objectcreation.TestNewActive"/&gt;
+ &lt;/simpleGroup&gt;</programlisting>
+
+        <para>You have created a group with 4 tests.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Add a group from a Java package</title>
+
+        <screen>&lt;packageGroup name="A Package Group" 
+              description="Construct Group from package." 
+              dir="/net/home/adicosta/workspace/ProActive/classes" 
+              packageName="nonregressiontest" &gt;
+&lt;/packageGroup&gt;</screen>
+
+        <para>You have created a group with all Tests was found in the package
+        <emphasis>nonregressiontest</emphasis></para>
+
+        <para>With this method you don't have any order on Tests, but you can
+        specify some order:</para>
+
+        <programlisting lang="xml">&lt;packageGroup name="A Package Group" description="Construct Group from  package." 
+                dir="/net/home/adicosta/workspace/ProActive/classes" 
+                packageName="nonregressiontest" &gt;
+     &lt;unitTest class="nonregressiontest.runtime.defaultruntime.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.node.nodefactory.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.stub.stubgeneration.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.stub.stubinterface.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.activeobject.creation.local.newactive.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.activeobject.creation.local.turnactive.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.activeobject.creation.remote.newactive.Test" /&gt;
+     &lt;unitTest class="nonregressiontest.activeobject.creation.remote.turnactive.Test" /&gt;
+&lt;/packageGroup&gt;</programlisting>
+
+        <para>All classes in package nonregressiontest are added, only the
+        specified tests are sorted.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Add a group of InterLinked Tests</title>
+
+        <programlisting lang="xml">&lt;interLinkedGroup name="Group with interlinked tests" description="Construct a Group with interlinked tests"&gt;
+         &lt;!-- Declare the tests in the execution order --&gt;
+ &lt;idTest class="test.groupmigration.TestGroupCreation" id="1"/&gt;
+ &lt;idTest class="test.groupmigration.TestGroupMigration" id="2"/&gt;
+ &lt;idTest class="test.groupmigration.TestGroupMessage" id="3"/&gt;
+         &lt;interLinks&gt;
+                 &lt;link id="3"&gt;
+                   &lt;parent id="1"/&gt;
+                   &lt;parent id="2"/&gt;
+                 &lt;/link&gt;
+           &lt;/interLinks&gt;
+ &lt;/interLinkedGroup&gt;</programlisting>
+
+        <para>TestGroupMessage depends from TestGroupCreation and
+        TestGroupMigration.</para>
+      </sect3>
+
+      <sect3 >
+        <title>How to configure log4j</title>
+
+        <programlisting lang="xml">&lt;log4j&gt;
+  /net/home/adicosta/log4j/config/file/path/log4j-file-config
+&lt;/log4j&gt;</programlisting>
+      </sect3>
+
+      <sect3 >
+        <title>How to configure results output?</title>
+
+        <para>Results in a text file:</para>
+
+        <screen> &lt;result type="text" file="/net/home/adicosta/tmp/results.txt" /&gt; </screen>
+
+        <para>Results in a HTML file:</para>
+
+        <screen> &lt;result type="html" file="/net/home/adicosta/tmp/results.html" /&gt; </screen>
+
+        <para>Results in the console:</para>
+
+        <screen> &lt;result type="console" /&gt; </screen>
+
+        <para>Results in a XML file:</para>
+
+        <screen> &lt;result type="xml" file="/net/home/adicosta/tmp/results.xml"/&gt; </screen>
+
+        <para>To execute all with the XML file configuration:</para>
+
+        <screen>Manager manager = new Manager(java.io.File xmlConfigFile);
+manager.execute();</screen>
+      </sect3>
+
+      <sect3 >
+        <title>Configure properties</title>
+
+        <para>Like in simple prop file:</para>
+
+        <programlisting lang="xml">&lt;properties&gt;
+   &lt;prop key="RemoteHostname" value="nahuel"/&gt;
+&lt;/properties&gt;</programlisting>
+      </sect3>
+    </sect2>
+  </sect1>
+
+  <sect1 id="extends">
+    <title>Extends the API</title>
+
+    <para>Thanks to the structure of the API, with many <emphasis
+    role="bold">Interfaces</emphasis> and <emphasis
+    role="bold">Abstracts</emphasis> classes, you can easily extends the API
+    for you needs.</para>
+
+    <para>For more details about this, you can the class: ProActiveManager,
+    ProActiveFuncTest or ProActiveBenchmark which they are extends the
+    API.</para>
+
+    <para>The choice of XML to export results can to help you with XSLT to
+    export and format results for you needs.</para>
+
+    <para>The logger <emphasis role="bold">log4j</emphasis> is also
+    configurable like you want.</para>
+  </sect1>
+
+  <sect1 id="first_test">
+    <title>Your first Test</title>
+
+    <para>This section describes how to write simple test and execute
+    it.</para>
+
+    <sect2 >
+      <title>Description</title>
+
+      <para>For this example, we choose to test the object creation in
+      ProActive API with <emphasis role="bold">newActive()</emphasis> method.
+      This test aims to perform object creation on the same JVM, on an other
+      local JVM and on a remote JVM.</para>
+    </sect2>
+
+    <sect2 >
+      <title>First step: write the Test</title>
+
+      <para>Create a new class who extends <emphasis
+      role="bold">testsuite.test.ProActiveFunctionalTest</emphasis>, it is an
+      abstract class.</para>
+
+      <para>See this template code:</para>
+
+      <programlisting lang="java">import testsuite.test.ProActiveFunctionalTest;
+import org.objectweb.proactive.core.node.Node;
+public class TestNewActive extends ProActiveFunctionalTest {
+ public TestNewActive() {
+            super();
+            setName('newActive');
+               setDescription('Test object creation with newActive in a node.');
+   }
+       public TestNewActive(Node node, String name) {
+              super(node,name,
+                    'Test object creation with newActive in a node.');
+  }
+       public void initTest() throws Exception {
+       }
+       public void action() throws Exception {
+ }
+       public void endTest() throws Exception {
+        }
+}</programlisting>
+
+      <para>We also override two methods from the super-super class: <emphasis
+      role="bold">testsuite.test.FunctionalTest</emphasis>, to check if post
+      and pre-conditions are verified:</para>
+
+      <programlisting lang="java">  public boolean postConditions() throws Exception { }
+  public boolean preConditions() throws Exception { }</programlisting>
+
+      <sect3 >
+        <title>Implementing initTest() and endTest()</title>
+
+        <para>In this example both methods are empty, but they could be
+        overridden in order to initialize and finalyze the test.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Implementing preConditions()</title>
+
+        <para>We will simply verify if the node is created:</para>
+
+        <programlisting lang="java">    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }</programlisting>
+      </sect3>
+
+      <sect3 >
+        <title>Implementing action()</title>
+
+        <para>This method is the test, we will create an active object:</para>
+
+        <programlisting lang="java"> private ReifiableObject active = null;
+  public void action() throws Exception {
+        active = (ReifiableObject) ProActive.newActive(ReifiableObject.class.getName(),
+                null, getNode());
+    }</programlisting>
+
+        <para><emphasis role="bold">Remarks:</emphasis> The <emphasis
+        role="bold">ReifiableObject</emphasis> class is a simple class who
+        just extends <emphasis role="bold">java.lang.Object</emphasis>,
+        implements <emphasis role="bold">java.io.Serilizable</emphasis> and
+        has an empty constructor with no argument.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Implementing postConditions()</title>
+
+        <para>We will check if active is different of null and if the node
+        contains active:</para>
+
+        <programlisting lang="java"> public boolean postConditions() throws Exception {
+        Object[] activeObjects = getNode().getActiveObjects();
+        return (active != null) &amp;&amp; (activeObjects != null) &amp;&amp;
+        (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(active);
+    }</programlisting>
+      </sect3>
+
+      <sect3 >
+        <title>The complete code of the test</title>
+
+        <programlisting lang="java">import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+public class TestNewActive extends ProActiveFunctionalTest {
+    private ReifiableObject active = null;
+    public TestNewActive() {
+        super();
+        setName('newActive');
+        setDescription('Test object creation with newActive in a node.');
+    }
+    public TestNewActive(Node node, String name) {
+        super(node, name,
+            'Test object creation with newActive in a node.');
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    public void action() throws Exception {
+        active = (ReifiableObject) ProActive.newActive(ReifiableObject.class.getName(),
+                null, getNode());
+    }
+    public boolean postConditions() throws Exception {
+        Object[] activeObjects = getNode().getActiveObjects();
+        return (active != null) &amp;&amp; (activeObjects != null) &amp;&amp;
+        (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(active);
+    }
+    public void endTest() throws Exception {
+           // nothing to do
+    }
+}</programlisting>
+
+        <para><emphasis role="bold">Tips:</emphasis> if you want to make a
+        trace in your test or in all classes who extends a testsuite class,
+        you have access to a log4j logger by: <emphasis
+        role="bold">getLogger()</emphasis></para>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Second step: write a manager</title>
+
+      <para>Now, we will write a <emphasis role="bold">Manager</emphasis> to
+      execute our test.</para>
+
+      <para>For this example it is very simple, you have just to extends
+      <emphasis
+      role="bold">testsuite.manager.ProActiveFuncTestManager</emphasis>:</para>
+
+      <programlisting lang="java">import testsuite.manager.ProActiveFuncTestManager;
+public class ObjectCreationManager extends ProActiveFuncTestManager {
+  public ObjectCreationManager() {
+            super('Object Creation','Manage objects creation tests.');
+  }
+}</programlisting>
+
+      <sect3 >
+        <title>Override initManager()</title>
+
+        <para>Normaly, you have nothing to do to initialize the manager. In
+        this example, we choose to create tests and group in this method , but
+        you can do this in the same place where you create the manager.</para>
+
+        <para>Create group by the <emphasis
+        role="bold">initManager()</emphasis>:</para>
+
+        <programlisting lang="java">import testsuite.group.Group;
+public void initManager() throws Exception {
+        Group testGroup = new Group('Test Group', 'no description.');
+        // adding a test in same VM
+        testGroup.add(new TestNewActive(getSameVMNode(),'NewActive same VM'));
+        // adding a test in local VM
+        testGroup.add(new TestNewActive(getLocalVMNode(),'NewActive local VM'));
+        // adding a test in remote VM
+        testGroup.add(new TestNewActive(getRemoteVMNode(),'NewActive remote VM'));
+        // adding the group
+        add(testGroup);
+    }</programlisting>
+
+        <para>Create group in the <emphasis role="bold">same place</emphasis>
+        of the manager:</para>
+
+        <programlisting lang="java">ObjectCreationManager manager = new ObjectCreationManager();
+Group testGroup = new Group('Test Group', 'no description.');
+// adding a test in same VM
+testGroup.add(new TestNewActive(getSameVMNode(),'NewActive same VM'));
+// adding a test in local VM
+testGroup.add(new TestNewActive(getLocalVMNode(),'NewActive local VM'));
+// adding a test in remote VM
+testGroup.add(new TestNewActive(getRemoteVMNode(),'NewActive remote VM'));
+// adding the group
+manager.add(testGroup);</programlisting>
+
+        <para><emphasis role="bold">Warning:</emphasis> if you override
+        <emphasis role="bold">endManager()</emphasis> method in a <emphasis
+        role="bold">ProActiveManager</emphasis> you must to add in this
+        code:</para>
+
+        <screen> super.endManager() </screen>
+
+        <para>The reason is to delete the ProActive nodes create at the
+        beginning.</para>
+      </sect3>
+
+      <sect3 >
+        <title>The attribute file</title>
+
+        <para>Our manager is a <emphasis
+        role="bold">ProActiveManager</emphasis>, so an attibutes file is
+        mandatory.</para>
+
+        <para>Create a file <emphasis
+        role="bold">ObjectCreationManager.prop</emphasis> in the same
+        directory of the manager. This file must contains the name (or URL) of
+        the remote host, like this:</para>
+
+        <screen> RemoteHostname=owenii  </screen>
+
+        <para><emphasis role="bold">Warning:</emphasis> respect the upper an
+        lower cases.</para>
+
+        <para><emphasis role="bold">Tips:</emphasis> you can use this file to
+        specify attributes for your tests classes. You can also use a
+        different file, in this case you must specify its path in the
+        <literal>execute()</literal> method of the manager.</para>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Now launch the test ...</title>
+
+      <para>Add this code in your main method:</para>
+
+      <screen>ObjectCreationManager manager = new ObjectCreationManager();
+// the argument must have true value, because it is a ProActiveManager
+// and the attributes file is obligatory
+manager.execute(true);</screen>
+
+      <para><emphasis role="bold">Warning:</emphasis> when you use a
+      ProActiveManager you must had <emphasis
+      role="bold">System.exit(0)</emphasis> at the end of the <emphasis
+      role="bold">main</emphasis> method. If you don't do that, the manager
+      can't stop properly.</para>
+    </sect2>
+
+    <sect2 >
+      <title>Get the results</title>
+
+      <screen> System.out.println(manager.getResults()); </screen>
+
+      <para>If you want all details:</para>
+
+      <screen> manager.setVerbatim(true); </screen>
+
+      <para>You can also have the results in a HTML or XML file or in a
+      stream, for more details see the <ulink url="format.xml">results
+      section</ulink> for: testssuite.result.ResultsExporter</para>
+
+      <sect3 >
+        <title>An example of results for this test with verbatim
+        option</title>
+
+        <screen>8/22/03 13:48:10.450 [MESSAGE] Local hostname: amda.inria.fr
+8/22/03 13:48:10.450 [MESSAGE] Remote hostname: owenii
+8/22/03 13:48:10.452 [MESSAGE] Starting ...
+8/22/03 13:48:10.458 [MESSAGE] Init Manager with success
+8/22/03 13:48:10.749 [RESULT] NewActive same VM: Test run with success [SUCCESS]
+8/22/03 13:48:11.141 [RESULT] NewActive local VM: Test run with success [SUCCESS]
+8/22/03 13:48:12.195 [RESULT] NewActive remote VM: Test run with success [SUCCESS]
+8/22/03 13:48:12.195 [RESULT] Group: Test Group Runs: 3 Errors: 0 [SUCCESS]
+8/22/03 13:48:12.195 [MESSAGE] ... Finish</screen>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>All the code</title>
+
+      <para><emphasis> TestNewActive.java</emphasis></para>
+
+      <programlisting lang="java">import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+public class TestNewActive extends ProActiveFunctionalTest {
+    private ReifiableObject active = null;
+    public TestNewActive() {
+        super();
+        setName('newActive');
+        setDescription('Test object creation with newActive in a node.');
+    }
+    public TestNewActive(Node node, String name) {
+        super(node, name,
+            'Test object creation with newActive in a node.');
+    }
+    public void initTest() throws Exception {
+     // nothing to do
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    public void action() throws Exception {
+        active = (ReifiableObject) ProActive.newActive(ReifiableObject.class.getName(),
+                null, getNode());
+    }
+    public boolean postConditions() throws Exception {
+        Object[] activeObjects = getNode().getActiveObjects();
+        return (active != null) &amp;&amp; (activeObjects != null) &amp;&amp;
+        (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(active);
+    }
+    public void endTest() throws Exception {
+           // nothing to do
+    }
+}</programlisting>
+
+      <para><emphasis>ReaifiableObject.java</emphasis></para>
+
+      <screen>import java.io.Serializable;
+public class ReifiableObject implements Serializable {
+        public ReifiableObject() {
+  }
+}  </screen>
+
+      <para><emphasis> ObjectCreationManager.prop</emphasis></para>
+
+      <screen> RemoteHostname=owenii  </screen>
+
+      <para><emphasis role="bold">ObjectCreationManager.java</emphasis></para>
+
+      <programlisting lang="java">import testsuite.group.Group;
+import testsuite.manager.ProActiveFuncTestManager;
+public class ObjectCreationManager extends ProActiveFuncTestManager {
+    public ObjectCreationManager() {
+        super('Object Creation', 'Manage objects creation tests.');
+    }
+    public void initManager() throws Exception {
+        Group testGroup = new Group('Test Group', 'no description.');
+        // adding a test in same VM
+        testGroup.add(new TestNewActive(getSameVMNode(),'NewActive same VM'));
+        // adding a test in local VM
+        testGroup.add(new TestNewActive(getLocalVMNode(),'NewActive local VM'));
+        // adding a test in remote VM
+        testGroup.add(new TestNewActive(getRemoteVMNode(),'NewActive remote VM'));
+        // adding the group
+        add(testGroup);
+    }
+    public static void main(String[] args) {
+        ObjectCreationManager manager = new ObjectCreationManager();
+        // the argument must have true value, because it is a ProActiveManager
+        // and the attributes file is obligatory
+        manager.execute(true);
+          manager.setVerbatim(true);
+        System.out.println(manager.getResults());
+         // for exit, also ProActive don't stop the application
+        System.exit(0);
+        
+    }
+}</programlisting>
+    </sect2>
+  </sect1>
+
+  <sect1 id="first_bench">
+    <title>Your first Benchmark</title>
+
+    <para>This section describes how to write and execute a simple
+    Benchmark.</para>
+
+    <sect2 >
+      <title>Description</title>
+
+      <para>For this example, we choose to measure the time of an object
+      creation with <emphasis role="bold">ProActive.newActive()</emphasis>.
+      This benchmark aims to perform object creation on the same JVM, on an
+      other local JVM and on a remote JVM.</para>
+    </sect2>
+
+    <sect2 >
+      <title>First step: write the Benchmark</title>
+
+      <para>Create new class who extends <emphasis
+      role="bold">testsuite.test.ProActiveBenchmark</emphasis>, it is an
+      abstract class.</para>
+
+      <para>See this template code:</para>
+
+      <programlisting lang="java">import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveBenchmark;
+public class BenchNewActive extends ProActiveBenchmark {
+    public BenchNewActive() {
+        super(null, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
+    }
+    public BenchNewActive(Node node) {
+        super(node, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
+    }
+    public long action() throws Exception {
+    }
+    public void initTest() throws Exception {
+    }
+    public void endTest() throws Exception {
+    }
+}</programlisting>
+
+      <para>We also override two methods from the super-class: <emphasis
+      role="bold">testsuite.test.Benchmark</emphasis>, to check if post and
+      pre-conditions are verified:</para>
+
+      <screen>   public boolean postConditions() throws Exception { }
+   public boolean preConditions() throws Exception { }</screen>
+
+      <sect3 >
+        <title>Implementing initTest() and endTest()</title>
+
+        <para>In this exampple both methods are empty, but they could be
+        overridden in order to initialize and finalyze the benchmark.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Implementing preConditions()</title>
+
+        <para>We will simply verify if the node is created:</para>
+
+        <screen>   public boolean preConditions() throws Exception {
+     return getNode() != null;
+   }</screen>
+      </sect3>
+
+      <sect3 >
+        <title>Implementing action()</title>
+
+        <para>This method measures the time of a creation of an Object with
+        ProActive.newActive() on a specified node:</para>
+
+        <programlisting lang="java">    private ReifiableObject object = null;
+    public long action() throws Exception {
+        ReifiableObject object;
+        String className = ReifiableObject.class.getName();
+        Node node = getNode();
+        this.timer.start();
+        object = (ReifiableObject) ProActive.newActive(className, null, node);
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
+    }</programlisting>
+
+        <note>
+          <para>It is the benchmark's programmer who measure the time of the
+          action with a configurable timer, see the <ulink
+          url="timer.xml">timer part</ulink> for more details.</para>
+        </note>
+
+        <para>The <emphasis role="bold">ReifiableObject</emphasis> class is a
+        simple class who just extends <emphasis
+        role="bold">java.lang.Object</emphasis>, implements <emphasis
+        role="bold">java.io.Serilizable</emphasis> and has an empty
+        constructor with no argument.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Implementing postConditions()</title>
+
+        <para>We will check if object is different of null and if the node
+        contains object:</para>
+
+        <programlisting lang="java"> public boolean postConditions() throws Exception {
+     Object[] activeObjects = getNode().getActiveObjects();
+     return (object != null) &amp;&amp; (activeObjects != null) &amp;&amp;
+       (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(object);
+   }</programlisting>
+
+        <para><emphasis role="bold">Tips:</emphasis> if you want to make a
+        trace in your benchmark , you have access to a log4j logger by:
+        <emphasis role="bold">getLogger()</emphasis> or by the variable
+        <emphasis role="bold">logger</emphasis></para>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Second step: write a manager</title>
+
+      <para>Now, we will write a <emphasis role="bold">Manager</emphasis> to
+      execute ou test.</para>
+
+      <para>For this example it is very simple, you have just to extends
+      <emphasis
+      role="bold">testsuite.manager.ProActiveBenchManager</emphasis>:</para>
+
+      <programlisting lang="java">import testsuite.manager.ProActiveBenchManager;
+public class Manager extends ProActiveBenchManager {
+        public Manager() {
+          super('Manager','To manage ProActive Benchmarks.');
+        }
+}</programlisting>
+
+      <sect3 >
+        <title>Override initManager() and endManager()</title>
+
+        <para>Normaly, you have nothing to do to initialize the manager. In
+        this example, we choose to create benchmarks and group in this method
+        , but you can do this in the same place where you create the
+        manager.</para>
+
+        <para>Create group by <emphasis
+        role="bold">initManager()</emphasis>:</para>
+
+        <programlisting lang="java">import testsuite.group.Group;
+  public void initManager() throwsException {
+    Group benchGroup = new Group('Bnechmark Group','no description.');
+    // adding bench in same VM
+    benchGroup.add(new BenchNewActive(getSameVMNode()));
+    // adding bench in local VM
+    benchGroup.add(new BenchNewActive(getLocalVMNode()));
+    // adding bench in remote VM
+    benchGroup.add(new BenchNewActive(getRemoteVMNode()));
+    // adding the group
+    add(benchGroup);
+  }</programlisting>
+
+        <para>Create group int the <emphasis role="bold">same place</emphasis>
+        of the manager:</para>
+
+        <programlisting lang="java">  // ...
+  Manager manager  = new Manager();
+  Group  benchGroup = new Group('Bnechmark Group','no description.');
+  // adding bench in same VM
+  benchGroup.add(new BenchNewActive(getSameVMNode()));
+  // adding bench in local VM
+  benchGroup.add(new BenchNewActive(getLocalVMNode()));
+  // adding bench in remote VM
+  benchGroup.add(new BenchNewActive(getRemoteVMNode()));
+  manager.add(benchGroup);
+  // ...</programlisting>
+
+        <para><emphasis role="bold">Warning:</emphasis> if you override
+        <emphasis role="bold">endManager()</emphasis> method in a <emphasis
+        role="bold">ProActiveManager</emphasis> you must to add in this
+        code:</para>
+
+        <screen> super.endManager() </screen>
+
+        <para>The reason is to delete the ProActive nodes create at the
+        beginning.</para>
+      </sect3>
+
+      <sect3 >
+        <title>The attribute file</title>
+
+        <para>Our manager is a <emphasis
+        role="bold">ProActiveManager</emphasis>, so an attibutes file is
+        mandatory.</para>
+
+        <para>Create a file <emphasis role="bold">Manager.prop</emphasis> in
+        the same directory of the manager. This file must contains the name
+        (or URL) of the remote host, like this:</para>
+
+        <screen> RemoteHostname=owenii </screen>
+
+        <para><emphasis role="bold">Warning:</emphasis> respect the upper an
+        lower cases.</para>
+
+        <para><emphasis role="bold">Tips:</emphasis> you can use this file to
+        specify attributes for your tests classes. You can also use a
+        different file, in this case you must specify its path in the
+        <literal>execute()</literal> method of the manager.</para>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Now launch the benchmark ...</title>
+
+      <para>Add this code in your <literal>main</literal> method:</para>
+
+      <screen><literal>Manager manager = new Manager();
+// the argument must have true value, because it is a ProActiveManager
+// and the attributes file is obligatory
+manager.execute(true);</literal></screen>
+
+      <para><emphasis role="bold">Warning:</emphasis> when you use a <emphasis
+      role="bold">ProActiveManager</emphasis> you must to had <emphasis
+      role="bold">System.exit(0)</emphasis> at the end of the main method. If
+      don't do that, the manager can't properly.</para>
+
+      <sect3 >
+        <title>Get the results</title>
+
+        <para>Results in your console:</para>
+
+        <screen> System.out.println(manager); </screen>
+
+        <para>If you want all details:</para>
+
+        <screen> manager.setVerbatim(true); </screen>
+
+        <para>For benchmarks it is more interesting to export results in a
+        HTML file. Indeed, you have average, min, max, STDEV and charts to
+        help you to analyse all results</para>
+
+        <example>
+          <title>Example of HTML results</title>
+
+          <screen><emphasis  role="bold">Object Creation</emphasis>
+Object Creation with newActive and turnActive. 
+<emphasis  role="bold">Messages of Object Creation:</emphasis>
+9/18/2003 at 13:0:32.527 <emphasis role="bold">[RESULT]</emphasis> 
+Object Creation with newActive -- Same VM: no message <emphasis role="bold">[SUCCESS]</emphasis> <ulink
+              url="Bench.png">See the chart</ulink>
+Max=113ms Moy=24.0ms STDEV=24.64ms --&gt; <emphasis>Min</emphasis><emphasis
+              role="bold">1</emphasis><emphasis>ms</emphasis>
+9/18/2003 at 13:0:36.693 <emphasis role="bold">[RESULT]</emphasis>
+ Object Creation with turnActive -- Same VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink
+              url="Bench1.png">See the chart</ulink>
+ Max=98ms Moy=41.0ms STDEV=32.20ms --&gt; <emphasis>Min</emphasis><emphasis
+              role="bold">1</emphasis><emphasis>ms</emphasis>
+9/18/2003 at 13:0:43.425 <emphasis role="bold">[RESULT]</emphasis>
+ Object Creation with newActive -- Local VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink
+              url="Bench2.png">See the chart</ulink>
+ Max=376ms Moy=67.03ms STDEV=83.73ms --&gt; <emphasis>Min</emphasis><emphasis
+              role="bold">6</emphasis><emphasis>ms</emphasis>
+9/18/2003 at 13:0:50.434 <emphasis role="bold">[RESULT]</emphasis>
+ Object Creation with turnActive -- Local VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink
+              url="Bench3.png">See the chart</ulink>
+ Max=326ms Moy=69.82ms STDEV=86.15ms --&gt; <emphasis>Min</emphasis><emphasis
+              role="bold">6</emphasis><emphasis>ms</emphasis>
+9/18/2003 at 13:0:53.297 <emphasis role="bold">[RESULT]</emphasis>
+ Object Creation with newActive -- Remote VM: no message <emphasis role="bold">[SUCCESS]</emphasis><ulink
+              url="Bench4.png">See the chart</ulink>
+ Max=290ms Moy=28.03ms STDEV=50.79ms --&gt; <emphasis>Min</emphasis><emphasis
+              role="bold">5</emphasis><emphasis>ms</emphasis>
+9/18/2003 at 13:0:55.980 <emphasis role="bold">[RESULT]</emphasis>
+ Object Creation with turnActive -- Remote VM: no message <emphasis
+              role="bold">[SUCCESS]</emphasis><ulink url="Bench5.png">See the chart</ulink>
+ Max=250ms Moy=26.32ms STDEV=53.46ms --&gt; <emphasis>Min</emphasis><emphasis
+              role="bold">5</emphasis><emphasis>ms</emphasis>
+9/18/2003 at 13:0:55.982 <emphasis role="bold">[RESULT]</emphasis>:
+ Group: Object Creation, Moy in 42.7ms Runs: 600 Errors: 0
+ To see all results of this group in a <ulink url="Group1.png">BarChart</ulink>.</screen>
+        </example>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>All the Code</title>
+
+      <para><emphasis role="bold">BenchnewActive.java</emphasis></para>
+
+      <programlisting lang="java">import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveBenchmark;
+import util.ReifiableObject;
+public class BenchNewActive extends ProActiveBenchmark {
+    private ReifiableObject object = null;
+    public BenchNewActive() {
+        super(null, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
+    }
+    public BenchNewActive(Node node) {
+        super(node, 'Object Creation with newActive',
+            'Measure time to create an active object with newActive.');
+    }
+    public long action() throws Exception {
+        String className = ReifiableObject.class.getName();
+        Node node = getNode();
+        this.timer.start();
+        object = (ReifiableObject) ProActive.newActive(className, null, node);
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    
+    public boolean postConditions() throws Exception {
+        Object[] activeObjects = getNode().getActiveObjects();
+        return (object != null) &amp;&amp; (activeObjects != null) &amp;&amp;
+        (activeObjects.length == 1) &amp;&amp; activeObjects[0].equals(object);
+    }
+}</programlisting>
+
+      <para><emphasis role="bold">ReifiableObject.java</emphasis></para>
+
+      <programlisting lang="java">import java.io.Serializable;
+public class ReifiableObject implements Serializable {
+        public ReifiableObject() {
+        }
+}</programlisting>
+
+      <para><emphasis role="bold">Manager.prop</emphasis></para>
+
+      <screen> RemoteHostname=owenii </screen>
+
+      <para><emphasis role="bold">Manager.java</emphasis></para>
+
+      <programlisting lang="java">import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.HTMLLayout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.WriterAppender;
+import testsuite.group.Group;
+import testsuite.manager.ProActiveBenchManager;
+import java.io.File;
+public class Manager extends ProActiveBenchManager {
+    private Logger logger = Logger.getLogger(Test1.class);
+    public Manager() {
+        super('Manager','To manage ProActive Benchmarks.');
+        // Log in a HTML file
+        HTMLLayout layout = new HTMLLayout();
+        WriterAppender appender = null;
+        try {
+            FileOutputStream output = new FileOutputStream(
+                    '/net/home/adicosta/output2.html');
+            appender = new WriterAppender(layout, output);
+        } catch (Exception e) {
+        }
+        logger.addAppender(appender);
+        BasicConfigurator.configure();
+        logger.setLevel(Level.DEBUG);
+    }
+    public void initManager() throws Exception {
+        Group benchGroup = new Group('Bnechmark Group','no description.');
+        // adding bench in same VM
+        benchGroup.add(new BenchNewActive(getSameVMNode()));
+        // adding bench in local VM
+        benchGroup.add(new BenchNewActive(getLocalVMNode()));
+        // adding bench in remote VM
+        benchGroup.add(new BenchNewActive(getRemoteVMNode()));
+        // adding the group
+        add(benchGroup);
+    }
+    public static void main(String[] args) {
+        Manager manager = new Manager();
+        // To run all benchmarks 100 times
+        manager.setNbRuns(100);
+        // Execute all benchmarks
+        manager.execute(true);
+        //Write results in a HTML file
+        try {
+            File file = new File(System.getProperty('user.home') +
+                    File.separatorChar + 'results.html');
+            manager.toHTML(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.exit(0);
+    }
+}</programlisting>
+    </sect2>
+  </sect1>
+
+  <sect1 id="howto">
+    <title>How to create a Test Suite with interlinked Tests</title>
+
+    <para>In this part we will not explain how to write a simple test, for
+    this see <ulink url="first_test.xml">Your first Test</ulink>
+    section.</para>
+
+    <sect2 >
+      <title>Description of our Test</title>
+
+      <para>In first step, we will test a ProActive Group creation with 3
+      Agents, and after this creation we will test the Agents migration by a
+      group communication.</para>
+    </sect2>
+
+    <sect2 >
+      <title>Root Test: ProActive Group Creation</title>
+
+      <sect3 >
+        <title>A simply ProActiveTest</title>
+
+        <para>Create a new class who extends <emphasis
+        role="bold">testsuite.test.ProActiveFunctionalTest</emphasis>, it is
+        an abstract class.</para>
+
+        <para>See this template code:</para>
+
+        <programlisting lang="java">import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+import java.io.Serializable;
+public class TestGroupCreation extends ProActiveFunctionalTest
+    implements Serializable {
+    public TestGroupCreation() {
+        super(null, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    public TestGroupCreation(Node node) {
+        super(node, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    public void action() throws Exception {
+    }
+    public boolean postConditions() throws Exception {
+    }
+    public boolean preConditions() throws Exception {
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+}</programlisting>
+
+        <para>Next we will simply test in preconditions if the node exists
+        (different of null):</para>
+
+        <programlisting>   public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }</programlisting>
+
+        <para>Now we will implement the action method to create a ProActive
+        Group with 3 Agent (see the Agent code at the end of this sect1 -
+        <xref linkend="agent" />):</para>
+
+        <programlisting lang="java">import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+public class TestGroupCreation extends ProActiveFunctionalTest
+    implements Serializable {
+     private Agent group = null;
+ 
+    // ...
+  public void action() throws Exception {
+             createGroupAgent();
+ }
+   
+    private void createGroupAgent() throws Exception {
+          Object[][] params = {
+                       { 'Agent0' },
+                       { 'Agent1' },
+                       { 'Agent2' }
+                };
+          Node node = getNode();
+              Node[] nodes = { node };
+            group = (Agent) ProActiveGroup.newGroup(Agent.class.getName(), params,
+              nodes);
+     }
+       // ...
+}</programlisting>
+
+        <para><emphasis role="bold">Remarks:</emphasis> We use an external
+        method to create the group is for the simple reason of we use this
+        code after in another method.</para>
+
+        <para><emphasis role="bold">Remarks:</emphasis> We don't explain the
+        Agent code because it is a ProActive example.</para>
+
+        <para>For the postconditions we will test if the group containts 3
+        elements and they are in the good node:</para>
+
+        <programlisting lang="java">    public boolean postConditions() throws Exception {
+        if (group == null) {
+            return false;
+        } else {
+            Group agentGroup = ProActiveGroup.getGroup(group);
+            if (agentGroup.size() != 3) {
+                return false;
+            } else {
+                Agent agent0 = (Agent) agentGroup.get(0);
+                Agent agent1 = (Agent) agentGroup.get(1);
+                Agent agent2 = (Agent) agentGroup.get(2);
+                String nodeURL = getNode().getNodeInformation().getURL()
+                                     .toUpperCase();
+                return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent2.getNodeName().compareTo(nodeURL) == 0);
+            }
+        }
+    }</programlisting>
+
+        <para>This class is now readi for a standalone use.</para>
+      </sect3>
+
+      <sect3 >
+        <title>Action method for interlinked mode</title>
+
+        <para>Now, we will add a new <emphasis role="bold">action</emphasis>
+        method who <emphasis role="bold">return</emphasis> a ProActive
+        Group:</para>
+
+        <programlisting lang="java">    public Agent action(Object o) throws Exception {
+        createGroupAgent();
+        return this.group;
+    }</programlisting>
+
+        <para>This method return an Agent (who is the group) and have one
+        argument: o. This argument will not use , we must to put this argument
+        is for have a different method signature from action().</para>
+
+        <para>Our test for group creation is now ready.</para>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>An independant Test: A Group migration</title>
+
+      <para>All the code is the same of the precedant class unexcepted for the
+      actions methods and for the method to create group of course.</para>
+
+      <sect3 >
+        <title>The default action method</title>
+
+        <para>In this test we can't run this method in a standalone test, but
+        for other maybe you can. It is just for this test.</para>
+
+        <programlisting lang="java">    public void action() throws Exception {
+        throw new Exception('This test doesn't work in standalone mode');
+    }</programlisting>
+      </sect3>
+
+      <sect3 >
+        <title>The action method for interlinked tests</title>
+
+        <para>The result of the precedent test is an Agent, so the argument
+        will be an Agent. This test have no result but we must to return an
+        Object here it is null because the API use the reflection mechanism of
+        Java.</para>
+
+        <programlisting>    public Object action(Agent group) throws Exception {
+        this.group = group;
+        this.group.moveTo(getNode().getNodeInformation().getURL());
+        return null;
+    }</programlisting>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>Run your tests</title>
+
+      <para>Create a simple <emphasis
+      role="bold">ProActiveFuncTestManager</emphasis> with a <emphasis
+      role="bold">main</emphasis>:</para>
+
+      <programlisting lang="java">import testsuite.manager.ProActiveFuncTestManager;
+public class Manager extends ProActiveFuncTestManager {
+    public Manager(String name, String description) {
+        super(name, description);
+    }
+    public static void main(String[] args) {
+        Manager manager = new Manager('Migration Tests',
+                'Create a group and migrate its objects.');
+    }
+}</programlisting>
+
+      <para>Create a new Group (testsuite.group.Group) in our main:</para>
+
+      <programlisting lang="java">import testsuite.group.Group;
+    // ...
+    Group group = new Group('Group Migration', 'Migration on an active group objects.');
+    // ...</programlisting>
+
+      <para>Create and add the 2 precends tests in the group:</para>
+
+      <programlisting lang="java">    // ...
+    TestGroupCreation creation = new TestGroupCreation(manager.getLocalVMNode());
+        group.add(creation);
+        TestGroupMigration migration = new TestGroupMigration(manager.getRemoteVMNode());
+        group.add(migration);
+    // ...</programlisting>
+
+      <para>Specify the ancestor test of migration is creation:</para>
+
+      <programlisting lang="java">  // ...
+  FunctionalTest[] params = { creation };
+             migration.setTests(params);
+  // ...</programlisting>
+
+      <para>You can see in the <ulink url="descriptor.xml">configuration file
+      part</ulink> how to do this by a configuration file.</para>
+
+      <para><emphasis role="bold">Warning:</emphasis> Don't forget to write a
+      prop file with the name of the remote host.</para>
+
+      <para>Add the group and launch the test:</para>
+
+      <programlisting lang="java">   // ...
+   manager.add(group);
+   manager.execute(group, migration, true);
+   // ...</programlisting>
+
+      <para><emphasis role="bold">Warning:</emphasis> when you use a
+      ProActiveManager you must to had <emphasis
+      role="bold">System.exit(0)</emphasis> at the end of the <emphasis
+      role="bold">main</emphasis> method. If don't do that, the manager can't
+      properly.</para>
+
+      <sect3 >
+        <title>An example of results for this test with verbatim
+        option</title>
+
+        <screen>8/26/03 12:40:47.407 [MESSAGE] Local hostname: amda.inria.fr
+8/26/03 12:40:47.408 [MESSAGE] Remote hostname: owenii
+8/26/03 12:40:47.498 [MESSAGE] Starting with interlinked Tests ...
+8/26/03 12:40:47.498 [MESSAGE] Init Manager with success
+8/26/03 12:40:48.547 [RESULT] Group Creation: Test run with success [SUCCESS]
+8/26/03 12:40:50.149 [RESULT] Group Migration: Test run with success [SUCCESS]
+8/26/03 12:40:50.149 [RESULT] Group: Group Migration Runs: 2 Errors: 0 [SUCCESS]
+8/26/03 12:40:50.243 [MESSAGE] ... Finish</screen>
+      </sect3>
+    </sect2>
+
+    <sect2 >
+      <title>All the code</title>
+
+      <para><emphasis role="bold">Manager.prop</emphasis></para>
+
+      <screen> RemoteHostname=owenii </screen>
+
+      <para><emphasis role="bold">Manager.java</emphasis></para>
+
+      <programlisting lang="java">import testsuite.group.Group;
+import testsuite.manager.ProActiveFuncTestManager;
+public class Manager extends ProActiveFuncTestManager {
+    public Manager(String name, String description) {
+        super(name, description);
+    }
+    public static void main(String[] args) {
+        Manager manager = new Manager('Migration Tests',
+                'Create a group and migrate its objects.');
+        Group group = new Group('Group Migration',
+                'Migration on an active group objects.');
+        TestGroupCreation creation = new TestGroupCreation(manager.getLocalVMNode());
+        group.add(creation);
+        TestGroupMigration migration = new TestGroupMigration(manager.getRemoteVMNode());
+        group.add(migration);
+        FunctionalTest[] params = { creation };
+        migration.setTests(params);
+        manager.add(group);
+        manager.execute(group, migration, true);
+        manager.setVerbatim(true);
+        manager.getResults().toOutPutStream(System.out);
+        System.exit(0);
+    }
+}
+</programlisting>
+
+      <para><emphasis role="bold">TestGroupMigration.java</emphasis></para>
+
+      <programlisting lang="java">import java.io.Serializable;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+public class TestGroupMigration extends ProActiveFunctionalTest
+    implements Serializable {
+    private Agent group = null;
+    public TestGroupMigration() {
+        super(null, 'Group Migration',
+            'Migrate all Group Element in a specified node.');
+    }
+    public TestGroupMigration(Node node) {
+        super(node, 'Group Migration',
+            'Migrate all Group Element in a specified node.');
+    }
+    public boolean postConditions() throws Exception {
+        if (group == null) {
+            return false;
+        } else {
+            Group agentGroup = ProActiveGroup.getGroup(group);
+            if (agentGroup.size() != 3) {
+                return false;
+            } else {
+                Agent agent0 = (Agent) agentGroup.get(0);
+                Agent agent1 = (Agent) agentGroup.get(1);
+                Agent agent2 = (Agent) agentGroup.get(2);
+                String nodeURL = getNode().getNodeInformation().getURL()
+                                     .toUpperCase();
+                return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent2.getNodeName().compareTo(nodeURL) == 0);
+            }
+        }
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    public void action() throws Exception {
+        throw new Exception('This test doesn't work in standalone mode');
+    }
+    public Object action(Agent group) throws Exception {
+        this.group = group;
+        this.group.moveTo(getNode().getNodeInformation().getURL());
+        return null;
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+}
+</programlisting>
+
+      <para><emphasis role="bold">TestGroupCreation.java</emphasis></para>
+
+      <programlisting lang="java">import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.node.Node;
+import testsuite.test.ProActiveFunctionalTest;
+import java.io.Serializable;
+public class TestGroupCreation extends ProActiveFunctionalTest
+    implements Serializable {
+    private Agent group = null;
+    public TestGroupCreation() {
+        super(null, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    public TestGroupCreation(Node node) {
+        super(node, 'Group Creation',
+            'Create a Group of active object in specify node.');
+    }
+    // Default action method
+    public void action() throws Exception {
+        createGroupAgent();
+    }
+    // For interlinked tests action method
+    public Agent action(Object o) throws Exception {
+        createGroupAgent();
+        return this.group;
+    }
+    private void createGroupAgent() throws Exception {
+        Object[][] params = {
+            { 'Agent0' },
+            { 'Agent1' },
+            { 'Agent2' }
+        };
+        Node node = getNode();
+        Node[] nodes = { node };
+        group = (Agent) ProActiveGroup.newGroup(Agent.class.getName(), params,
+                nodes);
+    }
+    public boolean postConditions() throws Exception {
+        if (group == null) {
+            return false;
+        } else {
+            Group agentGroup = ProActiveGroup.getGroup(group);
+            if (agentGroup.size() != 3) {
+                return false;
+            } else {
+                Agent agent0 = (Agent) agentGroup.get(0);
+                Agent agent1 = (Agent) agentGroup.get(1);
+                Agent agent2 = (Agent) agentGroup.get(2);
+                String nodeURL = getNode().getNodeInformation().getURL()
+                                     .toUpperCase();
+                return (agent0.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent1.getNodeName().compareTo(nodeURL) == 0) &amp;&amp;
+                (agent2.getNodeName().compareTo(nodeURL) == 0);
+            }
+        }
+    }
+    public boolean preConditions() throws Exception {
+        return getNode() != null;
+    }
+    public void initTest() throws Exception {
+        // nothing to do
+    }
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+}</programlisting>
+
+      <para><emphasis role="bold">Agent.java</emphasis></para>
+
+      <example id="agent">
+        <title>Agent class</title>
+
+        <programlisting lang="java">import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.RunActive;
+public class Agent implements InitActive, RunActive, 
+                                EndActive, java.io.Serializable {
+    private String name;
+    private String nodename;
+    private String hostname;
+    public Agent() {
+    }
+    public Agent(String name) {
+        this.name = name;
+    }
+    public String getName() {
+        try {
+            //return the name of the Host
+            return java.net.InetAddress.getLocalHost().getHostName()
+                                       .toUpperCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 'getName failed';
+        }
+    }
+    public String getNodeName() {
+        try {
+            //return the name of the Node  
+            return ProActive.getBodyOnThis().getNodeURL().toUpperCase();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 'getNodeName failed';
+        }
+    }
+    public void moveTo(String nodeURL) {
+        try {
+            System.out.println(' I am going to migate');
+            ProActive.migrateTo(nodeURL);
+            System.out.println('migration done');
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void endBodyActivity() {
+        ProActive.getBodyOnThis().terminate();
+    }
+    public void initActivity(Body body) {
+        System.out.println('Initialization of the Activity');
+    }
+    public void runActivity(Body body) {
+        org.objectweb.proactive.Service service = 
+                    new org.objectweb.proactive.Service(body);
+        while (body.isActive()) {
+            // The synchro policy is FIFO
+            service.blockingServeOldest();
+        }
+    }
+    public void endActivity(Body body) {
+        System.out.println('End of the activity of this Active Object');
+    }
+}
+ </programlisting>
+      </example>
+    </sect2>
+  </sect1>
+
+  <sect1 id="testSuiteConclusion">
+    <title>Conclusion</title>
+
+    <para>This tour was intented to guide you through an overview of ProActive
+    TestSuite API.</para>
+
+    <para>You can now easily use it for testing and benchmarking your
+    ProActive's applications.</para>
+
+    <para>Thanks to its extending mechanism, you can also use it for
+    non-ProActive's applications. Which means that use it for all Java
+    programs.</para>
+
+    <para>Your <ulink
+    url="mailto:proactive-support@inria.fr">suggestions</ulink> are
+    welcome.</para>
+  </sect1>
+</chapter>
