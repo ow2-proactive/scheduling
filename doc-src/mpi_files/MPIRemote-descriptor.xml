@@ -10,12 +10,12 @@
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="CPI" />
+			<virtualNode name="JACOBIVN" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
-			<map virtualNode="CPI">
+			<map virtualNode="JACOBIVN">
 				<jvmSet>
 					<vmName value="Jvm1" />
 				</jvmSet>
@@ -32,7 +32,7 @@
 	<FileTransferDefinitions>
 		<FileTransfer id="transfer">
 			<!-- Transfer mpi program on remote host -->
-			<file src="cpi" dest="cpi" />
+			<file src="jacobi" dest="jacobi" />
 		</FileTransfer>
 	</FileTransferDefinitions>
 	<infrastructure>
@@ -94,8 +94,8 @@
 			</processDefinition>
 
 			<!-- mpi Process -->
-			<processDefinition id="mpiCPI">
-				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="cpi">
+			<processDefinition id="mpiJACOBI">
+				<mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess" mpiFileName="jacobi">
 					<commandPath value=${MPIRUN_PATH} />
 					<mpiOptions>
 						<processNumber>${HOSTS_NUMBER}</processNumber>
@@ -110,17 +110,17 @@
 			</processDefinition>
 
 			<!-- dependent process -->
-			<processDefinition id="dpsCPI">
+			<processDefinition id="dpsJACOBI">
 				<dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess">
 					<processReference refid="pbsProcess" />
-					<processReference refid="mpiCPI" />
+					<processReference refid="mpiJACOBI" />
 				</dependentProcessSequence>
 			</processDefinition>
 
 			<!-- ssh process -->
 			<processDefinition id="sshProcess">
 				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="nef.inria.fr" username="smariani">
-					<processReference refid="dpsCPI" />
+					<processReference refid="dpsJACOBI" />
 					<FileTransferDeploy refid="transfer">
 						<copyProtocol>scp</copyProtocol>
 						<!-- local host path -->
