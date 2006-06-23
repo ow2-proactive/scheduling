@@ -281,12 +281,12 @@ public class DialogTask extends javax.swing.JDialog {
 	private void btnCancelActionPerformed(ActionEvent evt) {
 		System.out.println("btnCancel.actionPerformed, event=" + evt);
 		this.state = DialogTask.CANCEL;
-		this.show(false);
+		this.setVisible(false);
 	}
 
 	private void btnStartActionPerformed(ActionEvent evt) {
 		state = DialogTask.VALIDATE;
-		this.show(false);
+		this.setVisible(false);
 	}
 
 	public int getState() {

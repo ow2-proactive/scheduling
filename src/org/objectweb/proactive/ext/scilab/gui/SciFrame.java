@@ -730,7 +730,7 @@ public class SciFrame extends javax.swing.JFrame {
 			this.dialogResult.setSaveEnable(false);
 			
 			this.dialogResult.setLocationRelativeTo(this);
-	        this.dialogResult.show(true);
+	        this.dialogResult.setVisible(true);
 		}
 	}
 
@@ -746,7 +746,7 @@ public class SciFrame extends javax.swing.JFrame {
 			this.dialogResult.setSaveEnable(false);
 			
 			this.dialogResult.setLocationRelativeTo(this);
-	        this.dialogResult.show(true);
+	        this.dialogResult.setVisible(true);
 		}
 	}
 
@@ -769,7 +769,7 @@ public class SciFrame extends javax.swing.JFrame {
 			this.dialogResult.setSaveEnable(true);
 			this.dialogResult.setDataOut(strResult);
 			this.dialogResult.setLocationRelativeTo(this);
-	        this.dialogResult.show(true);
+	        this.dialogResult.setVisible(true);
 		}
 	}
 
@@ -928,7 +928,7 @@ public class SciFrame extends javax.swing.JFrame {
 		}
 		
         this.dialogTask.setLocationRelativeTo(this);
-        this.dialogTask.show(true);
+        this.dialogTask.setVisible(true);
 		
 		if ((this.dialogTask.getState() == DialogTask.CANCEL)) {
 			return;

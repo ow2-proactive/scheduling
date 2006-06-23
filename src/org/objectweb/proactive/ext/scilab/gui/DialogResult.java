@@ -232,7 +232,7 @@ public class DialogResult extends javax.swing.JDialog {
 	}
 	private void btnQuitActionPerformed(ActionEvent evt) {
 		System.out.println("btnQuit.actionPerformed, event=" + evt);
-		this.show(false);
+		this.setVisible(false);
 	}
 	
 	public void setPathScript(String pathScript){

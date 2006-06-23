@@ -90,7 +90,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper" 
+	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab" 
       description="build the class files"/>
 
 
@@ -217,6 +217,14 @@
 		</copy>
 	</target>
 
+	<!-- ================================================================ -->
+	<!--                          Compile scilab                            -->
+	<!--  =============================================================== -->
+	<target name="scilab" depends="ext" description="Compile the SCILAB Tool">
+		<copy todir="${classes.dir}/${proactive.dir}/ext/scilab/gui/img" includeEmptyDirs="no">
+			<fileset dir="${src.dir}/${proactive.dir}/ext/scilab/gui/img"/>
+		</copy>
+	</target>
 
 	<!-- ================================================================ -->
 	<!--                      Compile LoadBalancing                       -->
