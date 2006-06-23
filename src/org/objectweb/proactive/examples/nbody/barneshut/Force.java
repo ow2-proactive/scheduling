@@ -60,8 +60,8 @@ public class Force implements Serializable {
     public final double G = 9.81; 
 
 
-    public Force() {
-    }
+//    public Force() {
+//    }
     
     /**
      * Creation of a new Force
