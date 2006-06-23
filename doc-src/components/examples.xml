@@ -314,7 +314,7 @@ public class AImpl implements A, BindingController {
         </figure></para>
 
       <para><figure>
-          <title>2. With wrappers, where again, only the primitive components
+          <title>With wrappers, where again, only the primitive components
           are distributed.</title>
 
           <mediaobject>

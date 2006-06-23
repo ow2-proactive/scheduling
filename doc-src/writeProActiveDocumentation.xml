@@ -28,7 +28,7 @@
  <para> First off, all the documentation is written in 
   <ulink url="http://nwalsh.com/docbook/">docbook</ulink>. You 
   can find all the documentation source files in the 
-  <literal>ProActive/src/org/objectweb/proactive/doc-files/</literal>
+  <literal>ProActive/doc-src/</literal>
   directory. </para>
  
  <para>Here are the instrtuctions to follow to start well &amp; fast writing
@@ -42,7 +42,7 @@
   
   <listitem>
    <para>If you want a new chapter of your own, copy one of the existing
-    files. (<literal>doc-files/WSDoc</literal> for example)</para>
+    files. (<literal>ProActive/doc-src/WSDoc.xml</literal> for example)</para>
   </listitem>
   
   <listitem>
@@ -103,7 +103,7 @@
  
  <para>These are the basic rules to follow to use docbook tags. This document 
   is made up of the files in the <literal>docBookTutorial</literal> directory, and
-  you may find it with the other manual files in the 'doc-files' directory.</para>
+  you may find it with the other manual files in the 'doc-src' directory.</para>
  
  <sect2>
   <title>Summary of the useful tags</title>
@@ -259,16 +259,17 @@ public class Dummy {
    
    <para>Here is an example of deployment descriptor that deploys 3 virtual nodes .</para>
    
-   <programlisting lang="xml">  &lt;!-- Deploying 3 virtual Nodes  --&gt;
+   <programlisting lang="xml"> &lt;!-- Deploying 3 virtual Nodes  --&gt;
  &lt;ProActiveDescriptor&gt;                        
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="NonFT-Workers" property="multiple"/&gt;
-     &lt;virtualNode name="FT-Workers" property="multiple" <emphasis role="bold">ftServiceId="appli"</emphasis>/&gt;
-      &lt;virtualNode name="Failed" property="multiple" <emphasis role="bold">ftServiceId="resource"</emphasis>/&gt;
-     &lt;/virtualNodesDefinition&gt;
-    &lt;/componentDefinition&gt;
-    &lt;deployment&gt;
+    &lt;virtualNode name="FT-Workers" property="multiple" <emphasis role="bold">ftServiceId="appli"</emphasis>/&gt;
+    &lt;virtualNode name="Failed" property="multiple" <emphasis role="bold">ftServiceId="resource"</emphasis>/&gt;
+   &lt;/virtualNodesDefinition&gt;
+  &lt;/componentDefinition&gt;
+  
+  &lt;deployment&gt;
      &lt;mapping&gt;
       &lt;map virtualNode="NonFT-Workers"&gt;
        &lt;jvmSet&gt;
@@ -490,7 +491,7 @@ public class Dummy {
   <para>The dtd is the file detailling which are the allowed tags in our
    DocBook subset. Some tags have been removed, to make it easier to
    manage. Please refer to the file called
-   <literal>doc-files/ProActiveManual.dtd</literal> to know how much
+   <literal>ProActive/doc-src/ProActiveManual.dtd</literal> to know how much
    freedom you have been granted. </para>
   
   <para>When you run the manual generation through the ant tasks, the xml
@@ -499,7 +500,7 @@ public class Dummy {
   
   <para>If you happen to modify the dtd, you should put also copy it on
    the web, on <literal>/proj/oasis/www/proactive/doc/dtd/$version/</literal> or else
-   the previous one will always be used. </para>
+   the previous version one will always be used. </para>
  </sect2>
  
  <sect2>
