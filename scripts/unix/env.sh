@@ -219,7 +219,14 @@ if [ -f $PROACTIVE/lib/ws/xml-apis.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/xml-apis.jar
 fi
- 
+
+#--------------------------------------------------------
+# jars to set when using Scilab
+if [ -f $PROACTIVE/lib/scilab/javasci.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/scilab/javasci.jar
+fi 
+
 #echo "CLASSPATH"=$CLASSPATH 
 export CLASSPATH
 

@@ -43,6 +43,7 @@
 			<include name="ibis/*.jar"/>
 			<include name="unicore/*.jar"/>
 			<include name="glite/*.jar"/>
+			<include name="scilab/*.jar"/>
 		</fileset>
 		<fileset dir="${lib}/ws">
 			<include name="*.jar"/>
@@ -353,7 +354,7 @@
 	<!-- ================================================================ -->
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
-	<target name="proActiveJar" depends="ext,tools, bnb, daemon"
+	<target name="proActiveJar" depends="ext,tools, bnb, p2p"
      description="Create the ProActive jar, to be used for instance on a distant host">
 		<mkdir dir="${dist.dir}/ProActive"/>
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
