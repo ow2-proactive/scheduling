@@ -218,45 +218,45 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
  It provides the guarantee of application consistency and a better control of the application
  in case of multiple MPISpmd objects.</para>
 
-				<para>
-					<figure>
-						<title>State transition diagram</title>
-						<mediaobject>
-							<imageobject>
-								<imagedata fileref="mpi_files/status.png" format="PNG" />
-							</imageobject>
-						</mediaobject>
-					</figure>
-				</para>
+						<para>
+							<figure>
+								<title>State transition diagram</title>
+								<mediaobject>
+									<imageobject>
+										<imagedata fileref="mpi_files/status.png" format="PNG" />
+									</imageobject>
+								</mediaobject>
+							</figure>
+						</para>
 					</listitem>
 				</itemizedlist>
 			</sect3>
-</sect2>
-			<sect2>
-				<!-- ///// How to write an application with the API \\\\ -->
-				<title>How to write an application with the API</title>
+		</sect2>
+		<sect2>
+			<!-- ///// How to write an application with the API \\\\ -->
+			<title>How to write an application with the API</title>
 
-				<para>First finalize the xml file descriptor to specify files which have to be transfered on the remote hosts and resources requirement
-as it is explained in the next section <xref linkend="Using_the_MPI_Infrastructure"/>.
+			<para>First finalize the xml file descriptor to specify files which have to be transfered on the remote hosts and resources requirement
+as it is explained in the next section <xref linkend="Using_the_MPI_Infrastructure" />.
 Then import the package <emphasis role="bold">org.objectweb.proactive.mpi</emphasis>. In an attempt to keep application consistency, the MPISpmd object makes use of status.
 It garantees that either the method call on object is coherent or an exception is thrown. 
 Especially the exception is an <emphasis role="bold">IllegalMPIStateException</emphasis> that signals a method which has been called at an illegal or inappropriate time.
 In other words, an application is not in an appropriate state for the requested operation.</para>
-<para>
+			<para>
 An application does not require to declare in its throws clause because IllegalMPIStateException is a subclass of RuntimeException.
 The graph above presents a kind of finite state machine or finite automaton, that is a model of behavior composed of<emphasis role="bold"> states</emphasis> (status of the MPISpmd object) and 
 <emphasis role="bold">transition actions</emphasis> (methods of the API). Once the MPISpmd object is created, the object enters in the initial state: <emphasis role="bold">ProActiveMPIConstants.MPI_UNSTARTED</emphasis>.
 </para>
 
 
-				<para>
-					<emphasis role="bold">Sample of code (available in the release) </emphasis> 
+			<para>
+				<emphasis role="bold">Sample of code (available in the release) </emphasis> 
 These few lines show how to execute the MPI executive <emphasis role="bold">jacobi</emphasis> and to get its return value once finished.
 No modification have to be made to the source code. 
 				</para>
 
-				<programlisting lang="java">
-<emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
+			<programlisting lang="java">
+				<emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
 // load the file desciptor 
@@ -307,7 +307,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 In the following example, <emphasis role="bold">jacobi</emphasis> is the binary of the MPI program.
 For further details about File Transfer see <xref linkend="FileTransfer_html_intro" />.
 				</para>
-					<screen>&lt;componentDefinition&gt;
+					<programlisting lang="xml">&lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="<emphasis role="bold">JACOBIVN</emphasis>" /&gt;
    &lt;/virtualNodesDefinition&gt;
@@ -320,7 +320,7 @@ For further details about File Transfer see <xref linkend="FileTransfer_html_int
     &lt;file src="jacobi" dest="jacobi" /&gt;
    &lt;/fileTransfer&gt;
   &lt;/fileTransferDefinitions&gt;
-</screen>
+</programlisting>
 				</listitem>
 				<listitem>
 					<para>
@@ -337,7 +337,7 @@ first define the process used to join the remote host on which resources will be
  of the file transfer with the FileTransfer previously defined and link the
  reference ID to the DependentProcessSequence process explained below.</para>
 
-								<screen>&lt;processDefinition id="sshProcess"&gt;
+								<programlisting lang="xml">&lt;processDefinition id="sshProcess"&gt;
    &lt;sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="nef.inria.fr"
 		 username="user"&gt;
     &lt;processReference refid="<emphasis role="bold">jacobiDependentProcess</emphasis>"  /&gt;
@@ -348,7 +348,7 @@ first define the process used to join the remote host on which resources will be
 	&lt;/fileTransferDeploy&gt;
    &lt;/sshProcess&gt;
   &lt;/processDefinition&gt;
-</screen>
+</programlisting>
 							</listitem>
 							<listitem>
 								<para>
@@ -358,21 +358,21 @@ The first process of the list can be any process of the infrastructure of proces
 be imperatively a <emphasis role="bold">DependentProcess</emphasis>, that is to implement the <emphasis role="bold">org.objectweb.proactive.core.process.DependentProcess</emphasis> interface.
 The following lines express that the mpiProcess is dependent on the resources allocated by the pbsProcess.
 				</para>
-								<screen>
+								<programlisting lang="xml">
 &lt;processDefinition id=<emphasis role="bold">"jacobiDependentProcess"</emphasis>&gt;
    &lt;<emphasis role="bold">dependentProcessSequence</emphasis> class='<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcess</emphasis>"&gt;
 	&lt;processReference refid=<emphasis role="bold">"jacobiPBSProcess"</emphasis> /&gt;
 	&lt;processReference refid=<emphasis role="bold">"jacobiMPIProcess"</emphasis> /&gt;
    &lt;<emphasis role="bold">/dependentProcessSequence</emphasis>&gt;
   &lt;/processDefinition&gt;
-</screen>
+</programlisting>
 							</listitem>
 							<listitem>
 								<para>
 									<emphasis role="bold">PBS Process:</emphasis>
  note that you can use any services defined in ProActive to allocate resources instead of the PBS one.
 				</para>
-								<screen>
+								<programlisting lang="xml">
 &lt;processDefinition id=<emphasis role="bold">"jacobiPBSProcess"</emphasis>&gt;
   &lt;pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess"&gt;
 	&lt;processReference refid="jvmProcess" /&gt;
@@ -387,7 +387,7 @@ The following lines express that the mpiProcess is dependent on the resources al
 	&lt;/pbsOption&gt;
   &lt;/pbsProcess&gt;
  &lt;/processDefinition&gt;
-</screen>
+</programlisting>
 							</listitem>
 						</itemizedlist>
 					</para>
@@ -402,7 +402,7 @@ In the case of remote application, if the remote path field is not set, the host
 and MPI process will raise an error.
 
 				</para>
-					<screen>&lt;processDefinition id=<emphasis role="bold">"jacobiMPIProcess"</emphasis>&gt;
+					<programlisting lang="xml">&lt;processDefinition id=<emphasis role="bold">"jacobiMPIProcess"</emphasis>&gt;
  &lt;<emphasis role="bold">mpiProcess</emphasis> class="<emphasis role="bold">org.objectweb.proactive.core.process.mpi.MPIDependentProcess</emphasis>" mpiFileName="<emphasis role="bold">jacobi</emphasis>"
 	mpiCommandOptions="input_file.dat output_file.dat"&gt;
   &lt;commandPath value="/usr/src/redhat/BUILD/mpich-1.2.6/bin/mpirun" /&gt;
@@ -416,7 +416,7 @@ and MPI process will raise an error.
    &lt;/remoteAbsolutePath&gt;
   &lt;/mpiOptions&gt;
  &lt;<emphasis role="bold">/mpiProcess</emphasis>&gt;
-&lt;/processDefinition&gt;</screen>
+&lt;/processDefinition&gt;</programlisting>
 				</listitem>
 			</itemizedlist>
 		</sect2>
@@ -528,7 +528,7 @@ CheckConvergency.killAll(false);
 		</sect2>
 	</sect1>
 
-	
+
 
 	<!-- ////////////////////////////////// DESIGN AND IMPLEMENTATION  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
