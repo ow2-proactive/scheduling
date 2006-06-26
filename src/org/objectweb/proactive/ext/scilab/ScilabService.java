@@ -171,7 +171,6 @@ public class ScilabService {
 	
 	/**
 	 * @param idTask
-	 * @param idEngine
 	 */
 	
 	public synchronized void killTask(String idTask){
