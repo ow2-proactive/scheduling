@@ -427,9 +427,9 @@ and MPI process will raise an error.
 			<!-- ///// Usage example with several codes \\\\ -->
 			<title>
 			Example with several codes</title>
-
+<para>
 Let's assume we want to interconnect together several modules (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are each one a parallel MPI binary code. 
-	
+</para>
 	<programlisting lang="java">
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
