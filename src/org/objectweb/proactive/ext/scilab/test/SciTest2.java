@@ -30,10 +30,7 @@
  */ 
 package org.objectweb.proactive.ext.scilab.test;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
 
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
@@ -64,10 +61,11 @@ public class SciTest2 {
 			}
 		}
 		scilab.exit();
+		System.exit(0);
 	}
 	
 	
-	public SciTest2() throws Exception{
+	public SciTest2(String idVN, String pathVN) throws Exception{
 		SciTask task = new SciTask("id");
 		task.setJobInit("n = 10;");
 		task.addDataOut(new SciData("n"));
@@ -86,15 +84,14 @@ public class SciTest2 {
 				}
 			}
 		});
-		
-		scilab.deployEngine( "ScilabVN", "ProActiveScilab.xml", new String[]{"Scilab1", "Scilab2"});
+		scilab.deployEngine( idVN, pathVN, new String[]{"Scilab"});
 		scilab.sendTask(task);
 		
 	}
 	
 	
 	public static void main(String[] args) throws Exception {
-		new SciTest2();
+		new SciTest2(args[0], args[1]);
 	}
 
 }

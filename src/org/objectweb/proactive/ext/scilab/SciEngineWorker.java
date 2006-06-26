@@ -67,17 +67,6 @@ public class SciEngineWorker implements Serializable  {
 		this.idEngine = idEngine;
 	}
 	
-	/**
-	 * kill the task
-	 * @param idTask id of the task to kill
-	 */
-	public void killTask(String idTask){
-		logger.debug("->SciEngineWorker In:killTask" + idTask);
-		if(idTask.equals(this.idTask)){
-			this.killEngineTask();
-		}
-		
-	}
 	
 	public void exit(){
 		logger.debug("->SciEngineWorker In:exit");
@@ -115,9 +104,10 @@ public class SciEngineWorker implements Serializable  {
 		return new BooleanWrapper(false);
 	}
 	
-	private void killEngineTask(){
-			process.stopProcess();
-			this.sciEngineTask = null;
+	public void killEngineTask(){
+		logger.debug("->SciEngineWorker In:killEngineTask" + idTask);
+		process.stopProcess();
+		this.sciEngineTask = null;
 	}
 	
 }

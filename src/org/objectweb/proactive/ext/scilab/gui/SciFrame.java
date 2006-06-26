@@ -64,6 +64,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
@@ -74,7 +75,6 @@ import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.objectweb.proactive.ext.scilab.SciDeployEngine;
 import org.objectweb.proactive.ext.scilab.SciEngineInfo;
@@ -136,12 +136,14 @@ public class SciFrame extends javax.swing.JFrame {
 	private JPanel pnlTaskWait;
 	private JSplitPane splitMain1;
 	private JSplitPane splitTask1;
+	private JMenuItem itemRestartEngine;
+	private JPopupMenu popupTreeEngine;
 	private JList listPreview;
 	private JSplitPane splitTask2;
 	private DefaultTableModel tableTaskWaitModel;
 	private DefaultTableModel tableTaskRunModel;
 	private DefaultTableModel tableTaskEndModel;
-	private DefaultMutableTreeNode rootEngine;
+	private TreeEngineNode rootEngine;
 	private ScilabService service;
 	private DialogTask dialogTask;
 	private DialogResult dialogResult;
@@ -153,6 +155,7 @@ public class SciFrame extends javax.swing.JFrame {
 	private JLabel lblVn;
 	private DefaultComboBoxModel listPreviewModel;
 	private JScrollPane scrollPreview;
+	private TreeEngineRenderer treeRenderer;
 	
 	/**
 	 * Auto-generated main method to display this JFrame
@@ -244,9 +247,28 @@ public class SciFrame extends javax.swing.JFrame {
 						scrollTreeEngine = new JScrollPane();
 						splitMain2.add(scrollTreeEngine, JSplitPane.LEFT);
 						{
-							rootEngine = new DefaultMutableTreeNode("Scilab Engines");
+							rootEngine = new TreeEngineNode("Scilab Engines");
 							treeEngine = new JTree(rootEngine);
+						    treeRenderer = new TreeEngineRenderer();
+						    treeEngine.setCellRenderer(treeRenderer);
 							scrollTreeEngine.setViewportView(treeEngine);
+							{
+								popupTreeEngine = new JPopupMenu();
+								setComponentPopupMenu(
+									treeEngine,
+									popupTreeEngine);
+								{
+									
+									itemRestartEngine = new JMenuItem();
+									popupTreeEngine.add(itemRestartEngine);
+									itemRestartEngine.setText("Restart Engine");
+									itemRestartEngine.addActionListener(new ActionListener() {
+										public void actionPerformed(ActionEvent evt) {
+											itemRestartEngineActionPerformed(evt);
+										}
+										});
+								}
+							}
 							treeEngine.addMouseListener(new MouseAdapter() {
 								public void mouseClicked(MouseEvent evt) {
 									treeEngineMouseClicked(evt);
@@ -289,7 +311,7 @@ public class SciFrame extends javax.swing.JFrame {
 									{
 										tableTaskWaitModel = new DefaultTableModel(
 														null, new String[] { "Id Task", "Script",
-															    "Priority", "Awaited Time",
+															    "Priority", "Awaited Time(ms)",
 																"State"});
 										
 										tableTaskWait = new JTable() {
@@ -371,7 +393,7 @@ public class SciFrame extends javax.swing.JFrame {
 									{
 										tableTaskRunModel = new DefaultTableModel(
 												null, new String[] { "Id Task", "Script",
-														"Id Engine", "Global Time",
+														"Id Engine", "Global Time(ms)",
 														"State"});
 						
 										tableTaskRun = new JTable() {
@@ -452,7 +474,7 @@ public class SciFrame extends javax.swing.JFrame {
 								{
 									tableTaskEndModel = new DefaultTableModel(
 											null, new String[] { "Id Task", "Script", 
-													"Execution Time", "Global Time",
+													"Execution Time(ms)", "Global Time(ms)",
 													"State"});
 									
 									tableTaskEnd = new JTable() {
@@ -676,6 +698,12 @@ public class SciFrame extends javax.swing.JFrame {
 								String path = newFile.getAbsolutePath();
 								
 								String arrayNameVn[] = SciDeployEngine.getListVirtualNode(path);
+								
+								if(listPreviewModel == null){
+									txtLog.append("Invalid deployment descriptor:" + path);
+									return;
+								}
+								
 								listPreviewModel.removeAllElements();
 								for(int i=0; i<arrayNameVn.length; i++){
 									listPreviewModel.addElement(arrayNameVn[i]);
@@ -724,13 +752,11 @@ public class SciFrame extends javax.swing.JFrame {
 	
 	private void itemTaskActionPerformed(ActionEvent evt) {
 		System.out.println("itemTask.actionPerformed, event=" + evt);
-		// TODO add your code for itemTask.actionPerformed
 		this.addTask();
 	}
 
 	private void treeEngineMouseClicked(MouseEvent evt) {
 		System.out.println("treeEngine.mouseClicked, event=" + evt);
-		// TODO add your code for treeEngine.mouseClicked
 	}
 
 	private void tableTaskWaitMouseClicked(MouseEvent evt) {
@@ -982,19 +1008,19 @@ public class SciFrame extends javax.swing.JFrame {
 	private void refreshTreeEngine(){
 		HashMap mapEngine = this.service.getMapEngine();
 		SciEngineInfo sciEngineInfo;
-		DefaultMutableTreeNode nodeEngine;
+		TreeEngineNode nodeEngine;
 		
 		int i = 0;
 		int count = this.rootEngine.getChildCount();
 		while(i<count){
-			nodeEngine = (DefaultMutableTreeNode) this.rootEngine.getChildAt(i);
+			nodeEngine = (TreeEngineNode) this.rootEngine.getChildAt(i);
 			sciEngineInfo = (SciEngineInfo) mapEngine.remove(nodeEngine.toString());
 			if(sciEngineInfo == null){
 				nodeEngine.removeFromParent();
 				count--;
 			}else{
 				nodeEngine.removeAllChildren();
-				nodeEngine.add(new DefaultMutableTreeNode(sciEngineInfo.getSciEngineUrl()));
+				nodeEngine.add(new TreeEngineNode(sciEngineInfo.getSciEngineUrl()));
 				i++;
 			}
 		}
@@ -1004,22 +1030,33 @@ public class SciFrame extends javax.swing.JFrame {
 		
 		while(it.hasNext()){
 			sciEngineInfo = (SciEngineInfo) mapEngine.get(it.next());
-			nodeEngine = new DefaultMutableTreeNode(sciEngineInfo.getIdEngine());
-			nodeEngine.add(new DefaultMutableTreeNode(sciEngineInfo.getSciEngineUrl()));
+			nodeEngine = new TreeEngineNode(sciEngineInfo.getIdEngine());
+			nodeEngine.add(new TreeEngineNode(sciEngineInfo.getSciEngineUrl()));
 			this.rootEngine.add(nodeEngine);
 		}
 		
-		treeNodesInserted();
+		updateTreeNodes();
 	}
 	
-	private void treeNodesInserted(){
+	private void updateTreeNodes(){
 		EventQueue.invokeLater( new Runnable(){
 			public void run() {
 				treeEngine.updateUI();
 			}} );
 
 	}
-
+	
+	private void setStateTreeNode(String idEngine, int state){
+		TreeEngineNode nodeEngine;
+		for(int i=0; i < this.rootEngine.getChildCount(); i++){
+			nodeEngine = (TreeEngineNode) this.rootEngine.getChildAt(i);
+			nodeEngine.getUserObject();
+			if(idEngine.equals(nodeEngine.toString())){
+				nodeEngine.setState(state);
+			}
+		}		
+	}
+	
 	private void refreshTableTask(){
 		String value;
 		for(int i=0; i<this.tableTaskWaitModel.getRowCount(); i++){
@@ -1127,8 +1164,17 @@ public class SciFrame extends javax.swing.JFrame {
 			}	
 		}
 		
-		String strTmp = (sciTaskInfo.getState() == SciTaskInfo.SUCCESS)? "img/successTask.gif" : "img/abortTask.gif";
+		String strTmp;
 		
+		if(sciTaskInfo.getState() == SciTaskInfo.SUCCESS){
+			strTmp = "img/successTask.gif";
+			setStateTreeNode(sciTaskInfo.getIdEngine(), TreeEngineNode.VALID);
+		}
+		else{
+			strTmp = "img/abortTask.gif";
+			setStateTreeNode(sciTaskInfo.getIdEngine(), TreeEngineNode.SUSPECT);
+		}
+
 		Object row[] = new Object[]{
 				sciTaskInfo.getIdTask(),
 				sciTaskInfo.getNameScript(),
@@ -1137,6 +1183,52 @@ public class SciFrame extends javax.swing.JFrame {
 				new ImageIcon(getClass().getResource(strTmp))
 		};
 		this.tableTaskEndModel.addRow(row);
+		
+		updateTreeNodes();
+		
 		txtLog.append("->Terminate Scilab Task :" + sciTaskInfo.getIdTask() + "\n");
+	}
+	
+	/**
+	* Auto-generated method for setting the popup menu for a component
+	*/
+	private void setComponentPopupMenu(
+		final java.awt.Component parent,
+		final javax.swing.JPopupMenu menu) {
+		parent.addMouseListener(new java.awt.event.MouseAdapter() {
+			public void mousePressed(java.awt.event.MouseEvent e) {
+				if (e.isPopupTrigger())
+					menu.show(parent, e.getX(), e.getY());
+				
+				TreeEngineNode nodeEngine = (TreeEngineNode) treeEngine.getLastSelectedPathComponent();
+				
+				if(nodeEngine == null){
+					return;
+				}
+				
+				if(!nodeEngine.isRoot() && !nodeEngine.isLeaf()){
+					itemRestartEngine.setEnabled(true);
+				}else{
+					itemRestartEngine.setEnabled(false);
+				}
+			}
+			public void mouseReleased(java.awt.event.MouseEvent e) {
+				if (e.isPopupTrigger())
+					menu.show(parent, e.getX(), e.getY());
+			}
+		});
+	}
+	
+	private void itemRestartEngineActionPerformed(ActionEvent evt) {
+		System.out.println("itemRestartEngine.actionPerformed, event=" + evt);
+		
+		TreeEngineNode nodeEngine = (TreeEngineNode) treeEngine.getLastSelectedPathComponent();
+		
+		if(nodeEngine == null){
+			return;
+		}
+		
+		nodeEngine.setState(TreeEngineNode.VALID);
+		service.restartEngine(nodeEngine.toString());
 	}
 }

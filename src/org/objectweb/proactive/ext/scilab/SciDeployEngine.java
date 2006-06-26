@@ -64,7 +64,7 @@ public class SciDeployEngine {
 		
 		ProActiveDescriptor desc;
 		VirtualNode arrayVn[];
-		String arrayNameVn[];
+		String arrayNameVn[] = null;
 		try {
 			desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
 			arrayVn = desc.getVirtualNodes();
@@ -74,12 +74,12 @@ public class SciDeployEngine {
 				arrayNameVn[i] = arrayVn[i].getName();
 			}
 			
-			return arrayNameVn;
+			
 		} catch (ProActiveException e) {
 			e.printStackTrace();
 		}
 		
-		return null;
+		return arrayNameVn;
 		
 	}
 	
@@ -132,7 +132,7 @@ public class SciDeployEngine {
 		SciEngineWorker sciEngine  = (SciEngineWorker) ProActive.newActive(SciEngineWorker.class.getName(), param, currentNode);
 		
 		try{
-			ProActive.setImmediateService(sciEngine, "killTask");
+			ProActive.setImmediateService(sciEngine, "killEngineTask");
 			ProActive.setImmediateService(sciEngine, "exit");
 		}catch(IOException e){
 			e.printStackTrace();

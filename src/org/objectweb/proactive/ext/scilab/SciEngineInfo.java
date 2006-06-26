@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  */
 public class SciEngineInfo {
 	private String idEngine;
+	private String idCurrentTask;
 	private SciEngineWorker sciEngine;
 	private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
 	
@@ -67,5 +68,13 @@ public class SciEngineInfo {
 
 	public void setIsActivate(BooleanWrapper isActivate) {
 		this.isActivate = isActivate;
+	}
+
+	public String getIdCurrentTask() {
+		return idCurrentTask;
+	}
+
+	public void setIdCurrentTask(String idCurrentTask) {
+		this.idCurrentTask = idCurrentTask;
 	}
 }

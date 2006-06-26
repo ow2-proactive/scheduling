@@ -149,12 +149,15 @@ public class ScilabService {
 		sciTask.setJob(f);
 		sciTask.setJobInit(jobInit);
 		
-		ArrayList listDataOut = new ArrayList();
 		for(int i=0; i< dataOut.length; i++){
-			listDataOut.add(new SciData(dataOut[i]));
+			System.out.println("->ScilabService DataOut:sendTask:" + dataOut[i]);
+			if(dataOut[i].trim().equals("")){
+				continue;
+			}
+			
+			sciTask.addDataOut(new SciData(dataOut[i]));
 		}
-		sciTask.setListDataOut(listDataOut);
-		
+	
 		SciTaskInfo sciTaskInfo = new SciTaskInfo(sciTask);
 		sciTaskInfo.setFileScript(f);
 		
@@ -168,6 +171,7 @@ public class ScilabService {
 	
 	/**
 	 * @param idTask
+	 * @param idEngine
 	 */
 	
 	public synchronized void killTask(String idTask){
@@ -181,17 +185,47 @@ public class ScilabService {
 		
 		String idEngine = sciTaskInfo.getIdEngine();
 		SciEngineInfo sciEngineInfo = (SciEngineInfo) mapEngine.get(idEngine);
+		
+		
 		SciEngineWorker sciEngine = sciEngineInfo.getSciEngine();
+		sciEngine.killEngineTask();
 		
-		
-		sciEngine.killTask(idTask);
 		BooleanWrapper isActivate = sciEngine.activate();
 		sciEngineInfo.setIsActivate(isActivate);
+		sciEngineInfo.setIdCurrentTask(null);
+		
 		sciTaskInfo.setState(SciTaskInfo.KILL);
+		
 		this.listIdEngineFree.add(idEngine);
 		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
 	}
 	
+	
+	public synchronized void restartEngine(String idEngine){
+		logger.debug("->ScilabService In:restartEngine:" + idEngine);
+
+		SciEngineInfo sciEngineInfo = (SciEngineInfo) this.mapEngine.get(idEngine);
+		
+		if(sciEngineInfo == null){
+			return;
+		}
+		
+		String idTask = sciEngineInfo.getIdCurrentTask();
+		SciTaskInfo sciTaskInfo;
+		
+		if(idTask != null){
+			sciTaskInfo = (SciTaskInfo) this.mapTaskRun.remove(idTask);
+			sciTaskInfo.setState(SciTaskInfo.KILL);
+			sciEngineInfo.setIdCurrentTask(null);
+			this.listIdEngineFree.add(idEngine);
+			this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+		}
+		
+		SciEngineWorker sciEngine = sciEngineInfo.getSciEngine();
+		sciEngine.killEngineTask();
+		BooleanWrapper isActivate = sciEngine.activate();
+		sciEngineInfo.setIsActivate(isActivate);
+	}
 	
 	public synchronized void cancelTask(String idTask){
 		logger.debug("->ScilabService In:cancelTask:" + idTask);
@@ -219,6 +253,8 @@ public class ScilabService {
 		logger.debug("->ScilabService In:retrieveResult");
 		SciResult sciResult;
 		SciTaskInfo sciTaskInfo;
+		String idEngine;
+		SciEngineInfo sciEngineInfo;
 		Object keys[]; 
 
 		while (true) {
@@ -228,9 +264,15 @@ public class ScilabService {
 				sciResult = sciTaskInfo.getSciResult();
 				if (!ProActive.isAwaited(sciResult)) {
 					logger.debug("->ScilabService loop:retrieveResult:" + keys[i]);
+					
 					this.mapTaskRun.remove(keys[i]);
 					sciTaskInfo.setState(sciResult.getState());
-					this.listIdEngineFree.add(sciTaskInfo.getIdEngine());
+					
+					idEngine = sciTaskInfo.getIdEngine();
+					sciEngineInfo = (SciEngineInfo) mapEngine.get(idEngine);
+					
+					sciEngineInfo.setIdCurrentTask(null);
+					this.listIdEngineFree.add(idEngine);
 					sciTaskInfo.setDateEnd();
 					this.mapTaskEnd.put(sciTaskInfo.getIdTask(), sciTaskInfo);
 					this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
@@ -348,6 +390,8 @@ public class ScilabService {
 		logger.debug("->ScilabService In:executeTask");
 		SciResult sciResult;
 		SciEngineWorker sciEngine;
+		
+		sciEngineInfo.setIdCurrentTask(sciTaskInfo.getIdTask());
 		
 		sciEngine = sciEngineInfo.getSciEngine();
 		sciTaskInfo.setIdEngine(sciEngineInfo.getIdEngine());
