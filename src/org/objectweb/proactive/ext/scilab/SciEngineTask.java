@@ -64,7 +64,7 @@ public class SciEngineTask {
 	
 	/**
 	 * execute a task 
-	 * @param task Scilab task
+	 * @param sciTask Scilab task
 	 * @return result of the computation 
 	 */
 	public SciResult execute(SciTask sciTask){

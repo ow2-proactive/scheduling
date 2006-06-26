@@ -175,7 +175,6 @@ public class SciDeployEngine {
 	
 	/**
 	 * Kill all resources used
-	 * @param idVirtualNode
 	 */
 	public static synchronized void killAll(){
 		logger.debug("->SciDeployEngine In:killAll");

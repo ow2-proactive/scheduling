@@ -408,7 +408,6 @@ public abstract class FTManager implements java.io.Serializable {
     
     /**
      * This method is called after a migration to update the object's location
-     * @author Javier Bustos
      * @param ownerID the UniversalID of the caller
      * @param remoteBodyAdapter the remotBodyAdapter of the caller
      */
