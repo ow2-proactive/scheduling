@@ -630,7 +630,7 @@ public class SciFrame extends javax.swing.JFrame {
 						itemExit.setText("Exit");
 						itemExit.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent evt) {
-								System.out.println("itemExit.actionPerformed, event="+ evt);
+							
 								if(service != null){
 									service.exit();
 								}
@@ -741,26 +741,25 @@ public class SciFrame extends javax.swing.JFrame {
 
 	
 	private void itemDescriptorActionPerformed(ActionEvent evt) {
-		System.out.println("itemDescriptor.actionPerformed, event=" + evt);
+		
 		this.deployDescriptor();
 	}
 
 	private void itemDesktopGridActionPerformed(ActionEvent evt) {
-		System.out.println("itemDesktopGrid.actionPerformed, event=" + evt);
-		//TODO add your code for itemDesktopGrid.actionPerformed
+		
 	}
 	
 	private void itemTaskActionPerformed(ActionEvent evt) {
-		System.out.println("itemTask.actionPerformed, event=" + evt);
+		
 		this.addTask();
 	}
 
 	private void treeEngineMouseClicked(MouseEvent evt) {
-		System.out.println("treeEngine.mouseClicked, event=" + evt);
+		
 	}
 
 	private void tableTaskWaitMouseClicked(MouseEvent evt) {
-		System.out.println("tableTaskWait.mouseClicked, event=" + evt);
+		
 		if (evt.getClickCount() == 2) {
 			String idTask = (String) this.tableTaskWaitModel.getValueAt(this.tableTaskWait.getSelectedRow(), 0);
 			
@@ -791,7 +790,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void tableTaskRunMouseClicked(MouseEvent evt) {
-		System.out.println("tableTaskRun.mouseClicked, event=" + evt);
+		
 		if (evt.getClickCount() == 2) {
 			String idTask = (String)this.tableTaskRunModel.getValueAt(this.tableTaskRun.getSelectedRow(), 0);
 			
@@ -807,7 +806,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void tableTaskEndMouseClicked(MouseEvent evt) {
-		System.out.println("tableTaskEnd.mouseClicked, event=" + evt);
+		
 	
 		if (evt.getClickCount() == 2) {
 			String idTask = (String)this.tableTaskEndModel.getValueAt(this.tableTaskEnd.getSelectedRow(), 0);
@@ -830,7 +829,6 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void btnCancelTaskWaitActionPerformed(ActionEvent evt) {
-		System.out.println("btnCancelTaskWait.actionPerformed, event=" + evt);
 		
 		int array[] = this.tableTaskWait.getSelectedRows();
 		
@@ -842,7 +840,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void btnClearTaskWaitActionPerformed(ActionEvent evt) {
-		System.out.println("btnClearTaskWait.actionPerformed, event=" + evt);
+		
 		int i = 0;
 		int count =  this.tableTaskWaitModel.getRowCount();
 		String value;
@@ -860,7 +858,6 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void btnKillTaskRunActionPerformed(ActionEvent evt) {
-		System.out.println("btnKillTaskRun.actionPerformed, event=" + evt);
 		
 		int array[] = this.tableTaskRun.getSelectedRows();
 		
@@ -872,7 +869,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void btnClearTaskRunActionPerformed(ActionEvent evt) {
-		System.out.println("btnClearTaskRun.actionPerformed, event=" + evt);
+		
 		int i = 0;
 		int count =  this.tableTaskRunModel.getRowCount();
 		String value;
@@ -890,7 +887,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void btnSaveTaskEndActionPerformed(ActionEvent evt) {
-		System.out.println("btnSaveTaskEnd.actionPerformed, event=" + evt);
+		
 		
 		int i = this.tableTaskWait.getSelectedRow();
 		
@@ -924,7 +921,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 
 	private void btnDeleteTaskEndActionPerformed(ActionEvent evt) {
-		System.out.println("btnDeleteTaskEnd.actionPerformed, event=" + evt);
+		
 		
 		int array[] = this.tableTaskEnd.getSelectedRows();
 		int length = array.length;
@@ -937,7 +934,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 	
 	private void btnClearLogActionPerformed(ActionEvent evt) {
-		System.out.println("btnClearLog.actionPerformed, event=" + evt);
+		
 		this.txtLog.setText("");
 	}
 
@@ -1220,7 +1217,7 @@ public class SciFrame extends javax.swing.JFrame {
 	}
 	
 	private void itemRestartEngineActionPerformed(ActionEvent evt) {
-		System.out.println("itemRestartEngine.actionPerformed, event=" + evt);
+		
 		
 		TreeEngineNode nodeEngine = (TreeEngineNode) treeEngine.getLastSelectedPathComponent();
 		
