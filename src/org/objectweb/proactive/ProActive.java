@@ -2122,4 +2122,12 @@ public class ProActive {
     public void enableExitOnEmpty() {
     	LocalBodyStore.getInstance().enableExitOnEmpty();
     }
+    
+    /**
+     * Returns the number of this version
+     * @return String 
+     */
+    public String getProActiveVersion() {
+    	return "3.1";
+    }
 }
