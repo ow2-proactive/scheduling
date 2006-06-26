@@ -68,7 +68,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
         FILE_SEPARATOR + "gridEngineStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
-    protected static final String DEFAULT_PARALLEL_ENVIRONMENT = "make";
+    protected static final String DEFAULT_PARALLEL_ENVIRONMENT = null;
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
     protected String parallelEnvironment = DEFAULT_PARALLEL_ENVIRONMENT;
@@ -78,6 +78,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     //Following options are not yet included in the command
     protected String interactive = "false";
     protected String outputFile;
+    protected String errorFile;
     protected int jobID;
     protected String queueName;
     protected String hostList;
@@ -217,17 +218,22 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         this.interactive = interactive;
     }
 
-    /** Set the output file to be passed to sge
-     * Not yet included in the sge command
+    /** Set the destination file for all standard output
      * @param string
      */
     public void setOutputFile(String string) {
         outputFile = string;
     }
 
+    /** Set the destination file for all standard error output
+     * @param string
+     */
+    public void setErrorFile(String string) {
+        errorFile = string;
+    }
+
     /**
-     * Sets the value of the queue where the job will be launched. The default is 'normal'
-     * Not yet included in the sge command
+     * Sets the value of the queue where the job will be launched
      * @param queueName
      */
     public void setQueueName(String queueName) {
@@ -266,24 +272,28 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     protected String buildCommand() {
         StringBuffer qsubCommand = new StringBuffer();
 
-        qsubCommand.append(command_path).append(" -S /bin/bash  ");
-        if ((this.queueName != null) && (this.queueName.length() > 0)) {
-            qsubCommand.append("-q ").append(queueName).append(" ");
+        qsubCommand.append(command_path).append(" -S /bin/bash ");
+
+        if(this.queueName !=null && this.queueName.length()>0){
+        	qsubCommand.append("-q ").append(queueName).append(" ");
         }
 
-        if ((this.outputFile != null) && (this.outputFile.length() > 0)) {
-            qsubCommand.append("-o ").append(outputFile).append(" ");
+	if(this.outputFile !=null && this.outputFile.length()>0){
+        	qsubCommand.append("-o ").append(outputFile).append(" ");
         }
 
-        if ((this.parallelEnvironment != null) &&
-                (this.parallelEnvironment.length() > 0)) {
-            qsubCommand.append("-pe ").append(parallelEnvironment).append(" ");
+	if(this.errorFile !=null && this.errorFile.length()>0){
+        	qsubCommand.append("-e ").append(errorFile).append(" ");
         }
+	
+	if(this.parallelEnvironment !=null && this.parallelEnvironment.length()>0){
+        	qsubCommand.append("-pe ").append(parallelEnvironment).append(" ");
 
-        if ((this.hostNumber != null) && (this.hostNumber.length() > 0)) {
-            qsubCommand.append(hostNumber).append(" ");
-        } else {
-            qsubCommand.append("1").append(" ");
+		if(this.hostNumber !=null && this.hostNumber.length()>0){
+		        qsubCommand.append(hostNumber).append(" ");
+        	}else{
+	        	qsubCommand.append("1").append(" ");
+		}
         }
 
         qsubCommand.append(scriptLocation).append(" ");
@@ -292,8 +302,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         if (logger.isDebugEnabled()) {
             logger.debug("qsub command is " + qsubCommand.toString());
         }
-        System.out.println("GridEngineSubProcess.buildCommand() " +
-            qsubCommand);
+        //System.out.println("GridEngineSubProcess.buildCommand() " + qsubCommand);
         return qsubCommand.toString();
     }
 
