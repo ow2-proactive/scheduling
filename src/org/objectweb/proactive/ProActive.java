@@ -2127,7 +2127,7 @@ public class ProActive {
      * Returns the number of this version
      * @return String 
      */
-    public String getProActiveVersion() {
+    public static String getProActiveVersion() {
     	return "3.1";
     }
 }
