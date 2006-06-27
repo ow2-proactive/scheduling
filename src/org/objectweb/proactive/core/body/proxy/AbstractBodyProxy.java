@@ -118,6 +118,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         return invokeOnBody(methodCall);
     }
 
+    /*
+     * HACK: toString() can be implicitly called by log4j, which may result in a
+     * deadlock if we call log4j inside log4j, so for now, we disable the message
+     * for toString().
+     */
+    private static boolean isToString(MethodCall methodCall) {
+        return (methodCall.getNumberOfParameter() == 0) &&
+        "toString".equals(methodCall.getName());
+    }
+
     private static Set loggedSyncCalls = Collections.synchronizedSet(new HashSet());
 
     private Object invokeOnBody(MethodCall methodCall)
@@ -132,11 +142,13 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             if (reason == null) {
                 return reifyAsAsynchronous(methodCall);
             }
-            if (syncCallLogger.isEnabledFor(Level.WARN)) {
+            if (!isToString(methodCall) &&
+                    syncCallLogger.isEnabledFor(Level.WARN)) {
                 String msg = "SYNC: Synchronous Method Call: " + reason +
-                       System.getProperty("line.separator") + methodCall.getReifiedMethod();
+                    System.getProperty("line.separator") +
+                    methodCall.getReifiedMethod();
                 if (loggedSyncCalls.add(msg)) {
-                    syncCallLogger.warn(msg); 
+                    syncCallLogger.warn(msg);
                 }
             }
             return reifyAsSynchronous(methodCall);
