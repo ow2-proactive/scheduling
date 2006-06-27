@@ -90,7 +90,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab" 
+	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" 
       description="build the class files"/>
 
 
@@ -109,16 +109,20 @@
 		</copy>
 	</target>
 
+	<target name="osgi" depends="core"
+    description="Compile osgi related stuff">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath"/>
+			<include name="${proactive.dir}/osgi/**/*.java"/>
+		</javac>
+		</target>
+
+	
 	<target name="core" depends="init, configurationCopy"
     description="Compile the ProActive core classes">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
-			<include name="*.java"/>
 			<include name="${proactive.dir}/*.java"/>
-			<include name="${proactive.dir}/jini/*.java"/>
-			<include name="${proactive.dir}/osgi/**/*.java"/>
-			<include name="${proactive.dir}/osgi/**/**/*.java"/>
-			<include name="${proactive.dir}/rmi/*.java"/>
 			<include name="${proactive.core.dir}/**/*.java"/>
 		</javac>
 
@@ -779,40 +783,15 @@
 
 
 	<!-- ================================================================ -->
-	<!--                         Compile ProActiveMPI                     -->
+	<!--                         Compile mpi                     -->
 	<!-- ================================================================ -->
-	<!--
-  javac ../src/mpi/ProActiveMPI.java
-  javah -jni ../src/mpi/ProActiveMPI
-  javap -s -p ../src/ProActiveMPI > ../src/mpi/ProActiveMPI.sgn
-  mv ../src/mpi/ProActiveMPI.class ../bin/mpi
-  javac ../src/mpi/example/MPI_C_Interface_sample.java
-  mv ../src/mpi/example/MPI_C_Interface_sample.class ../bin/mpi
-  mpicc -DProActiveMPI_java -I/usr/local/jdk1.4.0/include -I/usr/local/jdk1.4.0/include/linux ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c -o ../bin/mpi/libMPI_C_Interface_sample.so -shared
-  mpicc ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c  -o ../bin/mpi/MPI_C_Interface_sample
-  -->
-	<target name="ProActiveMPI" depends="core">
-		<javac srcdir="${src.dir}/mpi" destdir="${classes.dir}/mpi" includes="" deprecation="on"  source="${source}">
-			<classpath refid="test.classpath"/>
-		</javac>
-		<exec dir="${src.dir}/mpi" executable="javah" os="Linux" >
-			<arg line=" -jni ../src/mpi/ProActiveMPI"/>
-		</exec>
-		<exec dir="${src.dir}/mpi" executable="javap" os="Linux" >
-			<arg line=" -s -p ../src/ProActiveMPI > ../src/mpi/ProActiveMPI.sgn"/>
-		</exec>
-		<exec dir="${src.dir}/mpi" executable="mpicc" os="Linux" >
-			<arg line=" -DProActiveMPI_java -I/usr/local/jdk1.4.0/include -I/usr/local/jdk1.4.0/include/linux ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c -o ../bin/mpi/libMPI_C_Interface_sample.so -shared"/>
-		</exec>
-		<exec dir="${src.dir}/mpi" executable="mpicc" os="Linux" >
-			<arg line=" ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c  -o ../bin/mpi/MPI_C_Interface_sample"/>
-		</exec>
-		<javac srcdir="${src.dir}/mpi/example" destdir="${classes.dir}/mpi/example" includes="" deprecation="on"  source="${source}">
-			<classpath refid="test.classpath"/>
+	 
+	<target name="mpi" depends="core" description="Compile mpi classes for simple wrapping">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/**/*.java" deprecation="on"  source="${source}" debug="${debug}" >
+			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
-
-
+	
 	<!-- ================================================================ -->
 	<!--   Tests coverage : need clover license in user.home directory    -->
 	<!-- ================================================================ -->
