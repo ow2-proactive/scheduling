@@ -59,9 +59,7 @@
     <sect2>
       <title>API Definition</title>
 
-      <programlisting lang="java">import org.objectweb.proactive.filetransfer;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+      <programlisting lang="java">import org.objectweb.proactive.filetransfer.*;
 
 static public FileVector <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
 static public FileVector <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File<emphasis
@@ -95,9 +93,7 @@ static public FileVector <emphasis role="bold">FileTransfer.pullFile</emphasis>(
       <emphasis>localhost</emphasis>@<emphasis
       role="bold">localDest</emphasis>, in the same fashion.</para>
 
-      <programlisting lang="java">import org.objectweb.proactive.filetransfer
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.FileWrapper;
+      <programlisting lang="java">import org.objectweb.proactive.filetransfer.*;
 
 pad = ProActive.getProactiveDescriptor(XML_LOCATION);
 
