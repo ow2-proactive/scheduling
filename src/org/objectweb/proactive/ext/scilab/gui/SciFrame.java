@@ -35,6 +35,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -110,11 +112,9 @@ public class SciFrame extends javax.swing.JFrame {
 	private JMenuItem itemExit;
 	private JMenuItem itemTask;
 	private JMenu menuCommand;
-	private JButton btnClearLog;
-	private JPanel pnlBtnLog;
+	private JPanel pnlLogSouth;
 	private JTextArea txtLog;
 	private JScrollPane scrollLog;
-	private JLabel lblLog;
 	private JPanel pnlMainLog;
 	private JButton btnDeleteTaskEnd;
 	private JButton btnSaveTaskEnd;
@@ -136,6 +136,16 @@ public class SciFrame extends javax.swing.JFrame {
 	private JPanel pnlTaskWait;
 	private JSplitPane splitMain1;
 	private JSplitPane splitTask1;
+	private JPanel pnlBtnClearCenter;
+	private JPanel pnlBtnClear;
+	private JPanel pnlLblTaskEnd;
+	private JPanel pnlLblTaskRun;
+	private JPanel pnlLblTaskWait;
+	private JMenuItem itemLegend;
+	private JPanel pnlScilab;
+	private JPanel pnlLogo;
+	private JButton btnClearLog;
+	private JPanel pnlProActive;
 	private JMenuItem itemRestartEngine;
 	private JPopupMenu popupTreeEngine;
 	private JList listPreview;
@@ -156,6 +166,9 @@ public class SciFrame extends javax.swing.JFrame {
 	private DefaultComboBoxModel listPreviewModel;
 	private JScrollPane scrollPreview;
 	private TreeEngineRenderer treeRenderer;
+	private DialogLegend dialogLegend;
+	
+	
 	
 	/**
 	 * Auto-generated main method to display this JFrame
@@ -168,15 +181,19 @@ public class SciFrame extends javax.swing.JFrame {
 	public SciFrame() {
 		super();
 		initGUI();
+		
 		dialogTask = new DialogTask(this);
 		dialogTask.setModal(true);
 		
 		dialogResult = new DialogResult(this);
 		dialogResult.setModal(true);
 		
+		dialogLegend = new DialogLegend(this);
+		dialogLegend.setModal(true);
+		
 		service = new ScilabService();
 		
-		service.getTaskObservable().addSciEventListener( new SciEventListener(){
+		service.addEventListenerTask(new SciEventListener(){
 			public void actionPerformed(SciEvent evt){
 				SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
 				
@@ -208,7 +225,7 @@ public class SciFrame extends javax.swing.JFrame {
 		});
 		
 		
-		service.getEngineObservable().addSciEventListener(new SciEventListener(){
+		service.addEventListenerEngine(new SciEventListener(){
 			public void actionPerformed(SciEvent evt){
 				refreshTreeEngine();
 			}
@@ -282,7 +299,7 @@ public class SciFrame extends javax.swing.JFrame {
 						splitTask1.setDividerSize(7);
 						splitTask1.setOneTouchExpandable(true);
 						splitMain2.add(splitTask1, JSplitPane.RIGHT);
-						{
+						{ 
 							splitTask2 = new JSplitPane();
 							splitTask2.setOneTouchExpandable(true);
 							splitTask2.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -294,14 +311,28 @@ public class SciFrame extends javax.swing.JFrame {
 								BorderLayout pnlTaskWaitLayout = new BorderLayout();
 								pnlTaskWait.setLayout(pnlTaskWaitLayout);
 								pnlTaskWait.setSize(700, 180);
-								pnlTaskWait
-										.setPreferredSize(new java.awt.Dimension(
-												702, 150));
+								pnlTaskWait.setPreferredSize(new java.awt.Dimension(702, 150));
+								pnlTaskWait.setBackground(new Color(96, 106, 173));
 								{
-									lblTaskWait = new JLabel();
-									pnlTaskWait.add(lblTaskWait, BorderLayout.NORTH);
-									lblTaskWait.setText("Pending Tasks:");
+									pnlLblTaskWait = new JPanel();
+									pnlTaskWait.add(pnlLblTaskWait, BorderLayout.NORTH);
+									pnlLblTaskWait.setBackground(new java.awt.Color(96,106,173));
+									{
+										lblTaskWait = new JLabel();
+										pnlLblTaskWait.add(lblTaskWait);
+										FlowLayout lblTaskWaitLayout = new FlowLayout();
+										lblTaskWait
+											.setLayout(lblTaskWaitLayout);
+										lblTaskWait.setForeground(Color.WHITE);
+										lblTaskWait.setFont(new Font(
+											"Tahoma",
+											Font.BOLD,
+											13));
+
+										lblTaskWait.setText("Pending Tasks");
+									}
 								}
+
 								{
 									scrollTaskWait = new JScrollPane();
 									pnlTaskWait.add(scrollTaskWait,
@@ -323,6 +354,7 @@ public class SciFrame extends javax.swing.JFrame {
 										scrollTaskWait.setViewportView(tableTaskWait);
 										scrollTaskWait.getViewport().setBackground(Color.WHITE);
 										tableTaskWait.setModel(tableTaskWaitModel);
+										tableTaskWait.getTableHeader().setBackground(new java.awt.Color(250,251,253));
 										tableTaskWait.getColumnModel().getColumn(4).setCellRenderer(new IconRenderer());
 										tableTaskWait.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 										tableTaskWait
@@ -379,17 +411,13 @@ public class SciFrame extends javax.swing.JFrame {
 								pnlTaskRun.setSize(700, 180);
 								pnlTaskRun.setPreferredSize(new java.awt.Dimension(
 										702, 150));
-								{
-									lblTaskRun = new JLabel();
-									pnlTaskRun.add(lblTaskRun, BorderLayout.NORTH);
-									lblTaskRun.setText("Executing Tasks:");
-								}
+								pnlTaskRun.setBackground(new Color(96, 106, 173));
+
 								{
 									scrollTaskRun = new JScrollPane();
 									pnlTaskRun.add(scrollTaskRun,
 											BorderLayout.CENTER);
 									scrollTaskRun.setPreferredSize(new java.awt.Dimension(690, 135));
-									//scrollTaskRun.setSize(692, 104);
 									{
 										tableTaskRunModel = new DefaultTableModel(
 												null, new String[] { "Id Task", "Script",
@@ -404,8 +432,10 @@ public class SciFrame extends javax.swing.JFrame {
 									 
 										scrollTaskRun.setViewportView(tableTaskRun);
 										scrollTaskRun.getViewport().setBackground(Color.WHITE);
-										
+									
 										tableTaskRun.setModel(tableTaskRunModel);
+										tableTaskRun.getTableHeader().setBackground(new java.awt.Color(250,251,253));
+										
 										tableTaskRun.getColumnModel().getColumn(4).setCellRenderer(new IconRenderer());
 										tableTaskRun.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 										tableTaskRun.addMouseListener(new MouseAdapter() {
@@ -451,6 +481,21 @@ public class SciFrame extends javax.swing.JFrame {
 												});
 									}
 								}
+								{
+									pnlLblTaskRun = new JPanel();
+									pnlTaskRun.add(pnlLblTaskRun, BorderLayout.NORTH);
+									pnlLblTaskRun.setBackground(new java.awt.Color(96,106,173));
+									{
+										lblTaskRun = new JLabel();
+										pnlLblTaskRun.add(lblTaskRun);
+										lblTaskRun.setForeground(Color.WHITE);
+										lblTaskRun.setFont(new Font(
+											"Tahoma",
+											Font.BOLD,
+											13));
+										lblTaskRun.setText("Executing Tasks");
+									}
+								}
 							}
 
 						}	
@@ -462,11 +507,7 @@ public class SciFrame extends javax.swing.JFrame {
 							pnlTaskEnd.setSize(700, 180);
 							pnlTaskEnd.setPreferredSize(new java.awt.Dimension(
 									702, 150));
-							{
-								lblTaskEnd = new JLabel();
-								pnlTaskEnd.add(lblTaskEnd, BorderLayout.NORTH);
-								lblTaskEnd.setText("Terminated Tasks:");
-							}
+							pnlTaskEnd.setBackground(new Color(96, 106, 173));
 							{
 								scrollTaskEnd = new JScrollPane();
 								pnlTaskEnd.add(scrollTaskEnd,BorderLayout.CENTER);
@@ -485,6 +526,7 @@ public class SciFrame extends javax.swing.JFrame {
 									scrollTaskEnd.setViewportView(tableTaskEnd);
 									scrollTaskEnd.getViewport().setBackground(Color.WHITE);
 									tableTaskEnd.setModel(tableTaskEndModel);
+									tableTaskEnd.getTableHeader().setBackground(new java.awt.Color(250,251,253));
 									tableTaskEnd.getColumnModel().getColumn(4).setCellRenderer(new IconRenderer());
 									tableTaskEnd.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 									tableTaskEnd.addMouseListener(new MouseAdapter() {
@@ -531,6 +573,21 @@ public class SciFrame extends javax.swing.JFrame {
 											});
 								}
 							}
+							{
+								pnlLblTaskEnd = new JPanel();
+								pnlTaskEnd.add(pnlLblTaskEnd, BorderLayout.NORTH);
+								pnlLblTaskEnd.setBackground(new java.awt.Color(96,106,173));
+								{
+									lblTaskEnd = new JLabel();
+									pnlLblTaskEnd.add(lblTaskEnd);
+									lblTaskEnd.setForeground(Color.WHITE);
+									lblTaskEnd.setFont(new Font(
+										"Tahoma",
+										Font.BOLD,
+										13));
+									lblTaskEnd.setText("Terminated Tasks");
+								}
+							}
 						}
 					}
 				}
@@ -542,11 +599,7 @@ public class SciFrame extends javax.swing.JFrame {
 					pnlMainLog
 							.setPreferredSize(new java.awt.Dimension(790, 348));
 					pnlMainLog.setSize(790, 200);
-					{
-						lblLog = new JLabel();
-						pnlMainLog.add(lblLog, BorderLayout.NORTH);
-						lblLog.setText("Operations:");
-					}
+					pnlMainLog.setBorder(BorderFactory.createTitledBorder("Operations"));
 					{
 						scrollLog = new JScrollPane();
 						pnlMainLog.add(scrollLog, BorderLayout.CENTER);
@@ -556,21 +609,97 @@ public class SciFrame extends javax.swing.JFrame {
 						}
 					}
 					{
-						pnlBtnLog = new JPanel();
-						pnlMainLog.add(pnlBtnLog, BorderLayout.SOUTH);
-						FlowLayout pnlBtnLogLayout = new FlowLayout();
-						pnlBtnLogLayout.setAlignment(FlowLayout.RIGHT);
-						pnlBtnLog.setLayout(pnlBtnLogLayout);
+						pnlLogSouth = new JPanel();
+						pnlMainLog.add(pnlLogSouth, BorderLayout.SOUTH);
+						BorderLayout pnlLogSouthLayout = new BorderLayout();
+						pnlLogSouth.setLayout(pnlLogSouthLayout);
 						{
-							btnClearLog = new JButton();
-							pnlBtnLog.add(btnClearLog);
-							btnClearLog.setText("Clear");
-							btnClearLog.setToolTipText("Clear operation logs");
-							btnClearLog.addActionListener(new ActionListener() {
-								public void actionPerformed(ActionEvent evt) {
-									btnClearLogActionPerformed(evt);
-								}
-							});
+							pnlLogo = new JPanel();
+							pnlLogSouth.add(pnlLogo, BorderLayout.CENTER);
+							FlowLayout pnlLogoLayout = new FlowLayout();
+							pnlLogo.setLayout(pnlLogoLayout);
+							pnlLogo.setSize(802, 60);
+							pnlLogo.setPreferredSize(new java.awt.Dimension(
+								802,
+								60));
+							{
+								pnlProActive = new JPanel() {
+									public void paintComponent(Graphics g) {
+										super.paintComponent(g);
+
+										g
+											.drawImage(
+												Toolkit
+													.getDefaultToolkit()
+													.getImage(
+														getClass()
+															.getResource(
+																"img/logo_proactive.png")),
+												0,
+												0,
+												this);
+									}
+								};
+								pnlLogo.add(pnlProActive);
+
+								pnlProActive
+									.setPreferredSize(new java.awt.Dimension(
+										200,
+										30));
+								pnlProActive.setSize(200, 30);
+							}
+							{
+								pnlScilab = new JPanel() {
+									public void paintComponent(Graphics g) {
+										super.paintComponent(g);
+
+										g
+											.drawImage(
+												Toolkit
+													.getDefaultToolkit()
+													.getImage(
+														getClass()
+															.getResource(
+																"img/logo_scilab1.gif")),
+												0,
+												0,
+												this);
+									}
+								};
+								pnlLogo.add(pnlScilab);
+
+								pnlScilab
+									.setPreferredSize(new java.awt.Dimension(
+										125,
+										70));
+								pnlScilab.setSize(125, 70);
+							}
+						}
+						{
+							pnlBtnClear = new JPanel();
+							BorderLayout pnlBtnClearLayout = new BorderLayout();
+							pnlBtnClear.setLayout(pnlBtnClearLayout);
+							pnlLogSouth.add(pnlBtnClear, BorderLayout.EAST);
+							{
+								btnClearLog = new JButton();
+								pnlBtnClear.add(btnClearLog, BorderLayout.NORTH);
+								btnClearLog.setText("Clear");
+								btnClearLog
+									.setToolTipText("Clear operation logs");
+								btnClearLog
+									.addActionListener(new ActionListener() {
+										public void actionPerformed(
+											ActionEvent evt) {
+											btnClearLogActionPerformed(evt);
+										}
+									});
+							}
+							{
+								pnlBtnClearCenter = new JPanel();
+								pnlBtnClear.add(
+									pnlBtnClearCenter,
+									BorderLayout.CENTER);
+							}
 						}
 					}
 				}
@@ -621,6 +750,16 @@ public class SciFrame extends javax.swing.JFrame {
 						itemTask.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent evt) {
 								itemTaskActionPerformed(evt);
+							}
+						});
+					}
+					{
+						itemLegend = new JMenuItem();
+						menuCommand.add(itemLegend);
+						itemLegend.setText("Legend");
+						itemLegend.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent evt) {
+								itemLegendActionPerformed(evt);
 							}
 						});
 					}
@@ -733,7 +872,7 @@ public class SciFrame extends javax.swing.JFrame {
 	        this.setBounds(x, y, f.width, f.height );
 	        this.setIconImage(new ImageIcon(getClass().getResource("img/icone.png")).getImage());
 	        this.setTitle("Grid Scilab ToolBox");
-			this.setSize(812, 744);
+			this.setSize(812, 780);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1227,5 +1366,10 @@ public class SciFrame extends javax.swing.JFrame {
 		
 		nodeEngine.setState(TreeEngineNode.VALID);
 		service.restartEngine(nodeEngine.toString());
+	}
+	
+	private void itemLegendActionPerformed(ActionEvent evt) {
+		this.dialogLegend.setLocationRelativeTo(this);
+        this.dialogLegend.setVisible(true);
 	}
 }

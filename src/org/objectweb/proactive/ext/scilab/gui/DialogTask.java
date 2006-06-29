@@ -86,7 +86,6 @@ public class DialogTask extends javax.swing.JDialog {
 	private JPanel pnlMain;
 	private JButton btnPath;
 	private JPanel pnlTaskSouth;
-	private JLabel lblIinit;
 	private JPanel pnlInit;
 
 	public static final int VALIDATE = 1,
@@ -143,7 +142,7 @@ public class DialogTask extends javax.swing.JDialog {
 						pnlInit.setLayout(pnlInitLayout);
 						pnlInit.setPreferredSize(new java.awt.Dimension(396, 228));
 						pnlInit.setSize(393, 23);
-						pnlInit.setBorder(BorderFactory.createTitledBorder(""));
+						pnlInit.setBorder(BorderFactory.createTitledBorder("Initialize Script"));
 						{
 							scrollInit = new JScrollPane();
 							pnlInit.add(scrollInit, BorderLayout.CENTER);
@@ -154,14 +153,6 @@ public class DialogTask extends javax.swing.JDialog {
 								txtInit = new JTextArea();
 								scrollInit.setViewportView(txtInit);
 							}
-						}
-						{
-							lblIinit = new JLabel();
-							pnlInit.add(lblIinit, BorderLayout.NORTH);
-							lblIinit.setText("Initialize Script:");
-							lblIinit.setPreferredSize(new java.awt.Dimension(
-								101,
-								19));
 						}
 					}
 					{
@@ -300,7 +291,7 @@ public class DialogTask extends javax.swing.JDialog {
 	}
 	
 	private void btnPathActionPerformed(ActionEvent evt) {
-		System.out.println("btnPath.actionPerformed, event=" + evt);
+		
 		if (this.chooserScript.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
@@ -309,7 +300,7 @@ public class DialogTask extends javax.swing.JDialog {
 	}
 	
 	private void btnCancelActionPerformed(ActionEvent evt) {
-		System.out.println("btnCancel.actionPerformed, event=" + evt);
+		
 		this.state = DialogTask.CANCEL;
 		this.setVisible(false);
 	}

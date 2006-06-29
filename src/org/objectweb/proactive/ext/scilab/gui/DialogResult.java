@@ -63,10 +63,8 @@ import javax.swing.border.LineBorder;
 */
 public class DialogResult extends javax.swing.JDialog {
 	private JPanel pnlMain;
-	private JLabel lblIinit;
 	private JLabel lblPath;
 	private JPanel pnlPath;
-	private JLabel lblOutParam;
 	private JPanel pnlOutParam;
 	private JScrollPane scrollInit;
 	private JTextField txtPath;
@@ -112,13 +110,7 @@ public class DialogResult extends javax.swing.JDialog {
 						
 						pnlInit.setLayout(pnlInitLayout);
 						pnlInit.setSize(570, 235);
-						pnlInit.setBorder(BorderFactory.createTitledBorder(""));
-						{
-							lblIinit = new JLabel();
-							pnlInit.add(lblIinit, BorderLayout.NORTH);
-							lblIinit.setText("Initialize Script:");
-							lblIinit.setPreferredSize(new java.awt.Dimension(551, 29));
-						}
+						pnlInit.setBorder(BorderFactory.createTitledBorder("Initialize Script"));
 						{
 							scrollInit = new JScrollPane();
 							pnlInit.add(scrollInit, BorderLayout.CENTER);
@@ -141,13 +133,7 @@ public class DialogResult extends javax.swing.JDialog {
 						BorderLayout pnlOutParamLayout = new BorderLayout();
 						pnlTask.add(pnlOutParam, BorderLayout.CENTER);
 						pnlOutParam.setLayout(pnlOutParamLayout);
-						pnlOutParam.setBorder(BorderFactory.createTitledBorder(""));
-						{
-							lblOutParam = new JLabel();
-							pnlOutParam.add(lblOutParam, BorderLayout.NORTH);
-							lblOutParam.setText("Out Parameters:");
-							lblOutParam.setPreferredSize(new java.awt.Dimension(551, 29));
-						}
+						pnlOutParam.setBorder(BorderFactory.createTitledBorder("Out Parameters"));
 						{
 							
 							{
@@ -199,6 +185,7 @@ public class DialogResult extends javax.swing.JDialog {
 					BorderLayout pnlPathLayout = new BorderLayout();
 					pnlPathLayout.setHgap(5);
 					pnlPath.setLayout(pnlPathLayout);
+					
 
 					{
 						lblPath = new JLabel();
@@ -207,6 +194,7 @@ public class DialogResult extends javax.swing.JDialog {
 						lblPath.setText("Select Script:");
 						lblPath.setSize(new java.awt.Dimension(90, 14));
 						lblPath.setPreferredSize(new java.awt.Dimension(81, 23));
+						
 					}
 					{
 						txtPath = new JTextField();
@@ -236,7 +224,7 @@ public class DialogResult extends javax.swing.JDialog {
 	}
 	
 	private void btnSaveActionPerformed(ActionEvent evt) {
-		System.out.println("btnSave.actionPerformed, event=" + evt);
+		
 		if (this.chooserSave.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
@@ -261,7 +249,7 @@ public class DialogResult extends javax.swing.JDialog {
 		this.btnSave.setEnabled(isEnable);
 	}
 	private void btnQuitActionPerformed(ActionEvent evt) {
-		System.out.println("btnQuit.actionPerformed, event=" + evt);
+		
 		this.setVisible(false);
 	}
 	
