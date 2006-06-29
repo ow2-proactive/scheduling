@@ -3,7 +3,7 @@
 echo
 echo --- Scilab example ---------------------------------------------
 
-. ~amangin/scilab/build4/scilab/env.sh
+. scilab_env.sh
 
 workingDir=`dirname $0`
 . $workingDir/env.sh
