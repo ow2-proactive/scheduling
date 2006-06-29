@@ -74,12 +74,12 @@
                                 <log4jpropertiesFile>
 				    <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive-log4j" />
 				</log4jpropertiesFile>
-                               <jvmParameters>
-                                 <!-- <parameter value="-DSCIDIR=${REMOTE_HOME}/${SCILAB_HOME}"/>
+                               <!-- <jvmParameters>
+                                 <parameter value="-DSCIDIR=${REMOTE_HOME}/${SCILAB_HOME}"/>
                                    <parameter value="-DSCI=${REMOTE_HOME}/${SCILAB_HOME}"/> 
                                    <parameter value="-DLD_LIBRARY_PATH=${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
-                                   <parameter value="-Djava.library.path=${REMOTE_HOME}/${SCILAB_HOME}/bin"/> -->
-                               </jvmParameters>
+                                   <parameter value="-Djava.library.path=${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+                               </jvmParameters> -->
                               </jvmProcess>
 			</processDefinition>
 			<processDefinition id="rsh_predadab">
