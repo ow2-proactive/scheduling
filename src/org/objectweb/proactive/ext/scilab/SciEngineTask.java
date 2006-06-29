@@ -59,7 +59,7 @@ public class SciEngineTask {
 	
 	
 	public SciEngineTask(){
-		
+		Scilab.init();
 	}
 	
 	/**

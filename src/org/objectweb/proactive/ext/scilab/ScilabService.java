@@ -150,7 +150,7 @@ public class ScilabService {
 		sciTask.setJobInit(jobInit);
 		
 		for(int i=0; i< dataOut.length; i++){
-			System.out.println("->ScilabService DataOut:sendTask:" + dataOut[i]);
+			logger.debug("->ScilabService DataOut:sendTask:" + dataOut[i]);
 			if(dataOut[i].trim().equals("")){
 				continue;
 			}
@@ -323,16 +323,16 @@ public class ScilabService {
 			idEngine = (String) this.listIdEngineFree.remove(0);
 			sciEngineInfo = (SciEngineInfo) mapEngine.get(idEngine);
 			isActivate = sciEngineInfo.getIsActivate();
-			System.out.println("->ScilabService test0:getNextEngine");
+			logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
 			if(ProActive.isAwaited(isActivate)){
-				System.out.println("->ScilabService test1:getNextEngine");
+				logger.debug("->ScilabService test1:getNextEngine:" + idEngine);
 				this.listIdEngineFree.add(idEngine);
 			}
 			else if(isActivate.booleanValue()){
-				System.out.println("->ScilabService test2:getNextEngine");
+				logger.debug("->ScilabService test2:getNextEngine:" + idEngine);
 				return sciEngineInfo;
 			}else{
-				System.out.println("->ScilabService test3:getNextEngine");
+				logger.debug("->ScilabService test3:getNextEngine:" + idEngine);
 				this.listIdEngineFree.add(idEngine);
 				SciEngineWorker sciEngine = sciEngineInfo.getSciEngine();
 				sciEngineInfo.setIsActivate(sciEngine.activate());
@@ -403,12 +403,13 @@ public class ScilabService {
 		notifyAll();
 	}
 	
-	public synchronized SciEventSource getTaskObservable() {
-		return taskObservable;
+	
+	public synchronized void addEventListenerTask(SciEventListener evtListener){
+		taskObservable.addSciEventListener(evtListener);
 	}
 	
-	public synchronized SciEventSource getEngineObservable() {
-		return engineObservable;
+	public synchronized void addEventListenerEngine(SciEventListener evtListener){
+		engineObservable.addSciEventListener(evtListener);
 	}
 	
 	public synchronized SciTaskInfo getTaskEnd(String idTask){

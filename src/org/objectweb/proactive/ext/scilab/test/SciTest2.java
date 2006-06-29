@@ -74,7 +74,7 @@ public class SciTest2 {
 		
 		ScilabService scilab = new ScilabService();
 		
-		scilab.getTaskObservable().addSciEventListener( new SciEventListener(){
+		scilab.addEventListenerTask( new SciEventListener(){
 			public void actionPerformed(SciEvent evt){
 				SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
 				

@@ -48,8 +48,6 @@ public class SciTaskInfo {
 	
 	private int state;
 	private String idEngine;
-	private String nameScript;
-	private String pathScript;
 	private File fileScript;
 	private SciTask sciTask;
 	private SciResult sciResult;
