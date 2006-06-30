@@ -52,7 +52,6 @@
       </listitem>
     </itemizedlist>
 
-    <sect2>
       <para>There are four classes which are intented for the user:</para>
 
       <para>The Class <literal>ScilabService</literal> implememts all
@@ -169,7 +168,7 @@
       linkend="sciex2" />.</para>
 
       <example id="sciex1">
-        <title>Exemple: Interface Scilab</title>
+        <title>Example: Interface Scilab</title>
 
         <programlisting lang="java">public class SciTest {
 
@@ -330,7 +329,6 @@
 	&lt;/infrastructure&gt;
 &lt;/ProActiveDescriptor&gt;</programlisting>
       </example>
-    </sect2>
   </sect1>
 
   <sect1>
@@ -346,16 +344,18 @@
 
       <para>On Unix:</para>
 
-      <screen>./proactive_home/scripts/unix/scilab.sh</screen>
+      <screen>cd scripts/unix
+scilab.sh</screen>
 
       <para>On Windows:</para>
 
-      <screen>./proactive_home/scripts/windows/scilab.sh</screen>
+      <screen>cd scripts\windows
+scilab.bat</screen>
 
       <para>if you use a local version of Scilab, you must declare the
       environment variables in the file: </para>
 
-      <screen>./proactive_home/scripts/unix_or_windows/scilab_env.sh</screen>
+      <screen>scripts/[unix|windows]/scilab_env.[sh|bat]</screen>
 
       <para>Once the application is started, the main frame is displayed. This
       frame is composed in three parts:</para>
