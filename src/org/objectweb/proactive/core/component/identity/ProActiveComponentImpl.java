@@ -300,9 +300,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                 controllerConfigFileLocation +
                 ". Reverting to default controllers configuration.");
             try {
-                return ComponentConfigurationHandler.createComponentConfigurationHandler(ProActiveComponent.class.getResource(
-                        ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION)
-                                                                                                                 .getFile());
+                return ComponentConfigurationHandler.createComponentConfigurationHandler(ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION);
             } catch (Exception e2) {
                 logger.error(
                     "could not load default controller config file either. Check that the default controller config file is available in your classpath at : " +
