@@ -7,7 +7,7 @@ echo --- Scilab example ---------------------------------------------
 SETLOCAL
 call init.bat
 call scilab_env.bat
-%JAVA_CMD% org.objectweb.proactive.ext.scilab.%1
+%JAVA_CMD% org.objectweb.proactive.ext.scilab.gui.SciFrame
 
 ENDLOCAL
 

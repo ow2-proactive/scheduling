@@ -1,4 +1,4 @@
-#!/bin/sh
+ #!/bin/sh
 
 echo
 echo --- Scilab example ---------------------------------------------
@@ -10,7 +10,7 @@ workingDir=`dirname $0`
 PROACTIVE=$workingDir/../..
 
 
-$JAVACMD org.objectweb.proactive.ext.scilab.$1
+$JAVACMD org.objectweb.proactive.ext.scilab.gui.SciFrame
 
 echo
 echo ------------------------------------------------------------
