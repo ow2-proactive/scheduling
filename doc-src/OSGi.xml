@@ -80,10 +80,9 @@
     specified in a Java interface. OSGi specify a set of standard services
     like Http Service, Log Service ...</para>
 
-    <para>We currently use the <ulink
-    url="http://oscar.objectweb.org"></ulink> OSCAR objectweb implementation.
-    For more information on OSGi, please visit the <ulink
-    url="http://www.osgi.org"></ulink>OSGi website .</para>
+    <para>We currently use the <ulink url="http://oscar.objectweb.org">OSCAR objectweb</ulink>  implementation.
+    For more information on OSGi, please visit the 
+    <ulink url="http://www.osgi.org">OSGi</ulink> website .</para>
   </sect1>
 
   <sect1  id="OSGi_html_proactiveBundle">
@@ -209,8 +208,8 @@ Bundle-Activator: org.objectweb.proactive.examples.osgi.hello.HelloActivator
     the Hello Bundle.</emphasis></emphasis></para>
 
     <para>In order to run the example you need to install an OSGi framework.
-    You can download and install one from the <ulink
-    url="http://oscar.objectweb.org">OSCAR website</ulink>. Install the
+    You can download and install one from the 
+    <ulink url="http://oscar.objectweb.org">OSCAR website</ulink>. Install the
     required services on the OSCAR framework:</para>
 
     <screen> --&gt; obr start 'Http Service' </screen>

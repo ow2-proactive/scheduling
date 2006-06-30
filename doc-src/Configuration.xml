@@ -433,8 +433,12 @@
               runtimes created with this property enabled fetch missing
               classes using a special mechanism
               (see the 
-              <ulink url="../api/org/objectweb/proactive/core/classloader/package-summary.html">
-               classloader package javadoc</ulink>). This is an alternative to RMI dynamic class
+              
+              <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+              <ulink os="html" url="../api/org/objectweb/proactive/core/classloader/package-summary.html">
+              classloader package javadoc</ulink>
+              <phrase os="pdf">org.objectweb.proactive.core.classloader javadoc</phrase>). 
+              This is an alternative to RMI dynamic class
               downloading, useful for instance when performing hierarchical
               deployment.</para>
             </listitem>

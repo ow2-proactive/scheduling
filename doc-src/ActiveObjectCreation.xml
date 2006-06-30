@@ -649,7 +649,9 @@ ProActive.turnActive(
        (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)      
       provides to simplify the creation of factories as singleton. More explanations
       can be found in the 
-      <ulink url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">javadoc of that class</ulink>. 
+      <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+      <ulink os="html" url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">javadoc of that class</ulink>
+      <phrase os="pdf"><literal>org.objectweb.proactive.core.body.ProActiveMetaObjectFactory</literal> javadoc</phrase>. 
       The use of that factory  is fairly simple. All you have to do is to pass an instance of the
       factory when creating a new active object. If we take the same example
       as before we have:</para>

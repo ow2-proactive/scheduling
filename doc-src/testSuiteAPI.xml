@@ -477,9 +477,8 @@ public interface Timeable {
       <sect3 >
         <title>By the file configurator</title>
 
-        <para>See the <ulink url="descriptor.xml">configuration file
-        part</ulink> for more details to configure results output by the file
-        descriptor.</para>
+        <para>See <xref linkend="descriptor"/> for more detail 
+         to configure result output through the file descriptor.</para>
       </sect3>
     </sect2>
 
@@ -556,8 +555,8 @@ public interface Timeable {
         configuration files. Currently, configuration files can be written in
         XML or in Java properties (key=value) format.</para>
 
-        <para>You can also configure the logger by the <ulink
-        url="descriptor.xml">configuration file</ulink>.</para>
+        <para>You can also configure the logger by the <xref
+        linkend="descriptor"/>.</para>
 
         <para>Use default configuration of log4J. Add this code Manager
           constructor:</para>
@@ -1083,8 +1082,7 @@ manager.execute(true);</screen>
       <screen> manager.setVerbatim(true); </screen>
 
       <para>You can also have the results in a HTML or XML file or in a
-      stream, for more details see the <ulink url="format.xml">results
-      section</ulink> for: testssuite.result.ResultsExporter</para>
+      stream, in <xref linkend="format"/>, look for: testssuite.result.ResultsExporter</para>
 
       <sect3 >
         <title>An example of results for this test with verbatim
@@ -1274,8 +1272,8 @@ public class BenchNewActive extends ProActiveBenchmark {
 
         <note>
           <para>It is the benchmark's programmer who measure the time of the
-          action with a configurable timer, see the <ulink
-          url="timer.xml">timer part</ulink> for more details.</para>
+          action with a configurable timer, see the <xref
+          linkend="timer"/> for more details.</para>
         </note>
 
         <para>The <emphasis role="bold">ReifiableObject</emphasis> class is a
@@ -1585,8 +1583,7 @@ public class Manager extends ProActiveBenchManager {
     <title>How to create a Test Suite with interlinked Tests</title>
 
     <para>In this part we will not explain how to write a simple test, for
-    this see <ulink url="first_test.xml">Your first Test</ulink>
-    section.</para>
+    this see <xref linkend="first_test"/> .</para>
 
     <sect2 >
       <title>Description of our Test</title>
@@ -1643,7 +1640,7 @@ public class TestGroupCreation extends ProActiveFunctionalTest
     }</programlisting>
 
         <para>Now we will implement the action method to create a ProActive
-        Group with 3 Agent (see the Agent code at the end of this sect1 -
+        Group with 3 Agent (see the Agent code at the end of this section -
         <xref linkend="agent" />):</para>
 
         <programlisting lang="java">import org.objectweb.proactive.core.group.Group;
@@ -1798,8 +1795,7 @@ public class Manager extends ProActiveFuncTestManager {
              migration.setTests(params);
   // ...</programlisting>
 
-      <para>You can see in the <ulink url="descriptor.xml">configuration file
-      part</ulink> how to do this by a configuration file.</para>
+      <para>You can see in the <xref linkend="descriptor"/> how to do this by a configuration file.</para>
 
       <para><emphasis role="bold">Warning:</emphasis> Don't forget to write a
       prop file with the name of the remote host.</para>

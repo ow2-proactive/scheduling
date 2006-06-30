@@ -73,9 +73,11 @@
   </table>
 
   <para>The full source of IC2D is included in the distribution and is also
-  browseable on line:</para>
+  browseable on line, or wherever you built the javadoc:</para>
 
- <para><ulink url="../api/org/objectweb/proactive/ic2d/package-summary.html"/></para>
+ <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+ <screen><ulink os="html" url="../api/org/objectweb/proactive/ic2d/package-summary.html"/><phrase 
+     os="pdf">org.objectweb.proactive.ic2d javadoc</phrase></screen>
 
   <sect1 >
     <title>Graphical Visualisation

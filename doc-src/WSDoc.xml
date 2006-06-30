@@ -105,7 +105,7 @@
 
     <para>The SOAP Engine is now installed ! You can verify, after starting
     the server that you access to the welcome page of Apache SOAP at: <ulink
-    url="http://localhost:8080/soap/index.html">http://localhost:8080/soap/index.html</ulink>.</para>
+    url="http://localhost:8080/soap/index.html"/>.</para>
 
     <para>Now we have to install ProActive into this SOAP engine. For that,
     follow these steps:</para>
@@ -135,7 +135,7 @@
         <para>Write your active object or your component in a classic way; for
         example:</para>
 
-        <programlisting lang="java"> A a = (A)ProActive.newActive('A', new Object [] {}); </programlisting>
+        <programlisting lang="java"> A a = (A)ProActive.newActive("A", new Object [] {}); </programlisting>
       </listitem>
 
       <listitem>
@@ -246,7 +246,7 @@
     the web service public interfaces and its location. Generally, WSDL files
     are used to generate a proxy to the service. For example, for a given
     service, say 'compute', you can get the WSDL document at 
-    <ulink url="http://localhost:8080/servlet/wsdl?id=compute">http://localhost:8080/servlet/wsdl?id=compute</ulink>.</para>
+    <ulink url="http://localhost:8080/servlet/wsdl?id=compute"/>.</para>
 
     <para>Now that this client knows what and where to call the service, it
     will send a SOAP message to the web server, the web server looks into the
@@ -281,15 +281,14 @@
       <programlisting lang="java">public class HelloWorld implements Serializable {
    public HelloWorld () {}
    public String helloWorld (String name) {
-      return 'Hello world !';
+      return "Hello world !";
    }
    public static void main (String [] args) {
 
     try {
-        HelloWorld hw = (HelloWorld)ProActive.newActive('HelloWorld', new Obj\
-ect []{});
+        HelloWorld hw = (HelloWorld)ProActive.newActive("HelloWorld", new Object []{});
         ProActive.exposeAsWebService(hw,
-        'helloWorld','http://localhost:8080', new String [] { 'helloWorld' }); 
+        "helloWorld","http://localhost:8080", new String [] { "helloWorld" }); 
 
     } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -301,7 +300,7 @@ ect []{});
 
       <para>The active object <literal>hw</literal> has been deployed as a web
       service on the web server located at
-      <literal>'http://localhost:8080'</literal> . The accessible service
+      <literal>"http://localhost:8080"</literal> . The accessible service
       method is <literal>helloWorld</literal>.</para>
 
       <para>Now that the server-side Web service is deployed, we can create a
@@ -324,7 +323,7 @@ ect []{});
         <listitem>
           <para>In the address box enter the WSDL service address, for
           example: 
-          <ulink url="http://localhost:8080/soap/servlet/wsdl?id=helloWorld">http://localhost:8080/soap/servlet/wsdl?id=helloWorld</ulink>
+          <ulink url="http://localhost:8080/soap/servlet/wsdl?id=helloWorld"/>
           .When clicking the 'add reference' button, this will get the
           service's WSDL and creates the specific proxy to the service.</para>
         </listitem>
@@ -362,16 +361,16 @@ string s = hw.helloWorld ();
       in order to a C# client for example controls it. Only one instruction
       has been added in the main method:</para>
 
-      <programlisting lang="java">ProActive.exposeAsWebService (dispatcher, 'C3DDispatcher',
-                    'http://localhost:8080',  new String [] {
-                    'rotateRight', 'getPicture', 'rotateLeft', 'rotateUp',
-                    'rotateDown', 'getPixels', 'getPixelMax', 'waitForImage',
-                    'spinClock', 'spinUnclock', 'addRandomSphere', 'resetScene',
-                    'registerWSUser', 'unregisterWSUser'
+      <programlisting lang="java">ProActive.exposeAsWebService (dispatcher, "C3DDispatcher",
+                    "http://localhost:8080",  new String [] {
+                    "rotateRight", "getPicture", "rotateLeft", "rotateUp",
+                    "rotateDown", "getPixels", "getPixelMax", "waitForImage",
+                    "spinClock", "spinUnclock", "addRandomSphere", "resetScene",
+                    "registerWSUser", "unregisterWSUser"
                 });</programlisting>
 
       <para>Once the dispatcher is deployed as a web service, we have a WSDL
-      url: <ulink url="http://localhost:8080/soap/servlet/id=C3DDispactcher">http://localhost:8080/soap/servlet/id=C3DDispactcher</ulink>.
+      url: <ulink url="http://localhost:8080/soap/servlet/id=C3DDispactcher"/>.
       It will be usefull to construct the dispatcher client.</para>
     </sect2>
 

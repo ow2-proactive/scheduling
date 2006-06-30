@@ -44,8 +44,8 @@
     <para>When the P2P infrastructure is running, it is very easy to obtain
     some nodes (JVMs). The next section describes how to use it.</para>
 
-    <para>Further research information is available <ulink
-    url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</ulink>.</para>
+    <para>Further research information is available 
+    at <ulink url="http://www-sop.inria.fr/oasis/Alexandre.Di_Costanzo/AdC/Publications.html"/>.</para>
   </sect1>
 
   <sect1  id="p2p_html_infrastructure_model">
@@ -1310,10 +1310,10 @@
           </mediaobject>
         </figure></para>
 
-      <para>For more information about ProActive XML Deployment Descriptor see
-      this <ulink
-      url="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/Descriptor.html">
-      page</ulink>.</para>
+      <para>For more information about ProActive XML Deployment Descriptor see 
+       <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+       <ulink os="html" url="../api/org/objectweb/proactive/Descriptor.html">the descriptor java doc</ulink>
+       <phrase os="pdf"><literal>org.objectweb.proactive.Descriptor</literal> javadoc</phrase>.</para>
     </sect2>
 
     <sect2  id="mozTocId294040">

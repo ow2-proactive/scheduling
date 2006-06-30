@@ -200,8 +200,10 @@
     
     See the javadoc of the topology package for more information:</para>
    
-		 <screen><ulink
- url="../api/org/objectweb/proactive/core/group/topology/package-summary.html">org.objectweb.proactive.core.group.topology</ulink></screen>
+    <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+   <screen><ulink os="html" 
+       url="../api/org/objectweb/proactive/core/group/topology/package-summary.html">org.objectweb.proactive.core.group.topology</ulink><phrase 
+       os="pdf">org.objectweb.proactive.core.group.topology</phrase></screen>
    
     <para>Like for the Total barrier, the string parameter represents a unique
     identity name for the barrier. The second parameter is the group of

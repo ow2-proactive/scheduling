@@ -3,8 +3,6 @@
 <chapter id="TypedGroupCommunication">
   <title>Typed Group Communication</title>
 
-  <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/TypedGroupCommunication.html  -->
-
   <sect1  id="TypedGroupCommunication_html_overview">
     <title>Overview</title>
 
@@ -245,8 +243,11 @@ ProActiveGroup.setScatterGroup(gb);
 ag1.foo(gb);</programlisting></para>
     
 
-     <para>To learn more, see the 
-      <ulink url="../api/org/objectweb/proactive/core/group/package-summary.html">JavaDoc</ulink> 
+     
+ <para>To learn more, see the 
+ <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+ <ulink os="html" url="../api/org/objectweb/proactive/core/group/package-summary.html">JavaDoc</ulink> 
+ <phrase os="pdf">javadoc of org.objectweb.proactive.core.group</phrase>
       and the paper <citation><xref linkend="BBC02" endterm="BBC02.abbrev"/></citation>.
      </para>
   </sect1>
