@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ProActive" default="compile" basedir=".">
-	<property environment="env"/>
-	<property name="base" value=".."/>
-	<property name="lib" value="${base}/lib"/>
-	<property name="src.dir" value="${base}/src"/>
-	<property name="daemon.dir" value="${base}/p2p"/>
-	<property name="proactive.dir" value="org/objectweb/proactive"/>
-	<property name="proactive.core.dir" value="${proactive.dir}/core"/>
-	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
-	<property name="proactive.tools.dir" value="${proactive.dir}/tools"/>
-	<property name="classes.dir" value="${base}/classes"/>
-	<property name="classlibs.dir" value="${base}/classlibs"/>
-	<property name="dist.dir" value="${base}/dist"/>
-	<property name="doc.src" value="${base}/doc-src"/>
-	<property name="docs.dir" value="${base}/docs"/>
+	<property environment="env" />
+	<property name="base" value=".." />
+	<property name="lib" value="${base}/lib" />
+	<property name="src.dir" value="${base}/src" />
+	<property name="daemon.dir" value="${base}/p2p" />
+	<property name="proactive.dir" value="org/objectweb/proactive" />
+	<property name="proactive.core.dir" value="${proactive.dir}/core" />
+	<property name="proactive.ext.dir" value="${proactive.dir}/ext" />
+	<property name="proactive.tools.dir" value="${proactive.dir}/tools" />
+	<property name="classes.dir" value="${base}/classes" />
+	<property name="classlibs.dir" value="${base}/classlibs" />
+	<property name="dist.dir" value="${base}/dist" />
+	<property name="doc.src" value="${base}/doc-src" />
+	<property name="docs.dir" value="${base}/docs" />
 	<property name="docs.tmp" value="${docs.dir}/tmp" />
 	<property name="docs.mainFile" value="PA_index.xml" />
 
-	<property name="name" value="ProActive"/>
-	<property name="version" value="3.1"/>
-	<property name="version_" value="3_1"/>
-	<property name="debug" value="on"/>
-	<property name="source" value="1.4"/>
-	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/"/>
-	<property name="manifest.example.dir" value="${src.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/"/>
+	<property name="name" value="ProActive" />
+	<property name="version" value="3.1" />
+	<property name="version_" value="3_1" />
+	<property name="debug" value="on" />
+	<property name="source" value="1.4" />
+	<property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/" />
+	<property name="manifest.example.dir" value="${src.dir}/org/objectweb/proactive/examples/osgi/hello/Manifest/" />
 	<property name="config.dir" value="${classes.dir}/${proactive.core.dir}/config/" />
-	<property name="bundle.dir" value="${base}/dist/bundle"/>
+	<property name="bundle.dir" value="${base}/dist/bundle" />
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
 	<path id="project.classpath">
-		<pathelement location="${base}/classes"/>
+		<pathelement location="${base}/classes" />
 		<fileset dir="${lib}">
-			<include name="*.jar"/>
-			<include name="jini/*.jar"/>
-			<include name="globus/*.jar"/>
-			<include name="ws/*.jar"/>
-			<include name="osgi/*.jar"/>
-			<include name="osgi/management/group/*.jar"/>
-			<include name="components/*.jar"/>
-			<include name="ibis/*.jar"/>
-			<include name="unicore/*.jar"/>
-			<include name="glite/*.jar"/>
-			<include name="scilab/*.jar"/>
+			<include name="*.jar" />
+			<include name="jini/*.jar" />
+			<include name="globus/*.jar" />
+			<include name="ws/*.jar" />
+			<include name="osgi/*.jar" />
+			<include name="osgi/management/group/*.jar" />
+			<include name="components/*.jar" />
+			<include name="ibis/*.jar" />
+			<include name="unicore/*.jar" />
+			<include name="glite/*.jar" />
+			<include name="scilab/*.jar" />
 		</fileset>
 		<fileset dir="${lib}/ws">
-			<include name="*.jar"/>
-			<include name="components/*.jar"/>
+			<include name="*.jar" />
+			<include name="components/*.jar" />
 		</fileset>
 	</path>
 	<path id="test.classpath">
-		<path refid="project.classpath"/>
-		<pathelement location="${base}/dev/lib/xml-apis.jar"/>
-		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar"/>
-		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar"/>
-		<pathelement location="${base}/dev/lib/jmf.jar"/>
+		<path refid="project.classpath" />
+		<pathelement location="${base}/dev/lib/xml-apis.jar" />
+		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar" />
+		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar" />
+		<pathelement location="${base}/dev/lib/jmf.jar" />
 	</path>
 	<path id="examples.classpath">
-		<path refid="project.classpath"/>
-		<pathelement location="${lib}/examples/clibwrapper_jiio.jar"/>
-		<pathelement location="${lib}/examples/jai_codec.jar"/>
-		<pathelement location="${lib}/examples/jai_core.jar"/>
-		<pathelement location="${lib}/examples/mlibwrapper_jai.jar"/>
-		<pathelement location="${lib}/examples/jai_imageio.jar"/>
+		<path refid="project.classpath" />
+		<pathelement location="${lib}/examples/clibwrapper_jiio.jar" />
+		<pathelement location="${lib}/examples/jai_codec.jar" />
+		<pathelement location="${lib}/examples/jai_core.jar" />
+		<pathelement location="${lib}/examples/mlibwrapper_jai.jar" />
+		<pathelement location="${lib}/examples/jai_imageio.jar" />
 	</path>
 
 
@@ -73,25 +73,24 @@
 	<target name="init">
 		<!-- Create the time stamp -->
 		<tstamp>
-			<format property="TODAY" pattern="yyyy-MM-dd"/>
+			<format property="TODAY" pattern="yyyy-MM-dd" />
 		</tstamp>
 		<!-- Create the build directory structure used by compile -->
-		<mkdir dir="${classes.dir}"/>
-		<echo message="--- Debugging is ${debug} ---"/>
+		<mkdir dir="${classes.dir}" />
+		<echo message="--- Debugging is ${debug} ---" />
 	</target>
 
 
 	<!-- ================================================================ -->
 	<!--                   Compile All and build the docs                 -->
 	<!--  =============================================================== -->
-	<target name="all" depends="compile,docs" description="Compile All and build the docs"/>
+	<target name="all" depends="compile,docs" description="Compile All and build the docs" />
 
 
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" 
-      description="build the class files"/>
+	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi, ProActiveMPI" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -100,52 +99,50 @@
 	<target name="configurationCopy">
 		<copy toDir="${classes.dir}">
 			<fileset dir="${src.dir}">
-				<include name="**/*.xml"/>
-				<include name="**/*.fractal"/>
-				<include name="**/*.properties"/>
-				<include name="**/*.xsd"/>
-				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd"/>
+				<include name="**/*.xml" />
+				<include name="**/*.fractal" />
+				<include name="**/*.properties" />
+				<include name="**/*.xsd" />
+				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
 			</fileset>
 		</copy>
 	</target>
 
-	<target name="osgi" depends="core"
-    description="Compile osgi related stuff">
+	<target name="osgi" depends="core" description="Compile osgi related stuff">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath"/>
-			<include name="${proactive.dir}/osgi/**/*.java"/>
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/osgi/**/*.java" />
 		</javac>
-		</target>
+	</target>
 
-	
-	<target name="core" depends="init, configurationCopy"
-    description="Compile the ProActive core classes">
+
+	<target name="core" depends="init, configurationCopy" description="Compile the ProActive core classes">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath"/>
-			<include name="${proactive.dir}/*.java"/>
-			<include name="${proactive.core.dir}/**/*.java"/>
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/*.java" />
+			<include name="${proactive.core.dir}/**/*.java" />
 		</javac>
 
 		<rmic classname="org.objectweb.proactive.core.body.jini.JiniRemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.body.rmi.RmiRemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeForwarderImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.jini.JiniRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.body.ft.servers.FTServer" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.body.rmi.RmiRemoteBodyForwarderImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath" />
 		</rmic>
 	</target>
 
@@ -154,9 +151,9 @@
 	<!--                        Compile Extensions                        -->
 	<!--  =============================================================== -->
 	<target name="ext" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
-			<classpath refid="project.classpath"/>
-			<include name="${proactive.ext.dir}/**/*.java"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.ext.dir}/**/*.java" />
 		</javac>
 	</target>
 
@@ -165,9 +162,9 @@
 	<!--                           Compile Tools                          -->
 	<!--  =============================================================== -->
 	<target name="tools" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
-			<classpath refid="project.classpath"/>
-			<include name="${proactive.tools.dir}/**/*.java"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.tools.dir}/**/*.java" />
 		</javac>
 	</target>
 
@@ -176,31 +173,30 @@
 	<!--                      Compile Branch and Bound                    -->
 	<!--  =============================================================== -->
 	<target name="bnb" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
-			<classpath refid="project.classpath"/>
-			<include name="${proactive.dir}/branchnbound/**/*.java"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/branchnbound/**/*.java" />
 		</javac>
 		<!-- BnB API stubs generation -->
 		<echo message="Branch and Bound API stubs generating..." />
-		<property name="stub_bnb.classdir" value="${basedir}/../classes"/>
+		<property name="stub_bnb.classdir" value="${basedir}/../classes" />
 		<path id="bnbClassDir">
-			<pathelement path="${stub_bnb.classdir}"/>
+			<pathelement path="${stub_bnb.classdir}" />
 		</path>
-		<pathconvert pathsep=" " property="bnbClassesDir" refid="bnbClassDir"/>
+		<pathconvert pathsep=" " property="bnbClassesDir" refid="bnbClassDir" />
 		<path id="bnbClasses">
-			<fileset dir="${classes.dir}/org/objectweb/proactive/branchnbound" >
-				<include name="**/*.class"/>
-				<exclude name="**/*$*"/>
+			<fileset dir="${classes.dir}/org/objectweb/proactive/branchnbound">
+				<include name="**/*.class" />
+				<exclude name="**/*$*" />
 			</fileset>
 		</path>
 		<pathconvert pathsep=" " property="bnb-files" refid="bnbClasses">
-			<map from="${bnbClassesDir}" to=""/>
+			<map from="${bnbClassesDir}" to="" />
 		</pathconvert>
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator"
-      fork="true" >
-			<classpath refid="project.classpath"/>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
 			<arg line="-d ${classes.dir}
-        ${bnb-files}"/>
+        ${bnb-files}" />
 		</java>
 	</target>
 
@@ -209,15 +205,15 @@
 	<!--                          Compile ic2d                            -->
 	<!--  =============================================================== -->
 	<target name="ic2d" depends="ext" description="Compile the IC2D Tool">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on"  source="${source}" debug="${debug}">
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
 		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/images" includeEmptyDirs="no">
-			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/images"/>
+			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/images" />
 		</copy>
 		<!-- JobMonitor images -->
 		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images" includeEmptyDirs="no">
-			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images"/>
+			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images" />
 		</copy>
 	</target>
 
@@ -226,7 +222,7 @@
 	<!--  =============================================================== -->
 	<target name="scilab" depends="ext" description="Compile the SCILAB Tool">
 		<copy todir="${classes.dir}/${proactive.dir}/ext/scilab/gui/img" includeEmptyDirs="no">
-			<fileset dir="${src.dir}/${proactive.dir}/ext/scilab/gui/img"/>
+			<fileset dir="${src.dir}/${proactive.dir}/ext/scilab/gui/img" />
 		</copy>
 	</target>
 
@@ -234,8 +230,8 @@
 	<!--                      Compile LoadBalancing                       -->
 	<!--  =============================================================== -->
 	<target name="loadbalancing" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/loadbalancing/*.java" deprecation="on"  source="${source}"  debug="${debug}">
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/loadbalancing/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
 		</javac>
 	</target>
 
@@ -244,20 +240,20 @@
 	<!--                      Compile P2P                                 -->
 	<!--  =============================================================== -->
 	<target name="p2p" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on"  source="${source}"  debug="${debug}">
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
 		</javac>
 	</target>
 	<target name="daemon" depends="p2p">
-		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS" >
-			<arg line="-Wall -g -o proactivep2p -x c proactivep2p.cpp proactivep2p.h"/>
+		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS">
+			<arg line="-Wall -g -o proactivep2p -x c proactivep2p.cpp proactivep2p.h" />
 		</exec>
-		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS" >
-			<arg line="-Wall -g -o p2pctl -x c p2pctl.c proactivep2p.h"/>
+		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS">
+			<arg line="-Wall -g -o p2pctl -x c p2pctl.c proactivep2p.h" />
 		</exec>
-		<mkdir dir="${daemon.dir}/build"/>
-		<move file="${daemon.dir}/src/common/proactivep2p" todir="${daemon.dir}/build"/>
-		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build"/>
+		<mkdir dir="${daemon.dir}/build" />
+		<move file="${daemon.dir}/src/common/proactivep2p" todir="${daemon.dir}/build" />
+		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build" />
 	</target>
 
 
@@ -311,8 +307,8 @@
 	<!--                      Compile Test Suite                         -->
 	<!--  =============================================================== -->
 	<target name="testsuite" depends="ext, copyDivers">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on"  source="${source}"  debug="${debug}">
-			<classpath refid="test.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="test.classpath" />
 		</javac>
 	</target>
 
@@ -321,7 +317,7 @@
 	<!--                      Compile Migration                           -->
 	<!--  =============================================================== -->
 	<target name="migration" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on"  source="${source}"  debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on" source="${source}" debug="${debug}" />
 	</target>
 
 
@@ -329,12 +325,7 @@
 	<!--                      Compile TryWithCatch annotator              -->
 	<!--  =============================================================== -->
 	<target name="trywithcatch">
-		<javac srcdir="${src.dir}"
-           destdir="${classes.dir}"
-           includes="trywithcatch/"
-           deprecation="on"
-           source="${source}"
-           debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="trywithcatch/" deprecation="on" source="${source}" debug="${debug}" />
 	</target>
 
 
@@ -342,38 +333,37 @@
 	<!--                      Compile util                                -->
 	<!--  =============================================================== -->
 	<target name="util" depends="">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on"  source="${source}"  debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on" source="${source}" debug="${debug}" />
 	</target>
 
 
 	<!-- ================================================================ -->
 	<!--                      All the junk targets                        -->
 	<!--  =============================================================== -->
-	<target name="alljunk" depends="compile, migration, nonregressiontest, benchmark"/>
+	<target name="alljunk" depends="compile, migration, nonregressiontest, benchmark" />
 
 
 	<!-- ================================================================ -->
 	<!--                  Clean up generated files                        -->
 	<!--  =============================================================== -->
 	<target name="clean" description="Remove all generated files">
-		<delete dir="${classes.dir}"/>
-		<delete dir="${dist.dir}"/>
-		<delete dir="${docs.dir}"/>
-		<delete dir="${classlibs.dir}"/>
+		<delete dir="${classes.dir}" />
+		<delete dir="${dist.dir}" />
+		<delete dir="${docs.dir}" />
+		<delete dir="${classlibs.dir}" />
 	</target>
 
 
 	<!-- ================================================================ -->
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
-	<target name="proActiveJar" depends="ext,tools, bnb, p2p"
-     description="Create the ProActive jar, to be used for instance on a distant host">
-		<mkdir dir="${dist.dir}/ProActive"/>
+	<target name="proActiveJar" depends="ext,tools, bnb, p2p" description="Create the ProActive jar, to be used for instance on a distant host">
+		<mkdir dir="${dist.dir}/ProActive" />
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
-				<include name="${proactive.dir}/**"/>
-				<exclude name="${proactive.dir}/examples/**"/>
-				<exclude name="${proactive.dir}/ic2d/**"/>
+				<include name="${proactive.dir}/**" />
+				<exclude name="${proactive.dir}/examples/**" />
+				<exclude name="${proactive.dir}/ic2d/**" />
 			</fileset>
 		</jar>
 	</target>
@@ -383,22 +373,20 @@
 	<!--                    Create ProActiveBundle.jar                    -->
 	<!--  =============================================================== -->
 	<target name="proActiveBundle" depends="proActiveJar">
-		<mkdir dir="${bundle.dir}"/>
-		<jar 
-            manifest="${manifest.dir}/Manifest.mf" 
-            jarfile="${bundle.dir}/proactiveBundle.jar">
+		<mkdir dir="${bundle.dir}" />
+		<jar manifest="${manifest.dir}/Manifest.mf" jarfile="${bundle.dir}/proactiveBundle.jar">
 			<fileset dir="${classes.dir}">
-				<include name="${proactive.dir}/**"/>
+				<include name="${proactive.dir}/**" />
 			</fileset>
 			<fileset dir="${lib}/">
-				<include name="asm.jar"/>
-				<include name="log4j.jar"/>
-				<include name="xercesImpl.jar"/>
-				<include name="bouncycastle.jar"/>
-				<include name="components/fractal.jar"/>
+				<include name="asm.jar" />
+				<include name="log4j.jar" />
+				<include name="xercesImpl.jar" />
+				<include name="bouncycastle.jar" />
+				<include name="components/fractal.jar" />
 			</fileset>
 
-			<fileset dir="${config.dir}" >
+			<fileset dir="${config.dir}">
 				<include name="ProActiveConfiguration.xml" />
 			</fileset>
 		</jar>
@@ -409,13 +397,11 @@
 	<!--                  Create helloWorlBundle.jar                      -->
 	<!--  =============================================================== -->
 	<target name="helloWorldBundle" depends="proActiveJar">
-		<mkdir dir="${bundle.dir}"/>
-		<jar 
-            manifest="${manifest.example.dir}/Manifest.mf" 
-            jarfile="${bundle.dir}/helloWorldBundle.jar">
+		<mkdir dir="${bundle.dir}" />
+		<jar manifest="${manifest.example.dir}/Manifest.mf" jarfile="${bundle.dir}/helloWorldBundle.jar">
 			<fileset dir="${classes.dir}">
-				<include name="${proactive.dir}/examples/osgi/hello/HelloActivator.class"/>
-				<include name="${proactive.dir}/examples/hello/Hello.class"/>
+				<include name="${proactive.dir}/examples/osgi/hello/HelloActivator.class" />
+				<include name="${proactive.dir}/examples/hello/Hello.class" />
 			</fileset>
 		</jar>
 	</target>
@@ -426,64 +412,64 @@
 	<!--  =============================================================== -->
 	<target name="dist" depends="compile, docs" description="Create the distribution binary">
 		<!-- Create the distribution directory -->
-		<delete dir="${dist.dir}"/>
-		<mkdir dir="${dist.dir}"/>
-		<property name="PAdist.dir" value="${dist.dir}/ProActive"/>
-		<mkdir dir="${PAdist.dir}"/>
+		<delete dir="${dist.dir}" />
+		<mkdir dir="${dist.dir}" />
+		<property name="PAdist.dir" value="${dist.dir}/ProActive" />
+		<mkdir dir="${PAdist.dir}" />
 		<!-- Put everything in ${classes} into the ProActive.jar file -->
 		<jar jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${classes.dir}">
-				<include name="${proactive.dir}/**"/>
-				<exclude name="${proactive.dir}/examples/**"/>
-				<exclude name="${proactive.dir}/ic2d/**"/>
+				<include name="${proactive.dir}/**" />
+				<exclude name="${proactive.dir}/examples/**" />
+				<exclude name="${proactive.dir}/ic2d/**" />
 			</fileset>
 		</jar>
-		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**"/>
-		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**"/>
+		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**" />
+		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**" />
 		<!--        copy docs / scripts / src / compile / lib      -->
 		<copy todir="${PAdist.dir}" includeEmptyDirs="no">
 			<fileset dir="${base}">
-				<include name="README.html"/>
-				<include name="docs/**"/>
-				<include name="scripts/**"/>
-				<exclude  name="scripts/unix/grid5000/**"/>
-				<exclude  name="scripts/unix/gridexperiment/**"/>
-				<include name="src/org/**"/>
-				<include name="compile/**"/>
-				<include name="lib/**"/>
-				<include name="descriptors/**"/>
+				<include name="README.html" />
+				<include name="docs/**" />
+				<include name="scripts/**" />
+				<exclude name="scripts/unix/grid5000/**" />
+				<exclude name="scripts/unix/gridexperiment/**" />
+				<include name="src/org/**" />
+				<include name="compile/**" />
+				<include name="lib/**" />
+				<include name="descriptors/**" />
 				<include name="p2p/**" />
 				<exclude name="p2p/config/inria/**" />
 				<exclude name="**/.svn" />
 			</fileset>
 		</copy>
-		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh"/>
-		<chmod file="${PAdist.dir}/compile/build" perm="755"/>
+		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh" />
+		<chmod file="${PAdist.dir}/compile/build" perm="755" />
 		<!--  create zip version of ProActive without source  -->
 		<zip zipfile="${dist.dir}/ProActive_${version_}.zip">
 			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
-				<exclude name="src/**"/>
-				<exclude name="compile/**"/>
+				<exclude name="src/**" />
+				<exclude name="compile/**" />
 			</zipfileset>
 		</zip>
 		<!--  create zip version of ProActive with source   -->
 		<zip zipfile="${dist.dir}/ProActive-src_${version_}.zip">
-			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive"/>
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive" />
 		</zip>
 		<!--  create zip version of all ProActive docs    -->
 		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
-			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
+			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs" />
 		</zip>
 		<!--  create zip versions of ProActive Manual    -->
 		<zip zipfile="${dist.dir}/ProActiveManualPdf.zip">
-			<zipfileset dir="${docs.dir}/pdf/" includes="ProActiveManual.pdf" prefix="ProActive/docs/pdf"/>
+			<zipfileset dir="${docs.dir}/pdf/" includes="ProActiveManual.pdf" prefix="ProActive/docs/pdf" />
 		</zip>
-		<zip zipfile="${dist.dir}/ProActiveManualMultipleHtml.zip" >
-			<zipfileset dir="${docs.dir}/html/" excludes="ProActiveManual.html" prefix="ProActive/docs/html"/>
+		<zip zipfile="${dist.dir}/ProActiveManualMultipleHtml.zip">
+			<zipfileset dir="${docs.dir}/html/" excludes="ProActiveManual.html" prefix="ProActive/docs/html" />
 		</zip>
 		<zip zipfile="${dist.dir}/ProActiveManualSingleHtml.zip">
-			<zipfileset dir="${docs.dir}/html/" includes="**/*" excludes="**/*.html" prefix="ProActive/docs/html"/>
-			<zipfileset dir="${docs.dir}/html/" includes="ProActiveManual.html" prefix="ProActive/docs/html"/>
+			<zipfileset dir="${docs.dir}/html/" includes="**/*" excludes="**/*.html" prefix="ProActive/docs/html" />
+			<zipfileset dir="${docs.dir}/html/" includes="ProActiveManual.html" prefix="ProActive/docs/html" />
 		</zip>
 	</target>
 
@@ -491,12 +477,12 @@
 	<!-- ================================================================ -->
 	<!--        Add Copyright and format source files                     -->
 	<!--  =============================================================== -->
-	<target name="copyright_format" depends="copyright, format"/>
+	<target name="copyright_format" depends="copyright, format" />
 
 	<target name="copyright" depends="util">
 		<java classname="util.AddCopyright" fork="true">
-			<classpath refid="project.classpath"/>
-			<arg value="${src.dir}/org/objectweb/proactive"/>
+			<classpath refid="project.classpath" />
+			<arg value="${src.dir}/org/objectweb/proactive" />
 		</java>
 	</target>
 
@@ -530,21 +516,21 @@
 	<!-- ================================================================ -->
 	<!--            Create docs, which is the javadoc + manual            -->
 	<!--  =============================================================== -->
-	<target name="docs" depends="java2html, javadoc, manual" description="Construct the javadoc and the manual"/>
+	<target name="docs" depends="java2html, javadoc, manual" description="Construct the javadoc and the manual" />
 
 
 	<!-- ================================================================ -->
 	<!--            Make the java files readable on the web               -->
 	<!--  =============================================================== -->
-	<target name="java2html" >
-		<echo message="Converting java to html..."/>
+	<target name="java2html">
+		<echo message="Converting java to html..." />
 		<java jar="${base}/dev/lib/j2h.jar" fork="true">
-			<arg line="-d ${docs.dir}/ProActive_src_html"/>
-			<arg line="-js ${src.dir}/${proactive.dir}"/>
-			<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api"/>
-			<arg line="-t 2 -n '${name} source code'"/>
+			<arg line="-d ${docs.dir}/ProActive_src_html" />
+			<arg line="-js ${src.dir}/${proactive.dir}" />
+			<arg line="-jd ${docs.dir}/api http://www-sop.inria.fr/oasis/ProActive/doc/api" />
+			<arg line="-t 2 -n '${name} source code'" />
 		</java>
- 
+
 	</target>
 
 
@@ -553,28 +539,28 @@
 	<!-- ================================================================ -->
 	<target name="javadoc" description="Use javadoc to build information on the ProActive classes">
 		<!-- Create the javadoc directory -->
-		<mkdir dir="${docs.dir}/api"/>
+		<mkdir dir="${docs.dir}/api" />
 		<copy todir="${docs.dir}/api">
 			<fileset dir="${src.dir}">
-				<include name="**/*.jpg"/>
+				<include name="**/*.jpg" />
 			</fileset>
 		</copy>
-		<mkdir dir="${docs.dir}/ic2d-api"/>
+		<mkdir dir="${docs.dir}/ic2d-api" />
 		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.p2p.*,org.objectweb.proactive.ext.*,org.objectweb.proactive.branchnbound.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" doctitle="ProActive ${version}&lt;br>&lt;a href='../html/index.html'>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright 2001-2005 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
-			<classpath refid="project.classpath"/>
-			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
-			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
-			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
-			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
-			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*"/>
-			<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*"/>
-			<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*"/>
-			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
-			<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*"/>
+			<classpath refid="project.classpath" />
+			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+			<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
+			<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
+			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
+			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
+			<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
+			<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
+			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
+			<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
 		</javadoc>
 		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive ${version} - IC2D" bottom="&lt;i>Copyright 2001-2006 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
-			<classpath refid="project.classpath"/>
-			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
+			<classpath refid="project.classpath" />
+			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*" />
 		</javadoc>
 
 	</target>
@@ -584,34 +570,34 @@
 	<!--           Generate ProActive stubs for all classes               -->
 	<!-- ================================================================ -->
 	<target name="stub_dir" unless="stub.classdir">
-		<property name="stub.classdir" value="${basedir}${file.separator}..${file.separator}classes"/>
+		<property name="stub.classdir" value="${basedir}${file.separator}..${file.separator}classes" />
 	</target>
 
 	<target name="stub" depends="stub_dir">
-		<echo message="${stub.classdir}"/>
+		<echo message="${stub.classdir}" />
 		<path id="classDir">
-			<pathelement path="${stub.classdir}"/>
+			<pathelement path="${stub.classdir}" />
 		</path>
 		<!--     The path to the class dir   -->
-		<pathconvert pathsep=" " property="classesDir" refid="classDir"/>
+		<pathconvert pathsep=" " property="classesDir" refid="classDir" />
 		<!--  Select files to rewrite  -->
 		<path id="classFiles">
-			<fileset dir="${stub.classdir}" >
-				<include name="**/*.class"/>
-				<exclude name="**/*$*"/>
+			<fileset dir="${stub.classdir}">
+				<include name="**/*.class" />
+				<exclude name="**/*$*" />
 			</fileset>
 		</path>
 		<!--  Remove the trailing path from all files -->
 		<pathconvert pathsep=" " property="test-files" refid="classFiles">
-			<map from="${classesDir}" to=""/>
+			<map from="${classesDir}" to="" />
 		</pathconvert>
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" dir="${stub.classdir}">
 			<classpath>
-				<pathelement path="${stub.classdir}"/>
-				<path refid="project.classpath"/>
-				<pathelement path="${env.CLASSPATH}"/>
+				<pathelement path="${stub.classdir}" />
+				<path refid="project.classpath" />
+				<pathelement path="${env.CLASSPATH}" />
 			</classpath>
-			<arg line="-d ${stub.classdir} ${test-files}"/>
+			<arg line="-d ${stub.classdir} ${test-files}" />
 		</java>
 	</target>
 
@@ -621,25 +607,24 @@
 	<!-- ================================================================ -->
 	<target name="stub_wrapper" depends="ext">
 		<echo message="Java primitive type wrapper stubs generating..." />
-		<property name="stub_wrapper.classdir" value="${basedir}/../classes"/>
+		<property name="stub_wrapper.classdir" value="${basedir}/../classes" />
 		<path id="wrapperClassDir">
-			<pathelement path="${stub_wrapper.classdir}"/>
+			<pathelement path="${stub_wrapper.classdir}" />
 		</path>
-		<pathconvert pathsep=" " property="wrapperClassesDir" refid="wrapperClassDir"/>
+		<pathconvert pathsep=" " property="wrapperClassesDir" refid="wrapperClassDir" />
 		<path id="wrapperClasses">
-			<fileset dir="${classes.dir}/org/objectweb/proactive/core/util/wrapper" >
-				<include name="**/*.class"/>
-				<exclude name="**/*$*"/>
+			<fileset dir="${classes.dir}/org/objectweb/proactive/core/util/wrapper">
+				<include name="**/*.class" />
+				<exclude name="**/*$*" />
 			</fileset>
 		</path>
 		<pathconvert pathsep=" " property="wrapper-files" refid="wrapperClasses">
-			<map from="${wrapperClassesDir}" to=""/>
+			<map from="${wrapperClassesDir}" to="" />
 		</pathconvert>
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator"
-      fork="true" >
-			<classpath refid="project.classpath"/>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
 			<arg line="-d ${classes.dir}
-        ${wrapper-files}"/>
+        ${wrapper-files}" />
 		</java>
 	</target>
 
@@ -649,19 +634,19 @@
 	<!-- ================================================================ -->
 	<target name="ibis" description="Everything related to ProActive IBIS">
 		<delete>
-			<fileset dir="${classes.dir}" includes="**/rmi*.java"/>
+			<fileset dir="${classes.dir}" includes="**/rmi*.java" />
 		</delete>
 		<java classname="ibis.frontend.rmi.Main" fork="true" dir="${classes.dir}/org/objectweb/proactive/core/body/ibis/">
-			<classpath refid="project.classpath"/>
-			<arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl"/>
+			<classpath refid="project.classpath" />
+			<arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl" />
 		</java>
 		<java classname="ibis.frontend.rmi.Main" fork="true" dir="${classes.dir}/org/objectweb/proactive/core/runtime/ibis/">
-			<classpath refid="project.classpath"/>
-			<arg value="org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeImpl"/>
+			<classpath refid="project.classpath" />
+			<arg value="org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeImpl" />
 		</java>
-		<javac srcdir="${classes.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}"  debug="${debug}">
-			<include name="**/*.java"/>
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${classes.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<include name="**/*.java" />
+			<classpath refid="project.classpath" />
 		</javac>
 	</target>
 
@@ -670,24 +655,22 @@
 	<!--     Call the IOGenerator to speed-up serialization with Ibis     -->
 	<!-- ================================================================ -->
 	<target name="rewrite" description="Rewrite classes to enhance performance with ibis">
-		<mkdir dir="${classlibs.dir}"/>
+		<mkdir dir="${classlibs.dir}" />
 		<!--  copy the proactive classfiles and unjar everything -->
 		<copy todir="${classlibs.dir}">
-			<fileset dir="${classes.dir}" includes="**/*.class"/>
+			<fileset dir="${classes.dir}" includes="**/*.class" />
 		</copy>
 		<unjar dest="${classlibs.dir}">
 			<fileset dir="${lib}">
-				<include name="*.jar"/>
+				<include name="*.jar" />
 			</fileset>
 		</unjar>
 		<!--  then we call the iogenerator -->
-		<java   classname="ibis.frontend.io.IOGenerator"
-         taskname="IOGenerator"  dir="${classlibs.dir}"
-         failonerror="true" maxmemory="256m" fork="true">
-			<arg line="-dir ."/>
+		<java classname="ibis.frontend.io.IOGenerator" taskname="IOGenerator" dir="${classlibs.dir}" failonerror="true" maxmemory="256m" fork="true">
+			<arg line="-dir ." />
 			<classpath>
-				<pathelement path="${classlibs.dir}"/>
-				<path refid="project.classpath"/>
+				<pathelement path="${classlibs.dir}" />
+				<path refid="project.classpath" />
 			</classpath>
 		</java>
 	</target>
@@ -697,8 +680,8 @@
 	<!--            Compile non regression test                            -->
 	<!-- ================================================================ -->
 	<target name="nonregressiontest" depends="testsuite, compile">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on"  source="${source}"  debug="${debug}">
-			<classpath refid="test.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="test.classpath" />
 		</javac>
 	</target>
 
@@ -706,38 +689,36 @@
 	<!-- ================================================================ -->
 	<!--       Run non regression test with TestSuite API                  -->
 	<!-- ================================================================ -->
-	<target name="runTests" depends="testsuite, nonregressiontest, proActiveJar"
-    description="Run all non regression tests">
+	<target name="runTests" depends="testsuite, nonregressiontest, proActiveJar" description="Run all non regression tests">
 		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="test.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
+			<classpath refid="test.classpath" />
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
 		</java>
 	</target>
 
-	<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar"
-    description="Run all non regression tests on the current host only">
-		<delete dir="${base}/compile/log"/>
+	<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar" description="Run all non regression tests on the current host only">
+		<delete dir="${base}/compile/log" />
 		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="test.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
-			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
+			<classpath refid="test.classpath" />
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
+			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
 		</java>
 	</target>
 
 	<target name="runTestsLocalIbis" depends="testsuite, nonregressiontest, proActiveJar">
 		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="test.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-			<jvmarg value="-Dproactive.rmi=ibis"/>
-			<jvmarg value="-Dibis.serialization=sun"/>
-			<jvmarg value="-Dibis.name_server.host=localhost"/>
-			<jvmarg value="-Dibis.name_server.pool=rutget"/>
-			<jvmarg value="-Dibis.pool_host_number=1"/>
-			<jvmarg value="-Dibis.name_server.key=12"/>
-			<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties"/>
-			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml"/>
+			<classpath refid="test.classpath" />
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+			<jvmarg value="-Dproactive.rmi=ibis" />
+			<jvmarg value="-Dibis.serialization=sun" />
+			<jvmarg value="-Dibis.name_server.host=localhost" />
+			<jvmarg value="-Dibis.name_server.pool=rutget" />
+			<jvmarg value="-Dibis.pool_host_number=1" />
+			<jvmarg value="-Dibis.name_server.key=12" />
+			<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties" />
+			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml" />
 		</java>
 	</target>
 
@@ -746,13 +727,13 @@
 	<!--                       Compile benchmark                          -->
 	<!-- ================================================================ -->
 	<target name="microTimer" depends="testsuite">
-		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="g++" os="Linux" >
-			<arg line=" -shared -o libMicroTimer.so  MicroTimer.cc"/>
+		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="g++" os="Linux">
+			<arg line=" -shared -o libMicroTimer.so  MicroTimer.cc" />
 		</exec>
 		<!--<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/ld" os="Linux">
       <arg line="  -G MicroTimer.o -o  libMicroTimer.so"/>
     </exec>-->
-		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib}"/>
+		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib}" />
 		<!--<copy toDir="${lib}">
       <fileset dir="${src.dir}">
         <include name="**/*.so"/>
@@ -762,8 +743,8 @@
 	</target>
 
 	<target name="benchmark" depends="testsuite, microTimer">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on"  source="${source}"  debug="${debug}">
-			<classpath refid="test.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="test.classpath" />
 		</javac>
 	</target>
 
@@ -771,13 +752,12 @@
 	<!-- ================================================================ -->
 	<!--                 Run benchmark with TestSuite API                  -->
 	<!-- ================================================================ -->
-	<target name="runBench" depends="testsuite, benchmark"
-    description="Run benchmarks">
+	<target name="runBench" depends="testsuite, benchmark" description="Run benchmarks">
 		<java classname="benchmark.BenchCenter" fork="true">
-			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro"/>
-			<classpath refid="test.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro"/>
+			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro" />
+			<classpath refid="test.classpath" />
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro" />
 		</java>
 	</target>
 
@@ -785,13 +765,51 @@
 	<!-- ================================================================ -->
 	<!--                         Compile mpi                     -->
 	<!-- ================================================================ -->
-	 
+
 	<target name="mpi" depends="core" description="Compile mpi classes for simple wrapping">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/**/*.java" deprecation="on"  source="${source}" debug="${debug}" >
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
 		</javac>
 	</target>
-	
+
+	<!-- ================================================================ -->
+	<!--                         Compile ProActiveMpi                     -->
+	<!-- ================================================================ -->
+
+	<target name="ProActiveMPI" depends="core" description="Compile mpi classes for wrapping with control">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/mpi/**/*.java" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+		</javac>
+		<!-- Delete existing header file to avoid conflict -->
+		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control" executable="rm" os="Linux">
+			<arg line=" -f org_objectweb_proactive_mpi_control_ProActiveMPIComm.h org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h" />
+		</exec>
+		<!-- Generate header file (based on classpath) -->
+		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control" executable="javah" os="Linux">
+			<arg line=" -jni org.objectweb.proactive.mpi.control.ProActiveMPIComm" />
+		</exec>
+		<!-- Generate library -->
+		<exec dir="${classes.dir}" executable="mpicc" os="Linux">
+			<arg line=" -I/usr/local/jdk1.4.0/include -I/usr/local/jdk1.4.0/include/linux ${src.dir}/org/objectweb/proactive/mpi/control/ProActiveMPIComm.c -o libProActiveMPIComm.so -shared" />
+		</exec>
+		<!-- Move generated library file to classes repository -->
+		<exec dir="${classes.dir}" executable="mv" os="Linux">
+			<arg line=" libProActiveMPIComm.so org/objectweb/proactive/mpi/control" />
+		</exec>
+		<!-- Delete object file generated in classes repository -->
+		<exec dir="${classes.dir}" executable="rm" os="Linux">
+			<arg line=" -f ProActiveMPIComm.o" />
+		</exec>
+		<!-- Delete existing header file to avoid conflict -->
+		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control" executable="rm" os="Linux">
+			<arg line=" -f org_objectweb_proactive_mpi_control_ProActiveMPIComm.h org_objectweb_proactive_mpi_control_ProActiveMPIComm_MessageRecvHandler.h" />
+		</exec>
+		<!-- execute configure to generate Makefiles -->
+		<exec dir="${src.dir}/org/objectweb/proactive/mpi/control/config" executable="sh" os="Linux">
+			<arg line="configure.sh " />
+		</exec>
+	</target>
+
 	<!-- ================================================================ -->
 	<!--   Tests coverage : need clover license in user.home directory    -->
 	<!-- ================================================================ -->
@@ -867,9 +885,8 @@
 	<!-- ==================================================================== -->
 	<target name="docbookTransform" depends="init">
 		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
-		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/${docbookInputFile}" 
-                 out="${docs.tmp}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
-			<param name="profile.os" expression="${docbook.profile}"/>
+		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/${docbookInputFile}" out="${docs.tmp}/profiled.xml" style="${doc.src}/xsl/profiling.xsl" force="yes">
+			<param name="profile.os" expression="${docbook.profile}" />
 			<!--docbook.profile can be html, pdf or empty-->
 			<xmlcatalog refid="docbookcatalog" />
 			<classpath>
@@ -885,8 +902,10 @@
 		<!-- Do the real conversion, docbook to pdf or html -->
 		<xslt basedir="${doc.src}" processor="trax" in="${docs.tmp}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
 			<xmlcatalog refid="docbookcatalog" />
-			<param name="TODAY" expression="${TODAY}"/>					<!-- the date for the first page -->
-			<param name="VERSION" expression="${version}"/>			<!-- the version number, for the first page -->
+			<param name="TODAY" expression="${TODAY}" />
+			<!-- the date for the first page -->
+			<param name="VERSION" expression="${version}" />
+			<!-- the version number, for the first page -->
 			<classpath>
 				<fileset dir="${lib}">
 					<include name="**/*.jar" />
@@ -942,12 +961,16 @@
 
 		<java classname="util.DocBookize" fork="true">
 			<classpath refid="project.classpath" />
-			<arg value="${docs.tmp}/${docbookInputFile}" />		<!-- The xml file to parse -->
-			<arg value="ProActive_src_html/${proactive.dir}/" />		<!-- The path to find java files in html -->
-			<arg value="${src.dir}/${proactive.dir}/" />			<!-- the path for java file inclusion -->
-			<arg value="${base}/descriptors/" />							<!-- the path for xml file inclusion -->
+			<arg value="${docs.tmp}/${docbookInputFile}" />
+			<!-- The xml file to parse -->
+			<arg value="ProActive_src_html/${proactive.dir}/" />
+			<!-- The path to find java files in html -->
+			<arg value="${src.dir}/${proactive.dir}/" />
+			<!-- the path for java file inclusion -->
+			<arg value="${base}/descriptors/" />
+			<!-- the path for xml file inclusion -->
 		</java>
-		
+
 		<java classname="util.Validate" fork="true">
 			<classpath refid="project.classpath" />
 			<classpath>
@@ -957,7 +980,7 @@
 			</classpath>
 			<arg value="${docs.tmp}/${docbookInputFile}" />
 		</java>
-		
+
 	</target>
 
 
@@ -967,8 +990,8 @@
 	<target name="docbookPreProcess">
 
 		<!-- as this file gets edited, make sure it's a fresh copy-->
-		<delete file="${docs.tmp}/${docs.mainFile}"/>  
-		
+		<delete file="${docs.tmp}/${docs.mainFile}" />
+
 		<!-- Copy the files needed for the html files (pics and maybe others) -->
 		<copy toDir="${docs.dir}/html/">
 			<fileset dir="${doc.src}">
@@ -1022,7 +1045,7 @@
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
-	<target name="manualSingleHtml" depends="docbookPreProcess" >
+	<target name="manualSingleHtml" depends="docbookPreProcess">
 		<antcall target="docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="docbookOutputFile" value="${docs.dir}/html/ProActiveManual.html" />
@@ -1035,14 +1058,13 @@
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
 	<!-- ==================================================================== -->
-	<target name="manual"
-    description="Build all the different manual version: html, pdf... " 
-    depends="java2html,manualSingleHtml,manualHtml,manualPdf" >
+	<target name="manual" description="Build all the different manual version: html, pdf... " depends="java2html,manualSingleHtml,manualHtml,manualPdf">
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
 		<delete dir="${docs.tmp}" />
-		<copy todir="${docs.dir}/examples" >  <!-- XML descriptor examples also available -->
-			<fileset dir="${base}/descriptors/examples"/>
+		<copy todir="${docs.dir}/examples">
+			<!-- XML descriptor examples also available -->
+			<fileset dir="${base}/descriptors/examples" />
 		</copy>
 	</target>
 
