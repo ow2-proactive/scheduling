@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.util.log;
 
 
@@ -38,7 +38,7 @@ package org.objectweb.proactive.core.util.log;
  *
  */
 public interface Loggers {
-	static final public String CORE = "proactive";
+    static final public String CORE = "proactive";
     static final public String CLASSLOADING = "proactive.classloading";
     static final public String EVENTS = "proactive.events";
     static final public String RUNTIME = "proactive.runtime";
@@ -59,7 +59,8 @@ public interface Loggers {
     static final public String RMI = "proactive.communication.rmi";
     static final public String SSH = "proactive.communication.ssh";
     static final public String COMPONENTS = "proactive.components";
-    static final public String COMPONENTS_CONTROLLERS = COMPONENTS + ".controllers";
+    static final public String COMPONENTS_CONTROLLERS = COMPONENTS +
+        ".controllers";
     static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
     static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
     static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS +
@@ -110,21 +111,22 @@ public interface Loggers {
     public static final String FAULT_TOLERANCE = "proactive.ft";
     public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
     public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
-    
+
     // MPI loggers
     static final public String MPI = "proactive.mpi";
-    static final public String MPI_DEPLOY = ".deploy";
-    
-    static final public String SKELETONS = CORE+".skeletons";
-    static final public String SKELETONS_STRUCTURE = SKELETONS+".structure";
-    static final public String SKELETONS_MANAGER = SKELETONS+".manager";
-    static final public String SKELETONS_KERNEL = SKELETONS+".kernel";
-    
+    static final public String MPI_CONTROL = MPI + ".control";
+    static final public String MPI_CONTROL_MANAGER = MPI_CONTROL + ".control";
+    static final public String MPI_CONTROL_COUPLING = MPI_CONTROL +
+        ".coupling";
+    static final public String SKELETONS = CORE + ".skeletons";
+    static final public String SKELETONS_STRUCTURE = SKELETONS + ".structure";
+    static final public String SKELETONS_MANAGER = SKELETONS + ".manager";
+    static final public String SKELETONS_KERNEL = SKELETONS + ".kernel";
+
     // Scilab loggers
     public static final String SCILAB = "proactive.scilab";
     public static final String SCILAB_DEPLOY = SCILAB + ".deploy";
     public static final String SCILAB_SERVICE = SCILAB + ".service";
     public static final String SCILAB_WORKER = SCILAB + ".worker";
     public static final String SCILAB_TASK = SCILAB + ".task";
-
 }
