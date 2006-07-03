@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="newIC2D">
+
+    <title>IC2D: Interactive Control and Debugging of Distribution</title>
+
+    <sect1 id="implementAPlugin">
+
+        <title>How to implement a plug-in for IC2D</title>
+
+        <para> IC2D is a <emphasis role="bold">Rich Client Platform (RCP)</emphasis> based on the
+            familiar <emphasis role="bold">Eclipse plug-in architecture</emphasis>. 
+        </para>
+
+        <sect2 id="createAProject">
+
+            <title>Create a project with the plug-in project wizard</title>
+
+            <para> 
+                If you want to create a plug-in for IC2D, you have to use the Eclipse's 
+                <emphasis role="bold">Plug-in Development Environment (PDE)</emphasis>. This is a complete
+                environment that Eclipse provides for plug-in development. The PDE adds a new
+                perspective and several views and wizards that help you create, maintain, and
+                publish plug-ins. The PDE creates boilerplate starter code that you can use to build
+                your plug-in. This section explains how to use the <emphasis role="bold">plug-in
+                project wizard</emphasis> to create your plug-in.
+            </para>
+
+            <orderedlist>
+                <listitem><para> 
+                    Select <emphasis role="bold">File &gt; New &gt;
+                    Project</emphasis> from the menu bar to open the new project wizard. 
+                </para></listitem>
+                <listitem><para> 
+                    Select <emphasis role="bold">Plug-in Project</emphasis> in 
+                    <emphasis role="bold">Plug-in Development</emphasis>. 
+                </para></listitem>
+            </orderedlist>
+
+            <figure id="newProject">
+                <title>Create a new project</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/new_project.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <orderedlist continuation="continues">
+                <listitem><para> 
+                    Click <emphasis role="bold">Next</emphasis>. 
+                </para></listitem>
+                <listitem><para> 
+                    In the <emphasis role="bold">Project name</emphasis> field, enter a name
+                    for the plug-in. For example, we chose org.objectweb.proactive.ic2d.example.
+                    You must use the fully-qualified name to ensure its uniqueness. 
+                </para></listitem>
+                <listitem><para> 
+                    In the Project contents pane, accept the default directory value. 
+                </para></listitem>
+                <listitem><para> 
+                    Make sure the <emphasis role="bold">Create a Java project</emphasis>
+                    option is selected since we want our project to contain Java files. Accept
+                    the default values of the other options.
+                </para></listitem>
+                <listitem><para>
+                    Beginning in Eclipse 3.1 you will get best results by using the 
+                    <emphasis role="bold">OSGi bundle manifest</emphasis>. In contrast to 
+                    previous versions, this is now the default.
+                </para></listitem>
+            </orderedlist>
+
+            <figure id="newPluginProject">
+                <title>Specify name and plug-in structure</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/new_plugin_project.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <orderedlist continuation="continues">
+                <listitem><para> 
+                    Click <emphasis role="bold">Next</emphasis>.
+                </para></listitem>
+                <listitem><para> 
+                    Now enter the fully qualified <emphasis role="bold">ID of the
+                    plug-in</emphasis>. By default it is the same as its project name. 
+                </para></listitem>
+                <listitem><para> 
+                    Accept the default values of the other options. 
+                </para></listitem>
+            </orderedlist>
+
+            <figure id="newPluginProject2">
+                <title>Specify plug-in content</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/new_plugin_project_2.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <orderedlist continuation="continues">
+                <listitem>
+                    <para> Click <emphasis role="bold">Finish</emphasis>.</para>
+                </listitem>
+            </orderedlist>
+
+        </sect2>
+        <!-- createAProject -->
+
+        <sect2 id="pluginStructure">
+
+            <title>The plug-in structure</title>
+
+            <para> The plug-in project has the file structure illustrated in the followed figure. </para>
+
+            <figure id="pluginStructureScreenshot">
+                <title>The plug-in structure</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/package_explorer.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <sect3 id="pluginManifest">
+
+                <title>Plug-in manifest</title>
+
+                <para> 
+                    The plug-in manifest ties all the code and resources together. When you first
+                    create a plug-in, Eclipse will create and open the manifest for you
+                    automatically. The manifest is split into two files: 
+                    <emphasis role="bold">MANIFEST.MF</emphasis> and 
+                    <emphasis role="bold">plugin.xml</emphasis>. PDE provides a fancy editor to 
+                    modify the options stored in these files (see <xref linkend="PDEOverview"/>) 
+                    but also allows you to edit the source directly. 
+                </para>
+
+                <figure id="PDEOverview">
+                    <title>Interface for editing the manifest and related files.</title>
+                    <mediaobject>
+                        <imageobject>
+                            <imagedata fileref="images/ic2d/overview.png" format="PNG"/>
+                        </imageobject>
+                    </mediaobject>
+                </figure>
+
+                <sect4 id="manifestMF">
+
+                    <title>MANIFEST.MF</title>
+
+                    <para> The <emphasis role="bold">OSGi bundle manifest</emphasis> is stored in
+                        MANIFEST.MF. OSGi is the name of a standard that Eclipse uses for
+                        dynamically loading plug-ins. <xref linkend="manifestMFListing"/> shows the OSGi bundle
+                        manifest generated by the plug-in wizard. Everything in this file can be
+                        edited by the Manifest editor, so <emphasis role="bold">there should be no
+                        need to edit it by hand</emphasis>. However if you need to, just
+                        double-click it in the Package Explorer to bring up the Manifest editor,
+                        then click on the MANIFEST.MF tab in the editor to see and modify the
+                        source. </para>
+
+                    <example id="manifestMFListing">
+                        <title>MANIFEST.MF</title>
+                        <screen>Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Example Plug-in
+Bundle-SymbolicName: org.objectweb.proactive.ic2d.example
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.example.ExamplePlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+  org.eclipse.core.runtime
+Eclipse-AutoStart: true</screen>
+                    </example>
+
+                </sect4><!-- manifestMF -->
+
+                <sect4 id="pluginXML">
+                    
+                    <title>plugin.xml</title>
+                    
+                    <para>
+                        The Eclipse extension manifest is called plugin.xml. It's used for defining and 
+                        using Eclipse <emphasis role="bold">extension points</emphasis>, so if you're not 
+                        using extension points then this file may be omitted. Extension points are the 
+                        fundamental way that Eclipse plug-ins are tied together. This new plug-in is not 
+                        yet using extension points so the plug-in wizard didn't generate the plugin.xml file.
+                    </para>
+                    
+                </sect4><!-- pluginXML -->
+                
+            </sect3><!-- pluginManifest -->
+            
+            <sect3 id="pluginClass">
+                    
+                <title>Plug-in class</title>
+                    
+                <para>
+                    The plug-in class is an optional singleton class that can be used to store 
+                    global information for the plug-in. It's also a convenient place to put a 
+                    few static utility functions used by other classes in the plug-in. See the listing 
+                    <xref linkend="pluginClassListing"/> for the plug-in class that was created for us by the plug-in wizard.
+                </para>
+                    
+                <example id="pluginClassListing">
+                    <title>ExamplePlugin.java</title>
+                    <programlisting lang="java"><![CDATA[package org.objectweb.proactive.ic2d.example;
+
+import org.eclipse.ui.plugin.*;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.osgi.framework.BundleContext;
+
+/**
+ * The main plugin class to be used in the desktop.
+ */
+public class ExamplePlugin extends AbstractUIPlugin {
+
+	//The shared instance.
+	private static ExamplePlugin plugin;
+	
+	/**
+	 * The constructor.
+	 */
+	public ExamplePlugin() {
+		plugin = this;
+	}
+
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+	}
+
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		plugin = null;
+	}
+
+	/**
+	 * Returns the shared instance.
+	 */
+	public static ExamplePlugin getDefault() {
+		return plugin;
+	}
+
+	/**
+	 * Returns an image descriptor for the image file at the given
+	 * plug-in relative path.
+	 *
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.objectweb.proactive.ic2d.example", path);
+	}
+}]]></programlisting>
+                </example>
+                    
+            </sect3><!-- pluginClass -->
+            
+            <sect3 id="buildProperties">
+                
+                <title>Build properties</title>
+                
+                <para>
+                    The <emphasis role="bold">build.properties</emphasis> file (see 
+                    <xref linkend="buildPropertiesListing"/>) will be needed when 
+                    <emphasis role="bold">exporting the application for others to use</emphasis>. 
+                    In particular if your application needs any resources 
+                    like icons they should be listed here in the bin.includes section. 
+                    The Plug-in Manifest editor provides a convenient interface to modify 
+                    this file that is less error-prone than modifying it by hand.
+                </para>
+                
+                <example id="buildPropertiesListing">
+                    <title>build.properties</title>
+                    <screen>source.. = src/
+output.. = bin/
+bin.includes = META-INF/,\
+               .</screen>
+                </example>
+                
+            </sect3><!-- buildProperties -->
+
+        </sect2><!-- pluginStructure -->
+
+        <sect2 id="addPluginToIC2D">
+            
+            <title>How to add your plugin to IC2D</title>
+            
+            <para>
+                In the project <emphasis role="bold">org.objectweb.proactive.ic2d</emphasis>, 
+                open <emphasis role="bold">ic2d.product</emphasis>. In the Configuration tab, click 
+                <emphasis role="bold">Add</emphasis>.
+            </para>
+            
+            <figure id="configuration">
+                <title>Configuration</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/ic2d_product.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            
+            <para>
+                Then select your plug-in.
+            </para>
+            
+            <figure id="pluginSelection">
+                <title>Plug-in selection</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/plugin_selection.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            
+            <orderedlist>
+                <listitem><para>
+                    Now, click Add <emphasis role="bold">Required Plug-ins</emphasis>.
+                </para></listitem>
+                <listitem><para>
+                    Return to the <emphasis role="bold">Overview</emphasis> tab and click 
+                    <emphasis role="bold">Synchronize</emphasis>. Now launch ic2d by clicking 
+                    <emphasis role="bold">Launch the product</emphasis>.
+                </para></listitem>
+                <listitem><para>
+                    You can verify that your plug-in is integrated : in the IC2D frame, go to 
+                    <emphasis role="bold">Help &gt; About product &gt; Plug-in Details</emphasis>.
+                </para></listitem>
+            </orderedlist>
+            
+            <figure id="aboutPlugin">
+                <title>About product Plug-ins</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/product_plugins.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            
+        </sect2><!-- addPluginToIC2D -->
+
+        <sect2 id="perspectivesViewsEditors">
+            
+            <title>Perspectives, views and editors</title>
+            
+            <figure id="workbenchStructure">
+                <title>Workbench structure</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="images/ic2d/workbench_decomposed.png" format="PNG"/>
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            
+            <sect3 id="perspectives">
+                <title>Perspectives</title>
+                
+                <para>
+                    Perspectives provide an additional layer of organization inside
+                    the workbench page. A perspective defines an appropriate
+                    <emphasis role="bold">collection of views</emphasis>, their layout,
+                    and applicable actions for a given user task. Users can switch
+                    between perspectives as they move across tasks. From an implementation
+                    point of view, the user's active perspective controls which views
+                    are shown on the workbench page and their positions and sizes.
+                    Editors are not affected by a change in perspective.                    
+                </para>
+                
+                <para>
+                    A new perspective is added to the workbench using a simple two step process :
+                </para>
+                
+                <orderedlist>
+                    <listitem><para><emphasis role="bold">
+                        Add a perspective extension to the plugin.xml file. 
+                    </emphasis></para></listitem>
+                    <listitem><para><emphasis role="bold">
+                        Define a perspective class for the extension within the plug-in.
+                    </emphasis></para></listitem>
+                </orderedlist>
+                
+                <sect4 id="perspectives_step1">
+                    
+                    <title>Step 1 : Add a Perspective Extension to the plugin.xml file</title>
+                    
+                    <orderedlist>
+                        <listitem><para>
+                            Open <emphasis role="bold">MANIFEST.MF</emphasis> with the Plug-in Manifest Editor
+                        </para></listitem>
+                        <listitem><para>
+                            Open the <emphasis role="bold">Extensions</emphasis> tab
+                        </para></listitem>
+                    </orderedlist>
+                    
+                    <figure id="extensions_0">
+                        <title>Extensions tab (no extensions)</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/ic2d/extensions-0.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <orderedlist continuation="continues">
+                        <listitem><para>
+                            Click <emphasis role="bold">Add</emphasis>
+                        </para></listitem>
+                        <listitem><para>
+                            In the <emphasis role="bold">Extensions Points</emphasis> tab, select 
+                            <emphasis role="bold">org.eclipse.ui.perspectives</emphasis>
+                        </para></listitem>
+                    </orderedlist>
+                    
+                    <para><emphasis role="bold">Ajouter un screenshot</emphasis></para>
+                    
+                    <orderedlist continuation="continues">
+                        <listitem><para>
+                            Click <emphasis role="bold">Finish</emphasis>
+                        </para></listitem>
+                    </orderedlist>
+                    
+                    <figure id="extensions_1">
+                        <title>Extensions tab (org.eclipse.ui.perspectives)</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/ic2d/extensions-1.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <orderedlist continuation="continues">
+                        <listitem><para>
+                            Right click the new extension : <emphasis role="bold">New &gt; perspective</emphasis>
+                        </para></listitem>
+                        <listitem><para>
+                            Now, enter the <emphasis role="bold">ID</emphasis>, the <emphasis role="bold">name</emphasis>
+                            and the <emphasis role="bold">class</emphasis> corresponding to the perspective.
+                        </para></listitem>
+                    </orderedlist>
+                    
+                    <figure id="extensions_2">
+                        <title>Extensions tab (Example)</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/ic2d/extensions-2.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                    <para>
+                        If the plugin.xml file didn't exist, it is now created. <xref linkend="pluginXMLexample"/>
+                        shows the plugin.xml file that was created.
+                    </para>
+                    
+                    <example id="pluginXMLexample">
+                        <title>plugin.xml</title>
+                        <programlisting lang="xml"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.objectweb.proactive.ic2d.example.ExamplePerspective"
+            id="org.objectweb.proactive.ic2d.example.ExamplePerspective"
+            name="Example"/>
+   </extension>
+</plugin>]]></programlisting>
+                    </example>
+                        
+                    
+                </sect4><!-- perspectives_step1 -->
+                
+                <sect4 id="perspectives_step2">
+                
+                    <title>Step 2 : Define a Perspective Class for the Extension within the Plug-in</title>
+                
+                    <para>
+                        Now we need to define the perspective class which must implements the IPerspectiveFactory interface :
+                    </para>
+                
+                    <example id="examplePlugin">
+                        <title>ExamplePlugin.java</title>
+                        <programlisting lang="java"><![CDATA[package org.objectweb.proactive.ic2d.example;
+
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPerspectiveFactory;
+
+public class ExamplePerspective implements IPerspectiveFactory {
+
+	public static final String ID="org.objectweb.proactive.ic2d.example.ExamplePerspective";
+	
+	public void createInitialLayout(IPageLayout layout) {
+		// TODO Auto-generated method stub
+
+	}
+
+}]]></programlisting>
+                    </example>
+                
+                    <para>
+                        You have created your first perspective !
+                    </para>
+                
+                </sect4><!-- perspectives_step2 -->
+                
+            </sect3><!-- perspectives -->
+            
+            <sect3 id="views">
+                
+                <title>Views</title>
+                
+                <para>
+                    A view is typically used to navigate a hierarchy of information, open an editor,
+                    or display properties for the active editor.
+                </para>
+                
+                <para>
+                    Create a view looks like create a perspective. You have to 
+                    <emphasis role="bold">add a perspective extension to the plugin.xml file</emphasis>
+                    and to <emphasis role="bold">define a view class for the extension within the plug-in</emphasis>.
+                </para>
+                
+                <sect4 id="views_step1">
+                    
+                    <title>Step 1 : Add a View Extension to the plugin.xml file</title>
+                    
+                    <para>
+                        Add an extension : org.eclipse.ui.views, then add a view and configure it. 
+                        You should obtain something like that is shown in the <xref linkend="extensions_3"/>.
+                    </para>
+                    
+                    <figure id="extensions_3">
+                        <title>Extensions tab (org.objectweb.proactive.ic2d.example.view)</title>
+                        <mediaobject>
+                            <imageobject>
+                                <imagedata fileref="images/ic2d/extensions-3.png" format="PNG"/>
+                            </imageobject>
+                        </mediaobject>
+                    </figure>
+                    
+                </sect4><!-- views_step1 -->
+                
+            </sect3><!-- views -->
+            
+        </sect2><!-- perspectivesViewsEditors -->
+
+    </sect1><!-- implementAPlugin -->
+
+</chapter><!-- newIC2D -->
