@@ -54,7 +54,7 @@ public class HTTPInputStream extends DataInputStream {
 
     public HTTPInputStream(InputStream is) {
         super(is);
-        in = in = new PushbackInputStream(in);
+        in = new PushbackInputStream(in);
     }
 
     /**
