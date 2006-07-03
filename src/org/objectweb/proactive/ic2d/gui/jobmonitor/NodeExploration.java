@@ -72,7 +72,6 @@ public class NodeExploration implements JobMonitorConstants {
     private int maxDepth;
     private DataAssociation asso;
     private DefaultListModel skippedObjects;
-    private Map aos;
     private Set visitedVM;
     private Map runtimes;
     private IC2DMessageLogger controller;
@@ -82,7 +81,6 @@ public class NodeExploration implements JobMonitorConstants {
         this.maxDepth = 3;
         this.asso = asso;
         this.skippedObjects = skippedObjects;
-        this.aos = new HashMap();
         this.runtimes = new HashMap();
         this.controller = controller;
     }

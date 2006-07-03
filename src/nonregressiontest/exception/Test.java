@@ -53,13 +53,12 @@ public class Test extends FunctionalTest {
     public boolean postConditions() throws Exception {
         if (counter == 14) {
             return true;
-        } else {
-            System.out.println("counter == " + counter);
-            return false;
         }
+        System.out.println("counter == " + counter);
+        return false;
     }
 
-    private void good() {
+    void good() {
         counter++;
     }
 
@@ -71,7 +70,6 @@ public class Test extends FunctionalTest {
     public void testMechanism(Exc r) throws Exception {
         ProActive.tryWithCatch(Exception.class);
         try {
-
             /* voidRT() */
             r.voidRT();
             ProActive.endTryWithCatch();

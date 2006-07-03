@@ -194,11 +194,11 @@ public class MonitoredObjectsList extends JDialog {
         tabbedPane.addTab(name, container);
     }
 
-    private void cancel() {
+    void cancel() {
         setVisible(false);
     }
 
-    private void ok() {
+    void ok() {
         if (monitoredListModel == null) {
 
             /* IC2D */

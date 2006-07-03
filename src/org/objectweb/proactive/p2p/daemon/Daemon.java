@@ -653,7 +653,7 @@ public class Daemon {
     private static final String ALIVE_CMD = "alive";
     private static final String FLUSH_CMD = "flush";
 
-    private static void log(String msg, boolean isError) {
+    static void log(String msg, boolean isError) {
         msg = LOG_HEADER + msg;
         try {
             if (isError) {
@@ -758,7 +758,7 @@ public class Daemon {
         startWorking();
     }
 
-    private static void sleep(long minutes) {
+    static void sleep(long minutes) {
         try {
             Thread.sleep(minutes * 60 * 1000);
         } catch (InterruptedException ie) {
@@ -778,7 +778,7 @@ public class Daemon {
         }
     }
 
-    private static String readCommand(BufferedReader reader) {
+    static String readCommand(BufferedReader reader) {
         char[] tab = new char[256];
         int offset = 0;
         do {
@@ -803,7 +803,7 @@ public class Daemon {
         return null;
     }
 
-    private void handleCommand(Socket client, String command) {
+    void handleCommand(Socket client, String command) {
         if (!KILL_CMD.equals(command) && !STOP_CMD.equals(command) &&
                 !RESTART_CMD.equals(command) && !ALIVE_CMD.equals(command) &&
                 !FLUSH_CMD.equals(command)) {
