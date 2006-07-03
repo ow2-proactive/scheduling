@@ -55,7 +55,6 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 public class MonitorThread {
     private static String depth;
     private WorldObject worldObject;
-    private IC2DMessageLogger logger;
     private DataAssociation asso;
     private DefaultListModel monitoredHosts;
     private DefaultListModel skippedObjects;
@@ -69,7 +68,6 @@ public class MonitorThread {
         IC2DMessageLogger logger) {
         this.asso = new DataAssociation();
         depth = _depth;
-        this.logger = logger;
         this.worldObject = worldObject;
 
         createRefresher();
@@ -79,9 +77,6 @@ public class MonitorThread {
         //skippedObjects.addElement(new MonitoredJob(ProActive.getJobId()));
         ttr = 30;
         explorator = new NodeExploration(asso, skippedObjects, logger);
-
-        String hostname = null;
-        int port = 0;
 
         explorator.setMaxDepth(depth);
 

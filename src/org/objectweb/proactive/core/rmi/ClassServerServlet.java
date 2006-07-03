@@ -46,10 +46,7 @@ import org.objectweb.proactive.osgi.OsgiParameters;
 
 public class ClassServerServlet extends HttpServlet {
     public static final String SERVLET_NAME = "/ProActiveHTTP";
-    private String url;
-    private ClassServer classServer;
     private HttpServletRequest request;
-    private HttpServletResponse response;
     private int port;
 
     public ClassServerServlet(int port) {
@@ -82,7 +79,6 @@ public class ClassServerServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             this.request = request;
-            this.response = response;
             InputStream in = request.getInputStream();
             OutputStream out = response.getOutputStream();
             RequestInfo reqInfo = new RequestInfo();

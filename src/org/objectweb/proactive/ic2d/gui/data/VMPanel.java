@@ -45,8 +45,6 @@ import org.objectweb.proactive.ic2d.spy.Spy;
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {
     private VMObject vmObject;
     protected PanelPopupMenu popup;
-    private String alignLayout; //keep state of layout H or V
-
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -131,7 +129,6 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     // set VM horiz or vertic layout for that VM
     // needed if there's more than one node in one VM
     public void alignLayout(String align) {
-        alignLayout = align;
         setPreferredSize(null);
         if (align.equals(new String("H"))) {
             setLayout(new java.awt.GridLayout(1, 0, 4, 4));

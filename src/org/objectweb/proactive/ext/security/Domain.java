@@ -35,12 +35,8 @@ import java.security.cert.*;
 
 
 public class Domain {
-    private String name;
     private X509Certificate certificate;
-    private PolicyServer policyServer;
-
     public Domain(String file, PolicyServer ps) {
-        this.policyServer = ps;
     }
 
     public PublicKey getPublicKey() {

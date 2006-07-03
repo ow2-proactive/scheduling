@@ -303,9 +303,6 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         /** 128-bit buffer for use with secRand */
         byte[] secRandBuf16 = new byte[16];
 
-        /** 64-bit buffer for use with secRand */
-        byte[] secRandBuf8 = new byte[8];
-
         secRand.nextBytes(secRandBuf16);
         secRandBuf16[6] &= 0x0f;
         secRandBuf16[6] |= 0x40; /* version 4 */

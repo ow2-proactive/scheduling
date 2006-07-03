@@ -53,11 +53,6 @@ public class DinnerLayout {
     transient private UserFrame display;
 
     /**
-     * The images needed to construct the PhilPanel objects
-     */
-    transient private javax.swing.Icon[] images;
-
-    /**
      * Reference to the Table manager, for bootstrap use.
      * In fact, the applet creates the layout
      * then the layout creates the active objects and
@@ -79,7 +74,6 @@ public class DinnerLayout {
      * @param the array holding the Philosopher/Forks's images
      */
     public DinnerLayout(javax.swing.Icon[] images) {
-        this.images = images;
         display = new UserFrame(images);
     }
 

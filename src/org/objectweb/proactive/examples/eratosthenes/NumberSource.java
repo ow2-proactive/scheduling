@@ -78,7 +78,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class NumberSource implements java.io.Serializable, RunActive, Slowable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    private PrimeOutputListener outputListener;
     private ActivePrimeContainer first;
     private boolean pause;
     private boolean sleep;

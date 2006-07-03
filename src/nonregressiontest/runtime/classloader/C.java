@@ -6,8 +6,6 @@ package nonregressiontest.runtime.classloader;
  *
  */
 public class C {
-    private String name;
-
     public C() {
     }
 

@@ -107,7 +107,6 @@ public class SubMatrix {
     private long startTime;
     private long endTime;
     private long startComp;
-    private long endComp;
     private long totalComp;
     private int nbComp = 0;
 

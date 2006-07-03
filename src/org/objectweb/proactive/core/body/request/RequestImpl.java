@@ -73,9 +73,7 @@ public class RequestImpl extends MessageImpl implements Request,
     /** transient because we deal with the serialization of this variable
        in a custom manner. see writeObject method*/
     protected transient UniversalBody sender;
-    private transient ProActiveSecurityManager psm;
     private byte[][] methodCallCiphered;
-    private byte[] methodCallCipheredSignature;
     public long sessionID;
     protected String codebase;
     private static Boolean enableStackTrace;

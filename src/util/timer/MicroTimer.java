@@ -6,7 +6,6 @@ public class MicroTimer {
         System.loadLibrary("Util_timer_MicroTimer");
     }
 
-    private long[] cumulatedTime;
     private long[] startTime;
     private long[] endTime;
 
@@ -18,7 +17,6 @@ public class MicroTimer {
     public void start() {
         this.startTime = currentTime();
         this.endTime = currentTime();
-        this.cumulatedTime = new long[2];
     }
 
     /**
@@ -71,8 +69,6 @@ public class MicroTimer {
 
     public static void main(String[] args) {
         MicroTimer timer = new MicroTimer();
-        long[] startTime;
-        long[] endTime;
         int i = 0;
         timer.start();
         while (i < 10) {

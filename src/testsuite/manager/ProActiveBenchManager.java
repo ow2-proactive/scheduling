@@ -66,8 +66,6 @@ public class ProActiveBenchManager extends BenchmarkManager
     private Node localVMNode = null;
     private Node remoteVMNode = null;
     private String remoteHostname = "localhost";
-    private RSHJVMProcess rshJVM = null;
-
     /**
      *
      */

@@ -39,8 +39,6 @@ import javax.crypto.KeyGenerator;
 
 
 public class SessionKeyFactory implements Serializable {
-    private Provider myProvider;
-
     // private SecureRandom      rand = new FixedSecureRandom();
     private KeyGenerator keyGen;
 

@@ -43,8 +43,6 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
  */
 class InfrastructureHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
-    private ProActiveDescriptor proActiveDescriptor;
-
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
@@ -53,7 +51,6 @@ class InfrastructureHandler extends PassiveCompositeUnmarshaller
     //
     public InfrastructureHandler(ProActiveDescriptor proActiveDescriptor) {
         super(false);
-        this.proActiveDescriptor = proActiveDescriptor;
         CollectionUnmarshaller ch = new CollectionUnmarshaller();
         ch.addHandler(PROCESS_DEFINITION_TAG,
             new ProcessDefinitionHandler(proActiveDescriptor));
