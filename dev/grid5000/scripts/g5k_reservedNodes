@@ -1,0 +1,97 @@
+#! /bin/sh
+
+source $(dirname $0)/g5k_lib.sh
+
+function print_help {
+	echo -e "Usage: $0 [-c] [-a|-o|-c cluster] "
+	echo -e "Print nodes owned by a reservation\n"
+	echo -e "\t-c       , check that each node is really free (slow)"
+	modopt_print_help
+	exit 1
+}
+
+OPT_C=NO
+
+modopt_parse "$@"
+while getopts "${MODOPT_OPTS}c" Option
+do
+	case $Option in
+  c) OPT_C=YES  ;;
+	h) print_help ;;
+	*)
+		modopt_error_handle $Option
+		if [ "$?" -eq 0 ] ; then
+			echo -e "Invalid option: $Option"
+			print_help
+		exit 1
+		fi
+	;;
+	esac
+done
+		
+function check_node_is_ok {
+	NODE=$1
+
+	$SSH_CMD $node true
+	if [ $? -ne 0 ] ;	then return 0 ; fi
+
+	USED_MEM=$($SSH_CMD $node free | head -n 3 | tail -n 1 | awk '{print $3}')
+	if [ $? -ne 0 ] || [ $USED_MEM -gt 100000 ] ; then
+		if [ "$VERBOSE" == "Yes" ] ; then 
+			echo "Excluding $node, USED_MEM=$USED_MEM" 1>&2
+		fi 	
+		return 0
+  fi
+
+	LOAD=$($SSH_CMD $node cat /proc/loadavg | cut -d'.' -f1 )
+	if [ $LOAD -ge 1 ] ; then
+		if [ "$VERBOSE" == "Yes" ] ; then 
+			echo "Excluding $node, LOAD=$LOAD" 1>&2
+		fi 	
+		return 0
+  fi
+
+  PS=$($SSH_CMD $node ps  aux| awk '{print $1 "\n"}' | grep -v USER|  grep -v $USER | sort | uniq)
+	for user in $PS ; do
+		user_home=$(eval echo ~$user) # Erk !
+		if [ "$(expr match $user_home '\(/home/\).*')" == "/home/" ] ; then
+			if [ "$VERBOSE" == "Yes" ] ; then 
+				echo "Excluding $node, $user is running processes on this node" 1>&2
+			fi 	
+			return 0
+  	fi			
+	done
+
+	return 1
+} 
+
+
+for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
+do
+	CLUSTER=${OPTIONS_CLUSTERS[$i]}
+
+	NODES=$(cd $(dirname $0) &&	$SSH_CMD $(get_oar_hostname $CLUSTER) $PWD/g5klocal_reservedNodes)
+	if [ ! $? -eq 0 ] ;
+	then
+			echo "Cannot get reserved nodes" 1>&2
+			exit 1
+	fi
+
+	if [ "$OPT_C" == "YES" ] ;
+  then
+		OUTPUT=""
+		for node in $NODES ;
+    do
+			if [ "$VERBOSE" == "Yes" ] ; then echo "Checking that $node is really free" ; fi
+			check_node_is_ok $node
+			if [ $? -eq 1 ] ;
+			then	
+				OUTPUT="$OUTPUT $node"
+			fi
+		done
+		echo $OUTPUT
+	
+	else
+		echo $NODES
+	fi	        
+done

@@ -1,0 +1,74 @@
+#! /bin/sh
+
+source $(dirname $0)/g5k_lib.sh
+
+function print_help {
+	echo -e "Usage: $0 -d dir|-l [-f] [-a|-o|-c cluster]"
+	echo -e "\n"
+	echo -e "\t-d dir , delete this file or directory"
+	echo -e "\t-l     , delete OAR logfiles"
+	echo -e "\t-f     , do not print warning"
+
+	modopt_print_help
+	exit 0
+}
+
+OPT_D=NO
+OPT_L=NO
+OPT_F=NO
+EXPR=""
+
+modopt_parse "$@"
+while getopts "aos:lfd:" Option
+do
+	echo -e "option: $OPTIND $Option $OPTARG"
+	case $Option in
+	d) 
+		echo "OPTD"
+		OPT_D=YES 
+    EXPR=$OPTARG
+	;;
+	l) OPT_L=YES ;;
+	f) OPT_F=YES ;;
+	h) print_help ;;
+	*)
+		modopt_error_handle $OPTARG
+		if [ "$?" -eq 0 ] ; then
+			echo -e "Invalid option: $OPTARG"
+			print_help
+	#		exit 1
+		fi
+	;;
+	esac
+done
+
+if [ "$OPT_L" == "NO" -a "$OPT_D" == "NO" ] ;
+then
+	echo -e "No action specified. Please use -d or -l." 1>&2
+	echo -e "Use $0 -h to get more help" 1>&2
+	exit 1
+fi
+		
+if [ $OPT_F == "NO" -a $OPT_D == "YES" ] ;
+then
+	echo -e  "\n\nWARNING: All files matching $EXPR on remote site will be deleted" 1>&2
+	echo "         You have 10 seconds to abort\n\n" 1>&2
+	sleep 10
+fi
+
+for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
+do
+	CLUSTER=${OPTIONS_CLUSTERS[$i]}
+	if [ "$OPT_D" == "YES" ] ;
+	then
+		echo -e "\n-> Deleting $EXPR on $CLUSTER"
+    		$SSH_CMD $(get_sync_hostname $CLUSTER) rm -Rf $EXPR
+	fi	
+
+	if [ $OPT_L == "YES" ] ;
+	then
+		echo -e "\n-> Deleting OAR & HotSpot Error logfiles on $CLUSTER"
+		$SSH_CMD $(get_sync_hostname $CLUSTER) rm -f OAR.\*
+		$SSH_CMD $(get_sync_hostname $CLUSTER) rm -f hs_err\*
+  	fi
+done
