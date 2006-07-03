@@ -13,30 +13,30 @@ function print_help {
 	exit 0
 }
 
+ARGS="lfd:"
 OPT_D=NO
 OPT_L=NO
 OPT_F=NO
 EXPR=""
 
-modopt_parse "$@"
-while getopts "aos:lfd:" Option
+modopt_parse $ARGS "$@"
+while getopts "${MODOPT_OPTS}${ARGS}" Option
 do
-	echo -e "option: $OPTIND $Option $OPTARG"
 	case $Option in
 	d) 
 		echo "OPTD"
 		OPT_D=YES 
-    EXPR=$OPTARG
+		EXPR=$OPTARG
 	;;
 	l) OPT_L=YES ;;
 	f) OPT_F=YES ;;
 	h) print_help ;;
 	*)
-		modopt_error_handle $OPTARG
+		modopt_error_handle $Option
 		if [ "$?" -eq 0 ] ; then
-			echo -e "Invalid option: $OPTARG"
+			echo -e "Invalid option: $Option"
 			print_help
-	#		exit 1
+		exit 1
 		fi
 	;;
 	esac

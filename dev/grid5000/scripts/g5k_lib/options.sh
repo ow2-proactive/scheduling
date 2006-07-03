@@ -29,19 +29,21 @@ function modopt_error_handle {
 
 
 function modopt_parse {
-        while getopts ":${MODOPT_OPTS}" Option
-        do
-                case $Option in
-                a)
-			if [ "$SEEN_OPT_S" == "Yes" ] || [ "$SEEN_OPT_O" == "Yes" ] ; then
-				echo "Option -a, -o and -s are incompatible. Try -h to get more help" 1>&2
-				exit 1
-			fi
-			SEEN_OPT_A="Yes" 
+	SCRIPT_OPTS=$1
+	shift
+	while getopts "aos:${SCRIPT_OPTS}" Option
+	do
+			case $Option in
+			a)
+				if [ "$SEEN_OPT_S" == "Yes" ] || [ "$SEEN_OPT_O" == "Yes" ] ; then
+					echo "Option -a, -o and -s are incompatible. Try -h to get more help" 1>&2
+					exit 1
+				fi
+				SEEN_OPT_A="Yes" 
 			
-			OPTIONS_CLUSTERS=("${CLUSTERS[@]}")
+				OPTIONS_CLUSTERS=("${CLUSTERS[@]}")
 		;;
-                s)
+		s)
 			if [ "$SEEN_OPT_A" == "Yes" ] || [ "$SEEN_OPT_O" == "Yes" ] ; then
 				echo "Option -a, -o and -s are incompatible. Try -h to get more help" 1>&2
 				exit 1
@@ -56,7 +58,6 @@ function modopt_parse {
 				done
 				exit 1
 			fi
-
 
 			if [ "$SEEN_OPT_S" == "No" ] ;
 			then
@@ -82,8 +83,8 @@ function modopt_parse {
 				fi
 			done
 		;;
-                esac
-        done
+		esac
+	done
 
 	OPTIND=0
 

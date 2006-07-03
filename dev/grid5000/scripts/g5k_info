@@ -11,11 +11,12 @@ function print_help {
 	exit 1
 }
 
+ARGS="jfh"
 OPT_J=No
 OPT_F=No
 
-modopt_parse $*
-while getopts "${MODOPT_OPTS}jfh" Option
+modopt_parse $ARGS $*
+while getopts "${MODOPT_OPTS}${ARGS}" Option
 do
 	case $Option in
   j) OPT_J=Yes ;;

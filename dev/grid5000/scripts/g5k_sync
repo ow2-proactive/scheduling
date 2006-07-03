@@ -35,10 +35,11 @@ _rsync () {
 	fi
 }
 
+ARGS="d:h"
 OPT_D=NO	
 
-modopt_parse $*
-while getopts "${MODOPT_OPTS}d:h" Option
+modopt_parse $ARGS $*
+while getopts "${MODOPT_OPTS}${ARGS}" Option
 do
 	case $Option in
   d) OPT_D=$OPTARG ;;
