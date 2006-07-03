@@ -8,8 +8,6 @@ import org.objectweb.proactive.ProActive;
  *
  */
 public class A {
-    private String name;
-
     public A() {
     }
 

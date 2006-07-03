@@ -16,17 +16,10 @@ import nonregressiontest.component.*;
  */
 public class Test extends ComponentTest {
     private static final int NB_WRAPPERS = 5;
-    private static final int NB_ITERATIONS = 1;
-    private static final String P1_NAME = "primitive-component-1";
-    private static final String P2_NAME = "primitive-component-2";
-    private static final String C1_NAME = "composite-component1";
-    private static final String C2_NAME = "composite-component2";
     private Message result1;
     private Message result2;
     private Message result3;
     private Message result4;
-    private Message result5;
-    private Message result6;
     private final String expectedResult = "foo-->a-->b-->a";
     private Component systemWithWrappingWithShortcuts;
     private Component systemWithWrappingWithoutShortcuts;

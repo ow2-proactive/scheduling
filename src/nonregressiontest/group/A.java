@@ -12,9 +12,6 @@ public class A implements InitActive, RunActive, EndActive,
     java.io.Serializable {
     private String name = "anonymous";
     private boolean onewayCallReceived = false;
-    private String nodename;
-    private String hostname;
-
     public A() {
     }
 
