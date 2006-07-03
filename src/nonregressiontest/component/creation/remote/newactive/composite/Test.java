@@ -31,7 +31,6 @@
 package nonregressiontest.component.creation.remote.newactive.composite;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;

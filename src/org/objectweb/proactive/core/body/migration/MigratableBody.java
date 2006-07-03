@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.LocalBodyStore;

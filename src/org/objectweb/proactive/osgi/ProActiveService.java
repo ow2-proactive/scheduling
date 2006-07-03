@@ -31,7 +31,6 @@
 package org.objectweb.proactive.osgi;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 

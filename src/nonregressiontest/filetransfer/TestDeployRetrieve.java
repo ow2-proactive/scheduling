@@ -1,8 +1,6 @@
 package nonregressiontest.filetransfer;
 
 import java.io.File;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;

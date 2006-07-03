@@ -30,7 +30,6 @@
  */ 
 package org.objectweb.proactive.ext.scilab.test;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import javasci.SciData;

@@ -29,15 +29,8 @@
  * ################################################################
  */ 
 package org.objectweb.proactive.loadbalancing.util;
-import java.util.Vector;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
 /**

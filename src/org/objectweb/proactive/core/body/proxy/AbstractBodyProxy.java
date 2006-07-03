@@ -30,7 +30,6 @@
  */ 
 package org.objectweb.proactive.core.body.proxy;
 
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

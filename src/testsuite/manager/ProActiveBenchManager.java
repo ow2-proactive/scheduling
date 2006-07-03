@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
 import org.xml.sax.SAXException;
 
 import testsuite.exception.BadTypeException;

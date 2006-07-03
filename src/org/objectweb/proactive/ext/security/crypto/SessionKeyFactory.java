@@ -32,7 +32,6 @@ package org.objectweb.proactive.ext.security.crypto;
 
 import java.io.Serializable;
 import java.security.Key;
-import java.security.Provider;
 import java.security.SecureRandom;
 
 import javax.crypto.KeyGenerator;

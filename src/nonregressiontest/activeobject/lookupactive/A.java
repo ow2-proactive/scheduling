@@ -32,8 +32,6 @@ package nonregressiontest.activeobject.lookupactive;
 
 import java.io.IOException;
 
-import nonregressiontest.activeobject.equality.RegisteredObject;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 

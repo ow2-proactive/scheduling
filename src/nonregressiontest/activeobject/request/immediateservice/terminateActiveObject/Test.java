@@ -35,8 +35,6 @@ package nonregressiontest.activeobject.request.immediateservice.terminateActiveO
 
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
-
 import testsuite.test.FunctionalTest;
 
 

@@ -1,6 +1,5 @@
 package org.objectweb.proactive.ext.scilab.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;

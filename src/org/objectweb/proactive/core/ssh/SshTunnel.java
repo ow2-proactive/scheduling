@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.ssh;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.InetAddress;
 import java.util.Random;
 

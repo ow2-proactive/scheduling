@@ -30,9 +30,6 @@
  */ 
 package org.objectweb.proactive.core.component.gen;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
  * Utility class for bytecode generation operations.
