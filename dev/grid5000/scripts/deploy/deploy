@@ -1,0 +1,33 @@
+#! /bin/bash
+
+for i in $NODES ; 
+do
+	KADEPLOY_ARGS="$KADEPLOY_ARGS -m $i "	
+done
+kadeploy $KADEPLOY_ARGS
+if [ $? -ne 0 ] ; then
+	echo $ERR_PREFIX "kadeploy returned non zero exit status. Aborting..."
+fi
+
+
+SSH=$(dirname $0)/deploy/ssh_autologin.exp
+
+for i in $NODES ; 
+do
+	# WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+	# PLEASE SHUT UP !
+	#sed -i "s/^$i.*//"  ~/.ssh/known_hosts
+	rm  ~/.ssh/known_hosts
+
+	$SSH $ROOT_PASSWD $i  mount -t nfs -o rsize=1024,wsize=1024  $MOUNT_ARGS
+	$SSH $ROOT_PASSWD $i  echo AllowUsers root cmathieu $USER \>\> /etc/ssh/sshd_config 
+	$SSH $ROOT_PASSWD $i  /etc/init.d/sshd restart
+	
+	if [ "$(cluster2site `get_cluster`)" == "rennes" ] ; then
+		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophiq 
+		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+	fi
+done
+
+echo "Hint: g5k_reservedNode -c can be used to retrieve the list of working nodes"
+
