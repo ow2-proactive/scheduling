@@ -175,7 +175,7 @@
     
      <para> Within this editor, you have the ability to change the component configuration,
       described in ADL files. This visual architecture design is easier than directly 
-      typing either java code, or xml descriptions. See <!--<xref linkend="fractal_gui_with_c3d"/>-->
+      typing either java code, or xml descriptions. See <xref linkend="fractal_gui_with_c3d"/>
       which contains an example use of this GUI. </para>
 </sect1>
 
