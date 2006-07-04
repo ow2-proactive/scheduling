@@ -1,0 +1,29 @@
+#! /bin/bash
+
+source $(dirname $0)/g5k_lib.sh
+
+NODES=$*
+KADEPLOY_ARGS="-e fedora4all -p hda6 -l deploy "
+
+for i in $NODES ; 
+do
+	KADEPLOY_ARGS="$KADEPLOY_ARGS -m $i "	
+done
+kadeploy $KADEPLOY_ARGS
+
+
+SSH=$(dirname $0)/misc/ssh_autologin.exp
+
+
+
+for i in $NODES ; 
+do
+	# WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+	# PLEASE SHUT UP !
+	sed -i "s/^$i.*//"  ~/.ssh/known_hosts
+
+	$SSH $ROOT_PASSWD $i  mount -t nfs -o rsize=1024,wsize=1024  nfs.sophia.grid5000.fr:/export/home /home
+	$SSH $ROOT_PASSWD $i  echo AllowUsers root, cmathieu, $USER \>\> /etc/ssh/sshd_config 
+	$SSH $ROOT_PASSWD $i  /etc/init.d/sshd restart
+done
+
