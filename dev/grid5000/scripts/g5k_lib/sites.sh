@@ -195,7 +195,12 @@ function get_cluster {
 		SITE=`expr match "$LOCAL" '.*\.\([a-zA-Z]\+\)'`	
 
 		# Extract the tupple <cluster, site> from FQDN
-		echo `${SITE}_get_cluster $FQDN`.$SITE
+		cluster=`${SITE}_get_cluster $FQDN`
+		if [ "$cluster" = "" ] ; then
+			echo $SITE
+		else
+			echo $cluster.$SITE
+		fi
 
 
 	elif [ "`expr match "$FQDN" '.*\(irisa.fr\)'`"  == "irisa.fr" ] ;
