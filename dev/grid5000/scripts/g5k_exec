@@ -1,0 +1,75 @@
+#! /bin/sh
+
+source $(dirname $0)/g5k_lib.sh
+
+function print_help {
+	echo -e "Usage: $0 -s cluster command\n"
+	echo -e "Execute a command on a node of cluster\n"
+	exit 0
+}
+
+ARGS="s:"
+OPT_S=NO
+
+while getopts "${ARGS}" Option
+do
+	case $Option in
+	s) OPT_S=$OPTARG ;;
+	h) print_help ;;
+	*)
+		echo -e "Invalid option: $Option"
+		print_help
+		exit 1
+	;;
+	esac
+done
+		
+
+if [ "$OPT_S" == "NO" ] ; then
+	print_help
+else
+	shift
+	shift
+	TMPFILE=`mktemp -p ~`
+	LOCKFILE=$TMPFILE.lock
+	CLUSTER=`resolv_cluster_alias $OPT_S`
+
+	echo "#! /bin/bash" > $TMPFILE
+	echo "sleep 10" >> $TMPFILE
+	echo "$*" >> $TMPFILE
+	echo "rm $LOCKFILE" >> $TMPFILE
+	echo "rm $TMPFILE" >> $TMPFILE
+	chmod +x $TMPFILE
+	$(dirname $0)/g5k_sync -s $CLUSTER -d $TMPFILE
+	
+
+	if [ "$VERBOSE" = "Yes" ] ; then
+		echo "Creating the lockfile $TMPFILE.lock"
+	fi 
+	ssh $(get_oar_hostname $CLUSTER) touch $LOCKFILE  
+
+	JOBID=`ssh $(get_oar_hostname $CLUSTER) oarsub -l nodes=1,walltime=00:05:00 $TMPFILE | grep IdJob | cut -d' ' -f3`
+
+	CONT=YES
+	while [ "$CONT" = "YES" ] ; do
+		ssh $(get_oar_hostname $CLUSTER) test -e $LOCKFILE  
+		if [ $? -eq 1 ] ; then
+			CONT=NO
+			if [ "$VERBOSE" = "Yes" ] ; then
+				echo "Lock is gone removing "
+			fi
+		else
+			if [ "$VERBOSE" = "Yes" ] ; then
+				echo "Waiting for $TMPFILE.lock to be deleted"
+			fi
+			sleep 1
+		fi
+	done
+
+	rm $TMPFILE
+	echo =================== STDOUT ======================
+	ssh $(get_oar_hostname $CLUSTER) "cat OAR.*$JOBID*.stdout ; rm OAR.*$JOBID*.stdout"  
+	echo =================== STDERR ======================
+	ssh $(get_oar_hostname $CLUSTER) "cat OAR.*$JOBID*.stderr ; rm OAR.*$JOBID*.stderr"  
+fi
+
