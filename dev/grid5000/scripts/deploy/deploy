@@ -4,7 +4,7 @@ for i in $NODES ;
 do
 	KADEPLOY_ARGS="$KADEPLOY_ARGS -m $i "	
 done
-kadeploy $KADEPLOY_ARGS
+ssh $(get_oar_hostname $CLUSTER) kadeploy $KADEPLOY_ARGS
 
 # TODO: Check that kadeploy succeded.
 #       Unfortunately it seems that kadeploy's devels only know 0 as exit status... 
@@ -20,12 +20,13 @@ do
 	rm  ~/.ssh/known_hosts
 
 	$SSH $ROOT_PASSWD $i  mount -t nfs -o rsize=1024,wsize=1024  $MOUNT_ARGS
-	$SSH $ROOT_PASSWD $i  echo AllowUsers root cmathieu $USER \>\> /etc/ssh/sshd_config 
-	$SSH $ROOT_PASSWD $i  /etc/init.d/sshd restart
 	
-	if [ "$(cluster2site `get_cluster`)" == "rennes" ] ; then
+	if [ "$(cluster2site $CLUSTER)" == "rennes" ] ; then
 		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
 		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+	else
+		$SSH $ROOT_PASSWD $i  echo AllowUsers root $USER \>\> /etc/ssh/sshd_config 
+#		$SSH $ROOT_PASSWD $i  /etc/init.d/sshd restart
 	fi
 done
 
