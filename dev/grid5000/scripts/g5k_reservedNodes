@@ -84,7 +84,7 @@ do
   	then
 		for node in $NODES ;
     		do
-			if [ "$VERBOSE" == "Yes" ] ; then echo "Checking that $node is really free" ; fi
+			if [ "$VERBOSE" == "Yes" ] ; then echo "Checking that $node is really free" 1>&2 ; fi
 			check_node_is_ok $node
 			if [ $? -eq 1 ] ;
 			then	
