@@ -30,5 +30,5 @@ do
 	fi
 done
 
-echo "Hint: g5k_reservedNode -c can be used to retrieve the list of working nodes"
+echo "Hint: g5k_reservedNodes -c can be used to retrieve the list of working nodes"
 
