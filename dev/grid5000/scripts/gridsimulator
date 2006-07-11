@@ -80,38 +80,38 @@ function configure_router {
 	router_name=$1
 	ssh_exec="$SSH $ROOT_PASSWD $OPT_R "
 
-	echo -e "-> Configuring router: $1"
+	echo -e "-> Configuring router: $1" 1>&2
+	local TMPFILE=`mktemp -p ~`
+		
+	echo "#! /bin/sh" > $TMPFILE
+	chmod +rx $TMPFILE
 
-	# IP Forwarding
-	echo "    [*] echo 1 > /proc/sys/net/ipv4/ip_forward" 
-	$ssh_exec echo 1 \>  /proc/sys/net/ipv4/ip_forward
-
+	echo "echo 1 > /proc/sys/net/ipv4/ip_forward" >> $TMPFILE
 	for ((i=0; i<$OPT_K; i++)) ;
 	do
-		echo "    [*] ifconfig eth0:$i 192.168.20$i.1"
-		$ssh_exec ifconfig eth0:$i 192.168.20$i.1
+		echo "ifconfig eth0:$i 192.168.20$i.1" >> $TMPFILE
 	done
 
-	echo "    [*] Fixing broken fedora's tc"
-	$ssh_exec ln -s /usr/lib64/tc /usr/lib
+	echo "ln -s /usr/lib64/tc /usr/lib" >> $TMPFILE
 	
-	echo "    [*] tc qdisc del dev eth0 root"
-	$ssh_exec tc qdisc del dev eth0 root
-	echo "    [*] tc qdisc add dev eth0 root handle 1:0 htb default 1"
-	$ssh_exec tc qdisc add dev eth0 root handle 1:0 htb default 1
+	echo "tc qdisc del dev eth0 root" >> $TMPFILE
+	echo "tc qdisc add dev eth0 root handle 1:0 htb default 1" >> $TMPFILE
+	echo "tc class add dev eth0 parent 1:0 classid 1:1 htb rate 1000tbit burst 0" >> $TMPFILE
+	echo "tc class add dev eth0 parent 1:0 classid 1:2 htb rate ${OPT_B}mbit burst 10kb" >> $TMPFILE
+	echo "tc qdisc add dev eth0 parent 1:2 handle 2:0 netem delay ${OPT_L}ms" >> $TMPFILE
+	echo "iptables -t mangle -F" >> $TMPFILE
+	echo "iptables -t mangle -A POSTROUTING ! -d 138.96.20.214 -j CLASSIFY --set-class 1:2" >> $TMPFILE
+
+	if [ "$VERBOSE" == "Yes" ] ; then
+		echo "    [*] Following script will be executed on $OPT_R" 1>&2
+		cat $TMPFILE
+		echo
+		echo
+	fi
 	
-	echo "    [*] tc class add dev eth0 parent 1:0 classid 1:1 htb rate 1000tbit burst 0"
-	$ssh_exec tc class add dev eth0 parent 1:0 classid 1:1 htb rate 1000tbit burst 0
-
-	echo "    [*] tc class add dev eth0 parent 1:0 classid 1:2 htb rate ${OPT_B}mbit burst 10kb"
-	$ssh_exec tc class add dev eth0 parent 1:0 classid 1:2 htb rate ${OPT_B}mbit burst 10kb
-
-	echo "    [*] tc qdisc add dev eth0 parent 1:2 handle 2:0 netem delay ${OPT_L}ms"
-	$ssh_exec tc qdisc add dev eth0 parent 1:2 handle 2:0 netem delay ${OPT_L}ms
-
-	echo "    [*] Iptables "
-	$ssh_exec iptables -t mangle -F
-	$ssh_exec iptables -t mangle -A POSTROUTING ! -d 138.96.20.214 -j CLASSIFY --set-class 1:2
+	
+	$ssh_exec $TMPFILE 
+	rm $TMPFILE
 }
 
 
@@ -120,26 +120,28 @@ function configure_host {
 	ip=$2
 	site=$3
 	ssh_exec="$SSH $ROOT_PASSWD $fqdn "
-	
-	echo "    [*] FQDN=$fqdn IP=$ip GROUP=$site"	
-	echo "        [*] ifconfig eth0:1 $ip"
-	$ssh_exec ifconfig eth0:1 $ip
+
+	local TMPFILE=`mktemp -p ~`
+	echo "#! /bin/sh" > $TMPFILE
+	chmod +rx $TMPFILE
+
+	echo "    [*] FQDN=$fqdn IP=$ip GROUP=$site" 1>&2	
+	echo "        [*] ifconfig eth0:1 $ip" 1>&2
+
+	echo "ifconfig eth0:1 $ip" >> $TMPFILE
 
 	for (( z=0;z<$OPT_K;z++ )) ; 
 	do 
 		if [ $z -eq $site ] ; then continue ; fi
-		echo "        [*] route add -net 192.168.20$z.0 netmask 255.255.255.0 gw 192.168.20$site.1"
-		$ssh_exec route add -net 192.168.20$z.0 netmask 255.255.255.0 gw 192.168.20$site.1
+		echo "route add -net 192.168.20$z.0 netmask 255.255.255.0 gw 192.168.20$site.1" >> $TMPFILE
 	done
 
-	echo "        [*] Installing arptables"
-	$ssh_exec rpm -Uvh ~cmathieu/DONTTOUCH/arptables_jf-0.0.8-4.x86_64.rpm 
+	echo "rpm -Uvh ~cmathieu/DONTTOUCH/arptables_jf-0.0.8-4.x86_64.rpm" >> $TMPFILE
 
 	for (( z=0;z<$OPT_K;z++ )) ; 
 	do 
 		if [ $z -eq $site ] ; then continue  ; fi
-		echo "        [*] arptables -A IN -s 192.168.20$z.0/24 -j DROP"
-		$ssh_exec arptables -A IN -s 192.168.20$z.0/24 -j DROP 
+		echo " arptables -A IN -s 192.168.20$z.0/24 -j DROP" >> $TMPFILE
 	done
 	
 	for (( z=0;z<$OPT_K;z++ )) ; 
@@ -148,12 +150,23 @@ function configure_host {
 		while [ "$hosts" != "" ] ; 
 		do
 			host=`echo $hosts | cut -d' ' -f1`
-			echo "        [*] echo `create_ip_address $host $z` $host >> /etc/hosts"
-			$ssh_exec echo "`create_ip_address $host $z` $host `echo $host | cut -d'.' -f1`" \>\> /etc/hosts
+			local ip=`create_ip_address $host $z`
+			local sname=`echo $host | cut -d'.' -f1`
+			echo "echo $ip  $host  $sname >> /etc/hosts" >> $TMPFILE
 		
 			hosts=`echo $hosts | cut -s -d' ' -f2-`
 		done
 	done
+
+	if [ "$VERBOSE" == "Yes" ] ; then
+		echo "    [*] Following script will be executed on $OPT_R" 1>&2
+		cat $TMPFILE
+		echo
+		echo
+	fi
+	
+	$ssh_exec $TMPFILE
+	rm $TMPFILE
 }
 
 function create_ip_address {
@@ -169,7 +182,7 @@ function configure_site {
 
 	shost=""
 	shosts="${groups[$ssite]} "
-	echo "-> Configuring site: $ssite [$shosts]"
+	echo "-> Configuring site: $ssite [$shosts]" 1>&2
 	
 	while [ "$shosts" != "" ] ; 
 	do
