@@ -6,30 +6,26 @@ source $ROOT_DIR/g5k_lib.sh
 SSH=$ROOT_DIR/deploy/ssh_autologin.exp
 
 function print_help {
-	echo -e "Usage: $0 -b bandwith -l lantency -k nbgroups nodes...\n\n"
-	echo -e "\t-b bandwith     , bandwith allowed for intergroup communications"
-	echo -e "\t-l latency      , latency between groups"
-	echo -e "\t-k nbgroups     , number of groups to create"
+	echo -e "Usage: $0 [-g l1:b1]+ nodes...\n\n"
+	echo -e "\t-g latency:bandwith     , define a group"
+	echo -e "\t-r                      , reconfigure router and nodes"
 	exit 0
 }
 
-ARGS="k:l:b:"
+ARGS="g:r"
 
-OPT_K=NO
-OPT_L=NO
-OPT_B=NO
-
+OPT_G=0
+OPT_R=NO
+declare -a groups_args
 while getopts "${ARGS}" Option
 do
 	case $Option in
-	k)
-		OPT_K=$OPTARG
+	g)
+		groups_args[$OPT_G]=$OPTARG
+		OPT_G=$(( OPT_G + 1 )) 
 	;;
-	l)
-		OPT_L=$OPTARG
-	;;
-	b)
-		OPT_B=$OPTARG
+	r)
+		OPT_R=YES
 	;;
 	*)
 		print_help
@@ -37,29 +33,32 @@ do
 	esac
 done
 
-if [ "$OPT_K" == "NO" -o "$OPT_L" == "NO" -o "$OPT_B" == "NO" ] ; then
+if [ $OPT_G -lt 1 ] ; then
 	print_help
 	exit 1
 fi
 
-shift 6 # Skip -l -k -b parameters 
+shift $(( OPTIND - 1 )) # Skip -g parameters 
 
 NODES=$@
+
 NBNODES=$#
-if [ $NBNODES -lt $OPT_K ] ; 
+if [ $NBNODES -lt $OPT_G ] ; 
 then
-	echo -e "To few nodes to create $OPT_K groups. Aborting..." 1>&2
+	echo -e "To few nodes to create $OPT_G groups. Aborting..." 1>&2
 	exit 1
 fi
 
-echo "-> Deploying fedora image on nodes[$NODES]"
-$ROOT_DIR/deploy_azur_fedora $OPT_R $NODES
+if [ "$OPT_R" == "NO" ] ; then
+	echo "-> Deploying fedora image on nodes[$NODES]"
+	$ROOT_DIR/deploy_azur_fedora $OPT_R $NODES
+fi
 
 nodesok=`$ROOT_DIR/g5k_reservedNodes -c`
-OPT_R=`echo $nodesok | cut -d' ' -f1`
+ROUTER=`echo $nodesok | cut -d' ' -f1`
 NODES=`echo $nodesok | cut -d' ' -f2- `
 
-echo "Router: $OPT_R"
+echo "Router: $ROUTER"
 echo "Nodes: $NODES"
 
 # Fill groups
@@ -71,44 +70,74 @@ while [ "$tmp" != "" ] ;
 do
 	groups[$index]="${groups[$index]} `echo $tmp | cut -d' ' -f1`"
 	tmp=`echo "$tmp" | cut  -d' ' -f2-`
-	index=`expr \( $index + 1 \) % $OPT_K`
+	index=`expr \( $index + 1 \) % $OPT_G`
 done
 
-
+# Choose a random private subnetwork
+SUBNET=192.168.`expr $RANDOM % 24`
 
 function configure_router {
 	router_name=$1
-	ssh_exec="$SSH $ROOT_PASSWD $OPT_R "
+	ssh_exec="$SSH $ROOT_PASSWD $ROUTER "
 
 	echo -e "-> Configuring router: $1" 1>&2
-	local TMPFILE=`mktemp -p ~`
+	TMPFILE=`mktemp -p ~`
 		
 	echo "#! /bin/sh" > $TMPFILE
 	chmod +rx $TMPFILE
 
 	echo "echo 1 > /proc/sys/net/ipv4/ip_forward" >> $TMPFILE
-	for ((i=0; i<$OPT_K; i++)) ;
+	for ((i=0; i<$OPT_G; i++)) ;
 	do
-		echo "ifconfig eth0:$i 192.168.20$i.1" >> $TMPFILE
+		echo "ifconfig eth0:$i ${SUBNET}$i.1" >> $TMPFILE
 	done
 
-	echo "ln -s /usr/lib64/tc /usr/lib" >> $TMPFILE
+	echo "ln -f -s /usr/lib64/tc /usr/lib" >> $TMPFILE
 	
 	echo "tc qdisc del dev eth0 root" >> $TMPFILE
 	echo "tc qdisc add dev eth0 root handle 1:0 htb default 1" >> $TMPFILE
 	echo "tc class add dev eth0 parent 1:0 classid 1:1 htb rate 1000tbit burst 0" >> $TMPFILE
-	echo "tc class add dev eth0 parent 1:0 classid 1:2 htb rate ${OPT_B}mbit burst 10kb" >> $TMPFILE
-	echo "tc qdisc add dev eth0 parent 1:2 handle 2:0 netem delay ${OPT_L}ms" >> $TMPFILE
 	echo "iptables -t mangle -F" >> $TMPFILE
-	echo "iptables -t mangle -A POSTROUTING ! -d 138.96.20.214 -j CLASSIFY --set-class 1:2" >> $TMPFILE
+
+	echo OPT_G: $OPT_G
+	local counter=2
+	for (( z=0;z<$OPT_G;z++ )) ; 
+	do
+		for (( y=0;y<$OPT_G;y++ )) ;
+		do
+			if [ $z -eq $y ] ; then continue ; fi
+			
+			from=${groups_args[$z]}
+			dest=${groups_args[$y]}
+
+			from_lat=`echo $from | cut -d':' -f 1`			
+			dest_lat=`echo $dest | cut -d':' -f 1`			
+			lat=$(( from_lat + dest_lat ))
+
+			from_bw=`echo $from | cut -d':' -f 2`			
+			dest_bw=`echo $dest | cut -d':' -f 2`			
+			bw=""
+			if [ $from_bw -lt $dest_bw ] ; then
+				bw=$from_bw
+			else
+				bw=$dest_bw
+			fi
+			
+			echo "tc class add dev eth0 parent 1:0 classid 1:$counter htb rate ${bw}mbit burst 5000mb" >> $TMPFILE
+			echo "tc qdisc add dev eth0 parent 1:$counter handle $counter:0 netem delay ${lat}ms" >> $TMPFILE
+
+			echo "iptables -t mangle -A POSTROUTING -s ${SUBNET}$z.0/24 -d ${SUBNET}$y.0/24 -j CLASSIFY --set-class 1:$counter" >> $TMPFILE
+
+			counter=$(( counter + 1 ))
+		done
+	done
 
 	if [ "$VERBOSE" == "Yes" ] ; then
-		echo "    [*] Following script will be executed on $OPT_R" 1>&2
+		echo "    [*] Following script will be executed on $ROUTER" 1>&2
 		cat $TMPFILE
 		echo
 		echo
 	fi
-	
 	
 	$ssh_exec $TMPFILE 
 	rm $TMPFILE
@@ -128,23 +157,37 @@ function configure_host {
 	echo "    [*] FQDN=$fqdn IP=$ip GROUP=$site" 1>&2	
 	echo "        [*] ifconfig eth0:1 $ip" 1>&2
 
+	# Network Interface & routes & tunning
 	echo "ifconfig eth0:1 $ip" >> $TMPFILE
 
-	for (( z=0;z<$OPT_K;z++ )) ; 
+	echo "echo 12800000 > /proc/sys/net/core/wmem_max" >> $TMPFILE
+	echo "echo 12800000 > /proc/sys/net/core/rmem_max" >> $TMPFILE
+	echo "echo 12800000 12800000 12800000 > /proc/sys/net/ipv4/tcp_wmem" >> $TMPFILE
+	echo "echo 12800000 12800000 12800000 > /proc/sys/net/ipv4/tcp_rmem" >> $TMPFILE
+
+	echo "echo 0 > /proc/sys/net/ipv4/tcp_no_metrics_save" >> $TMPFILE
+	echo "echo 0 > /proc/sys/net/ipv4/tcp_westwood" >> $TMPFILE
+#	echo "echo htcp > /proc/sys/net/ipv4/tcp_congestion_control" >> $TMPFILE
+
+	for (( z=0;z<$OPT_G;z++ )) ; 
 	do 
 		if [ $z -eq $site ] ; then continue ; fi
-		echo "route add -net 192.168.20$z.0 netmask 255.255.255.0 gw 192.168.20$site.1" >> $TMPFILE
+		echo "route add -net ${SUBNET}$z.0 netmask 255.255.255.0 gw ${SUBNET}$site.1" >> $TMPFILE
 	done
 
+	# Installing & Configuring arptables
 	echo "rpm -Uvh ~cmathieu/DONTTOUCH/arptables_jf-0.0.8-4.x86_64.rpm" >> $TMPFILE
 
-	for (( z=0;z<$OPT_K;z++ )) ; 
+	echo " arptables -F" >> $TMPFILE
+	for (( z=0;z<$OPT_G;z++ )) ; 
 	do 
 		if [ $z -eq $site ] ; then continue  ; fi
-		echo " arptables -A IN -s 192.168.20$z.0/24 -j DROP" >> $TMPFILE
+		echo " arptables -A IN -s ${SUBNET}$z.0/24 -j DROP" >> $TMPFILE
 	done
 	
-	for (( z=0;z<$OPT_K;z++ )) ; 
+	# Populating /etc/hosts
+	echo "echo 127.0.0.1               localhost.localdomain localhost > /etc/hosts"  >> $TMPFILE	
+	for (( z=0;z<$OPT_G;z++ )) ; 
 	do 
 		hosts=${groups[$z]}
 		while [ "$hosts" != "" ] ; 
@@ -159,7 +202,7 @@ function configure_host {
 	done
 
 	if [ "$VERBOSE" == "Yes" ] ; then
-		echo "    [*] Following script will be executed on $OPT_R" 1>&2
+		echo "    [*] Following script will be executed on $fqdn" 1>&2
 		cat $TMPFILE
 		echo
 		echo
@@ -174,7 +217,7 @@ function create_ip_address {
 	local site=$2
 
 	local end=`expr match $fqdn 'node-\([0-9]\+\).*'`
-	echo 192.168.20$site.$end
+	echo ${SUBNET}$site.$end
 }
 	
 function configure_site {
@@ -195,28 +238,33 @@ function configure_site {
 }
 
 function configure_nodes {
-	for ((k=0; k<$OPT_K; k++));
+	for ((k=0; k<$OPT_G; k++));
 	do 
 		configure_site $k
 	done
 }
 
-configure_router $OPT_R
+configure_router $ROUTER
 configure_nodes
 
 echo
 echo
 echo
 echo
-echo ROUTER: $OPT_R
-echo ROUTER: $OPT_R > ~/.gridsimulator
-for ((k=0; k<$OPT_K; k++));
+echo ROUTER: $ROUTER
+echo ROUTER: $ROUTER > ~/.gridsimulator
+for ((k=0; k<$OPT_G; k++));
 do 
-	echo "Group $k: ${groups[$k]} "
-	echo "Group $k: ${groups[$k]} " >> ~/.gridsimulator
+	site=${groups_args[$k]}
+	lat=`echo $site | cut -d':' -f 1`			
+	bw=`echo $site | cut -d':' -f 2`			
+		
+	echo "Group $k: latency=$lat bandwith=$bw"
+	echo -e "\t${groups[$k]} "
+
+	echo "Group $k: latency=$lat bandwith=$bw" >> ~/.gridsimulator
+	echo -e "\t${groups[$k]} " >> ~/.gridsimulator
 done
 echo "Hint: see ~/.gridsimulator "
 
 exit 0
-
-
