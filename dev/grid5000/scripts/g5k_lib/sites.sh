@@ -243,6 +243,8 @@ function resolv_cluster_alias {
 	tartopom) echo tartopom.rennes   ;;
 	idpot)    echo idpot.grenoble    ;;
 	icluster2)echo icluster2.grenoble;;
+	gdx)      echo orsay             ;;
+	grillon)  echo nancy             ;;
 	*) 
 		# TODO: Check that $1 is a valid cluster
 		echo $1
