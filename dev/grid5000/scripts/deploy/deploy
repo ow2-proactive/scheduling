@@ -19,9 +19,13 @@ do
 	#sed -i "s/^$i.*//"  ~/.ssh/known_hosts
 	rm  ~/.ssh/known_hosts
 
+	$SSH $ROOT_PASSWD $i  mkdir /home /home/sophia 
 	$SSH $ROOT_PASSWD $i  mount -t nfs -o rsize=1024,wsize=1024  $MOUNT_ARGS
 	
 	if [ "$(cluster2site $CLUSTER)" == "rennes" ] ; then
+		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
+		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+	elif [ "$(get_cluster)" = "orsay" ] ; then
 		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
 		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
 	else
