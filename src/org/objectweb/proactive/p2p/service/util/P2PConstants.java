@@ -98,9 +98,6 @@ public interface P2PConstants {
     /** Path of the xml deployment descriptor, for deploying shared nodes. */
     public static final String PROPERPY_XML_PATH = "proactive.p2p.xml_path";
 
-    /** Boolean for using or not p2p load balanced. */
-    public static final String PROPERTY_LOAD_BAL = "proactive.p2p.loadbalancing";
-
     /** Boolean value for disable node sharing. */
     public static final String PROPERTY_NO_SHARING = "proactive.p2p.nosharing";
 
