@@ -179,9 +179,18 @@ function configure_host {
 	echo "rpm -Uvh ~cmathieu/DONTTOUCH/arptables_jf-0.0.8-4.x86_64.rpm" >> $TMPFILE
 
 	echo " arptables -F" >> $TMPFILE
+	echo " arptables -A IN -s $ip/24 -j ACCEPT" >> $TMPFILE
+	echo " arptables -A IN -s 138.96.20.213 -j ACCEPT" >> $TMPFILE # services.sophia
+	echo " arptables -A IN -s 138.96.20.227 -j ACCEPT" >> $TMPFILE # www.sophia.grid5000.fr
+	echo " arptables -A IN -s 138.96.20.214 -j ACCEPT" >> $TMPFILE # frontale.sophia.grid500
+	echo " arptables -A IN -s 138.96.20.225 -j ACCEPT" >> $TMPFILE # ns.sophia.grid5000.fr
+	echo " arptables -A IN -j DROP" >> $TMPFILE
+
+	
 	for (( z=0;z<$OPT_G;z++ )) ; 
 	do 
 		if [ $z -eq $site ] ; then continue  ; fi
+		echo " arptables -A IN -s ${SUBNET}$z.0/24 -j DROP" >> $TMPFILE
 		echo " arptables -A IN -s ${SUBNET}$z.0/24 -j DROP" >> $TMPFILE
 	done
 	
