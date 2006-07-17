@@ -74,7 +74,7 @@ do
 done
 
 # Choose a random private subnetwork
-SUBNET=192.168.`expr $RANDOM % 24`
+SUBNET=192.168.`expr $RANDOM % 10 + 10`
 
 function configure_router {
 	router_name=$1
@@ -131,6 +131,25 @@ function configure_router {
 			counter=$(( counter + 1 ))
 		done
 	done
+
+	# Populating /etc/hosts
+	echo "echo 127.0.0.1               localhost.localdomain localhost > /etc/hosts"  >> $TMPFILE	
+	for (( z=0;z<$OPT_G;z++ )) ; 
+	do 
+		hosts=${groups[$z]}
+		while [ "$hosts" != "" ] ; 
+		do
+			host=`echo $hosts | cut -d' ' -f1`
+			local ip=`create_ip_address $host $z`
+			local sname=`echo $host | cut -d'.' -f1`
+			echo "echo $ip  $host  $sname >> /etc/hosts" >> $TMPFILE
+		
+			hosts=`echo $hosts | cut -s -d' ' -f2-`
+		done
+	done
+	local sname=`echo $ROUTER | cut -d'.' -f1`
+	echo "echo ${SUBNET}0.1 $ROUTER $sname " >> $TMPFILE
+
 
 	if [ "$VERBOSE" == "Yes" ] ; then
 		echo "    [*] Following script will be executed on $ROUTER" 1>&2
@@ -209,6 +228,8 @@ function configure_host {
 			hosts=`echo $hosts | cut -s -d' ' -f2-`
 		done
 	done
+	local sname=`echo $ROUTER | cut -d'.' -f1`
+	echo "echo ${SUBNET}$site.1 $ROUTER $sname " >> $TMPFILE
 
 	if [ "$VERBOSE" == "Yes" ] ; then
 		echo "    [*] Following script will be executed on $fqdn" 1>&2
