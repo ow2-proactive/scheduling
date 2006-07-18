@@ -42,27 +42,20 @@ int main( argc, argv )
 int argc;
 char **argv;
 {
-	int        rank, value, errcnt, toterr, i, j, itcnt, idjob, nb_proc;
+	int        rank, initValue, i, j, itcnt, idjob, nb_proc, error;
 	int        i_first, i_last;
-	MPI_Status status;
-	double     diffnorm, gdiffnorm;
 	double     xlocal[(size/3)+2][maxn];
 	double     xnew[(size/3)+3][maxn];
-	double 	   test[maxn];
-	int initValue;
-	int error;
 	char processor_name[MPI_MAX_PROCESSOR_NAME];
 	int  namelen;
 	
-
-	
-	
+	// MPI initialization 
 	MPI_Init( &argc, &argv );
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	MPI_Comm_size( MPI_COMM_WORLD, &nb_proc );
 	MPI_Get_processor_name(processor_name,&namelen);
-	
-	
+
+	// ProActive with MPI initialization  
 	error = ProActiveMPI_Init(rank);
 	if (error < 0){
 		printf("[MPI] !!! Error ProActiveMPI init \n");
@@ -73,7 +66,7 @@ char **argv;
 	ProActiveMPI_Job(&idjob);
 	if (nb_proc != 16) MPI_Abort( MPI_COMM_WORLD, 1 );
 	
-	/* xlocal[][0] is lower ghostpoints, xlocal[][maxn+2] is upper */
+	/* xlocal[][0] is lower ghostpoints, xlocal[][size+2] is upper */
 	
 	/*
 	 * Note that top and bottom processes have one less row of interior points
@@ -81,10 +74,10 @@ char **argv;
 	i_first = 1;
 	i_last = size/nb_proc;
 	
-	if ((rank == 0) && (idjob ==J OB_ZERO)) i_first++;
+	if ((rank == 0) && (idjob == JOB_ZERO)) i_first++;
 	if ((rank == nb_proc - 1) && (idjob == JOB_ONE)) i_last--;
 	
-	// initialization
+	// matrix initialization
 	if (idjob==JOB_ZERO) initValue=rank;
 	else {initValue = nb_proc+rank;} 
 	
@@ -174,6 +167,7 @@ char **argv;
 		if (rank == 0) printf( "[MPI] At iteration %d, job %d \n", itcnt, idjob );
 	} while (itcnt < NB_ITER);
 	
+	// print this process buffer 
 	printf("[MPI] Rank: %d Job: %d \n",rank, idjob );
 	for (i=1; i<(size/16); i++){
 		printf("[");
@@ -182,6 +176,7 @@ char **argv;
 		printf("] \n");
 	}
 	
+	// clean environment
 	ProActiveMPI_Finalize();
 	MPI_Finalize( );
 	return 0;
