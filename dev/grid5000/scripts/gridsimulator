@@ -148,7 +148,7 @@ function configure_router {
 		done
 	done
 	local sname=`echo $ROUTER | cut -d'.' -f1`
-	echo "echo ${SUBNET}0.1 $ROUTER $sname " >> $TMPFILE
+	echo "echo ${SUBNET}0.1 $ROUTER $sname >> /etc/hosts " >> $TMPFILE
 
 
 	if [ "$VERBOSE" == "Yes" ] ; then
@@ -203,6 +203,7 @@ function configure_host {
 	echo " arptables -A IN -s 138.96.20.227 -j ACCEPT" >> $TMPFILE # www.sophia.grid5000.fr
 	echo " arptables -A IN -s 138.96.20.214 -j ACCEPT" >> $TMPFILE # frontale.sophia.grid500
 	echo " arptables -A IN -s 138.96.20.225 -j ACCEPT" >> $TMPFILE # ns.sophia.grid5000.fr
+	echo " arptables -A IN -s 138.96.20.229 -j ACCEPT" >> $TMPFILE # nfs.sophia.grid5000.fr
 	echo " arptables -A IN -j DROP" >> $TMPFILE
 
 	
@@ -229,7 +230,7 @@ function configure_host {
 		done
 	done
 	local sname=`echo $ROUTER | cut -d'.' -f1`
-	echo "echo ${SUBNET}$site.1 $ROUTER $sname " >> $TMPFILE
+	echo "echo ${SUBNET}$site.1 $ROUTER $sname >> /etc/hosts " >> $TMPFILE
 
 	if [ "$VERBOSE" == "Yes" ] ; then
 		echo "    [*] Following script will be executed on $fqdn" 1>&2
