@@ -43,11 +43,15 @@ else
 fi
 
 
-
 # Return the cluster on which the script is executed
 function get_cluster {
-	FQDN=`$CMD_HOSTNAME`
+	get_cluster_from_hostname `$CMD_HOSTNAME`
+}
 
+# Return the cluster containing this hostname
+function get_cluster_from_hostname {
+	local FQDN=$1 
+	
 	function bordeaux_get_cluster {
 		FQDN=$1
 		if [ "$FQDN" == "frontale.bordeaux.grid5000.fr" ] ;

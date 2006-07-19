@@ -5,6 +5,24 @@ source $ROOT_DIR/g5k_lib.sh
 
 SSH=$ROOT_DIR/deploy/ssh_autologin.exp
 
+
+
+############### Check that gridsimulator work on the current cluster ##########
+
+GS_CLUSTER=`get_cluster`
+case $GS_CLUSTER in
+	azur.sophia) ;;
+	helios.sophia) ;;
+	*)
+		echo "GridSimulator don't work on $GS_CLUSTER" 1>&2
+		exit 1
+	;;
+esac
+
+
+
+################ Arguments parsing ############################################
+
 function print_help {
 	echo -e "Usage: $0 [-g l1:b1]+ nodes...\n\n"
 	echo -e "\t-g latency:bandwith     , define a group"
@@ -13,7 +31,6 @@ function print_help {
 }
 
 ARGS="g:r"
-
 OPT_G=0
 OPT_R=NO
 declare -a groups_args
@@ -33,54 +50,84 @@ do
 	esac
 done
 
+
+
+####################### arguments checking  ###################################
+
+shift $(( OPTIND - 1 )) # Skip -r and -g parameters 
+
+GS_NODES=$@  		# List of nodes 
+GS_NB_NODES=$#		# #nodes
+
+# At least one group defined 
 if [ $OPT_G -lt 1 ] ; then
 	print_help
 	exit 1
 fi
 
-shift $(( OPTIND - 1 )) # Skip -g parameters 
-
-NODES=$@
-
-NBNODES=$#
-if [ $NBNODES -lt $OPT_G ] ; 
+# At least one node per group
+if [ $GS_NB_NODES -lt $OPT_G ] ; 
 then
 	echo -e "To few nodes to create $OPT_G groups. Aborting..." 1>&2
 	exit 1
 fi
 
-if [ "$OPT_R" == "NO" ] ; then
-	echo "-> Deploying fedora image on nodes[$NODES]"
-	$ROOT_DIR/deploy_azur_fedora $OPT_R $NODES
+####################### Kadeploy part #########################################
+
+GS_IMAGE="fedora"
+
+# Deploy images on azur
+ds_azur="$ROOT_DIR/deploy_azur.sophia_${GS_IMAGE}"
+ds_helios="$ROOT_DIR/deploy_helios.sophia_${GS_IMAGE}"
+if [ ! -x $ds_azur -o ! -x $ds_helios ]  ; then
+	echo "Can't find or execute $ds. Aborting !" 1>&2
+	exit 1
 fi
 
-nodesok=`$ROOT_DIR/g5k_reservedNodes -c`
-ROUTER=`echo $nodesok | cut -d' ' -f1`
-NODES=`echo $nodesok | cut -d' ' -f2- `
+if [ "$OPT_R" == "NO" ] ; then
+	echo "-> Deploying image on nodes[$GS_NODES]"
 
-echo "Router: $ROUTER"
-echo "Nodes: $NODES"
+	# kadeploy ignores nodes not beloging to the cluster
+	$ds_azur   $GS_NODES
+	$ds_helios $GS_NODES
+fi
 
-# Fill groups
+######################## Create groups ########################################
+function get_ip_suffix {
+	fqdn=$1
+
+	echo $GS_NODES |awk "BEGIN {RS=\" \"} /$fqdn/ {print FNR}"
+}
+
+available_nodes=`$ROOT_DIR/g5k_reservedNodes -c -s azur -s helios`
+GS_ROUTER=`echo $available_nodes | cut -d' ' -f1`
+GS_NODES=`echo $available_nodes  | cut -d' ' -f2-`
+
 declare -a groups 
+
 index=0
-tmp="$NODES "
+tmp="$GS_NODES "
 echo $tmp
-while [ "$tmp" != "" ] ; 
+while [ "$tmp" != "" ] ;  # Round robin
 do
 	groups[$index]="${groups[$index]} `echo $tmp | cut -d' ' -f1`"
 	tmp=`echo "$tmp" | cut  -d' ' -f2-`
 	index=`expr \( $index + 1 \) % $OPT_G`
 done
 
-# Choose a random private subnetwork
-SUBNET=192.168.`expr $RANDOM % 10 + 10`
+######################### Random private network ##############################
+
+GS_SUBNET=192.168.`expr $RANDOM % 14 + 10`
+
+
+
+
 
 function configure_router {
 	router_name=$1
-	ssh_exec="$SSH $ROOT_PASSWD $ROUTER "
+	ssh_exec="$SSH $ROOT_PASSWD $GS_ROUTER "
 
-	echo -e "-> Configuring router: $1" 1>&2
+	echo -e "-> Configuring router: $router_name" 1>&2
 	TMPFILE=`mktemp -p ~`
 		
 	echo "#! /bin/sh" > $TMPFILE
@@ -89,17 +136,24 @@ function configure_router {
 	echo "echo 1 > /proc/sys/net/ipv4/ip_forward" >> $TMPFILE
 	for ((i=0; i<$OPT_G; i++)) ;
 	do
-		echo "ifconfig eth0:$i ${SUBNET}$i.1" >> $TMPFILE
+		echo "ifconfig eth0:$i ${GS_SUBNET}$i.1" >> $TMPFILE
 	done
 
-	echo "ln -f -s /usr/lib64/tc /usr/lib" >> $TMPFILE
-	
+	if [ "$GS_IMAGE" = "fedora" ] ; then
+		# Fedora core 4: tc bugfix
+		echo "ln -f -s /usr/lib64/tc /usr/lib" >> $TMPFILE
+	fi
+		
+	if [ "$GS_IMAGE" == "debian" ] ; then
+		# Install tc/iproute
+		echo "apt-get update ; apt-get -q -y install iproute" >>  $TMPFILE
+	fi
+
 	echo "tc qdisc del dev eth0 root" >> $TMPFILE
 	echo "tc qdisc add dev eth0 root handle 1:0 htb default 1" >> $TMPFILE
 	echo "tc class add dev eth0 parent 1:0 classid 1:1 htb rate 1000tbit burst 0" >> $TMPFILE
 	echo "iptables -t mangle -F" >> $TMPFILE
 
-	echo OPT_G: $OPT_G
 	local counter=2
 	for (( z=0;z<$OPT_G;z++ )) ; 
 	do
@@ -122,11 +176,11 @@ function configure_router {
 			else
 				bw=$dest_bw
 			fi
-			
+					
 			echo "tc class add dev eth0 parent 1:0 classid 1:$counter htb rate ${bw}mbit burst 5000mb" >> $TMPFILE
 			echo "tc qdisc add dev eth0 parent 1:$counter handle $counter:0 netem delay ${lat}ms" >> $TMPFILE
 
-			echo "iptables -t mangle -A POSTROUTING -s ${SUBNET}$z.0/24 -d ${SUBNET}$y.0/24 -j CLASSIFY --set-class 1:$counter" >> $TMPFILE
+			echo "iptables -t mangle -A POSTROUTING -s ${GS_SUBNET}$z.0/24 -d ${GS_SUBNET}$y.0/24 -j CLASSIFY --set-class 1:$counter" >> $TMPFILE
 
 			counter=$(( counter + 1 ))
 		done
@@ -148,11 +202,11 @@ function configure_router {
 		done
 	done
 	local sname=`echo $ROUTER | cut -d'.' -f1`
-	echo "echo ${SUBNET}0.1 $ROUTER $sname >> /etc/hosts " >> $TMPFILE
+	echo "echo ${GS_SUBNET}0.1 $ROUTER $sname >> /etc/hosts " >> $TMPFILE
 
 
 	if [ "$VERBOSE" == "Yes" ] ; then
-		echo "    [*] Following script will be executed on $ROUTER" 1>&2
+		echo "    [*] Following script will be executed on $GS_ROUTER" 1>&2
 		cat $TMPFILE
 		echo
 		echo
@@ -164,10 +218,10 @@ function configure_router {
 
 
 function configure_host {
-	fqdn=$1
-	ip=$2
-	site=$3
-	ssh_exec="$SSH $ROOT_PASSWD $fqdn "
+	local fqdn=$1
+	local ip=$2
+	local site=$3
+	local ssh_exec="$SSH $ROOT_PASSWD $fqdn "
 
 	local TMPFILE=`mktemp -p ~`
 	echo "#! /bin/sh" > $TMPFILE
@@ -179,25 +233,31 @@ function configure_host {
 	# Network Interface & routes & tunning
 	echo "ifconfig eth0:1 $ip" >> $TMPFILE
 
-	echo "echo 12800000 > /proc/sys/net/core/wmem_max" >> $TMPFILE
-	echo "echo 12800000 > /proc/sys/net/core/rmem_max" >> $TMPFILE
-	echo "echo 12800000 12800000 12800000 > /proc/sys/net/ipv4/tcp_wmem" >> $TMPFILE
-	echo "echo 12800000 12800000 12800000 > /proc/sys/net/ipv4/tcp_rmem" >> $TMPFILE
+	echo "echo 6553600 > /proc/sys/net/core/wmem_max" >> $TMPFILE
+	echo "echo 6553600 > /proc/sys/net/core/rmem_max" >> $TMPFILE
+	echo "echo 4096 13107200 13107200 > /proc/sys/net/ipv4/tcp_wmem" >> $TMPFILE
+	echo "echo 4096    65536 13107200 > /proc/sys/net/ipv4/tcp_rmem" >> $TMPFILE
 
-	echo "echo 0 > /proc/sys/net/ipv4/tcp_no_metrics_save" >> $TMPFILE
-	echo "echo 0 > /proc/sys/net/ipv4/tcp_westwood" >> $TMPFILE
-#	echo "echo htcp > /proc/sys/net/ipv4/tcp_congestion_control" >> $TMPFILE
+	# echo "echo 0 > /proc/sys/net/ipv4/tcp_no_metrics_save" >> $TMPFILE
+	# echo "echo htcp > /proc/sys/net/ipv4/tcp_congestion_control" >> $TMPFILE
 
 	for (( z=0;z<$OPT_G;z++ )) ; 
 	do 
 		if [ $z -eq $site ] ; then continue ; fi
-		echo "route add -net ${SUBNET}$z.0 netmask 255.255.255.0 gw ${SUBNET}$site.1" >> $TMPFILE
+		echo "route add -net ${GS_SUBNET}$z.0 netmask 255.255.255.0 gw ${GS_SUBNET}$site.1" >> $TMPFILE
 	done
 
 	# Installing & Configuring arptables
-	echo "rpm -Uvh ~cmathieu/DONTTOUCH/arptables_jf-0.0.8-4.x86_64.rpm" >> $TMPFILE
+	if [ "$GS_IMAGE" = "fedora" ] ; then
+		echo "rpm -Uvh ~cmathieu/DONTTOUCH/arptables_jf-0.0.8-4.x86_64.rpm" >> $TMPFILE
+	fi
+
+	if [ "$GS_IMAGE" = "debian" ] ; then
+		echo "apt-get update ; apt-get -q -y install arptables" >> $TMPFILE
+	fi
 
 	echo " arptables -F" >> $TMPFILE
+
 	echo " arptables -A IN -s $ip/24 -j ACCEPT" >> $TMPFILE
 	echo " arptables -A IN -s 138.96.20.213 -j ACCEPT" >> $TMPFILE # services.sophia
 	echo " arptables -A IN -s 138.96.20.227 -j ACCEPT" >> $TMPFILE # www.sophia.grid5000.fr
@@ -206,14 +266,6 @@ function configure_host {
 	echo " arptables -A IN -s 138.96.20.229 -j ACCEPT" >> $TMPFILE # nfs.sophia.grid5000.fr
 	echo " arptables -A IN -j DROP" >> $TMPFILE
 
-	
-	for (( z=0;z<$OPT_G;z++ )) ; 
-	do 
-		if [ $z -eq $site ] ; then continue  ; fi
-		echo " arptables -A IN -s ${SUBNET}$z.0/24 -j DROP" >> $TMPFILE
-		echo " arptables -A IN -s ${SUBNET}$z.0/24 -j DROP" >> $TMPFILE
-	done
-	
 	# Populating /etc/hosts
 	echo "echo 127.0.0.1               localhost.localdomain localhost > /etc/hosts"  >> $TMPFILE	
 	for (( z=0;z<$OPT_G;z++ )) ; 
@@ -229,8 +281,8 @@ function configure_host {
 			hosts=`echo $hosts | cut -s -d' ' -f2-`
 		done
 	done
-	local sname=`echo $ROUTER | cut -d'.' -f1`
-	echo "echo ${SUBNET}$site.1 $ROUTER $sname >> /etc/hosts " >> $TMPFILE
+	local sname=`echo $GS_ROUTER | cut -d'.' -f1`
+	echo "echo ${GS_SUBNET}$site.1 $GS_ROUTER $sname >> /etc/hosts " >> $TMPFILE
 
 	if [ "$VERBOSE" == "Yes" ] ; then
 		echo "    [*] Following script will be executed on $fqdn" 1>&2
@@ -242,13 +294,13 @@ function configure_host {
 	$ssh_exec $TMPFILE
 	rm $TMPFILE
 }
+	
 
 function create_ip_address {
 	local fqdn=$1
 	local site=$2
 
-	local end=`expr match $fqdn 'node-\([0-9]\+\).*'`
-	echo ${SUBNET}$site.$end
+	echo ${GS_SUBNET}$site.`get_ip_suffix $fqdn`
 }
 	
 function configure_site {
@@ -275,15 +327,15 @@ function configure_nodes {
 	done
 }
 
-configure_router $ROUTER
+configure_router $GS_ROUTER
 configure_nodes
 
 echo
 echo
 echo
 echo
-echo ROUTER: $ROUTER
-echo ROUTER: $ROUTER > ~/.gridsimulator
+echo GS_ROUTER: $GS_ROUTER
+echo GS_ROUTER: $GS_ROUTER > ~/.gridsimulator
 for ((k=0; k<$OPT_G; k++));
 do 
 	site=${groups_args[$k]}

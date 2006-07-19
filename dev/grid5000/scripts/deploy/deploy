@@ -14,6 +14,13 @@ SSH=$(dirname $0)/deploy/ssh_autologin.exp
 
 for i in $NODES ; 
 do
+	if [ "$CLUSTER" != "`get_cluster_from_hostname $i`" ] ; then
+		if [ "$Verbose" = "Yes" ] ; then
+			echo "Skip $i's configuration since it does not belong to $CLUSTER" 1>&2
+		fi
+		continue
+	fi
+
 	# WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
 	# PLEASE SHUT UP !
 	#sed -i "s/^$i.*//"  ~/.ssh/known_hosts

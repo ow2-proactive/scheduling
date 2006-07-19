@@ -33,9 +33,7 @@ else
 	TMPFILE=`mktemp -p ~`
 	LOCKFILE=$TMPFILE.lock
 	CLUSTER=`resolv_cluster_alias $OPT_S`
-
 	echo "#! /bin/bash" > $TMPFILE
-	echo "sleep 10" >> $TMPFILE
 	echo "$*" >> $TMPFILE
 	echo "rm $LOCKFILE" >> $TMPFILE
 	echo "rm $TMPFILE" >> $TMPFILE
@@ -66,7 +64,7 @@ else
 		fi
 	done
 
-	rm $TMPFILE
+	rm -f $TMPFILE
 	echo =================== STDOUT ======================
 	ssh $(get_oar_hostname $CLUSTER) "cat OAR.*$JOBID*.stdout ; rm OAR.*$JOBID*.stdout"  
 	echo =================== STDERR ======================

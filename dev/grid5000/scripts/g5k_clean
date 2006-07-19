@@ -3,7 +3,7 @@
 source $(dirname $0)/g5k_lib.sh
 
 function print_help {
-	echo -e "Usage: $0 [-f] [-k] [-a|-o|-c cluster]"
+	echo -e "Usage: $0 [-f] [-k] [-a|-o|-s cluster]"
 	echo -e "Delete OAR Jobs, kill JVMs & RMI registries and remove OAR logfiles\n"
 	echo -e "\t-f     , Erase OAR log files"
 	echo -e "\t-k     , Kill JVMs & RMI registries on all cluster's nodes"
