@@ -202,6 +202,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     }
 
     public void reinitProcess() {
+        this.killMPI();
         mpiProcess.setStarted(false);
         mpiProcess.setFinished(false);
     }
