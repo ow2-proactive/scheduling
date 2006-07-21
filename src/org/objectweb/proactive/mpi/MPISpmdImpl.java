@@ -271,18 +271,27 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     }
 
     public void newActiveSpmd(String cl, Object[][] params) {
-        if (spmdClasses.contains(cl) || classes.contains(cl)) {
-            MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
-                " class has already been added to the list of user classes to instanciate ");
-        } else {
-            this.spmdClasses.add(cl);
-            ArrayList parameters = new ArrayList(2);
+        try {
+            if (params.length != vn.getNodes().length) {
+                throw new RuntimeException(
+                    "!!! ERROR: mismatch between number of parameters and number of Nodes");
+            }
 
-            // index=0 => Object[] type
-            // index=1 => Object[][] type
-            parameters.add(0, null);
-            parameters.add(1, params);
-            this.spmdClassesParams.put(cl, parameters);
+            if (spmdClasses.contains(cl) || classes.contains(cl)) {
+                MPI_IMPL_LOGGER.info("!!! ERROR newActiveSpmd: " + cl +
+                    " class has already been added to the list of user classes to instanciate ");
+            } else {
+                this.spmdClasses.add(cl);
+                ArrayList parameters = new ArrayList(2);
+
+                // index=0 => Object[] type
+                // index=1 => Object[][] type
+                parameters.add(0, null);
+                parameters.add(1, params);
+                this.spmdClassesParams.put(cl, parameters);
+            }
+        } catch (NodeException e) {
+            e.printStackTrace();
         }
     }
 

@@ -87,7 +87,7 @@ public class ProActiveMPIUtil {
         return intToBytes(Float.floatToIntBits(fnum), bytes, startIndex);
     }
 
-    /** Given a byte array, restore it as an int
+    /** Given a byte array, restore it as an float
      * @param bytes the byte array
      * @param startIndex the starting index of the place the int is stored
      */
