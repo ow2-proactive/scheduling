@@ -1,41 +1,42 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.rmi;
 
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
+
 import java.io.IOException;
+
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
 
 
 public class RequestInfo {
@@ -49,6 +50,11 @@ public class RequestInfo {
     private String classFileName;
     private String action;
     private boolean hasInfo;
+    private boolean preferredList = false;
+
+    public boolean getPreferredList() {
+        return this.preferredList;
+    }
 
     public String getContentType() {
         return contentType;
@@ -72,8 +78,12 @@ public class RequestInfo {
      */
     public void read(HttpServletRequest request) {
         this.contentType = request.getContentType();
+
         this.contentLength = request.getContentLength();
+
         this.action = request.getHeader("Proactive-action");
+
+        //       System.out.println("--- " + javax.servlet.http.HttpUtils.parsePostData()
         this.hasInfo = true;
     }
 
@@ -82,6 +92,7 @@ public class RequestInfo {
      * and extract the necessary information
      **/
     public void read(HTTPInputStream in) throws IOException {
+        //        HTTPInputStream in = new HTTPInputStream(in_);
         String line;
 
         /* Clear the previous information */
@@ -97,7 +108,6 @@ public class RequestInfo {
         } else {
             hasInfo = true;
         }
-
         String[] triplet = pSpace.split(line, 3);
         String method = null;
         String requestURI = null;
@@ -105,7 +115,6 @@ public class RequestInfo {
         try {
             method = triplet[0];
             requestURI = triplet[1];
-
             String HTTPVersion = triplet[2];
         } catch (ArrayIndexOutOfBoundsException e) {
             throw new java.io.IOException(
@@ -113,6 +122,13 @@ public class RequestInfo {
         }
 
         if (method.equals(METHOD_GET)) {
+
+            /* fix the jini class loader problem */
+            if (requestURI.contains("PREFERRED.LIST")) {
+                this.preferredList = true;
+                return;
+            }
+
             // Extract the Path information
             int index = requestURI.indexOf(".class");
 
@@ -145,7 +161,6 @@ public class RequestInfo {
             // ProActive specific processing
             this.contentLength = Integer.parseInt(in.getHeader("Content-Length"));
             this.contentType = in.getHeader("Content-Type");
-
             if (!contentType.equals(HttpUtils.SERVICE_REQUEST_CONTENT_TYPE)) {
                 throw new java.io.IOException(
                     "Malformed header, expected Content-Type = " +

@@ -84,6 +84,11 @@ public class ClassServerHelper {
 
     public synchronized String initializeClassServer()
         throws java.io.IOException {
+
+    	if (OsgiParameters.servletEnabled()) {
+    		return this.getCodebase();
+    	}
+    	
         if (!shouldCreateClassServer) {
             return null; // don't bother
         }
@@ -110,11 +115,12 @@ public class ClassServerHelper {
             codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
                 ClassServer.getServerSocketPort() + "/";
         } else if (OsgiParameters.servletEnabled()) {
-            codebase = ClassServerServlet.getUrl();
+            codebase = ClassServerServlet.getUrl() + "doc";
         } else {
             codebase = "http://" + currentClassServer.getHostname() + ":" +
                 ClassServer.getServerSocketPort() + "/";
         }
+        
         return codebase;
     }
 }

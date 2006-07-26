@@ -1,50 +1,52 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.rmi;
+
+import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.osgi.OsgiParameters;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import java.net.Socket;
 
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 /**
@@ -117,7 +119,7 @@ public class HTTPRequestHandler extends Thread {
         DataOutputStream dOut = null;
         String responseHeaders = "";
         String statusLine = null;
-        String contentType;
+        String contentType = null;
         byte[] bytes = null;
 
         try {
@@ -130,19 +132,23 @@ public class HTTPRequestHandler extends Thread {
 
                 /* ----------------- Here we get the request headers  */
                 if (this.reqInfo == null) {
-                    //                        System.out.println("--> Lecture des headers !!!!!");
                     this.reqInfo = new RequestInfo();
                     reqInfo.read(httpIn);
                 }
+
                 if (!reqInfo.hasInfos()) {
                     return;
                 }
 
+                /* fix the jini class loader problem */
+                if (this.reqInfo.getPreferredList()) {
+                    statusLine = "HTTP/1.1 200 OK";
+                    bytes = "PreferredResources-Version: 1.0\nPreferred: false".getBytes();
+                }
                 // If  there is no field ClassFileName then it is a call to the
                 // ProActive Request via HTTP
-                if (this.reqInfo.getClassFileName() == null) {
+                else if (this.reqInfo.getClassFileName() == null) {
                     HTTPProcess process = new HTTPProcess(httpIn, this.reqInfo);
-
                     Object o = process.getBytes();
                     bytes = HttpMarshaller.marshallObject(o);
 
@@ -168,7 +174,6 @@ public class HTTPRequestHandler extends Thread {
                 bytes = new byte[0];
             }
 
-            //                System.out.println("ecriture sur le dOut " + out + " -- " + contentType);
             if (!OsgiParameters.servletEnabled()) {
                 dOut.writeBytes(statusLine + "\r\n");
                 dOut.writeBytes("Content-Length: " + bytes.length + "\r\n");
