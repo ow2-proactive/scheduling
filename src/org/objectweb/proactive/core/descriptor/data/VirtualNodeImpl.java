@@ -741,10 +741,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 "Cannot return the first node, no nodes hava been created");
         }
 
-        BooleanWrapper bw = (BooleanWrapper) fileTransferDeployedStatus.get(node.getNodeInformation()
+        FileVector fw = (FileVector) fileTransferDeployedStatus.get(node.getNodeInformation()
                                                                                 .getName());
-        if (bw != null) {
-            bw.booleanValue(); //wait-by-necessity
+        if (fw != null) {
+        	fw.waitForAll(); //wait-by-necessity
         }
 
         return node;
