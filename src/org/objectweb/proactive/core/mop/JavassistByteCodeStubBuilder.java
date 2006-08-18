@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javassist.CannotCompileException;
+import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -73,7 +74,16 @@ public class JavassistByteCodeStubBuilder {
             generatedClass = pool.makeClass(Utils.convertClassNameToStubClassName(
                         className));
             
-            CtClass superClass = pool.get(className);
+            CtClass superClass = null;
+            try {
+            	superClass = pool.get(className);
+            } catch (NotFoundException e) {
+            	// may happen in environments with multiple classloaders: className is not available
+            	// in the initial classpath of javassist's class pool
+            	// ==> try to append classpath of the class corresponding to className
+            	pool.appendClassPath(new ClassClassPath(Class.forName(className)));
+            	superClass = pool.get(className);
+            }
             CtField outsideOfConstructorField = new CtField(pool.get(CtClass.booleanType.getName()), "outsideOfConstructor", generatedClass);
             
             generatedClass.addField(outsideOfConstructorField, (superClass.isInterface()? " false" : "true"));
