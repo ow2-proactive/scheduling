@@ -90,7 +90,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi, ProActiveMPI" description="build the class files" />
+	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
 
 
 	<!-- ================================================================ -->
