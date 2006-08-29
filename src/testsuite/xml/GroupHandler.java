@@ -187,11 +187,14 @@ public class GroupHandler {
                     test.setManager(this.manager);
                 } catch (ClassNotFoundException e) {
                     logger.fatal("Can't found " + className, e);
+                    throw new RuntimeException(e);
                 } catch (InstantiationException e) {
                     logger.fatal("Can't create a new instance of " + className,
                         e);
+                    throw new RuntimeException(e);
                 } catch (IllegalAccessException e) {
                     logger.fatal("Can't access " + className, e);
+                    throw new RuntimeException(e);
                 }
             }
 
