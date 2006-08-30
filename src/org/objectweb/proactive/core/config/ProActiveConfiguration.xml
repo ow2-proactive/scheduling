@@ -12,7 +12,6 @@
 		<prop key="name_server" value="localhost"/>
 		<prop key="name_server_pool" value="rutget"/>
 		<prop key="pool_host_number" value="1"/>
-		<prop key="proactive.rmi.port" value="1099"/>
 		<prop key="proactive.communication.protocol" value="rmi"/> 
 		<prop key="byteCodeManipulator" value="javassist"/>
 		<prop key="proactive.rmi.port" value="1099"/>
