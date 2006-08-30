@@ -5,7 +5,7 @@
     <interface signature="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilder" role="server" name="implementation-builder"/>
   <component name="type-builder">
     <interface signature="org.objectweb.fractal.adl.types.TypeBuilder" role="server" name="type-builder"/>
-    <content class="org.objectweb.fractal.adl.types.FractalTypeBuilder"/>
+    <content class="org.objectweb.proactive.core.component.adl.types.ProActiveTypeBuilder"/>
     <controller desc="primitive"/>
   </component>
   <component name="implementation-builder">
@@ -16,13 +16,13 @@
       <content class="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilderImpl"/>
       <controller desc="primitive"/>
     </component>
-    <component name="registry">
+<!--    <component name="registry">
       <interface signature="org.objectweb.proactive.core.component.adl.RegistryManager" role="server" name="registry"/>
       <content class="org.objectweb.proactive.core.component.adl.RegistryManagerImpl"/>
       <controller desc="primitive"/>
-    </component>
+    </component>-->
     <binding client="this.implementation-builder" server="builder.implementation-builder"/>
-    <binding client="builder.registry" server="registry.registry"/>
+<!--    <binding client="builder.registry" server="registry.registry"/>-->
     <controller desc="composite"/>
   </component>
   <component name="component-builder">

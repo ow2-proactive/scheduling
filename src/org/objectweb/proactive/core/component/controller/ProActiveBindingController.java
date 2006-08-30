@@ -34,6 +34,8 @@ import org.objectweb.fractal.api.control.BindingController;
 
 
 /**
+ * Extension of the standard Fractal {@link org.objectweb.fractal.api.control.BindingController BindingController }
+ * 
  * @author Matthieu Morel
  *
  */
@@ -43,4 +45,6 @@ public interface ProActiveBindingController extends BindingController {
      * @return true if this component is bound on a client interface
      */
     public Boolean isBound();
+    
+    
 }

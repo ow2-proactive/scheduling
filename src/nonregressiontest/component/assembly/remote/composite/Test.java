@@ -115,13 +115,4 @@ public class Test extends ComponentTest {
         return (Arrays.equals(c2SubComponents, c2_sub_components) &&
         Arrays.equals(c1SubComponents, c1_sub_components));
     }
-
-    public static void main(String[] args) {
-        //			TestOld test = new TestOld();
-        //			try {
-        //				test.action();
-        //			} catch (Exception e) {
-        //				e.printStackTrace();
-        //			}
-    }
 }

@@ -353,10 +353,15 @@ public class JavassistByteCodeStubBuilder {
             body += "\n}";
 //            System.out.println("method : " + reifiedMethods[i].getName()
 //                    + " : \n" + body);
-            CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
-                    reifiedMethods[i].getName(),
-                    reifiedMethods[i].getParameterTypes(),
-                    reifiedMethods[i].getExceptionTypes(), body, generatedClass);
+            CtMethod methodToGenerate = null;
+            try {
+                methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
+                        reifiedMethods[i].getName(),
+                        reifiedMethods[i].getParameterTypes(),
+                        reifiedMethods[i].getExceptionTypes(), body, generatedClass);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
             generatedClass.addMethod(methodToGenerate);
         }
     }

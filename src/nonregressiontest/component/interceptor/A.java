@@ -34,7 +34,8 @@ public class A implements FooItf, BindingController {
 
     public Object lookupFc(String clientItfName)
         throws NoSuchInterfaceException {
-        return null;
+        if ("foo-client".equals(clientItfName)) return b;
+        throw new NoSuchInterfaceException(clientItfName);
     }
 
     public void unbindFc(String clientItfName)

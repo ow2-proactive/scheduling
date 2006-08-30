@@ -58,7 +58,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
-public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
+public class UniversalBodyProxy extends AbstractBodyProxy
+    implements java.io.Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle

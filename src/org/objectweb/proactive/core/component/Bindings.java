@@ -85,14 +85,14 @@ public class Bindings implements Serializable {
                                 .equals(Constants.PARALLEL)) {
                     addCollectiveBindingOnInternalClientItf(binding);
                 } else {
-                    exportBindings.put(client_itf_type.getFcItfName(), binding);
+                    exportBindings.put(binding.getClientInterfaceName(), binding);
                 }
             } else {
                 // normal bindings
                 if (client_itf_type.isFcCollectionItf()) {
                     addCollectiveBindingOnExternalClientItf(binding);
                 } else {
-                    normalBindings.put(client_itf_type.getFcItfName(), binding);
+                    normalBindings.put(binding.getClientInterfaceName(), binding);
                 }
             }
         } catch (NoSuchInterfaceException nsie) {

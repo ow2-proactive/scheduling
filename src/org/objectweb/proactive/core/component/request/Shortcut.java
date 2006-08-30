@@ -36,7 +36,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
+import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -66,7 +66,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class Shortcut implements Serializable {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     private transient UniversalBody sender;
-    private List steps; // the list of crossed membranes; TODO_M transient 
+    private List<UniversalBody> steps; // the list of crossed membranes; TODO_M transient 
 
     // FIXME replace with a custom list with custom serialization of contained bodies 
     private String fcFunctionalInterfaceName;
@@ -116,9 +116,9 @@ public class Shortcut implements Serializable {
      * @return the id of the interface which is bound through the BindingController ; it is different from the one
      * that is the target of the communication through the shortcut.
      */
-    public FunctionalInterfaceID getLinkedInterfaceID() {
+    public ItfID getLinkedInterfaceID() {
         // it is the first encountered interface while creating the shortcut
-        return new FunctionalInterfaceID(fcFunctionalInterfaceName,
+        return new ItfID(fcFunctionalInterfaceName,
             ((UniversalBody) steps.get(0)).getID());
     }
 
@@ -126,9 +126,9 @@ public class Shortcut implements Serializable {
      *
      * @return the ID of the last encountered interface when creating the shortcut
      */
-    public FunctionalInterfaceID getShortcutInterfaceID() {
+    public ItfID getShortcutInterfaceID() {
         // it is the last encountered interface while creating the shortcut
-        return new FunctionalInterfaceID(fcFunctionalInterfaceName,
+        return new ItfID(fcFunctionalInterfaceName,
             ((UniversalBody) steps.get(steps.size() - 1)).getID());
     }
 

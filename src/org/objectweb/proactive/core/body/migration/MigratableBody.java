@@ -282,4 +282,11 @@ public class MigratableBody extends BodyImpl implements Migratable,
             psm.setBody(this);
         }
     }
+
+    /*
+     * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
+     */
+    public long getNextSequenceID() {
+        return localBodyStrategy.getNextSequenceID();
+    }
 }

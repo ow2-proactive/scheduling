@@ -15,7 +15,9 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
+import nonregressiontest.component.I2Multicast;
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 
@@ -27,8 +29,8 @@ public class Setup {
     private static ComponentType d_type = null;
     private static ComponentType A_TYPE = null;
     private static ComponentType B_TYPE = null;
-    private static ProActiveGenericFactory CF = null;
-    private static TypeFactory TF = null;
+    private static ProActiveGenericFactory gf = null;
+    private static ProActiveTypeFactory tf = null;
 
     private static void createTypes() throws Exception {
         createTypeD();
@@ -38,16 +40,16 @@ public class Setup {
 
     private static void init()
         throws InstantiationException, NoSuchInterfaceException {
-        if ((TF == null) || (CF == null)) {
+        if ((tf == null) || (gf == null)) {
             System.setProperty("fractal.provider",
                 "org.objectweb.proactive.core.component.Fractive");
             Component boot = Fractal.getBootstrapComponent();
-            if (TF == null) {
-                TF = Fractal.getTypeFactory(boot);
+            if (tf == null) {
+                tf = (ProActiveTypeFactory)Fractal.getTypeFactory(boot);
             }
 
-            if (CF == null) {
-                CF = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
+            if (gf == null) {
+                gf = (ProActiveGenericFactory)Fractal.getGenericFactory(boot);
             }
         }
     }
@@ -55,8 +57,8 @@ public class Setup {
     private static void createTypeB() throws Exception {
         init();
         if (B_TYPE == null) {
-            B_TYPE = TF.createFcType(new InterfaceType[] {
-                        TF.createFcItfType("i2", I2.class.getName(),
+            B_TYPE = tf.createFcType(new InterfaceType[] {
+                        tf.createFcItfType("i2", I2.class.getName(),
                             TypeFactory.SERVER, TypeFactory.MANDATORY,
                             TypeFactory.SINGLE)
                     });
@@ -66,13 +68,13 @@ public class Setup {
     private static void createTypeD() throws Exception {
         init();
         if (d_type == null) {
-            d_type = TF.createFcType(new InterfaceType[] {
-                        TF.createFcItfType("i1", I1.class.getName(),
+            d_type = tf.createFcType(new InterfaceType[] {
+                        tf.createFcItfType("i1", I1.class.getName(),
                             TypeFactory.SERVER, TypeFactory.MANDATORY,
                             TypeFactory.SINGLE),
-                        TF.createFcItfType("i2", I2.class.getName(),
+                        tf.createFcItfType("i2", I2Multicast.class.getName(),
                             TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.COLLECTION)
+                            ProActiveTypeFactory.MULTICAST_CARDINALITY)
                     });
         }
     }
@@ -80,11 +82,11 @@ public class Setup {
     public static void createTypeA() throws Exception {
         init();
         if (A_TYPE == null) {
-            A_TYPE = TF.createFcType(new InterfaceType[] {
-                        TF.createFcItfType("i1", I1.class.getName(),
+            A_TYPE = tf.createFcType(new InterfaceType[] {
+                        tf.createFcItfType("i1", I1.class.getName(),
                             TypeFactory.SERVER, TypeFactory.MANDATORY,
                             TypeFactory.SINGLE),
-                        TF.createFcItfType("i2", I2.class.getName(),
+                        tf.createFcItfType("i2", I2.class.getName(),
                             TypeFactory.CLIENT, TypeFactory.MANDATORY,
                             TypeFactory.SINGLE)
                     });
@@ -105,7 +107,7 @@ public class Setup {
 
     public static Component createPrimitiveDbis() throws Exception {
         createTypeD();
-        return CF.newFcInstance(d_type,
+        return gf.newFcInstance(d_type,
             new ControllerDescription("primitiveDbis", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentDbis.class.getName(),
                 new Object[] {  }));
@@ -113,7 +115,7 @@ public class Setup {
 
     public static Component createPrimitiveD() throws Exception {
         createTypeD();
-        return CF.newFcInstance(d_type,
+        return gf.newFcInstance(d_type,
             new ControllerDescription("primitiveD", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentD.class.getName(),
                 new Object[] {  }));
@@ -121,7 +123,7 @@ public class Setup {
 
     public static Component createPrimitiveB2() throws Exception {
         createTypeB();
-        return CF.newFcInstance(B_TYPE,
+        return gf.newFcInstance(B_TYPE,
             new ControllerDescription("primitiveB2", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentB.class.getName(),
                 new Object[] {  }));
@@ -129,7 +131,7 @@ public class Setup {
 
     public static Component createPrimitiveB1() throws Exception {
         createTypeB();
-        return CF.newFcInstance(B_TYPE,
+        return gf.newFcInstance(B_TYPE,
             new ControllerDescription("primitiveB1", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentB.class.getName(),
                 new Object[] {  }));
@@ -137,7 +139,7 @@ public class Setup {
 
     public static Component createRemotePrimitiveB1() throws Exception {
         createTypeB();
-        return CF.newFcInstance(B_TYPE,
+        return gf.newFcInstance(B_TYPE,
             new ControllerDescription("primitiveB1", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentB.class.getName(),
                 new Object[] {  }), TestNodes.getLocalVMNode());
@@ -146,7 +148,7 @@ public class Setup {
     public static Component createRemoteSlowPrimitiveB()
         throws Exception {
         createTypeB();
-        return CF.newFcInstance(B_TYPE,
+        return gf.newFcInstance(B_TYPE,
             new ControllerDescription("slowPrimitiveB1", Constants.PRIMITIVE),
             new ContentDescription(SlowPrimitiveComponentB.class.getName(),
                 new Object[] {  }), TestNodes.getLocalVMNode());
@@ -154,7 +156,7 @@ public class Setup {
 
     public static Component createPrimitiveA() throws Exception {
         createTypeA();
-        return CF.newFcInstance(A_TYPE,
+        return gf.newFcInstance(A_TYPE,
             new ControllerDescription("primitiveA", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentA.class.getName(),
                 new Object[] {  }));
@@ -162,7 +164,7 @@ public class Setup {
 
     public static Component createSlowPrimitiveA() throws Exception {
         createTypeA();
-        return CF.newFcInstance(A_TYPE,
+        return gf.newFcInstance(A_TYPE,
             new ControllerDescription("slowPrimitiveA", Constants.PRIMITIVE),
             new ContentDescription(SlowPrimitiveComponentA.class.getName(),
                 new Object[] {  }));
@@ -185,7 +187,7 @@ public class Setup {
     public static Component createCompositeOfTypeA(String name)
         throws Exception {
         createTypeA();
-        Component composite = CF.newFcInstance(A_TYPE,
+        Component composite = gf.newFcInstance(A_TYPE,
                 new ControllerDescription(name, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));
@@ -195,7 +197,7 @@ public class Setup {
     public static Component createCompositeOfTypeB(String name)
         throws Exception {
         createTypeB();
-        Component composite = CF.newFcInstance(B_TYPE,
+        Component composite = gf.newFcInstance(B_TYPE,
                 new ControllerDescription(name, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));
@@ -205,7 +207,7 @@ public class Setup {
     public static Component createSynchronousCompositeOfTypeB(String name)
         throws Exception {
         createTypeB();
-        Component composite = CF.newFcInstance(B_TYPE,
+        Component composite = gf.newFcInstance(B_TYPE,
                 new ControllerDescription(name, Constants.COMPOSITE,
                     Constants.SYNCHRONOUS),
                 new ContentDescription(Composite.class.getName(),
@@ -216,7 +218,7 @@ public class Setup {
     public static Component createSynchronousCompositeOfTypeA(String name)
         throws Exception {
         createTypeA();
-        Component composite = CF.newFcInstance(A_TYPE,
+        Component composite = gf.newFcInstance(A_TYPE,
                 new ControllerDescription(name, Constants.COMPOSITE,
                     Constants.SYNCHRONOUS),
                 new ContentDescription(Composite.class.getName(),
@@ -226,7 +228,7 @@ public class Setup {
 
     public static Component createRemoteCompositeB1() throws Exception {
         createTypeB();
-        Component compositeB1 = CF.newFcInstance(B_TYPE,
+        Component compositeB1 = gf.newFcInstance(B_TYPE,
                 new ControllerDescription("compositeB1", Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }), TestNodes.getLocalVMNode());
@@ -235,7 +237,7 @@ public class Setup {
 
     public static Component createCompositeA() throws Exception {
         createTypeA();
-        Component compositeA = CF.newFcInstance(A_TYPE,
+        Component compositeA = gf.newFcInstance(A_TYPE,
                 new ControllerDescription("compositeA", Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));

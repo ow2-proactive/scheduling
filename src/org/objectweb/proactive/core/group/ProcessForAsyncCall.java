@@ -75,11 +75,11 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                 if (object instanceof ProActiveComponentRepresentative) {
                     // delegate to the corresponding interface
                     Object target;
-                    if (mc.getComponentInterfaceName() == null) {
+                    if (mc.getComponentMetadata().getComponentInterfaceName() == null) {
                         // a call on the Component interface
                         target = object;
                     } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
+                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata().getComponentInterfaceName());
                     }
                     this.proxyGroup.addToListOfResult(memberListOfResultGroup,
                         this.mc.execute(target), this.index);
@@ -114,7 +114,7 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                 /* when an exception occurs, put it in the result group instead of the (unreturned) value */
                 this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
                     new ExceptionInGroup(this.memberList.get(this.index),
-                        this.index, e), this.index);
+                        this.index, e.fillInStackTrace()), this.index);
             }
         } else {
 

@@ -33,8 +33,8 @@ package org.objectweb.proactive.core.rmi;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.gen.Utils;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -103,18 +103,11 @@ public class FileProcess {
 
         // COMPONENTS
         // try to get the class as a generated component interface reference
-        b = RepresentativeInterfaceClassGenerator.getClassData(info.getClassFileName());
-
+        b = Utils.getClassData(info.getClassFileName());
         if (b != null) {
             return b;
         }
-
-        // COMPONENTS
-        // try to get the class as a generated component interface reference
-        b = MetaObjectInterfaceClassGenerator.getClassData(info.getClassFileName());
-        if (b != null) {
-            return b;
-        }
+        
 
         //if (info.path != null) {
         //    System.out.println("ClassServer sent class " + info.path +

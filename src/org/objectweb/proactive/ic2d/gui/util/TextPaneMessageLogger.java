@@ -121,7 +121,7 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    // make sure the caller thread (especially if it is the gui thread does not get stuck
+    // make sure the caller thread (especially if it is the defaultGui thread does not get stuck
     // with a deadlock.
     private void invokeDialog(final String message) {
         new Thread(new Runnable() {

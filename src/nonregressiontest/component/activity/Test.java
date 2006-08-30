@@ -90,13 +90,19 @@ public class Test extends ComponentTest {
         A.getLock().waitForRelease(); // wait until component activity is finished
         return expectedResult.equals(A.message);
     }
-
+    
     public static void main(String[] args) {
         Test test = new Test();
         try {
             test.action();
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

@@ -27,6 +27,7 @@
 <!ENTITY conformance SYSTEM "components/conformance.xml">
 <!ENTITY Compconfiguration SYSTEM "components/configuration.xml">
 <!ENTITY adl SYSTEM "components/adl.xml">
+<!ENTITY collective-interfaces SYSTEM "components/collective-interfaces.xml">
 <!ENTITY examples SYSTEM "components/examples.xml">
 <!ENTITY perspectives SYSTEM "components/perspectives.xml">
 <!ENTITY p2p SYSTEM "p2p.xml">
@@ -107,6 +108,7 @@
     &conformance;
     &Compconfiguration;
     &adl;
+    &collective-interfaces;
     &examples;
     &perspectives;
    </part>

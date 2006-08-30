@@ -52,7 +52,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.ParallelComposite;
 
 
 /**
@@ -80,10 +79,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                 controller = cc.getController().getDescriptor();
             }
         }
-        if (controller == null) {
-            controller = "composite"; // that's the default
-        }
-
+        
         String name = null;
         if (container instanceof Definition) {
             name = ((Definition) container).getName();
@@ -99,7 +95,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                     "definition");
         }
 
-        Component[] comps = ((ComponentContainer) container).getComponents();
+//        Component[] comps = ((ComponentContainer) container).getComponents();
 
         VirtualNode n = null;
         if (container instanceof VirtualNodeContainer) {
@@ -136,27 +132,32 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         ControllerDescription controllerDesc = null;
 
         if (implementation == null) {
-            // a composite (or parallel) component 
-            if (controller.equals("composite")) {
+            // a composite component 
+            if ("composite".equals(controller)) {
                 controllerDesc = new ControllerDescription(name,
                         Constants.COMPOSITE);
                 contentDesc = new ContentDescription(Composite.class.getName());
-            } else if (controller.equals("parallel")) {
-                controllerDesc = new ControllerDescription(name,
-                        Constants.PARALLEL);
-                contentDesc = new ContentDescription(ParallelComposite.class.getName());
             } else {
-                controllerDesc = null;
-                throw new ADLException(" if no implementation is specified, a component should have the controller value set either to composite or to parallel",
-                    (Node) container);
+            	controllerDesc = new ControllerDescription(name,Constants.COMPOSITE, getClass().getResource(controller).getPath());
             }
         } else {
             // a primitive component
             if (implementation instanceof String) {
                 // that seems to be the case with the fractaladl
                 contentDesc = new ContentDescription((String) implementation);
-                controllerDesc = new ControllerDescription(name,
-                        Constants.PRIMITIVE);
+                if (controller !=null) {
+                	if ("primitive".equals(controller)) {
+                		controllerDesc = new ControllerDescription(name,
+                                Constants.PRIMITIVE);
+                	} else {
+//                		System.out.println("CONTROLLER = " + controller);
+                	controllerDesc = new ControllerDescription(name,
+                        Constants.PRIMITIVE, getClass().getResource(controller).getPath());
+                	}
+                } else {
+                	controllerDesc = new ControllerDescription(name,
+                            Constants.PRIMITIVE);
+                }
             }
         }
 

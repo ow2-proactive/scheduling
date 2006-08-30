@@ -44,7 +44,7 @@ import java.util.Set;
  * @author Laurent Baduel
  *
  */
-public interface Group extends List {
+public interface Group<E> extends List<E> {
 
     /**
      * Returns the (upper) class of member.
@@ -64,7 +64,7 @@ public interface Group extends List {
     /**
      * Returns the object at the specified index.
      */
-    public Object get(int index);
+    public E get(int index);
 
     /**
      * Merges a group into the group.
@@ -75,7 +75,7 @@ public interface Group extends List {
      * Removes the object at the specified index.
      * @return the object that has been removed
      */
-    public Object remove(int index);
+    public E remove(int index);
 
     /**
      * Returns the index in the group of the first occurence of the specified element, -1 if the list does not contain this element.

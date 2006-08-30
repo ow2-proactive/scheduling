@@ -36,7 +36,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 
 /**
@@ -59,7 +59,7 @@ public class ProActiveNameController extends AbstractProActiveController
 
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.NAME_CONTROLLER,
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.NAME_CONTROLLER,
                     NameController.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {

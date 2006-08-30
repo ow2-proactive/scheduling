@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 public abstract class AbstractRequestHandler implements RequestHandler,
     Serializable {
     private RequestHandler nextHandler = null;
-    protected Component owner;
+    protected ProActiveComponent owner;
 
     /*
      * @see org.objectweb.proactive.core.component.controller.RequestHandler#nextHandler()
@@ -74,21 +74,26 @@ public abstract class AbstractRequestHandler implements RequestHandler,
 
     public Object handleRequest(ComponentRequest request)
         throws MethodCallExecutionFailedException, InvocationTargetException {
-        if (request.getMethodCall().getComponentInterfaceName().equals(getFcItfName()) && request.getTargetClass().isAssignableFrom(this.getClass())) {
+        if (request.getMethodCall().getComponentMetadata()
+                       .getComponentInterfaceName().equals(getFcItfName()) &&
+                request.getTargetClass().isAssignableFrom(this.getClass())) {
             return request.getMethodCall().execute(this);
         }
         if (nextHandler() != null) {
             return nextHandler().handleRequest(request);
         }
+
         // special case for attribute controllers for primitive components
-        if (AttributeController.class.isAssignableFrom(request.getTargetClass()) && isPrimitive()) {
+        if (AttributeController.class.isAssignableFrom(request.getTargetClass()) &&
+                isPrimitive()) {
             // delegate to implementation
-            return request.getMethodCall().execute(((ProActiveComponent)getFcItfOwner()).getReferenceOnBaseObject());
+            return request.getMethodCall()
+                          .execute(((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject());
         }
         throw new MethodCallExecutionFailedException(
             "cannot find a suitable handler for this request");
     }
-    
+
     abstract public String getFcItfName();
 
     public Component getFcItfOwner() {
@@ -97,7 +102,7 @@ public abstract class AbstractRequestHandler implements RequestHandler,
 
     protected String getHierarchicalType() {
         try {
-            return Fractive.getComponentParametersController(getFcItfOwner())
+            return Fractive.getComponentParametersController((ProActiveComponent) getFcItfOwner())
                            .getComponentParameters().getHierarchicalType();
         } catch (NoSuchInterfaceException e) {
             throw new ProActiveRuntimeException(
@@ -111,9 +116,5 @@ public abstract class AbstractRequestHandler implements RequestHandler,
 
     protected boolean isComposite() {
         return Constants.COMPOSITE.equals(getHierarchicalType());
-    }
-
-    protected boolean isParallel() {
-        return Constants.PARALLEL.equals(getHierarchicalType());
     }
 }

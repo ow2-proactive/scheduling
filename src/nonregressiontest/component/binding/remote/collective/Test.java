@@ -143,14 +143,4 @@ public class Test extends ComponentTest {
 
         return resulting_msg.toString().equals(single_message + single_message);
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-            test.postConditions();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

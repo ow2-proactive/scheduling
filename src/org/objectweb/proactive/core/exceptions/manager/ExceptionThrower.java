@@ -107,7 +107,7 @@ public class ExceptionThrower {
         }
     }
 
-    synchronized static void throwException(Throwable t) {
+    public synchronized static void throwException(Throwable t) {
         if (thrower == null) {
             activate();
         }

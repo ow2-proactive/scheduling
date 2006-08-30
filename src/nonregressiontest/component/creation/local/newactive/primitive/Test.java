@@ -104,13 +104,4 @@ public class Test extends ComponentTest {
         return (name.equals("toto") &&
         (nodeUrl.indexOf(UrlBuilder.getHostNameorIP(InetAddress.getLocalHost())) != -1));
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

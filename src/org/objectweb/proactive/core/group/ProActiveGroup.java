@@ -1127,8 +1127,11 @@ public class ProActiveGroup {
                 if (MOP.isReifiedObject(((FutureProxy) tmp).getResult())) {
                     tmp = ((StubObject) ((FutureProxy) tmp).getResult()).getProxy();
                 }
-                // future of standard objet
+                // future of standard object (or group proxy in case of multicast interfaces)
                 else {
+                	if (((FutureProxy)tmp).getResult() instanceof ProxyForGroup) {
+                		return (ProxyForGroup)((FutureProxy)tmp).getResult();
+                	}
                     return null;
                 }
 

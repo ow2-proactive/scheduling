@@ -101,7 +101,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     transient protected ThreadPool threadpool;
 
     /** Used for profiling */
-    private CompositeAverageMicroTimer timer;
+    protected CompositeAverageMicroTimer timer;
 
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
@@ -183,7 +183,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
      */
     public synchronized Object reify(MethodCall mc)
-        throws InvocationTargetException {
+        throws InvocationTargetException  {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
         ExceptionListException exceptionList = null;
 
@@ -200,6 +200,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         if ("equals".equals(mc.getName()) && (mc.getNumberOfParameter() == 1)) {
             return new Boolean(this.equals(mc.getParameter(0)));
         }
+        
+        // there may be some reorganization of the parameters
+//        redistributeParameters(mc);
 
         /* result will be a stub on a proxy for group representing the group of results */
         Object result = null;
@@ -248,7 +251,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param mc the MethodCall to be applied on each member of the Group.
      * @return the result of the call.
      */
-    protected Object asynchronousCallOnGroup(MethodCall mc) {
+    protected Object asynchronousCallOnGroup(MethodCall mc) throws InvocationTargetException {
         Object result;
         Body body = ProActive.getBodyOnThis();
         if (Profiling.GROUP) {
@@ -288,7 +291,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                         this.memberList, memberListOfResultGroup, index, mc,
                         body));
         } else { // isDispatchingCall == true
+            //Object[] individualEffectiveArguments = distributeParameters(mc);
             for (int index = 0; index < memberList.size(); index++) {
+                
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
                     if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
@@ -314,6 +319,27 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     }
 
     /**
+     * @param mc
+     * @param individualEffectiveArguments
+     * @return
+     */
+//    protected Object[] distributeParameters(MethodCall mc) {
+//        Object[] individualEffectiveArguments = null;
+//        individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
+//        for (int index = 0; index < memberList.size(); index++) {
+//            for (int i = 0; i < mc.getNumberOfParameter(); i++)
+//                if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i))) {
+//                    individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(
+//                                i),
+//                            index % ProActiveGroup.size(mc.getParameter(i)));
+//                } else {
+//                    individualEffectiveArguments[i] = mc.getParameter(i);
+//                }
+//        }
+//        return individualEffectiveArguments;
+//    }
+
+    /**
      * Add the results (Future) into the typed group result at the correct poisition.
      * @param memberListOfResultGroup the list of the typed group result.
      * @param result the result of a call on member of a Group.
@@ -331,7 +357,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param mc the MethodCall to be applied on each member of the Group.
      */
     protected void oneWayCallOnGroup(MethodCall mc,
-        ExceptionListException exceptionList) {
+        ExceptionListException exceptionList) throws InvocationTargetException {
         Body body = ProActive.getBodyOnThis();
         if (Profiling.GROUP) {
             timer.setTimer("oneWayCallOnGroup." + mc.getName());
@@ -348,6 +374,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                         this.memberList, index, mc, body, exceptionList));
             }
         } else { // isDispatchingCall == true
+//            Object[] individualEffectiveArguments = distributeParameters(mc);
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
@@ -1229,6 +1256,37 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         remove(index);
         elementNames.remove(key);
         return removed;
+    }
+    
+    protected void redistributeParameters(MethodCall mc) {
+        // nothing here
+    }
+
+    
+    /**
+     * @return Returns the className.
+     */
+    public String getClassName() {
+    
+        return className;
+    }
+
+    
+    /**
+     * @return Returns the memberList.
+     */
+    public Vector getMemberList() {
+    
+        return memberList;
+    }
+
+    
+    /**
+     * @param className The className to set.
+     */
+    public void setClassName(String className) {
+    
+        this.className = className;
     }
 
 }

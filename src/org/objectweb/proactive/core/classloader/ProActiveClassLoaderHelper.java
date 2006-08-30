@@ -31,9 +31,8 @@
 package org.objectweb.proactive.core.classloader;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
-import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
+//import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
@@ -102,15 +101,16 @@ public class ProActiveClassLoaderHelper {
             String classname = Utils.convertStubClassNameToClassName(className);
 
             //ASM is now the default bytecode manipulator
-            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-                class_data = bsb.create();
-            } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+//            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+//                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+//                class_data = bsb.create();
+//            } else 
+                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
                 class_data = JavassistByteCodeStubBuilder.create(classname);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
+                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
                 System.err.println(
                     "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
             }
@@ -124,16 +124,9 @@ public class ProActiveClassLoaderHelper {
             return class_data;
         }
 
-        // 4. component representative?
-        class_data = RepresentativeInterfaceClassGenerator.getClassData(className);
+        // component-generated?
+        class_data = org.objectweb.proactive.core.component.gen.Utils.getClassData(className);
 
-        if (class_data != null) {
-            classCache.addClassData(className, class_data);
-            return class_data;
-        }
-
-        // 5. component metaobject interface?
-        class_data = MetaObjectInterfaceClassGenerator.getClassData(className);
         if (class_data != null) {
             classCache.addClassData(className, class_data);
             return class_data;

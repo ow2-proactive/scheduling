@@ -64,24 +64,10 @@ public class Test extends ComponentTest {
     private Component getDummy() {
         return dummy;
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        System.setProperty("fractal.provider",
-            "org.objectweb.proactive.core.component.Fractive");
-        try {
-            test.action();
-            Component dummy = test.getDummy();
-            System.out.println(((Action) dummy.getFcInterface("action")).doSomething());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                //test.endTest();
-                System.exit(0);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        }
+    
+    
+    public static void main(String[] args) throws Throwable {
+    	Test t = new Test();
+    	t.action();
     }
 }

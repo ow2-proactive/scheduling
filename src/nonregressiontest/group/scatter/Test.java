@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.node.Node;
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
 import nonregressiontest.group.A;
 
+import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 
@@ -79,12 +80,41 @@ public class Test extends FunctionalTest {
         Group groupParameter = ProActiveGroup.getGroup(this.parameterGroup);
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
-            rightRankingAndCorrectnessOfResults &= ((A) groupResult.get(i)).getName()
-                                                    .equals((((A) group.get(i)).asynchronousCall(
-                    (A) groupParameter.get(i))).getName());
+            // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
+            Assertions.assertEquals(((A) groupResult.get(i)).getName(),
+                (((A) group.get(i)).asynchronousCall((A) groupParameter.get(i))).getName());
         }
 
         // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
-        return rightRankingAndCorrectnessOfResults;
+        return true;
+    }
+
+    public static void main(String[] args) {
+        try {
+            System.setProperty("fractal.provider",
+                "org.objectweb.proactive.core.component.Fractive");
+            System.setProperty("java.security.policy",
+                System.getProperty("user.dir") +
+                "/compile/proactive.java.policy");
+            System.setProperty("log4j.configuration",
+                System.getProperty("user.dir") + "/compile/proactive-log4j");
+            System.setProperty("log4j.configuration",
+                "file:" + System.getProperty("user.dir") +
+                "/compile/proactive-log4j");
+            System.setProperty("nonregressiontest.descriptor.defaultnodes.file",
+                "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+            Test test = new Test();
+            test.initTest();
+            test.action();
+            boolean success = test.postConditions();
+            if (success) {
+                System.out.println("[SUCCESS] " + test.getName());
+            } else {
+                System.out.println("[FAILED] " + test.getName());
+            }
+            System.exit(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

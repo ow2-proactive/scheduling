@@ -162,12 +162,13 @@ public class Test extends ComponentTest {
         Binding dummy = (Binding) bindings1.get("dummy");
         Assertions.assertEquals(dummy, null);
 
-        // check we get a vector of bindings for a collective binding with same names
-        Assertions.assertEquals(retreived1, b1);
-        Vector v = new Vector();
-        v.addElement(b2);
-        v.addElement(b3);
-        Assertions.assertTrue(v.equals(retreived2));
+//        // check we get a vector of bindings for a collective binding with same names
+		// removed because of new way of managing collection interfaces
+//        Assertions.assertEquals(retreived1, b1);
+//        Vector v = new Vector();
+//        v.addElement(b2);
+//        v.addElement(b3);
+//        Assertions.assertTrue(v.equals(retreived2));
 
         //check we get a single binding for a collective binding with different names
         Assertions.assertEquals(retreived3, b5);
@@ -194,12 +195,17 @@ public class Test extends ComponentTest {
         Assertions.assertTrue((l.size() == t.length) &&
             (l.containsAll(Arrays.asList(t))));
     }
-
+    
     public static void main(String[] args) {
         Test test = new Test();
         try {
+        	test.initTest();
             test.action();
-            test.postConditions();
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.ic2d.gui.components;
 
+import java.util.EventListener;
+
 import org.objectweb.fractal.gui.TitlePane;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
@@ -50,5 +52,9 @@ public class ProActiveTitlePane extends TitlePane
         String virtualNodeName, String oldValue) {
         // TOCHECK : update title ???
         updateTitle(component);
+    }
+
+    public EventListener[] getListeners(Class aClass) {
+        return new EventListener[0];
     }
 }

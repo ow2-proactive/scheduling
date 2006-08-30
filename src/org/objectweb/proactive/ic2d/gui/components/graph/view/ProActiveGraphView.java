@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.ic2d.gui.components.graph.view;
 
+import java.util.EventListener;
+
 import org.objectweb.fractal.gui.graph.view.BasicGraphView;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveComponent;
 import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationListener;
@@ -46,5 +48,9 @@ public class ProActiveGraphView extends BasicGraphView
     public void exportedVirtualNodeChanged(ProActiveComponent component,
         String virtualNodeName, String oldValue) {
         redraw();
+    }
+
+    public EventListener[] getListeners(Class aClass) {
+        return new EventListener[0];
     }
 }

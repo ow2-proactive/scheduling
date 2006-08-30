@@ -454,7 +454,7 @@ public abstract class BodyImpl extends AbstractBody
                     BodyImpl.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
-            if (methodCall.isComponentMethodCall()) {
+            if (methodCall.getComponentMetadata()!=null) {
                 request = new ComponentRequestImpl((RequestImpl) request);
             }
             if (future != null) {
@@ -472,17 +472,18 @@ public abstract class BodyImpl extends AbstractBody
             }
         }
 
-        //
-        // -- PROTECTED METHODS -----------------------------------------------
-        //
-
         /**
          * Returns a unique identifier that can be used to tag a future, a request
          * @return a unique identifier that can be used to tag a future, a request.
          */
-        private synchronized long getNextSequenceID() {
+        public synchronized long getNextSequenceID() {
             return bodyID.toString().hashCode() + ++absoluteSequenceID;
         }
+
+        //
+        // -- PROTECTED METHODS -----------------------------------------------
+        //
+
         
         /**
          * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediately".
@@ -543,6 +544,15 @@ public abstract class BodyImpl extends AbstractBody
             UniversalBody destinationBody) throws java.io.IOException {
             throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
         }
+
+        /*
+         * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
+         */
+        public long getNextSequenceID() {
+            return 0;
+        }
+
+        
     }
 
     // end inner class LocalInactiveBody

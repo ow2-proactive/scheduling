@@ -101,13 +101,4 @@ public class Test extends ComponentTest {
     public boolean postConditions() throws Exception {
         return "DUMMY".equals(result);
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

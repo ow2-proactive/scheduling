@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
 import org.objectweb.proactive.ext.webservices.WSConstants;
 import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
 
@@ -87,7 +87,7 @@ public class ProActiveDeployer extends WSConstants {
 
             /* only expose server interfaces and not the lifecycle controller */
             if (!(interface_ instanceof LifeCycleController)) {
-                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                if (!((ProActiveInterfaceTypeImpl) interface_.getFcItfType()).isFcClientItf()) {
                     String name = interface_.getFcItfName();
 
                     /* get all the public methods */
@@ -144,7 +144,7 @@ public class ProActiveDeployer extends WSConstants {
             Interface inter = (Interface) interfaces[i];
 
             if (!(inter instanceof LifeCycleController)) {
-                if (!((ProActiveInterfaceType) inter.getFcItfType()).isFcClientItf()) {
+                if (!((ProActiveInterfaceTypeImpl) inter.getFcItfType()).isFcClientItf()) {
                     String serviceName = componentName + "_" +
                         inter.getFcItfName();
                     undeploy(serviceName, url);

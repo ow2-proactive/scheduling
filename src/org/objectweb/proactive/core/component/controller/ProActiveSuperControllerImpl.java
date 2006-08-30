@@ -37,7 +37,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 
 
 /**
@@ -51,19 +51,20 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController
         super(owner);
     }
 
-	protected void setControllerItfType() {
-		try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.SUPER_CONTROLLER,
+    protected void setControllerItfType() {
+        try {
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(Constants.SUPER_CONTROLLER,
                     ProActiveSuperController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
-        }		
-	}
+        }
+    }
 
-	// the following is borrowed from the Julia implementation
+    // the following is borrowed from the Julia implementation
     public Component[] fcParents;
 
     public Component[] getFcSuperComponents() {
@@ -99,5 +100,4 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController
             fcParents = parents;
         }
     }
-
 }

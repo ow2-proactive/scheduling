@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.Type;
+import org.objectweb.proactive.core.mop.StubObject;
 
 
 /**
@@ -43,7 +44,7 @@ import org.objectweb.fractal.api.Type;
  * @author Matthieu Morel
  *
  */
-public interface ProActiveInterface extends Interface {
+public interface ProActiveInterface extends Interface, StubObject {
 
     /**
      * Sets the isInternal.
@@ -84,4 +85,6 @@ public interface ProActiveInterface extends Interface {
      * @see #getFcItfImpl getFcItfImpl
      */
     public abstract void setFcItfImpl(final Object impl);
+    
+    public boolean isFcCollective();
 }

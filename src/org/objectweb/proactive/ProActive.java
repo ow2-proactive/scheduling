@@ -955,6 +955,8 @@ public class ProActive {
         }
     }
 
+ 
+
     /**
      * Looks-up all Active Objects registered on a host, using a registry(RMI or JINI or HTTP or IBIS)
      * The registry where to look for is fully determined with the protocol included in the url.

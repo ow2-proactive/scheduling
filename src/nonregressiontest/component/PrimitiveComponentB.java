@@ -9,7 +9,7 @@ package nonregressiontest.component;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentB implements I2 {
-    public final static String MESSAGE = "-->b";
+    public final static String MESSAGE = "-b-";
 
     /**
      *
@@ -21,7 +21,6 @@ public class PrimitiveComponentB implements I2 {
      * @see nonregressiontest.component.creation.I2#processOutputMessage(java.lang.String)
      */
     public Message processOutputMessage(Message message) {
-        //logger.info("transferring message :" + message.toString());
         return message.append(MESSAGE);
     }
 }

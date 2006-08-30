@@ -33,7 +33,7 @@ package org.objectweb.proactive.ext.util;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
+//import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
@@ -117,17 +117,18 @@ public class StubGenerator {
             //ASM is now the default bytecode manipulator
             byte[] data;
 
-            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(className);
-                data = bsb.create();
-                stubClassName = Utils.convertClassNameToStubClassName(className);
-            } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+//            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+//                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(className);
+//                data = bsb.create();
+//                stubClassName = Utils.convertClassNameToStubClassName(className);
+//            } else 
+                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
                 data = JavassistByteCodeStubBuilder.create(className);
                 stubClassName = Utils.convertClassNameToStubClassName(className);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(
-                "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
+                "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
                 System.err.println(
                 "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
                 stubClassName = null;
@@ -147,8 +148,6 @@ public class StubGenerator {
             fos.write(data);
             fos.flush();
             fos.close();
-        } catch (ClassNotFoundException e) {
-            System.err.println("Cannot find class " + className);
         } catch (Exception e) {
             System.err.println("Cannot write file " + fileName);
             System.err.println("Reason is " + e);

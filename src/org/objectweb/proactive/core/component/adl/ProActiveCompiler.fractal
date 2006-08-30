@@ -14,6 +14,11 @@
     <content class="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesCompiler"/>
   </component>
   
+   <component name="binding-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
+    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.bindings.BindingBuilder"/>
+    <content class="org.objectweb.proactive.core.component.adl.bindings.ProActiveBindingCompiler"/>
+  </component>
+ 
   <binding client="main-compiler.primitive-compilers5" server="exportedVirtualNodes-compiler.compiler"/>
   <binding client="exportedVirtualNodes-compiler.builder" server="this.exportedVirtualNode-builder"/>
   

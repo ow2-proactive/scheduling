@@ -99,16 +99,10 @@ public class ProActiveGUIBackend implements ProActiveImplementationBuilder,
         }
 
         // convert to Julia's format
-        Component c = (Component) createComponent(type, name, definition,
-                (controllerDesc.getHierarchicalType().equals(Constants.PARALLEL)
-                ? "composite" : controllerDesc.getHierarchicalType()),
+        Component c = (Component) createComponent(type, name, definition,controllerDesc.getHierarchicalType(),
                 contentDesc.getClassName(), context);
 
         if (c instanceof ProActiveComponent) {
-            // set parallel
-            if (controllerDesc.getHierarchicalType().equals(Constants.PARALLEL)) {
-                ((ProActiveComponent) c).setParallel();
-            }
 
             // add the virtual node
             if (string_vn != null) {

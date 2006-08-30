@@ -115,6 +115,9 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     public ProActiveComponentImpl getProActiveComponentImpl() {
         return (ProActiveComponentImpl)componentIdentity;
     }
+    
+    
+    
 
     /**
      * overrides the @link{Body#isActive()} method :
@@ -167,5 +170,6 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         }
         shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }
+
 
 }

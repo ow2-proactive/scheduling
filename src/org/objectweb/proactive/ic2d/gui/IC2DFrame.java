@@ -662,7 +662,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         menuBar.add(globusMenu);
 
         //*******************************************************
-        // Components gui
+        // Components defaultGui
         //*******************************************************
         javax.swing.JMenu componentsMenu = new javax.swing.JMenu("Components");
         {

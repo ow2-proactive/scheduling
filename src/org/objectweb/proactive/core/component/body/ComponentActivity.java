@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ComponentActivity implements RunActive, InitActive, EndActive {
+public class ComponentActivity implements RunActive, InitActive, EndActive, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
     private transient InitActive componentInitActive; // used only once
     private RunActive componentRunActive;
@@ -159,8 +159,16 @@ public class ComponentActivity implements RunActive, InitActive, EndActive {
                     while (LifeCycleController.STOPPED.equals(
                                 Fractal.getLifeCycleController(
                                     componentBody.getProActiveComponentImpl())
-                                           .getFcState())) {
+                                           .getFcState()) ) {
                         componentService.blockingServeOldest(nfRequestFilter);
+                        if (!body.isActive()) {
+                        	// in case of a migration 
+                        	break;
+                        }
+                    }
+                    if (!body.isActive()) {
+                    	// in case of a migration 
+                    	break;
                     }
 
                     // 3.1. init object Activity

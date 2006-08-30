@@ -29,7 +29,7 @@ public class PrimitiveComponentD implements I1, BindingController {
     public final static String I2_ITF_NAME = "i2";
 
     // typed collective interface
-    I2 i2 = (I2) Fractive.createCollectiveClientInterface(I2_ITF_NAME,
+    I2 i2 = (I2) Fractive.createMulticastClientInterface(I2_ITF_NAME,
             I2.class.getName());
 
     // ref on the Group

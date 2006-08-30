@@ -188,8 +188,10 @@ public class HTTPRequestHandler extends Thread {
             dOut.flush();
 
             if (reqInfo.getClassFileName() != null) {
-                logger.info("ClassServer sent class " +
-                    reqInfo.getClassFileName() + " successfully");
+            	if (logger.isDebugEnabled()) {
+            		logger.info("ClassServer sent class " +
+            				reqInfo.getClassFileName() + " successfully");
+            	}
             }
         } catch (IOException e) {
             // If there is an error when writing the reply,

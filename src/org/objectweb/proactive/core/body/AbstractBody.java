@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
+import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
@@ -696,10 +696,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     /*
      *
-     * @see org.objectweb.proactive.Body#getShortcutTargetBody(org.objectweb.proactive.core.component.representative.FunctionalInterfaceID)
+     * @see org.objectweb.proactive.Body#getShortcutTargetBody(org.objectweb.proactive.core.component.representative.ItfID)
      */
     public UniversalBody getShortcutTargetBody(
-        FunctionalInterfaceID functionalItfID) {
+        ItfID functionalItfID) {
         if (shortcuts == null) {
             return null;
         } else {

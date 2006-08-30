@@ -65,7 +65,11 @@ log4j.logger.testsuite=INFO, CONSOLE
 #log4j.logger.proactive.security.crypto = DEBUG, CONSOLE
 #log4j.logger.proactive.security.psm = DEBUG, CONSOLE
 
-
+#log4j.logger.proactive.skeletons = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.kernel = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.structure = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.manager = DEBUG, CONSOLE
+#log4j.logger.proactive.skeletons.application = DEBUG, CONSOLE
 
 # Appender FILE writes to the file "tests.log".
 log4j.appender.FILE=org.apache.log4j.FileAppender

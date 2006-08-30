@@ -166,14 +166,4 @@ public class Test extends ComponentTest {
         return (p1_name.equals(P1_NAME) && p2_name.equals(P2_NAME) &&
         c1_name.equals(C1_NAME) && c2_name.equals(C2_NAME));
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-            test.postConditions();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

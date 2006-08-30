@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 
@@ -133,7 +134,7 @@ public class ControllerDescription implements Serializable {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(controllersConfigFileLocation).getControllers();
+        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(this.controllersConfigFileLocation).getControllers();
     }
 
     /**

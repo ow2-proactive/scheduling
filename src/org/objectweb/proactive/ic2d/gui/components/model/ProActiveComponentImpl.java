@@ -249,13 +249,6 @@ public class ProActiveComponentImpl extends BasicComponent
         return lvn.getComposingVirtualNodesAsString();
     }
 
-    public String getComponentControllerDescriptor() {
-        if (isParallel) {
-            return Constants.PARALLEL;
-        } else {
-            return super.getComponentControllerDescriptor();
-        }
-    }
 
     /**
      *

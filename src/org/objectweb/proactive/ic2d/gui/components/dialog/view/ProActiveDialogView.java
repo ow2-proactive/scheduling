@@ -37,6 +37,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -273,6 +274,10 @@ public class ProActiveDialogView extends BasicDialogView
         if (component == configuration.getRootComponent()) {
             statusChanged();
         }
+    }
+
+    public EventListener[] getListeners(Class aClass) {
+        return new EventListener[0];
     }
 
     protected class ProActiveListListener extends ListListener {

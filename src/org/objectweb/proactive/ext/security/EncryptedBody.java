@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
+import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
@@ -387,7 +387,7 @@ public class EncryptedBody implements Body, Serializable {
     }
 
     public UniversalBody getShortcutTargetBody(
-        FunctionalInterfaceID functionalItfID) {
+        ItfID functionalItfID) {
         return null;
     }
 
@@ -415,4 +415,13 @@ public class EncryptedBody implements Body, Serializable {
     public int fireNFE(NonFunctionalException e) {
         return 0;
     }
+
+    /*
+     * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
+     */
+    public long getNextSequenceID() {
+        return 0;
+    }
+    
+    
 }

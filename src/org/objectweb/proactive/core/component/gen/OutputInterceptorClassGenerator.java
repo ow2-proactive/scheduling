@@ -48,15 +48,19 @@ import javassist.Modifier;
 import javassist.NotFoundException;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.component.ItfStubObject;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ClassDataCache;
 
 /**
- * This class generates output interceptors for intercepting outgoing functional invocations.
+ * This class generates output interceptors for intercepting outgoing functional invocations. 
+ * We could also use a dynamic proxy, but the current way keeps homogeneity with other generators for ProActive components.
+ * 
  * 
  * @author Matthieu Morel
  *
@@ -80,13 +84,13 @@ public class OutputInterceptorClassGenerator
         this.outputInterceptors = outputInterceptors;
         ProActiveInterface generated = generateInterface(representative.getFcItfName(),
                 representative.getFcItfOwner(),
-                (InterfaceType) representative.getFcItfType(), false, true);
+                (ProActiveInterfaceType) representative.getFcItfType(), false, true);
         ((StubObject) generated).setProxy(((StubObject) representative).getProxy());
         return generated;
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal,
+        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
@@ -120,6 +124,11 @@ public class OutputInterceptorClassGenerator
                 // add StubObject, so we can set the proxy
                 generatedCtClass.addInterface(pool.get(
                         StubObject.class.getName()));
+                
+                // add ItfStubObject, so we can set the sender itf
+                generatedCtClass.addInterface(pool.get(ItfStubObject.class.getName()));
+                Utils.createItfStubObjectMethods(generatedCtClass);
+
 
                 //interfacesToImplement.add(pool.get(StubObject.class.getName()));
                 List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
@@ -217,7 +226,7 @@ public class OutputInterceptorClassGenerator
                 //                System.out.println("[JAVASSIST] generated class : " +
                 //                    representativeClassName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                RepresentativeInterfaceClassGenerator.generatedClassesCache.put(representativeClassName,
+                ClassDataCache.instance().addClassData(representativeClassName,
                     generatedCtClass.toBytecode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + representativeClassName +
@@ -225,11 +234,11 @@ public class OutputInterceptorClassGenerator
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("generated classes cache is : " +
-                        generatedClassesCache.toString());
+                            ClassDataCache.instance().toString());
                 }
 
                 // convert the bytes into a Class
-                generated_class = defineClass(representativeClassName, bytecode);
+                generated_class = Utils.defineClass(representativeClassName, bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
@@ -266,7 +275,7 @@ public class OutputInterceptorClassGenerator
 
             body += ("org.objectweb.proactive.core.mop.MethodCall methodCall = org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
             "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, interfaceName," + isFunctionalInterface + ");\n");
+            ", parameters, interfaceName, senderItfID);\n");
 
             // delegate to outputinterceptors
             body += "java.util.ListIterator it = outputInterceptors.listIterator();\n";

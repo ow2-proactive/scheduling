@@ -152,11 +152,21 @@ public class Assertions {
      * @param o the reference to test
      */
    static public void assertNotNull(Object o) {
-	  if (o==null) {
-		  throw new AssertionFailedException(null);
-	  }
+	  assertNotNull(null, o);
     }
     
+   /**
+    * Asserts that an element is not null<br>
+    * If the element is  null , a runtime exception is thrown (AssertionFailedException) and
+    * the current test is terminated
+    *
+    * @param o the reference to test
+    */
+  static public void assertNotNull(String failureMessage, Object o) {
+      if (o==null) {
+          throw new AssertionFailedException(failureMessage);
+      }
+   }
 
 //    static private void failureNotification() {
 //        failureNotification(null);

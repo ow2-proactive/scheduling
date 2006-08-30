@@ -121,14 +121,4 @@ public class Test extends ComponentTest {
             PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
             PrimitiveComponentA.MESSAGE + Test.MESSAGE));
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-        try {
-            test.action();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            e.printStackTrace();
-        }
-    }
 }

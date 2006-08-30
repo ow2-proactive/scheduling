@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -60,7 +59,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
-import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
+//import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
@@ -939,28 +938,29 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         byte[] classData = null;
 
         if (Utils.isStubClassName(className)) {
-            try {
+//            try {
                 // do not use directly MOP methods (avoid classloader cycles)
                 //                /Logger.getLogger(Loggers.CLASSLOADING).debug("Generating class : " + className);
                 //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(className);
 
                 //ASM is now the default bytecode manipulator
-                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-                    classData = bsb.create();
-                } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals(
+//                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+//                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+//                    classData = bsb.create();
+//                } else 
+                    if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals(
                             "javassist")) {
                     classData = JavassistByteCodeStubBuilder.create(classname);
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                     System.err.println(
-                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
+                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
                     System.err.println(
                         "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
                 }
-            } catch (ClassNotFoundException ignored) {
-            }
+//            } catch (ClassNotFoundException ignored) {
+//            }
         }
 
         if (classData != null) {
@@ -970,7 +970,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         // try to get the class as a generated component interface reference
-        classData = RepresentativeInterfaceClassGenerator.getClassData(className);
+        classData = org.objectweb.proactive.core.component.gen.Utils.getClassData(className);
 
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
@@ -978,14 +978,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             return classData;
         }
 
-        // try to get the class as a generated component interface reference
-        classData = MetaObjectInterfaceClassGenerator.getClassData(className);
-
-        if (classData != null) {
-            ClassDataCache.instance().addClassData(className, classData);
-
-            return classData;
-        }
 
         return null;
     }

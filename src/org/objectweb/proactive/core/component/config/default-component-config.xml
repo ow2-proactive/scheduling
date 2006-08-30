@@ -10,11 +10,11 @@
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ComponentParametersController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveComponentParametersController</implementation>
+            <implementation>org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.fractal.api.control.ContentController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentController</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveContentController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
@@ -27,6 +27,18 @@
         <controller>
             <interface>org.objectweb.fractal.api.control.NameController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.MulticastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MulticastControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.GathercastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.GathercastControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.MigrationController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.MigrationControllerImpl</implementation>
         </controller>
     </controllers>
     

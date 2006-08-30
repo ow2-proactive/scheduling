@@ -37,14 +37,16 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.group.ProxyForComponentGroup;
+import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -58,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  *
- *  // TODO : change class name (interfaces only are grouped)
+ *  
  *
  * A class for creating groups of interfaces
  * Indeed, the standard mechanism cannot be used here, as we are referencing components
@@ -80,7 +82,7 @@ public class ProActiveComponentGroup {
      * @throws ClassNotReifiableException
      */
     public static ProActiveInterface newComponentInterfaceGroup(
-        InterfaceType interfaceType, Component owner)
+        ProActiveInterfaceType interfaceType, Component owner)
         throws ClassNotFoundException, ClassNotReifiableException {
         try {
             Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(),
@@ -95,8 +97,8 @@ public class ProActiveComponentGroup {
                     owner, interfaceType);
             ((StubObject) generated).setProxy(proxy);
 
-            proxy.interfaceType = interfaceType;
-            proxy.owner = owner;
+            proxy.setInterfaceType(interfaceType);
+            proxy.setOwner(owner);
 
             return generated;
         } catch (InvalidProxyClassException e) {
@@ -154,8 +156,8 @@ public class ProActiveComponentGroup {
             result.setProxy(proxy);
 
             proxy.className = Component.class.getName();
-            proxy.componentType = componentType;
-            proxy.controllerDesc = controllerDesc;
+            proxy.setComponentType(componentType);
+            proxy.setControllerDesc(controllerDesc);
 
             return result;
         } catch (Exception e) {

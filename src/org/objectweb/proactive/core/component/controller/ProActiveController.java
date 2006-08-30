@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.node.Node;
 
 /**
  * This interface defines some basic services offered by a component controller in the ProActive implementation of the Fractal model.
@@ -60,4 +62,14 @@ public interface ProActiveController {
      * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
     public abstract Type getFcItfType();
+    
+    public void init();
+
+	/**
+	 * If a controller holds references to active objects which are dependent on it, it needs to
+	 * trigger the migration of these active objects. This is done by overriding this method. 
+	 * @param node
+	 * @throws MigrationException
+	 */
+	public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
 }

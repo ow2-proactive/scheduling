@@ -10,7 +10,7 @@ require any argument (the backend is always the same) -->
     <interface name="scheduler" role="client" signature="org.objectweb.deployment.scheduling.core.api.Scheduler"/>
     <content class="org.objectweb.fractal.adl.BasicFactory"/>
   </component>
-  <component name="loader" definition="org.objectweb.fractal.adl.BasicLoader"/>
+  <component name="loader" definition="org.objectweb.proactive.core.component.adl.ProActiveLoader"/>
   <component name="compiler" definition="org.objectweb.proactive.core.component.adl.ProActiveCompiler"/>
   <component name="backend" definition="org.objectweb.proactive.core.component.adl.ProActiveBackend"/>
   <component name="scheduler" definition="org.objectweb.fractal.adl.BasicScheduler"/>  <binding client="this.factory" server="factory.factory"/>

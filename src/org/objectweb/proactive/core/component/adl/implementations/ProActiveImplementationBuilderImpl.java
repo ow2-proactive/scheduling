@@ -152,14 +152,14 @@ public class ProActiveImplementationBuilderImpl
         Component result;
         
         // FIXME : exhaustively specify the behaviour
-        if (deploymentVN!=null && deploymentVN.getNbMappedNodes()>1 && controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
+        if (deploymentVN!=null && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) && controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
             result = (Component)((Group)((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstanceAsList((ComponentType) type,
                     controllerDesc, contentDesc, deploymentVN)).getGroupByType();
         } else {
             result = ((ProActiveGenericFactory)Fractal.getGenericFactory(bootstrap)).newFcInstance((ComponentType) type,
                     controllerDesc, contentDesc, deploymentVN);
         }
-        registry.addComponent(result); // the registry can handle groups
+//        registry.addComponent(result); // the registry can handle groups
 
         return result;
     }

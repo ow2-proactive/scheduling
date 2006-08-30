@@ -33,9 +33,11 @@ package org.objectweb.proactive.core.component.identity;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -46,26 +48,33 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.NameController;
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractRequestHandler;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.ProActiveController;
 import org.objectweb.proactive.core.component.controller.RequestHandler;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -76,18 +85,22 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
-public class ProActiveComponentImpl implements ProActiveComponent, Interface,
-    Serializable {
+public class ProActiveComponentImpl extends AbstractRequestHandler
+    implements ProActiveComponent, Interface, Serializable {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+    private transient ProActiveComponent representativeOnMyself = null;
 
     // private ComponentParameters componentParameters;
-    private Interface[] interfaceReferences;
+    //    private Interface[] interfaceReferences;
+    private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
+    private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
+    private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
     private Body body;
     private RequestHandler firstControllerRequestHandler;
 
     // need Vector-specific operations for inserting elements
-    private Vector inputInterceptors = new Vector();
-    private Vector outputInterceptors = new Vector();
+    private Vector<AbstractProActiveController> inputInterceptors = new Vector<AbstractProActiveController>();
+    private Vector<AbstractProActiveController> outputInterceptors = new Vector<AbstractProActiveController>();
 
     public ProActiveComponentImpl() {
     }
@@ -100,6 +113,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      *            a reference on the body (required notably to get a reference
      *            on the request queue, used to control the life cycle of the
      *            component)
+     * @throws InstantiationException
      */
     public ProActiveComponentImpl(ComponentParameters componentParameters,
         Body myBody) {
@@ -108,20 +122,25 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                                                             .equals(Constants.PRIMITIVE);
 
         // add interface references
-        ArrayList interface_references_list = new ArrayList(4);
+        ArrayList<Interface> interface_references_list = new ArrayList<Interface>(4);
 
         // 1. component identity
         interface_references_list.add(this);
 
         // 2. control interfaces
-        addControllers(interface_references_list, componentParameters,
-            component_is_primitive);
+        addControllers(componentParameters, component_is_primitive);
 
         // 3. external functional interfaces
-        addFunctionalInterfaces(componentParameters, component_is_primitive,
-            interface_references_list);
+        addFunctionalInterfaces(componentParameters, component_is_primitive);
+
+        //        Set<String> s = controlItfs.keySet();
+        //        for (Iterator iter = s.iterator(); iter.hasNext();) {
+        //			String key = (String) iter.next();
+        //			((AbstractProActiveController)controlItfs.get(key)).init();
+        //		}
+
         // put all in a table
-        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
+        //        interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
         if (logger.isDebugEnabled()) {
             logger.debug("created component : " +
                 componentParameters.getControllerDescription().getName());
@@ -135,69 +154,78 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * @param current_component_is_primitive
      */
     private void addFunctionalInterfaces(
-        ComponentParameters componentParameters,
-        boolean component_is_primitive, ArrayList interface_references_list) {
-        InterfaceType[] interface_types = componentParameters.getComponentType()
-                                                             .getFcInterfaceTypes();
+        ComponentParameters componentParameters, boolean component_is_primitive) {
+        // ProActiveInterfaceType[] interface_types =
+        // (ProActiveInterfaceType[])componentParameters.getComponentType()
+        // .getFcInterfaceTypes();
+        InterfaceType[] tmp = componentParameters.getComponentType()
+                                                 .getFcInterfaceTypes();
+        ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
+        System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
+
         try {
             for (int i = 0; i < interface_types.length; i++) {
-                // no interface generated for client itfs of primitive
-                // components
-                if (!(interface_types[i].isFcClientItf() &&
-                        component_is_primitive)) {
-                    ProActiveInterface itf_ref = null;
+                ProActiveInterface itf_ref = null;
 
-                    // if we have a COLLECTION CLIENT interface, we should see
-                    // the delegatee ("impl" field) as a group
-                    if (interface_types[i].isFcClientItf() &&
-                            interface_types[i].isFcCollectionItf()) {
-                        itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i],
-                                component_is_primitive);
-                    } // if we have a server port of a PARALLEL component, we
+                if (interface_types[i].isFcCollectionItf()) {
+                    // members of collection itfs are created dynamically
+                    continue;
+                }
+                if (interface_types[i].isFcMulticastItf()) {
+                    itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
+                    //                    itf_ref = ProActiveComponentGroup.newComponentInterfaceGroup(interface_types[i],
+                    //                            getFcItfOwner());
+                } else {
+                    // no interface generated for client itfs of primitive
+                    // components
+                    if (!(interface_types[i].isFcClientItf() &&
+                            component_is_primitive)) {
+                        // TODO_M multicast
 
-                    // also create a group proxy on the delegatee field
-                    else if (componentParameters.getHierarchicalType().equals(Constants.PARALLEL) &&
-                            (!interface_types[i].isFcClientItf())) {
-                        // parallel component have a collective port on their
-                        // server interfaces
-                        itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i],
-                                component_is_primitive);
-                    } else {
+                        //                        // if we have a COLLECTION CLIENT interface, we should see
+                        //                        // the delegatee ("impl" field) as a group
+                        //                        if (interface_types[i].isFcClientItf() &&
+                        //                                interface_types[i].isFcCollectionItf()) {
+                        //                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
+                        //                        }
                         itf_ref = MetaObjectInterfaceClassGenerator.instance()
                                                                    .generateFunctionalInterface(interface_types[i].getFcItfName(),
                                 this, interface_types[i]);
-                        // functional interfaces are external interfaces (at
+                        // server functional interfaces are external interfaces (at
                         // least they are tagged as external)
-                    }
 
-                    // set delegation link
-                    if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
-                        // TODO_M no group case
-                        if (!interface_types[i].isFcCollectionItf()) {
-                            if (!interface_types[i].isFcClientItf()) {
-                                (itf_ref).setFcItfImpl(getReferenceOnBaseObject());
-                            } else if (interface_types[i].isFcClientItf()) {
-                                (itf_ref).setFcItfImpl(null);
+                        // set delegation link
+                        if (componentParameters.getHierarchicalType()
+                                                   .equals(Constants.PRIMITIVE)) {
+                            // TODO_M no group case
+                            if (!interface_types[i].isFcCollectionItf()) {
+                                if (!interface_types[i].isFcClientItf()) {
+                                    (itf_ref).setFcItfImpl(getReferenceOnBaseObject());
+                                } else if (interface_types[i].isFcClientItf()) {
+                                    (itf_ref).setFcItfImpl(null);
+                                }
                             }
                         }
-                    } else { // we have a composite component
                     }
 
-                    interface_references_list.add(itf_ref);
+                    // non multicast client itf of primitive comp : do nothing
                 }
+
+                functionalItfs.put(interface_types[i].getFcItfName(), itf_ref);
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("cannot create interface references : " +
                     e.getMessage());
             }
+
             throw new RuntimeException("cannot create interface references : " +
                 e.getMessage());
         }
     }
 
-    private void addControllers(ArrayList interface_references_list,
-        ComponentParameters componentParameters, boolean isPrimitive) {
+    private void addControllers(ComponentParameters componentParameters,
+        boolean isPrimitive) {
         ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadControllerConfiguration(componentParameters.getControllerDescription()
                                                                                                                                      .getControllersConfigFileLocation());
         Map controllers = componentConfiguration.getControllers();
@@ -210,20 +238,23 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         // loadControllersConfiguration(componentParameters.getControllerDescription().getControllersConfigFile());
         Iterator iteratorOnControllers = controllers.keySet().iterator();
         AbstractProActiveController lastController = null;
+
         while (iteratorOnControllers.hasNext()) {
-            Class controllerClass = null;
+            Class<?> controllerClass = null;
             AbstractProActiveController currentController;
             String controllerItfName = (String) iteratorOnControllers.next();
+
             try {
-                Class controllerItf = Class.forName(controllerItfName);
+                Class<?> controllerItf = Class.forName(controllerItfName);
                 controllerClass = Class.forName((String) controllers.get(
                             controllerItf.getName()));
-                Constructor controllerClassConstructor = controllerClass.getConstructor(new Class[] {
+                Constructor<?> controllerClassConstructor = controllerClass.getConstructor(new Class[] {
                             Component.class
                         });
                 currentController = (AbstractProActiveController) controllerClassConstructor.newInstance(new Object[] {
                             this
                         });
+
                 // add interceptor
                 if (InputInterceptor.class.isAssignableFrom(controllerClass)) {
                     // keep the sequence order of the interceptors
@@ -235,6 +266,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                     logger.error(controllerClass.getName() +
                         " was specified as input interceptor in the configuration file, but it is not an input interceptor since it does not implement the InputInterceptor interface");
                 }
+
                 if (OutputInterceptor.class.isAssignableFrom(controllerClass)) {
                     outputInterceptors.setElementAt(currentController,
                         outputInterceptorsSignatures.indexOf(
@@ -245,10 +277,11 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                         " was specified as output interceptor in the configuration file, but it is not an output interceptor since it does not implement the OutputInterceptor interface");
                 }
             } catch (Exception e) {
-                logger.error("could not create controller " +
+                e.printStackTrace();
+                throw new ProActiveRuntimeException(
+                    "could not create controller " +
                     controllers.get(controllerItfName) + " : " +
-                    e.getMessage());
-                continue;
+                    e.getMessage(), e);
             }
 
             // there are some special cases for some controllers
@@ -256,8 +289,10 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                         controllerClass)) {
                 ((ComponentParametersController) currentController).setComponentParameters(componentParameters);
             }
+
             if (BindingController.class.isAssignableFrom(controllerClass)) {
-                if ((componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) &&
+                if ((componentParameters.getHierarchicalType()
+                                            .equals(Constants.PRIMITIVE) &&
                         (componentParameters.getClientInterfaceTypes().length == 0))) {
                     // bindingController = null;
                     if (logger.isDebugEnabled()) {
@@ -265,30 +300,56 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                             componentParameters.getName() +
                             "' does not have any client interface. It will have no BindingController");
                     }
+
                     continue;
                 }
+
+                //             else {
+                //                Class baseClass = getBody().getReifiedObject().getClass();
+                //                // get all fields (including inherited and private/protected ones)
+                //                List<Field> fields = Arrays.asList(baseClass.getFields());
+                //                fields.addAll(Arrays.asList(baseClass.getDeclaredFields()));
+                //                // check if has annotations
+                //                for (Iterator iter = fields.iterator(); iter.hasNext();) {
+                //                    Field field = (Field) iter.next();
+                //                    FractalBC bindingAnnotation = field.getAnnotation(FractalBC.class);
+                //                    if (bindingAnnotation == null) {
+                //                        continue;
+                //                    }
+                //                    // add to list in binding controller class
+                //                    ((ProActiveBindingControllerImpl)currentController).addClientItf(field.getName(), field);
+                //                }
+                //             }
             }
+
             if (ContentController.class.isAssignableFrom(controllerClass)) {
                 if (isPrimitive) {
                     // no content controller here
                     continue;
                 }
             }
+
             if (NameController.class.isAssignableFrom(controllerClass)) {
                 ((NameController) currentController).setFcName(componentParameters.getName());
             }
+
             if (lastController != null) {
                 lastController.setNextHandler(currentController);
             } else {
                 firstControllerRequestHandler = currentController;
             }
+
             lastController = currentController;
-            interface_references_list.add(currentController);
+            controlItfs.put(currentController.getFcItfName(), currentController);
         }
+
+        // add the "component" control itfs
+        lastController.setNextHandler(this);
     }
 
     /**
-     * @param controllerConfigFileLocation the location of the configuration file
+     * @param controllerConfigFileLocation
+     *            the location of the configuration file
      * @return a xml parsing handler
      */
     public static ComponentConfigurationHandler loadControllerConfiguration(
@@ -299,16 +360,17 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
             logger.error("could not load controller config file : " +
                 controllerConfigFileLocation +
                 ". Reverting to default controllers configuration.");
+
             try {
                 return ComponentConfigurationHandler.createComponentConfigurationHandler(ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION);
-            } catch (Exception e2) {
+            } catch (Exception e1) {
                 logger.error(
                     "could not load default controller config file either. Check that the default controller config file is available in your classpath at : " +
                     ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION);
                 throw new ProActiveRuntimeException(
                     "could not load default controller config file either. Check that the default controller config file is available on your system at : " +
                     ControllerDescription.DEFAULT_COMPONENT_CONFIG_FILE_LOCATION,
-                    e2);
+                    e1);
             }
         }
     }
@@ -316,7 +378,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     // returns a generated interface reference, whose impl field is a group
     // It is able to handle multiple bindings
     private ProActiveInterface createInterfaceOnGroupOfDelegatees(
-        InterfaceType itfType, boolean isPrimitive) throws Exception {
+        ProActiveInterfaceType itfType) throws Exception {
         ProActiveInterface itf_ref = MetaObjectInterfaceClassGenerator.instance()
                                                                       .generateFunctionalInterface(itfType.getFcItfName(),
                 this, itfType);
@@ -333,42 +395,44 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (interfaceReferences != null) {
-            for (int i = 0; i < interfaceReferences.length; i++) {
-                // TODO check the following
-                // if (ProActiveGroup.isGroup(interfaceReferences[i])) {
-                // // need to find at least one occurence of the interface
-                // // if exists but not for all elements of the group -> throw
-                // error
-                // // if does not exist -> do nothing
-                // int count = 0;
-                // Group itf_ref_group =
-                // ProActiveGroup.getGroup(interfaceReferences[i]);
-                // Iterator iterator = itf_ref_group.iterator();
-                // // ensure groups are coherent (ie : if 1 interface of the
-                // given name exists,
-                // // all of the group elements should be of this kind
-                // while (iterator.hasNext()) {
-                // Interface group_element = (Interface) iterator.next();
-                // if (group_element.getFcItfName().equals(interfaceName)) {
-                // count++;
-                // }
-                // }
-                // if (count > 0) {
-                // if (count == itf_ref_group.size()) {
-                // return interfaceReferences[i];
-                // } else {
-                // throw new NoSuchInterfaceException(
-                // "some elements of the collection are not named " +
-                // interfaceName);
-                // }
-                // }
-                // } else { //looking into single interface
-                if (interfaceReferences[i].getFcItfName().equals(interfaceName)) {
-                    return interfaceReferences[i];
+        if (!("attribute-controller".equals(interfaceName)) &&
+                (interfaceName.endsWith("-controller") ||
+                interfaceName.equals("component"))) {
+            if (!controlItfs.containsKey(interfaceName)) {
+                throw new NoSuchInterfaceException(interfaceName);
+            }
+            return (controlItfs.get(interfaceName));
+        }
+        if (functionalItfs.containsKey(interfaceName)) {
+            return functionalItfs.get(interfaceName);
+        }
+
+        // a member of a collection itf?
+        InterfaceType[] itfTypes = ((ComponentType) getFcType()).getFcInterfaceTypes();
+        for (int i = 0; i < itfTypes.length; i++) {
+            InterfaceType type = itfTypes[i];
+            if (type.isFcCollectionItf()) {
+                if ((interfaceName.startsWith(type.getFcItfName()) &&
+                        !type.getFcItfName().equals(interfaceName))) {
+                    if (collectionItfsMembers.containsKey(interfaceName)) {
+                        return collectionItfsMembers.get(interfaceName);
+                    } else {
+                        //					 generate a new interface and add it to the list of members of collection its
+                        try {
+                            Interface clientItf = MetaObjectInterfaceClassGenerator.instance()
+                                                                                   .generateFunctionalInterface(interfaceName,
+                                    this, (ProActiveInterfaceType) itfTypes[i]);
+                            collectionItfsMembers.put(interfaceName, clientItf);
+                            return clientItf;
+                        } catch (InterfaceGenerationFailedException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    }
                 }
             }
         }
+
         throw new NoSuchInterfaceException(interfaceName);
     }
 
@@ -376,14 +440,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        ArrayList external_interfaces = new ArrayList(interfaceReferences.length);
-        for (int i = 0; i < interfaceReferences.length; i++) {
-            if (!interfaceReferences[i].isFcInternalItf()) {
-                external_interfaces.add(interfaceReferences[i]);
-            }
-        }
-        external_interfaces.trimToSize();
-        return external_interfaces.toArray();
+        return functionalItfs.values().toArray();
     }
 
     /*
@@ -466,17 +523,22 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * see
      * {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
-    public Component getRepresentativeOnThis() {
+    public ProActiveComponent getRepresentativeOnThis() {
+        // optimization : cache self reference 
+        if (representativeOnMyself != null) {
+            return representativeOnMyself;
+        }
+
         try {
-            return ProActiveComponentRepresentativeFactory.instance()
-                                                          .createComponentRepresentative((ComponentType) getFcType(),
-                getComponentParameters().getHierarchicalType(),
-                ((StubObject) MOP.turnReified(body.getReifiedObject().getClass()
-                                                  .getName(),
-                    org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-                    new Object[] { body }, body.getReifiedObject())).getProxy(),
-                getComponentParameters().getControllerDescription()
-                    .getControllersConfigFileLocation());
+            return representativeOnMyself = ProActiveComponentRepresentativeFactory.instance()
+                                                                                   .createComponentRepresentative((ComponentType) getFcType(),
+                    getComponentParameters().getHierarchicalType(),
+                    ((StubObject) MOP.turnReified(body.getReifiedObject()
+                                                      .getClass().getName(),
+                        org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+                        new Object[] { body }, body.getReifiedObject())).getProxy(),
+                    getComponentParameters().getControllerDescription()
+                        .getControllersConfigFileLocation());
         } catch (Exception e) {
             throw new ProActiveRuntimeException("This component could not generate a reference on itself",
                 e);
@@ -490,11 +552,31 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         return firstControllerRequestHandler;
     }
 
-    public List getInputInterceptors() {
+    public List<AbstractProActiveController> getInputInterceptors() {
         return inputInterceptors;
     }
 
-    public List getOutputInterceptors() {
+    public List<AbstractProActiveController> getOutputInterceptors() {
         return outputInterceptors;
+    }
+
+    public void migrateControllersDependentActiveObjectsTo(Node node)
+        throws MigrationException {
+        for (Iterator iter = controlItfs.values().iterator(); iter.hasNext();) {
+            ProActiveController controller = (ProActiveController) iter.next();
+            controller.migrateDependentActiveObjectsTo(node);
+        }
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out)
+        throws java.io.IOException {
+        //        System.out.println("writing ProActiveComponentImpl");
+        out.defaultWriteObject();
+    }
+
+    private void readObject(java.io.ObjectInputStream in)
+        throws java.io.IOException, ClassNotFoundException {
+        //        System.out.println("reading ProActiveComponentImpl");
+        in.defaultReadObject();
     }
 }

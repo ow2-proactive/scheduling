@@ -40,13 +40,19 @@ import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -60,30 +66,29 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveLifeCycleControllerImpl
     extends AbstractProActiveController implements ProActiveLifeCycleController,
         Serializable {
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
-    private String fcState = LifeCycleController.STOPPED;
+	static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
+    protected String fcState = LifeCycleController.STOPPED;
 
     public ProActiveLifeCycleControllerImpl(Component owner) {
         super(owner);
     }
-    
-        protected void setControllerItfType() {
-            try {
-                setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
-                        ProActiveLifeCycleController.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE));
-            } catch (InstantiationException e) {
-                throw new ProActiveRuntimeException("cannot create controller " +
-                    this.getClass().getName());
-            }
-}
 
+    protected void setControllerItfType() {
+        try {
+            setItfType(ProActiveTypeFactoryImpl.instance()
+                                               .createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+                    ProActiveLifeCycleController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " +
+                this.getClass().getName());
+        }
+    }
 
-
-	/*
-     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
-     */
+    /*
+    * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
+    */
     public String getFcState() {
         return fcState;
         //        return getRequestQueue().isStarted() ? LifeCycleController.STARTED
@@ -98,24 +103,60 @@ public class ProActiveLifeCycleControllerImpl
     public void startFc() {
         try {
             //check that all mandatory client interfaces are bound
-            Object[] itfs = getFcItfOwner().getFcInterfaces();
-            for (int i = 0; i < itfs.length; i++) {
-                InterfaceType itf_type = (InterfaceType) (((Interface) itfs[i]).getFcItfType());
-                if (itf_type.isFcClientItf() && !itf_type.isFcOptionalItf()) {
-                    if (Fractal.getBindingController(getFcItfOwner()).lookupFc(itf_type.getFcItfName()) == null) {
+//            Object[] itfs = getFcItfOwner().getFcInterfaces();
+        	InterfaceType[] itfTypes = ((ComponentType)getFcItfOwner().getFcType()).getFcInterfaceTypes();
+            
+            for (int i = 0; i < itfTypes.length; i++) {
+                if (itfTypes[i].isFcClientItf() && !itfTypes[i].isFcOptionalItf()) {
+                	if (itfTypes[i].isFcCollectionItf()) {
+                		// look for collection members
+                		Object[] itfs = owner.getFcInterfaces();
+                		for (int j = 0; j < itfs.length; j++) {
+                			Interface itf = (Interface)itfs[j];
+                			if (itf.getFcItfName().startsWith(itfTypes[i].getFcItfName())) {
+                				if (itf.getFcItfName().equals(itfTypes[i].getFcItfName())) {
+                					throw new IllegalLifeCycleException("invalid collection interface name at runtime (suffix required)");
+                				}
+                				if (Fractal.getBindingController(owner).lookupFc(itf.getFcItfName()) == null ) {
+                					throw new IllegalLifeCycleException(
+                                            "compulsory collection client interface " +
+                                            itfTypes[i].getFcItfName() + " in component " +
+                                            Fractal.getNameController(getFcItfOwner())
+                                                   .getFcName() + " is not bound. ");
+                				}
+                				
+                			}
+						}
+                	} else
+                    if (((ProActiveInterfaceType)itfTypes[i]).isFcMulticastItf() && !!itfTypes[i].isFcOptionalItf()) {
+                        ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getMulticastController(getFcItfOwner())
+                                                                                  .lookupFcMulticast(itfTypes[i].getFcItfName());
+//                        if (clientSideProxy == null) {
+//                        	System.out.println("client side proxy is null from " + ProActiveRuntimeImpl.getProActiveRuntime().getURL());
+//                        }
+
+                        if (clientSideProxy.getDelegatee().isEmpty()) {
+                            throw new IllegalLifeCycleException(
+                                "compulsory multicast client interface " +
+                                itfTypes[i].getFcItfName() + " in component " +
+                                Fractal.getNameController(getFcItfOwner())
+                                       .getFcName() + " is not bound. ");
+                        }
+                    } else if (((ProActiveInterfaceType)itfTypes[i]).getFcCardinality().equals(ProActiveTypeFactory.SINGLETON_CARDINALITY) && Fractal.getBindingController(getFcItfOwner())
+                                          .lookupFc(itfTypes[i].getFcItfName()) == null) {
                         throw new IllegalLifeCycleException(
                             "compulsory client interface " +
-                            itf_type.getFcItfName() + " in component " +
+                            itfTypes[i].getFcItfName() + " in component " +
                             Fractal.getNameController(getFcItfOwner())
                                    .getFcName() + " is not bound. ");
                     }
                 }
             }
-            String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
+
+            String hierarchical_type = Fractive.getComponentParametersController((ProActiveComponent)getFcItfOwner())
                                                .getComponentParameters()
                                                .getHierarchicalType();
-            if (hierarchical_type.equals(Constants.COMPOSITE) ||
-                    hierarchical_type.equals(Constants.PARALLEL)) {
+            if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // start all inner components
                 Component[] inner_components = Fractal.getContentController(getFcItfOwner())
                                                       .getFcSubComponents();
@@ -152,8 +193,7 @@ public class ProActiveLifeCycleControllerImpl
             String hierarchical_type = ((ComponentParametersController) getFcItfOwner()
                                         .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
                                         .getHierarchicalType();
-            if (hierarchical_type.equals(Constants.COMPOSITE) ||
-                    hierarchical_type.equals(Constants.PARALLEL)) {
+            if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // stop all inner components
                 Component[] inner_components = ((ContentController) getFcItfOwner()
                                                                         .getFcInterface(Constants.CONTENT_CONTROLLER)).getFcSubComponents();

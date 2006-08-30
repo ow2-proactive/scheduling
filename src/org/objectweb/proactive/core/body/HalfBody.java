@@ -244,7 +244,7 @@ public class HalfBody extends AbstractBody {
                     HalfBody.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
-            if (methodCall.isComponentMethodCall()) {
+            if (methodCall.getComponentMetadata() != null ) {
                 request = new ComponentRequestImpl((RequestImpl) request);
             }
             if (future != null) {
@@ -269,7 +269,7 @@ public class HalfBody extends AbstractBody {
          * Returns a unique identifier that can be used to tag a future, a request
          * @return a unique identifier that can be used to tag a future, a request.
          */
-        private synchronized long getNextSequenceID() {
+        public synchronized long getNextSequenceID() {
             return bodyID.toString().hashCode() + ++absoluteSequenceID;
         }
     }
@@ -296,5 +296,9 @@ public class HalfBody extends AbstractBody {
             return nfeListeners.fireNFE(e);
         }
         return 0;
+    }
+
+    public long getNextSequenceID() {
+        return localBodyStrategy.getNextSequenceID();
     }
 }

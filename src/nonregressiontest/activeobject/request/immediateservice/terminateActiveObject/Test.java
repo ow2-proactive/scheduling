@@ -28,43 +28,52 @@
  *
  * ################################################################
  */
-
-
 package nonregressiontest.activeobject.request.immediateservice.terminateActiveObject;
-
-
 
 import org.objectweb.proactive.ProActive;
 import testsuite.test.FunctionalTest;
 
 
-
-public class Test extends FunctionalTest{
-
-	B b;
+public class Test extends FunctionalTest {
+    B b;
 
     public Test() {
-        super("Active Object termination", "Test immediate termination of an active object");
+        super("Active Object termination",
+            "Test immediate termination of an active object");
     }
-    
-	public void action() throws Exception {
-		b = (B) ProActive.newActive(B.class.getName(), new Object[] {"blue"});
+
+    public void action() throws Exception {
+        b = (B) ProActive.newActive(B.class.getName(), new Object[] { "blue" });
         b.changeColor("red");
-        ProActive.terminateActiveObject(b,true);		
-	}
+        ProActive.terminateActiveObject(b, true);
+    }
 
-	public void initTest() throws Exception {		
-	}
+    public void initTest() throws Exception {
+    }
 
-	public void endTest() throws Exception {		
-	}
-	
-	public boolean postConditions() {
-		try {
-			b.getColor();
-		} catch(Exception e) {
-			return true;
-		}
-		return false;
-	}
+    public void endTest() throws Exception {
+    }
+
+    public boolean postConditions() {
+        try {
+            b.getColor();
+        } catch (Exception e) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.action();
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

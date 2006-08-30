@@ -51,8 +51,10 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -93,13 +95,13 @@ public class MetaObjectInterfaceClassGenerator
     }
 
     public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal,
+        Component owner, ProActiveInterfaceType interfaceType, boolean isInternal,
         boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
             if (ProActiveLogger.getLogger(
-                        Loggers.COMPONENTS_BYTECODE_GENERATION).isDebugEnabled()) {
-                ProActiveLogger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION)
+                        Loggers.COMPONENTS_GEN_ITFS).isDebugEnabled()) {
+                ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS)
                                .debug("generating metaobject interface reference");
             }
 
@@ -217,11 +219,11 @@ public class MetaObjectInterfaceClassGenerator
 
                 createMethods(generatedCtClass, reifiedMethods, interfaceType);
 
-                //                generatedCtClass.writeFile("generated/");
-                //                System.out.println("[JAVASSIST] generated class : " +
-                //                    generatedClassFullName);
+//                                generatedCtClass.writeFile("generated/");
+//                                System.out.println("[JAVASSIST] generated class : " +
+//                                    generatedClassFullName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                RepresentativeInterfaceClassGenerator.generatedClassesCache.put(generatedClassFullName,
+                ClassDataCache.instance().addClassData(generatedClassFullName,
                     generatedCtClass.toBytecode());
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassFullName +
@@ -229,11 +231,11 @@ public class MetaObjectInterfaceClassGenerator
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("generated classes cache is : " +
-                        generatedClassesCache.toString());
+                        ClassDataCache.instance().toString());
                 }
 
                 // convert the bytes into a Class
-                generated_class = defineClass(generatedClassFullName, bytecode);
+                generated_class = Utils.defineClass(generatedClassFullName, bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();

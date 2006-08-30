@@ -78,8 +78,10 @@ public class MOPClassLoader extends URLClassLoader {
         byte[] cb = null;
         cb = (byte[]) classDataCache.get(classname);
         if (cb == null) {
-            logger.info(
-                "MOPClassLoader: class not found, trying to generate it");
+        	if (logger.isDebugEnabled()) {
+        		logger.debug(
+                	"MOPClassLoader: class not found, trying to generate it");
+        	}
             try {
                 this.loadClass(classname);
             } catch (ClassNotFoundException e) {
@@ -191,19 +193,19 @@ public class MOPClassLoader extends URLClassLoader {
                 //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(name);
 
-                //ASM is now the default bytecode manipulator
                 byte[] data = null;
-                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
-                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-                    data = bsb.create();
-                    MOPClassLoader.classDataCache.put(name, data);
-                } else if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
+//                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
+//                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+//                    data = bsb.create();
+//                    MOPClassLoader.classDataCache.put(name, data);
+//                } else 
+                    if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
                     data = JavassistByteCodeStubBuilder.create(classname);
                     MOPClassLoader.classDataCache.put(name, data);
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                     logger.error(
-                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to ASM.");
+                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
                     logger.error(
                         "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
                 }
@@ -247,7 +249,7 @@ public class MOPClassLoader extends URLClassLoader {
                     throw new ClassNotFoundException(ex.getMessage());
                 }
             } else {
-                System.out.println("Cannot generate class " + name);
+                System.out.println("Cannot generate class " + name + " as a stub class");
                 throw e;
             }
         }

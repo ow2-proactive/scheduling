@@ -7,7 +7,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 import nonregressiontest.component.controller.DummyController;
@@ -21,7 +21,7 @@ public class OutputInterceptor1Impl extends AbstractProActiveController
 
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
                     OutputInterceptor1.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {

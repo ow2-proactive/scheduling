@@ -68,8 +68,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
-    Serializable, Cloneable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
+    Serializable {
+    protected transient final static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     private static Field universalBodyField;
     private static Field bodyIDField;
     Proxy bodyProxyDelegatee = null;
@@ -119,8 +119,8 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
         // if shortcut : change ref on Body
         UniversalBody newDestinationBody = LocalBodyStore.getInstance()
                                                          .getCurrentThreadBody()
-                                                         .getShortcutTargetBody(new FunctionalInterfaceID(
-                    c.getComponentInterfaceName(),
+                                                         .getShortcutTargetBody(new ItfID(
+                    c.getComponentMetadata().getComponentInterfaceName(),
                     ((UniversalBodyProxy) bodyProxyDelegatee).getBody().getID()));
         if (newDestinationBody != null) {
             changeRefOnBody(newDestinationBody);
@@ -136,21 +136,5 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
         return bodyProxyDelegatee;
     }
 
-    //    public String getHandlerizableInfo() throws IOException {
-    //        return null;
-    //    }
-    //
-    //    public HashMap getHandlersLevel() throws IOException {
-    //        return null;
-    //    }
-    //
-    //    public void clearHandlersLevel() throws IOException {
-    //    }
-    //
-    //    public void setExceptionHandler(Handler handler, Class exception) throws IOException {
-    //    }
-    //
-    //    public Handler unsetExceptionHandler(Class exception) throws IOException {
-    //        return null;
-    //    }
+ 
 }
