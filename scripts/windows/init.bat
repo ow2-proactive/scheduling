@@ -18,7 +18,6 @@ set CLASSPATH=.
 IF EXIST %PROACTIVE%\classes set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes
 IF EXIST %PROACTIVE%\ProActive.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
 IF EXIST %PROACTIVE%\ProActive_examples.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
-IF EXIST %PROACTIVE%\lib\asm.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\asm.jar
 IF EXIST %PROACTIVE%\lib\log4j.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j.jar
 IF EXIST %PROACTIVE%\lib\bouncycastle.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
@@ -54,6 +53,7 @@ rem jars for Fractal GUI
 rem -------------------------------------------------
 IF EXIST %PROACTIVE%\lib\components\fractal-adl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\fractal-adl.jar
 IF EXIST %PROACTIVE%\lib\components\dtdparser.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\dtdparser.jar
+IF EXIST %PROACTIVE%\lib\components\asm-2.2.1.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\asm-2.2.1.jar
 IF EXIST %PROACTIVE%\lib\components\ow_deployment_scheduling.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\ow_deployment_scheduling.jar
 IF EXIST %PROACTIVE%\lib\components\fractal-gui.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\fractal-gui.jar
 IF EXIST %PROACTIVE%\lib\components\fractal-swing.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\fractal-swing.jar

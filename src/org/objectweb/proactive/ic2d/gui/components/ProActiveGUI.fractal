@@ -381,7 +381,7 @@
             <component name="binding-loader">
               <interface signature="org.objectweb.fractal.adl.Loader" role="server" name="loader"/>
               <interface signature="org.objectweb.fractal.adl.Loader" role="client" name="client-loader"/>
-              <content class="org.objectweb.fractal.adl.bindings.TypeBindingLoader"/>
+              <content class="org.objectweb.proactive.core.component.adl.bindings.ProActiveTypeBindingLoader"/>
               <controller desc="primitive"/>
             </component>
             <binding client="this.loader" server="binding-loader.loader"/>

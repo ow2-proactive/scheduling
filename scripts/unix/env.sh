@@ -41,10 +41,6 @@ if [ -f $PROACTIVE/ProActive_examples.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
 fi
-if [ -f $PROACTIVE/lib/asm.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
-fi
 if [ -f $PROACTIVE/lib/log4j.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j.jar
@@ -138,6 +134,10 @@ fi
 
 #--------------------------------------------------
 # jars to set when using Fractal GUI
+if [ -f $PROACTIVE/lib/components/asm-2.2.1.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/asm-2.2.1.jar
+fi
 if [ -f $PROACTIVE/lib/components/fractal-adl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-adl.jar
