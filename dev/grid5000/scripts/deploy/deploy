@@ -2,8 +2,13 @@
 
 for i in $NODES ; 
 do
+	if [ "$CLUSTER" != "`get_cluster_from_hostname $i`" ] ; then
+		continue # $i does not belong to $CLUSTER
+	fi
+
 	KADEPLOY_ARGS="$KADEPLOY_ARGS -m $i "	
 done
+
 ssh $(get_oar_hostname $CLUSTER) kadeploy $KADEPLOY_ARGS
 
 # TODO: Check that kadeploy succeded.
@@ -32,13 +37,19 @@ do
 	if [ "$(cluster2site $CLUSTER)" == "rennes" ] ; then
 		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
 		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
-	elif [ "$(get_cluster)" = "orsay" ] ; then
+	elif [ "$(get_cluster)" = "orsay" ] || [ "$(get_cluster)" = "nancy" ]  ; then
 		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
 		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
 	else
 		$SSH $ROOT_PASSWD $i  echo AllowUsers root $USER \>\> /etc/ssh/sshd_config 
-#		$SSH $ROOT_PASSWD $i  /etc/init.d/sshd restart
+		$SSH $ROOT_PASSWD $i  /etc/init.d/sshd reload
 	fi
+
+	# Disable haldaemon on helios to avoid system load
+	if [ "$CLUSTER" = "helios.sophia" ] ; then
+		$SSH $ROOT_PASSWD $i  /etc/init.d/haldaemon stop
+	fi
+		
 done
 
 echo "Hint: g5k_reservedNodes -c can be used to retrieve the list of working nodes"

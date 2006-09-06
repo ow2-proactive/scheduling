@@ -86,7 +86,7 @@ function get_cluster_from_hostname {
 
 	function lille_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "fadmin.lille.grid5000.fr" ] ;
+		if [ "$FQDN" == "frontale.lille.grid5000.fr" ] ;
 		then
 			echo ""
 		elif [ "$(expr match $FQDN '\(node-[0-9]\{1,2\}.lille.grid5000.fr\)')" == "$FQDN" ] ;
@@ -139,16 +139,24 @@ function get_cluster_from_hostname {
 
 	function rennes_get_cluster {
 		FQDN=$1
-		if [ "$(expr match $FQDN '\(parasol\(-dev\)\?[0-9]\{0,3\}.irisa.fr\)')"  == "$FQDN" ] ;
+		
+		# Frontals still use irisa.fr domain name
+		if   [ "$FQDN" = "parasol-dev.irisa.fr" ]  ; then echo parasol  ; 
+		elif [ "$FQDN" = "paraci-dev.irisa.fr" ]   ; then echo paraci   ; 
+		elif [ "$FQDN" = "paravent-dev.irisa.fr" ] ; then echo paravent ; 
+		elif [ "$FQDN" = "tartopom-dev.irisa.fr" ] ; then echo tartopom ; 
+
+		# Nodes have a standard domain name eg. grid5000.fr
+		elif [ "$(expr match $FQDN '\(parasol[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
 		then
 			echo "parasol"
-		elif [ "$(expr match $FQDN '\(paraci\(-dev\)\?[0-9]\{0,3\}.irisa.fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr match $FQDN '\(paraci[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
 		then
 			echo "paraci"
-		elif [ "$(expr match $FQDN '\(paravent\(-dev\)\?[0-9]\{0,3\}.irisa.fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr match $FQDN '\(paravent[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
 		then
 			echo "paravent"
-		elif [ "$(expr match $FQDN '\(tartopom\(-dev\)\?[0-9]\{0,3\}.irisa.fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr match $FQDN '\(tartopom[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
 		then
 			echo "tartopom"
 		else
@@ -205,12 +213,9 @@ function get_cluster_from_hostname {
 		else
 			echo $cluster.$SITE
 		fi
-
-
 	elif [ "`expr match "$FQDN" '.*\(irisa.fr\)'`"  == "irisa.fr" ] ;
 	then
-		echo `rennes_get_cluster $FQDN`.rennes
-
+               echo `rennes_get_cluster $FQDN`.rennes
 	elif [ "`expr match "$FQDN" '.*\(imag.fr\)'`"  == "imag.fr" ] ;
 	then
 		echo `grenoble_get_cluster $FQDN`.grenoble
