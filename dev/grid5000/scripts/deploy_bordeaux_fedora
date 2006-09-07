@@ -8,7 +8,7 @@ if [ $# -gt 0 ] ; then
 else 
 	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
 fi
-KADEPLOY_ARGS="-e fedora4all -p sda3 -l cmathieu "
+KADEPLOY_ARGS="-e fedora4all -p sda3 -l deploy "
 MOUNT_ARGS="nfs.bordeaux.grid5000.fr:/export/home /home"
 
 . $(dirname $0)/deploy/deploy
