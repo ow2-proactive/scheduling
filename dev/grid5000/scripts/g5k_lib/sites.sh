@@ -188,7 +188,7 @@ function get_cluster_from_hostname {
 
 	function toulouse_get_cluster {
 		FQDN=$1
-		if [ "$(expr match $FQDN '\(citc-[0-9]\{1,3\}.toulouse.grid5000.fr\)')" == "$FQDN" ] ;
+		if [ "$(expr match $FQDN '\(cict-[0-9]\{1,3\}.toulouse.grid5000.fr\)')" == "$FQDN" ] ;
 		then
 			echo ""
 		else

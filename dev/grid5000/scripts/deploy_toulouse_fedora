@@ -1,0 +1,14 @@
+#! /bin/bash
+
+source $(dirname $0)/g5k_lib.sh
+
+CLUSTER=toulouse
+if [ $# -gt 0 ] ; then
+	NODES=$*
+else 
+	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
+fi
+KADEPLOY_ARGS="-e fedora4all -p sda3 -l deploy "
+MOUNT_ARGS="nfs.toulouse.grid5000.fr:/home /home"
+
+. $(dirname $0)/deploy/deploy
