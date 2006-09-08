@@ -13,6 +13,7 @@
 			<unitTest class="nonregressiontest.node.nodefactory.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
 			<unitTest exclude="no" class="nonregressiontest.node.localnode.Test" />
+			<unitTest exclude="no" class="nonregressiontest.node.groupinformation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.stubgeneration.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.stubinterface.Test" />
 			<unitTest exclude="no" class="nonregressiontest.stub.abstractclass.Test" />

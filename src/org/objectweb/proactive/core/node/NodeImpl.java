@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.node;
 
 import java.io.IOException;
@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
+import org.objectweb.proactive.core.runtime.GroupInformation;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
@@ -85,7 +86,7 @@ public class NodeImpl implements Node, Serializable {
         String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol,
-                jobID, vmName);
+                jobID, vmName, proActiveRuntime.getVMInformation().getGroup());
         this.fileTransferServicePool = new ArrayList();
     }
 
@@ -227,9 +228,10 @@ public class NodeImpl implements Node, Serializable {
         private java.rmi.dgc.VMID hostVMID;
         private String hostname;
         private String vmName;
+        private GroupInformation groupInformation;
 
         public NodeInformationImpl(String url, String protocol, String jobID,
-            String vmName) {
+            String vmName, GroupInformation groupInformation) {
             this.nodeURL = url;
             this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
             this.hostInetAddress = proActiveRuntime.getVMInformation()
@@ -239,6 +241,7 @@ public class NodeImpl implements Node, Serializable {
             this.nodeName = extractNameFromUrl(url);
             this.jobID = jobID;
             this.vmName = vmName;
+            this.groupInformation = groupInformation;
         }
 
         /**
@@ -328,6 +331,13 @@ public class NodeImpl implements Node, Serializable {
         public String getDescriptorVMName() {
             return vmName;
         }
+
+        /**
+         * @see org.objectweb.proactive.core.node.NodeInformation#getGroup()
+         */
+        public GroupInformation getGroup() {
+            return groupInformation;
+        }
     }
 
     // SECURITY
@@ -355,7 +365,8 @@ public class NodeImpl implements Node, Serializable {
     /**
      * @see org.objectweb.proactive.core.node.Node#setProperty(java.lang.String, java.lang.String)
      */
-    public Object setProperty(String key, String value) throws ProActiveException {
+    public Object setProperty(String key, String value)
+        throws ProActiveException {
         return this.proActiveRuntime.setLocalNodeProperty(this.nodeInformation.getName(),
             key, value);
     }

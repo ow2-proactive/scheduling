@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
@@ -108,7 +108,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveRuntime proActiveRuntime;
 
     static {
-        
         if (ProActiveConfiguration.isForwarder()) {
             proActiveRuntime = new ProActiveRuntimeForwarderImpl();
         } else {
@@ -938,29 +937,29 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         byte[] classData = null;
 
         if (Utils.isStubClassName(className)) {
-//            try {
-                // do not use directly MOP methods (avoid classloader cycles)
-                //                /Logger.getLogger(Loggers.CLASSLOADING).debug("Generating class : " + className);
-                //    e.printStackTrace();
-                String classname = Utils.convertStubClassNameToClassName(className);
+            //            try {
+            // do not use directly MOP methods (avoid classloader cycles)
+            //                /Logger.getLogger(Loggers.CLASSLOADING).debug("Generating class : " + className);
+            //    e.printStackTrace();
+            String classname = Utils.convertStubClassNameToClassName(className);
 
-                //ASM is now the default bytecode manipulator
-//                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-//                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-//                    classData = bsb.create();
-//                } else 
-                    if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals(
-                            "javassist")) {
-                    classData = JavassistByteCodeStubBuilder.create(classname);
-                } else {
-                    // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
-                    System.err.println(
-                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
-                    System.err.println(
-                        "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-                }
-//            } catch (ClassNotFoundException ignored) {
-//            }
+            //ASM is now the default bytecode manipulator
+            //                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+            //                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+            //                    classData = bsb.create();
+            //                } else 
+            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
+                classData = JavassistByteCodeStubBuilder.create(classname);
+            } else {
+                // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
+                System.err.println(
+                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
+                System.err.println(
+                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
+            }
+
+            //            } catch (ClassNotFoundException ignored) {
+            //            }
         }
 
         if (classData != null) {
@@ -977,7 +976,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             return classData;
         }
-
 
         return null;
     }
@@ -1109,6 +1107,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String processCreatorId;
         private String jobId;
         private String hostName;
+        private GroupInformation groupInformation;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
@@ -1139,6 +1138,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 //if the property is null, no need to generate another random, take the one in name
                 this.jobId = "JOB-" + random;
             }
+
+            groupInformation = new GroupInformation(ProActiveConfiguration.getGroupInformation());
         }
 
         //
@@ -1186,6 +1187,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
          */
         public String getDescriptorVMName() {
             return name;
+        }
+
+        /**
+         * @see org.objectweb.proactive.core.runtime.VMInformation#getGroup()
+         */
+        public GroupInformation getGroup() {
+            return groupInformation;
         }
     }
 
