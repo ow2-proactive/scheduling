@@ -56,19 +56,18 @@ public class ExceptionThrower {
                                                                               .getName();
     private static final String THROWER_CLASS_FULLNAME = THROWER_CLASS_PACKAGE +
         "." + THROWER_CLASS_NAME;
-    private static final String THROWER_METHOD_NAME = "throwException";
     private static Thrower thrower = null;
 
     private static Class loadClassJavassist() {
         try {
-            CtClass thrower = ClassPool.getDefault().makeClass(THROWER_CLASS_FULLNAME);
-            thrower.addInterface(ClassPool.getDefault().get(Thrower.class.getName()));
-            thrower.addConstructor(CtNewConstructor.defaultConstructor(thrower));
+            CtClass throwerClass = ClassPool.getDefault().makeClass(THROWER_CLASS_FULLNAME);
+            throwerClass.addInterface(ClassPool.getDefault().get(Thrower.class.getName()));
+            throwerClass.addConstructor(CtNewConstructor.defaultConstructor(throwerClass));
             CtMethod throwException = CtNewMethod.make("" +
                     "public void throwException(Throwable t) {" +
-                    "    throw t;}", thrower);
-            thrower.addMethod(throwException);
-            return loadClass(THROWER_CLASS_FULLNAME, thrower.toBytecode());
+                    "    throw t;}", throwerClass);
+            throwerClass.addMethod(throwException);
+            return loadClass(THROWER_CLASS_FULLNAME, throwerClass.toBytecode());
         } catch (Exception e) {
             e.printStackTrace();
         }
