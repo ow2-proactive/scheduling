@@ -31,19 +31,19 @@
 package org.objectweb.proactive.core.runtime;
 
 /**
- * GroupInformation allows applications to utilize topographic informations 
+ * DeployerTag allows applications to utilize topographic informations 
  * to speed up calculations.
  * 
  * Deployment descriptors describe how to acquire ressources. This, static, information
  * can be used to organize Nodes in groups. Two Nodes in the same group are likely close 
- * to each other. An application, by using smartly GroupInformation, can improve its  
+ * to each other. An application, by using smartly DeployerTag, can improve its  
  * performances by bringing together communicating active objects.
  * 
- *  A GroupInformation object contains two informations. The first one is who created this node.
+ *  A DeployerTag object contains two informations. The first one is who created this node.
  *  The second one is two which group this node contains. It is ensured that tupples <vmid, group> 
  *  are uniques.
  */
-public class GroupInformation implements java.io.Serializable {
+public class DeployerTag implements java.io.Serializable {
 	
 	// An unique identifier describing the VM from which this node was deployed
 	private String vmid;
@@ -51,12 +51,12 @@ public class GroupInformation implements java.io.Serializable {
 	private int  myGroup;
 	
 	
-	public GroupInformation() {
+	public DeployerTag() {
 		vmid = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getVMID().toString();
 		myGroup = -1;
 	}
 	
-	public GroupInformation(String _str) {
+	public DeployerTag(String _str) {
 		String [] sa = _str.split("~");
 		assert(sa.length == 2);
 		
@@ -68,10 +68,10 @@ public class GroupInformation implements java.io.Serializable {
 		if (this == _gi) 
 			return true;		
 		
-		if (! (_gi instanceof GroupInformation))
+		if (! (_gi instanceof DeployerTag))
 			return false;
 		
-		GroupInformation gi = (GroupInformation)_gi;
+		DeployerTag gi = (DeployerTag)_gi;
 		if (gi.vmid == vmid && gi.myGroup == myGroup)
 			return true;
 		

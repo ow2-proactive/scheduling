@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.runtime.GroupInformation;
+import org.objectweb.proactive.core.runtime.DeployerTag;
 
 import testsuite.test.FunctionalTest;
 
@@ -62,8 +62,8 @@ public class Test extends FunctionalTest {
     private static VirtualNode[] virtualNodes = null;
 
     public Test() {
-        super("GroupInformation",
-            "Test that GroupInformation are correctly assigned.");
+        super("DeployerTag",
+            "Test that DeployerTag are correctly assigned.");
     }
 
     /**
@@ -86,8 +86,8 @@ public class Test extends FunctionalTest {
                     continue;
                 }
 
-                GroupInformation gi_i = nodes[i].getNodeInformation().getGroup();
-                GroupInformation gi_j = nodes[j].getNodeInformation().getGroup();
+                DeployerTag gi_i = nodes[i].getNodeInformation().getDeployerTag();
+                DeployerTag gi_j = nodes[j].getNodeInformation().getDeployerTag();
                 if (gi_i.equals(gi_j)) {
                     throw new Exception("Two GroupInformations are equals !");
                 }

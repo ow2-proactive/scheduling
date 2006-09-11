@@ -1107,7 +1107,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String processCreatorId;
         private String jobId;
         private String hostName;
-        private GroupInformation groupInformation;
+        private DeployerTag deployerTag;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
@@ -1139,7 +1139,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 this.jobId = "JOB-" + random;
             }
 
-            groupInformation = new GroupInformation(ProActiveConfiguration.getGroupInformation());
+            deployerTag = new DeployerTag(ProActiveConfiguration.getGroupInformation());
         }
 
         //
@@ -1190,10 +1190,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         /**
-         * @see org.objectweb.proactive.core.runtime.VMInformation#getGroup()
+         * @see org.objectweb.proactive.core.runtime.VMInformation#getDeployerTag()
          */
-        public GroupInformation getGroup() {
-            return groupInformation;
+        public DeployerTag getDeployerTag() {
+            return deployerTag;
         }
     }
 

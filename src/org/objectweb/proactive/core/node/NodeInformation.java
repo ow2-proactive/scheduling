@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.node;
 
-import org.objectweb.proactive.core.runtime.GroupInformation;
+import org.objectweb.proactive.core.runtime.DeployerTag;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
@@ -77,8 +77,8 @@ public interface NodeInformation extends VMInformation {
     public void setJobID(String jobId);
 
     /**
-     * Returns the Group Information of this node
-     * @return the Group Information of this node
+     * Returns the deployer tag of this node
+     * @return the deployer tag of this node
      */
-    public GroupInformation getGroup();
+    public DeployerTag getDeployerTag();
 }

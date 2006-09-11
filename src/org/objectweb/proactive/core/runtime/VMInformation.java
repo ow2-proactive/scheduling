@@ -105,5 +105,5 @@ public interface VMInformation extends java.io.Serializable, Job {
      * Returns the Group Information of this VM
      * @return the Group Information of this VM
      */
-    public GroupInformation getGroup();
+    public DeployerTag getDeployerTag();
 }

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
-import org.objectweb.proactive.core.runtime.GroupInformation;
+import org.objectweb.proactive.core.runtime.DeployerTag;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
@@ -86,7 +86,7 @@ public class NodeImpl implements Node, Serializable {
         String protocol, String jobID, String vmName) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol,
-                jobID, vmName, proActiveRuntime.getVMInformation().getGroup());
+                jobID, vmName, proActiveRuntime.getVMInformation().getDeployerTag());
         this.fileTransferServicePool = new ArrayList();
     }
 
@@ -228,10 +228,10 @@ public class NodeImpl implements Node, Serializable {
         private java.rmi.dgc.VMID hostVMID;
         private String hostname;
         private String vmName;
-        private GroupInformation groupInformation;
+        private DeployerTag deployerTag;
 
         public NodeInformationImpl(String url, String protocol, String jobID,
-            String vmName, GroupInformation groupInformation) {
+            String vmName, DeployerTag deployerTag) {
             this.nodeURL = url;
             this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
             this.hostInetAddress = proActiveRuntime.getVMInformation()
@@ -241,7 +241,7 @@ public class NodeImpl implements Node, Serializable {
             this.nodeName = extractNameFromUrl(url);
             this.jobID = jobID;
             this.vmName = vmName;
-            this.groupInformation = groupInformation;
+            this.deployerTag = deployerTag;
         }
 
         /**
@@ -333,10 +333,10 @@ public class NodeImpl implements Node, Serializable {
         }
 
         /**
-         * @see org.objectweb.proactive.core.node.NodeInformation#getGroup()
+         * @see org.objectweb.proactive.core.node.NodeInformation#getDeployerTag()
          */
-        public GroupInformation getGroup() {
-            return groupInformation;
+        public DeployerTag getDeployerTag() {
+            return deployerTag;
         }
     }
 
