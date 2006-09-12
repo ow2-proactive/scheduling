@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if [ "$G5K_USER" = ""] ; then
+if [ "$G5K_USER" = "" ] ; then
 	ssh acces.sophia.grid5000.fr $*
 else
 	ssh -l $G5K_USER acces.sophia.grid5000.fr $*
