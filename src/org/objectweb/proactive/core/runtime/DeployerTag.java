@@ -78,6 +78,10 @@ public class DeployerTag implements java.io.Serializable {
 		return true;
 	}
 	
+	public int hashcode() {
+		return this.toString().hashCode();
+	}
+	
 	public String toString() {
 		return vmid + "~" + myGroup;
 	}
