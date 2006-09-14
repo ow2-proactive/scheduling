@@ -7,19 +7,22 @@ function print_help {
 	echo -e "Delete OAR Jobs, kill JVMs & RMI registries and remove OAR logfiles\n"
 	echo -e "\t-f     , Erase OAR log files"
 	echo -e "\t-k     , Kill JVMs & RMI registries on all cluster's nodes"
+	echo -e "\t-c     , Kill JVMs & RMI registries on all reserved nodes"
 	modopt_print_help
 	exit 0
 }
 
-ARGS="kfh"
+ARGS="ckfh"
 OPT_F=NO
 OPT_K=NO
+OPT_C=NO
 
 modopt_parse $ARGS $*
 while getopts "${MODOPT_OPTS}${ARGS}" Option
 do
 	case $Option in
 	k) OPT_K=YES ;;
+	c) OPT_C=YES ;;
 	f) OPT_F=YES ;;
 	h) print_help ;;
 	*)
@@ -58,5 +61,13 @@ do
 		echo -e "\n-> Killing JVMs & rmiregistries on each nodes of $CLUSTER"
  	 	$SSH_CMD $(get_oar_hostname $CLUSTER) \
  			'for i in $(oarnodes | egrep "^\w") ; do echo -e "$i" ; $SSH_CMD $i pkill -9 java   ;done' 
+	fi
+
+	if [ "$OPT_C" == "YES" ] ;
+	then	
+		for i in $(g5k_reservedNodes -s $CLUSTER) ; do
+			echo "[i] Clean -> $i"
+			$SSH_CMD $i killall -9 java rmid 2> /dev/null
+		done
 	fi
 done
