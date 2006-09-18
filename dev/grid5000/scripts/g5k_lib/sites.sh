@@ -48,6 +48,12 @@ function get_cluster {
 	get_cluster_from_hostname `$CMD_HOSTNAME`
 }
 
+function get_site {
+	cluster2site $(get_cluster)
+}
+
+
+
 # Return the cluster containing this hostname
 function get_cluster_from_hostname {
 	local FQDN=$1 
