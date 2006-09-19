@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 import org.objectweb.deployment.scheduling.component.api.InstanceProviderTask;
 import org.objectweb.deployment.scheduling.core.api.Task;
 import org.objectweb.fractal.adl.ADLException;
-import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.TaskMap;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingBuilder;

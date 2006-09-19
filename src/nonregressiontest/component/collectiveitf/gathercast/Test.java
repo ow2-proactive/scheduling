@@ -3,15 +3,14 @@ package nonregressiontest.component.collectiveitf.gathercast;
 import java.util.HashMap;
 import java.util.Map;
 
+import nonregressiontest.component.ComponentTest;
+
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import testsuite.test.Assertions;
-
-import nonregressiontest.component.ComponentTest;
 
 
 public class Test extends ComponentTest {

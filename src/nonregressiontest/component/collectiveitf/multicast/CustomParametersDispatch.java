@@ -3,9 +3,7 @@ package nonregressiontest.component.collectiveitf.multicast;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;

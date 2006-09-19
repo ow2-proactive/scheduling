@@ -36,7 +36,6 @@ import java.util.Map;
 import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.gui.model.Component;
-import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilder;

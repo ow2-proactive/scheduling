@@ -32,9 +32,15 @@ package nonregressiontest.component.binding.local.collective;
 
 import java.util.Arrays;
 
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.I1;
+import nonregressiontest.component.I2;
+import nonregressiontest.component.Message;
+import nonregressiontest.component.PrimitiveComponentB;
+import nonregressiontest.component.PrimitiveComponentD;
+import nonregressiontest.component.PrimitiveComponentE;
+
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -48,14 +54,6 @@ import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import testsuite.test.Assertions;
-
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.I2;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentB;
-import nonregressiontest.component.PrimitiveComponentD;
-import nonregressiontest.component.PrimitiveComponentE;
 
 
 /**

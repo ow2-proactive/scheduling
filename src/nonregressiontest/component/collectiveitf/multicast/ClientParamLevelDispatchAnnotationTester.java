@@ -3,16 +3,13 @@ package nonregressiontest.component.collectiveitf.multicast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.proactive.core.component.controller.MulticastBindingController;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 import nonregressiontest.component.I1;
 import nonregressiontest.component.Message;
+
+import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.proactive.core.component.controller.MulticastBindingController;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ClientParamLevelDispatchAnnotationTester implements I1,

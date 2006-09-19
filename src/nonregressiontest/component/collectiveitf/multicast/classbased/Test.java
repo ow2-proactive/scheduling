@@ -34,35 +34,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
-import nonregressiontest.component.I2;
-import nonregressiontest.component.Message;
-import nonregressiontest.component.PrimitiveComponentB;
-import nonregressiontest.component.collectiveitf.multicast.ClientParamLevelDispatchAnnotationTester;
-import nonregressiontest.component.collectiveitf.multicast.MulticastTestItf;
-import nonregressiontest.component.collectiveitf.multicast.Identifiable;
-import nonregressiontest.component.collectiveitf.multicast.NonAnnotatedClientItf;
-import nonregressiontest.component.collectiveitf.multicast.ServerImpl;
-import nonregressiontest.component.collectiveitf.multicast.ServerItfTestItf;
-import nonregressiontest.component.collectiveitf.multicast.ServerTestItf;
-import nonregressiontest.component.collectiveitf.multicast.TesterImpl;
 import nonregressiontest.component.collectiveitf.multicast.Tester;
 
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**

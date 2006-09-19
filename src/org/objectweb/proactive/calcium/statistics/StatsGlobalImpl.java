@@ -27,8 +27,6 @@
  */
 package org.objectweb.proactive.calcium.statistics;
 
-import javax.print.attribute.standard.Finishings;
-
 import org.objectweb.proactive.calcium.Task;
 
 /**

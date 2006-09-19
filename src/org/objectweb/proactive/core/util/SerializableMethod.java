@@ -3,9 +3,6 @@ package org.objectweb.proactive.core.util;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
-import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.MethodCall.FixWrapper;
-
 
 public class SerializableMethod implements Serializable {
     private transient Method m;

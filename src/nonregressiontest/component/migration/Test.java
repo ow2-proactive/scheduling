@@ -4,13 +4,11 @@
  */
 package nonregressiontest.component.migration;
 
-import java.util.List;
+import nonregressiontest.component.ComponentTest;
+import nonregressiontest.component.Message;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-
-import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.Message;
 
 
 /**

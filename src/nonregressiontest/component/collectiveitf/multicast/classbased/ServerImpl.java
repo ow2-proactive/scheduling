@@ -2,9 +2,7 @@ package nonregressiontest.component.collectiveitf.multicast.classbased;
 
 import java.util.List;
 
-import testsuite.test.Assertions;
 import nonregressiontest.component.collectiveitf.multicast.Identifiable;
-import nonregressiontest.component.collectiveitf.multicast.Test;
 import nonregressiontest.component.collectiveitf.multicast.WrappedInteger;
 
 

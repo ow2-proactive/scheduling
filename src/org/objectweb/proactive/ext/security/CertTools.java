@@ -411,13 +411,13 @@ public class CertTools {
     }
 
     public static void installBCProvider() {
-        if (Security.addProvider(new BouncyCastleProvider()) < 0) {
-            // If already installed, remove so we can handle redeploy
-            Security.removeProvider("BC");
-            if (Security.addProvider(new BouncyCastleProvider()) < 0) {
-                log.error("Cannot even install BC provider again!");
-            }
+        // we need to check if the BouncyCastle provider is already installed
+        // before installing it
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
         }
+        
+     
     }
 
     /**

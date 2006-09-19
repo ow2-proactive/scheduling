@@ -28,19 +28,15 @@
 package org.objectweb.proactive.calcium;
 
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.calcium.examples.nqueens.Board;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.exceptions.ParameterException;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.statistics.Stats;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
-import org.objectweb.proactive.calcium.statistics.StatsGlobalImpl;
-import org.objectweb.proactive.calcium.statistics.StatsImpl;
 
 /**
  * 

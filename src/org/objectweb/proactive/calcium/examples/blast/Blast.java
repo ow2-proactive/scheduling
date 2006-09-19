@@ -33,13 +33,14 @@ import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.examples.nqueens.NQueens;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
+import org.objectweb.proactive.calcium.exceptions.ParameterException;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
-import org.objectweb.proactive.calcium.skeletons.*;
+import org.objectweb.proactive.calcium.skeletons.DaC;
+import org.objectweb.proactive.calcium.skeletons.Pipe;
+import org.objectweb.proactive.calcium.skeletons.Seq;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
-import org.objectweb.proactive.calcium.statistics.StatsGlobalImpl;
 
 
 public class Blast {

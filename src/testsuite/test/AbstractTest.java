@@ -39,8 +39,6 @@ import java.lang.reflect.Method;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import nonregressiontest.component.interceptor.Test;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

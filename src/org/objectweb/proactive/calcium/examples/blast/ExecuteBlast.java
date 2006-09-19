@@ -27,12 +27,11 @@
  */
 package org.objectweb.proactive.calcium.examples.blast;
 
-import java.io.IOException;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
 import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.SchedulingException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;

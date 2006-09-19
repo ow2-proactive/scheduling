@@ -2,7 +2,6 @@ package nonregressiontest.component.collectiveitf.gathercast;
 
 import java.util.List;
 
-import org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 

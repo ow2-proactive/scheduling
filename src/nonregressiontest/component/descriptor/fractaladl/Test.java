@@ -9,24 +9,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.objectweb.fractal.adl.Factory;
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.util.Fractal;
-
-//import org.objectweb.fractal.adl.Registry;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.adl.Launcher;
-import org.objectweb.proactive.core.component.adl.Registry;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
-
 import nonregressiontest.component.ComponentTest;
-import nonregressiontest.component.I1;
 import nonregressiontest.component.I1Multicast;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
+
+import org.objectweb.fractal.adl.Factory;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.component.adl.Registry;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 
 
 /**
