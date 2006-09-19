@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -152,7 +153,7 @@ public interface SecurityEntity {
      * @return returns all the entity's ID which contain this entity plus this entity ID.
      * @throws SecurityNotAvailableException if the target entity does not support security
      */
-    public ArrayList getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException;
 
     /**

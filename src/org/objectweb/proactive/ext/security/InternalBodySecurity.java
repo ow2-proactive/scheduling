@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -130,7 +131,7 @@ public class InternalBodySecurity implements SecurityEntity {
         return distantBody.getPolicy(securityContext);
     }
 
-    public ArrayList getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         return distantBody.getEntities();
     }

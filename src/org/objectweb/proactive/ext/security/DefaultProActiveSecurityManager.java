@@ -49,6 +49,7 @@ import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 import org.bouncycastle.x509.X509V3CertificateGenerator;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.security.crypto.Session;
 
 
 public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
@@ -64,7 +65,7 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
     public DefaultProActiveSecurityManager(String vide)
         throws Exception {
         super(vide);
-        sessions = new Hashtable();
+        sessions = new Hashtable<Long,Session>();
         logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();

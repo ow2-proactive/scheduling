@@ -131,7 +131,7 @@ public class KeyTools {
      * @exception Exception if input parameters are not OK or certificate generation fails
      */
     static public KeyStore createP12(String alias, PrivateKey privKey,
-        X509Certificate cert, Collection cacerts) throws Exception {
+        X509Certificate cert, Collection<Certificate> cacerts) throws Exception {
         Certificate[] chain;
         if (cacerts == null) {
             chain = null;
@@ -352,7 +352,7 @@ public class KeyTools {
         }
 
         // If we came here, we have a cert which is not root cert in 'cert'
-        ArrayList array = new ArrayList();
+        ArrayList<Certificate> array = new ArrayList<Certificate>();
 
         for (int i = 0; i < certchain.length; i++) {
             array.add(certchain[i]);

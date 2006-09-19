@@ -38,8 +38,8 @@ import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 public class PolicyRule implements Serializable {
-    protected ArrayList from;
-    protected ArrayList to;
+    protected ArrayList<Entity> from;
+    protected ArrayList<Entity> to;
     protected Communication communicationReply;
     protected Communication communicationRequest;
     protected boolean migration = false;
@@ -50,9 +50,9 @@ public class PolicyRule implements Serializable {
      * authentication,confidentiality and integrity set to optional
      */
     public PolicyRule() {
-        from = new ArrayList();
+        from = new ArrayList<Entity>();
         from.add(new DefaultEntity());
-        to = new ArrayList();
+        to = new ArrayList<Entity>();
         to.add(new DefaultEntity());
         communicationReply = new Communication();
         communicationRequest = new Communication();
@@ -61,15 +61,15 @@ public class PolicyRule implements Serializable {
     /**
      * @param object
      */
-    public void setEntitiesFrom(ArrayList object) {
-        from = object;
+    public void setEntitiesFrom(ArrayList<Entity> object) {
+        this.from = object;
     }
 
     /**
      * @param object
      */
-    public void setEntitiesTo(ArrayList object) {
-        to = object;
+    public void setEntitiesTo(ArrayList<Entity> object) {
+        this.to = object;
     }
 
     /**

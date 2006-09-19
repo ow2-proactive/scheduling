@@ -84,11 +84,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
-     * Uses active objects if set to true
-     */
-    private static final boolean ACTIVE = true;
-
-    /**
      * The array of random colors
      */
     private static Vec[] color = {

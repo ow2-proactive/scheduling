@@ -44,6 +44,7 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 public class DomainImpl implements SecurityDomain {
@@ -82,7 +83,7 @@ public class DomainImpl implements SecurityDomain {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.ext.security.domain.Domain#getEntities()
      */
-    public ArrayList getEntities() throws SecurityNotAvailableException {
+    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException {
         return null;
     }
 

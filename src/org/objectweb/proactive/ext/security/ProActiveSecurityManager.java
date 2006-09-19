@@ -103,7 +103,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
 
     /* contains all active sessions for the current active object */
-    protected Hashtable sessions;
+    protected Hashtable<Long,Session> sessions;
 
     /* random generator used for generating sesssion key */
     protected transient RandomLongGenerator randomLongGenerator;
@@ -131,7 +131,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * This a the default constructor to use with the ProActiveSecurityManager
      */
     public ProActiveSecurityManager() {
-        this.sessions = new Hashtable();
+        this.sessions = new Hashtable<Long,Session>();
         this.policyServer = null;
     }
 
@@ -139,7 +139,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         throws java.io.IOException, InvalidPolicyFile {
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
-        sessions = new Hashtable();
+        sessions = new Hashtable<Long,Session>();
 
         if ((new File(file)).exists()) {
             this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
@@ -239,8 +239,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         Communication VNPolicy;
         Communication distantPolicy;
         runtimePolicy = VNPolicy = distantBodyPolicy = null;
-        ArrayList arrayFrom = new ArrayList();
-        ArrayList arrayTo = new ArrayList();
+        ArrayList<Entity> arrayFrom = new ArrayList<Entity>();
+        ArrayList<Entity> arrayTo = new ArrayList<Entity>();
 
         // retrienes entities from source 
         arrayFrom = this.getEntities();
@@ -1481,13 +1481,13 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     //    public void setParentCertificate(X509Certificate certificate) {
     //        parentCertificate = certificate;
     //    }
-    public Hashtable getOpenedConnexion() {
-        Hashtable table = null;
+    public Hashtable<Long,String> getOpenedConnexion() {
+        Hashtable<Long,String> table = null;
         if (sessions == null) {
             return table;
         }
 
-        table = new Hashtable();
+        table = new Hashtable<Long,String>();
 
         for (Enumeration e = sessions.keys(); e.hasMoreElements();) {
             Long l = (Long) e.nextElement();
@@ -1554,9 +1554,9 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     /**
      * @return entities that inforces security policy on the object
      */
-    public ArrayList getEntities() {
+    public ArrayList<Entity> getEntities() {
         Entity entity = null;
-        ArrayList a = new ArrayList();
+        ArrayList<Entity> a = new ArrayList<Entity>();
         switch (type) {
         case SecurityConstants.ENTITY_TYPE_OBJECT:
             //	Entity entity = new 
@@ -1576,7 +1576,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
         if (parent != null) {
             try {
-                ArrayList parentEntities = parent.getEntities();
+                ArrayList<Entity> parentEntities = parent.getEntities();
                 if (parentEntities == null) {
                     return null;
                 }

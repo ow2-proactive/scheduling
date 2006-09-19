@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.SecurityEntity;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -62,7 +63,7 @@ public interface SecurityDomain extends SecurityEntity {
      * @return returns the set of wrapping entities
      * @throws SecurityNotAvailableException
      */
-    public ArrayList getEntities() throws SecurityNotAvailableException;
+    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException;
 
     /**
      * @return Returns the name of the domain.

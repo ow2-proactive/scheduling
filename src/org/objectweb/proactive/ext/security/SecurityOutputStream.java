@@ -54,7 +54,7 @@ public class SecurityOutputStream extends ObjectOutputStream {
         super(out);
         System.out.println(
             "-*-**-*--*-*-*-**--**-*--*-**- instanciating securtityoutpoutstream");
-        java.security.AccessController.doPrivileged(new java.security.PrivilegedAction() {
+        java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
                 public Object run() {
                     enableReplaceObject(true);
                     return null;

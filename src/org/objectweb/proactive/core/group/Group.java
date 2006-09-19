@@ -85,7 +85,7 @@ public interface Group<E> extends List<E> {
     /**
      * Returns a list iterator of the members in this Group (in proper sequence).
      */
-    public ListIterator listIterator();
+    public ListIterator<E> listIterator();
 
     /**
      * Waits that all the members are arrived.

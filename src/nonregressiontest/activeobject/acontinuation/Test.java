@@ -99,7 +99,7 @@ public class Test extends FunctionalTest {
                 a.initFirstDeleguate();
                 idDeleguate = a.getId("deleguate2");
                 idPrincipal = a.getId("principal");
-                Vector v = new Vector(2);
+                Vector<Id> v = new Vector<Id>(2);
                 v.add(idDeleguate);
                 v.add(idPrincipal);
                 if (ProActive.waitForAny(v) == 0) {

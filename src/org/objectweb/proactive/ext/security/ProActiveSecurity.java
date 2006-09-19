@@ -441,7 +441,7 @@ public class ProActiveSecurity {
             cf = CertificateFactory.getInstance("X.509");
             // X509Certificate[] serverCerts = {certLevel2, certLevel1};
             // X509Certificate[] serverCerts = { acCert };
-            List mylist = new ArrayList();
+            List<X509Certificate> mylist = new ArrayList<X509Certificate>();
             for (int i = 0; i < serverCerts.length; i++) {
                 mylist.add(serverCerts[i]);
             }

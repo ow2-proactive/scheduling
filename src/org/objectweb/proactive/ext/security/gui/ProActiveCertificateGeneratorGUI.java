@@ -868,8 +868,8 @@ public class ProActiveCertificateGeneratorGUI extends JFrame
                 tableModel.removeRow(i);
             }
             for (int i = 1; i < chain.length; i++) {
-                Vector v = new Vector();
-                v.addElement(new Integer(i));
+                Vector<String> v = new Vector<String>();
+                v.addElement(new Integer(i).toString());
                 v.addElement(((X509Certificate) chain[i]).getSubjectDN()
                               .toString());
                 tableModel.addRow(v);

@@ -120,8 +120,8 @@ public class CertTools {
     }
 
     /** BC X509Name contains some lookup tables that could maybe be used here. */
-    private static final HashMap oids = new HashMap();
-
+    private static final HashMap<String,DERObjectIdentifier> oids = new HashMap<String,DERObjectIdentifier>();
+  
     static {
         oids.put("c", X509Name.C);
         oids.put("dc", X509Name.DC);
@@ -177,8 +177,8 @@ public class CertTools {
         //log.debug(">stringToBcX509Name: " + dn);
         // first make two vectors, one with all the C, O, OU etc specifying
         // the order and one holding the actual values
-        ArrayList oldordering = new ArrayList();
-        ArrayList oldvalues = new ArrayList();
+        ArrayList<String> oldordering = new ArrayList<String>();
+        ArrayList<String> oldvalues = new ArrayList<String>();
         X509NameTokenizer xt = new X509NameTokenizer(dn);
 
         while (xt.hasMoreTokens()) {
@@ -197,8 +197,8 @@ public class CertTools {
 
         // Now in the specified order, move from oldordering to newordering,
         // reshuffling as we go along
-        Vector ordering = new Vector();
-        Vector values = new Vector();
+        Vector<DERObjectIdentifier> ordering = new Vector<DERObjectIdentifier>();
+        Vector<String> values = new Vector<String>();
         int index = -1;
 
         for (int i = 0; i < dNObjects.length; i++) {
@@ -450,7 +450,7 @@ public class CertTools {
     public static Collection getCertsFromPEM(InputStream certstream)
         throws IOException, CertificateException {
         log.debug(">getCertfromPEM:");
-        ArrayList ret = new ArrayList();
+        ArrayList<X509Certificate> ret = new ArrayList<X509Certificate>();
         String beginKey = "-----BEGIN CERTIFICATE-----";
         String endKey = "-----END CERTIFICATE-----";
         BufferedReader bufRdr = new BufferedReader(new InputStreamReader(

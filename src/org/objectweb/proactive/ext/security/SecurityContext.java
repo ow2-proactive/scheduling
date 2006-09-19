@@ -48,8 +48,8 @@ public class SecurityContext implements Serializable {
     public static int MIGRATION_TO = 4;
     public static int MIGRATION_FROM = 5;
     public static int Validate_POLICY = 5;
-    protected ArrayList entitiesFrom;
-    protected ArrayList entitiesTo;
+    protected ArrayList<Entity> entitiesFrom;
+    protected ArrayList<Entity> entitiesTo;
     protected Communication sendRequest;
     protected Communication receiveRequest;
     protected Communication sendReply;
@@ -66,8 +66,8 @@ public class SecurityContext implements Serializable {
     public SecurityContext() {
     }
 
-    public SecurityContext(int type, ArrayList entitiesFrom,
-        ArrayList entitiesTo) {
+    public SecurityContext(int type, ArrayList<Entity> entitiesFrom,
+        ArrayList<Entity> entitiesTo) {
         this.type = type;
         this.entitiesFrom = entitiesFrom;
         this.entitiesTo = entitiesTo;
@@ -113,14 +113,14 @@ public class SecurityContext implements Serializable {
     /**
      * @return entities of the 'from' objects
      */
-    public ArrayList getEntitiesFrom() {
+    public ArrayList<Entity> getEntitiesFrom() {
         return entitiesFrom;
     }
 
     /**
      * @return entities of the 'to' objects
      */
-    public ArrayList getEntitiesTo() {
+    public ArrayList<Entity> getEntitiesTo() {
         return entitiesTo;
     }
 
@@ -176,14 +176,14 @@ public class SecurityContext implements Serializable {
     /**
      * @param list all entities from 'from'
      */
-    public void setEntitiesFrom(ArrayList list) {
+    public void setEntitiesFrom(ArrayList<Entity> list) {
         entitiesFrom = list;
     }
 
     /**
      * @param list all entities from 'to'
      */
-    public void setEntitiesTo(ArrayList list) {
+    public void setEntitiesTo(ArrayList<Entity> list) {
         entitiesTo = list;
     }
 

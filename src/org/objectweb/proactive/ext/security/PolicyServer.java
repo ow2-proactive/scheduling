@@ -66,7 +66,7 @@ public class PolicyServer implements Serializable, Cloneable {
     private static int REQUIRED = 1;
     private static int DENIED = -1;
     private static int OPTIONAL = 0;
-    protected ArrayList policyRules;
+    protected ArrayList<PolicyRule> policyRules;
     protected String policyRulesFileLocation;
     protected String applicationName;
     protected transient KeyStore keyStore;
@@ -77,17 +77,17 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     public PolicyServer(PolicyRule[] policyRules) {
-        this.policyRules = new ArrayList();
+        this.policyRules = new ArrayList<PolicyRule>();
         for (int i = 0; i < policyRules.length; i++) {
             this.policyRules.add(policyRules[i]);
         }
     }
 
-    public PolicyServer(ArrayList policyRules) {
+    public PolicyServer(ArrayList<PolicyRule> policyRules) {
         this.policyRules = policyRules;
     }
 
-    public PolicyServer(KeyStore keyStore, ArrayList policyRules) {
+    public PolicyServer(KeyStore keyStore, ArrayList<PolicyRule> policyRules) {
         this.policyRules = policyRules;
         this.keyStore = keyStore;
     }
@@ -105,8 +105,8 @@ public class PolicyServer implements Serializable, Cloneable {
 
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException {
-        ArrayList entitiesFrom = securityContext.getEntitiesFrom();
-        ArrayList entitiesTo = securityContext.getEntitiesTo();
+        ArrayList<Entity> entitiesFrom = securityContext.getEntitiesFrom();
+        ArrayList<Entity> entitiesTo = securityContext.getEntitiesTo();
 
         if (policyRules == null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug("trying to find a policy whereas none has been set" +
@@ -120,11 +120,11 @@ public class PolicyServer implements Serializable, Cloneable {
         Communication communication;
 
         if ((entitiesFrom == null) || (entitiesFrom.size() == 0)) {
-            entitiesFrom = new ArrayList();
+            entitiesFrom = new ArrayList<Entity>();
             entitiesFrom.add(new DefaultEntity());
         }
         if ((entitiesTo == null) || (entitiesTo.size() == 0)) {
-            entitiesTo = new ArrayList();
+            entitiesTo = new ArrayList<Entity>();
             entitiesTo.add(new DefaultEntity());
         }
 
@@ -298,8 +298,8 @@ public class PolicyServer implements Serializable, Cloneable {
     public boolean canMigrateTo(String type, String from, String to) {
         try {
             System.out.println("Migration from " + from + "to" + to);
-            ArrayList arrayFrom = new ArrayList();
-            ArrayList arrayTo = new ArrayList();
+            ArrayList<Entity> arrayFrom = new ArrayList<Entity>();
+            ArrayList<Entity> arrayTo = new ArrayList<Entity>();
 
             SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
                     arrayFrom, arrayTo);
@@ -392,7 +392,7 @@ public class PolicyServer implements Serializable, Cloneable {
     /**
      * @param policies
      */
-    public void setPolicies(ArrayList policies) {
+    public void setPolicies(ArrayList<PolicyRule> policies) {
         ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).info("storing policies");
         this.policyRules = policies;
     }

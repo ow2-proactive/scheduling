@@ -35,6 +35,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -65,7 +66,7 @@ public class ProActiveSecurityDescriptorHandler
     protected String applicationName = null;
     protected String applicationPrivateKeyPath = null;
     protected String applicationCertificatePath = null;
-    protected ArrayList policyRules = null;
+    protected ArrayList<PolicyRule> policyRules = null;
     static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     protected static String PROACTIVE_SECURITY_TAG = "Policy";
     protected String RULE_TAG = "Rule";
@@ -121,7 +122,8 @@ public class ProActiveSecurityDescriptorHandler
         //            policyServer.setApplicationCertificate(applicationCertificatePath);
         //        } else 
         if (name.equals(RULES_TAG)) {
-            policyRules = (ArrayList) activeHandler.getResultObject();
+           
+            policyRules =   (ArrayList) activeHandler.getResultObject();
             policyServer.setPolicies(policyRules);
         } else if (name.equals(APPLICATION_NAME_TAG)) {
             applicationName = (String) activeHandler.getResultObject();
@@ -168,11 +170,11 @@ public class ProActiveSecurityDescriptorHandler
      */
     private class RulesHandler extends AbstractUnmarshallerDecorator {
         RuleHandler ruleHandler = null;
-        private ArrayList policies;
+        private ArrayList<PolicyRule> policies;
 
         public RulesHandler() {
             super();
-            policies = new ArrayList();
+            policies = new ArrayList<PolicyRule>();
             ruleHandler = new RuleHandler();
             addHandler(RULE_TAG, ruleHandler);
         }
@@ -191,7 +193,7 @@ public class ProActiveSecurityDescriptorHandler
             // addHandler(RULE_TAG, new RuleHandler());
             // ruleHandler = new RuleHandler();
             if (name.equals(RULE_TAG)) {
-                policies.add(activeHandler.getResultObject());
+                policies.add((PolicyRule) activeHandler.getResultObject());
                 //	  ruleHandler = new RuleHandler();
             }
             addHandler(RULE_TAG, new RuleHandler());
@@ -515,4 +517,7 @@ public class ProActiveSecurityDescriptorHandler
                     args[0]), h);
         sr.read();
     }
+    
+    
+
 }
