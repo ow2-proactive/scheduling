@@ -57,7 +57,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * an Hashtable containing all the http  adapters registered. They can be retrieved
      * thanks to the ProActive.lookupActive method
      */
-    protected static transient Hashtable urnBodys = new Hashtable();
+    protected static transient Hashtable<String,HttpBodyAdapter> urnBodys = new Hashtable<String,HttpBodyAdapter>();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------

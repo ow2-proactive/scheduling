@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
  */
 public class RuntimeRequest extends ReflectRequest implements Serializable {
     private String methodName;
-    private ArrayList parameters = new ArrayList();
+    private ArrayList<Object> parameters = new ArrayList<Object>();
     private static HashMap hMapMethods;
     private static ProActiveRuntimeImpl runtime;
 
@@ -72,13 +72,13 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
         return this.returnedObject;
     }
 
-    public RuntimeRequest(String newmethodName, ArrayList newparameters,
+    public RuntimeRequest(String newmethodName, ArrayList<Object> newparameters,
         String url) {
         this(newmethodName, url);
         this.parameters = newparameters;
     }
 
-    public RuntimeRequest(String newmethodName, ArrayList newparameters,
+    public RuntimeRequest(String newmethodName, ArrayList<Object> newparameters,
         ArrayList newparamsTypes, String url) {
         this(newmethodName, newparameters, url);
     }

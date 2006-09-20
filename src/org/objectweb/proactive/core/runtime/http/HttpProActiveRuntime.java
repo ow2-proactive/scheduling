@@ -123,7 +123,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) throws ProActiveException {
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(proActiveRuntimeDist);
         params.add(creatorID);
         params.add(vmName);
@@ -157,7 +157,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             localruntime.createLocalNode(name, replacePreviousBinding,
                 securityManager, vname, jobId);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(name);
             paramsList.add(new Boolean(replacePreviousBinding));
             paramsList.add(securityManager);
@@ -194,7 +194,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(name);
         new RuntimeRequest("killNode", params, this.url).send();
     }
@@ -207,7 +207,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(remoteProcess);
         new RuntimeRequest("createVM", params, this.url).send();
     }
@@ -257,8 +257,8 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
-        ArrayList paramsTypes = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
+        ArrayList<Class> paramsTypes = new ArrayList<Class>();
 
         params.add(proActiveRuntimeDist);
         paramsTypes.add(ProActiveRuntime.class);
@@ -289,8 +289,8 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
-        ArrayList paramsTypes = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
+        ArrayList<Class> paramsTypes = new ArrayList<Class>();
 
         params.add(proActiveRuntimeDist);
         paramsTypes.add(ProActiveRuntime.class);
@@ -329,7 +329,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getProActiveRuntime(proActiveRuntimeName);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(proActiveRuntimeName);
 
         RuntimeRequest req = new RuntimeRequest("getProActiveRuntime", params,
@@ -348,7 +348,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             if (isLocal) {
                 localruntime.killRT(softly);
             } else {
-                ArrayList params = new ArrayList();
+                ArrayList<Object> params = new ArrayList<Object>();
                 params.add(new Boolean(softly));
 
                 new RuntimeRequest("killRT", params, this.url).send();
@@ -368,7 +368,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getActiveObjects(nodeName);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeName);
 
         RuntimeRequest req = new RuntimeRequest("getActiveObjects", params,
@@ -388,7 +388,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getActiveObjects(nodeName, objectName);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeName);
         params.add(objectName);
 
@@ -409,7 +409,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getVirtualNode(virtualNodeName);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(virtualNodeName);
 
         RuntimeRequest req = new RuntimeRequest("getVirtualNode", params,
@@ -449,7 +449,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(virtualNodeName);
 
         new RuntimeRequest("unregisterVirtualNode", params, this.url).send();
@@ -479,7 +479,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 isNodeLocal);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeName);
         params.add(bodyConstructorCall);
         params.add(new Boolean(isNodeLocal));
@@ -504,7 +504,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.receiveBody(nodeName, body);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeName);
         params.add(body);
 
@@ -528,7 +528,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getJobID(nodeUrl);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeUrl);
 
         RuntimeRequest req = new RuntimeRequest("getJobID", params, this.url);
@@ -549,7 +549,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(proActiveRuntimeName);
 
         new RuntimeRequest("addAcquaintance", params, this.url).send();
@@ -584,7 +584,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(proActiveRuntimeName);
 
         new RuntimeRequest("rmAcquaintance", params, this.url).send();
@@ -596,7 +596,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getClassDataFromParentRuntime(className);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(className);
 
         RuntimeRequest req = new RuntimeRequest("getClassDataFromParentRuntime",
@@ -616,7 +616,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getClassDataFromThisRuntime(className);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(className);
 
         RuntimeRequest req = new RuntimeRequest("getClassDataFromThisRuntime",
@@ -641,7 +641,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.receiveCheckpoint(nodeURL, ckpt, inc);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeURL);
         params.add(ckpt);
         params.add(new Integer(inc));
@@ -663,7 +663,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getDescriptor(url, isHierarchicalSearch);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(url);
         params.add(new Boolean(isHierarchicalSearch));
 
@@ -687,7 +687,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(className);
         params.add(parameters);
 
@@ -703,7 +703,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return;
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(className);
 
         RuntimeRequest req = new RuntimeRequest("newRemote", params, this.url);
@@ -768,7 +768,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getVNName(nodename);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodename);
 
         RuntimeRequest req = new RuntimeRequest("getVNName", params, this.url);
@@ -787,7 +787,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getCertificate();
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
 
         RuntimeRequest req = new RuntimeRequest("getCertificate", params,
                 this.url);
@@ -813,7 +813,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.startNewSession(policy);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(policy);
 
         RuntimeRequest req = new RuntimeRequest("startNewSession", params,
@@ -840,7 +840,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getPublicKey();
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
 
         RuntimeRequest req = new RuntimeRequest("getPublicKey", params, this.url);
 
@@ -866,7 +866,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.randomValue(sessionID, clientRandomValue);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(new Long(sessionID));
         params.add(clientRandomValue);
 
@@ -896,7 +896,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 myCertificate, signature);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(new Long(sessionID));
         params.add(myPublicKey);
         params.add(myCertificate);
@@ -931,7 +931,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
                 parametersSignature);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(new Long(sessionID));
         params.add(encodedAESKey);
         params.add(encodedIVParameters);
@@ -965,7 +965,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getPolicy(securityContext);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(securityContext);
 
         RuntimeRequest req = new RuntimeRequest("getPolicy", params, this.url);
@@ -991,7 +991,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getCertificateEncoded();
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
 
         RuntimeRequest req = new RuntimeRequest("getCertificateEncoded",
                 params, this.url);
@@ -1017,7 +1017,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getEntities();
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
 
         RuntimeRequest req = new RuntimeRequest("getEntities", params, this.url);
 
@@ -1042,7 +1042,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             localruntime.terminateSession(sessionID);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(new Long(sessionID));
 
         RuntimeRequest req = new RuntimeRequest("terminateSession", params,
@@ -1067,7 +1067,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.setLocalNodeProperty(nodeName, key, value);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeName);
         params.add(key);
         params.add(value);
@@ -1096,7 +1096,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             return localruntime.getLocalNodeProperty(nodeName, key);
         }
 
-        ArrayList params = new ArrayList();
+        ArrayList<Object> params = new ArrayList<Object>();
         params.add(nodeName);
         params.add(key);
 

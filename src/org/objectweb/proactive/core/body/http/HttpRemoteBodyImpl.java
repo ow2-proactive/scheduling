@@ -58,6 +58,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -184,7 +185,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.updateLocation(id, body);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(id);
             paramsList.add(body);
             (new BodyRequest("updateLocation", paramsList, bodyID, this.url)).send();
@@ -221,7 +222,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.setImmediateService(methodName);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(methodName);
             (new BodyRequest("setImmediateService", paramsList, bodyID, this.url)).send();
         }
@@ -232,7 +233,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.setImmediateService(methodName, parametersTypes);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(methodName);
             paramsList.add(parametersTypes);
             new BodyRequest("setImmediateService", paramsList, bodyID, this.url).send();
@@ -244,7 +245,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.removeImmediateService(methodName, parametersTypes);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(methodName);
             paramsList.add(parametersTypes);
             new BodyRequest("removeImmediateService", paramsList, bodyID,
@@ -260,7 +261,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.terminateSession(sessionID);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(new Long(sessionID));
             new BodyRequest("terminateSession", paramsList, bodyID, this.url).send();
         }
@@ -296,7 +297,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.startNewSession(policy);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(policy);
             BodyRequest req = new BodyRequest("startNewSession", paramsList,
                     bodyID, this.url);
@@ -344,7 +345,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.randomValue(sessionID, cl_rand);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(new Long(sessionID));
             paramsList.add(cl_rand);
 
@@ -373,7 +374,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.publicKeyExchange(sessionID, my_pub, my_cert, sig_code);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(new Long(sessionID));
             paramsList.add(my_pub);
             paramsList.add(my_cert);
@@ -408,7 +409,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3, tmp4);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(new Long(sessionID));
             paramsList.add(tmp);
             paramsList.add(tmp1);
@@ -439,7 +440,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.getPolicy(securityContext);
         } else {
-            ArrayList paramsList = new ArrayList();
+            ArrayList<Object> paramsList = new ArrayList<Object>();
             paramsList.add(securityContext);
 
             BodyRequest req = new BodyRequest("getPolicy", paramsList, bodyID,
@@ -481,7 +482,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
      */
-    public ArrayList getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         if (isLocal) {
             return body.getEntities();
@@ -532,7 +533,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.addNFEListener(listener);
         } else {
-            ArrayList paramList = new ArrayList();
+            ArrayList<Object> paramList = new ArrayList<Object>();
             paramList.add(listener);
 
             new BodyRequest("addNFEListener", paramList, bodyID, url).send();
@@ -544,7 +545,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.removeNFEListener(listener);
         } else {
-            ArrayList paramList = new ArrayList();
+            ArrayList<Object> paramList = new ArrayList<Object>();
             paramList.add(listener);
 
             new BodyRequest("removeNFEListener", paramList, bodyID, url).send();
@@ -555,7 +556,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.fireNFE(e);
         } else {
-            ArrayList paramList = new ArrayList();
+            ArrayList<Object> paramList = new ArrayList<Object>();
             paramList.add(e);
             BodyRequest br = new BodyRequest("fireNFE", paramList, bodyID, url);
             br.send();
