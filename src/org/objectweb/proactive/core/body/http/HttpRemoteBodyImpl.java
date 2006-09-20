@@ -147,7 +147,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.terminate();
         } else {
-            (new BodyRequest("terminate", new ArrayList(), bodyID, this.url)).send();
+            (new BodyRequest("terminate", new ArrayList<Object>(), bodyID, this.url)).send();
         }
     }
 
@@ -159,7 +159,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.getNodeURL();
         } else {
-            BodyRequest br = new BodyRequest("getNodeURL", new ArrayList(),
+            BodyRequest br = new BodyRequest("getNodeURL", new ArrayList<Object>(),
                     bodyID, this.url);
             br.send();
             try {
@@ -199,7 +199,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.enableAC();
         } else {
-            (new BodyRequest("enableAC", new ArrayList(), bodyID, this.url)).send();
+            (new BodyRequest("enableAC", new ArrayList<Object>(), bodyID, this.url)).send();
         }
     }
 
@@ -210,7 +210,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             body.disableAC();
         } else {
-            (new BodyRequest("disableAC", new ArrayList(), bodyID, this.url)).send();
+            (new BodyRequest("disableAC", new ArrayList<Object>(), bodyID, this.url)).send();
         }
     }
 
@@ -276,7 +276,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             return body.getCertificate();
         } else {
             BodyRequest req = new BodyRequest("getCertificate",
-                    new ArrayList(), bodyID, this.url);
+                    new ArrayList<Object>(), bodyID, this.url);
             req.send();
             try {
                 return (X509Certificate) req.getReturnedObject();
@@ -322,7 +322,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.getPublicKey();
         } else {
-            BodyRequest req = new BodyRequest("getPublicKey", new ArrayList(),
+            BodyRequest req = new BodyRequest("getPublicKey", new ArrayList<Object>(),
                     bodyID, this.url);
             req.send();
 
@@ -466,7 +466,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
             return body.getCertificateEncoded();
         } else {
             BodyRequest req = new BodyRequest("getCertificateEncoded",
-                    new ArrayList(), bodyID, this.url);
+                    new ArrayList<Object>(), bodyID, this.url);
             req.send();
 
             try {
@@ -487,11 +487,12 @@ public class HttpRemoteBodyImpl implements RemoteBody {
         if (isLocal) {
             return body.getEntities();
         } else {
-            BodyRequest req = new BodyRequest("getEntities", new ArrayList(),
+            BodyRequest req = new BodyRequest("getEntities", new ArrayList<Object>(),
                     bodyID, this.url);
             req.send();
 
             try {
+                
                 return (ArrayList) req.getReturnedObject();
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
