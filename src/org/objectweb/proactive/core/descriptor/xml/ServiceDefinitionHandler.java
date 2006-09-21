@@ -1,39 +1,40 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.RMIRegistryLookupService;
+import org.objectweb.proactive.core.descriptor.services.SchedulerLookupService;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
@@ -41,13 +42,17 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.scheduler.GenericJob;
+import org.objectweb.proactive.scheduler.Scheduler;
 import org.xml.sax.SAXException;
 
 
 public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
     ProActiveDescriptor pad;
+    Scheduler scheduler;
     protected String serviceId;
+    private String jobId;
 
     public ServiceDefinitionHandler(ProActiveDescriptor pad) {
         super(false);
@@ -55,6 +60,19 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         this.addHandler(RMI_LOOKUP_TAG, new RMILookupHandler());
         this.addHandler(FT_CONFIG_TAG, new FaultToleranceHandler());
         this.addHandler(P2P_SERVICE_TAG, new P2PServiceHandler());
+        this.addHandler(PROACTIVE_SCHEDULER_TAG, new ProActiveSchedulerHandler());
+    }
+
+    public ServiceDefinitionHandler(Scheduler scheduler, String jobId,
+        ProActiveDescriptor pad) {
+        super(false);
+        this.pad = pad;
+        this.scheduler = scheduler;
+        this.jobId = jobId;
+        this.addHandler(RMI_LOOKUP_TAG, new RMILookupHandler());
+        this.addHandler(FT_CONFIG_TAG, new FaultToleranceHandler());
+        this.addHandler(P2P_SERVICE_TAG, new P2PServiceHandler());
+        this.addHandler(PROACTIVE_SCHEDULER_TAG, new ProActiveSchedulerHandler());
     }
 
     /* (non-Javadoc)
@@ -85,6 +103,52 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             setResultObject(rmiService);
         }
     } // end of inner class RMILookupHandler
+
+    protected class ProActiveSchedulerHandler
+        extends PassiveCompositeUnmarshaller {
+        protected SchedulerLookupService schedulerLookupService;
+
+        public ProActiveSchedulerHandler() {
+            super(false);
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            String schedulerUrl = attributes.getValue("schedulerUrl");
+            schedulerLookupService = new SchedulerLookupService(schedulerUrl);
+
+            String nbOfNodes = attributes.getValue("numberOfNodes");
+
+            if (!checkNonEmpty(nbOfNodes)) {
+                throw new org.xml.sax.SAXException(
+                    "ProActiveScheduler Tag without any numberOfNodes defined");
+            }
+
+            schedulerLookupService.setNodeNumber(Integer.parseInt(nbOfNodes));
+
+            if (scheduler != null) {
+                String jvmParam = attributes.getValue("jvmParameters");
+                GenericJob job = scheduler.getTmpJob(jobId);
+                if (checkNonEmpty(nbOfNodes)) {
+                    job.setJVMParameters(jvmParam);
+                }
+
+                String minNumberOfNodes = attributes.getValue(
+                        "minNumberOfNodes");
+                if (checkNonEmpty(minNumberOfNodes)) {
+                    schedulerLookupService.setMinNodeNumber(Integer.parseInt(
+                            minNumberOfNodes));
+                } else {
+                    schedulerLookupService.setMinNodeNumber(Integer.parseInt(
+                            nbOfNodes));
+                }
+            }
+        }
+
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            return schedulerLookupService;
+        }
+    } // end of inner class ProActiveSchedulerHandler
 
     protected class P2PServiceHandler extends PassiveCompositeUnmarshaller {
         protected P2PDescriptorService p2pDescriptorService;

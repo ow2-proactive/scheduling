@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.descriptor.xml;
 
 
@@ -43,15 +43,15 @@ public interface ProActiveDescriptorConstants {
     public static final String PROACTIVE_DESCRIPTOR_TAG = "ProActiveDescriptor";
     public static final String MAIN_DEFINITION_TAG = "mainDefinition";
     public static final String VARIABLES_TAG = "variables";
-    public static final String VARIABLES_DESCRIPTOR_TAG ="descriptorVariable";
-    public static final String VARIABLES_PROGRAM_TAG ="programVariable";
-    public static final String VARIABLES_DESCRIPTOR_DEFAULT_TAG ="descriptorDefaultVariable";
-    public static final String VARIABLES_PROGRAM_DEFAULT_TAG ="programDefaultVariable";
-    public static final String VARIABLES_JAVAPROPERTY_TAG ="javaPropertyVariable";    
-    public static final String VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG ="javaPropertyDescriptorDefault";
-    public static final String VARIABLES_JAVAPROPERTY_PROGRAM_TAG ="javaPropertyProgramDefault";
-    public static final String VARIABLES_INCLUDE_XML_FILE_TAG ="includeXMLFile";
-    public static final String VARIABLES_INCLUDE_PROPERTY_FILE_TAG ="includePropertyFile";
+    public static final String VARIABLES_DESCRIPTOR_TAG = "descriptorVariable";
+    public static final String VARIABLES_PROGRAM_TAG = "programVariable";
+    public static final String VARIABLES_DESCRIPTOR_DEFAULT_TAG = "descriptorDefaultVariable";
+    public static final String VARIABLES_PROGRAM_DEFAULT_TAG = "programDefaultVariable";
+    public static final String VARIABLES_JAVAPROPERTY_TAG = "javaPropertyVariable";
+    public static final String VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG = "javaPropertyDescriptorDefault";
+    public static final String VARIABLES_JAVAPROPERTY_PROGRAM_TAG = "javaPropertyProgramDefault";
+    public static final String VARIABLES_INCLUDE_XML_FILE_TAG = "includeXMLFile";
+    public static final String VARIABLES_INCLUDE_PROPERTY_FILE_TAG = "includePropertyFile";
     public static final String DEPLOYMENT_TAG = "deployment";
     public static final String INFRASTRUCTURE_TAG = "infrastructure";
     public static final String COMPONENT_DEFINITION_TAG = "componentDefinition";
@@ -92,7 +92,7 @@ public interface ProActiveDescriptorConstants {
     public static final String MPI_PROCESS_TAG = "mpiProcess";
     public static final String MPI_PROCESS_OPTIONS_TAG = "mpiOptions";
     public static final String MPI_LOCAL_PATH_TAG = "localRelativePath";
-    public static final String MPI_REMOTE_PATH_TAG = "remoteAbsolutePath";    
+    public static final String MPI_REMOTE_PATH_TAG = "remoteAbsolutePath";
     public static final String PROCESS_NUMBER_TAG = "processNumber";
     public static final String NG_PROCESS_TAG = "ngProcess";
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
@@ -159,6 +159,7 @@ public interface ProActiveDescriptorConstants {
     public static final String SECURITY_TAG = "security";
     public static final String RMI_LOOKUP_TAG = "RMIRegistryLookup";
     public static final String P2P_SERVICE_TAG = "P2PService";
+    public static final String PROACTIVE_SCHEDULER_TAG = "ProActiveScheduler";
     public static final String PEERS_SET_TAG = "peerSet";
     public static final String PEER_TAG = "peer";
     public static final String FT_CONFIG_TAG = "faultTolerance";

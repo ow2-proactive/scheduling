@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.scheduler.Scheduler;
 
 
 /**
@@ -51,6 +52,8 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     implements ProActiveDescriptorConstants {
     protected ProActiveDescriptor proActiveDescriptor;
+    private Scheduler scheduler;
+    private String jobID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -90,11 +93,45 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
     }
 
+    public ProActiveDescriptorHandler(Scheduler scheduler, String jobId,
+        String xmlDescriptorUrl) {
+        super(false);
+        this.proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
+        this.scheduler = scheduler;
+        this.jobID = jobId;
+        addHandler(MAIN_DEFINITION_TAG,
+            new MainDefinitionHandler(scheduler, jobId, this.proActiveDescriptor));
+        addHandler(INFRASTRUCTURE_TAG,
+            new InfrastructureHandler(scheduler, jobId, this.proActiveDescriptor));
+        addHandler(DEPLOYMENT_TAG,
+            new DeploymentHandler(proActiveDescriptor, false));
+        addHandler(FILE_TRANSFER_DEFINITIONS_TAG,
+            new FileTransferDefinitionsHandler(proActiveDescriptor));
+        addHandler(TECHNICAL_SERVICES_TAG,
+            new TechnicalServicesHandler(proActiveDescriptor));
+        addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
+        {
+            PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
+            PassiveCompositeUnmarshaller vNodesDefHandler = new PassiveCompositeUnmarshaller();
+            PassiveCompositeUnmarshaller vNodesAcqHandler = new PassiveCompositeUnmarshaller();
+            vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG,
+                new VirtualNodeHandler(proActiveDescriptor));
+            vNodesAcqHandler.addHandler(VIRTUAL_NODE_TAG,
+                new VirtualNodeLookupHandler());
+            compDefHandler.addHandler(VIRTUAL_NODES_DEFINITION_TAG,
+                vNodesDefHandler);
+            compDefHandler.addHandler(VIRTUAL_NODES_ACQUISITION_TAG,
+                vNodesAcqHandler);
+            this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
+        }
+    }
+
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public static void main(String[] args) throws java.io.IOException {
-        String uri = "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
+        //        String uri = "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
+        String uri = "/user/cjarjouh/home/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
         InitialHandler h = new InitialHandler(uri, new VariableContract());
 
         //String uri = "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";

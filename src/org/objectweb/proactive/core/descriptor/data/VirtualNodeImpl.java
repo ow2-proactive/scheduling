@@ -46,6 +46,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
+import org.objectweb.proactive.core.descriptor.services.SchedulerLookupService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -83,6 +84,7 @@ import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+import org.objectweb.proactive.scheduler.SchedulerConstants;
 
 
 /**
@@ -1634,6 +1636,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             } else {
                 MAX_P2P = true;
             }
+        } else if (service.getServiceName()
+                              .equals(SchedulerConstants.SCHEDULER_NODE_NAME)) {
+            int nodeRequested = ((SchedulerLookupService) service).getNodeNumber();
+            increaseNumberOfNodes(nodeRequested);
         } else {
             //increase with 1 node
             increaseNumberOfNodes(1);
@@ -1661,6 +1667,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             } else {
                 MAX_P2P = true;
             }
+        } else if (service.getServiceName()
+                              .equals(SchedulerConstants.SCHEDULER_NODE_NAME)) {
+            int nodeRequested = ((SchedulerLookupService) service).getNodeNumber();
+            increaseNumberOfNodes(nodeRequested);
         } else {
             //increase with 1 node
             increaseNumberOfNodes(1);
@@ -1883,5 +1893,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void addTechnicalService(TechnicalServiceWrapper technicalWrapper) {
         this.technicalService = technicalWrapper;
+    }
+
+    public ArrayList getVirtualMachines() {
+        return this.virtualMachines;
     }
 }

@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 class DeploymentHandler extends PassiveCompositeUnmarshaller
     implements ProActiveDescriptorConstants {
     private ProActiveDescriptor proActiveDescriptor;
+    private boolean activate = true;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -62,6 +63,32 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
     //
     public DeploymentHandler(ProActiveDescriptor proActiveDescriptor) {
         super(false);
+        this.proActiveDescriptor = proActiveDescriptor;
+        this.addHandler(REGISTER_TAG, new RegisterHandler());
+        this.addHandler(LOOKUP_TAG, new LookupHandler());
+        {
+            PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
+            ch.addHandler(MAP_TAG, new MapHandler());
+            this.addHandler(MAPPING_TAG, ch);
+        }
+        {
+            PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
+            ch.addHandler(JVM_TAG, new JVMHandler());
+            this.addHandler(JVMS_TAG, ch);
+        }
+    }
+
+    /**
+     * This is the same constructor as the first but with the main difference that
+     * this one is used by the scheduler and has another argument which is the activate
+     * that tells the parser wether we are activating and creating the nodes or nt.
+     * @param proActiveDescriptor
+     * @param activate is set to false if we don't need to activate the VNs
+     */
+    public DeploymentHandler(ProActiveDescriptor proActiveDescriptor,
+        boolean activate) {
+        super(false);
+        this.activate = activate;
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(REGISTER_TAG, new RegisterHandler());
         this.addHandler(LOOKUP_TAG, new LookupHandler());
@@ -222,12 +249,20 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 UnmarshallerHandler activeHandler)
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
-                    String protocol = (String) activeHandler.getResultObject();
-                    if (!checkNonEmpty(protocol)) {
-                        protocol = System.getProperty(
-                                "proactive.communication.protocol");
+                    // we create the node if and only if we are activating the mapping.
+                    // this is used by the scheduler to ensure that when parsing for 
+                    // description we don't create a node in the currentJVM
+                    if (activate) {
+                        String protocol = (String) activeHandler.getResultObject();
+                        if (!checkNonEmpty(protocol)) {
+                            protocol = System.getProperty(
+                                    "proactive.communication.protocol");
+                        }
+                        vn.createNodeOnCurrentJvm(protocol);
+                    } else {
+                        throw new org.xml.sax.SAXException(
+                            "The use of the currentJVM tag is banned");
                     }
-                    vn.createNodeOnCurrentJvm(protocol);
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }

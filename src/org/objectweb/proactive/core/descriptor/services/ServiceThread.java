@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.descriptor.services;
 
 import java.util.Vector;
@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+import org.objectweb.proactive.scheduler.SchedulerConstants;
 
 
 /**
@@ -89,11 +90,32 @@ public class ServiceThread extends Thread {
             if (part != null) {
                 notifyVirtualNode(part);
             }
+
+            if (service.getServiceName()
+                           .equals(SchedulerConstants.SCHEDULER_NODE_NAME)) {
+                SchedulerLookupService schedulerLookupService = ((SchedulerLookupService) service);
+                Node[] reservedNodes = schedulerLookupService.getNodes();
+
+                for (int i = 0; i < reservedNodes.length; i++) {
+                    Node node = reservedNodes[i];
+                    nodeCount++;
+                    ((VirtualNodeImpl) vn).nodeCreated(new NodeCreationEvent(
+                            vn, NodeCreationEvent.NODE_CREATED, node, nodeCount));
+                    //                    System.out.println("--------------------" + node.getNodeInformation().getURL());
+                    if (loggerDeployment.isInfoEnabled()) {
+                        loggerDeployment.info(
+                            "Service thread just created event for node: " +
+                            node.getNodeInformation().getURL());
+                    }
+                }
+            }
+
             if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
                 // Start asking nodes
                 P2PService p2pService = ((P2PDescriptorService) service).getP2PService();
                 String nodeFamilyRegexp = ((P2PDescriptorService) service).getNodeFamilyRegexp();
-                nodeFamilyRegexp = (nodeFamilyRegexp != null)?nodeFamilyRegexp:"";
+                nodeFamilyRegexp = (nodeFamilyRegexp != null)
+                    ? nodeFamilyRegexp : "";
                 P2PNodeLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
                         nodeFamilyRegexp, this.vn.getName(), this.vn.getJobID());
                 ((VirtualNodeImpl) vn).addP2PNodesLookup(p2pNodesLookup);

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../descriptors/DescriptorSchema.xsd">
+	<!-- <security file="../../../../../../descriptors/c3dPolicy.xml"></security> -->
+	
+	<mainDefinition id="main" class="org.objectweb.proactive.examples.c3d.C3DDispatcher">
+ 	 	<arg value="/user/cjarjouh/home/ProActive/src/org/objectweb/proactive/examples/scheduler/C3D_Dispatcher_Renderer_scheduler.xml"/>	
+      	<mapToVirtualNode value="schedulervn"/>
+	</mainDefinition>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Dispatcher" property="unique_singleAO"/>
+			<virtualNode name="Renderer"/>
+			<virtualNode name="schedulervn"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<register virtualNode="Dispatcher"/> 
+		<mapping>
+		     <map virtualNode="schedulervn">
+        		<jvmSet>
+          			<vmName value="Jvm5"/>
+        		</jvmSet>
+      		 </map>     
+			<map virtualNode="Dispatcher">
+				<jvmSet>
+					<vmName value="Jvm4"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="Renderer">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>				
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<acquisition>
+          			<serviceReference refid="ProactiveScheduler"/>
+        		</acquisition>
+			</jvm>
+			<jvm name="Jvm2">
+				<acquisition>
+          			<serviceReference refid="ProactiveScheduler"/>
+        		</acquisition>
+			</jvm>
+			<jvm name="Jvm3">
+				<acquisition>
+          			<serviceReference refid="ProactiveScheduler"/>
+        		</acquisition>
+			</jvm>
+			<jvm name="Jvm4">
+				<acquisition>
+          			<serviceReference refid="ProactiveScheduler"/>
+        		</acquisition>
+			</jvm>
+			<jvm name="Jvm5">
+				<acquisition>
+          			<serviceReference refid="ProactiveScheduler"/>
+        		</acquisition>
+			</jvm> 
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<services>
+      		<serviceDefinition id="ProactiveScheduler">
+        		<ProActiveScheduler numberOfNodes="1" 
+        		schedulerUrl="rmi://localhost:1234" jvmParameters="-Dname=value"/>
+      		</serviceDefinition>
+    	</services>
+	</infrastructure>
+</ProActiveDescriptor>
