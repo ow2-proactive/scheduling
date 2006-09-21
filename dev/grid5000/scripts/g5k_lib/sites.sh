@@ -31,6 +31,7 @@ CLUSTERS=(
 )
 
 CMD_HOSTNAME=''
+UNAME=$(uname)
 if [ "$UNAME" == "Linux" ] ;
 then
 	CMD_HOSTNAME='hostname -f'
