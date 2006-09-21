@@ -9,7 +9,7 @@ CLASSPATH=.
 . $workingDir/env.sh
 
 
-$JAVACMD -Dproactive.rmi.port=1234 org.objectweb.proactive.scheduler.Scheduler &
+$JAVACMD -Dproactive.rmi.port=1234 org.objectweb.proactive.scheduler.Scheduler
 
 echo
 echo ------------------------------------------------------------

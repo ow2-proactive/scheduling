@@ -90,7 +90,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
+	<target name="compile" depends="ic2d, bnb, p2p, scheduler, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -198,6 +198,17 @@
 			<arg line="-d ${classes.dir}
         ${bnb-files}" />
 		</java>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!--                          Compile Scheduler                       -->
+	<!--  =============================================================== -->
+	
+	<target name="scheduler" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/scheduler/**/*.java" />
+		</javac>
 	</target>
 
 
