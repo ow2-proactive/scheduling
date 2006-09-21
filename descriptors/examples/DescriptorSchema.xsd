@@ -320,6 +320,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:group ref="ArgGroup" minOccurs="0" maxOccurs="unbounded" />
 			<xs:group ref="MapToVirtualNodeGroup" maxOccurs="unbounded" />
+			<xs:group ref="ClassPathGroup" maxOccurs="unbounded" />					
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" />
 		<xs:attribute name="id" type="xs:string" use="required" />
@@ -328,6 +329,11 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:group name="ArgGroup">
 		<xs:sequence>
 			<xs:element name="arg" type="ArgType" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="ClassPathGroup">
+		<xs:sequence>
+			<xs:element name="classpath" type="ClasspathType" minOccurs="0" />
 		</xs:sequence>
 	</xs:group>
 	<!--a arg is defined by a required value attribute, containing the argument.-->
@@ -588,6 +594,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:choice>
 			<xs:element name="RMIRegistryLookup" type="RMIRegistryLookupType" />
 			<xs:element name="P2PService" type="P2PServiceType" />
+			<xs:element name="ProActiveScheduler" type="ProActiveSchedulerType" />
 			<xs:element name="faultTolerance" type="faultToleranceType" />
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required" />
@@ -624,6 +631,21 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="RMIRegistryLookupType">
 		<xs:attribute name="url" type="xs:string" use="required" />
 	</xs:complexType>
+	<!-- ProActiveScheduler has no childs. It has only 3 attributes:
+		numberOfNodes: an estimate of the number of nodes needed 
+			to start the application. This number may be altered at runtime,
+			if the job needs to have more ressources.
+		schedulerUrl: the url of the scheduler. By default we connect to the
+			following url: rmi://localhost:1234
+		jvmParameters: JVM parameters, mainly system variables, that need to
+			be submitted.
+	--> 
+	<xs:complexType name="ProActiveSchedulerType">
+		<xs:attribute name="numberOfNodes" type="xs:positiveInteger" use="required" />
+		<xs:attribute name="minNumberOfNodes" type="xs:positiveInteger" use="optional" />
+		<xs:attribute name="schedulerUrl" type="xs:string" use="optional" />
+		<xs:attribute name="jvmParameters" type="xs:string" use="optional" />
+	</xs:complexType>	
 	<!-- P2PService has one child peerSet that represents a set of peer's url.
 	It has also 6 attributes: 
 		nodesAsked: that represents the number of nodes requested, 
@@ -906,7 +928,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess" />
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional" />
 		<xs:attribute name="hostname" type="xs:string" use="required" />
-		<xs:attribute name="username" type="xs:string" use="optional" />
+		<xs:attribute name="username" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
 	<xs:complexType name="BsubProcessType">
