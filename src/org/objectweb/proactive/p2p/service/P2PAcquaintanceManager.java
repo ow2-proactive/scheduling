@@ -67,7 +67,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     private P2PService localService = null;
     private P2PService acquaintances = null;
     private P2PService acquaintancesActived = null;
-    private Group groupOfAcquaintances = null;
+    private Group<P2PService> groupOfAcquaintances = null;
     private static final long TTU = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_TTU));
     private static final int NOA = Integer.parseInt(System.getProperty(
@@ -225,13 +225,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     public P2PService randomPeer() {
         int random = this.randomizer.nextInt(this.groupOfAcquaintances.size());
-        return (P2PService) this.groupOfAcquaintances.get(random);
+        return this.groupOfAcquaintances.get(random);
     }
 
     /**
      * @return the list of current acquaintances.
      */
-    public Vector getAcquaintanceList() {
-        return new Vector(this.groupOfAcquaintances);
+    public Vector<P2PService> getAcquaintanceList() {
+        return new Vector<P2PService>(this.groupOfAcquaintances);
     }
 }
