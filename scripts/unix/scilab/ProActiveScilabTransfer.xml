@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+        <variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="ProActive_RELEASE"/>
+		<descriptorVariable name="REMOTE_HOME" value="/user/amangin/home"/>
+		<descriptorVariable name="SCILAB_HOME" value="scilab-4.0"/>
+	        <descriptorVariable name="SCILAB_HOME0" value="scilab0"/>
+	        <descriptorVariable name="SCILAB_HOME1" value="scilab1"/>
+	        <descriptorVariable name="SCILAB_HOME2" value="scilab2"/>
+	</variables>
+        <componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="ScilabVN" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="ScilabVN">
+				<jvmSet>
+                                        <vmName value="Jvm0"/>
+                                      <!--  <vmName value="Jvm1"/>
+					<vmName value="Jvm2"/> -->
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+	                <jvm name="Jvm0">
+				<creation>
+					<processReference refid="rsh_predadab0"/> 
+				</creation>
+			</jvm>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="rsh_predadab1"/> 
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+                                 	<processReference refid="rsh_predadab2"/> 
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+        <fileTransferDefinitions>
+              <fileTransfer id="ScilabTransfer0">
+                    <dir src="${SCILAB_HOME}" dest="${SCILAB_HOME0}"/>
+              </fileTransfer>
+        </fileTransferDefinitions>
+        <fileTransferDefinitions>
+              <fileTransfer id="ScilabTransfer1">
+                    <dir src="${SCILAB_HOME}" dest="${SCILAB_HOME1}"/>
+              </fileTransfer>
+        </fileTransferDefinitions>
+        <fileTransferDefinitions>
+              <fileTransfer id="ScilabTransfer2">
+                    <dir src="${SCILAB_HOME}" dest="${SCILAB_HOME2}"/>
+              </fileTransfer>
+        </fileTransferDefinitions>
+
+	<infrastructure>
+		<processes>
+			<processDefinition id="scilabJVM">
+			    <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+                              <classpath>
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/jsch.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" />
+				   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes"/>
+                                   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/scilab/javasci.jar" />
+                               </classpath>
+                               <javaPath>
+                                   <absolutePath value="/user/gchazara/home/NOSAVE/java/jvm/bin/java" />
+                               </javaPath>
+                               <policyFile>
+                                   <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive.java.policy" />
+                                </policyFile>
+                                <log4jpropertiesFile>
+				    <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive-log4j" />
+				</log4jpropertiesFile>
+                              </jvmProcess>
+			</processDefinition>
+                         <processDefinition id="rsh_predadab0">
+                            <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
+                               <environment>
+                                    <variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME0}"/>
+                                    <variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME0}"/>
+                                    <variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME0}/bin"/>
+                                </environment>
+                               <processReference refid="scilabJVM"/>
+                               <fileTransferDeploy refid="ScilabTransfer0">
+                                    <copyProtocol>rcp</copyProtocol>
+                                    <sourceInfo prefix="${REMOTE_HOME}" />
+                                    <destinationInfo prefix="${REMOTE_HOME}"/>
+                               </fileTransferDeploy>
+                           </rshProcess>
+                       </processDefinition>
+			<processDefinition id="rsh_predadab1">
+                            <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
+                               <environment>
+                                    <variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+                                    <variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+                                    <variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+                                </environment>
+                               <processReference refid="scilabJVM"/>
+                              <!-- <fileTransferDeploy refid="ScilabTransfer1">
+                                    <copyProtocol>rcp</copyProtocol>
+                                    <sourceInfo prefix="${REMOTE_HOME}" />
+                                    <destinationInfo prefix="${REMOTE_HOME}"/>
+                               </fileTransferDeploy> --> 
+              
+                           </rshProcess>
+                       </processDefinition>
+	              <processDefinition id="rsh_predadab2">
+                            <rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
+                               <environment>
+                                    <variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+                                    <variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+                                    <variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+                                </environment>
+                               <processReference refid="scilabJVM"/>
+                             <!--   <fileTransferDeploy refid="ScilabTransfer2">
+                                    <copyProtocol>rcp</copyProtocol>
+                                    <sourceInfo prefix="${REMOTE_HOME}" />
+                                    <destinationInfo prefix="${REMOTE_HOME}"/> 
+                               </fileTransferDeploy>  -->
+                              <!-- <fileTransferDeploy refid="ScilabScriptTransfer">
+                                    <copyProtocol>rcp</copyProtocol>
+                                    <sourceInfo prefix="..." />
+                                    <destinationInfo prefix="..."/>
+                               </fileTransferDeploy>  -->
+                           </rshProcess>
+                       </processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
