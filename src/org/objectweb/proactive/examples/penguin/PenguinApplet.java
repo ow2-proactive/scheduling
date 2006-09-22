@@ -327,12 +327,12 @@ public class PenguinApplet extends StandardFrame
         }
 
         public void setItinerary(String itinerary) {
-            java.util.ArrayList itineraryList = new java.util.ArrayList();
+            java.util.ArrayList<String> itineraryList = new java.util.ArrayList<String>();
             java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(itinerary,
                     "\n");
             while (tokenizer.hasMoreTokens())
                 itineraryList.add(tokenizer.nextToken());
-            String[] intineraryArray = (String[]) itineraryList.toArray(new String[0]);
+            String[] intineraryArray = itineraryList.toArray(new String[0]);
             penguin.setItinerary(intineraryArray);
         }
 
