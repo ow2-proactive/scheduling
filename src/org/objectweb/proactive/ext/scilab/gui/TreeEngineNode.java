@@ -3,7 +3,6 @@ package org.objectweb.proactive.ext.scilab.gui;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class TreeEngineNode extends DefaultMutableTreeNode{
-
 	public static final int VALID = 0, SUSPECT = 1;
 	private int state = VALID;
 	

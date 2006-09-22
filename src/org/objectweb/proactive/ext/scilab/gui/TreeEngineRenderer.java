@@ -8,7 +8,6 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 
 public class TreeEngineRenderer extends DefaultTreeCellRenderer {
 	
-	
 	public Component getTreeCellRendererComponent(JTree tree, Object value,
 		      boolean selected, boolean expanded, boolean leaf, int row,
 		      boolean hasFocus) {

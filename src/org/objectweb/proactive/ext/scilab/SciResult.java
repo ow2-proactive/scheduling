@@ -37,6 +37,9 @@ import java.util.Iterator;
 
 import javasci.SciData;
 
+/**
+ * This class represents a Scilab result
+ */
 public class SciResult implements Serializable{
 	public static final int SUCCESS = 0, ABORT = 1;
 	private String id;

@@ -28,10 +28,54 @@
  * 
  * ################################################################
  */ 
-package org.objectweb.proactive.ext.scilab;
-import java.util.EventListener;
+package org.objectweb.proactive.ext.scilab.monitor;
 
-public interface SciEventListener extends EventListener {
-	public void actionPerformed(SciEvent evt);
+import org.objectweb.proactive.ext.scilab.SciEngine;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+
+
+/**
+ * SciEngineInfo contains all methods to access to informations about a Scilab Engine
+ */
+public class SciEngineInfo {
+	private String idEngine;
+	private String idCurrentTask;
+	private SciEngine sciEngine;
+	private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
+	
+	public SciEngineInfo (String idEngine, SciEngine sciEngine, BooleanWrapper isActivate){
+		this.idEngine = idEngine;
+		this.sciEngine = sciEngine;
+		this.isActivate = isActivate;
+	}
+	
+	public String getIdEngine() {
+		return idEngine;
+	}
+
+	public SciEngine getSciEngine() {
+		return sciEngine;
+	}
+	
+	public String getSciEngineUrl(){
+		return ProActive.getActiveObjectNodeUrl(this.sciEngine);
+	}
+
+	public BooleanWrapper getIsActivate() {
+		return isActivate;
+	}
+
+	public void setIsActivate(BooleanWrapper isActivate) {
+		this.isActivate = isActivate;
+	}
+
+	public String getIdCurrentTask() {
+		return idCurrentTask;
+	}
+
+	public void setIdCurrentTask(String idCurrentTask) {
+		this.idCurrentTask = idCurrentTask;
+	}
 }
-

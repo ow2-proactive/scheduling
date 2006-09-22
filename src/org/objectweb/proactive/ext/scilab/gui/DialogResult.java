@@ -88,8 +88,7 @@ public class DialogResult extends javax.swing.JDialog {
 		try {
 			{
 				chooserSave = new JFileChooser();
-				chooserSave.setDialogTitle("Save Scilab Result");
-				
+				chooserSave.setDialogTitle("Save Scilab Result");	
 			}
 			{
 				pnlMain = (JPanel) getContentPane();
@@ -113,9 +112,7 @@ public class DialogResult extends javax.swing.JDialog {
 						{
 							scrollInit = new JScrollPane();
 							pnlInit.add(scrollInit, BorderLayout.CENTER);
-							scrollInit.setPreferredSize(new java.awt.Dimension(
-								500,
-								210));
+							scrollInit.setPreferredSize(new java.awt.Dimension(500, 210));
 							scrollInit.setSize(500, 210);
 							{
 								txtInit = new JTextArea();
@@ -123,8 +120,6 @@ public class DialogResult extends javax.swing.JDialog {
 								txtInit.setEditable(false);
 								txtInit.setEnabled(false);
 							}
-							
-
 						}
 					}
 					{
@@ -247,8 +242,8 @@ public class DialogResult extends javax.swing.JDialog {
 	public void setSaveEnable(boolean isEnable){
 		this.btnSave.setEnabled(isEnable);
 	}
+	
 	private void btnQuitActionPerformed(ActionEvent evt) {
-		
 		this.setVisible(false);
 	}
 	

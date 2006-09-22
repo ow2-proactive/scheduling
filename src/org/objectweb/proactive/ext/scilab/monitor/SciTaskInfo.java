@@ -28,21 +28,26 @@
  * 
  * ################################################################
  */ 
-package org.objectweb.proactive.ext.scilab;
+package org.objectweb.proactive.ext.scilab.monitor;
 
 import java.io.File;
-import java.util.Date;
 
+import org.objectweb.proactive.ext.scilab.SciResult;
+import org.objectweb.proactive.ext.scilab.SciTask;
+
+/**
+ * SciTaskInfo contains all methods to access to informations about a Scilab task
+ */
 public class SciTaskInfo {
 
 	public static final int LOW=0, NORMAL=1, HIGH=2;
-	public static final int SUCCESS = 0, 
-							ABORT = 1, 
-							WAIT = 2, 
-							RUN = 3, 
-							KILL = 4, 
-							CANCEL = 5,
-							REMOVE = 6;
+	public static final int SUCCEEDED = 0, 
+							ABORTED = 1, 
+							PENDING = 2, 
+							RUNNING = 3, 
+							KILLED = 4, 
+							CANCELLED = 5,
+							REMOVED = 6;
 	
 	private int priority = NORMAL;
 	
@@ -56,7 +61,7 @@ public class SciTaskInfo {
 	
 	public SciTaskInfo(SciTask sciTask){
 		this.sciTask = sciTask;
-		this.dateStart = (new Date()).getTime();
+		this.dateStart = System.currentTimeMillis();
 	}
 	public int getPriority() {
 		return priority;
@@ -91,7 +96,7 @@ public class SciTaskInfo {
 	}
 	
 	public void setDateEnd(){
-		this.dateEnd = (new Date()).getTime();
+		this.dateEnd = System.currentTimeMillis();
 	}
 	
 	public long getTimeGlobal(){

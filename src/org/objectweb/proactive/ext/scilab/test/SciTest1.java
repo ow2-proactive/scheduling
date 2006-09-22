@@ -37,7 +37,7 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.ext.scilab.SciDeployEngine;
-import org.objectweb.proactive.ext.scilab.SciEngineWorker;
+import org.objectweb.proactive.ext.scilab.SciEngine;
 import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
 
@@ -57,21 +57,17 @@ public class SciTest1 {
 		task.addDataOut(m3);
 		task.setJob("x = a+b;");
 		
-		SciEngineWorker engine = SciDeployEngine.deploy("Scilab1");
-		BooleanWrapper isActivate = engine.activate();
 		
+		// local deployment
+		SciEngine engine = SciDeployEngine.deploy("ScilabEngine");
+		BooleanWrapper isActivate = engine.activate();
 		
 		if(isActivate.booleanValue()){
 			System.out.println("->Scilab engine is not activate");
 		}
+		
 		SciResult sciResult = engine.execute(task);
-		System.out.println("->test1");
-	
-		
-		
 		ArrayList listResult = sciResult.getList();
-		
-		System.out.println("->test2");
 		
 		SciData result;
 		for(int i=0; i<listResult.size(); i++){
@@ -80,7 +76,7 @@ public class SciTest1 {
 		}
 	
 		
-		System.out.println("->test3");
 		engine.exit();
+		System.exit(0);
 	}
 }

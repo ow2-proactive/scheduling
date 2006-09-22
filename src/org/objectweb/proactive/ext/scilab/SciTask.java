@@ -39,6 +39,9 @@ import java.util.ArrayList;
 
 import javasci.SciData;
 
+/**
+ * This class represents a Scilab task
+ */
 public class SciTask implements Serializable {
 	
 	private String id;

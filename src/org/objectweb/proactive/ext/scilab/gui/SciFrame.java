@@ -79,24 +79,12 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 
 import org.objectweb.proactive.ext.scilab.SciDeployEngine;
-import org.objectweb.proactive.ext.scilab.SciEngineInfo;
-import org.objectweb.proactive.ext.scilab.SciEvent;
-import org.objectweb.proactive.ext.scilab.SciEventListener;
-import org.objectweb.proactive.ext.scilab.SciTaskInfo;
-import org.objectweb.proactive.ext.scilab.ScilabService;
+import org.objectweb.proactive.ext.scilab.monitor.SciEngineInfo;
+import org.objectweb.proactive.ext.scilab.monitor.SciEvent;
+import org.objectweb.proactive.ext.scilab.monitor.SciEventListener;
+import org.objectweb.proactive.ext.scilab.monitor.SciTaskInfo;
+import org.objectweb.proactive.ext.scilab.monitor.ScilabService;
 
-
-
-/**
- * This code was edited or generated using CloudGarden's Jigloo SWT/Swing GUI
- * Builder, which is free for non-commercial use. If Jigloo is being used
- * commercially (ie, by a corporation, company or business for any purpose
- * whatever) then you should purchase a license for each developer using Jigloo.
- * Please visit www.cloudgarden.com for details. Use of Jigloo implies
- * acceptance of these licensing terms. A COMMERCIAL LICENSE HAS NOT BEEN
- * PURCHASED FOR THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED LEGALLY FOR
- * ANY CORPORATE OR COMMERCIAL PURPOSE.
- */
 public class SciFrame extends javax.swing.JFrame {
 	private JMenuBar menuBar;
 	private JSplitPane splitMain2;
@@ -168,8 +156,6 @@ public class SciFrame extends javax.swing.JFrame {
 	private TreeEngineRenderer treeRenderer;
 	private DialogLegend dialogLegend;
 	
-	
-	
 	/**
 	 * Auto-generated main method to display this JFrame
 	 */
@@ -197,27 +183,27 @@ public class SciFrame extends javax.swing.JFrame {
 			public void actionPerformed(SciEvent evt){
 				SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
 				
-				if(sciTaskInfo.getState() == SciTaskInfo.WAIT){
+				if(sciTaskInfo.getState() == SciTaskInfo.PENDING){
 					updateTableTaskWait(sciTaskInfo);
 					return;
 				}
 				
-				if(sciTaskInfo.getState() == SciTaskInfo.CANCEL){
+				if(sciTaskInfo.getState() == SciTaskInfo.CANCELLED){
 					updateTableTaskCancel(sciTaskInfo);
 					return;
 				}
 				
-				if(sciTaskInfo.getState() == SciTaskInfo.RUN){
+				if(sciTaskInfo.getState() == SciTaskInfo.RUNNING){
 					updateTableTaskRun(sciTaskInfo);
 					return;
 				}
 				
-				if(sciTaskInfo.getState() == SciTaskInfo.KILL){
+				if(sciTaskInfo.getState() == SciTaskInfo.KILLED){
 					updateTableTaskKill(sciTaskInfo);
 					return;
 				}
 				
-				if(sciTaskInfo.getState() == SciTaskInfo.SUCCESS || sciTaskInfo.getState() == SciTaskInfo.ABORT){
+				if(sciTaskInfo.getState() == SciTaskInfo.SUCCEEDED || sciTaskInfo.getState() == SciTaskInfo.ABORTED){
 					updateTableTaskEnd(sciTaskInfo);
 					return;
 				}
@@ -619,16 +605,13 @@ public class SciFrame extends javax.swing.JFrame {
 							FlowLayout pnlLogoLayout = new FlowLayout();
 							pnlLogo.setLayout(pnlLogoLayout);
 							pnlLogo.setSize(802, 60);
-							pnlLogo.setPreferredSize(new java.awt.Dimension(
-								802,
-								60));
+							pnlLogo.setPreferredSize(new java.awt.Dimension(802, 60));
 							{
 								pnlProActive = new JPanel() {
 									public void paintComponent(Graphics g) {
 										super.paintComponent(g);
 
-										g
-											.drawImage(
+										g.drawImage(
 												Toolkit
 													.getDefaultToolkit()
 													.getImage(
@@ -646,15 +629,14 @@ public class SciFrame extends javax.swing.JFrame {
 									.setPreferredSize(new java.awt.Dimension(
 										200,
 										30));
-								pnlProActive.setSize(200, 30);
+								pnlProActive.setSize(200, 70);
 							}
 							{
 								pnlScilab = new JPanel() {
 									public void paintComponent(Graphics g) {
 										super.paintComponent(g);
 
-										g
-											.drawImage(
+										g.drawImage(
 												Toolkit
 													.getDefaultToolkit()
 													.getImage(
@@ -1101,7 +1083,7 @@ public class SciFrame extends javax.swing.JFrame {
 		(new Thread(){
 			private String path = pathDescriptor;
 			public void run(){
-				service.deployEngine(nameVn, path, 4);
+				service.deployEngine(nameVn, path);
 				txtLog.append("->Deployment is successfull:" + path + "\n");
 			}
 		}).start();
@@ -1302,7 +1284,7 @@ public class SciFrame extends javax.swing.JFrame {
 		
 		String strTmp;
 		
-		if(sciTaskInfo.getState() == SciTaskInfo.SUCCESS){
+		if(sciTaskInfo.getState() == SciTaskInfo.SUCCEEDED){
 			strTmp = "img/successTask.gif";
 			setStateTreeNode(sciTaskInfo.getIdEngine(), TreeEngineNode.VALID);
 		}
