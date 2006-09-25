@@ -156,23 +156,24 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         ProActiveInterfaceType itfType) {
 
         try {
+        	
+        	if (itfType == null) {
+        		// infer a mock type from signature of representative
+                String name = Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName);
+                String signature = Utils.getInterfaceSignatureFromRepresentativeClassName(representativeClassName);
+                itfType = (ProActiveInterfaceType)ProActiveTypeFactoryImpl.instance().createFcItfType(name, signature, false, false, false);
+        	}
         	String interfaceName = Utils.getMetaObjectComponentRepresentativeClassName(itfType.getFcItfName(), itfType.getFcItfSignature());
-//            String interfaceName = Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName);
-//            String interfaceSignature = Utils.getInterfaceSignatureFromRepresentativeClassName(representativeClassName);
             boolean isFunctionalInterface = (!Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName)
                                                    .endsWith("-controller"));
             CtMethod[] reifiedMethods;
             CtClass generatedCtClass = pool.makeClass(representativeClassName);
             
 
-            //this.fcInterfaceName = fcInterfaceName;
-            //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
-            //                                                    .equals(ComponentParameters.PRIMITIVE);
             List interfacesToImplement = new ArrayList();
 
             // add interface to reify
             CtClass functional_itf = pool.get(itfType.getFcItfSignature());
-//            System.out.println("FROM 2nd pool             : " + Arrays.deepToString(functional_itf.getMethods()));
             
             generatedCtClass.addInterface(functional_itf);
 

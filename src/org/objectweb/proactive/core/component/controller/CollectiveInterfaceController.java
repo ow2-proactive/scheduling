@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 
 /**
  * A collective interface controller is able to check compatibility between 
@@ -10,7 +11,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
  */
 public interface CollectiveInterfaceController {
     
-    public void checkCompatibility(String itfName, ProActiveInterface itf) throws IllegalBindingException;
+    public void ensureCompatibility(ProActiveInterfaceType itfType, ProActiveInterface itf) throws IllegalBindingException;
     
 
 

@@ -245,6 +245,7 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
+  
     /*
      *implements  org.objectweb.fractal.api.Component#getFcInterface(String)}
      */
@@ -370,10 +371,23 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     public int hashCode() {
-        Object result = reifyCall(Object.class.getName(), "hashCode",
-                new Class[] {  }, new Object[] {  },
-                ComponentRequest.STRICT_FIFO_PRIORITY);
-        return ((Integer) result).intValue();
+    	// reified as a standard invocation (not a component one)
+    	Object result;
+		try {
+			result = proxy.reify((MethodCall) MethodCall.getMethodCall(
+			         Class.forName(Object.class.getName()).getDeclaredMethod("hashCode",
+			             new Class[] {}), new Object[] {}));
+	        return ((Integer) result).intValue();
+		} catch (SecurityException e) {
+			throw new ProActiveRuntimeException(e.toString());
+		} catch (NoSuchMethodException e) {
+			throw new ProActiveRuntimeException(e.toString());
+		} catch (ClassNotFoundException e) {
+			throw new ProActiveRuntimeException(e.toString());
+		} catch (Throwable e) {
+			throw new ProActiveRuntimeException(e.toString());
+		}
+
     }
     
 
