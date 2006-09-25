@@ -1,0 +1,54 @@
+#! /bin/sh
+
+source $(dirname $0)/g5k_lib.sh
+source $(dirname $0)/g5k_lib/sites.sh
+
+LOG_HOME=~cmathieu/DONTTOUCH/kadeploy_stats
+
+for ((i=1; i < 8 ; i=i*2 )) ; do
+
+	for j in `seq 0 $((${#CLUSTERS[@]}-1))` ;
+	do
+	        cluster=${CLUSTERS[$j]}
+		KA="-l jleduc -e debian4jul"
+
+		case $cluster in
+	        bordeaux)
+			KA="$KA -p hda3"   ;;
+	        lille)
+			KA="$KA -p sda3"   ;;
+	        lyon)
+			KA="$KA -p hda3"   ;;
+	        nancy)
+			KA="$KA -p sda3"   ;;
+	        orsay)
+			KA="$KA -p sda3"   ;;
+	        parasol.rennes)
+			KA="$KA -p sda3"   ;;
+	        paravent.rennes)
+			KA="$KA -p sda3"   ;;
+	        azur.sophia) 
+			KA="$KA -p hda3"   ;;
+		helios.sophia)
+			KA="$KA -p sda3"   ;;
+        	toulouse)
+			KA="$KA -p sda3"   ;;
+		*)
+			echo "[W] Skipping $cluster"
+			continue
+		esac
+
+		# Temps de deploiment max constat~10 minutes, 15 minutes pour voir large
+		$SSH_CMD $(get_oar_hostname $cluster) oarsub -r $(date "+%Y-%m-%d\ %H:%M:00") -l nodes=$i,walltime=00:15:00 -q deploy
+		sleep 10
+		for host in $(g5k_reservedNodes -s $cluster) ; do KA="$KA -m $host" ; done		
+		
+		LOG_FILE=$LOG_HOME/$cluster/$i/$(date "+%Y-%m-%d_%H%M")
+		mkdir -p $(dirname $LOG_FILE)
+
+		/usr/bin/time --output-file=$LOG_FILE -f "%e" $SSH_CMD $(get_oar_hostname $cluster) kadeploy $KA
+		
+		# Atttention: supprime *TOUTES* les reservations sur le site
+		# g5k_clean -s $cluster -r
+	done
+done
