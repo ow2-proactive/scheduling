@@ -244,6 +244,9 @@ public class JavassistByteCodeStubBuilder {
             createReifiedMethods(generatedClass, reifiedMethods, superClass.isInterface());
 //                        generatedClass.writeFile();
 //                        System.out.println("[JAVASSIST] generated class : " + className);
+
+            // detach to fix some "frozen class" errors encountered in some large scale deployments 
+            generatedClass.detach();
             return generatedClass.toBytecode();
         } catch (Exception e) {
             e.printStackTrace();
