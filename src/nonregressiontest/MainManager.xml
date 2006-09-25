@@ -83,7 +83,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.gathercast.Test"/>			
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.collectiveitf.multicast.classbased.Test"/>
-			<unitTest exclude="yes" class="nonregressiontest.component.migration.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.migration.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.cic.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
