@@ -6,16 +6,18 @@ function print_help {
 	echo -e "Usage: $0 [-f] [-k] [-a|-o|-s cluster]"
 	echo -e "Delete OAR Jobs, kill JVMs & RMI registries and remove OAR logfiles\n"
 	echo -e "\t-f     , Erase OAR log files"
+	echo -e "\t-r     , Delete OAR reservations"
 	echo -e "\t-k     , Kill JVMs & RMI registries on all cluster's nodes"
 	echo -e "\t-c     , Kill JVMs & RMI registries on all reserved nodes"
 	modopt_print_help
 	exit 0
 }
 
-ARGS="ckfh"
+ARGS="ckfhr"
 OPT_F=NO
 OPT_K=NO
 OPT_C=NO
+OPT_R=NO
 
 modopt_parse $ARGS $*
 while getopts "${MODOPT_OPTS}${ARGS}" Option
@@ -24,6 +26,7 @@ do
 	k) OPT_K=YES ;;
 	c) OPT_C=YES ;;
 	f) OPT_F=YES ;;
+	r) OPT_R=YES ;;
 	h) print_help ;;
 	*)
 		modopt_error_handle $Option
@@ -55,19 +58,22 @@ do
 
 	echo -e "\n-> Removing OAR Jobs on $CLUSTER"
 	clean_oarjobs $CLUSTER
+	if [ "$OPT_R" = "YES" ] ; then
+		clean_oarreservations $CLUSTER
+	fi
 
 	if [ "$OPT_K" == "YES" ] ;
 	then
 		echo -e "\n-> Killing JVMs & rmiregistries on each nodes of $CLUSTER"
  	 	$SSH_CMD $(get_oar_hostname $CLUSTER) \
- 			'for i in $(oarnodes | egrep "^\w") ; do echo -e "$i" ; $SSH_CMD $i pkill -9 java   ;done' 
+ 			'for i in $(oarnodes | egrep "^\w") ; do echo -e "$i" ; ssh  -o NumberOfPasswordPrompts=0 $i pkill -9 java   ;done' 
 	fi
 
 	if [ "$OPT_C" == "YES" ] ;
 	then	
 		for i in $(g5k_reservedNodes -s $CLUSTER) ; do
 			echo "[i] Clean -> $i"
-			$SSH_CMD $i killall -9 java rmid 2> /dev/null
+			${SSH_CMD} $i killall -9 java rmid 2> /dev/null
 		done
 	fi
 done

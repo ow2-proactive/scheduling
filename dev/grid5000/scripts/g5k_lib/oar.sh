@@ -13,6 +13,13 @@ function clean_oarjobs {
   		'oarstat | tail +4 | egrep "^[0-9]" | grep -v sleep | grep $USER | cut -d" " -f1 | xargs -n1 oardel 2>&1 |grep -v usage '
 }
 
+# Delete OAR RESERVATIONS owned by $USER
+# Reservation ___ARE___ deleted
+function clean_oarreservations {
+	$SSH_CMD $(get_oar_hostname $1) \
+  		'oarstat | tail +4 | egrep "^[0-9]" | grep sleep | grep $USER | cut -d" " -f1 | xargs -n1 oardel 2>&1 |grep -v usage '
+}
+
 # Delete OAR Jobs owned by $USER
 # Reservation ___ARE___ deleted
 function clean_oarjobs_and_reservations {
