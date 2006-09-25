@@ -7,7 +7,6 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.ResourceManager;
-import org.objectweb.proactive.calcium.Statistics;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.exceptions.ParameterException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
@@ -15,6 +14,7 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
 import org.objectweb.proactive.calcium.skeletons.Farm;
 import org.objectweb.proactive.calcium.skeletons.Seq;
+import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 import org.objectweb.proactive.ext.scilab.SciEngineWorker;
 import org.objectweb.proactive.ext.scilab.SciResult;
 import org.objectweb.proactive.ext.scilab.SciTask;
@@ -77,7 +77,7 @@ public class SciTestCalcium implements Serializable{
 			e.printStackTrace();
 		}
 		
-		Statistics stats = calcium.getStats();
+		StatsGlobal stats = calcium.getStatsGlobal();
 		System.out.println(stats);
 	}
 	
