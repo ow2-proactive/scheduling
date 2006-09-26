@@ -45,13 +45,14 @@
       <binding client="this.i1-multicast" server="a2-3.i1"/>
       <binding client="a2-3.i2" server="b1.i1"/>
       <binding client="a2-2.i2" server="this.i2"/>
-      <controller desc="composite"/>
+      <controller desc="/org/objectweb/proactive/core/component/config/default-component-config.xml"/>
     </component>
     <binding client="this.i1" server="parallel-2.i1-multicast"/>
 <!--    <binding client="this.i1-multicast-multicast" server="a1.i1-multicast"/>-->
  <!--   <binding client="a1.i2" server="this.i2"/>-->
     <binding client="parallel-2.i2" server="this.i2"/>
-    <controller desc="composite"/>
+    <!-- also testing config file -->
+    <controller desc="/org/objectweb/proactive/core/component/config/default-composite-config.xml"/>
   </component>
   <binding client="parallel.i2" server="b2.i1"/>
   <binding client="this.i1-multicast" server="parallel.i1"/>

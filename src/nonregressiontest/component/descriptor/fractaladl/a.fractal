@@ -10,6 +10,6 @@
     </exportedVirtualNode>
   </exportedVirtualNodes>
   <content class="nonregressiontest.component.PrimitiveComponentA"/>
-  <controller desc="primitive"/>
+  <controller desc="/org/objectweb/proactive/core/component/config/default-component-config.xml"/>
   <virtual-node name="VNa" cardinality="multiple"/>
 </definition>
