@@ -135,6 +135,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 return;
             }
             try {
+            	this.urlForLookup = UrlBuilder.buildUrl(this.lookupHost, this.name,
+                      this.lookupProtocol, this.portForLookup);
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
                 this.virtualNode = ProActive.lookupVirtualNode(urlForLookup);
