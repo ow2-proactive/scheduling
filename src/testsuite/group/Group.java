@@ -72,7 +72,7 @@ public class Group {
 
     /** All the tests of a group.
      */
-    private ArrayList tests = new ArrayList();
+    private ArrayList<AbstractTest> tests = new ArrayList<AbstractTest>();
 
     /** To construct a new group with default params.
      */
@@ -86,7 +86,7 @@ public class Group {
     public Group(Group group) {
         logger = ProActiveLogger.getLogger("testsuite");
         this.results = new ResultsCollections(group.getResults());
-        this.tests = new ArrayList(group.tests);
+        this.tests = new ArrayList<AbstractTest>(group.tests);
         this.name = group.name;
         this.description = group.description;
     }
@@ -260,9 +260,9 @@ public class Group {
         if (logger.isDebugEnabled()) {
             logger.debug("Beginning groupTest " + name + "' initialization");
         }
-        Iterator it = tests.iterator();
+        Iterator<AbstractTest> it = tests.iterator();
         while (it.hasNext()) {
-            AbstractTest test = (AbstractTest) it.next();
+            AbstractTest test = it.next();
             test.uponInitOfGroupOfTests();
             if (timer != null) {
                 ((Benchmark) test).setTimer(timer);
@@ -287,9 +287,9 @@ public class Group {
         if (logger.isDebugEnabled()) {
             logger.debug("Beginning groupTest " + name + "' ending");
         }
-        Iterator it = tests.iterator();
+        Iterator<AbstractTest> it = tests.iterator();
         while (it.hasNext()) {
-            AbstractTest test = (AbstractTest) it.next();
+            AbstractTest test = it.next();
             test.uponEndOfGroupOfTests();
         }
         if (logger.isDebugEnabled()) {
@@ -367,7 +367,7 @@ public class Group {
      * @param c the tests to be inserted into this list.
      * @return true if this list changed as a result of the call.
      */
-    public boolean addAll(Collection c) {
+    public boolean addAll(Collection<AbstractTest> c) {
         return tests.addAll(c);
     }
 
@@ -376,7 +376,7 @@ public class Group {
      * @param c tests to be inserted into this list.
      * @return true if this list changed as a result of the call.
      */
-    public boolean addAll(int index, Collection c) {
+    public boolean addAll(int index, Collection<AbstractTest> c) {
         return tests.addAll(index, c);
     }
 
@@ -391,7 +391,7 @@ public class Group {
     /** Returns an iterator over the tests in this list in proper sequence.Returns an iterator over the tests in this list in proper sequence.
      * @return an iterator over the tests in this list in proper sequence.
      */
-    public Iterator iterator() {
+    public Iterator<AbstractTest> iterator() {
         return tests.iterator();
     }
 
@@ -408,7 +408,7 @@ public class Group {
      * @return the test at the specified position in this list.
      */
     public AbstractTest get(int index) {
-        return (AbstractTest) tests.get(index);
+        return tests.get(index);
     }
 
     /** Searches for the first occurence of the given argument, testing for equality using the equals method.
@@ -431,7 +431,7 @@ public class Group {
      * @return the test that was removed from the list.
      */
     public AbstractTest remove(int index) {
-        return (AbstractTest) tests.remove(index);
+        return tests.remove(index);
     }
 
     /** Replaces the test at the specified position in this list with the specified test.
@@ -440,7 +440,7 @@ public class Group {
      * @return the test previously at the specified position.
      */
     public AbstractTest set(int index, AbstractTest test) {
-        return (AbstractTest) tests.set(index, test);
+        return tests.set(index, test);
     }
 
     /** Returns the number of tests in this list.
@@ -456,6 +456,6 @@ public class Group {
      * @return an array containing all of the tests in this list in the correct order.
      */
     public AbstractTest[] toArray() {
-        return (AbstractTest[]) tests.toArray(new AbstractTest[size()]);
+        return tests.toArray(new AbstractTest[size()]);
     }
 }
