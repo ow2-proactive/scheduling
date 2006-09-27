@@ -9,6 +9,6 @@ else
 	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
 fi
 KADEPLOY_ARGS="-e debian4all -p sda3 -l deploy "
-MOUNT_ARGS="nfs.orsay.grid5000.fr:/home/sophia /home/sophia"
+MOUNT_ARGS="frontgdx1:/home/sophia /home/sophia"
 
 . $(dirname $0)/deploy/deploy

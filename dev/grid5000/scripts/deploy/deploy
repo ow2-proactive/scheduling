@@ -34,16 +34,11 @@ do
 	$SSH $ROOT_PASSWD $i  mkdir /home /home/sophia 
 	$SSH $ROOT_PASSWD $i  mount -t nfs -o rsize=1024,wsize=1024  $MOUNT_ARGS
 	
-	if [ "$(cluster2site $CLUSTER)" == "rennes" ] ; then
-		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
-		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
-	elif [ "$(get_cluster $i)" = "orsay" ] || [ "$(get_cluster $i)" = "nancy" ]  ; then
-		$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
-		$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
-	else
-		$SSH $ROOT_PASSWD $i  echo AllowUsers root $USER \>\> /etc/ssh/sshd_config 
-		$SSH $ROOT_PASSWD $i  /etc/init.d/sshd reload
-	fi
+	$SSH $ROOT_PASSWD $i groupadd  -g `id -g` sophia 
+	$SSH $ROOT_PASSWD $i useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+	$SSH $ROOT_PASSWD $i  echo AllowUsers root $USER \>\> /etc/ssh/sshd_config 
+	$SSH $ROOT_PASSWD $i  /etc/init.d/ssh reload
+	$SSH $ROOT_PASSWD $i  /etc/init.d/sshd reload
 
 	# Disable haldaemon on helios to avoid system load
 	if [ "$CLUSTER" = "helios.sophia" ] ; then

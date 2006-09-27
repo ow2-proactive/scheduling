@@ -18,7 +18,8 @@ CLUSTERS=(
 	idpot.grenoble
 	icluster2.grenoble
 	lille
-	lyon
+	capricorne.lyon
+	sagittaire.lyon
 	nancy
 	orsay
 	paraci.rennes
@@ -107,12 +108,13 @@ function get_cluster_from_hostname {
 
 	function lyon_get_cluster {
 		FQDN=$1
-		if [ "$FQDN" == "capricorne.lyon.grid5000.fr" ] ;
-		then
-			echo ""
-		elif [ "$(expr match $FQDN '\(node-[0-9]\{1,2\}.lyon.grid5000.fr\)')" == "$FQDN" ] ;
-		then
-			echo ""
+		if   [ "$FQDN" == "capricorne.lyon.grid5000.fr" ] ; then echo "capricorne" ; 
+		elif [ "$FQDN" == "sagittaire.lyon.grid5000.fr" ] ; then echo "sagittaire" ; 
+
+		elif [ "$(expr match $FQDN '\(node-[0-9]\{1,2\}.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
+			echo "capricorne"
+		elif [ "$(expr match $FQDN '\(sagittaire-[0-9]\{1,2\}.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
+			echo "sagittaire"
 		else
 			echo ERR_PREFIX "lyon_get_cluster, Strange FQDN=$FQDN for lyon site. Aborting" 1>&2
 			exit 1
@@ -242,6 +244,8 @@ function cluster2site {
     tartopom.rennes) echo rennes ;;
     azur.sophia)     echo sophia ;;
     helios.sophia)   echo sophia ;;
+    capricorne.lyon) echo lyon   ;;
+    sagittaire.lyon) echo sagittaire;;
     # Note: each of idpot & icluster2 has its own NFS
     *) 
     	# TODO: Check taht $1 is a valid cluster
@@ -251,16 +255,18 @@ function cluster2site {
 
 function resolv_cluster_alias {
   case $1 in
-	helios)   echo helios.sophia     ;;
-	azur)     echo azur.sophia       ;;
-	paraci)   echo paraci.rennes     ;;
-	parasol)  echo parasol.rennes    ;;
-	paravent) echo paravent.rennes   ;;
-	tartopom) echo tartopom.rennes   ;;
-	idpot)    echo idpot.grenoble    ;;
-	icluster2)echo icluster2.grenoble;;
-	gdx)      echo orsay             ;;
-	grillon)  echo nancy             ;;
+	helios)    echo helios.sophia     ;;
+	azur)      echo azur.sophia       ;;
+	paraci)    echo paraci.rennes     ;;
+	parasol)   echo parasol.rennes    ;;
+	paravent)  echo paravent.rennes   ;;
+	tartopom)  echo tartopom.rennes   ;;
+	idpot)     echo idpot.grenoble    ;;
+	icluster2) echo icluster2.grenoble;;
+	gdx)       echo orsay             ;;
+	grillon)   echo nancy             ;;
+	capricorne)echo capricorne.lyon   ;;
+	sagittaire)echo sagittaire.lyon   ;;
 	*) 
 		# TODO: Check that $1 is a valid cluster
 		echo $1
@@ -298,7 +304,8 @@ function get_kadeploy_part {
 	case $CLUSTER in 
 	bordeaux)          echo "hda3" ;;
 	lille)             echo "sda3" ;;
-	lyon)              echo "hda9" ;;
+	capricorne.lyon)   echo "hda9" ;;
+	sagittaire.lyon)   echo "sda3" ;;
 	nancy)             echo "sda3" ;;
 	orsay)             echo "sda3" ;;
 	parasol.rennes)    echo "sda3" ;;
