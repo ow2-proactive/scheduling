@@ -1,0 +1,71 @@
+#! /bin/sh
+
+source $(dirname $0)/g5k_lib.sh
+
+function print_help {
+	echo -e "Usage: $0 [-a|-o|-s cluster]"
+	echo -e "Deploy a debian4jul image on given sites\n"
+	modopt_print_help
+	exit 1
+}
+
+ARGS="h"
+
+modopt_parse $ARGS $*
+while getopts "${MODOPT_OPTS}${ARGS}" Option
+do
+	case $Option in
+	h) print_help ;;
+	*)
+		modopt_error_handle $Option
+		if [ "$?" -eq 0 ] ; then
+			echo -e "Invalid option: $Option" 1>&2
+			print_help
+			exit 1
+		fi
+	;;
+	esac
+done
+
+SSH=$(dirname $0)/deploy/ssh_autologin.exp
+
+for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
+do
+	CLUSTER=${OPTIONS_CLUSTERS[$i]}
+	echo CLUSTER=$CLUSTER
+	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
+	echo NODES=$NODES
+	KADEPLOY_ARGS="-l jleduc -e debian4jul -p $(get_kadeploy_part $CLUSTER)"
+
+	for j in $NODES ; do KADEPLOY_ARGS="$KADEPLOY_ARGS -m $j " ; done
+	echo $KADEPLOY_ARGS
+	ssh $(get_oar_hostname $CLUSTER) kadeploy $KADEPLOY_ARGS &
+
+done
+
+while true ; do
+	echo ++++++++++++++++++++++++
+	ps aux | grep $USER | grep kadeploy
+	
+	if [ "$(ps aux | grep $USER | grep kadeploy|grep -v grep)" = "" ] ; then break ; fi
+	sleep 15
+done
+
+echo "////////////// CONF"
+for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
+do
+	CLUSTER=${OPTIONS_CLUSTERS[$i]}
+	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
+	
+	for j in $NODES ; 
+	do 
+		# WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
+		# PLEASE SHUT UP !
+		#sed -i "s/^$j.*//"  ~/.ssh/known_hosts
+		rm  ~/.ssh/known_hosts
+
+		$SSH $ROOT_PASSWD $j groupadd  -g `id -g` sophia 
+		$SSH $ROOT_PASSWD $j useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+	done
+done
+
