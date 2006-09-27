@@ -292,6 +292,29 @@ function allow_direct_ssh {
 	return 1
 }
 
+function get_kadeploy_part {
+	CLUSTER=$1
+	
+	case $CLUSTER in 
+	bordeaux)          echo "hda3" ;;
+	lille)             echo "sda3" ;;
+	lyon)              echo "hda9" ;;
+	nancy)             echo "sda3" ;;
+	orsay)             echo "sda3" ;;
+	parasol.rennes)    echo "sda3" ;;
+	paravent.rennes)   echo "sda3" ;;
+	azur.sophia)       echo "hda3" ;;
+	helios.sophia)     echo "sda3" ;;
+	toulouse)          echo "sda3" ;;
+	*) echo "[E] $cluster is not KADEPLOYABLE" 1>&2
+	   return 1
+	   ;;
+	
+	esac
+	   
+return 0
+}
+
 LOCAL_CLUSTER=$(get_cluster)
 LOCAL_SITE=$(cluster2site $LOCAL_CLUSTER)
 
