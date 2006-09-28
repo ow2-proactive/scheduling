@@ -1,0 +1,99 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
+package org.objectweb.proactive.jmx.client;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
+
+import org.objectweb.proactive.jmx.ProActiveConnection;
+import org.objectweb.proactive.jmx.ProActiveJMXConstants;
+
+
+/**
+ *  This class creates a JMX client connector whose communication protocol is ProActive
+ * @author ProActive Team
+ *
+ */
+public class ClientConnector {
+    private ProActiveConnection connection;
+    private JMXConnector connector;
+    private String url;
+
+    /**
+     * Creates a ClientConnector and connect to the remote JMX MBean Server whose at the specified url
+     * @param url The ProActive JMX connector url ( for example localhost:8080 )
+     */
+    public ClientConnector(String url) {
+        this.url = url;
+        connect();
+    }
+
+    /*
+     *  Connect to the ProActive Connector
+     */
+    private void connect() {
+        try {
+            /*  build the jmx Url */
+            this.url = "service:jmx:proactive://" + this.url +
+                ProActiveJMXConstants.SERVER_REGISTERED_NAME;
+            JMXServiceURL jmxUrl = new JMXServiceURL(url);
+            /* connect to the connector server  */
+            this.connector = JMXConnectorFactory.connect(jmxUrl,
+                    ProActiveJMXConstants.PROACTIVE_JMX_ENV);
+            /* retrieve the ProActive Connection that will enable the remote calls onto the remote MBean server */
+            this.connection = (ProActiveConnection) this.connector.getMBeanServerConnection();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *  Returns the ProActiveConnection that will enable the calls onto the remote MBean Server
+     * @return the JMX ProActive Connection
+     */
+    public ProActiveConnection getConnection() {
+        return this.connection;
+    }
+
+    /**
+     * Returns the ProActive Remote connector that can be used to establish a connection to a connector server.
+     * @returnthe ProActive JMX Connector Server
+     */
+    public JMXConnector getConnector() {
+        return this.connector;
+    }
+}
