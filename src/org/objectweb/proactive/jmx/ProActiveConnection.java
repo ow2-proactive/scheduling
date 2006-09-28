@@ -63,8 +63,8 @@ import javax.management.ObjectName;
 import javax.management.QueryExp;
 import javax.management.ReflectionException;
 
+import org.objectweb.proactive.core.util.wrapper.ObjectWrapper;
 import org.objectweb.proactive.jmx.listeners.ListenerAdapter;
-import org.objectweb.proactive.osgi.management.wrapper.ObjectWrapper;
 
 
 /**
