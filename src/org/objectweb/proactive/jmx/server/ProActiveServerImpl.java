@@ -1,0 +1,93 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
+
+/*
+ * Created on May 3, 2005
+ *
+ * To change the template for this generated file go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ */
+package org.objectweb.proactive.jmx.server;
+
+import java.io.Serializable;
+
+import javax.management.MBeanServer;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.jmx.ProActiveConnection;
+import org.objectweb.proactive.jmx.ProActiveJMXConstants;
+
+
+/**
+ *
+ * @author vlegrand
+ */
+public class ProActiveServerImpl implements Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -5189383875728195134L;
+    private transient MBeanServer mbeanServer;
+
+    public String getVersion() {
+        return ProActiveJMXConstants.VERSION;
+    }
+
+    /**
+     *
+     * @param credential
+     * @return
+     */
+    public ProActiveConnection newClient(Object credential) {
+        ProActiveConnection client = null;
+        try {
+            client = new ProActiveConnection(this.mbeanServer);
+            client = (ProActiveConnection) ProActive.turnActive(client);
+            return client;
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        }
+        return client;
+    }
+
+    public synchronized void setMBeanServer(MBeanServer mbs) {
+        this.mbeanServer = mbs;
+    }
+
+    public synchronized MBeanServer getMBeanServer() {
+        return mbeanServer;
+    }
+}
