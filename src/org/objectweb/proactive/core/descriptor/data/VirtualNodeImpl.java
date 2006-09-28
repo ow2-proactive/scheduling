@@ -121,7 +121,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private String property;
 
     /** the list of remote virtual machines associated with this VirtualNode */
-    private java.util.ArrayList virtualMachines;
+    private java.util.ArrayList<VirtualMachine> virtualMachines;
 
     /** the list of local virtual machine (normally one) associated with this VirtualNode */
     private java.util.ArrayList localVirtualMachines;
@@ -164,7 +164,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private boolean nodeCreated = false;
     private boolean isActivated = false;
 
-    /** the list of VitualNodes Id that this VirualNode is waiting for in order to create Nodes on a JVM
+    /** the list of VirtualNodes Id that this VirualNode is waiting for in order to create Nodes on a JVM
      * already assigned in the XML descriptor */
     private Hashtable awaitedVirtualNodes;
     private String registrationProtocol;
@@ -230,8 +230,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             this.name = name;
         }
 
-        virtualMachines = new java.util.ArrayList(5);
-        localVirtualMachines = new java.util.ArrayList();
+        virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
+        localVirtualMachines = new java.util.ArrayList<VirtualMachine>();
         createdNodes = new java.util.ArrayList();
         createdRuntimeF = new ArrayList();
         awaitedVirtualNodes = new Hashtable();
@@ -312,7 +312,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //we need to do it here otherwise event could occurs, whereas vm 's creator id is not in the hash map
             //just synchro pb, this workaround solves the pb
         }
-
+        
         if (logger.isDebugEnabled()) {
             logger.debug("mapped VirtualNode=" + name +
                 " with VirtualMachine=" + virtualMachine.getName());
