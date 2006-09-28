@@ -33,9 +33,8 @@ package org.objectweb.proactive.jmx.server;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
@@ -51,57 +50,59 @@ import com.sun.jmx.remote.util.EnvHelp;
 
 
 /**
- * @author Virginie Legrand - INRIA
+ * This connector server is attached to an MBean server.
+ * It listens for client connection
+ * requests and creates a connection for each one.</p>
+ *
+ * @author ProActive Team
  */
 public class ProActiveConnectorServer extends JMXConnectorServer {
     private JMXServiceURL address;
     private ProActiveServerImpl paServer;
-    private Map attributes;
+    private Map<String, Object> attributes;
     private static final int CREATED = 0;
     private static final int STARTED = 1;
     private static final int STOPPED = 2;
     private int state = CREATED;
-    private final static Set openedServers = new HashSet();
 
     /**
-     *
-     * @param url
-     * @param environment
+     * Creates a ProActiveConnectorServer
+     * @param url The connector url
+     * @param environment the connector environnement, i.e., the package location of the ServerProvider
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url, Map environment)
+    public ProActiveConnectorServer(JMXServiceURL url, Map<String, Object> environment)
         throws IOException {
         this(url, environment, (MBeanServer) null);
     }
 
     /**
-     *
-     * @param url
-     * @param environment
-     * @param mbeanServer
+     * Creates a ProActiveConnectorServer
+     * @param url The connector url
+     * @param  environment the connector environnement, i.e., the package location of the ServerProvider
+     * @param mbeanServer the MBean server bound with the connector
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url, Map environment,
+    public ProActiveConnectorServer(JMXServiceURL url, Map<String, Object> environment,
         MBeanServer mbeanServer) throws IOException {
         this(url, environment, (ProActiveServerImpl) null, mbeanServer);
     }
 
     /**
-     *
-     * @param url
-     * @param environment
-     * @param paServer
-     * @param mbeanServer
+     * Creates a ProActiveConnectorServer
+     * @param url The connector url
+     * @param  environment the connector environnement, i.e., the package location of the ServerProvider
+     * @param paServer the proActive JMX Server that
+     * @param mbeanServer the MBean server bound with the connector
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url, Map environment,
+    public ProActiveConnectorServer(JMXServiceURL url, Map<String, Object> environment,
         ProActiveServerImpl paServer, MBeanServer mbeanServer)
         throws IOException {
         super(mbeanServer);
         if (url == null) {
             throw new IllegalArgumentException("Null JMXService URL");
         }
-
         if (paServer == null) {
             final String prt = url.getProtocol();
             if ((prt == null) || !(prt.equals("proactive"))) {
@@ -110,9 +111,8 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
             }
 
             final String urlPath = url.getURLPath();
-
             if (environment == null) {
-                this.attributes = Collections.EMPTY_MAP;
+                this.attributes = new HashMap<String, Object> ();
             } else {
                 this.attributes = Collections.unmodifiableMap(environment);
                 EnvHelp.checkAttributes(this.attributes);
@@ -127,11 +127,11 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * Calling this method when the connector server is already active has no effect.
      *  Calling this method when the connector server has been stopped will generate an IOException.
      *  The behaviour of this method when called for the first time depends on the parameters that were supplied at construction, as described below.
-                 First, an object of a subclass of ProActiveServerImpl is required, to export the connector server through ProActive:
-                 If an ProActiveServerImpl was supplied to the constructor, it is used.
+       * First, an object of a subclass of ProActiveServerImpl is required, to export the connector server through ProActive:
+        * If an ProActiveServerImpl was supplied to the constructor, it is used.
      */
 
-    //C'est lui qui expose l'objet actif  qui va gerer les connexions
+    //exposes the active object
     public synchronized void start() throws IOException {
         if (this.state == STARTED) {
             return;
@@ -155,12 +155,8 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
             e.printStackTrace();
         }
 
-        System.out.println(
-            "Enregistrement du Server JMX pour acces a distance ...");
-
-        //enregistrement de l'objet
+        //Server registrations
         String url = ClassServer.getUrl();
-        System.out.println("url = " + url);
         url += ProActiveJMXConstants.SERVER_REGISTERED_NAME;
         ProActive.register(this.paServer, url);
         state = STARTED;
@@ -170,16 +166,15 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * Deactivates the connector server, that is, stops listening for client connections.
      * Calling this method will also close all client connections that were made by this server.
      * After this method returns, whether normally or with an exception, the connector server will not create any new client connections.
-             Once a connector server has been stopped, it cannot be started again.
-             Calling this method when the connector server has already been stopped has no effect.
-             Calling this method when the connector server has not yet been started will disable the connector server object permanently.
-             If closing a client connection produces an exception, that exception is not thrown from this method.
-             A JMXConnectionNotification is emitted from this MBean with the connection ID of the connection that could not be closed.
-             Closing a connector server is a potentially slow operation. For example, if a client machine with an open connection has crashed, the close operation might have to wait for a network protocol timeout. Callers that do not want to block in a close operation should do it in a separate thread.
-             This method calls the method close on the connector server's RMIServerImpl object.
+     * Once a connector server has been stopped, it cannot be started again.
+     * Calling this method when the connector server has already been stopped has no effect.
+     * Calling this method when the connector server has not yet been started will disable the connector server object permanently.
+     *  If closing a client connection produces an exception, that exception is not thrown from this method.
+     *  A JMXConnectionNotification is emitted from this MBean with the connection ID of the connection that could not be closed.
+     *  Closing a connector server is a potentially slow operation. For example, if a client machine with an open connection has crashed, the close operation might have to wait for a network protocol timeout. Callers that do not want to block in a close operation should do it in a separate thread.
      */
-    public void stop() throws IOException {
-        this.paServer = null;
+    public void stop()  {
+        this.paServer = null;        
         this.state = STOPPED;
     }
 
@@ -199,7 +194,10 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         return this.address;
     }
 
-    public Map getAttributes() {
+    /**
+     * Returns the attributes of this connector
+     */
+    public Map<String, Object> getAttributes() {
         return this.attributes;
     }
 }

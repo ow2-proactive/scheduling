@@ -49,27 +49,36 @@ import org.objectweb.proactive.jmx.ProActiveJMXConstants;
 
 
 /**
- *
+ * The active object representing the connector. This object is responsible of creating ProActive JMX Connections
  * @author vlegrand
  */
-public class ProActiveServerImpl implements Serializable {
 
-    /**
-         *
-         */
+/**
+ * @author vlegrand
+ *
+ */
+
+/**
+ * @author vlegrand
+ *
+ */
+public class ProActiveServerImpl implements Serializable {
     private static final long serialVersionUID = -5189383875728195134L;
     private transient MBeanServer mbeanServer;
 
+    /**
+     *  The ProActive Connector version
+     * @return
+     */
     public String getVersion() {
         return ProActiveJMXConstants.VERSION;
     }
 
     /**
-     *
-     * @param credential
-     * @return
+     * Returns a new ProActive Connection
+     * @return a ProActive Connection that will enables remote calls onto the remote MBean Server
      */
-    public ProActiveConnection newClient(Object credential) {
+    public ProActiveConnection newClient() {
         ProActiveConnection client = null;
         try {
             client = new ProActiveConnection(this.mbeanServer);
@@ -83,10 +92,17 @@ public class ProActiveServerImpl implements Serializable {
         return client;
     }
 
+    /**
+     * Sets the MBean server attached to the connector
+     * @param mbs The MBean Server bounfd with the connector
+     */
     public synchronized void setMBeanServer(MBeanServer mbs) {
         this.mbeanServer = mbs;
     }
 
+    /**
+     * @return the Mbean Server bound with  the connector
+     */
     public synchronized MBeanServer getMBeanServer() {
         return mbeanServer;
     }

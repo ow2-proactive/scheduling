@@ -32,19 +32,17 @@ package org.objectweb.proactive.jmx.server;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
-import org.objectweb.proactive.osgi.connector.Activator;
+import org.objectweb.proactive.jmx.ProActiveJMXConstants;
 
 
 /**
- *
+ *  Creates and register a ProActive JMX Connector Server
  * @author ProActive Team
  *
  */
@@ -52,11 +50,13 @@ public class ServerConnector {
     private MBeanServer mbs;
 
     /**
-     *
+     * Creates and register a ProActive JMX Connector attached to the platform MBean Server.
      *
      */
     public ServerConnector() {
+        /*Retrieve the Platform MBean Server */
         this.mbs = ManagementFactory.getPlatformMBeanServer();
+
         try {
             useProActiveConnector("service:jmx:proactive:///jndi/proactive://localhost/server",
                 this.mbs);
@@ -65,40 +65,18 @@ public class ServerConnector {
         }
     }
 
-    /**
-     *
-     * @param url
-     * @param mbs
-     * @throws IOException
-     */
+    /* Starts the connector */
     private void useProActiveConnector(String url, MBeanServer mbs)
         throws IOException {
-        JMXServiceURL url2 = new JMXServiceURL(url);
-        Map env = new HashMap();
+        JMXServiceURL jmxUrl = new JMXServiceURL(url);
 
-        //Utile ???
-        Thread.currentThread()
-              .setContextClassLoader(Activator.class.getClassLoader());
-        env.put("jmx.remote.protocol.provider.pkgs",
-            "org.objectweb.proactive.jmx.provider");
-        JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(url2,
-                env, this.mbs);
+        //Useful???
+        //        Thread.currentThread()
+        //              .setContextClassLoader(Activator.class.getClassLoader());
+        JMXConnectorServer cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl,
+                ProActiveJMXConstants.PROACTIVE_JMX_ENV, this.mbs);
+
+        //starts the JMX Connector
         cs.start();
-
-        /***    ****/
     }
-    //    public void bindProActiveService(ProActiveService service) {
-    //    	System.out.println("bindProActiveSErvice connector");
-    //        try {
-    //            useProActiveConnector("service:jmx:proactive:///jndi/proactive://localhost:8080/server",
-    //                this.mbs);
-    //        } catch (NullPointerException e) {
-    //            e.printStackTrace();
-    //        } catch (IOException e) {
-    //            e.printStackTrace();
-    //        }
-    //    }
-    //
-    //    public void unbindProActiveService(ProActiveService service) {
-    //    }
 }
