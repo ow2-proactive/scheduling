@@ -49,7 +49,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
  */
 public class LocalNode {
     private String name;
-    private ArrayList activeObjectsId;
+    private ArrayList<UniqueID> activeObjectsId;
     private String jobId;
     private ProActiveSecurityManager securityManager;
     private String virtualNodeName;
@@ -61,7 +61,7 @@ public class LocalNode {
         this.jobId = jobId;
         this.securityManager = securityManager;
         this.virtualNodeName = virtualNodeName;
-        this.activeObjectsId = new ArrayList();
+        this.activeObjectsId = new ArrayList<UniqueID>();
         this.localProperties = new Properties();
 
         if (this.securityManager != null) {
