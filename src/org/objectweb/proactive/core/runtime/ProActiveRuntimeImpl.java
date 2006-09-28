@@ -119,7 +119,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static ProActiveSecurityManager runtimeSecurityManager;
 
     // map of local nodes, key is node name
-    private java.util.Hashtable nodeMap;
+    private java.util.Hashtable<String,LocalNode> nodeMap;
     private String defaultNodeVirtualNode = null;
 
     //
@@ -153,7 +153,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet());
             this.virtualNodesMap = new java.util.Hashtable();
             this.descriptorMap = new java.util.Hashtable();
-            this.nodeMap = new java.util.Hashtable();
+            this.nodeMap = new java.util.Hashtable<String,LocalNode>();
 
             try {
                 String file = System.getProperties()
