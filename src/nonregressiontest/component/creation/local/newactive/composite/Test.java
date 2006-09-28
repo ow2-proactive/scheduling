@@ -113,6 +113,14 @@ public class Test extends ComponentTest {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
+
+        // check that composites with no functional interface can be instantiated
+        ComponentType voidType = type_factory.createFcType(new InterfaceType[] {  });
+        Component voidComposite = cf.newFcInstance(voidType,
+                new ControllerDescription("void composite", Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }));
+
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                     type_factory.createFcItfType("i1", I1.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -165,5 +173,29 @@ public class Test extends ComponentTest {
         String c2_name = Fractal.getNameController(c2).getFcName();
         return (p1_name.equals(P1_NAME) && p2_name.equals(P2_NAME) &&
         c1_name.equals(C1_NAME) && c2_name.equals(C2_NAME));
+    }
+
+    public static void main(String[] args) {
+        System.setProperty("fractal.provider",
+            "org.objectweb.proactive.core.component.Fractive");
+        System.setProperty("java.security.policy",
+            System.getProperty("user.dir") + "/proactive.java.policy");
+        System.setProperty("log4j.configuration",
+            System.getProperty("user.dir") + "/proactive-log4j");
+        System.setProperty("log4j.configuration",
+            "file:" + System.getProperty("user.dir") + "/proactive-log4j");
+        System.setProperty("nonregressiontest.descriptor.defaultnodes.file",
+            "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+        Test test = new Test();
+        try {
+            test.action(null);
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
