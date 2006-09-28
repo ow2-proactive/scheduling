@@ -31,6 +31,11 @@
 package org.objectweb.proactive.ext.security.exceptions;
 
 public class IncompatiblePolicyException extends RuntimeException {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6479483178883214436L;
+
     public IncompatiblePolicyException() {
         super();
     }

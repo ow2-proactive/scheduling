@@ -38,6 +38,11 @@ package org.objectweb.proactive.ext.security.exceptions;
 public class InvalidPolicyFile extends Exception {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = -9034655159707157738L;
+
+    /**
      *
      */
     public InvalidPolicyFile() {

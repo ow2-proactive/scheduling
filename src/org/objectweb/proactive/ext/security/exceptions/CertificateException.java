@@ -42,6 +42,11 @@ import java.io.Serializable;
 public class CertificateException extends Exception implements Serializable {
 
     /**
+     * 
+     */
+    private static final long serialVersionUID = 3043478553819893720L;
+
+    /**
      *
      */
     public CertificateException() {
