@@ -95,6 +95,7 @@
 			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
 		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>
+		    <unitTest exclude="no" class="nonregressiontest.loadbalancing.Test" />
 	</packageGroup>
 	
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
