@@ -79,7 +79,7 @@ public class Test extends FunctionalTest {
 	}
 
 	public void endTest() throws Exception {
-		
+		LoadBalancing.kill();
 	}
 	
 	public boolean postConditions() throws Exception {
