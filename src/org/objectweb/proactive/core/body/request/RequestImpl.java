@@ -38,8 +38,12 @@ import java.security.cert.X509Certificate;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -47,8 +51,11 @@ import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.exceptions.proxy.ProxyNonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ext.locationserver.LocationServer;
+import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.crypto.Session;
@@ -83,6 +90,13 @@ public class RequestImpl extends MessageImpl implements Request,
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
     
+	/**
+	 * indicates how many times we will try to send the request
+	 */
+	private static final int MAX_TRIES = 15;
+
+	transient protected LocationServer server;
+
     
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -318,14 +332,97 @@ public class RequestImpl extends MessageImpl implements Request,
             //todo remove SecurityNotAvalaible e.printStackTrace();
         }
 
-        int ftres = destinationBody.receiveRequest(this);
+        int ftres = FTManager.NON_FT;
+        try {
+			ftres = destinationBody.receiveRequest(this);
+		} catch (Exception e) {
+			/*
+			 * The exception is catched, we have to try 
+			 * our backupSolution 
+			 */
+			try {
+				backupSolution(destinationBody);
+			}catch (IOException ioex)
+			{
+				throw new IOException(e.getMessage()+ioex.getMessage());
+			}
+		}
 
-        if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) {
             logger.debug(" sending request finished");
         }
-
         return ftres;
     }
+
+    /**
+	 * Implements the backup solution
+	 */
+	protected void backupSolution(UniversalBody destinationBody)
+			throws java.io.IOException {
+		int tries = 0;
+		
+		UniqueID bodyID = destinationBody.getID();
+		while (tries < MAX_TRIES) {
+			UniversalBody remoteBody = null;
+			try {
+				// get the new location from the server
+				UniversalBody mobile = queryServer(bodyID);
+
+				// we want to bypass the stub/proxy
+				FutureProxy futureProxy = (FutureProxy) ((StubObject) mobile)
+				.getProxy();
+				remoteBody = (UniversalBody) futureProxy.getResult();
+				
+				if (remoteBody == null)
+					throw new IOException("remoteBody is null");
+				
+				remoteBody.receiveRequest(this);
+
+				// everything went fine, we have to update the current location
+				// of the object
+				// so that next requests don't go through the server
+				if (sender != null) {
+					sender.updateLocation(bodyID, remoteBody);
+				} else {
+					LocalBodyStore.getInstance()
+							.getLocalBody(getSourceBodyID()).updateLocation(
+									bodyID, remoteBody);
+				}
+				return;
+			} catch (Exception e) {
+				
+				tries++;
+
+				/*
+				 * The location server has been perform to block the request if
+				 * it has to send the same location of the object so we don't
+				 * have to wait between two requests 
+				 * try { Thread.sleep(500); }
+				 * catch (InterruptedException e1) { e1.printStackTrace(); }
+				 */
+				if(tries == MAX_TRIES){
+					logger.error("FAILED = " + " for method " + methodName
+							+ " exception :" + e.getClass().getName());
+				
+					throw new IOException("FAILED = " + " for method " + methodName
+							+ " exception :" + e.getClass().getName()+"("+e.getMessage()+")");
+				}
+			}
+		}
+	}
+
+	protected UniversalBody queryServer(UniqueID bodyID) throws IOException {
+		if (server == null) {
+			server = LocationServerFactory.getLocationServer();
+		}
+		if (server == null){
+			throw new IOException("No server found");
+		}
+		UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+		//logger.info("backupSolution() server has sent an answer");
+		ProActive.waitFor(mobile);
+		return mobile;
+	}
 
     // security issue
     public boolean isCiphered() {
