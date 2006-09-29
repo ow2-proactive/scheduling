@@ -44,6 +44,8 @@ public interface MigrationManager {
     public UniversalBody migrateTo(Node node, Body body)
         throws MigrationException;
 
+    public void changeBodyAfterMigration(MigratableBody body, UniversalBody migratedBody);
+    
     public void startingAfterMigration(Body body);
 
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
@@ -55,4 +57,6 @@ public interface MigrationManager {
     public void addMigrationEventListener(MigrationEventListener listener);
 
     public void removeMigrationEventListener(MigrationEventListener listener);
+    
+    public void setMigrationStrategy(int ttl, boolean updatingForwarder, int maxMigrationNb, int maxTimeOnSite);
 }

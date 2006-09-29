@@ -36,9 +36,10 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyImpl;
-import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.reply.ReplyReceiver;
+import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -57,6 +58,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
+
+    /** The object responsible for the migration */
     protected MigrationManager migrationManager;
 
     /** signal that the body has just migrated */
@@ -78,9 +81,15 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+       
     //
     // -- implements Migratable -----------------------------------------------
     //
+    
+    public boolean hasJustMigrated(){
+    	return this.hasJustMigrated;
+    }
+    
     public UniversalBody migrateTo(Node node) throws MigrationException {
         return internalMigrateTo(node, false);
     }
@@ -100,10 +109,18 @@ public class MigratableBody extends BodyImpl implements Migratable,
             migrationManager.removeMigrationEventListener(listener);
         }
     }
-
+    
+	public MigrationManager getMigrationManager() {
+		return migrationManager;
+	}
+    
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+
+    /**
+     * Signals that the activity of this body, managed by the active thread has just started.
+     */
     protected void activityStarted() {
         super.activityStarted();
 
@@ -122,11 +139,31 @@ public class MigratableBody extends BodyImpl implements Migratable,
             hasJustMigrated = false;
         }
     }
-
+    
+    protected void setRequestReceiver(RequestReceiver requestReceiver){
+    	this.requestReceiver = requestReceiver;
+    }
+    
+    protected void setReplyReceiver(ReplyReceiver replyReceiver){
+    	this.replyReceiver = replyReceiver;
+    }
+    
+    protected void setHasMigrated(){
+    	this.hasJustMigrated = true;
+    }
+    
+    protected RequestReceiver getRequestReceiver(){
+    	return this.requestReceiver;
+    }
+    
+    protected ReplyReceiver getReplyReceiver(){
+    	return this.replyReceiver;
+    }
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    protected UniversalBody internalMigrateTo(Node node, boolean byCopy)
+    private UniversalBody internalMigrateTo(Node node, boolean byCopy)
         throws MigrationException {
         UniqueID savedID = null;
         UniversalBody migratedBody = null;
@@ -232,10 +269,12 @@ public class MigratableBody extends BodyImpl implements Migratable,
             }
             acceptCommunication();
             throw e;
-        }
+        } 
 
         if (!byCopy) {
-            changeBodyAfterMigration(migratedBody);
+        	this.migrationManager.changeBodyAfterMigration(this,migratedBody);
+        	activityStopped();
+            
         } else {
             bodyID = savedID;
             nodeURL = saveNodeURL;
@@ -243,20 +282,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
         acceptCommunication();
 
         return migratedBody;
-    }
-
-    protected void changeBodyAfterMigration(UniversalBody migratedBody) {
-        // cleanup after migration
-        requestReceiver = migrationManager.createRequestReceiver(migratedBody,
-                requestReceiver);
-        replyReceiver = migrationManager.createReplyReceiver(migratedBody,
-                replyReceiver);
-        activityStopped();
-        migrationManager = null;
-
-        // signal that this body (remaining after migration) has just migrated
-        hasJustMigrated = true;
-        LocalBodyStore.getInstance().registerForwarder(this);
     }
 
     //

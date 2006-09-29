@@ -43,4 +43,8 @@ public interface Migratable {
     public void addMigrationEventListener(MigrationEventListener listener);
 
     public void removeMigrationEventListener(MigrationEventListener listener);
+    
+    public boolean hasJustMigrated();
+    
+    public MigrationManager getMigrationManager();
 }
