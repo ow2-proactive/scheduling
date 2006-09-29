@@ -29,24 +29,63 @@
  * ################################################################
  */
 package org.objectweb.proactive.jmx.listeners;
+
 import java.io.IOException;
 
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.remote.JMXConnectionNotification;
-import javax.management.remote.JMXConnector;
+
+import org.objectweb.proactive.jmx.server.ProActiveConnector;
 
 
 /**
+ * This Notification emitter send informations about the state of the connection between connector client and
+ * connector server.
  * @author ProActive Team
  *
  */
 public class ProActiveConnectionNotificationEmitter
     extends NotificationBroadcasterSupport {
     private static long sequenceNumber;
-    private JMXConnector connector;
+    private ProActiveConnector connector;
 
-    public ProActiveConnectionNotificationEmitter(JMXConnector connector) {
+    /**
+     * Constructor for the emitter
+     * @param connector  This emitter is sending notifications about this connector
+     */
+    public ProActiveConnectionNotificationEmitter(ProActiveConnector connector) {
         this.connector = connector;
+        addNotificationListener(connector, null, null);
+    }
+
+    /**
+     * Sends a "Connection opened"  notification to listeners
+     */
+    public void sendConnectionNotificationOpened() {
+        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.OPENED,
+                connector, getConnectionId(), getNextNotificationNumber(),
+                "Connection opened", null);
+        sendNotification(notification);
+    }
+
+    /**
+     *  Sends a "Connection closed" Notification to listeners
+     */
+    public void sendConnectionNotificationClosed() {
+        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.CLOSED,
+                connector, getConnectionId(), getNextNotificationNumber(),
+                "Connection closed", null);
+        sendNotification(notification);
+    }
+
+    /**
+     *  sends a "Connection failed" notification to listeners
+     */
+    public void sendConnectionNotificationFailed() {
+        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.FAILED,
+                connector, getConnectionId(), getNextNotificationNumber(),
+                "Connection failed", null);
+        sendNotification(notification);
     }
 
     private long getNextNotificationNumber() {
@@ -61,33 +100,5 @@ public class ProActiveConnectionNotificationEmitter
         } catch (IOException x) {
             return null;
         }
-    }
-
-    public void sendConnectionNotificationOpened() {
-        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.OPENED,
-                connector, getConnectionId(), getNextNotificationNumber(),
-                "Connection opened", null);
-        sendNotification(notification);
-    }
-
-    public void sendConnectionNotificationClosed() {
-        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.CLOSED,
-                connector, getConnectionId(), getNextNotificationNumber(),
-                "Connection closed", null);
-        sendNotification(notification);
-    }
-
-    public void sendConnectionNotificationFailed() {
-        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.FAILED,
-                connector, getConnectionId(), getNextNotificationNumber(),
-                "Connection failed", null);
-        sendNotification(notification);
-    }
-
-    public void sendConnectionNotificationLost(long howMany) {
-        JMXConnectionNotification notification = new JMXConnectionNotification(JMXConnectionNotification.NOTIFS_LOST,
-                connector, getConnectionId(), getNextNotificationNumber(),
-                "Some notification (" + howMany + ") was lost", null);
-        sendNotification(notification);
     }
 }
