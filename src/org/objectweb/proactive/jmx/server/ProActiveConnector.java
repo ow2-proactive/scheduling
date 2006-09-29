@@ -32,10 +32,13 @@ package org.objectweb.proactive.jmx.server;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Enumeration;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerConnection;
+import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.remote.JMXConnector;
@@ -55,13 +58,13 @@ import org.objectweb.proactive.jmx.listeners.ProActiveConnectionNotificationEmit
  * @author ProActive Team
  *
  */
-public class ProActiveConnector implements JMXConnector, Serializable {
+public class ProActiveConnector implements JMXConnector, Serializable, NotificationListener  {
     private static final long serialVersionUID = -4295401093312884914L;
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private ProActiveConnection connection;
     private ProActiveServerImpl paServer;
-    private JMXServiceURL jmxServiceURL;
+    private JMXServiceURL jmxServiceURL; 
     private transient ProActiveConnectionNotificationEmitter emitter;
     private Map env;
     private int state = CLOSED;
@@ -120,7 +123,6 @@ public class ProActiveConnector implements JMXConnector, Serializable {
                     "proactive.communication.protocol");
             String lookupUrl = protocol + "://" + hostname + ":" + port +
                 ProActiveJMXConstants.SERVER_REGISTERED_NAME;
-            System.out.println("lookup url = " + lookupUrl);
             ProActiveServerImpl paServer = (ProActiveServerImpl) ProActive.lookupActive(ProActiveServerImpl.class.getName(),
                     lookupUrl);
 
@@ -165,7 +167,8 @@ public class ProActiveConnector implements JMXConnector, Serializable {
     public void addConnectionNotificationListener(
         NotificationListener listener, NotificationFilter filter,
         Object handback) {
-        this.emitter.addNotificationListener(listener, filter, handback);
+    	this.listeners.addElement(listener);
+        this.emitter.addNotificationListener(this, filter, handback);
     }
 
     /**
@@ -191,4 +194,15 @@ public class ProActiveConnector implements JMXConnector, Serializable {
     public String getConnectionId() throws IOException {
         return "" + this.hashCode();
     }
+
+    private Vector <NotificationListener>listeners  = new Vector <NotificationListener>();
+
+	public void handleNotification(Notification notification, Object handback) {
+		Enumeration<NotificationListener> e= listeners.elements();
+		while(e.hasMoreElements()) {
+			e.nextElement().handleNotification(notification,handback);
+		}
+	}
+
+
 }

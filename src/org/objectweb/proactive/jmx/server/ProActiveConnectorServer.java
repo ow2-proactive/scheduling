@@ -57,6 +57,7 @@ import com.sun.jmx.remote.util.EnvHelp;
  * @author ProActive Team
  */
 public class ProActiveConnectorServer extends JMXConnectorServer {
+	
     private JMXServiceURL address;
     private ProActiveServerImpl paServer;
     private Map<String, Object> attributes;
@@ -71,8 +72,8 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * @param environment the connector environnement, i.e., the package location of the ServerProvider
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url, Map<String, Object> environment)
-        throws IOException {
+    public ProActiveConnectorServer(JMXServiceURL url,
+        Map<String, ?> environment) throws IOException {
         this(url, environment, (MBeanServer) null);
     }
 
@@ -83,8 +84,9 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * @param mbeanServer the MBean server bound with the connector
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url, Map<String, Object> environment,
-        MBeanServer mbeanServer) throws IOException {
+    public ProActiveConnectorServer(JMXServiceURL url,
+        Map<String, ?> environment, MBeanServer mbeanServer)
+        throws IOException {
         this(url, environment, (ProActiveServerImpl) null, mbeanServer);
     }
 
@@ -96,9 +98,9 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * @param mbeanServer the MBean server bound with the connector
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url, Map<String, Object> environment,
-        ProActiveServerImpl paServer, MBeanServer mbeanServer)
-        throws IOException {
+    public ProActiveConnectorServer(JMXServiceURL url,
+        Map<String, ?> environment, ProActiveServerImpl paServer,
+        MBeanServer mbeanServer) throws IOException {
         super(mbeanServer);
         if (url == null) {
             throw new IllegalArgumentException("Null JMXService URL");
@@ -112,7 +114,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
 
             final String urlPath = url.getURLPath();
             if (environment == null) {
-                this.attributes = new HashMap<String, Object> ();
+                this.attributes = new HashMap<String, Object>();
             } else {
                 this.attributes = Collections.unmodifiableMap(environment);
                 EnvHelp.checkAttributes(this.attributes);
@@ -173,8 +175,8 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      *  A JMXConnectionNotification is emitted from this MBean with the connection ID of the connection that could not be closed.
      *  Closing a connector server is a potentially slow operation. For example, if a client machine with an open connection has crashed, the close operation might have to wait for a network protocol timeout. Callers that do not want to block in a close operation should do it in a separate thread.
      */
-    public void stop()  {
-        this.paServer = null;        
+    public void stop() {
+        this.paServer = null;
         this.state = STOPPED;
     }
 
