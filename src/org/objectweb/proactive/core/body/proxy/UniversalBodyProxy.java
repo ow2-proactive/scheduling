@@ -38,6 +38,7 @@ import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -258,7 +259,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         // TODO if component request and shortcut : update body ref
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
-        UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
+    	//UniqueID id = universalBody.getID();
+        UniversalBody newBody = sourceBody.checkNewLocation(bodyID);
         if (newBody != null) {
             universalBody = newBody;
             isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
