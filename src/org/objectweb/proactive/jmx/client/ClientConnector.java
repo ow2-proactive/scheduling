@@ -31,6 +31,7 @@
 package org.objectweb.proactive.jmx.client;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 
 import javax.management.remote.JMXConnector;
@@ -46,8 +47,10 @@ import org.objectweb.proactive.jmx.ProActiveJMXConstants;
  * @author ProActive Team
  *
  */
-public class ClientConnector {
-    private ProActiveConnection connection;
+public class ClientConnector implements Serializable{
+
+	private static final long serialVersionUID = 7966471528807607476L;
+	private ProActiveConnection connection;
     private JMXConnector connector;
     private String url;
 
