@@ -5,16 +5,18 @@
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Migration.html  -->
 
-  <sect1 >
+  <sect1>
     <title>Migration Primitive</title>
 
-    <indexterm significance="preferred"><primary>Migration</primary></indexterm>
-    
-      <para>The migration of an active object can be triggered by the active
+    <indexterm significance="preferred">
+      <primary>Migration</primary>
+    </indexterm>
+
+    <para>The migration of an active object can be triggered by the active
     object itself, or by an external agent. In both cases a single primitive
     will eventually get called to perform the migration. It is the method
     <literal> migrateTo</literal> accessible from a migratable body (a body
-    that inherits from <literal>AbstractMigratableBody</literal>).</para>
+    that inherits from <literal>MigratableBody</literal>).</para>
 
     <para>In order to ease the use of the migration, we provide 2 sets of
     static methods on the <literal>ProActive</literal> class. The first set is
@@ -58,13 +60,13 @@
       </listitem>
 
       <listitem>
-        <para><literal> migrateTo(Body body, Node node, boolean
+        <para><literal>migrateTo(Body body, Node node, boolean
         priority)</literal>: migrate to the location of the given node</para>
       </listitem>
     </itemizedlist>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Using migration</title>
 
     <para>Any active object has the ability to migrate. If it references some
@@ -76,15 +78,13 @@
     last one in the method, i.e the method must return immediately after. Here
     is an example of a method in an active object:</para>
 
-    
-      <para><programlisting lang="java">   public void moveTo(String t) {
+    <para><programlisting lang="java">   public void moveTo(String t) {
      try {
        ProActive.migrateTo(t);
      } catch (Exception e) {
        e.printStackTrace();
      }
    }</programlisting></para>
-    
 
     <para>We don't provide any test to check if the call to migrateTo is the
     last one in the method, hence if this rule is not enforced, it can lead to
@@ -92,11 +92,10 @@
     its <literal>moveTo()</literal> method.</para>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Complete example</title>
 
-    
-      <para><programlisting lang="java">  import org.objectweb.proactive.ProActive;
+    <para><programlisting lang="java">  import org.objectweb.proactive.ProActive;
   public class SimpleAgent implements Serializable {
     public SimpleAgent() {
     }
@@ -132,7 +131,6 @@
       System.out.println('The Active Object is now on host ' + t.whereAreYou());
     }
   }</programlisting></para>
-    
 
     <para>The class SimpleAgent implements <literal>Serializable</literal> so
     the objects created will be able to migrate. We need to provide an empty
@@ -149,7 +147,7 @@
     location.</para>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Dealing with non-serializable attributes</title>
 
     <para>The migration of an active object uses the serialization.
@@ -168,11 +166,259 @@
     new location. This can easily be done by providing in the active object
     the standard method</para>
 
-    
-     <programlisting lang="java"> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </programlisting>
-    
+    <programlisting lang="java"> private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException; </programlisting>
 
     <para>See the <literal>Serializable</literal> interface in the standard
     JavaDoc to learn more.</para>
+
+    <para></para>
+  </sect1>
+
+  <sect1>
+    <title>Mixed Location Migration</title>
+
+    <para></para>
+
+    <sect2>
+      <title>Principles</title>
+
+      <para>There are two way to communicate with an active object which has
+      migrated :</para>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>Forwarders</emphasis></para>
+
+          <para>An active object upon leaving a site leaves behind a special
+          object, a forwarder, which is in charge of forwarding incoming
+          messages to the next destination. As time goes, a chain of
+          forwarders builds between a caller and the mobile object. Any
+          message sent to the latter will go through the chain to reach the
+          agent. There is a virtual path between a caller and a mobile
+          object.</para>
+        </listitem>
+      </itemizedlist>
+
+      <itemizedlist>
+        <listitem>
+          <para><emphasis>Location Server</emphasis></para>
+
+          <para>Communicating with a mobile object can be done with an
+          explicit reference towards the mobile entity, which requires a mean
+          to get its current location is necessary.</para>
+
+          <para>In that case there is a two steps communication: first there
+          should be a search to obtain an up-to-date reference (localization),
+          and then the actual communication. The simplest solution is to have
+          a unique location server which maintains a database of the known
+          position of the agents. When an object wants to communicate with an
+          object which has migrated, it queries the serv er which sends back a
+          new reference. If this is the correct one then the communication
+          takes place, otherwise a new query is issued.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>Both techniques have their drawbacks. Two problems arise when
+      using a forwarding scheme, especially if the ambition is scalable mobile
+      agents over WAN. First, the forwarders use resources on a site as long
+      as they have not been garbage collected. Thus if a chain exists between
+      to objects, it will remains even if there is no new communications going
+      by. Second, the longer the chain is, the more likely it will be cut
+      because of a hardware or software failure. As a consequence, while
+      forwarders are more efficient under some conditions, they do not appear
+      to be scalable, nor reliable.</para>
+
+      <para>The server on the other hand is a single point of failure and a
+      potential bottleneck. If a server is to help communicating with a higher
+      number of mobile agents, then it might not be able to serve requests
+      quickly enough. Furthermore, in case of a crash, it is not possible to
+      communicate with mobile objects until the server is back. It si possible
+      to avoid most of these issues by having redundant servers with load
+      balancing at the cost of increaing complexity.</para>
+
+      <para>Based on these observations and taking into account the
+      variability of the environment, we propose a configurable communication
+      protocol which offers the main benefits from both the forwarder and the
+      server while avoiding their drawbacks. Configurable with discrete and
+      continuous parameters, it can be tailored to the environment to offer
+      both performance and reliability.</para>
+
+      <para></para>
+
+      <sect3>
+        <title>Time To Live Forwarder</title>
+
+        <para>We introduce time limited forwarders which remain alive only for
+        a limited period. When their lifetime is over, they can just be
+        removed. First of all, this brings an important advantage: scalability
+        due to absence of the DGC and the systematic reclaim of forwarding
+        resources. But of course, this first principle increases the risks of
+        having the forwarding chain cut since this can now happen during the
+        normal execution of the application without any failure. In such a
+        situation, we will rely on a server which will be considered as an
+        alternative solution. This increases the overall reliability.</para>
+      </sect3>
+
+      <sect3>
+        <title>Updating forwarder</title>
+
+        <para>It is possible to rely on the forwarder to maintain the location
+        of the agent by having them update the server. When they reach the end
+        of their lifetime, they can send to the server their outgoing
+        reference which could be the adress of the agent or another forwarder.
+        The Updating forwarder parameter can be true or false. If true, the
+        main advantage is that it releases the agent from most of the updates.
+        In order to increase reliability, it is possible to have the agent
+        also update the server on a regular basis. This leads us to the third
+        principle.</para>
+      </sect3>
+
+      <sect3>
+        <title>Time To Update Agent</title>
+
+        <para>Each mobile agent has a nominal Time To Update (TTU) after which
+        it will inform the localization server of its new location. Clearly,
+        there are two differents events that influence when a localization
+        server of its current position :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>the number of migrations it has performed since its last
+            update,</para>
+          </listitem>
+
+          <listitem>
+            <para>the time it has spent on the current node without having
+            updated the server.</para>
+          </listitem>
+        </itemizedlist>
+
+        <para>This observation leads us to the fourth principle :</para>
+      </sect3>
+
+      <sect3>
+        <title>Dual TTU</title>
+
+        <para>The TTu is defined as the first occurence of two potential
+        events since the last update:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>maxMigrationNb : the number of migrations,</para>
+          </listitem>
+        </itemizedlist>
+
+        <itemizedlist>
+          <listitem>
+            <para>maxTimeOnSite : the time already spent on the current
+            site.</para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+
+      <sect3>
+        <title>Conclusion</title>
+
+        <para>If we consider that both the agent and the forwarders can send
+        updates to the server, the server must be able to make the difference
+        between messages from the forwarders and from the agent; those are
+        always the most up to date. Also, since we don't have any constraint
+        on the Time To Live (TTL) of the forwarders, it could be that a
+        forwarder at the beginning of a chain dies after on at the end. If
+        this happens and we are not careful when dealing with the requests,
+        the server could erase a more up to date reference with an old
+        one.</para>
+
+        <para>To summarize, the adaptable mechanism we propose to localize
+        mobile objects, is parameterized by the following values :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>TTL forwarder :</para>
+
+            <para>- ttl : time (in milliseconds),</para>
+
+            <para>- updatingForwarder : boolean,</para>
+          </listitem>
+
+          <listitem>
+            <para>TTU agents :</para>
+
+            <para>- maxMigrationNb : integer,</para>
+
+            <para>- maxTimeOnSite : time (in milliseconds).</para>
+          </listitem>
+        </itemizedlist>
+
+        <itemizedlist></itemizedlist>
+      </sect3>
+    </sect2>
+
+    <sect2>
+      <title>How to configure</title>
+
+      <para>As a default, ProActive uses a strategy "Forwarders based". It
+      means that the forwarders have a unlimited lifetime and the agent never
+      updates the location server.</para>
+
+      <sect3>
+        <title>Properties</title>
+
+        <para>To configure your own strategy, you have to edit the file
+        src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml.
+        The four properties are the following :</para>
+
+        <itemizedlist>
+          <listitem>
+            <para>proactive.mixedlocation.ttl</para>
+
+            <para>the TTL value in milliseconds. Use -1 to indicate that the
+            forwarders have a unlimited lifetime.</para>
+          </listitem>
+        </itemizedlist>
+
+        <itemizedlist>
+          <listitem>
+            <para>proactive.mixedlocation.updatingForwarder</para>
+
+            <para>true or false.</para>
+          </listitem>
+        </itemizedlist>
+
+        <itemizedlist>
+          <listitem>
+            <para>proactive.mixedlocation.maxMigrationNb</para>
+
+            <para>indicates the number of migrations without updating the
+            server. Use -1 to indicate that the agent never updates the
+            server.</para>
+          </listitem>
+        </itemizedlist>
+
+        <itemizedlist>
+          <listitem>
+            <para>proactive.mixedlocation.maxTimeOnSite</para>
+
+            <para>the max time spent on a site before updating the server. You
+            can use -1 to indicate that there is no limited time to spend on a
+            site.</para>
+          </listitem>
+        </itemizedlist>
+      </sect3>
+
+      <sect3>
+        <title>Location Server</title>
+
+        <para>A location server is available in the package
+        org.objectweb.proactive.core.body.migration.MixedLocationServer. It
+        can be launched using scripts/unix/migration/LocationServer. You can
+        indicate on which node it have to be running.</para>
+
+        <para><emphasis>Limitation</emphasis> : there can be only one
+        LocationServer for the migration. </para>
+      </sect3>
+    </sect2>
+
+    <sect2></sect2>
   </sect1>
 </chapter>
