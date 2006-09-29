@@ -82,7 +82,7 @@ public class ServerProvider implements JMXConnectorServerProvider {
     * @exception IOException if the connector server cannot be
     * created.
     */
-    public JMXConnectorServer newJMXConnectorServer(JMXServiceURL url, Map env,
+    public JMXConnectorServer newJMXConnectorServer(JMXServiceURL url, Map <String, ? >env,
         MBeanServer mbs) throws IOException {
         return new ProActiveConnectorServer(url, env, mbs);
     }
