@@ -5,6 +5,13 @@
 		<!--<prop key="ibis.property.file" value="/home1/fabrice/workIbis/Ibis/src/ibis/properties"/> -->
 		<prop key="proactive.locationserver" value="org.objectweb.proactive.ext.locationserver.LocationServer"/>
 		<prop key="proactive.locationserver.rmi" value="//localhost/LocationServer"/>
+		<prop key="proactive.securitymanager" value="true"/>
+		
+		<prop key="proactive.mixedlocation.ttl" value="-1"/>
+		<prop key="proactive.mixedlocation.updatingForwarder" value="false"/>
+		<prop key="proactive.mixedlocation.maxMigrationNb" value="-1"/>
+		<prop key="proactive.mixedlocation.maxTimeOnSite" value="-1"/>
+		
 		<prop key="proactive.future.ac" value="enable"/>
 		<prop key="proactive.future.maxdelay" value="0"/> <!-- 0: no timeout -->
 		<prop key="proactive.stack_trace" value="false"/> <!-- complete stack traces in requests -->
