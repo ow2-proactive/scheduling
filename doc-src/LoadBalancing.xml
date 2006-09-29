@@ -19,7 +19,7 @@
 
     <para>The load balancing uses the migration to move objects from a node to
     an other : ProActive.migrateTo(object,node,false). (see <xref
-    linkend="migration" /> for more details).</para>
+    linkend="Migration" /> for more details).</para>
   </sect1>
 
   <sect1>
