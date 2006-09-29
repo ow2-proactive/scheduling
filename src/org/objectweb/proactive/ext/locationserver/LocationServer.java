@@ -36,6 +36,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 
 public interface LocationServer {
     public void updateLocation(UniqueID i, UniversalBody s);
-
+    
+    public void updateLocation(UniqueID i, UniversalBody s, int version);
+    
     public UniversalBody searchObject(UniqueID i);
 }
