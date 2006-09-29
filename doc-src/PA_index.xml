@@ -57,6 +57,7 @@
 <!ENTITY biblio SYSTEM "biblio.xml">
 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
+<!ENTITY loadbalancing SYSTEM "LoadBalancing.xml">
 ]>
 <book>
    &bookinfo;
@@ -118,6 +119,7 @@
    <part id="ProActiveAdvancedTopics">
     <title>Advanced</title>
     &p2p;
+    &loadbalancing;
     &Security;
     &WSDoc;
     &OSGi;
