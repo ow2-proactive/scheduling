@@ -35,14 +35,14 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 
-public class LoadMonitorLinux extends LoadMonitor {
+public class LoadMonitorLinux{
     private double normaLoad;
     private RandomAccessFile statfile;
 
     public LoadMonitorLinux(LoadBalancer lb) {
-        this.lb = lb;
+       // this.lb = lb;
         this.normaLoad = 1.0;
-        load = 0;
+        //load = 0;
         int nProcessors = 0;
         try {
         	nProcessors = Runtime.getRuntime().availableProcessors();
@@ -76,6 +76,6 @@ public class LoadMonitorLinux extends LoadMonitor {
     protected synchronized void calculateLoad() {
 
     	double newload = getLoad();
-        load = newload;
+       // load = newload;
     }
 }

@@ -28,24 +28,19 @@
  * 
  * ################################################################
  */ 
-package org.objectweb.proactive.loadbalancing;
+package org.objectweb.proactive.loadbalancing.metrics.CPURanking;
 
 import java.io.*;
 
+import org.objectweb.proactive.loadbalancing.LoadBalancer;
+import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
+import org.objectweb.proactive.loadbalancing.metrics.Metric;
 
-/**
- * @author Javier.Bustos@sophia.inria.fr
- *
- */
-public class LinuxCPURanking implements CPURanking {
+
+public class LinuxCPURanking implements Metric {
     private double ranking = 1;
-
-    /**
-     * This method returns if the machine ranking
-     */
-    public double getRanking() {
-        return ranking;
-    }
+	private double normaLoad;
+	private RandomAccessFile statfile;
 
     /**
      * This method returns sets the machine ranking, in our implementation is the CPU clock
@@ -70,8 +65,21 @@ public class LinuxCPURanking implements CPURanking {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        
+        this.normaLoad = 1.0;
+        //load = 0;
+        int nProcessors = 0;
+        try {
+        	nProcessors = Runtime.getRuntime().availableProcessors();
+        	if (nProcessors > 1) this.normaLoad = 1/(1.0 * nProcessors);
+            statfile = new RandomAccessFile("/proc/loadavg", "r");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+		}
     }
-
+    
     public void setRanking(double x) {
         ranking = x;
     }
@@ -79,4 +87,42 @@ public class LinuxCPURanking implements CPURanking {
     public void addToRanking(double x) {
         ranking += x;
     }
+    
+
+    /* -- IMPLEMENTS METRIC -- */
+    
+    /**
+     * This method returns if the machine ranking
+     */
+    public double getRanking() {
+        return ranking;
+    }
+
+    
+	public void takeDecision(LoadBalancer lb) {
+		double load = getLoad();
+		if (load > LoadBalancingConstants.OVERLOADED_THREASHOLD) {
+          lb.startBalancing();
+        } else if (load < LoadBalancingConstants.UNDERLOADED_THREASHOLD) {
+           lb.stealWork();
+        }
+		
+	}
+
+	public double getLoad() {
+		 String cpuLine = null;
+	        try {
+	            statfile.seek(0);
+	            cpuLine = statfile.readLine();
+	        } catch (IOException e) {
+	            return 1;
+	        }
+
+	        double min1;
+	        
+	        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine," ");
+	        min1 = Double.parseDouble(st.nextToken());
+
+	       return min1*normaLoad;
+	}
 }

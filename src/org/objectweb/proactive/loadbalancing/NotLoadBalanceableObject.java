@@ -30,21 +30,16 @@
  */ 
 package org.objectweb.proactive.loadbalancing;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 
 /**
- * @author Javier.Bustos@sophia.inria.fr
+ * <p>
+ * This interface has to be implemented for ActiveObjects which don't have to 
+ * be load balance
+ * </p>
+ *
+ * @author  ProActive Team
  *
  */
-public abstract interface CPURanking {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
+public interface NotLoadBalanceableObject {
 
-    public double getRanking();
-
-    public void setRanking(double x);
-
-    public void addToRanking(double x);
 }

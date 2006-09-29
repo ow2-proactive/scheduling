@@ -30,6 +30,9 @@
  */ 
 package org.objectweb.proactive.loadbalancing;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -37,10 +40,14 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.loadbalancing.metrics.Metric;
+import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
 
 
 /**
@@ -61,57 +68,56 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class LoadBalancer implements ProActiveInternalObject {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
-    protected boolean underloaded = false;
+    
     protected LoadMonitor lm;
-    protected double normalization = 1;
-    protected double myLoad = 0;
-    protected double ranking = 1;
+    protected Metric metric;
     protected Node myNode;
+    protected ArrayList loadBalancers;
+    
+    private static final int STEAL = 1;
+    private static final int BALANCE = 2;
+   
+	protected String balancerName;
+    protected Random randomizer;
+	protected LoadBalancer myThis;
+	protected InformationRecover informationRecover;
 
-    /**
-     * This method is called by the LoadMonitor, it updates the load state
-     * @param <code>load</code> is the load value, using the load index from the load monitor.
-     * @return none
-     */
-    public void register(double load) {
-        myLoad = load;
-        if (load > LoadBalancingConstants.OVERLOADED_THREASHOLD) {
-            if (underloaded) {
-                underloaded = false;
-            }
-            startBalancing();
-        } else if (load >= (LoadBalancingConstants.UNDERLOADED_THREASHOLD * normalization)) {
-            if (underloaded) {
-                underloaded = false;
-            }
-        } else {
-            if (!underloaded) {
-                underloaded = true;
-            }
-            stealWork();
-        }
-    }
 
-    /**
-     * This method has to be implemented for load balancing algorithms,
-     * it starts the load balance process
-     * @param none
-     * @return none
-     */
+	public LoadBalancer(){}
+	
+	public LoadBalancer(MetricFactory mf){
+        this.randomizer = new Random();
+        this.metric = mf.getNewMetric();
+
+       
+	}
+	
+
     public void startBalancing() {
+    	internalAction(BALANCE);
     }
-    ;
 
-    /**
-     * This method has to be implemented for load balancing algorithms,
-     * it starts the work stealing process (underloaded processores which "steal"
-     * work from others
-     * @param none
-     * @return none
-     */
     public void stealWork() {
+    	internalAction(STEAL);
     }
 
+    
+    public void sendActiveObjectsTo(Node remoteNode, double remoteRanking) {
+    	if (this.metric == null)
+    		return;
+        if (this.metric.getRanking() < remoteRanking * LoadBalancingConstants.STEAL_FACTOR) { // it's better than me!
+        	sendActiveObjectsTo(remoteNode);
+        	}
+    	}
+    
+    protected void getActiveObjectsFrom (LoadBalancer remoteBalancer, double remoteRanking){
+    	if (this.metric == null)
+    		return;
+		if (remoteRanking < this.metric.getRanking() * LoadBalancingConstants.BALANCE_FACTOR) { // I'm better than him!
+			remoteBalancer.sendActiveObjectsTo(myNode);			
+		}
+	}
+    
     /**
      * This method sends an active object to a destiny, choosing the active objects
      * whom don't implement <code>ProActiveInternalObject</code> and having the shortest queue.
@@ -143,7 +149,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                 Object testObject = activeObjectBody.getReifiedObject();
 
                 /********** Only some Active Objects can migrate *************/
-                boolean testSerialization = !(testObject instanceof ProActiveInternalObject);
+                boolean testSerialization = !(testObject instanceof ProActiveInternalObject) && !(testObject instanceof NotLoadBalanceableObject);
 
                 if (activeObjectBody.isAlive()) {
                     if (activeObjectBody.isActive() && testSerialization) {
@@ -157,23 +163,14 @@ public class LoadBalancer implements ProActiveInternalObject {
                 }
             }
 
-            Class params[] = {Node.class};
-
             /***********  we have the Active Object with shortest queue, so we send the migration call ********/
             if ((minBody != null) && minBody.isActive()) {
-                logger.info("[Loadbalancer] Migrating from " +
+                /*logger.info("[Loadbalancer] Migrating ("+minBody.getReifiedObject().getClass().getName()+") from " +
                     myNode.getNodeInformation().getURL() + " to " +
                     destNode.getNodeInformation().getURL());
-                
-//                minBody.updateLocation(minBody.getID(),minBody);
-//                Object stubOfminBody = ProActive.getStubForBody(minBody);
-//                Method m = stubOfminBody.getClass().getMethod("migrateTo",params);
-//                minBody.receiveFTMessage(null);
-//                m.invoke(stubOfminBody,new Node[]{destNode});
-
-                ProActive.migrateTo(minBody, destNode, false);
-//                minBody.updateLocation(minBody.getID(),null);
-                
+                    */
+                ProActive.migrateTo(minBody, destNode, false);  
+                informationRecover.register(this.getName(),this.metric.getLoad(), destNode.getNodeInformation().getURL(),minBody.getReifiedObject().getClass().getName());
             }
         } catch (IllegalArgumentException e) {
         	logger.error("[LoadBalancer] "+e.getLocalizedMessage());
@@ -182,23 +179,80 @@ public class LoadBalancer implements ProActiveInternalObject {
         } catch (MigrationException e) {
         	logger.error("[LoadBalancer] Object can't migrate (?)");
             /** ****** if you cannot migrate, is not my business ********** */
-/*        } catch (IOException e) {
-        	logger.error("[LoadBalancer] Migrating Object can't update its location");
-		} catch (NoSuchMethodException e) {
-			logger.error("[LoadBalancer] Object doesn't have migrateTo method");
-		} catch (IllegalAccessException e) {
-			logger.error("[LoadBalancer] Illegal access to migrateTo method");
-		} catch (InvocationTargetException e) {
-			logger.error("[LoadBalancer] Invocation error on migrateTo method");
-*/		}
+		}
     }
 
+    /*
     /**
      * This method returns if this machine is in an underloaded state
      * @param none
      * @return none
-     */
+     *
     public boolean AreYouUnderloaded() {
         return underloaded;
     }
+    */
+    public String getName(){
+    	return balancerName;
+    }
+    
+    public void init(ArrayList loadBalancers, InformationRecover ir){
+    	try {
+			this.myNode = ProActive.getNode();
+			this.informationRecover = ir;
+		} catch (NodeException e) {
+			e.printStackTrace();
+		}
+		this.loadBalancers = loadBalancers;
+    	this.myThis = (LoadBalancer) ProActive.getStubOnThis();
+    	this.balancerName = myNode.getNodeInformation().getHostName();
+    	
+    	// by now we use only Linux
+	    lm = new LoadMonitor(myThis,metric);
+	    new Thread(lm).start();
+    } 
+    
+    
+    private void internalAction(int action) {
+    	int size = loadBalancers.size();
+    	if (size < 1) return;
+   	
+    	int first = randomizer.nextInt(size);
+    	for (int i = 0; i < LoadBalancingConstants.SUBSET_SIZE  && size > 0; i++) {
+    		LoadBalancer remoteLb = ((LoadBalancer) loadBalancers.get((first+i)%size));
+    		try {
+    			switch (action) {
+				case STEAL:
+					remoteLb.sendActiveObjectsTo(myNode,this.metric.getRanking());
+					break;
+
+				case BALANCE:
+					remoteLb.getActiveObjectsFrom(myThis,this.metric.getRanking());
+					break;
+				}
+			} catch (NonFunctionalException e) {
+				loadBalancers.remove((first+i)%size);
+	    		size--;
+			}
+    	}
+    }
+    
+    public void notifyLoadBalancers(){
+    	LoadBalancer lb;
+    	LoadBalancer myThis = (LoadBalancer)ProActive.getStubOnThis();
+    	Iterator it = loadBalancers.iterator();
+		while (it.hasNext()) {
+			lb = ((LoadBalancer) it.next());
+			if(!lb.equals(this)){
+				lb.addNewBalancer(myThis);
+			}
+			lb = null;
+
+		}
+    }
+    
+    public void addNewBalancer(LoadBalancer lb){
+    	loadBalancers.add(lb);
+    }
+
 }

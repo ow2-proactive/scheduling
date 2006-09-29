@@ -47,10 +47,10 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.loadbalancing.CPURanking;
-import org.objectweb.proactive.loadbalancing.LinuxCPURanking;
+import org.objectweb.proactive.loadbalancing.metrics.CPURanking.LinuxCPURanking;
 import org.objectweb.proactive.loadbalancing.LoadBalancer;
 import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
+import org.objectweb.proactive.loadbalancing.LoadMonitor;
 import org.objectweb.proactive.loadbalancing.LoadMonitorLinux;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -63,6 +63,9 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,ProActive
 	protected P2PService p2pService;
     protected Vector acquaintances, forBalancing, forStealing;
     protected P2PLoadBalancer myThis;
+    
+    protected double ranking;
+    
     
     public P2PLoadBalancer() {}
 
@@ -305,9 +308,8 @@ public void runActivity(Body body) {
     	this.forBalancing = new Vector(MAX_KNOWN_PEERS);
     	this.forStealing = new Vector(MAX_KNOWN_PEERS);
         this.randomizer = new Random();
-        this.underloaded = false;
         /* We update the ranking */
-        CPURanking thisCPURanking = new LinuxCPURanking();
+        LinuxCPURanking thisCPURanking = new LinuxCPURanking();
         ranking = thisCPURanking.getRanking();
 
 		try {
@@ -321,7 +323,7 @@ public void runActivity(Body body) {
 	    this.addToStealList(MAX_KNOWN_PEERS);
 
 	    // by now we use only P2P over Linux
-	    lm = new LoadMonitorLinux(myThis);
+	    lm = new LoadMonitor(myThis,thisCPURanking);
 	    new Thread(lm).start();
 
 	}

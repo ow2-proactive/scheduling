@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.loadbalancing.metrics.Metric;
 
 
 /**
@@ -53,12 +54,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class LoadMonitor implements Runnable,ProActiveInternalObject {
     static Logger logger = ProActiveLogger.getLogger(Loggers.LOAD_BALANCING);
-    protected double load = 0;
+    //protected double load = 0;
     protected LoadBalancer lb;
+    protected Metric metric;
 
-    protected synchronized void calculateLoad() {
-    };
-    
+    public LoadMonitor(LoadBalancer lb, Metric metric) {
+        this.lb = lb;
+        this.metric = metric;
+    	
+    }
+        
 	public synchronized void killMePlease() {
 		Thread.currentThread().interrupt();
 		}
@@ -66,15 +71,16 @@ public class LoadMonitor implements Runnable,ProActiveInternalObject {
     public void run() {
         Random r = new Random();
         do {
-            calculateLoad();
-            lb.register(load);
-            try {
+        	this.metric.takeDecision(lb);
+        	try {
                 double sl;
                 sl = LoadBalancingConstants.UPDATE_TIME * r.nextDouble();
+                /*
                 if (load > 0) {
                     if (load < 1) sl = sl * (1 - load);
                     sl = sl + LoadBalancingConstants.MIGRATION_TIME;
                 }
+                */
                 Thread.sleep(Math.round(sl));
             } catch (InterruptedException interruptedexception) {
             }
