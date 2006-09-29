@@ -1,38 +1,79 @@
 /*
- * Created on Jun 3, 2005
+ * ################################################################
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@objectweb.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
  */
 package org.objectweb.proactive.core.util.wrapper;
 
 import java.io.Serializable;
 
+
 /**
- * @author vlegrand
+ * <p>A reifiable object for wrapping the Java type <code>Object</code>.</p>
+ * <p>Use this class as result for ProActive asynchronous method calls.</p>
  *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * @author ProActive Team
  */
-public class ObjectWrapper <T extends Object >implements Serializable{
+public class ObjectWrapper<T extends Object> implements Serializable {
 
     /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6165789939643190366L;
-	private T  o;
-    
-    public ObjectWrapper () {}
-     
-    public ObjectWrapper(T o) {
-        this.o=o;
+         *
+         */
+    private static final long serialVersionUID = 6165789939643190366L;
+    private T o;
+
+    /**
+     * Empty no args Constructor
+     *
+     */
+    public ObjectWrapper() {
     }
-    
-    public T  getObject() {
+
+    /**
+     * Constructor for  the wrapper
+     * @param o the object to wrap
+     */
+    public ObjectWrapper(T o) {
+        this.o = o;
+    }
+
+    /**
+     * Retrieves the wrapp object
+     * @return the wrapped object
+     */
+    public T getObject() {
         return this.o;
     }
-    
-    public boolean equals (Object o ) {
-    	return this.hashCode() == o.hashCode();
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object o) {
+        return this.hashCode() == o.hashCode();
     }
 }
