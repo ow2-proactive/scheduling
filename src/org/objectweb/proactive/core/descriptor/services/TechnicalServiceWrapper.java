@@ -30,6 +30,7 @@
  */ 
 package org.objectweb.proactive.core.descriptor.services;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -43,7 +44,7 @@ import org.objectweb.proactive.core.node.Node;
  *
  * Created on Jun 15, 2006
  */
-public class TechnicalServiceWrapper implements TechnicalService {
+public class TechnicalServiceWrapper implements TechnicalService, Serializable {
     private TechnicalService ts;
 
     public void setTs(TechnicalService ts) {
