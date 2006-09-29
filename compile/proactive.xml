@@ -90,7 +90,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p, scheduler, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
+	<target name="compile" depends="ic2d, bnb, p2p,loadbalancing, scheduler, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -241,8 +241,9 @@
 	<!--                      Compile LoadBalancing                       -->
 	<!--  =============================================================== -->
 	<target name="loadbalancing" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/loadbalancing/*.java" deprecation="on" source="${source}" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/loadbalancing/**/*.java" />
 		</javac>
 	</target>
 
