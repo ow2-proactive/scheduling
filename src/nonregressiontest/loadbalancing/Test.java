@@ -31,6 +31,8 @@
 package nonregressiontest.loadbalancing;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
@@ -49,40 +51,41 @@ import testsuite.test.FunctionalTest;
  * Window>Preferences>Java>Code Generation.
  */
 public class Test extends FunctionalTest {
+    private static String XML_LOCATION = Test.class.getResource(
+            "/nonregressiontest/loadbalancing/LoadBalancing.xml").getPath();
+    private ProActiveDescriptor pad;
+    private VirtualNode vn1;
     A a;
-    Node sameVmNode;
-    Node localVmNode;
+    Node nodeOne;
+    Node nodeTwo;
 
     public Test() {
         super("load balancing", "Test load balancing");
     }
 
-	public void action() throws Exception {
-		
-		a = (A) ProActive.newActive(A.class.getName(), null,
-                sameVmNode);
-		
-		Thread.sleep(1000);
-	}
+    public void action() throws Exception {
+        a = (A) ProActive.newActive(A.class.getName(), null, nodeOne);
 
-	public void initTest() throws Exception {
-		sameVmNode = TestNodes.getSameVMNode();
-        if (sameVmNode == null) {
-            new TestNodes().action();
-            sameVmNode = TestNodes.getSameVMNode();
-        }
-        
-        localVmNode = TestNodes.getLocalVMNode();
-        
-        LoadBalancing.activateOn(new Node[]{sameVmNode,localVmNode}, new CurrentTimeMillisMetricFactory());
-        
-	}
+        Thread.sleep(1000);
+    }
 
-	public void endTest() throws Exception {
-		LoadBalancing.kill();
-	}
-	
-	public boolean postConditions() throws Exception {
-        return a.getNodeUrl().equals(localVmNode.getNodeInformation().getURL());
+    public void initTest() throws Exception {
+        this.pad = ProActive.getProactiveDescriptor(XML_LOCATION);
+        this.pad.activateMappings();
+        this.vn1 = this.pad.getVirtualNode("VN");
+        this.vn1.getNumberOfCreatedNodesAfterDeployment();
+        this.nodeOne = this.vn1.getNode(0);
+        this.nodeTwo = this.vn1.getNode(1);
+
+        LoadBalancing.activateOn(new Node[] { nodeOne, nodeTwo },
+            new CurrentTimeMillisMetricFactory());
+    }
+
+    public void endTest() throws Exception {
+        this.pad.killall(false);
+    }
+
+    public boolean postConditions() throws Exception {
+        return a.getNodeUrl().equals(nodeTwo.getNodeInformation().getURL());
     }
 }

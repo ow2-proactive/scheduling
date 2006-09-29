@@ -66,7 +66,7 @@ public class LocationServerFactory {
             server = (LocationServer) ProActive.lookupActive(ProActiveConfiguration.getLocationServerClass(),
                     ProActiveConfiguration.getLocationServerRmi());
         } catch (Exception e) {
-            e.printStackTrace();
+           return null;
         }
         return server;
         //	try {

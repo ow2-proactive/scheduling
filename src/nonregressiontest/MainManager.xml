@@ -86,6 +86,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.migration.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.cic.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.loadbalancing.Test" />
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
 			<unitTest exclude="no" class="nonregressiontest.forwarder.interfaceconsistency.Test" />
 		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
@@ -95,7 +96,7 @@
 			<unitTest exclude="yes" class="nonregressiontest.security.policyserver.SecurityTestPolicyServer"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.securitymanager.SecurityTestSecurityManager"/>
 		    <unitTest exclude="yes" class="nonregressiontest.security.sessionkeyexchange.SecurityTestSessionKeyExchange"/>
-		    <unitTest exclude="no" class="nonregressiontest.loadbalancing.Test" />
+		    
 	</packageGroup>
 	
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
