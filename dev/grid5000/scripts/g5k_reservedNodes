@@ -57,7 +57,7 @@ function check_node_is_ok {
   PS=$($SSH_CMD $node ps  aux| awk '{print $1 "\n"}' | grep -v USER|  grep -v $USER | sort | uniq)
 	for user in $PS ; do
 		user_home=$(eval echo ~$user) # Erk !
-		if [ "$(expr match $user_home '\(/home/\).*/.*')" == "/home/" ] ; then
+		if [ "$(expr "$user_home" : '\(/home/\).*/.*')" == "/home/" ] ; then
 			if [ "$VERBOSE" == "Yes" ] ; then 
 				echo "Excluding $node, $user is running processes on this node" 1>&2
 			fi 	

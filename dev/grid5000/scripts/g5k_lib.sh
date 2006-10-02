@@ -25,3 +25,16 @@ fi
 if [ "$VERBOSE" == "Yes" ] ; then
 	echo SSH_CMD=$SSH_CMD
 fi
+
+
+# Darwin does not have seq command
+function seq {
+	start=$1
+	end=$2
+
+	if [ "$UNAME" = "Darwin" ] ; then
+		jot `expr $end - $start + 1` $start 	
+	else
+		$(which seq) $start $end
+	fi
+}
