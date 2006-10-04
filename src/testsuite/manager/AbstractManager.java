@@ -79,14 +79,14 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     AbstractManagerConstants {
     private String name = "AbstractManager with no name";
     private String description = "AbstractManager with no description.";
-    private ArrayList groups = new ArrayList();
+    private ArrayList<Group> groups = new ArrayList<Group>();
     protected static Logger logger = ProActiveLogger.getLogger("testsuite");
 
     //protected static Logger logger = Logger.getRootLogger();
     private int nbRuns = 1;
     private ResultsCollections results = new ResultsCollections();
     private Properties properties = null;
-    protected ArrayList interLinkedGroups = null;
+    protected ArrayList<Group> interLinkedGroups = null;
     private int resultType = 0;
     private String outputPath = null;
 
@@ -264,7 +264,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     /**
      * @param groups
      */
-    public void setGroups(ArrayList groups) {
+    public void setGroups(ArrayList<Group> groups) {
         this.groups = groups;
     }
 

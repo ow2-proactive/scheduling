@@ -40,7 +40,7 @@ import java.util.Iterator;
  * This is a Bag, because keys can be the same [even though they shouldn't be!].
  */
 public class UserBag implements Serializable {
-    private ArrayList list = new ArrayList();
+    private ArrayList<Troika> list = new ArrayList<Troika>();
 
     /** Create an empty Bag. */
     public UserBag() {
@@ -65,8 +65,8 @@ public class UserBag implements Serializable {
      * @returns null if no element corresponds
      */
     public User getUser(int key) {
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            Troika pair = (Troika) iter.next();
+        for (Iterator<Troika> iter = list.iterator(); iter.hasNext();) {
+            Troika pair = iter.next();
             if (pair.key == key) {
                 return pair.user;
             }
@@ -79,8 +79,8 @@ public class UserBag implements Serializable {
      * @returns null if no element corresponds, else returns the name of the correponding user.
      */
     public String getName(int key) {
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
-            Troika troika = (Troika) iter.next();
+        for (Iterator<Troika> iter = list.iterator(); iter.hasNext();) {
+            Troika troika = iter.next();
             if (troika.key == key) {
                 return troika.name;
             }
@@ -97,7 +97,7 @@ public class UserBag implements Serializable {
     public User remove(int key) {
         int max = size();
         for (int i = 0; i < max; i++) {
-            Troika pair = (Troika) list.get(i);
+            Troika pair = list.get(i);
             if (pair.key == key) {
                 list.remove(i);
                 return pair.user;
@@ -107,7 +107,7 @@ public class UserBag implements Serializable {
     }
 
     // iteration related variables
-    private transient Iterator iterator;
+    private transient Iterator<Troika> iterator;
     private transient Troika currentTroika;
 
     // Iteration primitives, just like any Java Collection
@@ -120,7 +120,7 @@ public class UserBag implements Serializable {
     }
 
     public void next() {
-        currentTroika = (Troika) iterator.next();
+        currentTroika = iterator.next();
     }
 
     // On the current triple pointed; get the different values. 

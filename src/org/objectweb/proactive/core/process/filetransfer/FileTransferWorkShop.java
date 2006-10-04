@@ -63,7 +63,7 @@ public class FileTransferWorkShop implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
 
     /* Reference to filetransfer definitions */
-    private HashMap fileTransfers;
+    private HashMap<String, FileTransferDefinition> fileTransfers;
 
     /*Array with protocols to try*/
     private String[] copyProtocol;
@@ -89,7 +89,7 @@ public class FileTransferWorkShop implements Serializable {
         }
 
         isImplicit = false;
-        fileTransfers = new HashMap();
+        fileTransfers = new HashMap<String, FileTransferDefinition>();
         copyProtocol = new String[0];
         srcInfoParams = new StructureInformation();
         dstInfoParams = new StructureInformation();
@@ -117,9 +117,9 @@ public class FileTransferWorkShop implements Serializable {
         sb.append(dstInfoParams).append("\n");
 
         //FileTransfers
-        Iterator it = fileTransfers.keySet().iterator();
+        Iterator<String> it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            FileTransferDefinition ft = (FileTransferDefinition) fileTransfers.get(it.next());
+            FileTransferDefinition ft = fileTransfers.get(it.next());
 
             sb.append(ft.toString()).append("\n");
         }
@@ -164,7 +164,7 @@ public class FileTransferWorkShop implements Serializable {
      * @return An array of CopyProtocol[].
      */
     public CopyProtocol[] getCopyProtocols() {
-        ArrayList alist = new ArrayList();
+        ArrayList<CopyProtocol> alist = new ArrayList<CopyProtocol>();
 
         StringBuffer skippedProtocols = new StringBuffer();
         for (int i = 0; i < copyProtocol.length; i++) {
@@ -190,7 +190,7 @@ public class FileTransferWorkShop implements Serializable {
             alist.add(copyProtocolFactory(PROCESSDEFAULT_KEYWORD));
         }
 
-        return (CopyProtocol[]) alist.toArray(new CopyProtocol[0]);
+        return alist.toArray(new CopyProtocol[0]);
     }
 
     /**
@@ -240,16 +240,16 @@ public class FileTransferWorkShop implements Serializable {
      * @return A File Transfer Definition Array.
      */
     public synchronized FileTransferDefinition[] getAllFileTransferDefinitions() {
-        ArrayList ftList = new ArrayList();
+        ArrayList<FileTransferDefinition> ftList = new ArrayList<FileTransferDefinition>();
 
-        Iterator it = fileTransfers.keySet().iterator();
+        Iterator<String> it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            FileTransferDefinition ft = (FileTransferDefinition) fileTransfers.get(it.next());
+            FileTransferDefinition ft = fileTransfers.get(it.next());
 
             ftList.add(ft);
         }
 
-        return (FileTransferDefinition[]) ftList.toArray(new FileTransferDefinition[0]);
+        return ftList.toArray(new FileTransferDefinition[0]);
     }
 
     /**
@@ -288,9 +288,9 @@ public class FileTransferWorkShop implements Serializable {
 
         //Checking FileTransfer definitions
         boolean retval = false;
-        Iterator it = fileTransfers.keySet().iterator();
+        Iterator<String> it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            ft = (FileTransferDefinition) fileTransfers.get(it.next());
+            ft = fileTransfers.get(it.next());
             if (ft.isEmpty()) {
                 logger.warn("Warning: FileTransfer definition id=" +
                     ft.getId() + " is empty or undefined.");
@@ -341,18 +341,18 @@ public class FileTransferWorkShop implements Serializable {
      */
     public FileDescription[] getAllFileDescriptions(){
     
-    	ArrayList fd = new ArrayList();
+    	ArrayList<FileDescription> fd = new ArrayList<FileDescription>();
 
-        Iterator it = fileTransfers.keySet().iterator();
+        Iterator<String> it = fileTransfers.keySet().iterator();
         while (it.hasNext()) {
-            FileTransferDefinition ft = (FileTransferDefinition) fileTransfers.get(it.next());
+            FileTransferDefinition ft = fileTransfers.get(it.next());
             
             FileDescription fdesc[]=ft.getAllFiles();
             for(int i=0; i < fdesc.length ; i++)
             	fd.add(fdesc[i]);
         }
         
-        return (FileDescription[]) fd.toArray(new FileDescription[0]);
+        return fd.toArray(new FileDescription[0]);
     }
     
     /**

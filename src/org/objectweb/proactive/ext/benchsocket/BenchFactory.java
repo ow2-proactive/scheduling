@@ -35,7 +35,7 @@ import java.util.Iterator;
 
 
 public class BenchFactory implements BenchFactoryInterface {
-    protected static ArrayList streamList = new ArrayList();
+    protected static ArrayList<BenchStream> streamList = new ArrayList<BenchStream>();
 
     public void addStream(BenchStream s) {
         synchronized (streamList) {
@@ -45,9 +45,9 @@ public class BenchFactory implements BenchFactoryInterface {
 
     public static void dumpStreamIntermediateResults() {
         synchronized (streamList) {
-            Iterator it = streamList.iterator();
+            Iterator<BenchStream> it = streamList.iterator();
             while (it.hasNext()) {
-                ((BenchStream) it.next()).dumpIntermediateResults();
+                it.next().dumpIntermediateResults();
             }
         }
     }

@@ -59,12 +59,12 @@ import org.objectweb.proactive.ext.scilab.SciTask;
 
 public class ScilabService implements Serializable{
 
-	private HashMap mapEngine;
-	private ArrayList listIdEngineFree;
+	private HashMap<String, SciEngineInfo> mapEngine;
+	private ArrayList<String> listIdEngineFree;
 	
-	private ArrayList listTaskWait;
-	private HashMap mapTaskRun;
-	private HashMap mapTaskEnd;
+	private ArrayList<SciTaskInfo> listTaskWait;
+	private HashMap<String, SciTaskInfo> mapTaskRun;
+	private HashMap<String, SciTaskInfo> mapTaskEnd;
 	
 	private long countIdTask;
 	private long countIdEngine;
@@ -78,12 +78,12 @@ public class ScilabService implements Serializable{
 	 * constructor
 	 */
 	public ScilabService() {	
-		this.mapEngine = new HashMap();
-		this.listIdEngineFree = new ArrayList();
+		this.mapEngine = new HashMap<String, SciEngineInfo>();
+		this.listIdEngineFree = new ArrayList<String>();
 		
-		this.listTaskWait = new ArrayList();
-		this.mapTaskRun = new HashMap();
-		this.mapTaskEnd = new HashMap();
+		this.listTaskWait = new ArrayList<SciTaskInfo>();
+		this.mapTaskRun = new HashMap<String, SciTaskInfo>();
+		this.mapTaskEnd = new HashMap<String, SciTaskInfo>();
 		
 		this.taskObservable = new SciEventSource();
 		this.engineObservable = new SciEventSource();
@@ -215,14 +215,14 @@ public class ScilabService implements Serializable{
 	public synchronized void killTask(String idTask){
 		logger.debug("->ScilabService In:killTask:" + idTask);
 		
-		SciTaskInfo sciTaskInfo = (SciTaskInfo) this.mapTaskRun.remove(idTask);
+		SciTaskInfo sciTaskInfo = this.mapTaskRun.remove(idTask);
 		
 		if(sciTaskInfo == null){
 			return;
 		}
 		
 		String idEngine = sciTaskInfo.getIdEngine();
-		SciEngineInfo sciEngineInfo = (SciEngineInfo) mapEngine.get(idEngine);
+		SciEngineInfo sciEngineInfo = mapEngine.get(idEngine);
 		
 		
 		SciEngine sciEngine = sciEngineInfo.getSciEngine();
@@ -245,7 +245,7 @@ public class ScilabService implements Serializable{
 	public synchronized void restartEngine(String idEngine){
 		logger.debug("->ScilabService In:restartEngine:" + idEngine);
 
-		SciEngineInfo sciEngineInfo = (SciEngineInfo) this.mapEngine.get(idEngine);
+		SciEngineInfo sciEngineInfo = this.mapEngine.get(idEngine);
 		
 		if(sciEngineInfo == null){
 			return;
@@ -255,7 +255,7 @@ public class ScilabService implements Serializable{
 		SciTaskInfo sciTaskInfo;
 		
 		if(idTask != null){
-			sciTaskInfo = (SciTaskInfo) this.mapTaskRun.remove(idTask);
+			sciTaskInfo = this.mapTaskRun.remove(idTask);
 			sciTaskInfo.setState(SciTaskInfo.KILLED);
 			sciEngineInfo.setIdCurrentTask(null);
 			this.listIdEngineFree.add(idEngine);
@@ -277,7 +277,7 @@ public class ScilabService implements Serializable{
 		logger.debug("->ScilabService In:cancelTask:" + idTask);
 		SciTaskInfo sciTaskInfo;
 		for(int i=0; i<this.listTaskWait.size(); i++){
-			sciTaskInfo = (SciTaskInfo) this.listTaskWait.get(i);
+			sciTaskInfo = this.listTaskWait.get(i);
 			
 			if(idTask.equals(sciTaskInfo.getIdTask())){
 				this.listTaskWait.remove(i);
@@ -294,7 +294,7 @@ public class ScilabService implements Serializable{
 	 */
 	public synchronized void removeTask(String idTask){
 		logger.debug("->ScilabService In:removeTask:" + idTask);
-		SciTaskInfo sciTaskInfo = (SciTaskInfo) this.mapTaskEnd.remove(idTask);
+		SciTaskInfo sciTaskInfo = this.mapTaskEnd.remove(idTask);
 		sciTaskInfo.setState(SciTaskInfo.REMOVED);
 		this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
 	}
@@ -311,7 +311,7 @@ public class ScilabService implements Serializable{
 		while (true) {
 			keys= this.mapTaskRun.keySet().toArray();
 			for (int i = 0; i < keys.length; i++) {
-				sciTaskInfo = (SciTaskInfo) this.mapTaskRun.get(keys[i]);
+				sciTaskInfo = this.mapTaskRun.get(keys[i]);
 				sciResult = sciTaskInfo.getSciResult();
 				if (!ProActive.isAwaited(sciResult)) {
 					logger.debug("->ScilabService loop:retrieveResult:" + keys[i]);
@@ -320,7 +320,7 @@ public class ScilabService implements Serializable{
 					sciTaskInfo.setState(sciResult.getState());
 					
 					idEngine = sciTaskInfo.getIdEngine();
-					sciEngineInfo = (SciEngineInfo) mapEngine.get(idEngine);
+					sciEngineInfo = mapEngine.get(idEngine);
 					
 					sciEngineInfo.setIdCurrentTask(null);
 					this.listIdEngineFree.add(idEngine);
@@ -344,22 +344,22 @@ public class ScilabService implements Serializable{
 		if (this.listTaskWait.size() == 0) return null;
 		
 		for(int i=0; i<this.listTaskWait.size(); i++){
-			sciTaskInfo = (SciTaskInfo)this.listTaskWait.get(i);
+			sciTaskInfo = this.listTaskWait.get(i);
 			
 			if(sciTaskInfo.getPriority() == SciTaskInfo.HIGH){
-				return (SciTaskInfo) this.listTaskWait.remove(i);
+				return this.listTaskWait.remove(i);
 			}	
 		}
 		
 		for(int i=0; i<this.listTaskWait.size(); i++){
-			sciTaskInfo = (SciTaskInfo)this.listTaskWait.get(i);
+			sciTaskInfo = this.listTaskWait.get(i);
 			
 			if(sciTaskInfo.getPriority() == SciTaskInfo.NORMAL){
-				return (SciTaskInfo) this.listTaskWait.remove(i);
+				return this.listTaskWait.remove(i);
 			}	
 		}
 		
-		return (SciTaskInfo) this.listTaskWait.remove(0);
+		return this.listTaskWait.remove(0);
 	}
 	
 	
@@ -372,8 +372,8 @@ public class ScilabService implements Serializable{
 		int count = this.listIdEngineFree.size();
 		
 		while (i<count){
-			idEngine = (String) this.listIdEngineFree.remove(0);
-			sciEngineInfo = (SciEngineInfo) mapEngine.get(idEngine);
+			idEngine = this.listIdEngineFree.remove(0);
+			sciEngineInfo = mapEngine.get(idEngine);
 			isActivate = sciEngineInfo.getIsActivate();
 			logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
 			if(ProActive.isAwaited(isActivate)){
@@ -487,7 +487,7 @@ public class ScilabService implements Serializable{
 	 * @return return the task
 	 */
 	public synchronized SciTaskInfo getTaskEnd(String idTask){
-		return (SciTaskInfo) mapTaskEnd.get(idTask);
+		return mapTaskEnd.get(idTask);
 	}
 	
 	/**
@@ -501,30 +501,30 @@ public class ScilabService implements Serializable{
 	 * 
 	 * @return a Map of terminated task
 	 */
-	public synchronized HashMap getMapTaskEnd() {
-		return (HashMap) mapTaskEnd.clone();
+	public synchronized HashMap<String, SciTaskInfo> getMapTaskEnd() {
+		return (HashMap<String, SciTaskInfo>) mapTaskEnd.clone();
 	}
 
 	
 	/**
 	 * @return a Map of running task
 	 */
-	public synchronized HashMap getMapTaskRun() {
-		return (HashMap) mapTaskRun.clone();
+	public synchronized HashMap<String, SciTaskInfo> getMapTaskRun() {
+		return  (HashMap<String, SciTaskInfo>) mapTaskRun.clone();
 	}
 
 	/**
 	 * @return a Map of Deployed Engine
 	 */
-	public synchronized HashMap getMapEngine() {
-		return (HashMap) mapEngine.clone();
+	public synchronized HashMap<String, SciEngineInfo> getMapEngine() {
+		return (HashMap<String, SciEngineInfo>) mapEngine.clone();
 	}
 
 	/**
 	 * @return a List of pending tasks
 	 */
-	public synchronized ArrayList getListTaskWait() {
-		return (ArrayList) listTaskWait.clone();
+	public synchronized ArrayList<SciTaskInfo> getListTaskWait() {
+		return (ArrayList<SciTaskInfo>) listTaskWait.clone();
 	}
 	
 	/**
@@ -538,7 +538,7 @@ public class ScilabService implements Serializable{
 		
 		Object keys[] = mapEngine.keySet().toArray();
 		for(int i=0; i<keys.length; i++){
-			sciEngineInfo = (SciEngineInfo) mapEngine.get(keys[i]);
+			sciEngineInfo = mapEngine.get(keys[i]);
 			sciEngine = sciEngineInfo.getSciEngine();
 			try{
 			sciEngine.exit();

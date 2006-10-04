@@ -55,13 +55,13 @@ public abstract class ReflectRequest extends HttpMessage {
      * @param theclass we want to get all the methods
      * @return an HasMap containing methods and parameters
      */
-    protected static HashMap getHashMapReflect(Class theclass) {
+    protected static HashMap<String, Object> getHashMapReflect(Class theclass) {
         // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
         // in 'Object' (value) and the name of funtions in key 
         // (Warning two functions can t have the same name (for now)) 
         Method[] allmethods = theclass.getMethods();
         int numberOfMethods = allmethods.length;
-        HashMap hMapMethods = new HashMap(numberOfMethods);
+        HashMap<String, Object> hMapMethods = new HashMap<String, Object>(numberOfMethods);
 
         for (int i = 0; i < numberOfMethods; i++) {
             String methodname = allmethods[i].getName();
@@ -70,13 +70,13 @@ public abstract class ReflectRequest extends HttpMessage {
                 Object obj = hMapMethods.get(methodname);
 
                 if (!(obj instanceof ArrayList)) {
-                    ArrayList array = new ArrayList();
+                    ArrayList<Method> array = new ArrayList<Method>();
                     array.add((Method) obj);
                     array.add(allmethods[i]);
                     hMapMethods.put(methodname, array);
                 } else {
-                    ((ArrayList) obj).add(allmethods[i]);
-                    hMapMethods.put(methodname, (ArrayList) obj);
+                    ((ArrayList<Method>) obj).add(allmethods[i]);
+                    hMapMethods.put(methodname, (ArrayList<Method>) obj);
                 }
             } else {
                 hMapMethods.put(methodname, allmethods[i]);
@@ -122,7 +122,7 @@ public abstract class ReflectRequest extends HttpMessage {
                     paramtypes = ((Method) allSameMethod.get(i)).getParameterTypes();
 
                     for (int j = 0; j < paramsearchsize; j++) {
-                        Class classtest = paramsearch.get(j).getClass();
+                        Class<? extends Object> classtest = paramsearch.get(j).getClass();
 
                         if (paramtypes[j] != classtest) {
                             isgood = false;

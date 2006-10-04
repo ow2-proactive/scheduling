@@ -219,7 +219,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             logger.info("Killing nodes...");
             logger.info(
                 "This may print out some exception messages, but that's OK.");
-            java.util.Vector killedRTs = new java.util.Vector();
+            java.util.Vector<String> killedRTs = new java.util.Vector<String>();
             for (int i = -2; i < containersVirtualNode.getNbMappedNodes(); i++) {
                 try {
                     Node node;

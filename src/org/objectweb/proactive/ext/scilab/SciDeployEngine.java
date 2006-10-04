@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class SciDeployEngine {
 	private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_DEPLOY);
-	private static HashMap mapNode = new HashMap(); // List of deployed VNs 
+	private static HashMap<String, Node> mapNode = new HashMap<String, Node>(); // List of deployed VNs 
 	
 	/**
 	 * @param pathDescriptor
@@ -99,13 +99,13 @@ public class SciDeployEngine {
 	 * @param arrayIdEngine
 	 * @return HashMap of deployed Scilab Engines
 	 */
-	public synchronized static HashMap deploy(String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine){
+	public synchronized static HashMap<String, SciEngine> deploy(String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine){
 		logger.debug("->SciDeployEngine In:deploy:" + pathDescriptor);
 		ProActiveDescriptor desc;
 		VirtualNode vn;
 		Node nodes[];
 		SciEngine sciEngine;
-		HashMap mapEngine = new HashMap();
+		HashMap<String, SciEngine> mapEngine = new HashMap<String, SciEngine>();
 		
 		try {
 			desc = ProActive.getProactiveDescriptor("file:" + pathDescriptor);
@@ -169,6 +169,6 @@ public class SciDeployEngine {
 	}
 	
 	public static Node getEngineNode(String idEngine){
-		return (Node) mapNode.get(idEngine);
+		return mapNode.get(idEngine);
 	}
 }

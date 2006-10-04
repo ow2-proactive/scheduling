@@ -108,7 +108,7 @@ public class JavassistByteCodeStubBuilder {
             generatedClass.addField(methodsField);
 
             //   This map is used for keeping track of the method signatures / methods that are to be reified
-            java.util.Map temp = new HashMap();
+            java.util.Map<String, CtMethod> temp = new HashMap<String, CtMethod>();
 
             // Recursively calls getDeclaredMethods () on the target type
             // and each of its superclasses, all the way up to java.lang.Object
@@ -118,7 +118,7 @@ public class JavassistByteCodeStubBuilder {
             CtClass[] params;
             Object exists;
 
-            List classesIndexer = new Vector();
+            List<String> classesIndexer = new Vector<String>();
             classesIndexer.add(superClass.getName());
 
             // If the target type is an interface, the only thing we have to do is to
@@ -182,10 +182,10 @@ public class JavassistByteCodeStubBuilder {
             }
 
             // now get the methods from implemented interfaces
-            List superInterfaces = new Vector();
+            List<CtClass> superInterfaces = new Vector<CtClass>();
             addSuperInterfaces(superClass, superInterfaces);
             
-            CtClass[] implementedInterfacesTable = (CtClass[])(superInterfaces.toArray(new CtClass[superInterfaces.size()]));
+            CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces.size()]));
             for (int i=0; i< implementedInterfacesTable.length; i++) {
                 
             }
@@ -218,12 +218,12 @@ public class JavassistByteCodeStubBuilder {
                 }
             }
 
-            reifiedMethods = (CtMethod[]) (temp.values().toArray(new CtMethod[temp.size()]));
+            reifiedMethods = (temp.values().toArray(new CtMethod[temp.size()]));
 
             // Determines which reifiedMethods are valid for reification
             // It is the responsibility of method checkMethod 
             // to decide if a method is valid for reification or not
-            Vector v = new Vector();
+            Vector<CtMethod> v = new Vector<CtMethod>();
             int initialNumberOfMethods = reifiedMethods.length;
 
             for (int i = 0; i < initialNumberOfMethods; i++) {
@@ -377,7 +377,7 @@ public class JavassistByteCodeStubBuilder {
      * @throws NotFoundException
      */
     public static void createStaticInitializer(CtClass generatedClass,
-        CtMethod[] reifiedMethods, List classesIndexer)
+        CtMethod[] reifiedMethods, List<String> classesIndexer)
         throws CannotCompileException, NotFoundException {
         CtConstructor classInitializer = generatedClass.makeClassInitializer();
 
@@ -389,11 +389,11 @@ public class JavassistByteCodeStubBuilder {
         classInitializerBody += "Class[] temp;\n";
 
         int methodsIndex = 0;
-        Iterator it = classesIndexer.iterator();
+        Iterator<String> it = classesIndexer.iterator();
         int index = 0;
         while (it.hasNext()) {
             classInitializerBody += ("classes[" + index +
-            "] = Class.forName(\"" + (String) it.next() + "\");\n");
+            "] = Class.forName(\"" + it.next() + "\");\n");
             index++;
         }
         for (int i = 0; i < reifiedMethods.length; i++) {
@@ -530,7 +530,7 @@ public class JavassistByteCodeStubBuilder {
         return true;
     }
     
-    private static void addSuperInterfaces(CtClass cl, List superItfs) throws NotFoundException {
+    private static void addSuperInterfaces(CtClass cl, List<CtClass> superItfs) throws NotFoundException {
         if (!cl.isInterface() && !Modifier.isAbstract(cl.getModifiers())) {
         	// inspect interfaces AND abstract classes
             return;

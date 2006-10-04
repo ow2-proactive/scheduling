@@ -65,6 +65,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -82,7 +83,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     /** Processes to deploy
      * <String, ExternalProcess> */
-    private HashMap hierarchicalProcesses;
+    private HashMap<Object, ExternalProcess> hierarchicalProcesses;
 
     /** The parent of this runtime */
     private ProActiveRuntime parentRuntime = null;
@@ -98,7 +99,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
     protected ProActiveRuntimeForwarderImpl() {
         super();
         registeredRuntimes = new HashMap();
-        hierarchicalProcesses = new HashMap();
+        hierarchicalProcesses = new HashMap<Object, ExternalProcess>();
         bodyForwarder = new BodyForwarderImpl();
 
         // Create the BodyForwarder, protocol specific
@@ -732,7 +733,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         return null;
     }
 
-    public ArrayList getEntities(UniqueRuntimeID urid)
+    public ArrayList<Entity> getEntities(UniqueRuntimeID urid)
         throws IOException, SecurityNotAvailableException {
         if (urid == null) {
             return this.getEntities();

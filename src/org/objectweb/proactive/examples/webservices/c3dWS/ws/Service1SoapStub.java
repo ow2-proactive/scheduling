@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 
+import javax.xml.namespace.QName;
+
 
 
 
@@ -42,10 +44,10 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
         _initOperationDesc1();
     }
 
-    private java.util.Vector cachedSerClasses = new java.util.Vector();
-    private java.util.Vector cachedSerQNames = new java.util.Vector();
-    private java.util.Vector cachedSerFactories = new java.util.Vector();
-    private java.util.Vector cachedDeserFactories = new java.util.Vector();
+    private java.util.Vector<Class> cachedSerClasses = new java.util.Vector<Class>();
+    private java.util.Vector<QName> cachedSerQNames = new java.util.Vector<QName>();
+    private java.util.Vector<Class> cachedSerFactories = new java.util.Vector<Class>();
+    private java.util.Vector<Class> cachedDeserFactories = new java.util.Vector<Class>();
  
     public Service1SoapStub() throws org.apache.axis.AxisFault {
         this(null);

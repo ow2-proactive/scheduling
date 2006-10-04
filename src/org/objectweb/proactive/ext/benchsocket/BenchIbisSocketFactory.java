@@ -44,7 +44,7 @@ import ibis.util.IbisSocketFactory;
 
 public class BenchIbisSocketFactory extends IbisSocketFactory
     implements BenchFactoryInterface {
-    protected static ArrayList streamList = new ArrayList();
+    protected static ArrayList<BenchStream> streamList = new ArrayList<BenchStream>();
 
     public void addStream(BenchStream s) {
         synchronized (streamList) {
@@ -54,9 +54,9 @@ public class BenchIbisSocketFactory extends IbisSocketFactory
 
     public static void dumpStreamIntermediateResults() {
         synchronized (streamList) {
-            Iterator it = streamList.iterator();
+            Iterator<BenchStream> it = streamList.iterator();
             while (it.hasNext()) {
-                ((BenchStream) it.next()).dumpIntermediateResults();
+                it.next().dumpIntermediateResults();
             }
         }
     }

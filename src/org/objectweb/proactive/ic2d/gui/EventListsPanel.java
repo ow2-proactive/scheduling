@@ -91,7 +91,7 @@ public class EventListsPanel extends javax.swing.JPanel
      * KEY: id
      * VAL: corresponding JList [model = default]
      */
-    private java.util.HashMap objectTrackPanelMap;
+    private java.util.HashMap<UniqueID, ObjTrackPanel> objectTrackPanelMap;
     private BoundedCircularArrayList events;
 
     /**
@@ -122,7 +122,7 @@ public class EventListsPanel extends javax.swing.JPanel
                 java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE,
                 new MyDropTargetListener(), true);
 
-        objectTrackPanelMap = new java.util.HashMap();
+        objectTrackPanelMap = new java.util.HashMap<UniqueID, ObjTrackPanel>();
         events = new BoundedCircularArrayList(1000);
         recorder = new PlayerFrameTimeLine(this, ic2dObject.getController());
 
@@ -204,10 +204,10 @@ public class EventListsPanel extends javax.swing.JPanel
     // 
     public void clearAll() {
         synchronized (objectTrackPanelMap) {
-            java.util.Iterator i = objectTrackPanelMap.values().iterator();
+            java.util.Iterator<ObjTrackPanel> i = objectTrackPanelMap.values().iterator();
             while (i.hasNext()) {
                 // clean the ui
-                ObjTrackPanel otp = (ObjTrackPanel) i.next();
+                ObjTrackPanel otp = i.next();
                 otp.getListModel().clear();
             }
         }
@@ -235,7 +235,7 @@ public class EventListsPanel extends javax.swing.JPanel
     public void removeActiveObject(ActiveObject activeObject) {
         ObjTrackPanel o;
         synchronized (objectTrackPanelMap) {
-            o = (ObjTrackPanel) objectTrackPanelMap.remove(activeObject.getID());
+            o = objectTrackPanelMap.remove(activeObject.getID());
         }
         if (o == null) {
             return;
@@ -279,10 +279,10 @@ public class EventListsPanel extends javax.swing.JPanel
     public void allEventsProcessed() {
         //Code for downScrolling should be there...
         synchronized (objectTrackPanelMap) {
-            java.util.Iterator i = objectTrackPanelMap.values().iterator();
+            java.util.Iterator<ObjTrackPanel> i = objectTrackPanelMap.values().iterator();
             while (i.hasNext()) {
                 // clean the ui
-                ObjTrackPanel otp = (ObjTrackPanel) i.next();
+                ObjTrackPanel otp = i.next();
                 otp.scrollDown();
             }
         }
@@ -334,7 +334,7 @@ public class EventListsPanel extends javax.swing.JPanel
 
     private ObjTrackPanel getObjTrackPanel(UniqueID id) {
         synchronized (objectTrackPanelMap) {
-            return (ObjTrackPanel) objectTrackPanelMap.get(id);
+            return objectTrackPanelMap.get(id);
         }
     }
 
@@ -396,8 +396,8 @@ public class EventListsPanel extends javax.swing.JPanel
                 if (id == null) {
                     return;
                 }
-                java.util.LinkedList bef = getMsgBefore(m, id);
-                java.util.LinkedList aft = getMsgAfter(m, id);
+                java.util.LinkedList<Object> bef = getMsgBefore(m, id);
+                java.util.LinkedList<Object> aft = getMsgAfter(m, id);
                 computeColor(m, 10);
                 for (int i = 0; i < bef.size(); i++)
                     computeColor((SpyEvent) bef.get(i), 9 - i);
@@ -467,9 +467,9 @@ public class EventListsPanel extends javax.swing.JPanel
 
     /** returns all SpyMessageEvents that belong to the same body,
      * the same type (request or reply) and occured before target */
-    private java.util.LinkedList getMsgBefore(SpyMessageEvent target,
+    private java.util.LinkedList<Object> getMsgBefore(SpyMessageEvent target,
         UniqueID id) {
-        java.util.LinkedList result = new java.util.LinkedList();
+        java.util.LinkedList<Object> result = new java.util.LinkedList<Object>();
         int index = events.indexOf(target);
         if (index == -1) {
             return result;
@@ -508,8 +508,8 @@ public class EventListsPanel extends javax.swing.JPanel
 
     /** returns all SpyMessageEvents that belong to the same body,
      * the same type (request or reply) and occured after target */
-    private java.util.LinkedList getMsgAfter(SpyMessageEvent target, UniqueID id) {
-        java.util.LinkedList result = new java.util.LinkedList();
+    private java.util.LinkedList<Object> getMsgAfter(SpyMessageEvent target, UniqueID id) {
+        java.util.LinkedList<Object> result = new java.util.LinkedList<Object>();
         int index = events.indexOf(target);
         if (index == -1) {
             return result;

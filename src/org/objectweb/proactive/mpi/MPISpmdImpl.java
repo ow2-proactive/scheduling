@@ -60,16 +60,16 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     private VirtualNode vn;
 
     /** user SPMD classes name */
-    private ArrayList spmdClasses = null;
+    private ArrayList<String> spmdClasses = null;
 
     /** user SPMD classes params */
-    private Hashtable spmdClassesParams;
+    private Hashtable<String, ArrayList<Object[]>> spmdClassesParams;
 
     /** user classes name */
-    private ArrayList classes = null;
+    private ArrayList<String> classes = null;
 
     /** user classes params */
-    private Hashtable classesParams;
+    private Hashtable<String, Object[]> classesParams;
     private Object[] classesParamsByRank;
 
     // empty no-args constructor 
@@ -89,10 +89,10 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             vn.activate();
         }
         if (vn.hasMPIProcess()) {
-            this.spmdClasses = new ArrayList();
-            this.classes = new ArrayList();
-            this.spmdClassesParams = new Hashtable();
-            this.classesParams = new Hashtable();
+            this.spmdClasses = new ArrayList<String>();
+            this.classes = new ArrayList<String>();
+            this.spmdClassesParams = new Hashtable<String, ArrayList<Object[]>>();
+            this.classesParams = new Hashtable<String, Object[]>();
             this.classesParamsByRank = new Object[vn.getNodes().length];
             this.mpiProcess = vn.getMPIProcess();
             this.name = vn.getName();
@@ -246,7 +246,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
                 " class has already been added to the list of user classes to instanciate ");
         } else {
             this.spmdClasses.add(cl);
-            ArrayList parameters = new ArrayList(2);
+            ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
             parameters.add(0, null);
             parameters.add(1, null);
             this.spmdClassesParams.put(cl, parameters);
@@ -260,7 +260,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         } else {
             this.spmdClasses.add(cl);
 
-            ArrayList parameters = new ArrayList(2);
+            ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
 
             // index=0 => Object[] type
             // index=1 => Object[][] type
@@ -282,7 +282,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
                     " class has already been added to the list of user classes to instanciate ");
             } else {
                 this.spmdClasses.add(cl);
-                ArrayList parameters = new ArrayList(2);
+                ArrayList<Object[]> parameters = new ArrayList<Object[]>(2);
 
                 // index=0 => Object[] type
                 // index=1 => Object[][] type
@@ -315,19 +315,19 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         }
     }
 
-    public ArrayList getSpmdClasses() {
+    public ArrayList<String> getSpmdClasses() {
         return this.spmdClasses;
     }
 
-    public Hashtable getSpmdClassesParams() {
+    public Hashtable<String, ArrayList<Object[]>> getSpmdClassesParams() {
         return this.spmdClassesParams;
     }
 
-    public ArrayList getClasses() {
+    public ArrayList<String> getClasses() {
         return this.classes;
     }
 
-    public Hashtable getClassesParams() {
+    public Hashtable<String, Object[]> getClassesParams() {
         return this.classesParams;
     }
 

@@ -82,7 +82,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
             logger.info("Starting ...");
         }
         ResultsCollections results = getResults();
-        Vector listOfFailed = new Vector();
+        Vector<String> listOfFailed = new Vector<String>();
         if (useAttributesFile) {
             try {
                 loadAttributes();
@@ -167,9 +167,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
 
         if (this.interLinkedGroups != null) {
             // runs interlinked test
-            Iterator itInterGroup = this.interLinkedGroups.iterator();
+            Iterator<Group> itInterGroup = this.interLinkedGroups.iterator();
             while (itInterGroup.hasNext()) {
-                Group group = (Group) itInterGroup.next();
+                Group group = itInterGroup.next();
 
                 ResultsCollections resultsGroup = group.getResults();
 
@@ -242,7 +242,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (this.errors > 0) {
             logger.fatal("---------------------------------");
             logger.fatal(">>> FAILED TESTS: ");
-            Iterator it = listOfFailed.iterator();
+            Iterator<String> it = listOfFailed.iterator();
             while (it.hasNext()) {
                 logger.fatal("\t" + it.next());
             }
@@ -358,7 +358,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
         }
         ResultsCollections results = getResults();
 
-        Vector listOfFailed = new Vector();
+        Vector<String> listOfFailed = new Vector<String>();
         results.add(AbstractResult.IMP_MSG, "Starting ...");
         try {
             initManager();
@@ -372,9 +372,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
         }
         results.add(AbstractResult.IMP_MSG, "Init Manager with success");
 
-        Iterator itGroup = this.interLinkedGroups.iterator();
+        Iterator<Group> itGroup = this.interLinkedGroups.iterator();
         while (itGroup.hasNext()) {
-            Group group = (Group) itGroup.next();
+            Group group = itGroup.next();
 
             ResultsCollections resultsGroup = group.getResults();
 
@@ -442,7 +442,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (this.errors > 0) {
             logger.fatal("---------------------------------");
             logger.fatal(">>> FAILED TESTS: ");
-            Iterator it = listOfFailed.iterator();
+            Iterator<String> it = listOfFailed.iterator();
             while (it.hasNext()) {
                 logger.fatal("\t" + it.next());
             }
@@ -459,14 +459,14 @@ public abstract class FunctionalTestManager extends AbstractManager {
     /**
      * @return
      */
-    public ArrayList getInterLinkedGroups() {
+    public ArrayList<Group> getInterLinkedGroups() {
         return this.interLinkedGroups;
     }
 
     /**
      * @param list
      */
-    public void setInterLinkedGroups(ArrayList list) {
+    public void setInterLinkedGroups(ArrayList<Group> list) {
         this.interLinkedGroups = list;
     }
 

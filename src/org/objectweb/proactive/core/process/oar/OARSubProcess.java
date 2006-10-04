@@ -232,7 +232,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     //    }
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
-        ArrayList al = new ArrayList();
+        ArrayList<String> al = new ArrayList<String>();
 
         //we divide the command into tokens
         //it's basically 3 blocks, the script path, the option and the rest
@@ -246,7 +246,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
             //            System.out.println(m.group(i));
             al.add(m.group(i));
         }
-        String[] command = (String[]) al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {  });
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);

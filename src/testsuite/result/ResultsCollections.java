@@ -54,15 +54,15 @@ import testsuite.xslt.TransformerXSLT;
  *
  */
 public class ResultsCollections implements ResultsExporter {
-    private ArrayList results = null;
+    private ArrayList<AbstractResult> results = null;
     private boolean verbatim = true;
 
     public ResultsCollections() {
-        results = new ArrayList();
+        results = new ArrayList<AbstractResult>();
     }
 
     public ResultsCollections(ResultsCollections resultsCollection) {
-        this.results = new ArrayList(resultsCollection.results);
+        this.results = new ArrayList<AbstractResult>(resultsCollection.results);
     }
 
     public boolean add(int type, String message) throws BadTypeException {

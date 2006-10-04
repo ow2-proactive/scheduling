@@ -45,15 +45,15 @@ import javasci.SciData;
 public class SciTask implements Serializable {
 	
 	private String id;
-	private ArrayList listDataIn;
-	private ArrayList listDataOut;
+	private ArrayList<SciData> listDataIn;
+	private ArrayList<SciData> listDataOut;
 	private String job;
 	private String jobInit;
 
 	public SciTask(String id) {
 		this.id = id;
-		this.listDataIn = new ArrayList();
-		this.listDataOut = new ArrayList();
+		this.listDataIn = new ArrayList<SciData>();
+		this.listDataOut = new ArrayList<SciData>();
 	}
 	
 	public String getJob() {
@@ -82,11 +82,11 @@ public class SciTask implements Serializable {
 		reader.close();
 	}
 
-	public ArrayList getListDataIn() {
+	public ArrayList<SciData> getListDataIn() {
 		return listDataIn;
 	}
 
-	public void setListDataIn(ArrayList listDataIn) {
+	public void setListDataIn(ArrayList<SciData> listDataIn) {
 		this.listDataIn = listDataIn;
 	}
 
@@ -94,11 +94,11 @@ public class SciTask implements Serializable {
 		this.listDataIn.add(data);
 	}
 	
-	public ArrayList getListDataOut() {
+	public ArrayList<SciData> getListDataOut() {
 		return listDataOut;
 	}
 
-	public void setListDataOut(ArrayList listDataOut) {
+	public void setListDataOut(ArrayList<SciData> listDataOut) {
 		this.listDataOut = listDataOut;
 	}
 	

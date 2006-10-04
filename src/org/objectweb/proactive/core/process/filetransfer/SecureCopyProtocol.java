@@ -148,7 +148,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
 
     private String[] buildHeteronymousTransfer() {
         FileDescription[] files = getHeteronymousAll();
-        ArrayList command = new ArrayList();
+        ArrayList<String> command = new ArrayList<String>();
 
         //Files & Dirs are the same
         for (int i = 0; i < files.length; i++) {
@@ -184,7 +184,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
             command.add(sb.toString());
         }
 
-        return (String[]) command.toArray(new String[0]);
+        return command.toArray(new String[0]);
     }
 
     /**

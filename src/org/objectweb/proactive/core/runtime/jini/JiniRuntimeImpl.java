@@ -71,19 +71,19 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //    protected String proActiveRuntimeURL;
     //ServiceRegistar table used afterwards to register node service
     //Vector is used because the size is unknown and this class is synchronized
-    protected java.util.Vector registrarsTable;
+    protected java.util.Vector<ServiceRegistrar> registrarsTable;
 
     //table used to store references on runtime registration in order to be 
     //able to unregister it from all lookup services. There is no need for a Hashtable 
     //since there is only one key, but it is for coding purpose.
-    protected java.util.Hashtable jiniRuntimeMap;
+    protected java.util.Hashtable<String, Vector<ServiceRegistration>> jiniRuntimeMap;
 
     //table used to handle node's registration when discovery event is received after the node's creation
-    protected java.util.Hashtable jiniNodeMap;
+    protected java.util.Hashtable<String, Vector<ServiceRegistration>> jiniNodeMap;
 
     //table used to handle virtualnode's registration when discovery event is received after the virtualnode's registration
     //this table contains a mapping virtualNode's name and an arrayList that contains all associated ServiceRegistrations
-    protected java.util.Hashtable jiniVirtualNodeMap;
+    protected java.util.Hashtable<String, Vector<ServiceRegistration>> jiniVirtualNodeMap;
     private volatile boolean isRuntimeRegistered = false;
 
     // this object is not serializable
@@ -96,11 +96,11 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         super(true);
         this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
         this.proActiveRuntimeURL = buildRuntimeURL();
-        this.jiniRuntimeMap = new java.util.Hashtable();
-        jiniRuntimeMap.put(proActiveRuntimeURL, new java.util.Vector());
-        this.jiniNodeMap = new java.util.Hashtable();
-        this.jiniVirtualNodeMap = new java.util.Hashtable();
-        this.registrarsTable = new java.util.Vector();
+        this.jiniRuntimeMap = new java.util.Hashtable<String, Vector<ServiceRegistration>>();
+        jiniRuntimeMap.put(proActiveRuntimeURL, new java.util.Vector<ServiceRegistration>());
+        this.jiniNodeMap = new java.util.Hashtable<String, Vector<ServiceRegistration>>();
+        this.jiniVirtualNodeMap = new java.util.Hashtable<String, Vector<ServiceRegistration>>();
+        this.registrarsTable = new java.util.Vector<ServiceRegistrar>();
         net.jini.discovery.LookupDiscovery discover = null;
         try {
             discover = new net.jini.discovery.LookupDiscovery(net.jini.discovery.LookupDiscovery.ALL_GROUPS);
@@ -161,8 +161,8 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     }
 
     public void killAllNodes() throws RemoteException, ProActiveException {
-        for (java.util.Enumeration e = jiniNodeMap.keys(); e.hasMoreElements();) {
-            String nodeURL = (String) e.nextElement();
+        for (java.util.Enumeration<String> e = jiniNodeMap.keys(); e.hasMoreElements();) {
+            String nodeURL = e.nextElement();
             killNode(nodeURL);
         }
         proActiveRuntime.killAllNodes();
@@ -236,9 +236,9 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
 
     public void unregisterAllVirtualNodes()
         throws RemoteException, ProActiveException {
-        for (java.util.Enumeration e = jiniVirtualNodeMap.keys();
+        for (java.util.Enumeration<String> e = jiniVirtualNodeMap.keys();
                 e.hasMoreElements();) {
-            String vnNodeURL = (String) e.nextElement();
+            String vnNodeURL = e.nextElement();
             unregisterVirtualNode(vnNodeURL);
         }
     }
@@ -266,7 +266,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
                 runtimeLogger.error("register exception " + e.toString());
                 continue;
             }
-            ((Vector) jiniRuntimeMap.get(proActiveRuntimeURL)).add(reg);
+            jiniRuntimeMap.get(proActiveRuntimeURL).add(reg);
 
             //add the registrar in the table for future use(node registration)
             registrarsTable.add(registrar);
@@ -326,16 +326,16 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
     //This method is very useful when the JiniRuntime receives event about a new Lookup service
     //that was discovered.In such case, the runtime registers all nodes and virtualnodes previously registered
     //as Jini service with the registrar given as parameter and the corresponding hashtable
-    private void registerServiceAfterDiscovery(Hashtable jiniObjectTable,
+    private void registerServiceAfterDiscovery(Hashtable<String, Vector<ServiceRegistration>> jiniObjectTable,
         ServiceRegistrar registrar) {
         ServiceRegistration reg = null;
         ServiceID serviceID = null;
         if (!jiniObjectTable.isEmpty()) {
             synchronized (jiniObjectTable) {
-                for (java.util.Enumeration e = jiniObjectTable.keys();
+                for (java.util.Enumeration<String> e = jiniObjectTable.keys();
                         e.hasMoreElements();) {
-                    String objectURL = (String) e.nextElement();
-                    Vector serviceRegistrationTable = (Vector) jiniObjectTable.get(objectURL);
+                    String objectURL = e.nextElement();
+                    Vector serviceRegistrationTable = jiniObjectTable.get(objectURL);
                     if (!serviceRegistrationTable.isEmpty()) {
                         serviceID = ((ServiceRegistration) serviceRegistrationTable.get(0)).getServiceID();
                     } else {
@@ -354,7 +354,7 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
 
                     // on lance le lease manager pour que l'objet puisse se reenregistrer
                     leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
-                    ((Vector) jiniObjectTable.get(objectURL)).add(reg);
+                    jiniObjectTable.get(objectURL).add(reg);
                 }
             }
         }
@@ -380,17 +380,17 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         }
     }
 
-    private Vector registerService(String objectUrl)
+    private Vector<ServiceRegistration> registerService(String objectUrl)
         throws java.rmi.RemoteException {
         //counter used to check that the object has been registered at 
         //least once as jini service
         int counter = 0;
         ServiceID serviceID = newServiceID();
-        Vector serviceRegistrationTable = new Vector();
+        Vector<ServiceRegistration> serviceRegistrationTable = new Vector<ServiceRegistration>();
 
         //register it as a jini service with the url
         for (int n = 0; n < registrarsTable.size(); n++) {
-            ServiceRegistrar registrar = (ServiceRegistrar) registrarsTable.get(n);
+            ServiceRegistrar registrar = registrarsTable.get(n);
             ServiceRegistration reg = null;
             try {
                 ServiceItem item = new ServiceItem(serviceID, this,
@@ -415,12 +415,12 @@ public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
         return serviceRegistrationTable;
     }
 
-    private void unregisterService(String objectUrl, Hashtable jiniObjectTable)
+    private void unregisterService(String objectUrl, Hashtable<String, Vector<ServiceRegistration>> jiniObjectTable)
         throws java.rmi.RemoteException {
         if (!jiniObjectTable.isEmpty()) {
             synchronized (jiniObjectTable) {
                 try {
-                    Vector serviceRegistrationTable = (Vector) jiniObjectTable.get(objectUrl);
+                    Vector serviceRegistrationTable = jiniObjectTable.get(objectUrl);
                     if (!serviceRegistrationTable.isEmpty()) {
                         for (int i = 0; i < serviceRegistrationTable.size();
                                 i++) {

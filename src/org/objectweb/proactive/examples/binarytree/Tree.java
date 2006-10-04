@@ -152,8 +152,8 @@ public class Tree {
         return key;
     }
 
-    public java.util.ArrayList getKeys() {
-        java.util.ArrayList keys = new java.util.ArrayList();
+    public java.util.ArrayList<String> getKeys() {
+        java.util.ArrayList<String> keys = new java.util.ArrayList<String>();
         if (key != null) {
             keys.add(key);
         }

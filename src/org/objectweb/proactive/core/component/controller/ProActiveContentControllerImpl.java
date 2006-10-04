@@ -68,16 +68,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveContentControllerImpl extends AbstractProActiveController
     implements ProActiveContentController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    List fcSubComponents;
-    Map<Component, IllegalContentException> contentExceptions = new Hashtable();
-    Map<Component, IllegalLifeCycleException> lifeCycleExceptions = new Hashtable();
+    List<Component> fcSubComponents;
+    Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();
+    Map<Component, IllegalLifeCycleException> lifeCycleExceptions = new Hashtable<Component, IllegalLifeCycleException>();
 
     /**
      * Constructor for ProActiveContentController.
      */
     public ProActiveContentControllerImpl(Component owner) {
         super(owner);
-        fcSubComponents = new ArrayList();
+        fcSubComponents = new ArrayList<Component>();
     }
     
         protected void setControllerItfType() {
@@ -119,13 +119,13 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
      * @see org.objectweb.fractal.api.control.ContentController#getFcSubComponents()
      */
     public Component[] getFcSubComponents() {
-        return (Component[]) fcSubComponents.toArray(new Component[fcSubComponents.size()]);
+        return fcSubComponents.toArray(new Component[fcSubComponents.size()]);
     }
 
     public boolean isSubComponent(Component component) {
         if (ProActiveGroup.isGroup(component)) {
-            Group group = ProActiveGroup.getGroup(component);
-            for (Iterator it = group.iterator(); it.hasNext();) {
+            Group<Component> group = ProActiveGroup.getGroup(component);
+            for (Iterator<Component> it = group.iterator(); it.hasNext();) {
                 if (!fcSubComponents.contains(it.next())) {
                     return false;
                 }
@@ -245,9 +245,9 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
      * @param component a component.
      * @return all the direct and indirect sub components of the given component.
      */
-    private List getAllSubComponents(final Component component) {
-        List allSubComponents = new ArrayList();
-        List stack = new ArrayList();
+    private List<Component> getAllSubComponents(final Component component) {
+        List<Component> allSubComponents = new ArrayList<Component>();
+        List<Component> stack = new ArrayList<Component>();
 
         // first layer of sub components retreived directly (do not go through the representative)
         Component[] subComponents = getFcSubComponents();
@@ -257,7 +257,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         }
         while (stack.size() > 0) {
             int index = stack.size() - 1;
-            Component c = (Component) stack.get(index);
+            Component c = stack.get(index);
             stack.remove(index);
 
             if (!allSubComponents.contains(c)) {
@@ -283,8 +283,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
 		
 		ExecutorService threadPool = Executors.newCachedThreadPool();
 		ContentControllerExceptionListException e = new ContentControllerExceptionListException();
-		for (Iterator iter = subComponents.iterator(); iter.hasNext();) {
-			Component element = (Component) iter.next();
+		for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
+			Component element = iter.next();
 			AddSubComponentTask task = new AddSubComponentTask(e, this, element);
 			threadPool.execute(task);
 		}
@@ -300,8 +300,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
 		
 		ExecutorService threadPool = Executors.newCachedThreadPool();
 		ContentControllerExceptionListException e = new ContentControllerExceptionListException();
-		for (Iterator iter = subComponents.iterator(); iter.hasNext();) {
-			Component element = (Component) iter.next();
+		for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
+			Component element = iter.next();
 			RemoveSubComponentTask task = new RemoveSubComponentTask(e, this, element);
 			threadPool.execute(task);
 		}

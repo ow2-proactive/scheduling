@@ -119,13 +119,13 @@ public class ProcessControlPanel extends javax.swing.JPanel {
      *
      */
     private class ProcessesListModel extends javax.swing.AbstractListModel {
-        private java.util.ArrayList processesList;
+        private java.util.ArrayList<JVMProcessWrapper> processesList;
 
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
         public ProcessesListModel() {
-            processesList = new java.util.ArrayList();
+            processesList = new java.util.ArrayList<JVMProcessWrapper>();
         }
 
         //
@@ -149,7 +149,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
         }
 
         public void removeProcess(int index) {
-            JVMProcessWrapper wrapper = (JVMProcessWrapper) processesList.remove(index);
+            JVMProcessWrapper wrapper = processesList.remove(index);
             wrapper.stopProcess();
             fireIntervalRemoved(this, index, index);
         }
@@ -434,7 +434,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
         private String[] stringToStringArray(String string) {
             java.util.StringTokenizer st = new java.util.StringTokenizer(string,
                     "\n");
-            java.util.ArrayList result = new java.util.ArrayList();
+            java.util.ArrayList<String> result = new java.util.ArrayList<String>();
             while (st.hasMoreTokens()) {
                 String s = st.nextToken().trim();
                 if (s.length() > 0) {

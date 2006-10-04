@@ -77,7 +77,7 @@ public class Shortcut implements Serializable {
     public Shortcut(String functionalInterfaceName, UniversalBody sender,
         UniversalBody intermediate) {
         fcFunctionalInterfaceName = functionalInterfaceName;
-        steps = new Vector();
+        steps = new Vector<UniversalBody>();
         this.sender = sender;
         steps.add(intermediate);
     }
@@ -119,7 +119,7 @@ public class Shortcut implements Serializable {
     public ItfID getLinkedInterfaceID() {
         // it is the first encountered interface while creating the shortcut
         return new ItfID(fcFunctionalInterfaceName,
-            ((UniversalBody) steps.get(0)).getID());
+            steps.get(0).getID());
     }
 
     /**
@@ -129,7 +129,7 @@ public class Shortcut implements Serializable {
     public ItfID getShortcutInterfaceID() {
         // it is the last encountered interface while creating the shortcut
         return new ItfID(fcFunctionalInterfaceName,
-            ((UniversalBody) steps.get(steps.size() - 1)).getID());
+            steps.get(steps.size() - 1).getID());
     }
 
     /**
@@ -137,7 +137,7 @@ public class Shortcut implements Serializable {
      * @return a reference on the body which is targetted by this shortcut
      */
     public UniversalBody getShortcutTargetBody() {
-        return (UniversalBody) steps.get(steps.size() - 1);
+        return steps.get(steps.size() - 1);
     }
 
     //

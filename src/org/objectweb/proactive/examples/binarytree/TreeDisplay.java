@@ -99,9 +99,9 @@ public class TreeDisplay {
     }
 
     // Return a specified number of random keys
-    public java.util.ArrayList getRandomKeys(int number) {
-        java.util.ArrayList result = new java.util.ArrayList();
-        java.util.ArrayList keys = getKeys();
+    public java.util.ArrayList<String> getRandomKeys(int number) {
+        java.util.ArrayList<String> result = new java.util.ArrayList<String>();
+        java.util.ArrayList<String> keys = getKeys();
         if (keys.size() < number) {
             number = keys.size();
         }
@@ -116,8 +116,8 @@ public class TreeDisplay {
     }
 
     // Return the key list of the tree. 
-    public java.util.ArrayList getKeys() {
-        java.util.ArrayList keys = new java.util.ArrayList();
+    public java.util.ArrayList<String> getKeys() {
+        java.util.ArrayList<String> keys = new java.util.ArrayList<String>();
         if (tree != null) {
             keys = tree.getKeys();
         }
@@ -143,16 +143,16 @@ public class TreeDisplay {
      *    Methods to create a random tree       *
      ********************************************/
     private String[] randomKeys(int number) {
-        java.util.TreeSet keys = new java.util.TreeSet();
+        java.util.TreeSet<String> keys = new java.util.TreeSet<String>();
         for (int i = 0; i < number; i++) {
             while (!keys.add(randomWord(4))) {
             }
         }
         int i = 0;
         String[] result = new String[number];
-        java.util.Iterator it = keys.iterator();
+        java.util.Iterator<String> it = keys.iterator();
         while (it.hasNext()) {
-            result[i++] = (String) it.next();
+            result[i++] = it.next();
         }
         return result;
     }

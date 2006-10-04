@@ -39,16 +39,16 @@ import java.util.Hashtable;
  * @since 3.0
  */
 public class ActiveQueue extends Thread {
-    private java.util.ArrayList queue;
+    private java.util.ArrayList<ActiveQueueJob> queue;
     private int counter;
     private boolean kill;
-    private Hashtable barriers;
+    private Hashtable<ActiveQueueJob, JobBarrier> barriers;
 
     public ActiveQueue(String name) {
-        queue = new java.util.ArrayList();
+        queue = new java.util.ArrayList<ActiveQueueJob>();
         counter = 0;
         kill = false;
-        barriers = new Hashtable();
+        barriers = new Hashtable<ActiveQueueJob, JobBarrier>();
         this.setName(name);
     }
 
@@ -60,7 +60,7 @@ public class ActiveQueue extends Thread {
      * return the current queue of jobs to perform
      * @return the current queue of jobs to perform
      */
-    public java.util.ArrayList getQueue() {
+    public java.util.ArrayList<ActiveQueueJob> getQueue() {
         return queue;
     }
 
@@ -95,7 +95,7 @@ public class ActiveQueue extends Thread {
      */
     public synchronized ActiveQueueJob removeJob() {
         counter--;
-        return (ActiveQueueJob) (queue.remove(0));
+        return (queue.remove(0));
     }
 
     /**
@@ -124,7 +124,7 @@ public class ActiveQueue extends Thread {
             if (toDo != null) {
                 toDo.doTheJob();
                 // unlock barrier if any
-                JobBarrier b = (JobBarrier) (this.barriers.get(toDo));
+                JobBarrier b = (this.barriers.get(toDo));
                 if (b != null) {
                     // this job is barriered
                     b.signalJobCompletion();

@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class MigrationStrategyImpl implements java.io.Serializable,
     MigrationStrategy {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
-    private java.util.Vector table;
+    private java.util.Vector<Destination> table;
     private int index;
 
     /**
@@ -51,7 +51,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
      */
     public MigrationStrategyImpl() {
         super();
-        table = new java.util.Vector();
+        table = new java.util.Vector<Destination>();
         index = -1; //Negative value for first execution of getNextDestination
     }
 
@@ -62,7 +62,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
      */
     public MigrationStrategyImpl(String filename) {
         super();
-        table = new java.util.Vector();
+        table = new java.util.Vector<Destination>();
         index = -1; //Negative value for first execution of getNextDestination
         String s;
         java.io.FileReader f_in = null;
@@ -142,7 +142,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
         int i = 0;
         Destination r2;
         while (i < table.size()) {
-            r2 = (Destination) table.elementAt(i);
+            r2 = table.elementAt(i);
             if ((r2.getDestination().equals(r.getDestination())) &&
                     (r2.getMethodName().equals(r.getMethodName()))) {
                 table.removeElementAt(i);
@@ -163,7 +163,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
     public Destination next() {
         index++;
         if (index < table.size()) {
-            Destination r = (Destination) table.elementAt(index);
+            Destination r = table.elementAt(index);
 
             //index++;
             return (r);
@@ -179,7 +179,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
      */
     public Destination getCurrentDestination() {
         if ((index < table.size()) && (index >= 0)) {
-            Destination r = (Destination) table.elementAt(index);
+            Destination r = table.elementAt(index);
             return (r);
         } else //should never happens
          {
@@ -220,10 +220,10 @@ public class MigrationStrategyImpl implements java.io.Serializable,
     /**
      * Return a java.util.Vector made of strings representing the destinations
      */
-    public java.util.Vector toVector() {
-        java.util.Vector temp = new java.util.Vector();
+    public java.util.Vector<String> toVector() {
+        java.util.Vector<String> temp = new java.util.Vector<String>();
         for (int i = 0; i < table.size(); i++) {
-            temp.add(((Destination) table.elementAt(i)).getDestination());
+            temp.add(table.elementAt(i).getDestination());
         }
         return temp;
     }

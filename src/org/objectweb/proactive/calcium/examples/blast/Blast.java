@@ -28,6 +28,8 @@
 package org.objectweb.proactive.calcium.examples.blast;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
@@ -55,11 +57,12 @@ public class Blast {
          * 2.3 Blast the database
          * 2.4 Cleanup
          */
-        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(new Seq<BlastParameters>(new ExceuteFormatDB()),
-        						  new Seq<BlastParameters>(new ExecuteFormatQuery()),
-                				  new Seq<BlastParameters>(new ExecuteBlast()),
-                				  new Seq<BlastParameters>(new CleanBlast())
-                				  );
+        List<Skeleton<BlastParameters>>  array = new ArrayList<Skeleton<BlastParameters>>();
+        array.add(new Seq<BlastParameters>(new ExceuteFormatDB()));
+        array.add(new Seq<BlastParameters>(new ExecuteFormatQuery()));
+        array.add(new Seq<BlastParameters>(new CleanBlast()));
+        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(array);
+        						  
 
         /* 1   Divide the database
          * 2   Blast the database with the query

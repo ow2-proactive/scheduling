@@ -284,15 +284,15 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     try {
                         java.util.Iterator it = keys.iterator();
-                        java.util.Vector tab1 = new java.util.Vector();
+                        java.util.Vector<ObjectWrapper> tab1 = new java.util.Vector<ObjectWrapper>();
                         while (it.hasNext()) {
                             String key = (String) it.next();
                             tab1.add(display.search(key));
                         }
 
                         int lng = keys.size();
-                        java.util.ArrayList vKeys = new java.util.ArrayList();
-                        java.util.ArrayList res = new java.util.ArrayList();
+                        java.util.ArrayList<Integer> vKeys = new java.util.ArrayList<Integer>();
+                        java.util.ArrayList<String[]> res = new java.util.ArrayList<String[]>();
                         for (int i = 0; i < lng; i++) {
                             vKeys.add(new Integer(i));
                         }
@@ -302,8 +302,8 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                             key = org.objectweb.proactive.ProActive.waitForAny(tab1);
                             res.add(new String[] {
                                     (String) (keys.get(
-                                        ((Integer) vKeys.remove(key)).intValue())),
-                                    ((ObjectWrapper) tab1.get(key)).toString(),
+                                        vKeys.remove(key).intValue())),
+                                    tab1.get(key).toString(),
                                     "" + i
                                 });
                             tab1.remove(key);
@@ -537,18 +537,18 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     }
 
     public class RefreshThread extends Thread {
-        java.util.ArrayList list;
+        java.util.ArrayList<String[]> list;
 
-        public RefreshThread(java.util.ArrayList list) {
+        public RefreshThread(java.util.ArrayList<String[]> list) {
             this.list = list;
         }
 
         public void run() {
-            java.util.Iterator it = list.iterator();
+            java.util.Iterator<String[]> it = list.iterator();
             while (it.hasNext()) {
                 try {
                     Thread.sleep(500);
-                    searchPane.updateKeyValue((String[]) (it.next()));
+                    searchPane.updateKeyValue((it.next()));
                 } catch (InterruptedException ex) {
                 }
             }

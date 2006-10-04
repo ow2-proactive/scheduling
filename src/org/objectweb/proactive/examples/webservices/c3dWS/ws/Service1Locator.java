@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 
+import javax.xml.namespace.QName;
+
 public class Service1Locator extends org.apache.axis.client.Service
     implements org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1 {
     // Use to get a proxy class for Service1Soap
@@ -37,7 +39,7 @@ public class Service1Locator extends org.apache.axis.client.Service
 
     // The WSDD service name defaults to the port name.
     private java.lang.String Service1SoapWSDDServiceName = "Service1Soap";
-    private java.util.HashSet ports = null;
+    private java.util.HashSet<QName> ports = null;
 
     public Service1Locator(String url) {
         this.Service1Soap_address = url;
@@ -140,9 +142,9 @@ public class Service1Locator extends org.apache.axis.client.Service
         return new javax.xml.namespace.QName("http://tempuri.org/", "Service1");
     }
 
-    public java.util.Iterator getPorts() {
+    public java.util.Iterator<QName> getPorts() {
         if (ports == null) {
-            ports = new java.util.HashSet();
+            ports = new java.util.HashSet<QName>();
             ports.add(new javax.xml.namespace.QName("Service1Soap"));
         }
 

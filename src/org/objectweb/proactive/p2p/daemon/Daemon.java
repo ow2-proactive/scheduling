@@ -272,13 +272,13 @@ class IntervalTime implements Comparable {
 
 
 class WorkTime {
-    private List intervals;
+    private List<IntervalTime> intervals;
 
     public WorkTime() {
-        intervals = new ArrayList();
+        intervals = new ArrayList<IntervalTime>();
     }
 
-    private boolean handleIntersection(ListIterator iter,
+    private boolean handleIntersection(ListIterator<IntervalTime> iter,
         IntervalTime intersected, IntervalTime interval) {
         if (interval.compareTo(intersected) < 0) {
             intersected.setStart(interval.getStart());
@@ -287,9 +287,9 @@ class WorkTime {
         if (interval.getEnd().compareTo(intersected.getEnd()) > 0) {
             intersected.setEnd(interval.getEnd());
 
-            List toDelete = new ArrayList();
+            List<IntervalTime> toDelete = new ArrayList<IntervalTime>();
             while (iter.hasNext()) {
-                IntervalTime next = (IntervalTime) iter.next();
+                IntervalTime next = iter.next();
                 if (intersected.contains(next)) {
                     toDelete.add(next);
                 } else if (intersected.intersect(next)) {
@@ -300,9 +300,9 @@ class WorkTime {
                 }
             }
 
-            Iterator toDeleteIter = toDelete.iterator();
+            Iterator<IntervalTime> toDeleteIter = toDelete.iterator();
             while (toDeleteIter.hasNext()) {
-                IntervalTime toDeleteItem = (IntervalTime) toDeleteIter.next();
+                IntervalTime toDeleteItem = toDeleteIter.next();
                 intervals.remove(toDeleteItem);
             }
         }
@@ -315,9 +315,9 @@ class WorkTime {
             return false;
         }
 
-        ListIterator iter = intervals.listIterator();
+        ListIterator<IntervalTime> iter = intervals.listIterator();
         while (iter.hasNext()) {
-            IntervalTime inList = (IntervalTime) iter.next();
+            IntervalTime inList = iter.next();
             if (inList.intersect(interval)) {
                 if (inList.contains(interval)) {
                     return true;
@@ -353,9 +353,9 @@ class WorkTime {
 
     public IntervalTime getCurrentWorkInterval() {
         Moment now = new Moment();
-        Iterator iter = intervals.iterator();
+        Iterator<IntervalTime> iter = intervals.iterator();
         while (iter.hasNext()) {
-            IntervalTime interval = (IntervalTime) iter.next();
+            IntervalTime interval = iter.next();
             if (interval.getEnd().equals(now)) {
                 continue;
             }
@@ -374,15 +374,15 @@ class WorkTime {
 
     public IntervalTime getNextWorkInterval() {
         Moment now = new Moment();
-        Iterator iter = intervals.iterator();
+        Iterator<IntervalTime> iter = intervals.iterator();
         while (iter.hasNext()) {
-            IntervalTime interval = (IntervalTime) iter.next();
+            IntervalTime interval = iter.next();
             if (interval.getStart().compareTo(now) >= 0) {
                 return interval;
             }
         }
 
-        return (IntervalTime) intervals.get(0);
+        return intervals.get(0);
     }
 
     public int computeDuration(IntervalTime work) {
@@ -397,7 +397,7 @@ class WorkTime {
             return -1;
         }
 
-        IntervalTime first = (IntervalTime) intervals.get(0);
+        IntervalTime first = intervals.get(0);
         if (!first.getStart().equals(Moment.START_OF_WEEK)) {
             return end.minutesFromNow();
         }
@@ -411,12 +411,12 @@ class WorkTime {
 
     /* <Debug> */
     public boolean isValid() {
-        Iterator iter = intervals.iterator();
+        Iterator<IntervalTime> iter = intervals.iterator();
         IntervalTime previous = null;
         IntervalTime current = null;
         while (iter.hasNext()) {
             previous = current;
-            current = (IntervalTime) iter.next();
+            current = iter.next();
             if (!current.isValid()) {
                 return false;
             }
@@ -437,10 +437,10 @@ class WorkTime {
         }
         String res = "(" + intervals.get(0);
 
-        Iterator iter = intervals.iterator();
+        Iterator<IntervalTime> iter = intervals.iterator();
         iter.next();
         while (iter.hasNext()) {
-            IntervalTime current = (IntervalTime) iter.next();
+            IntervalTime current = iter.next();
             res += (", " + current);
         }
 
@@ -464,9 +464,9 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         "config" + File.separator;
     private static String hostname = null;
     private WorkTime work;
-    private Vector url;
+    private Vector<String> url;
 
-    public XMLConfig(WorkTime work, Vector url) {
+    public XMLConfig(WorkTime work, Vector<String> url) {
         this.work = work;
         this.url = url;
     }
@@ -501,11 +501,11 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     /* Used when parsing */
     private boolean rightHost;
     private boolean rightConfig;
-    private Stack currentConfigFile;
+    private Stack<File> currentConfigFile;
     private Moment start;
     private Moment end;
     private boolean parsed;
-    private Collection parsedXML;
+    private Collection<String> parsedXML;
 
     public void startElement(String name, Attributes attributes)
         throws SAXException {
@@ -528,7 +528,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
             String path = attributes.getValue("path").replace('/',
                     File.separatorChar);
             if (!new File(path).isAbsolute()) {
-                File current = (File) currentConfigFile.peek();
+                File current = currentConfigFile.peek();
                 path = new File(current.getParentFile(), path).getAbsolutePath();
             }
 
@@ -610,11 +610,11 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     }
 
     public void parse() throws SAXException {
-        currentConfigFile = new Stack();
+        currentConfigFile = new Stack<File>();
         rightHost = false;
         rightConfig = false;
         parsed = false;
-        parsedXML = new HashSet();
+        parsedXML = new HashSet<String>();
 
         if (parseConfigFile(getDefaultConfig(true)) ||
                 parseConfigFile(getDefaultConfig(false))) {
@@ -630,7 +630,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
 
 public class Daemon {
     private WorkTime work;
-    private Vector url;
+    private Vector<String> url;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_DAEMON);
 
     /* Logging */
@@ -701,7 +701,7 @@ public class Daemon {
 
     private Daemon(boolean nextRun) {
         work = new WorkTime();
-        url = new Vector();
+        url = new Vector<String>();
 
         try {
             new XMLConfig(work, url).parse();

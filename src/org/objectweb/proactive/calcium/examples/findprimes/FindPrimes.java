@@ -41,7 +41,7 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 public class FindPrimes implements Serializable{
 
-	public Skeleton root;
+	public Skeleton<Challenge> root;
 
 	
 	public static void main(String[] args) {

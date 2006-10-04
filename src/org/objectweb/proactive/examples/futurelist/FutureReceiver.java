@@ -40,7 +40,7 @@ public class FutureReceiver implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     int etape = 0; // this is to count the jumps we have made so far
     BlockedObject blocked;
-    java.util.Vector waitingFutures = new java.util.Vector();
+    java.util.Vector<EmptyFuture> waitingFutures = new java.util.Vector<EmptyFuture>();
     FutureList futureList;
 
     public FutureReceiver() {
@@ -62,9 +62,9 @@ public class FutureReceiver implements java.io.Serializable {
     public void displayAllFutures() {
         EmptyFuture temp;
 
-        for (java.util.Enumeration e = waitingFutures.elements();
+        for (java.util.Enumeration<EmptyFuture> e = waitingFutures.elements();
                 e.hasMoreElements();) {
-            temp = (EmptyFuture) e.nextElement();
+            temp = e.nextElement();
             logger.info("Result: " + temp.getName());
         }
     }

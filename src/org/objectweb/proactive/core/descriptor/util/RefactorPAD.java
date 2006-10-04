@@ -83,7 +83,7 @@ public class RefactorPAD {
         Set set = virtualNodesMapping.keySet();
 
         // do a copy of the keyList in a list to avoid concurrent problems with iter.next() when removing
-        List keyList = new ArrayList();
+        List<String> keyList = new ArrayList<String>();
         for (Iterator iter = set.iterator(); iter.hasNext();) {
             String id = (String) iter.next();
             keyList.add(id);
@@ -93,7 +93,7 @@ public class RefactorPAD {
         //    virtualNodesMapping.size());
         // for all nodes, if the current node is a main node, remove it
         for (int i = 0; i < keyList.size(); i++) {
-            String id = (String) keyList.get(i);
+            String id = keyList.get(i);
 
             //System.out.println("*** VN searched : " + id);
             VirtualNode vn = (VirtualNode) virtualNodesMapping.get(id);

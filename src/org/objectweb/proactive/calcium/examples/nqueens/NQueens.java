@@ -41,7 +41,7 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 public class NQueens implements Serializable{
 
-	public Skeleton root;
+	public Skeleton<Board> root;
 	
 	public static void main(String[] args) {
 		

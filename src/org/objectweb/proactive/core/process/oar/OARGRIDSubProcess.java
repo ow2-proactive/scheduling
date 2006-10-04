@@ -149,13 +149,13 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
     public void setResources(String resources) {
         checkStarted();
         if (resources != null) {
-            ArrayList al = new ArrayList();
+            ArrayList<OarSite> al = new ArrayList<OarSite>();
             this.resources = resources;
             String[] resTab = resources.split(",");
             for (int i = 0; i < resTab.length; i++)
                 al.add(new OarSite(resTab[i]));
 
-            this.oarsite = (OarSite[]) al.toArray((new OarSite[] {  }));
+            this.oarsite = al.toArray((new OarSite[] {  }));
         }
     }
 
@@ -183,7 +183,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
 
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
-        ArrayList al = new ArrayList();
+        ArrayList<String> al = new ArrayList<String>();
 
         //we divide the command into tokens
         //it's basically 3 blocks, the script path, the option and the rest
@@ -197,7 +197,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
             //            System.out.println(m.group(i));
             al.add(m.group(i));
         }
-        String[] command = (String[]) al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {  });
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);

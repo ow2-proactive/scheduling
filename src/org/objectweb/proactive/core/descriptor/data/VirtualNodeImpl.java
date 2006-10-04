@@ -130,19 +130,19 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private int lastVirtualMachineIndex;
 
     /** the list of RuntimeForwarder that have been created */
-    private ArrayList createdRuntimeF;
+    private ArrayList<ProActiveRuntime> createdRuntimeF;
 
     /** the list of nodes linked to this VirtualNode that have been created*/
-    private java.util.ArrayList createdNodes;
+    private java.util.ArrayList<Node> createdNodes;
 
     /** the list of file transfers to deploy*/
-    private java.util.ArrayList fileTransferDeploy;
+    private java.util.ArrayList<FileTransferDefinition> fileTransferDeploy;
 
     /** the list of file transfers to retrieve*/
-    private java.util.ArrayList fileTransferRetrieve;
+    private java.util.ArrayList<FileTransferDefinition> fileTransferRetrieve;
 
     /** Holds the futures for the status of the deployed files using pftp */
-    private HashMap fileTransferDeployedStatus;
+    private HashMap<String, FileVector> fileTransferDeployedStatus;
     private int fileBlockSize;
     private int overlapping;
 
@@ -166,7 +166,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** the list of VirtualNodes Id that this VirualNode is waiting for in order to create Nodes on a JVM
      * already assigned in the XML descriptor */
-    private Hashtable awaitedVirtualNodes;
+    private Hashtable<String, VirtualMachine> awaitedVirtualNodes;
     private String registrationProtocol;
     private boolean registration = false;
     private boolean waitForTimeout = false;
@@ -190,12 +190,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
-    private Vector p2pNodes = new Vector();
+    private Vector<Node> p2pNodes = new Vector<Node>();
 
     // PAD infos
     private boolean mainVirtualNode;
     private String padURL;
-    private Vector p2pNodeslookupList = new Vector();
+    private Vector<P2PNodeLookup> p2pNodeslookupList = new Vector<P2PNodeLookup>();
 
     //REGISTRATION ATTEMPTS
     private final int REGISTRATION_ATTEMPTS = 2;
@@ -232,12 +232,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
         localVirtualMachines = new java.util.ArrayList<VirtualMachine>();
-        createdNodes = new java.util.ArrayList();
-        createdRuntimeF = new ArrayList();
-        awaitedVirtualNodes = new Hashtable();
-        fileTransferDeploy = new ArrayList();
-        fileTransferDeployedStatus = new HashMap();
-        fileTransferRetrieve = new ArrayList();
+        createdNodes = new java.util.ArrayList<Node>();
+        createdRuntimeF = new ArrayList<ProActiveRuntime>();
+        awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
+        fileTransferDeploy = new ArrayList<FileTransferDefinition>();
+        fileTransferDeployedStatus = new HashMap<String, FileVector>();
+        fileTransferRetrieve = new ArrayList<FileTransferDefinition>();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
         fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
         overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
@@ -719,11 +719,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         waitForNodeCreation();
 
         if (!createdNodes.isEmpty()) {
-            node = (Node) createdNodes.get(lastNodeIndex);
+            node = createdNodes.get(lastNodeIndex);
             increaseNodeIndex();
 
             //wait for pending file transfer
-            FileVector fw = (FileVector) fileTransferDeployedStatus.get(node.getNodeInformation()
+            FileVector fw = fileTransferDeployedStatus.get(node.getNodeInformation()
                                                                             .getName());
             if (fw != null) {
                 fw.waitForAll(); //wait-by-necessity
@@ -735,14 +735,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     public Node getNode(int index) throws NodeException {
-        Node node = (Node) createdNodes.get(index);
+        Node node = createdNodes.get(index);
 
         if (node == null) {
             throw new NodeException(
                 "Cannot return the first node, no nodes hava been created");
         }
 
-        FileVector fw = (FileVector) fileTransferDeployedStatus.get(node.getNodeInformation()
+        FileVector fw = fileTransferDeployedStatus.get(node.getNodeInformation()
                                                                         .getName());
         if (fw != null) {
             fw.waitForAll(); //wait-by-necessity
@@ -765,7 +765,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 nodeNames = new String[createdNodes.size()];
 
                 for (int i = 0; i < createdNodes.size(); i++) {
-                    nodeNames[i] = ((Node) createdNodes.get(i)).getNodeInformation()
+                    nodeNames[i] = createdNodes.get(i).getNodeInformation()
                                     .getURL();
                 }
             }
@@ -800,7 +800,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 nodeTab = new Node[createdNodes.size()];
 
                 for (int i = 0; i < createdNodes.size(); i++) {
-                    nodeTab[i] = ((Node) createdNodes.get(i));
+                    nodeTab[i] = createdNodes.get(i);
                 }
             }
         } else {
@@ -832,9 +832,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (!createdNodes.isEmpty()) {
             synchronized (createdNodes) {
                 for (int i = 0; i < createdNodes.size(); i++) {
-                    if (((Node) createdNodes.get(i)).getNodeInformation()
+                    if (createdNodes.get(i).getNodeInformation()
                              .getURL().equals(url)) {
-                        node = (Node) createdNodes.get(i);
+                        node = createdNodes.get(i);
 
                         break;
                     }
@@ -857,14 +857,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (this.p2pNodeslookupList.size() > 0) {
                 for (int index = 0; index < this.p2pNodeslookupList.size();
                         index++) {
-                    P2PNodeLookup currentNodesLookup = (P2PNodeLookup) this.p2pNodeslookupList.get(index);
+                    P2PNodeLookup currentNodesLookup = this.p2pNodeslookupList.get(index);
                     currentNodesLookup.killAllNodes();
                 }
             }
 
             // Killing other nodes
             for (int i = 0; i < createdNodes.size(); i++) {
-                node = (Node) createdNodes.get(i);
+                node = createdNodes.get(i);
                 part = node.getProActiveRuntime();
 
                 if (this.p2pNodes.contains(node)) {
@@ -917,7 +917,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         for (int i = 0; i < createdRuntimeF.size(); i++) {
-            part = (ProActiveRuntime) createdRuntimeF.get(i);
+            part = createdRuntimeF.get(i);
 
             try {
                 part.killRT(true);
@@ -1328,10 +1328,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         //wait for the nodes to complete their deployment file transfer
-        Collection c = fileTransferDeployedStatus.values();
-        Iterator it = c.iterator();
+        Collection<FileVector> c = fileTransferDeployedStatus.values();
+        Iterator<FileVector> it = c.iterator();
         while (it.hasNext()) {
-            FileVector fw = (FileVector) it.next();
+            FileVector fw = it.next();
             fw.waitForAll(); //wait-by-necessity
         }
 
@@ -1492,13 +1492,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         if ((ftsDeploy != null) && ftsDeploy.isImplicit()) {
             for (int i = 0; i < fileTransferDeploy.size(); i++)
-                ftsDeploy.addFileTransfer((FileTransferDefinition) fileTransferDeploy.get(
+                ftsDeploy.addFileTransfer(fileTransferDeploy.get(
                         i));
         }
 
         if ((ftsRetrieve != null) && ftsRetrieve.isImplicit()) {
             for (int i = 0; i < fileTransferRetrieve.size(); i++)
-                ftsRetrieve.addFileTransfer((FileTransferDefinition) fileTransferRetrieve.get(
+                ftsRetrieve.addFileTransfer(fileTransferRetrieve.get(
                         i));
         }
     }

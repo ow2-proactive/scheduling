@@ -78,10 +78,10 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     protected String proActiveRuntimeURL;
 
     //	stores nodes urls to be able to unregister nodes
-    protected ArrayList nodesArray;
+    protected ArrayList<String> nodesArray;
 
     //store vn urls to be able to unregister vns
-    protected ArrayList vnNodesArray;
+    protected ArrayList<String> vnNodesArray;
 
     //	
     // -- CONSTRUCTORS -----------------------------------------------
@@ -90,8 +90,8 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         throws RemoteException, AlreadyBoundException {
         //System.out.println("toto");
         this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-        this.nodesArray = new java.util.ArrayList();
-        this.vnNodesArray = new java.util.ArrayList();
+        this.nodesArray = new java.util.ArrayList<String>();
+        this.vnNodesArray = new java.util.ArrayList<String>();
         this.proActiveRuntimeURL = buildRuntimeURL();
         register(proActiveRuntimeURL, false);
     }
@@ -128,7 +128,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
 
     public void killAllNodes() throws RemoteException, ProActiveException {
         for (int i = 0; i < nodesArray.size(); i++) {
-            String url = (String) nodesArray.get(i);
+            String url = nodesArray.get(i);
             killNode(url);
         }
 
@@ -280,7 +280,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
     public void unregisterAllVirtualNodes()
         throws RemoteException, ProActiveException {
         for (int i = 0; i < vnNodesArray.size(); i++) {
-            String url = (String) vnNodesArray.get(i);
+            String url = vnNodesArray.get(i);
             unregisterVirtualNode(url);
         }
     }

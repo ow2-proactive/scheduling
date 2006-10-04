@@ -488,7 +488,7 @@ public abstract class Utils extends Object {
      * @param cl the base interface
      * @param superItfs a vector that will list all Class instances corresponding to the super interfaces of cl
      */
-    public static void addSuperInterfaces(Class cl, List superItfs) {
+    public static void addSuperInterfaces(Class cl, List<Class> superItfs) {
         if (!cl.isInterface()) {
             return;
         }
@@ -504,10 +504,10 @@ public abstract class Utils extends Object {
      * adds them to this list.
      * @param interfaces a list of interfaces
      */
-    public static void addSuperInterfaces(List interfaces) {
+    public static void addSuperInterfaces(List<Class> interfaces) {
         for (int i = 0; i < interfaces.size(); i++) {
-            Class[] super_itfs_table = ((Class) interfaces.get(i)).getInterfaces();
-            List super_itfs = new ArrayList(super_itfs_table.length); // resizable list
+            Class[] super_itfs_table = interfaces.get(i).getInterfaces();
+            List<Class> super_itfs = new ArrayList<Class>(super_itfs_table.length); // resizable list
             for (int j = 0; j < super_itfs_table.length; j++) {
                 super_itfs.add(super_itfs_table[j]);
             }

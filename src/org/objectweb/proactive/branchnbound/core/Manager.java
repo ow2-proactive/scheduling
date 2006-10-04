@@ -85,11 +85,11 @@ public class Manager implements Serializable, InitActive {
     private Worker workerGroup = null;
 
     // managing task
-    private Vector futureTaskList = new Vector();
-    private Vector pendingTaskList = new Vector();
-    private Vector workingWorkerList = new Vector();
-    private Vector freeWorkerList = new Vector();
-    private Vector toReallocTaskList = new Vector();
+    private Vector<Result> futureTaskList = new Vector<Result>();
+    private Vector<Task> pendingTaskList = new Vector<Task>();
+    private Vector<Worker> workingWorkerList = new Vector<Worker>();
+    private Vector<Worker> freeWorkerList = new Vector<Worker>();
+    private Vector<Task> toReallocTaskList = new Vector<Task>();
 
     /**
      * The no args constructor for ProActive.
@@ -214,7 +214,7 @@ public class Manager implements Serializable, InitActive {
                     " groups of workers");
                 // Node[][]
                 this.workerGroup = (Worker) ProActiveGroup.newGroup(Worker.class.getName());
-                Group mainGroup = ProActiveGroup.getGroup(this.workerGroup);
+                Group<Worker> mainGroup = ProActiveGroup.getGroup(this.workerGroup);
                 for (int i = 0; i < this.arrayOfNodes.length; i++) {
                     GroupThread gt = new GroupThread(this.arrayOfNodes[i],
                             args, mainGroup);
@@ -226,7 +226,7 @@ public class Manager implements Serializable, InitActive {
                     " groups of workers");
                 // VN []
                 this.workerGroup = (Worker) ProActiveGroup.newGroup(Worker.class.getName());
-                Group vnGroup = ProActiveGroup.getGroup(this.workerGroup);
+                Group<Worker> vnGroup = ProActiveGroup.getGroup(this.workerGroup);
                 for (int i = 0; i < this.arrayOfVns.length; i++) {
                     VnThread vt = new VnThread(this.arrayOfVns[i], args, vnGroup);
                     new Thread(vt).start();
@@ -249,7 +249,7 @@ public class Manager implements Serializable, InitActive {
             throw new ProActiveRuntimeException(e);
         }
 
-        Group groupOfWorkers = ProActiveGroup.getGroup(this.workerGroup);
+        Group<Worker> groupOfWorkers = ProActiveGroup.getGroup(this.workerGroup);
         this.workerGroup.setWorkerGroup(this.workerGroup);
 
         if (logger.isInfoEnabled()) {
@@ -284,9 +284,9 @@ public class Manager implements Serializable, InitActive {
             boolean hasAddedTask = false;
             if (!this.toReallocTaskList.isEmpty() &&
                     !this.freeWorkerList.isEmpty()) {
-                Task tReallocated = (Task) this.toReallocTaskList.remove(0);
+                Task tReallocated = this.toReallocTaskList.remove(0);
                 try {
-                    this.assignTaskToWorker((Worker) this.freeWorkerList.remove(
+                    this.assignTaskToWorker(this.freeWorkerList.remove(
                             0), tReallocated);
                     logger.info("A task just reallocated");
                 } catch (Exception e) {
@@ -299,7 +299,7 @@ public class Manager implements Serializable, InitActive {
                     if ((this.freeWorkerList.size() > 0)) {
                         Task t = this.taskProviderQueue.next();
                         try {
-                            this.assignTaskToWorker((Worker) this.freeWorkerList.remove(
+                            this.assignTaskToWorker(this.freeWorkerList.remove(
                                     0), t);
                             hasAddedTask = true;
                         } catch (Exception e) {
@@ -328,10 +328,10 @@ public class Manager implements Serializable, InitActive {
                 try {
                     int index = ProActive.waitForAny(this.futureTaskList, 1000);
                     backupCounter++;
-                    Result currentResult = (Result) this.futureTaskList.remove(index);
+                    Result currentResult = this.futureTaskList.remove(index);
                     this.taskProviderQueue.addResult(currentResult);
                     this.pendingTaskList.remove(index);
-                    Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
+                    Worker freeWorker = this.workingWorkerList.remove(index);
                     if (this.taskProviderQueue.hasNext().booleanValue()) {
                         Task t1 = this.taskProviderQueue.next();
                         try {
@@ -368,7 +368,7 @@ public class Manager implements Serializable, InitActive {
                         reallocCounter = 0;
                         for (int i = 0; i < this.workingWorkerList.size();
                                 i++) {
-                            Worker current = (Worker) this.workingWorkerList.get(i);
+                            Worker current = this.workingWorkerList.get(i);
                             try {
                                 current.alive();
                             } catch (Exception down) {
@@ -533,9 +533,9 @@ public class Manager implements Serializable, InitActive {
     private class GroupThread implements Runnable {
         private Node[] nodes;
         private Object[] args;
-        private Group group;
+        private Group<Worker> group;
 
-        public GroupThread(Node[] nodes, Object[] args, Group group) {
+        public GroupThread(Node[] nodes, Object[] args, Group<Worker> group) {
             this.nodes = nodes;
             this.args = args;
             this.group = group;
@@ -583,11 +583,11 @@ public class Manager implements Serializable, InitActive {
     private class VnThread implements Runnable {
         private VirtualNode vn;
         private Object[] args;
-        private Group group;
+        private Group<Worker> group;
         long startTime;
         long endTime;
 
-        public VnThread(VirtualNode virtualNode, Object[] args, Group vnGroup) {
+        public VnThread(VirtualNode virtualNode, Object[] args, Group<Worker> vnGroup) {
             this.vn = virtualNode;
             this.args = args;
             this.group = vnGroup;

@@ -68,8 +68,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Node p2pServiceNode = null;
     private ProActiveRuntime proactiveRuntime = null;
-    private Vector availbaleNodes = new Vector();
-    private Vector bookedNodes = new Vector();
+    private Vector<Node> availbaleNodes = new Vector<Node>();
+    private Vector<Object> bookedNodes = new Vector<Object>();
     private Vector usingNodes = new Vector();
     private int nodeCounter = 0;
     private final String descriptorPath = System.getProperty(PROPERPY_XML_PATH);
@@ -106,7 +106,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.deployingDefaultSharedNodes();
             }
             if (this.availbaleNodes.size() > 0) {
-                Node node = (Node) this.availbaleNodes.remove(0);
+                Node node = this.availbaleNodes.remove(0);
                 this.bookedNodes.add(new Booking(node));
                 logger.debug("Yes the manager has a node");
                 return new P2PNode(node,
@@ -119,7 +119,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         return new P2PNode(null, null);
     }
 
-    public Vector askingAllNodes(String nodeFamilyRegexp) {
+    public Vector<Node> askingAllNodes(String nodeFamilyRegexp) {
         logger.debug("Asking all nodes to the nodes manager");
         if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
                 System.getProperty("os.name").matches(nodeFamilyRegexp)) {
@@ -130,7 +130,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.deployingDefaultSharedNodes();
             }
             if (this.availbaleNodes.size() > 0) {
-                Vector allNodes = new Vector(this.availbaleNodes);
+                Vector<Node> allNodes = new Vector<Node>(this.availbaleNodes);
                 this.availbaleNodes.removeAllElements();
                 this.bookedNodes.addAll(allNodes);
                 logger.debug("Yes the manager has some nodes");
@@ -140,7 +140,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
 
         // All nodes is already assigned
         logger.debug("Sorry no availbale node for the moment");
-        return new Vector();
+        return new Vector<Node>();
     }
 
     public P2PNode askingNode(boolean evenIfItIsShared) {
@@ -154,7 +154,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
             this.deployingDefaultSharedNodes();
         }
         if (this.availbaleNodes.size() > 0) {
-            Node node = (Node) this.availbaleNodes.remove(0);
+            Node node = this.availbaleNodes.remove(0);
             this.bookedNodes.add(new Booking(node));
             logger.debug("Yes, the manager has an empty node");
             return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
@@ -199,7 +199,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      * @param givenNode node given and not used.
      */
     public void noMoreNodeNeeded(Node givenNode) {
-        Iterator it = this.bookedNodes.iterator();
+        Iterator<Object> it = this.bookedNodes.iterator();
         while (it.hasNext()) {
             Booking current = (Booking) it.next();
             if (current.getNode().equals(givenNode)) {

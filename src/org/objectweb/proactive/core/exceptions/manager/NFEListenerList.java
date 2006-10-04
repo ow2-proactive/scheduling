@@ -41,10 +41,10 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 public class NFEListenerList implements NFEProducer, Serializable {
 
     /* The registered handlers */
-    private Collection listeners;
+    private Collection<NFEListener> listeners;
 
     public NFEListenerList() {
-        listeners = new LinkedList();
+        listeners = new LinkedList<NFEListener>();
     }
 
     public void addNFEListener(NFEListener listener) {
@@ -58,9 +58,9 @@ public class NFEListenerList implements NFEProducer, Serializable {
     public int fireNFE(NonFunctionalException e) {
         int nbListeners = 0;
 
-        Iterator iter = listeners.iterator();
+        Iterator<NFEListener> iter = listeners.iterator();
         while (iter.hasNext()) {
-            NFEListener listener = (NFEListener) iter.next();
+            NFEListener listener = iter.next();
             if (listener.handleNFE(e)) {
                 nbListeners++;
             }

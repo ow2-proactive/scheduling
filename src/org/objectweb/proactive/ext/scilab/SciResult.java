@@ -44,7 +44,7 @@ public class SciResult implements Serializable{
 	public static final int SUCCESS = 0, ABORT = 1;
 	private String id;
 	private int state;
-	private HashMap mapResult; //map of SciResult
+	private HashMap<String, SciData> mapResult; //map of SciResult
 	private long timeExecution;
 	
 	/**
@@ -56,7 +56,7 @@ public class SciResult implements Serializable{
 	
 	public SciResult(String id){
 		this.id = id;
-		mapResult = new HashMap();
+		mapResult = new HashMap<String, SciData>();
 	}
 	
 	/**
@@ -73,16 +73,16 @@ public class SciResult implements Serializable{
 	 * @return the data
 	 */
 	public SciData get(String name){
-		return (SciData) this.mapResult.get(name);
+		return this.mapResult.get(name);
 	}
 	
 	/**
 	 * 
 	 * @return list of all out data 
 	 */
-	public ArrayList getList(){
-		ArrayList listResult = new ArrayList();
-		Iterator it = this.mapResult.values().iterator();
+	public ArrayList<SciData> getList(){
+		ArrayList<SciData> listResult = new ArrayList<SciData>();
+		Iterator<SciData> it = this.mapResult.values().iterator();
 		
 		while(it.hasNext()){
 			listResult.add(it.next());

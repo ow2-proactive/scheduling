@@ -111,7 +111,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
      * destination filename.
      */
     protected FileDescription[] getHomonymousFiles() {
-        ArrayList aList = new ArrayList();
+        ArrayList<FileDescription> aList = new ArrayList<FileDescription>();
 
         for (int i = 0; i < fileTransfer.length; i++) {
             FileDescription[] fd = fileTransfer[i].getHomonymousFile();
@@ -119,7 +119,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
                 aList.add(fd[j]);
         }
 
-        return (FileDescription[]) aList.toArray(new FileDescription[0]);
+        return aList.toArray(new FileDescription[0]);
     }
 
     /**
@@ -131,7 +131,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
      * filename.
      */
     protected FileDescription[] getHeteronymousFiles() {
-        ArrayList aList = new ArrayList();
+        ArrayList<FileDescription> aList = new ArrayList<FileDescription>();
 
         for (int i = 0; i < fileTransfer.length; i++) {
             FileDescription[] fd = fileTransfer[i].getHeteronymousFile();
@@ -139,7 +139,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
                 aList.add(fd[j]);
         }
 
-        return (FileDescription[]) aList.toArray(new FileDescription[0]);
+        return aList.toArray(new FileDescription[0]);
     }
 
     /**
@@ -151,7 +151,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
      * destination dirname.
      */
     protected DirectoryDescription[] getHomonymousDirs() {
-        ArrayList aList = new ArrayList();
+        ArrayList<FileDescription> aList = new ArrayList<FileDescription>();
 
         for (int i = 0; i < fileTransfer.length; i++) {
             FileDescription[] fd = fileTransfer[i].getHomonymousDir();

@@ -122,7 +122,7 @@ public class ProActiveSecurityDescriptorHandler
         //            policyServer.setApplicationCertificate(applicationCertificatePath);
         //        } else 
         if (name.equals(RULES_TAG)) {
-           
+            
             policyRules =   (ArrayList) activeHandler.getResultObject();
             policyServer.setPolicies(policyRules);
         } else if (name.equals(APPLICATION_NAME_TAG)) {

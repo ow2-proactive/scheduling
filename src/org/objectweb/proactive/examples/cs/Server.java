@@ -55,13 +55,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class Server {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected String messageOfTheDay;
-    protected java.util.ArrayList clients;
+    protected java.util.ArrayList<Client> clients;
 
     public Server() {
     }
 
     public Server(String messageOfTheDay) {
-        this.clients = new java.util.ArrayList();
+        this.clients = new java.util.ArrayList<Client>();
         this.messageOfTheDay = messageOfTheDay;
     }
 
@@ -84,11 +84,11 @@ public class Server {
     }
 
     protected void notifyClients() {
-        java.util.Iterator it = this.clients.iterator();
+        java.util.Iterator<Client> it = this.clients.iterator();
         Client currentClient;
 
         while (it.hasNext()) {
-            currentClient = (Client) it.next();
+            currentClient = it.next();
             try {
                 currentClient.messageChanged(this.messageOfTheDay);
             } catch (Exception t) {

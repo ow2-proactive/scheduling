@@ -45,7 +45,7 @@ public class ThreadPool {
     private Thread[] threads = null;
 
     /** The queue of pending jobs waiting to be served by a thread. */
-    private ArrayList pendingJobs = null;
+    private ArrayList<AbstractProcessForGroup> pendingJobs = null;
 
     /** The controler that is looking for the end of jobs to perform. */
     protected EndControler controler = new EndControler();
@@ -68,7 +68,7 @@ public class ThreadPool {
      */
     public ThreadPool(int size) {
         this.threads = new ThreadInThePool[size];
-        this.pendingJobs = new ArrayList(size);
+        this.pendingJobs = new ArrayList<AbstractProcessForGroup>(size);
         for (int i = 0; i < this.threads.length; i++) {
             this.threads[i] = new ThreadInThePool(this);
             this.threads[i].start();

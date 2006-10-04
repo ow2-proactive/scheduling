@@ -47,23 +47,23 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FileTransferDefinition implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
-    private ArrayList all;
-    private ArrayList files;
-    private ArrayList homonymousFiles;
-    private ArrayList heteronymousFiles;
-    private ArrayList directories;
-    private ArrayList homonymousDirs;
-    private ArrayList heteronymousDirs;
+    private ArrayList<FileDescription> all;
+    private ArrayList<FileDescription> files;
+    private ArrayList<FileDescription> homonymousFiles;
+    private ArrayList<FileDescription> heteronymousFiles;
+    private ArrayList<DirectoryDescription> directories;
+    private ArrayList<DirectoryDescription> homonymousDirs;
+    private ArrayList<DirectoryDescription> heteronymousDirs;
     String name;
 
     public FileTransferDefinition(String name) {
-        all = new ArrayList();
-        files = new ArrayList();
-        directories = new ArrayList();
-        homonymousDirs = new ArrayList();
-        homonymousFiles = new ArrayList();
-        heteronymousDirs = new ArrayList();
-        heteronymousFiles = new ArrayList();
+        all = new ArrayList<FileDescription>();
+        files = new ArrayList<FileDescription>();
+        directories = new ArrayList<DirectoryDescription>();
+        homonymousDirs = new ArrayList<DirectoryDescription>();
+        homonymousFiles = new ArrayList<FileDescription>();
+        heteronymousDirs = new ArrayList<DirectoryDescription>();
+        heteronymousFiles = new ArrayList<FileDescription>();
 
         this.name = name;
     }
@@ -122,31 +122,31 @@ public class FileTransferDefinition implements Serializable {
      * @return All Files and Directories
      */
     public FileDescription[] getAll() {
-        return (FileDescription[]) all.toArray(new FileDescription[0]);
+        return all.toArray(new FileDescription[0]);
     }
 
     public FileDescription[] getAllFiles() {
-        return (FileDescription[]) files.toArray(new FileDescription[0]);
+        return files.toArray(new FileDescription[0]);
     }
 
     public DirectoryDescription[] getAllDirectories() {
-        return (DirectoryDescription[]) directories.toArray(new DirectoryDescription[0]);
+        return directories.toArray(new DirectoryDescription[0]);
     }
 
     public FileDescription[] getHomonymousFile() {
-        return (FileDescription[]) homonymousFiles.toArray(new FileDescription[0]);
+        return homonymousFiles.toArray(new FileDescription[0]);
     }
 
     public DirectoryDescription[] getHomonymousDir() {
-        return (DirectoryDescription[]) homonymousDirs.toArray(new DirectoryDescription[0]);
+        return homonymousDirs.toArray(new DirectoryDescription[0]);
     }
 
     public FileDescription[] getHeteronymousFile() {
-        return (FileDescription[]) heteronymousFiles.toArray(new FileDescription[0]);
+        return heteronymousFiles.toArray(new FileDescription[0]);
     }
 
     public DirectoryDescription[] getHeteronymousDir() {
-        return (DirectoryDescription[]) heteronymousDirs.toArray(new DirectoryDescription[0]);
+        return heteronymousDirs.toArray(new DirectoryDescription[0]);
     }
 
     public String getId() {

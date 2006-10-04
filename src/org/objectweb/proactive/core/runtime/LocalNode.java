@@ -82,7 +82,7 @@ public class LocalNode {
     /**
      * @return Returns the active objects located inside the node.
      */
-    public ArrayList getActiveObjectsId() {
+    public ArrayList<UniqueID> getActiveObjectsId() {
         return activeObjectsId;
     }
 
@@ -90,7 +90,7 @@ public class LocalNode {
      * set the list of active objects contained by the node
      * @param activeObjects active objects to set.
      */
-    public void setActiveObjects(ArrayList activeObjects) {
+    public void setActiveObjects(ArrayList<UniqueID> activeObjects) {
         this.activeObjectsId = activeObjects;
     }
 

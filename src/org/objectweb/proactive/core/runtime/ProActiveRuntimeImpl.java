@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PublicKey;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -128,17 +130,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private VMInformation vmInformation;
 
     //map VirtualNodes and their names
-    private java.util.Hashtable virtualNodesMap;
+    private java.util.Hashtable<String, VirtualNode> virtualNodesMap;
 
     //map descriptor and their url
-    private java.util.Hashtable descriptorMap;
+    private java.util.Hashtable<String, ProActiveDescriptor> descriptorMap;
 
     // map proActiveRuntime registered on this VM and their names
-    private java.util.Hashtable proActiveRuntimeMap;
+    private java.util.Hashtable<String, ProActiveRuntime> proActiveRuntimeMap;
     private java.util.Hashtable proActiveRuntimeForwarderMap;
 
     // synchronized set of URL to runtimes in which we are registered
-    private java.util.Set runtimeAcquaintancesURL;
+    private java.util.Set<String> runtimeAcquaintancesURL;
     private ProActiveRuntime parentRuntime;
 
     //
@@ -148,11 +150,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     protected ProActiveRuntimeImpl() {
         try {
             this.vmInformation = new VMInformationImpl();
-            this.proActiveRuntimeMap = new java.util.Hashtable();
+            this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
             this.proActiveRuntimeForwarderMap = new java.util.Hashtable();
-            this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet());
-            this.virtualNodesMap = new java.util.Hashtable();
-            this.descriptorMap = new java.util.Hashtable();
+            this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet<String>());
+            this.virtualNodesMap = new java.util.Hashtable<String, VirtualNode>();
+            this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptor>();
             this.nodeMap = new java.util.Hashtable<String,LocalNode>();
 
             try {
@@ -248,7 +250,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public ProActiveDescriptor getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
-        ProActiveDescriptor pad = (ProActiveDescriptor) descriptorMap.get(url);
+        ProActiveDescriptor pad = descriptorMap.get(url);
 
         // hierarchical search or not, look if we know the pad
         if (pad != null) {
@@ -300,7 +302,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 vnName);
 
         if (replacePreviousBinding && (nodeMap.get(nodeName) != null)) {
-            newNode.setActiveObjects(((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId());
+            newNode.setActiveObjects(nodeMap.get(nodeName).getActiveObjectsId());
             nodeMap.remove(nodeName);
         }
 
@@ -313,8 +315,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killAllNodes()
      */
     public void killAllNodes() {
-        for (Enumeration e = nodeMap.keys(); e.hasMoreElements();) {
-            String nodeName = (String) e.nextElement();
+        for (Enumeration<String> e = nodeMap.keys(); e.hasMoreElements();) {
+            String nodeName = e.nextElement();
             killNode(nodeName);
         }
     }
@@ -323,7 +325,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killNode(String)
      */
     public void killNode(String nodeName) {
-        LocalNode localNode = (LocalNode) nodeMap.get(nodeName);
+        LocalNode localNode = nodeMap.get(nodeName);
         localNode.terminate();
         nodeMap.remove(nodeName);
     }
@@ -346,8 +348,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         synchronized (nodeMap) {
             nodeNames = new String[nodeMap.size()];
 
-            for (java.util.Enumeration e = nodeMap.keys(); e.hasMoreElements();) {
-                nodeNames[i] = (String) e.nextElement();
+            for (java.util.Enumeration<String> e = nodeMap.keys(); e.hasMoreElements();) {
+                nodeNames[i] = e.nextElement();
                 i++;
             }
         }
@@ -397,9 +399,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         synchronized (proActiveRuntimeMap) {
             runtimeArray = new ProActiveRuntime[proActiveRuntimeMap.size()];
 
-            for (java.util.Enumeration e = proActiveRuntimeMap.elements();
+            for (java.util.Enumeration<ProActiveRuntime> e = proActiveRuntimeMap.elements();
                     e.hasMoreElements();) {
-                runtimeArray[i] = (ProActiveRuntime) e.nextElement();
+                runtimeArray[i] = e.nextElement();
                 i++;
             }
         }
@@ -411,7 +413,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntime(String)
      */
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) {
-        return (ProActiveRuntime) proActiveRuntimeMap.get(proActiveRuntimeName);
+        return proActiveRuntimeMap.get(proActiveRuntimeName);
     }
 
     /**
@@ -430,10 +432,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         synchronized (runtimeAcquaintancesURL) {
             urls = new String[runtimeAcquaintancesURL.size()];
 
-            java.util.Iterator iter = runtimeAcquaintancesURL.iterator();
+            java.util.Iterator<String> iter = runtimeAcquaintancesURL.iterator();
 
             for (int i = 0; i < urls.length; i++)
-                urls[i] = (String) iter.next();
+                urls[i] = iter.next();
         }
 
         return urls;
@@ -463,11 +465,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         vmInformation.getName();
     }
 
-    public ArrayList getActiveObjects(String nodeName) {
+    public ArrayList<ArrayList<Serializable>> getActiveObjects(String nodeName) {
         //the array to return
-        ArrayList localBodies = new ArrayList();
+        ArrayList<ArrayList<Serializable>> localBodies = new ArrayList<ArrayList<Serializable>>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
+        ArrayList<UniqueID> bodyList = nodeMap.get(nodeName).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -476,7 +478,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         synchronized (bodyList) {
             for (int i = 0; i < bodyList.size(); i++) {
-                UniqueID bodyID = (UniqueID) bodyList.get(i);
+                UniqueID bodyID = bodyList.get(i);
 
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
@@ -489,7 +491,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 } else {
                     //the body is on this runtime then return adapter and class name of the reified
                     //object to enable the construction of stub-proxy couple.
-                    ArrayList bodyAndObjectClass = new ArrayList(2);
+                    ArrayList<Serializable> bodyAndObjectClass = new ArrayList<Serializable>(2);
 
                     //adapter
                     bodyAndObjectClass.add(0, body.getRemoteAdapter());
@@ -507,7 +509,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public VirtualNode getVirtualNode(String virtualNodeName) {
         //  	System.out.println("i am in get vn ");
-        return (VirtualNode) virtualNodesMap.get(virtualNodeName);
+        return virtualNodesMap.get(virtualNodeName);
     }
 
     public void registerVirtualNode(String virtualNodeName,
@@ -532,15 +534,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public String getJobID(String nodeUrl) {
         String name = UrlBuilder.getNameFromUrl(nodeUrl);
 
-        LocalNode localNode = (LocalNode) nodeMap.get(name);
+        LocalNode localNode = nodeMap.get(name);
         return localNode.getJobId();
     }
 
-    public ArrayList getActiveObjects(String nodeName, String className) {
+    public ArrayList<BodyAdapter> getActiveObjects(String nodeName, String className) {
         //the array to return
-        ArrayList localBodies = new ArrayList();
+        ArrayList<BodyAdapter> localBodies = new ArrayList<BodyAdapter>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
+        ArrayList<UniqueID> bodyList = nodeMap.get(nodeName).getActiveObjectsId();
 
         if (bodyList == null) {
             // Probably the node is killed
@@ -549,7 +551,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         synchronized (bodyList) {
             for (int i = 0; i < bodyList.size(); i++) {
-                UniqueID bodyID = (UniqueID) bodyList.get(i);
+                UniqueID bodyID = bodyList.get(i);
 
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
@@ -589,7 +591,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
 
             if (objectSecurityManager != null) {
-                ProActiveSecurityManager nodeSecurityManager = ((LocalNode) this.nodeMap.get(nodeName)).getSecurityManager();
+                ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName).getSecurityManager();
                 objectSecurityManager.setParent(nodeSecurityManager);
             }
         } catch (SecurityNotAvailableException e) {
@@ -623,7 +625,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public UniversalBody receiveBody(String nodeName, Body body) {
         try {
             ((AbstractBody) body).getProActiveSecurityManager()
-             .setParent(((LocalNode) this.nodeMap.get(nodeName)).getSecurityManager());
+             .setParent(this.nodeMap.get(nodeName).getSecurityManager());
         } catch (SecurityNotAvailableException e) {
             // an exception here means that the body and its associated application
             // have not been started with a security policy
@@ -680,7 +682,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
+        ArrayList<UniqueID> bodyList = nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             if (!bodyList.contains(bodyID)) {
@@ -699,7 +701,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void unregisterBody(String nodeName, UniqueID bodyID) {
         //System.out.println("in remove id= "+ bodyID.toString());
         //System.out.println("array size "+((ArrayList)nodeMap.get(nodeName)).size());
-        ArrayList bodyList = ((LocalNode) nodeMap.get(nodeName)).getActiveObjectsId();
+        ArrayList<UniqueID> bodyList = nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             bodyList.remove(bodyID);
@@ -734,11 +736,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
      */
-    public ArrayList getEntities(String nodeName) {
+    public ArrayList<Entity> getEntities(String nodeName) {
         ProActiveSecurityManager nodeSecurityManager = null;
         Entity nodeEntity = null;
-        String nodeVirtualName = ((LocalNode) nodeMap.get(nodeName)).getVirtualNodeName();
-        nodeSecurityManager = ((LocalNode) nodeMap.get(nodeName)).getSecurityManager();
+        String nodeVirtualName = nodeMap.get(nodeName).getVirtualNodeName();
+        nodeSecurityManager = nodeMap.get(nodeName).getSecurityManager();
 
         if (nodeSecurityManager != null) {
             nodeEntity = new EntityVirtualNode(nodeVirtualName,
@@ -747,11 +749,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     nodeSecurityManager.getCertificate());
         }
 
-        ArrayList entities = null;
+        ArrayList<Entity> entities = null;
 
         //entities = getEntities();
         if (entities == null) {
-            entities = new ArrayList();
+            entities = new ArrayList<Entity>();
         }
 
         entities.add(nodeEntity);
@@ -813,14 +815,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities()
      */
-    public ArrayList getEntities() {
+    public ArrayList<Entity> getEntities() {
         PolicyServer policyServer = null;
 
         if ((runtimeSecurityManager != null) &&
                 ((policyServer = runtimeSecurityManager.getPolicyServer()) != null)) {
             Entity e = new EntityCertificate(policyServer.getApplicationCertificate(),
                     runtimeSecurityManager.getCertificate());
-            ArrayList array = new ArrayList();
+            ArrayList<Entity> array = new ArrayList<Entity>();
             array.add(e);
 
             return array;
@@ -1073,7 +1075,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public ExternalProcess getProcessToDeploy(
         ProActiveRuntime proActiveRuntimeDist, String creatorID, String vmName,
         String padURL) throws ProActiveException {
-        ProActiveDescriptor pad = (ProActiveDescriptor) descriptorMap.get(padURL);
+        ProActiveDescriptor pad = descriptorMap.get(padURL);
 
         if (pad == null) {
             logger.info("Cannot find descriptor, " + padURL);
@@ -1089,7 +1091,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public String getVNName(String nodename) throws ProActiveException {
-        return ((LocalNode) nodeMap.get(nodename)).getVirtualNodeName();
+        return nodeMap.get(nodename).getVirtualNodeName();
     }
 
     //
@@ -1244,13 +1246,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#setLocalNodeProperty(java.lang.String, java.lang.String, java.lang.String)
      */
     public Object setLocalNodeProperty(String nodeName, String key, String value) {
-        return ((LocalNode) this.nodeMap.get(nodeName)).setProperty(key, value);
+        return this.nodeMap.get(nodeName).setProperty(key, value);
     }
 
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getLocalNodeProperty(java.lang.String, java.lang.String)
      */
     public String getLocalNodeProperty(String nodeName, String key) {
-        return ((LocalNode) this.nodeMap.get(nodeName)).getProperty(key);
+        return this.nodeMap.get(nodeName).getProperty(key);
     }
 }

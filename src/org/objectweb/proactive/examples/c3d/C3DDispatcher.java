@@ -83,10 +83,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     protected int lastUserID = 0;
 
     /**  connects an Engine to its name, and other way round, without asking the remote object */
-    private Vector engineAndStringTable = new Vector();
+    private Vector<Object[]> engineAndStringTable = new Vector<Object[]>();
 
     /** list of engines. */
-    private Vector engineVector = new Vector();
+    private Vector<RenderingEngine> engineVector = new Vector<RenderingEngine>();
 
     /**
      * Scene to be rendered; set by the first user frame to register;
@@ -170,7 +170,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         } else {
             // the GUI shows the engines being used.  
             for (int i = 0; i < this.engineAndStringTable.size(); i++) {
-                Object[] engineAndString = (Object[]) this.engineAndStringTable.get(i);
+                Object[] engineAndString = this.engineAndStringTable.get(i);
 
                 if (engineVector.contains(engineAndString[0])) {
                     this.gui.addUsedEngine((String) engineAndString[1]);
@@ -213,7 +213,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         // Benchmarking stuff...
         long startTime = System.currentTimeMillis();
 
-        RenderingEngine[] engine = (RenderingEngine[]) engineVector.toArray(new RenderingEngine[0]);
+        RenderingEngine[] engine = engineVector.toArray(new RenderingEngine[0]);
 
         int nbTasks = 3 * engine.length;
         log("Creating " + nbTasks + " intervals");
@@ -237,7 +237,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         intervalsToDraw[intervalsToDraw.length - 1] = newint;
 
         // To store future ImagePart values
-        Vector images = new Vector();
+        Vector<Image2D> images = new Vector<Image2D>();
         int counter = 0; // says which interval is to assign next 
 
         for (int i = 0; i < nbTasks; i++) // no value has come back yet    
@@ -320,9 +320,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
      * @param received the array of booleans which says if vector is arrived, aka !toBeComputedAgain
      * @return an image which is no longer a future
      */
-    private Image2D getReturned(Vector images, boolean[] received) {
+    private Image2D getReturned(Vector<Image2D> images, boolean[] received) {
         int index = ProActive.waitForAny(images);
-        Image2D returnedImage = (Image2D) images.remove(index);
+        Image2D returnedImage = images.remove(index);
         setPixels(returnedImage);
         received[returnedImage.getInterval().number] = true;
 
@@ -717,7 +717,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
                 // A too long way to say "use only i engines"
                 String[] enginesNowUsed = this.gui.setEngines(i);
-                this.engineVector = new Vector(); // equal to "for all engines, turnOff(engine)"
+                this.engineVector = new Vector<RenderingEngine>(); // equal to "for all engines, turnOff(engine)"
 
                 for (int k = 0; k < enginesNowUsed.length; k++)
                     turnOnEngine(enginesNowUsed[k]);
@@ -770,7 +770,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         String name = null;
 
         for (int i = 0; i < length; i++) {
-            Object[] couple = (Object[]) engineAndStringTable.get(i);
+            Object[] couple = engineAndStringTable.get(i);
 
             if (couple[0].equals(engine)) {
                 name = (String) couple[1];
@@ -804,7 +804,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             int length = engineAndStringTable.size();
 
             for (int i = 0; i < length; i++) {
-                Object[] couple = (Object[]) engineAndStringTable.get(i);
+                Object[] couple = engineAndStringTable.get(i);
                 gui.addUsedEngine((String) couple[1]);
                 turnOnEngine((String) couple[1]);
             }
@@ -829,7 +829,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         int length = engineAndStringTable.size();
 
         for (int i = 0; i < length; i++) {
-            Object[] couple = (Object[]) engineAndStringTable.get(i);
+            Object[] couple = engineAndStringTable.get(i);
 
             if (couple[1].equals(name)) {
                 return (RenderingEngine) couple[0];
@@ -848,7 +848,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         int length = engineAndStringTable.size();
 
         for (int i = 0; i < length; i++) {
-            Object[] couple = (Object[]) engineAndStringTable.get(i);
+            Object[] couple = engineAndStringTable.get(i);
 
             if (couple[0].equals(engine)) {
                 return (String) couple[1];

@@ -51,10 +51,10 @@ import org.objectweb.proactive.ProActive;
 
 
 public class FutureList {
-    private java.util.Vector futureList;
+    private java.util.Vector<Object> futureList;
 
     public FutureList() {
-        futureList = new java.util.Vector();
+        futureList = new java.util.Vector<Object>();
     }
 
     /**
@@ -180,7 +180,7 @@ public class FutureList {
     }
 
     public void waitN(int n) {
-        java.util.Vector temp = new java.util.Vector(futureList);
+        java.util.Vector<Object> temp = new java.util.Vector<Object>(futureList);
         for (int i = 0; i < n; i++) {
             int index = ProActive.waitForAny(temp);
             temp.remove(index);

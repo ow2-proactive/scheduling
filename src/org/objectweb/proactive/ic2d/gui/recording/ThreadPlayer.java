@@ -36,8 +36,8 @@ import org.objectweb.proactive.ic2d.spy.SpyEvent;
 
 
 public class ThreadPlayer {
-    private java.util.LinkedList eventList;
-    private java.util.LinkedList activeObjectList;
+    private java.util.LinkedList<SpyEvent> eventList;
+    private java.util.LinkedList<ActiveObject> activeObjectList;
     private int recordMark = 0;
     private CommunicationEventListener communicationEventListener;
     private boolean record = false;
@@ -50,8 +50,8 @@ public class ThreadPlayer {
         javax.swing.JProgressBar eventReplayProgressBar) {
         this.communicationEventListener = communicationEventListener;
         this.eventReplayProgressBar = eventReplayProgressBar;
-        eventList = new java.util.LinkedList();
-        activeObjectList = new java.util.LinkedList();
+        eventList = new java.util.LinkedList<SpyEvent>();
+        activeObjectList = new java.util.LinkedList<ActiveObject>();
     }
 
     public int recordEvent(ActiveObject activeObject, SpyEvent evt) {
@@ -137,8 +137,8 @@ public class ThreadPlayer {
                     eventReplayProgressBar.setString((recordMark + 1) + "/" +
                         eventList.size());
                     eventReplayProgressBar.setValue(recordMark + 1);
-                    dispatchEvent((ActiveObject) activeObjectList.get(
-                            recordMark), (SpyEvent) eventList.get(recordMark));
+                    dispatchEvent(activeObjectList.get(
+                            recordMark), eventList.get(recordMark));
                     recordMark++;
                 }
                 try {

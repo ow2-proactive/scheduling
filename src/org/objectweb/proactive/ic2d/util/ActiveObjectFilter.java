@@ -31,13 +31,13 @@
 package org.objectweb.proactive.ic2d.util;
 
 public class ActiveObjectFilter {
-    private java.util.HashSet filter; // set of class to be filtered
+    private java.util.HashSet<String> filter; // set of class to be filtered
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public ActiveObjectFilter() {
-        filter = new java.util.HashSet();
+        filter = new java.util.HashSet<String>();
     }
 
     //
@@ -55,7 +55,7 @@ public class ActiveObjectFilter {
         return filter.contains(classname);
     }
 
-    public java.util.Iterator iterator() {
+    public java.util.Iterator<String> iterator() {
         return filter.iterator();
     }
 

@@ -10,6 +10,7 @@ import javasci.SciDoubleMatrix;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.ext.scilab.SciDeployEngine;
 import org.objectweb.proactive.ext.scilab.SciEngine;
 import org.objectweb.proactive.ext.scilab.SciResult;
@@ -29,7 +30,7 @@ public class SciTestLibrary {
          mapEngine = SciDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
 
           //Activation
-          Vector listStateEngine = new Vector();
+          Vector<BooleanWrapper> listStateEngine = new Vector<BooleanWrapper>();
               for(int i=0; i<mapEngine.size(); i++){
                       listStateEngine.add(((SciEngine) mapEngine.get(arrayEngine[i])).activate());
               }

@@ -60,14 +60,14 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 
 	
 	private static final long serialVersionUID = 1L;
-	private AbstractList nfRequestsQueue;
+	private AbstractList<Request> nfRequestsQueue;
 	private RequestFilter immediateNFResquestFilter;
     private RequestFilter priorityNFRequestFilter;
     private int immediateNFReqNumber, priorityNFReqNumber;
     
     
 	public NonFunctionalRequestsProcessor() {
-		nfRequestsQueue = new Vector();
+		nfRequestsQueue = new Vector<Request>();
 		this.immediateNFResquestFilter = new ImmediateNFRequestFilter();
         this.priorityNFRequestFilter = new PriorityNFRequestFilter();
         immediateNFReqNumber = 0;
@@ -101,7 +101,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 		if(nfRequestsQueue.isEmpty()) {
 			return null;
 		}else if (remove){			
-			request = (Request) nfRequestsQueue.remove(0);
+			request = nfRequestsQueue.remove(0);
 			if(immediateNFReqNumber > 0){
 				immediateNFReqNumber --;
 			}else {
@@ -109,7 +109,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 			}
 			return request;
 		}else {
-			return (Request) nfRequestsQueue.get(0);
+			return nfRequestsQueue.get(0);
 		}		
 	}
 	
@@ -126,19 +126,19 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 			return null;
 		}else if (remove){
 			if(immediateNFReqNumber != 0){
-				request = (Request) nfRequestsQueue.remove(immediateNFReqNumber);
+				request = nfRequestsQueue.remove(immediateNFReqNumber);
 				immediateNFReqNumber --;
 				return request;
 			}else {
-				request = (Request) nfRequestsQueue.remove(priorityNFReqNumber);
+				request = nfRequestsQueue.remove(priorityNFReqNumber);
 				priorityNFReqNumber --;
 				return request;
 			}
 		}else {
 			if(immediateNFReqNumber != 0){
-				return (Request) nfRequestsQueue.get(immediateNFReqNumber);
+				return nfRequestsQueue.get(immediateNFReqNumber);
 			}else {
-				return (Request) nfRequestsQueue.get(priorityNFReqNumber);
+				return nfRequestsQueue.get(priorityNFReqNumber);
 			}
 		}			
 	}
@@ -153,9 +153,9 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor, Seriali
 		StringBuffer sb = new StringBuffer("NFRequests Queue : ");
 		sb.append("--- NonFunctionalRequestQueue n=").append(nfRequestsQueue.size()).append("   requests --- ->\n");
 		int count = 0;
-		java.util.Iterator iterator = nfRequestsQueue.iterator();
+		java.util.Iterator<Request> iterator = nfRequestsQueue.iterator();
 		while (iterator.hasNext()) {
-			Request currentrequest = (Request) iterator.next();
+			Request currentrequest = iterator.next();
 			sb.append(count).append("--> ")
 			.append(currentrequest.getMethodName()).append("\n");
 			count++;

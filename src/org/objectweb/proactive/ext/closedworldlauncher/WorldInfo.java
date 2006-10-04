@@ -78,12 +78,12 @@ public class WorldInfo {
      * Divide a string into elements separated by a blank space
      */
     protected String[] stringToArray(String string) {
-        ArrayList tmp = new ArrayList();
+        ArrayList<String> tmp = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(string);
         while (st.hasMoreTokens()) {
             tmp.add(st.nextToken());
         }
-        return (String[]) tmp.toArray(new String[] { "" });
+        return tmp.toArray(new String[] { "" });
     }
 
     public String toString() {

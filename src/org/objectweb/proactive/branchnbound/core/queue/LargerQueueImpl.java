@@ -56,13 +56,13 @@ import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
  */
 public class LargerQueueImpl extends TaskQueue {
     private static final String BCK_SEPARTOR = "End pending tasks backup -- Starting not started tasks backup";
-    private Vector queue = new Vector();
+    private Vector<Collection> queue = new Vector<Collection>();
     private int size = 0;
     private int hungryLevel;
     private int current = 0;
-    private Vector pendingTasksFromBackup = new Vector();
+    private Vector<Object> pendingTasksFromBackup = new Vector<Object>();
     private Task rootTaskFromBackup = null;
-    private Vector allResults = new Vector();
+    private Vector<Object> allResults = new Vector<Object>();
 
     /**
      * The no args constructor for ProActive activate.
@@ -123,13 +123,13 @@ public class LargerQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#flushAll()
      */
     public void flushAll() {
-        queue = new Vector();
+        queue = new Vector<Collection>();
         size = 0;
         hungryLevel = 0;
         current = 0;
-        pendingTasksFromBackup = new Vector();
+        pendingTasksFromBackup = new Vector<Object>();
         rootTaskFromBackup = null;
-        allResults = new Vector();
+        allResults = new Vector<Object>();
     }
 
     /**
@@ -189,7 +189,7 @@ public class LargerQueueImpl extends TaskQueue {
                 }
                 this.pendingTasksFromBackup.add(read);
             }
-            this.queue = (Vector) ois.readObject();
+            this.queue = (Vector<Collection>) ois.readObject();
 
             ois.close();
             taskInputStream.close();
@@ -223,7 +223,7 @@ public class LargerQueueImpl extends TaskQueue {
     /**
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#getAllResults()
      */
-    public Collection getAllResults() {
+    public Collection<Object> getAllResults() {
         return this.allResults;
     }
 
@@ -266,7 +266,7 @@ public class LargerQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#addTask(org.objectweb.proactive.branchnbound.core.Task)
      */
     public void addTask(Task t) {
-        Vector v = new Vector();
+        Vector<Task> v = new Vector<Task>();
         v.add(t);
         this.queue.add(v);
         size++;

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.loadbalancing.metrics.MetricFactory;
 
 public class LoadBalancing {
-	private static ArrayList loadBalancers = new ArrayList();
+	private static ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
 	private static MetricFactory mf;
 	private static boolean activated = false;
 	private static InformationRecover ir;
@@ -62,9 +62,9 @@ public class LoadBalancing {
 				lb = null;
 			}
 
-			Iterator it = loadBalancers.iterator();
+			Iterator<LoadBalancer> it = loadBalancers.iterator();
 			while (it.hasNext()) {
-				lb = ((LoadBalancer) it.next());
+				lb = it.next();
 				lb.init(loadBalancers,ir);
 				lb = null;
 
@@ -95,9 +95,9 @@ public class LoadBalancing {
 
 		ProActive.terminateActiveObject(ir,true);
 		LoadBalancer lb;
-		Iterator it = loadBalancers.iterator();
+		Iterator<LoadBalancer> it = loadBalancers.iterator();
 		while (it.hasNext()) {
-			lb = ((LoadBalancer) it.next());
+			lb = it.next();
 			ProActive.terminateActiveObject(lb,true);
 		}
 	}

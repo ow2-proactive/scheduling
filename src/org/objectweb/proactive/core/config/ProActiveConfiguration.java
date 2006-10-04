@@ -52,15 +52,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class ProActiveConfiguration {
-    protected HashMap loadedProperties;
+    protected HashMap<String, String> loadedProperties;
     protected HashMap addedProperties;
     protected static ProActiveConfiguration singleton;
     protected static boolean isLoaded = false;
     protected static boolean defaultConfigAlreadyLoaded = false;
-    protected static List jvmDefinedProperties = new ArrayList();
+    protected static List<String> jvmDefinedProperties = new ArrayList<String>();
 
     private ProActiveConfiguration() {
-        this.loadedProperties = new HashMap();
+        this.loadedProperties = new HashMap<String, String>();
         this.addedProperties = new HashMap();
     }
 
@@ -134,12 +134,12 @@ public class ProActiveConfiguration {
      * Add the loaded properties to the system
      */
     public void loadProperties() {
-        Iterator it = loadedProperties.keySet().iterator();
+        Iterator<String> it = loadedProperties.keySet().iterator();
         String name = null;
         String value = null;
         while (it.hasNext()) {
-            name = (String) it.next();
-            value = (String) this.loadedProperties.get(name);
+            name = it.next();
+            value = this.loadedProperties.get(name);
             if (!defaultConfigAlreadyLoaded) {
                 // JVM parameters cannot be overriden
                 if (System.getProperty(name) == null) {

@@ -46,7 +46,7 @@ import java.util.ArrayList;
  */
 public class DiaryImpl implements Diary, Serializable {
     protected String diaryName;
-    protected ArrayList entries;
+    protected ArrayList<String> entries;
 
     public DiaryImpl() {
     }
@@ -73,7 +73,7 @@ public class DiaryImpl implements Diary, Serializable {
      * @see org.objectweb.proactive.examples.mydiary.Diary#getEntry(int)
      */
     public String getEntry(int entryNumber) {
-        return (String) entries.get(entryNumber);
+        return entries.get(entryNumber);
     }
 
     public static Diary load(String fileName) {

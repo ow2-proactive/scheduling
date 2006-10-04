@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 public class MigratableBody extends BodyImpl implements Migratable,
@@ -190,8 +191,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
                 try {
                     ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
 
-                    ArrayList entitiesFrom = null;
-                    ArrayList entitiesTo = null;
+                    ArrayList<Entity> entitiesFrom = null;
+                    ArrayList<Entity> entitiesTo = null;
 
                     entitiesFrom = this.getEntities();
                     entitiesTo = runtimeDestination.getEntities();

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
  * It also registers itself to run when the JVM shutdowns and dump the results of the profilers
  */
 public class PAProfilerEngine implements Runnable {
-    ArrayList profilerList = new ArrayList();
+    ArrayList<Timer> profilerList = new ArrayList<Timer>();
     private static PAProfilerEngine engine;
 
     static {
@@ -99,9 +99,9 @@ public class PAProfilerEngine implements Runnable {
      * Call dump on all profilers registered in this engine
      */
     public void dump() {
-        Iterator it = profilerList.iterator();
+        Iterator<Timer> it = profilerList.iterator();
         while (it.hasNext()) {
-            ((Timer) it.next()).dump();
+            it.next().dump();
         }
     }
 

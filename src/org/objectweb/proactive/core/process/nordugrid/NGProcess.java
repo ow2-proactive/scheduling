@@ -75,7 +75,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     protected String tmp_executable;
     protected String DEFAULT_INPUT_FILE = "(inputfiles = ";
     protected String inputFiles;
-    protected ArrayList command_buffer;
+    protected ArrayList<String> command_buffer;
 
     //===========================================================
     // Constructor
@@ -114,13 +114,13 @@ public class NGProcess extends AbstractExternalProcessDecorator {
 
     protected String internalBuildCommand() {
         buildExecutable();
-        command_buffer = new ArrayList();
+        command_buffer = new ArrayList<String>();
         return buildNGSUBCommand() + " " + buildXRSLCommand();
     }
 
     protected void internalStartProcess(String xRslCommand)
         throws java.io.IOException {
-        String[] ng_command = (String[]) command_buffer.toArray(new String[] {  });
+        String[] ng_command = command_buffer.toArray(new String[] {  });
         int j = new Integer(count).intValue();
 
         for (int i = 0; i < j; i++) {

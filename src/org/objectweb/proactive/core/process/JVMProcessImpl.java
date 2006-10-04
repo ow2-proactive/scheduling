@@ -109,7 +109,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
     //this array will be used to know which options have been modified in case
     //this process extends anothe jvmprocess in the descriptor
-    protected ArrayList modifiedOptions;
+    protected ArrayList<String> modifiedOptions;
 
     /**
      * This attributes is used when this jvm extends another one.
@@ -130,7 +130,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
      * Used with XML Descriptor
      */
     public JVMProcessImpl() {
-        this.modifiedOptions = new ArrayList();
+        this.modifiedOptions = new ArrayList<String>();
     }
 
     /**
@@ -139,7 +139,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
      */
     public JVMProcessImpl(RemoteProcessMessageLogger messageLogger) {
         super(messageLogger);
-        this.modifiedOptions = new ArrayList();
+        this.modifiedOptions = new ArrayList<String>();
     }
 
     /**
@@ -150,7 +150,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public JVMProcessImpl(RemoteProcessMessageLogger inputMessageLogger,
         RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
-        this.modifiedOptions = new ArrayList();
+        this.modifiedOptions = new ArrayList<String>();
     }
 
     //

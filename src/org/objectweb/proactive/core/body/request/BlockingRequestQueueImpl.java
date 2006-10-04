@@ -53,7 +53,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
     private boolean suspended = false;
     private boolean specialExecution = false;
     private String specialMethod = "";
-    private LinkedList methodBarriers = new LinkedList();
+    private LinkedList<MethodBarrier> methodBarriers = new LinkedList<MethodBarrier>();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -91,11 +91,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
 
         // if there is a "method based barrier"
         if (this.methodBarriers.size() != 0) {
-            Iterator it = this.methodBarriers.iterator();
+            Iterator<MethodBarrier> it = this.methodBarriers.iterator();
             boolean methodFound = false;
             MethodBarrier mb;
             while (it.hasNext() && !methodFound) {
-                mb = (MethodBarrier) it.next();
+                mb = it.next();
                 methodFound = mb.checkMethod(r.getMethodName());
                 if (methodFound) {
                     if (mb.barrierOver()) {

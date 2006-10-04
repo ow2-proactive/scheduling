@@ -44,6 +44,7 @@ import java.util.TreeSet;
 import javax.swing.DefaultListModel;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
@@ -72,8 +73,8 @@ public class NodeExploration implements JobMonitorConstants {
     private int maxDepth;
     private DataAssociation asso;
     private DefaultListModel skippedObjects;
-    private Set visitedVM;
-    private Map runtimes;
+    private Set<String> visitedVM;
+    private Map<String, ProActiveRuntime> runtimes;
     private IC2DMessageLogger controller;
 
     public NodeExploration(DataAssociation asso,
@@ -81,7 +82,7 @@ public class NodeExploration implements JobMonitorConstants {
         this.maxDepth = 3;
         this.asso = asso;
         this.skippedObjects = skippedObjects;
-        this.runtimes = new HashMap();
+        this.runtimes = new HashMap<String, ProActiveRuntime>();
         this.controller = controller;
     }
 
@@ -117,7 +118,7 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     private ProActiveRuntime urlToRuntime(String url) {
-        ProActiveRuntime rt = (ProActiveRuntime) runtimes.get(url);
+        ProActiveRuntime rt = runtimes.get(url);
         if (rt != null) {
             return rt;
         }
@@ -130,17 +131,17 @@ public class NodeExploration implements JobMonitorConstants {
         return rt;
     }
 
-    private List getKnownRuntimes(ProActiveRuntime from) {
-        List known;
+    private List<ProActiveRuntime> getKnownRuntimes(ProActiveRuntime from) {
+        List<ProActiveRuntime> known;
         String[] parents;
 
         try {
             ProActiveRuntime[] registered = from.getProActiveRuntimes();
-            known = new ArrayList(Arrays.asList(registered));
+            known = new ArrayList<ProActiveRuntime>(Arrays.asList(registered));
             parents = from.getAcquaintances();
         } catch (ProActiveException e) {
             log(e);
-            return new ArrayList();
+            return new ArrayList<ProActiveRuntime>();
         }
 
         for (int i = 0; i < parents.length; i++) {
@@ -252,10 +253,10 @@ public class NodeExploration implements JobMonitorConstants {
         asso.addChild(jobObject, jvmObject);
 
         if (depth < maxDepth) {
-            List known = getKnownRuntimes(pr);
-            Iterator iter = known.iterator();
+            List<ProActiveRuntime> known = getKnownRuntimes(pr);
+            Iterator<ProActiveRuntime> iter = known.iterator();
             while (iter.hasNext())
-                handleProActiveRuntime((ProActiveRuntime) iter.next(), depth +
+                handleProActiveRuntime(iter.next(), depth +
                     1);
         }
     }
@@ -334,7 +335,7 @@ public class NodeExploration implements JobMonitorConstants {
         for (int i = 0, size = activeObjects.size(); i < size; ++i) {
             ArrayList aoWrapper = (ArrayList) activeObjects.get(i);
             UniversalBody rba = (UniversalBody) aoWrapper.get(0);
-
+            
             String className = (String) aoWrapper.get(1);
             if (className.equalsIgnoreCase(
                         "org.objectweb.proactive.ic2d.spy.Spy")) {
@@ -407,7 +408,7 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     public void startExploration() {
-        visitedVM = new TreeSet();
+        visitedVM = new TreeSet<String>();
     }
 
     public void endExploration() {

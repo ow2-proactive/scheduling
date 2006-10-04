@@ -74,8 +74,8 @@ public abstract class RuntimeFactory {
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
 
     /** the table where associations Protocol - Factory are kept */
-    private static java.util.HashMap protocolFactoryMapping = new java.util.HashMap();
-    private static java.util.HashMap instanceFactoryMapping = new java.util.HashMap();
+    private static java.util.HashMap<String, String> protocolFactoryMapping = new java.util.HashMap<String, String>();
+    private static java.util.HashMap<String, RuntimeFactory> instanceFactoryMapping = new java.util.HashMap<String, RuntimeFactory>();
 
     //private static ProActiveRuntime defaultRuntime = null;
     //private static RuntimeFactory defaultRuntimeFactory;
@@ -346,12 +346,12 @@ public abstract class RuntimeFactory {
             runtimeLogger.debug("protocol = " + protocol);
         }
 
-        RuntimeFactory factory = (RuntimeFactory) instanceFactoryMapping.get(protocol);
+        RuntimeFactory factory = instanceFactoryMapping.get(protocol);
         if (factory != null) {
             return factory;
         }
 
-        String factoryClassName = (String) protocolFactoryMapping.get(protocol);
+        String factoryClassName = protocolFactoryMapping.get(protocol);
         if (runtimeLogger.isDebugEnabled()) {
             runtimeLogger.debug("factoryClassName  = " + factoryClassName);
         }

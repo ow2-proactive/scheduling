@@ -50,7 +50,7 @@ public class Election implements RunActive, Serializable {
     private int nbUsers = 0; // To know when the election is over
     private long startTime = 0; // To enable the countdown
     private Ballots ballots = new Ballots(); // registers the votes
-    private Vector voters = new Vector(); // remembers who has voted
+    private Vector<Integer> voters = new Vector<Integer>(); // remembers who has voted
 
     /** Required ProActive empty no-arg constructor */
     public Election() {

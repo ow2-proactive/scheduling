@@ -52,10 +52,10 @@ public class RequestReceiverImpl implements RequestReceiver,
     //private java.util.Vector immediateServices;
     // refactored : keys are method names, and values are arrays of parameters types
     // map of immediate services (method names +lists of method parameters)
-    private java.util.Map immediateServices;
+    private java.util.Map<String, Object> immediateServices;
 
     public RequestReceiverImpl() {
-        immediateServices = new Hashtable(2);
+        immediateServices = new Hashtable<String, Object>(2);
         immediateServices.put("toString", ANY_PARAMETERS);
         immediateServices.put("hashCode", ANY_PARAMETERS);
         immediateServices.put("_terminateAOImmediately", ANY_PARAMETERS);
@@ -125,11 +125,11 @@ public class RequestReceiverImpl implements RequestReceiver,
         Class[] parametersTypes) throws IOException {
         if (immediateServices.containsKey(methodName)) {
             if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
-                List list = (List) immediateServices.get(methodName);
-                List elementsToRemove = new ArrayList(list.size());
-                Iterator it = list.iterator();
+                List<Class[]> list = (List<Class[]>) immediateServices.get(methodName);
+                List<Class[]> elementsToRemove = new ArrayList<Class[]>(list.size());
+                Iterator<Class[]> it = list.iterator();
                 while (it.hasNext()) {
-                    Class[] element = (Class[]) it.next();
+                    Class[] element = it.next();
                     if (Arrays.equals(element, parametersTypes)) {
                         // cannot modify a list while iterating over it => keep reference of 
                         // the elements to remove
@@ -155,10 +155,10 @@ public class RequestReceiverImpl implements RequestReceiver,
                 // there is already a filter on all methods with that name, whatever the parameters
                 return;
             } else {
-                ((List) immediateServices.get(methodName)).add(parametersTypes);
+                ((List<Class[]>) immediateServices.get(methodName)).add(parametersTypes);
             }
         } else {
-            List list = new ArrayList();
+            List<Class[]> list = new ArrayList<Class[]>();
             list.add(parametersTypes);
             immediateServices.put(methodName, list);
         }

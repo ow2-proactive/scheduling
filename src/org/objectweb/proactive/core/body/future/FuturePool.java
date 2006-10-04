@@ -30,6 +30,7 @@
  */ 
 package org.objectweb.proactive.core.body.future;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,14 +69,14 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     // table used for storing values which arrive in the futurePool BEFORE the registration
     // of its corresponding future.
-    private java.util.HashMap valuesForFutures;
+    private java.util.HashMap<String,FutureResult> valuesForFutures;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public FuturePool() {
         futures = new FutureMap();
-        valuesForFutures = new java.util.HashMap();
+        valuesForFutures = new java.util.HashMap<String,FutureResult>();
         this.newState = false;
         if ("enable".equals(ProActiveConfiguration.getACState())) {
             this.acEnabled = true;
@@ -94,10 +95,10 @@ public class FuturePool extends Object implements java.io.Serializable {
     // this table is used to register destination before sending.
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
-    static private java.util.Hashtable bodyDestination;
+    static private java.util.Hashtable<Thread, UniversalBody> bodyDestination;
 
     // map of threads that are running a body forwarder 
-    static private Map forwarderThreads;
+    static private Map<Thread,Object> forwarderThreads;
 
     // Add the current thread as a body forwarder
     static public void addMeAsBodyForwarder() {
@@ -126,20 +127,20 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     // to get a destination
     static public UniversalBody getBodyDestination() {
-        return (UniversalBody) (bodyDestination.get(Thread.currentThread()));
+        return (bodyDestination.get(Thread.currentThread()));
     }
 
     // this table is used to register deserialized futures after receive
     // So, futures to add in the local futurePool could be retreived
-    static private java.util.Hashtable incomingFutures;
+    static private java.util.Hashtable<Thread, ArrayList<Future>> incomingFutures;
 
     // to register an incoming future in the table  	
     public static void registerIncomingFuture(Future f) {
-        java.util.ArrayList listOfFutures = (java.util.ArrayList) incomingFutures.get(Thread.currentThread());
+        java.util.ArrayList<Future> listOfFutures = incomingFutures.get(Thread.currentThread());
         if (listOfFutures != null) {
             listOfFutures.add(f);
         } else {
-            java.util.ArrayList newListOfFutures = new java.util.ArrayList();
+            java.util.ArrayList<Future> newListOfFutures = new java.util.ArrayList<Future>();
             newListOfFutures.add(f);
             incomingFutures.put(Thread.currentThread(), newListOfFutures);
         }
@@ -152,15 +153,15 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     // to get a list of incomingFutures
     static public java.util.ArrayList getIncomingFutures() {
-        return (java.util.ArrayList) (incomingFutures.get(Thread.currentThread()));
+        return (incomingFutures.get(Thread.currentThread()));
     }
 
     // static init block
     static {
-        bodyDestination = new java.util.Hashtable();
-        incomingFutures = new java.util.Hashtable();
+        bodyDestination = new java.util.Hashtable<Thread, UniversalBody>();
+        incomingFutures = new java.util.Hashtable<Thread, ArrayList<Future>>();
         // A HashTable cannot contain null as value so we use a syncrhonized HashMap
-        forwarderThreads = Collections.synchronizedMap(new HashMap());
+        forwarderThreads = Collections.synchronizedMap(new HashMap<Thread,Object>());
     }
 
     //
@@ -283,7 +284,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
                 this.receiveFutureValue(id, creatorID,
-                    (FutureResult) valuesForFutures.remove("" + id + creatorID),
+                    valuesForFutures.remove("" + id + creatorID),
                     null);
             } catch (java.io.IOException e) {
                 e.printStackTrace();
@@ -396,7 +397,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         unsetMigrationTag();
         if (acEnabled) {
             // create a new ActiveACQueue
-            java.util.ArrayList queue = (java.util.ArrayList) (in.readObject());
+            java.util.ArrayList<ACService> queue = (java.util.ArrayList<ACService>) (in.readObject());
             queueAC = new ActiveACQueue(queue);
             //queueAC.start(); <-- done in ActiveBody.start();
         }
@@ -412,7 +413,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @see ACservice
      */
     private class ActiveACQueue extends Thread {
-        private java.util.ArrayList queue;
+        private java.util.ArrayList<ACService> queue;
         private int counter;
         private boolean kill;
 
@@ -420,13 +421,13 @@ public class FuturePool extends Object implements java.io.Serializable {
         // -- CONSTRUCTORS -----------------------------------------------
         //
         public ActiveACQueue() {
-            queue = new java.util.ArrayList();
+            queue = new java.util.ArrayList<ACService>();
             counter = 0;
             kill = false;
             this.setName("Thread for AC");
         }
 
-        public ActiveACQueue(java.util.ArrayList queue) {
+        public ActiveACQueue(java.util.ArrayList<ACService> queue) {
             this.queue = queue;
             counter = queue.size();
             kill = false;
@@ -440,7 +441,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         /**
          * return the current queue of ACServices to perform
          */
-        public java.util.ArrayList getQueue() {
+        public java.util.ArrayList<ACService> getQueue() {
             return queue;
         }
 
@@ -458,7 +459,7 @@ public class FuturePool extends Object implements java.io.Serializable {
          */
         public synchronized ACService removeACRequest() {
             counter--;
-            return (ACService) (queue.remove(0));
+            return (queue.remove(0));
         }
 
         /**

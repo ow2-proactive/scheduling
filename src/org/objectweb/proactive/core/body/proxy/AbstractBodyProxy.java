@@ -127,7 +127,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         "toString".equals(methodCall.getName());
     }
 
-    private static Set loggedSyncCalls = Collections.synchronizedSet(new HashSet());
+    private static Set<String> loggedSyncCalls = Collections.synchronizedSet(new HashSet<String>());
 
     private Object invokeOnBody(MethodCall methodCall)
         throws Exception, RenegotiateSessionException, Throwable {

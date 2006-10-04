@@ -20,7 +20,7 @@ public class SciTest3 {
 	
 	public SciTest3(String nameVN, String pathDescriptor, String[] arrayEngine){
 		
-		Vector listStateEngine = new Vector();
+		Vector<BooleanWrapper> listStateEngine = new Vector<BooleanWrapper>();
 		this.arrayEngine = arrayEngine;
 		SciData m1 = new SciDoubleMatrix("a",1, 1, new double[]{10});
 	    SciData m2 = new SciDoubleMatrix("b",1, 1, new double[]{20});
@@ -38,7 +38,7 @@ public class SciTest3 {
 		ProActive.waitForAll(listStateEngine);
 		
 		for(int i=0; i<mapEngine.size(); i++){
-			if(!((BooleanWrapper)listStateEngine.get(i)).booleanValue()){
+			if(!listStateEngine.get(i).booleanValue()){
 				System.out.println("->Activation Error");
 				return;
 			}

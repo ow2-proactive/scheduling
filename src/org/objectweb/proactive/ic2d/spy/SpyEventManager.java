@@ -60,13 +60,13 @@ public class SpyEventManager {
      * Log of all the RequestSent messages received
      * to perform a search when receiving a ReplyReceive
      */
-    protected java.util.LinkedList requestSentEventsList;
-    protected java.util.LinkedList replyReceivedEventsList;
+    protected java.util.LinkedList<MessageEvent> requestSentEventsList;
+    protected java.util.LinkedList<MessageEvent> replyReceivedEventsList;
 
     /**
      * Vector of pending messages
      */
-    protected java.util.List pendingSpyEvents;
+    protected java.util.List<SpyEvent> pendingSpyEvents;
     protected UniqueID masterSpyID;
 
     /**
@@ -85,11 +85,11 @@ public class SpyEventManager {
         futureEventListener = new MyFutureEventListener();
 
         // Initialises the list of pending messages
-        pendingSpyEvents = new java.util.ArrayList();
+        pendingSpyEvents = new java.util.ArrayList<SpyEvent>();
         // Initialize the list of RequestSent
-        requestSentEventsList = new java.util.LinkedList();
+        requestSentEventsList = new java.util.LinkedList<MessageEvent>();
         // Initialize the list of ReplyReceived
-        replyReceivedEventsList = new java.util.LinkedList();
+        replyReceivedEventsList = new java.util.LinkedList<MessageEvent>();
 
         lastTimeMasterSpyCheck = System.currentTimeMillis();
     }
@@ -193,9 +193,9 @@ public class SpyEventManager {
         UniqueID requestSenderID = requestSentEvent.getSourceBodyID();
         UniqueID requestReceiverID = requestSentEvent.getDestinationBodyID();
         synchronized (replyReceivedEventsList) {
-            java.util.ListIterator l = replyReceivedEventsList.listIterator();
+            java.util.ListIterator<MessageEvent> l = replyReceivedEventsList.listIterator();
             while (l.hasNext()) {
-                MessageEvent replyReceivedEvent = (MessageEvent) l.next();
+                MessageEvent replyReceivedEvent = l.next();
                 if (sequence == replyReceivedEvent.getSequenceNumber()) {
                 }
                 if ((sequence == replyReceivedEvent.getSequenceNumber()) &&
@@ -219,9 +219,9 @@ public class SpyEventManager {
         UniqueID replySenderID = replyReceivedEvent.getSourceBodyID();
         UniqueID replyReceiverID = replyReceivedEvent.getDestinationBodyID();
         synchronized (replyReceivedEventsList) {
-            java.util.ListIterator l = requestSentEventsList.listIterator();
+            java.util.ListIterator<MessageEvent> l = requestSentEventsList.listIterator();
             while (l.hasNext()) {
-                MessageEvent requestSentEvent = (MessageEvent) l.next();
+                MessageEvent requestSentEvent = l.next();
                 if (sequence == requestSentEvent.getSequenceNumber()) {
                 }
                 if ((sequence == requestSentEvent.getSequenceNumber()) &&
@@ -259,9 +259,9 @@ public class SpyEventManager {
         // we deregister from everybody
         removeBodyEventListener();
         synchronized (pendingSpyEvents) {
-            java.util.ListIterator l = pendingSpyEvents.listIterator();
+            java.util.ListIterator<SpyEvent> l = pendingSpyEvents.listIterator();
             while (l.hasNext()) {
-                SpyEvent event = (SpyEvent) l.next();
+                SpyEvent event = l.next();
                 UniqueID bodyID = event.getBodyID();
                 Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
                 if (body != null) {

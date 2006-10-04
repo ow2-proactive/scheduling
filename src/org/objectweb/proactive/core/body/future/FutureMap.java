@@ -30,6 +30,9 @@
  */ 
 package org.objectweb.proactive.core.body.future;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -44,13 +47,13 @@ import org.objectweb.proactive.core.body.UniversalBody;
  */
 public class FutureMap extends Object implements java.io.Serializable {
     // main map
-    private java.util.HashMap indexedByBodyID;
+    private java.util.HashMap<UniqueID, HashMap<Long, ArrayList[]>> indexedByBodyID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public FutureMap() {
-        indexedByBodyID = new java.util.HashMap();
+        indexedByBodyID = new java.util.HashMap<UniqueID, HashMap<Long, ArrayList[]>>();
     }
 
     /**
@@ -62,7 +65,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      */
     public synchronized void addAutomaticContinuation(long id,
         UniqueID creatorID, UniversalBody bodyDest) {
-        java.util.HashMap indexedByID = (java.util.HashMap) (indexedByBodyID.get(creatorID));
+        java.util.HashMap indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID == null) {
             throw new ProActiveRuntimeException(
                 "There is no map for creatorID " + creatorID);
@@ -87,18 +90,18 @@ public class FutureMap extends Object implements java.io.Serializable {
     public synchronized void receiveFuture(Future futureObject) {
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
-        java.util.HashMap indexedByID = (java.util.HashMap) (indexedByBodyID.get(creatorID));
+        java.util.HashMap<Long, ArrayList[]> indexedByID = (indexedByBodyID.get(creatorID));
 
         // entry does not exist
         if (indexedByID == null) {
             //sub-map
-            java.util.HashMap newIndexedByID = new java.util.HashMap();
+            java.util.HashMap<Long, ArrayList[]> newIndexedByID = new java.util.HashMap<Long, ArrayList[]>();
 
             //list of futures
-            java.util.ArrayList futures = new java.util.ArrayList();
+            java.util.ArrayList<Future> futures = new java.util.ArrayList<Future>();
             futures.add(futureObject);
             //list of ACs (ie bodies destination)
-            java.util.ArrayList dests = new java.util.ArrayList();
+            java.util.ArrayList<Future> dests = new java.util.ArrayList<Future>();
 
             java.util.ArrayList[] listes = new java.util.ArrayList[2];
             listes[0] = futures;
@@ -109,10 +112,10 @@ public class FutureMap extends Object implements java.io.Serializable {
         // entry for creatorID exists, but there is no sub-entry for id
         else if (indexedByID.get(new Long(id)) == null) {
             //list of futures
-            java.util.ArrayList futures = new java.util.ArrayList();
+            java.util.ArrayList<Future> futures = new java.util.ArrayList<Future>();
             futures.add(futureObject);
             //list of ACs
-            java.util.ArrayList dests = new java.util.ArrayList();
+            java.util.ArrayList<Future> dests = new java.util.ArrayList<Future>();
 
             java.util.ArrayList[] listes = new java.util.ArrayList[2];
             listes[0] = futures;
@@ -121,7 +124,7 @@ public class FutureMap extends Object implements java.io.Serializable {
         }
         // one copy of an existing future
         else {
-            (((java.util.ArrayList[]) (indexedByID.get(new Long(id))))[0]).add(futureObject);
+            ((indexedByID.get(new Long(id)))[0]).add(futureObject);
         }
     }
 
@@ -132,7 +135,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      */
     public synchronized java.util.ArrayList getFuturesToUpdate(long id,
         UniqueID creatorID) {
-        java.util.HashMap indexedByID = (java.util.HashMap) (indexedByBodyID.get(creatorID));
+        java.util.HashMap indexedByID = (indexedByBodyID.get(creatorID));
         java.util.ArrayList resultat = null;
 
         if (indexedByID != null) {
@@ -159,7 +162,7 @@ public class FutureMap extends Object implements java.io.Serializable {
     public synchronized java.util.ArrayList getAutomaticContinuation(long id,
         UniqueID bodyID) {
         java.util.ArrayList resultat = null;
-        java.util.HashMap indexedByID = (java.util.HashMap) (indexedByBodyID.get(bodyID));
+        java.util.HashMap indexedByID = (indexedByBodyID.get(bodyID));
         if (indexedByID != null) {
             java.util.ArrayList[] listes = (java.util.ArrayList[]) (indexedByID.get(new Long(
                         id)));
@@ -176,7 +179,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the creator body of the future
      */
     public synchronized void removeFutures(long id, UniqueID creatorID) {
-        java.util.HashMap indexedByID = (java.util.HashMap) (indexedByBodyID.get(creatorID));
+        java.util.HashMap indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID != null) {
             java.util.ArrayList[] listes = (java.util.ArrayList[]) (indexedByID.remove(new Long(
                         id)));
@@ -188,11 +191,11 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @see FutureProxy
      */
     public synchronized void unsetMigrationTag() {
-        java.util.Collection c1 = indexedByBodyID.values();
-        java.util.Iterator it1 = c1.iterator();
+        java.util.Collection<HashMap<Long, ArrayList[]>> c1 = indexedByBodyID.values();
+        java.util.Iterator<HashMap<Long, ArrayList[]>> it1 = c1.iterator();
 
         while (it1.hasNext()) {
-            java.util.Collection c2 = ((java.util.HashMap) (it1.next())).values();
+            java.util.Collection c2 = (it1.next()).values();
             java.util.Iterator it2 = c2.iterator();
             while (it2.hasNext()) {
                 java.util.ArrayList[] listes = (java.util.ArrayList[]) (it2.next());
@@ -211,11 +214,11 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @see FutureProxy
      */
     public synchronized void setMigrationTag() {
-        java.util.Collection c1 = indexedByBodyID.values();
-        java.util.Iterator it1 = c1.iterator();
+        java.util.Collection<HashMap<Long, ArrayList[]>> c1 = indexedByBodyID.values();
+        java.util.Iterator<HashMap<Long, ArrayList[]>> it1 = c1.iterator();
 
         while (it1.hasNext()) {
-            java.util.Collection c2 = ((java.util.HashMap) (it1.next())).values();
+            java.util.Collection c2 = (it1.next()).values();
             java.util.Iterator it2 = c2.iterator();
             while (it2.hasNext()) {
                 java.util.ArrayList[] listes = (java.util.ArrayList[]) (it2.next());

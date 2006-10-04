@@ -78,7 +78,7 @@ public class IbisHostRTFinder implements HostRTFinder {
     //
     // -- implements HostNodeFinder -----------------------------------------------
     //
-    public ArrayList findPARuntimes(String host, int port)
+    public ArrayList<ProActiveRuntime> findPARuntimes(String host, int port)
         throws java.io.IOException {
         // Try to determine the hostname
         log("Exploring " + host + " with Ibis on port " + port);
@@ -90,12 +90,12 @@ public class IbisHostRTFinder implements HostRTFinder {
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private ArrayList findPARuntimes(Registry registry)
+    private ArrayList<ProActiveRuntime> findPARuntimes(Registry registry)
         throws java.io.IOException {
         // enumarate through the rmi binding on the registry
         log("Listing bindings for " + registry);
         String[] list = registry.list();
-        ArrayList runtimeArray = new ArrayList();
+        ArrayList<ProActiveRuntime> runtimeArray = new ArrayList<ProActiveRuntime>();
         for (int idx = 0; idx < list.length; ++idx) {
             String id = list[idx];
             if (id.indexOf("PA_JVM") != -1) {

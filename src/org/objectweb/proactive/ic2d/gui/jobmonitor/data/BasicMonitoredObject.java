@@ -102,7 +102,7 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     private boolean reallyDeleted;
 
     /* Set of MonitoredObjectSet that contain this object */
-    private Set references;
+    private Set<MonitoredObjectSet> references;
 
     protected BasicMonitoredObject(int key, String fullname) {
         this(key, fullname, fullname);
@@ -113,7 +113,7 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
         this.fullname = fullname;
         this.deletedSince = null;
         this.reallyDeleted = false;
-        this.references = new HashSet();
+        this.references = new HashSet<MonitoredObjectSet>();
         computePrettyName(prettyPrefix);
     }
 
@@ -121,12 +121,12 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
         return 0;
     }
 
-    protected Map getPrettyNames() {
+    protected Map<String, String> getPrettyNames() {
         return null;
     }
 
     private void computePrettyName(String prefix) {
-        Map prettyNames = getPrettyNames();
+        Map<String, String> prettyNames = getPrettyNames();
         if (prettyNames == null) {
 
             /* Special case for the root element */
@@ -139,7 +139,7 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
             return;
         }
 
-        prettyName = (String) prettyNames.get(fullname);
+        prettyName = prettyNames.get(fullname);
         if (prettyName == null) {
             int id = incLastID();
             if (getKey() == HOST) {
@@ -161,19 +161,19 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     }
 
     /* When an object is removed we also have to remove it in the sets that contain it */
-    public List removeInReferences() {
+    public List<MonitoredObjectSet> removeInReferences() {
 
         /*
          * The list is copied because, as we are removing the object in sets, the
          * list is updated, which would cause ConcurrentModificationException.
          */
-        List copy = new ArrayList();
+        List<MonitoredObjectSet> copy = new ArrayList<MonitoredObjectSet>();
         copy.addAll(references);
-        Iterator iter = copy.iterator();
+        Iterator<MonitoredObjectSet> iter = copy.iterator();
 
-        List clearedSets = new ArrayList();
+        List<MonitoredObjectSet> clearedSets = new ArrayList<MonitoredObjectSet>();
         while (iter.hasNext()) {
-            MonitoredObjectSet set = (MonitoredObjectSet) iter.next();
+            MonitoredObjectSet set = iter.next();
             set.remove(this);
             if (set.isEmpty()) {
                 clearedSets.add(set);

@@ -39,13 +39,13 @@ import java.util.NoSuchElementException;
 public class ExceptionMaskStack {
 
     /* List of ExceptionMaskLevel, starts with the top */
-    private LinkedList stack;
+    private LinkedList<ExceptionMaskLevel> stack;
 
     /* The combination of all masks */
     private ExceptionMaskLevel currentExceptionMask;
 
     private ExceptionMaskStack() {
-        stack = new LinkedList();
+        stack = new LinkedList<ExceptionMaskLevel>();
         currentExceptionMask = new ExceptionMaskLevel();
     }
 
@@ -83,9 +83,9 @@ public class ExceptionMaskStack {
     /* Recompute the full mask */
     private void updateExceptionMask() {
         currentExceptionMask = new ExceptionMaskLevel();
-        Iterator iter = stack.iterator();
+        Iterator<ExceptionMaskLevel> iter = stack.iterator();
         while (iter.hasNext()) {
-            ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
+            ExceptionMaskLevel level = iter.next();
             currentExceptionMask.addExceptionTypes(level);
         }
     }
@@ -102,7 +102,7 @@ public class ExceptionMaskStack {
 
     private ExceptionMaskLevel getTopLevel() {
         try {
-            return (ExceptionMaskLevel) stack.getFirst();
+            return stack.getFirst();
         } catch (NoSuchElementException nsee) {
             throw new IllegalStateException("Exception stack is empty");
         }
@@ -110,9 +110,9 @@ public class ExceptionMaskStack {
 
     void waitForPotentialException(boolean allLevels) {
         if (allLevels) {
-            Iterator iter = stack.iterator();
+            Iterator<ExceptionMaskLevel> iter = stack.iterator();
             while (iter.hasNext()) {
-                ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
+                ExceptionMaskLevel level = iter.next();
                 level.waitForPotentialException();
             }
         } else {
@@ -122,9 +122,9 @@ public class ExceptionMaskStack {
 
     /* Optimization: we don't always insert at the top level */
     ExceptionMaskLevel findBestLevel(Class[] c) {
-        Iterator iter = stack.iterator();
+        Iterator<ExceptionMaskLevel> iter = stack.iterator();
         while (iter.hasNext()) {
-            ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
+            ExceptionMaskLevel level = iter.next();
             if (level.catchRuntimeException() ||
                     level.areExceptionTypesCaught(c)) {
                 return level;
@@ -136,9 +136,9 @@ public class ExceptionMaskStack {
 
     void waitForIntersection(Class[] exceptions) {
         if (currentExceptionMask.areExceptionTypesCaught(exceptions)) {
-            Iterator iter = stack.iterator();
+            Iterator<ExceptionMaskLevel> iter = stack.iterator();
             while (iter.hasNext()) {
-                ExceptionMaskLevel level = (ExceptionMaskLevel) iter.next();
+                ExceptionMaskLevel level = iter.next();
                 if (level.areExceptionTypesCaught(exceptions)) {
                     level.waitForPotentialException();
                 }

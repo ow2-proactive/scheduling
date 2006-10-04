@@ -42,14 +42,14 @@ import java.util.Vector;
 public class ExceptionListException extends RuntimeException {
 
     /** A vector implements the list */
-    private Vector list;
+    private Vector<ExceptionInGroup> list;
 
     /**
      * Builds a new empty list of exception
      */
     public ExceptionListException() {
         super("Exception list, only one cause in the stacktrace");
-        this.list = new Vector();
+        this.list = new Vector<ExceptionInGroup>();
     }
 
     /**
@@ -74,7 +74,7 @@ public class ExceptionListException extends RuntimeException {
      * Returns an iterator over the exceptions in this list in proper sequence.
      * @return an iterator over the exceptions in this list in proper sequence.
      */
-    public Iterator iterator() {
+    public Iterator<ExceptionInGroup> iterator() {
         return this.list.iterator();
     }
 

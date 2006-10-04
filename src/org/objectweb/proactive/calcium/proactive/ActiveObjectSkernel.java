@@ -67,9 +67,9 @@ public class ActiveObjectSkernel<T> extends Skernel<T> implements RunActive, Ser
 	
 	@SuppressWarnings("unchecked")
 	public Task<T> getReadyTask(){
-		Task task= super.getReadyTask();
+		Task<T> task= super.getReadyTask();
 		if(task==null){ //ProActive doesn't handle null
-			task= new Task();
+			task= new Task<T>();
 			task.setDummy();
 			return task; //return dummy task
 		}

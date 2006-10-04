@@ -78,7 +78,7 @@ public class Main {
 
     private static class Args {
         private String taillardBenchFile = null;
-        private ArrayList xmlDescriptor = new ArrayList();
+        private ArrayList<String> xmlDescriptor = new ArrayList<String>();
         private long lowerBound = -1;
         private long upperBound = -1;
     }
@@ -183,10 +183,10 @@ public class Main {
         return parsed;
     }
 
-    public static void exit(ArrayList pads, int returnCode) {
+    public static void exit(ArrayList<ProActiveDescriptor> pads, int returnCode) {
         try {
-            for (Iterator iter = pads.iterator(); iter.hasNext();) {
-                ProActiveDescriptor pad = (ProActiveDescriptor) iter.next();
+            for (Iterator<ProActiveDescriptor> iter = pads.iterator(); iter.hasNext();) {
+                ProActiveDescriptor pad = iter.next();
                 pad.killall(false);
             }
         } catch (ProActiveException e) {
@@ -215,12 +215,12 @@ public class Main {
         }
 
         // Activate the deployment
-        ArrayList pads = new ArrayList();
-        ArrayList vns = new ArrayList();
+        ArrayList<ProActiveDescriptor> pads = new ArrayList<ProActiveDescriptor>();
+        ArrayList<VirtualNode> vns = new ArrayList<VirtualNode>();
         try {
-            for (Iterator iter = parsed.xmlDescriptor.iterator();
+            for (Iterator<String> iter = parsed.xmlDescriptor.iterator();
                     iter.hasNext();) {
-                String descriptor = (String) iter.next();
+                String descriptor = iter.next();
                 ProActiveDescriptor pad = ProActive.getProactiveDescriptor(descriptor);
                 pads.add(pad);
                 VirtualNode[] currentVNs = pad.getVirtualNodes();
@@ -261,11 +261,11 @@ public class Main {
         try {
             if (vns.size() > 1) {
                 manager = ProActiveBranchNBound.newBnB(task,
-                        (VirtualNode[]) vns.toArray(new VirtualNode[vns.size()]),
+                        vns.toArray(new VirtualNode[vns.size()]),
                         BasicQueueImpl.class.getName());
             } else {
                 manager = ProActiveBranchNBound.newBnB(task,
-                        (VirtualNode) vns.get(0),
+                        vns.get(0),
                         BasicQueueImpl.class.getName());
             }
         } catch (ActiveObjectCreationException e) {

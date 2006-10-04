@@ -72,7 +72,7 @@ public class LoadBalancer implements ProActiveInternalObject {
     protected LoadMonitor lm;
     protected Metric metric;
     protected Node myNode;
-    protected ArrayList loadBalancers;
+    protected ArrayList<LoadBalancer> loadBalancers;
     
     private static final int STEAL = 1;
     private static final int BALANCE = 2;
@@ -196,7 +196,7 @@ public class LoadBalancer implements ProActiveInternalObject {
     	return balancerName;
     }
     
-    public void init(ArrayList loadBalancers, InformationRecover ir){
+    public void init(ArrayList<LoadBalancer> loadBalancers, InformationRecover ir){
     	try {
 			this.myNode = ProActive.getNode();
 			this.informationRecover = ir;
@@ -219,7 +219,7 @@ public class LoadBalancer implements ProActiveInternalObject {
    	
     	int first = randomizer.nextInt(size);
     	for (int i = 0; i < LoadBalancingConstants.SUBSET_SIZE  && size > 0; i++) {
-    		LoadBalancer remoteLb = ((LoadBalancer) loadBalancers.get((first+i)%size));
+    		LoadBalancer remoteLb = loadBalancers.get((first+i)%size);
     		try {
     			switch (action) {
 				case STEAL:
@@ -240,9 +240,9 @@ public class LoadBalancer implements ProActiveInternalObject {
     public void notifyLoadBalancers(){
     	LoadBalancer lb;
     	LoadBalancer myThis = (LoadBalancer)ProActive.getStubOnThis();
-    	Iterator it = loadBalancers.iterator();
+    	Iterator<LoadBalancer> it = loadBalancers.iterator();
 		while (it.hasNext()) {
-			lb = ((LoadBalancer) it.next());
+			lb = it.next();
 			if(!lb.equals(this)){
 				lb.addNewBalancer(myThis);
 			}

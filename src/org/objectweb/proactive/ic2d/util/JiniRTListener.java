@@ -55,7 +55,7 @@ import net.jini.discovery.LookupDiscovery;
 
 public class JiniRTListener implements DiscoveryListener {
     static Logger log4jlogger = ProActiveLogger.getLogger(Loggers.IC2D);
-    protected java.util.ArrayList runtimes = new java.util.ArrayList();
+    protected java.util.ArrayList<ProActiveRuntime> runtimes = new java.util.ArrayList<ProActiveRuntime>();
     private String host;
     private IC2DMessageLogger logger;
     private DefaultListModel skippedObjects;
@@ -221,7 +221,7 @@ public class JiniRTListener implements DiscoveryListener {
     public void discarded(DiscoveryEvent evt) {
     }
 
-    public java.util.ArrayList getRuntimes() {
+    public java.util.ArrayList<ProActiveRuntime> getRuntimes() {
         return runtimes;
     }
 }

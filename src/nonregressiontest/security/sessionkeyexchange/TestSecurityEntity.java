@@ -14,6 +14,7 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 public class TestSecurityEntity implements SecurityEntity {
@@ -88,7 +89,7 @@ public class TestSecurityEntity implements SecurityEntity {
         return securityManager.getCertificateEncoded();
     }
 
-    public ArrayList getEntities() throws SecurityNotAvailableException {
+    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException {
         return securityManager.getEntities();
     }
 }

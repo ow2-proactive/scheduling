@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.profiling.Timer;
  */
 public class CompositeAverageMicroTimer extends AverageMicroTimer
     implements Timer, Serializable {
-    private HashMap timerMap = new HashMap();
+    private HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
     private Timer activeTimer = null;
 
     private CompositeAverageMicroTimer() {
@@ -84,9 +84,9 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
 
     public long getCumulatedTime() {
         long time = 0;
-        Iterator it = timerMap.values().iterator();
+        Iterator<Timer> it = timerMap.values().iterator();
         while (it.hasNext()) {
-            Timer t = ((Timer) it.next());
+            Timer t = it.next();
             time += t.getCumulatedTime();
         }
         return time;
@@ -94,9 +94,9 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
 
     public int getNumberOfValues() {
         int values = 0;
-        Iterator it = timerMap.values().iterator();
+        Iterator<Timer> it = timerMap.values().iterator();
         while (it.hasNext()) {
-            Timer t = ((Timer) it.next());
+            Timer t = it.next();
             values += t.getNumberOfValues();
         }
         return values;
@@ -108,9 +108,9 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     public double getAverage() {
         int values = 0;
         long time = 0;
-        Iterator it = timerMap.values().iterator();
+        Iterator<Timer> it = timerMap.values().iterator();
         while (it.hasNext()) {
-            Timer t = ((Timer) it.next());
+            Timer t = it.next();
             values += t.getNumberOfValues();
             time += t.getCumulatedTime();
         }
@@ -124,9 +124,9 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         tmp.append("\nTotal time measured: ").append(this.getCumulatedTime());
         tmp.append("\nAverage time: ").append(this.getAverage()).append("\n");
         //  Now we deal with the internal timers
-        Iterator it = timerMap.values().iterator();
+        Iterator<Timer> it = timerMap.values().iterator();
         while (it.hasNext()) {
-            Timer t = (Timer) it.next();
+            Timer t = it.next();
             tmp.append("    ").append(t.getName()).append("\n");
             tmp.append("        ").append("Number of measures: ").append(t.getNumberOfValues());
             tmp.append("\n        ").append("Total time measured: ").append(t.getCumulatedTime());
@@ -150,7 +150,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
 
     public void setTimer(String name) {
         String realName = this.name + "." + name;
-        this.activeTimer = (Timer) timerMap.get(realName);
+        this.activeTimer = timerMap.get(realName);
         if (this.activeTimer == null) {
             //need to create a new timer
             this.activeTimer = new AverageMicroTimer(realName);

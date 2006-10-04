@@ -277,7 +277,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         //tokens are separated by space or quotation marks
         StringTokenizer st = new StringTokenizer(commandToExecute, " \"", true);
         String token;
-        ArrayList al = new ArrayList();
+        ArrayList<String> al = new ArrayList<String>();
         int quotationFound = 0;
         boolean commandFound = false;
         StringBuffer buff = new StringBuffer();
@@ -307,7 +307,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
                 }
             }
         }
-        String[] command = (String[]) al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {  });
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);

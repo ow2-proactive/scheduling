@@ -86,10 +86,10 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     protected String proActiveRuntimeURL;
 
     //stores nodes urls to be able to unregister nodes
-    private ArrayList nodesArray;
+    private ArrayList<String> nodesArray;
 
     //store vn urls to be able to unregister vns
-    private ArrayList vnNodesArray;
+    private ArrayList<String> vnNodesArray;
     private boolean hasCreatedRegistry;
 
     public RmiProActiveRuntimeImpl()
@@ -125,8 +125,8 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
                 throw e;
             }
 
-            this.nodesArray = new java.util.ArrayList();
-            this.vnNodesArray = new java.util.ArrayList();
+            this.nodesArray = new java.util.ArrayList<String>();
+            this.vnNodesArray = new java.util.ArrayList<String>();
 
             //this.urlBuilder = new UrlBuilder();
             this.proActiveRuntimeURL = buildRuntimeURL();
@@ -183,7 +183,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
 
     public void killAllNodes() throws RemoteException, ProActiveException {
         for (int i = 0; i < nodesArray.size(); i++) {
-            String url = (String) nodesArray.get(i);
+            String url = nodesArray.get(i);
             killNode(url);
         }
 
@@ -349,7 +349,7 @@ public class RmiProActiveRuntimeImpl extends UnicastRemoteObject
     public void unregisterAllVirtualNodes()
         throws RemoteException, ProActiveException {
         for (int i = 0; i < vnNodesArray.size(); i++) {
-            String url = (String) vnNodesArray.get(i);
+            String url = vnNodesArray.get(i);
             unregisterVirtualNode(url);
         }
     }

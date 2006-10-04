@@ -93,7 +93,7 @@ public class LocalBodyStore {
      * events
      */
     private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
-    private ThreadLocal bodyPerThread = new ThreadLocal();
+    private ThreadLocal<Body> bodyPerThread = new ThreadLocal<Body>();
     private MetaObjectFactory halfBodyMetaObjectFactory = null;
 
     /** Should the JVM be killed when it has no more active bodies? */

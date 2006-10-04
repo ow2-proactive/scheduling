@@ -61,9 +61,9 @@ public class UnicoreParameters implements java.io.Serializable {
     private int vsiteRuntime; //runtime in seconds
     private String vsitePriority;
     private String scriptContent;
-    private ArrayList deployFiles;
-    private ArrayList deployDirs;
-    private ArrayList retrieveFiles; //not yet supported
+    private ArrayList<String> deployFiles;
+    private ArrayList<String> deployDirs;
+    private ArrayList<String> retrieveFiles; //not yet supported
     private String fileSep;
 
     public String toString() {
@@ -86,14 +86,14 @@ public class UnicoreParameters implements java.io.Serializable {
         sb.append("scriptContent=>").append(scriptContent).append("\n");
 
         sb.append("FileTransfer Directories:\n");
-        ListIterator it = deployDirs.listIterator();
+        ListIterator<String> it = deployDirs.listIterator();
         while (it.hasNext())
-            sb.append((String) it.next()).append("\n");
+            sb.append(it.next()).append("\n");
 
         sb.append("FileTransfer Files:\n");
         it = deployFiles.listIterator();
         while (it.hasNext())
-            sb.append((String) it.next()).append("\n");
+            sb.append(it.next()).append("\n");
 
         return sb.toString();
     }
@@ -475,15 +475,15 @@ public class UnicoreParameters implements java.io.Serializable {
         sb.append("-vsitePriority ").append(vsitePriority).append(" ");
 
         //TODO check for white spaces!
-        Iterator it = deployFiles.iterator();
+        Iterator<String> it = deployFiles.iterator();
         while (it.hasNext()) {
-            String s = (String) it.next();
+            String s = it.next();
             sb.append("-deploymentFile ").append(s).append(" ");
         }
 
         it = deployDirs.iterator();
         while (it.hasNext()) {
-            String s = (String) it.next();
+            String s = it.next();
             sb.append("-deploymentDir ").append(s).append(" ");
         }
 
@@ -553,8 +553,8 @@ public class UnicoreParameters implements java.io.Serializable {
 
         scriptContent = "";
 
-        deployFiles = new ArrayList();
-        deployDirs = new ArrayList();
+        deployFiles = new ArrayList<String>();
+        deployDirs = new ArrayList<String>();
 
         retrieveFiles = null; //new ArrayList(); not yet implemented
     }
@@ -563,12 +563,12 @@ public class UnicoreParameters implements java.io.Serializable {
      * @return All files and dirs on the deploy queue.
      */
     public String[] getDeployAllFilesAndDirectories() {
-        ArrayList allFiles = new ArrayList();
+        ArrayList<String> allFiles = new ArrayList<String>();
 
         allFiles.addAll(deployFiles);
         allFiles.addAll(deployDirs);
 
-        return (String[]) allFiles.toArray(new String[0]);
+        return allFiles.toArray(new String[0]);
     }
 
     /**
