@@ -108,9 +108,11 @@ public class Test extends FunctionalTest {
                     msg.append("     -> Incompatible return type\n");
                 }
             } catch (NoSuchMethodException e) {
-                testPassed = false;
-                msg.append(method + "\n");
-                msg.append("     -> Missing in remote class");
+                if (!(method.getName().equals("getJobID") && parameters.length == 0)) {
+                	testPassed = false;
+                	msg.append(method + "\n");
+                	msg.append("     -> Missing in remote class");
+                }
             }
         }
 
