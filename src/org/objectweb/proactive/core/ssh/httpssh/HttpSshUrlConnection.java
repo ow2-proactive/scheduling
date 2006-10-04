@@ -39,6 +39,7 @@ import java.net.ProtocolException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -57,7 +58,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
     private SshTunnel _tunnel;
     private HttpURLConnection _httpConnection;
-    private java.util.Hashtable _properties;
+    private java.util.Hashtable<String,List<String>> _properties;
     static private TryCache _tryCache = null;
 
     static private TryCache getTryCache() {
@@ -74,7 +75,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
 
     public HttpSshUrlConnection(java.net.URL u) throws IOException {
         super(u);
-        _properties = new Hashtable();
+        _properties = new Hashtable<String,List<String>>();
     }
 
     private void checkNotConnected() throws IllegalStateException {
@@ -89,7 +90,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
-    public Map getRequestProperties() {
+    public Map <String,List<String>> getRequestProperties() {
         checkNotConnected();
         return _properties;
     }
@@ -110,7 +111,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
     public void setRequestProperty(String key, String value) {
         checkNotConnected();
         checkNullKey(key);
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList<String>();
         list.add(value);
         _properties.put(key, list);
     }
@@ -118,14 +119,12 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
     public void addRequestProperty(String key, String value) {
         checkNotConnected();
         checkNullKey(key);
-        ArrayList list = (ArrayList) _properties.get(key);
+        List<String> list = _properties.get(key);
         if (list == null) {
-            list = new ArrayList();
-        } else {
-            _properties.remove(key);
-        }
+            list = new ArrayList<String>();
+        } 
         list.add(value);
-        _properties.put(key, value);
+        _properties.put(key, list);
     }
 
     public void setInstanceFollowRedirects(boolean followRedirects) {
@@ -201,7 +200,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
     }
 
-    public Map getHeaderFields() {
+    public Map<String,List<String>> getHeaderFields() {
         try {
             ensureTunnel();
             return _httpConnection.getHeaderFields();
