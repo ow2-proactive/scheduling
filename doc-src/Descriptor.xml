@@ -1469,6 +1469,7 @@
      &lt;scriptPath&gt;
       &lt;absolutePath value='/home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh'/&gt;
      &lt;/scriptPath&gt;
+     &lt;parallelEnvironment&gt;mpi&lt;/parallelEnvironment&gt;
     &lt;/gridEngineOption&gt;
    &lt;/gridengineProcess&gt;
   &lt;/processDefinition&gt;
