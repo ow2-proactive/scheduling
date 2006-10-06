@@ -3,7 +3,7 @@
 source $(dirname $0)/g5k_lib.sh
 
 function print_help {
-	echo -e "Usage: $0 -d dir|-l [-f] [-a|-o|-c cluster]"
+	echo -e "Usage: $0 -d dir|-l [-f] [-a|-o|-s cluster]"
 	echo -e "\n"
 	echo -e "\t-d dir , delete this file or directory"
 	echo -e "\t-l     , delete OAR logfiles"

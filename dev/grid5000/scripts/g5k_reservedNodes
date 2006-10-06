@@ -3,7 +3,7 @@
 source $(dirname $0)/g5k_lib.sh
 
 function print_help {
-	echo -e "Usage: $0 [-c] [-n num] [-a|-o|-c cluster] "
+	echo -e "Usage: $0 [-c] [-n num] [-a|-o|-s cluster] "
 	echo -e "Print nodes owned by a reservation\n"
 	echo -e "\t-c       , check that each node is really free (slow)"
 	echo -e "\t-n num   , print only num nodes instead of all reserved nodes"

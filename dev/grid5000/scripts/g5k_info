@@ -3,7 +3,7 @@
 source $(dirname $0)/g5k_lib.sh
 
 function print_help {
-	echo -e "Usage: $0 [-f] [-j] [-a|-o|-c cluster]"
+	echo -e "Usage: $0 [-f] [-j] [-a|-o|-s cluster]"
 	echo -e "Print statistics about nodes and OAR Jobs\n"
 	echo -e "\t-f       , print full node statistics"
 	echo -e "\t-j       , print informations about OAR Jobs"

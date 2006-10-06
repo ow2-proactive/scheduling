@@ -3,7 +3,7 @@
 source $(dirname $0)/g5k_lib.sh
 
 function print_help {
-	echo -e "Usage: $0 -d dir [-a|-o|-c cluster]"
+	echo -e "Usage: $0 -d dir [-a|-o|-s cluster]"
 	echo -e "Synchronize a directory between two clusters\n"
 	echo -e "\t-d dir     , directory to be synchronized"
 	modopt_print_help
