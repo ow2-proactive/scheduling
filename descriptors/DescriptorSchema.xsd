@@ -1178,7 +1178,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="bookingDuration" type="xs:string" />
 			<xs:element name="scriptPath" type="FilePathType" />
 			<xs:element name="hostlist" type="xs:string" minOccurs="0" />
-			<xs:element name="parallelEnvironment" type="xs:string" minOccurs="0" />
+			<xs:element name="parallelEnvironment" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
