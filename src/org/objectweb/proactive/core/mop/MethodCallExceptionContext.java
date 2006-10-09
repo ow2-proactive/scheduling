@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 
 /* This class is optimized so that its instances are immutable */
-public class MethodCallMetadata implements Serializable {
+public class MethodCallExceptionContext implements Serializable {
 
     /**
      * If the caller catches some RuntimeException, we have to wait for all calls
@@ -51,14 +51,14 @@ public class MethodCallMetadata implements Serializable {
     /**
      * The default parameters, when the exception mechanism is not used.
      */
-    public static final MethodCallMetadata DEFAULT = new MethodCallMetadata(false,
+    public static final MethodCallExceptionContext DEFAULT = new MethodCallExceptionContext(false,
             false);
 
     /**
      * @param runtimeExceptionHandled
      * @param exceptionAsynchronously
      */
-    public MethodCallMetadata(boolean runtimeExceptionHandled,
+    public MethodCallExceptionContext(boolean runtimeExceptionHandled,
         boolean exceptionAsynchronously) {
         this.runtimeExceptionHandled = runtimeExceptionHandled;
         this.exceptionAsynchronously = exceptionAsynchronously;
@@ -78,12 +78,12 @@ public class MethodCallMetadata implements Serializable {
         return runtimeExceptionHandled;
     }
 
-    public static MethodCallMetadata optimize(MethodCallMetadata metadata) {
-        if (DEFAULT.equals(metadata)) {
-            metadata = null;
+    public static MethodCallExceptionContext optimize(MethodCallExceptionContext context) {
+        if (DEFAULT.equals(context)) {
+            context = null;
         }
 
-        return metadata;
+        return context;
     }
 
     public String toString() {

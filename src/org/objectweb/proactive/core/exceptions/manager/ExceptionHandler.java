@@ -35,7 +35,7 @@ import java.util.Collection;
 
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.MethodCallMetadata;
+import org.objectweb.proactive.core.mop.MethodCallExceptionContext;
 
 
 public class ExceptionHandler {
@@ -86,9 +86,9 @@ public class ExceptionHandler {
 
     /* Called by ProActive on the client side */
     public static void addRequest(MethodCall methodCall, FutureProxy future) {
-        MethodCallMetadata metadata = methodCall.getMetadata();
-        if (metadata.isExceptionAsynchronously() ||
-                metadata.isRuntimeExceptionHandled()) {
+        MethodCallExceptionContext context = methodCall.getExceptionContext();
+        if (context.isExceptionAsynchronously() ||
+        		context.isRuntimeExceptionHandled()) {
             ExceptionMaskStack stack = ExceptionMaskStack.get();
             synchronized (stack) {
                 Method m = methodCall.getReifiedMethod();
@@ -105,12 +105,12 @@ public class ExceptionHandler {
         }
     }
 
-    public static MethodCallMetadata getMetadataForCall(Method m) {
+    public static MethodCallExceptionContext getContextForCall(Method m) {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             boolean runtime = stack.isRuntimeExceptionHandled();
             boolean async = stack.areExceptionTypesCaught(m.getExceptionTypes());
-            MethodCallMetadata res = new MethodCallMetadata(runtime, async);
+            MethodCallExceptionContext res = new MethodCallExceptionContext(runtime, async);
 
             //            System.out.println(m + " => " + res);
             return res;

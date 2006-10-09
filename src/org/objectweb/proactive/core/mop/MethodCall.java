@@ -127,7 +127,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     /**
      * Actually only used for exceptions.
      */
-    private MethodCallMetadata metadata;
+    private MethodCallExceptionContext exceptioncontext;
 
     /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
@@ -208,8 +208,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      *        <code>reifiedMethod</code> with arguments <code>effectiveArguments</code>
      */
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
-        Object[] effectiveArguments, MethodCallMetadata metadata) {
-        metadata = MethodCallMetadata.optimize(metadata);
+        Object[] effectiveArguments, MethodCallExceptionContext exceptioncontext) {
+    	exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
 
         if (MethodCall.getRecycleMethodCallObject()) {
             // Finds a recycled MethodCall object in the pool, cleans it and
@@ -223,17 +223,17 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 result.reifiedMethod = reifiedMethod;
                 result.effectiveArguments = effectiveArguments;
                 result.key = buildKey(reifiedMethod);
-                result.metadata = metadata;
+                result.exceptioncontext = exceptioncontext;
                 return result;
             }
         }
-        return new MethodCall(reifiedMethod, effectiveArguments, metadata);
+        return new MethodCall(reifiedMethod, effectiveArguments, exceptioncontext);
     }
 
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
         Object[] effectiveArguments) {
-        MethodCallMetadata metadata = ExceptionHandler.getMetadataForCall(reifiedMethod);
-        return getMethodCall(reifiedMethod, effectiveArguments, metadata);
+        MethodCallExceptionContext exceptioncontext = ExceptionHandler.getContextForCall(reifiedMethod);
+        return getMethodCall(reifiedMethod, effectiveArguments, exceptioncontext);
     }
 
     /**
@@ -284,7 +284,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 mc.effectiveArguments = null;
                 mc.tagsForBarrier = null;
                 mc.key = null;
-                mc.metadata = null;
+                mc.exceptioncontext = null;
                 // Inserts the object in the pool
                 MethodCall.recyclePool[MethodCall.index] = mc;
                 MethodCall.index++;
@@ -305,11 +305,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // because we want to enforce the use of factory methods for getting fresh
     // instances of this class (see <I>Factory</I> pattern in GoF).
     public MethodCall(Method reifiedMethod, Object[] effectiveArguments,
-        MethodCallMetadata metadata) {
+        MethodCallExceptionContext exceptioncontext) {
         this.reifiedMethod = reifiedMethod;
         this.effectiveArguments = effectiveArguments;
         this.key = buildKey(reifiedMethod);
-        this.metadata = MethodCallMetadata.optimize(metadata);
+        this.exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
     }
 
     public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
@@ -343,7 +343,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 effectiveArguments = (Object[]) Utils.makeDeepCopy(mc.effectiveArguments);
             }
             this.key = MethodCall.buildKey(mc.getReifiedMethod());
-            this.metadata = mc.metadata;
+            this.exceptioncontext = mc.exceptioncontext;
             // methodcallID?
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -357,7 +357,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         this.reifiedMethod = null;
         this.effectiveArguments = null;
         this.serializedEffectiveArguments = null;
-        this.metadata = null;
+        this.exceptioncontext = null;
     }
 
     /**
@@ -570,7 +570,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     public boolean isOneWayCall() {
         return this.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE) &&
         (this.getReifiedMethod().getExceptionTypes().length == 0) &&
-        !this.getMetadata().isRuntimeExceptionHandled();
+        !this.getExceptionContext().isRuntimeExceptionHandled();
     }
 
     /* Used in the REIF_AND_EXCEP cache */
@@ -603,7 +603,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             REIF_AND_EXCEP.put(m, cached);
         }
 
-        if (cached.reifiable && cached.exceptions && getMetadata().isExceptionAsynchronously()) {
+        if (cached.reifiable && cached.exceptions && getExceptionContext().isExceptionAsynchronously()) {
                 /* ProActive.tryWithCatch() is used, so this call is asynchronous */
         	return null;
         }
@@ -646,12 +646,12 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         return this.tagsForBarrier;
     }
 
-    public MethodCallMetadata getMetadata() {
-        if (metadata == null) {
-            return MethodCallMetadata.DEFAULT;
+    public MethodCallExceptionContext getExceptionContext() {
+        if (exceptioncontext == null) {
+            return MethodCallExceptionContext.DEFAULT;
         }
 
-        return metadata;
+        return exceptioncontext;
     }
 
     //
