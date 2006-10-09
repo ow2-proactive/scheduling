@@ -124,10 +124,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private long methodCallID;
     private String key;
 
-    /**
-     * Actually only used for exceptions.
-     */
-    private MethodCallExceptionContext exceptioncontext;
+    private transient MethodCallExceptionContext exceptioncontext;
 
     /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
