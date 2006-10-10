@@ -208,8 +208,9 @@ public class NodeImpl implements Node, Serializable {
         Object[] constructorParameters, Object[] proxyParameters)
         throws MOPException {
         try {
-            return MOP.newInstance(className, constructorParameters,
-                Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
+            return MOP.newInstance(className, (Class[])null, constructorParameters,
+                    Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
+
         } catch (ClassNotFoundException e) {
             throw new ConstructionOfProxyObjectFailedException(
                 "Class can't be found e=" + e);

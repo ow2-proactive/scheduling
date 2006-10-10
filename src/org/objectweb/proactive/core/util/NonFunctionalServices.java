@@ -31,7 +31,8 @@
 package org.objectweb.proactive.core.util;
 
 import java.lang.reflect.Method;
-
+import java.lang.reflect.TypeVariable;
+import java.util.Map;
 
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -78,7 +79,7 @@ public class NonFunctionalServices {
      * @throws Throwable
      */
     public static void terminateAO (Proxy proxy) throws Throwable {
-        proxy.reify(MethodCall.getMethodCall(terminateAOMethod, paramTypes));       
+        proxy.reify(MethodCall.getMethodCall(terminateAOMethod, paramTypes, (Map<TypeVariable, Class>)null));       
     }
     
     /**
@@ -88,7 +89,7 @@ public class NonFunctionalServices {
      * @throws Throwable
      */
     public static void terminateAOImmediately(Proxy proxy) throws Throwable {
-        proxy.reify(MethodCall.getMethodCall(terminateAOImmediatelyMethod, paramTypes));
+        proxy.reify(MethodCall.getMethodCall(terminateAOImmediatelyMethod, paramTypes, (Map<TypeVariable, Class>)null));
     }
 
     /**

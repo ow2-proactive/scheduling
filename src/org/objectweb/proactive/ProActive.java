@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive;
 
+import ibis.rmi.RemoteException;
+
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.UnknownHostException;
@@ -103,10 +105,6 @@ import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
-
-
-
-import ibis.rmi.RemoteException;
 
 
 /**
@@ -265,14 +263,13 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object newActive(String classname,
+    public static Object newActive(String classname, 
         Object[] constructorParameters)
         throws ActiveObjectCreationException, NodeException {
-        // avoid ambiguity for method parameters types
-        Node nullNode = null;
-        return newActive(classname, constructorParameters, nullNode, null, null);
+        return newActive(classname, null, constructorParameters, (Node)null, null, null);
     }
 
+    
     /**
      * Creates a new ActiveObject based on classname attached to the node of the given URL.
      * @param classname the name of the class to instanciate as active
@@ -287,13 +284,11 @@ public class ProActive {
         Object[] constructorParameters, String nodeURL)
         throws ActiveObjectCreationException, NodeException {
         if (nodeURL == null) {
-            // avoid ambiguity for method parameters types
-            Node nullNode = null;
-            return newActive(classname, constructorParameters, nullNode, null,
-                null);
+            return newActive(classname, null, constructorParameters, (Node)null,
+                null, null);
         } else {
-            return newActive(classname, constructorParameters,
-                NodeFactory.getNode(nodeURL), null, null);
+            return newActive(classname, null,
+                constructorParameters, NodeFactory.getNode(nodeURL), null, null);
         }
     }
 
@@ -310,7 +305,368 @@ public class ProActive {
     public static Object newActive(String classname,
         Object[] constructorParameters, Node node)
         throws ActiveObjectCreationException, NodeException {
-        return newActive(classname, constructorParameters, node, null, null);
+        return newActive(classname, null, constructorParameters, node, null, null);
+    }
+
+    
+    /**
+     * <p>Create a set of active objects  with given construtor parameters.
+     * The object activation is optimized by a thread pool.</p>
+     * <p>The total of active objects created is equal to the number of nodes
+     * and to the total of constructor paramaters also.</p>
+     * <p>The condition to use this method is that:
+     * <b>constructorParameters.length == nodes.length</b></p>
+     *
+     * @param className the name of the class to instanciate as active.
+     * @param constructorParameters the array that contains the parameters used
+     * to build the active objects. All active objects have the same constructor
+     * parameters.
+     * @param nodes the array of nodes where the active objects are created.
+     * @return an array of references (possibly remote) on Stubs of the newly
+     * created active objects.
+     * @throws ClassNotFoundException in the case of className is not a class.
+     */
+    public static Object[] newActiveInParallel(String className,
+        Object[][] constructorParameters, Node[] nodes)
+        throws ClassNotFoundException {
+    	return newActiveInParallel(className, null, constructorParameters, nodes);
+    }
+
+    /**
+     * <p>Create a set of identical active objects on a given virtual node. The
+     * object activation is optimized by a thread pool.</p>
+     * <p>When the given virtual node is not previously activated, this method
+     * employ the node creation event producer/listerner mechanism joined to the
+     * thread pool. That aims to create an active object just after the node
+     * deploying.</p>
+     *
+     * @param className the name of the class to instanciate as active.
+     * @param constructorParameters the array that contains the parameters used
+     * to build the active objects. All active objects have the same constructor
+     * parameters.
+     * @param virtualNode the virtual node where the active objects are created.
+     * @return an array of references (possibly remote) on Stubs of the newly
+     * created active objects.
+     * @throws NodeException happens when the given virtualNode is already
+     * activated and throws an exception.
+     * @throws ClassNotFoundException in the case of className is not a class.
+     */
+    public static Object[] newActiveInParallel(String className,
+        Object[] constructorParameters, VirtualNode virtualNode)
+        throws NodeException, ClassNotFoundException {
+    	return newActiveInParallel(className, null, constructorParameters, virtualNode);
+    }
+
+    /**
+     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
+     * correspond to the classname parameter.
+     * This group will contain one active object per node mapped onto the virtual node
+     * given as a parameter.
+     * @param classname classname the name of the class to instanciate as active
+     * @param constructorParameters constructorParameters the parameters of the constructor.
+     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
+     * on each node mapped to the given virtualnode in XML deployment descriptor.
+     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws NodeException if the virtualnode was null
+     */
+    public static Object newActiveAsGroup(String classname,
+        Object[] constructorParameters, VirtualNode virtualnode)
+        throws ActiveObjectCreationException, NodeException {
+        return ProActive.newActiveAsGroup(classname, null, constructorParameters,
+            virtualnode, null, null);
+    }
+
+    /**
+     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
+     * correspond to the classname parameter.
+     * This group will contain one active object per node mapped onto the virtual node
+     * given as a parameter.
+     * @param className classname the name of the class to instanciate as active
+     * @param constructorParameters constructorParameters the parameters of the constructor.
+     * @param virtualNode The virtualnode where to create active objects. Active objects will be created
+     * on each node mapped to the given virtualnode in XML deployment descriptor.
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this classe for more information.
+     * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+     * @return Object a Group of references (possibly remote) on Stubs of newly created active objects
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws NodeException if the virtualnode was null
+     *
+     */
+    public static Object newActiveAsGroup(String className,
+        Object[] constructorParameters, VirtualNode virtualNode,
+        Active activity, MetaObjectFactory factory)
+        throws ActiveObjectCreationException, NodeException {
+    	return newActiveAsGroup(className, null, constructorParameters, virtualNode, activity, factory);
+    }
+
+    /**
+     * Creates a new ProActive component over the specified base class, according to the
+     * given component parameters, and returns a reference on the component of type Component.
+     * A reference on the active object base class can be retreived through the component parameters controller's
+     * method "getStubOnReifiedObject".
+     *
+     * @param className the name of the base class. "Composite" if the component is a composite,
+     * "ParallelComposite" if the component is a parallel composite component
+     * @param constructorParameters the parameters of the constructor of the object
+     *    to instantiate as active. If some parameters are primitive types, the wrapper
+     *    class types should be given here. null can be used to specify that no parameter
+     *    are passed to the constructor.
+     * @param node the possibly null node where to create the active object. If null, the active object
+     *       is created localy on a default node
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this classe for more information.
+     * @param factory should be null for components (automatically created)
+     * @param componentParameters the parameters of the component
+     * @return a component representative of type Component
+     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Component newActiveComponent(String className,
+        Object[] constructorParameters, Node node, Active activity,
+        MetaObjectFactory factory, ComponentParameters componentParameters)
+        throws ActiveObjectCreationException, NodeException {
+    	return newActiveComponent(className, null, constructorParameters, node, activity, factory, componentParameters);
+    }
+
+    /**
+     * Creates a new ProActive component over the specified base class, according to the
+     * given component parameters, and returns a reference on the component of type Component.
+     *
+     * This method allows automatic of primitive components on Virtual Nodes. In that case, the appendix
+     * -cyclicInstanceNumber-<b><i>number</i></b> is added to the name of each of these components.
+     * If the component is not a primitive, only one instance of the component is created, on the first node
+     * retreived from the specified virtual node.
+     *
+     * A reference on the active object base class can be retreived through the component parameters controller's
+     * method "getStubOnReifiedObject".
+     *
+     * @param className the name of the base class. "Composite" if the component is a composite,
+     * "ParallelComposite" if the component is a parallel composite component
+     * @param constructorParameters the parameters of the constructor of the object
+     *    to instantiate as active. If some parameters are primitive types, the wrapper
+     *    class types should be given here. null can be used to specify that no parameter
+     *    are passed to the constructor.
+     * @param vn the possibly null node where to create the active object. If null, the active object
+     *       is created localy on a default node
+     * @param componentParameters the parameters of the component
+     * @return a typed group of component representative elements, of type Component
+     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Component newActiveComponent(String className,
+        Object[] constructorParameters, VirtualNode vn,
+        ComponentParameters componentParameters)
+        throws ActiveObjectCreationException, NodeException {
+    	return newActiveComponent(className, null, constructorParameters, vn, componentParameters);
+    }
+    
+    
+    /**
+     * Turns the target object into an ActiveObject attached to a default node in the local JVM.
+     * The type of the stub is is the type of the existing object.
+     * @param target The object to turn active
+     * @return a reference (possibly remote) on a Stub of the existing object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target)
+        throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, (Class[])null, (Node) null);
+    }
+
+    /**
+     * Turns the target object into an Active Object and send it to the Node
+     * identified by the given url.
+     * The type of the stub is is the type of the existing object.
+     * @param target The object to turn active
+     * @param nodeURL the URL of the node where to create the active object on. If null, the active object
+     *       is created localy on a default node
+     * @return a reference (possibly remote) on a Stub of the existing object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target, String nodeURL)
+        throws ActiveObjectCreationException, NodeException {
+        if (nodeURL == null) {
+            return turnActive(target, null, target.getClass().getName(), null, null,
+                null);
+        } else {
+            return turnActive(target, null, target.getClass().getName(),
+                NodeFactory.getNode(nodeURL), null, null);
+        }
+    }
+
+    /**
+     * Turns the target object into an Active Object and send it to the given Node
+     * or to a default node in the local JVM if the given node is null.
+     * The type of the stub is is the type of the target object.
+     * @param target The object to turn active
+     * @param node The Node the object should be sent to or null to create the active
+     *       object in the local JVM
+     * @return a reference (possibly remote) on a Stub of the target object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target, Node node)
+        throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, null, target.getClass().getName(), node, null, null);
+    }
+
+    /**
+     * Turns the target object into an Active Object and send it to the given Node
+     * or to a default node in the local JVM if the given node is null.
+     * The type of the stub is is the type of the target object.
+     * @param target The object to turn active
+     * @param node The Node the object should be sent to or null to create the active
+     *       object in the local JVM
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this classe for more information.
+     * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+     * @return a reference (possibly remote) on a Stub of the target object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target, Node node, Active activity,
+        MetaObjectFactory factory)
+        throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, null, target.getClass().getName(), node, activity,
+            factory);
+    }
+
+    /**
+     * Turns a Java object into an Active Object and send it to a remote Node or to a
+     * local node if the given node is null.
+     * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+     * @param target The object to turn active
+     * @param nameOfTargetType the fully qualified name of the type the stub class should
+     * inherit from. That type can be less specific than the type of the target object.
+     * @param node The Node the object should be sent to or null to create the active
+     *       object in the local JVM
+     * @return a reference (possibly remote) on a Stub of the target object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target, String nameOfTargetType,
+        Node node) throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, null, nameOfTargetType, node, null, null);
+    }
+    
+    /**
+     * Turns a Java object into an Active Object and send it to a remote Node or to a
+     * local node if the given node is null.
+     * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+     * A Stub is dynamically generated for the existing object. The result of the call
+     * will be an instance of the Stub class pointing to the proxy object pointing
+     * to the body object pointing to the existing object. The body can be remote
+     * or local depending if the existing is sent remotely or not.
+     * @param target The object to turn active
+     * @param nameOfTargetType the fully qualified name of the type the stub class should
+     * inherit from. That type can be less specific than the type of the target object.
+     * @param node The Node the object should be sent to or null to create the active
+     *       object in the local JVM
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this classe for more information.
+     * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+     * @return a reference (possibly remote) on a Stub of the target object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target, String nameOfTargetType,
+            Node node, Active activity, MetaObjectFactory factory)
+            throws ActiveObjectCreationException, NodeException {
+    	return turnActive(target, null, nameOfTargetType, node, activity, factory);
+    }
+    
+    /**
+     * Turns a Java object into a group of Active Objects and sends the elements of the group
+     * to remote Nodes mapped to the given virtualnode in the XML deployment descriptor.
+     * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+     * @param target The object to turn active
+     * @param nameOfTargetType the fully qualified name of the type the stub class should
+     * inherit from. That type can be less specific than the type of the target object.
+     * @param virtualnode The VirtualNode where the target object will be turn into an Active Object
+     * Target object will be turned into an Active Object on each node mapped to the given virtualnode in XML deployment descriptor.
+     * @return an array of references (possibly remote) on a Stub of the target object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActiveAsGroup(Object target,
+        String nameOfTargetType, VirtualNode virtualnode)
+        throws ActiveObjectCreationException, NodeException {
+    	return turnActiveAsGroup(target, null, nameOfTargetType, virtualnode);
+    }
+
+    
+    
+
+    
+    ////////////////////////////////////////////////////////////////////////////////////
+    /////// constructors with generic types ////////////////////////////////////////////
+
+    
+    /**
+     * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
+     * @param classname the name of the class to instanciate as active
+     * @param genericParameters parameterizing types (of class @param classname)
+     * @param constructorParameters the parameters of the constructor.
+     * @return a reference (possibly remote) on a Stub of the newly created active object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the DefaultNode cannot be created
+     */
+    public static Object newActive(String classname, Class[] genericParameters, 
+        Object[] constructorParameters)
+        throws ActiveObjectCreationException, NodeException {
+        // avoid ambiguity for method parameters types
+        Node nullNode = null;
+        return newActive(classname, genericParameters, constructorParameters, nullNode, null, null);
+    }
+
+    
+    /**
+     * Creates a new ActiveObject based on classname attached to the node of the given URL.
+     * @param classname the name of the class to instanciate as active
+     * @param genericParameters parameterizing types (of class @param classname)
+     * @param constructorParameters the parameters of the constructor.
+     * @param nodeURL the URL of the node where to create the active object. If null, the active object
+     *       is created localy on a default node
+     * @return a reference (possibly remote) on a Stub of the newly created active object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node URL cannot be resolved as an existing Node
+     */
+    public static Object newActive(String classname, Class[] genericParameters,
+        Object[] constructorParameters, String nodeURL)
+        throws ActiveObjectCreationException, NodeException {
+        if (nodeURL == null) {
+            // avoid ambiguity for method parameters types
+            Node nullNode = null;
+            return newActive(classname, genericParameters, constructorParameters, nullNode,
+                null, null);
+        } else {
+            return newActive(classname, genericParameters,
+                constructorParameters, NodeFactory.getNode(nodeURL), null, null);
+        }
+    }
+
+    /**
+     * Creates a new ActiveObject based on classname attached to the given node or on
+     * a default node in the local JVM if the given node is null.
+     * @param classname the name of the class to instanciate as active
+     * @param genericParameters parameterizing types (of class @param classname)
+     * @param constructorParameters the parameters of the constructor.
+     * @param node the possibly null node where to create the active object.
+     * @return a reference (possibly remote) on a Stub of the newly created active object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newActive(String classname, Class[] genericParameters,
+        Object[] constructorParameters, Node node)
+        throws ActiveObjectCreationException, NodeException {
+        return newActive(classname, genericParameters, constructorParameters, node, null, null);
     }
 
     /**
@@ -322,6 +678,7 @@ public class ProActive {
      * depending or the respective location of the object calling the newActive and the active object
      * itself.
      * @param classname the name of the class to instanciate as active
+     * @param genericParameters parameterizing types (of class @param classname)
      * @param constructorParameters the parameters of the constructor of the object
      *    to instantiate as active. If some parameters are primitive types, the wrapper
      *    class types should be given here. null can be used to specify that no parameter
@@ -337,8 +694,8 @@ public class ProActive {
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newActive(String classname,
-        Object[] constructorParameters, Node node, Active activity,
-        MetaObjectFactory factory)
+        Class[] genericParameters, Object[] constructorParameters, Node node,
+        Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
         //using default proactive node
         if (node == null) {
@@ -378,7 +735,7 @@ public class ProActive {
 
         try {
             //          create stub object
-            Object stub = createStubObject(classname, constructorParameters,
+            Object stub = createStubObject(classname, genericParameters, constructorParameters,
                     node, activity, clonedFactory);
 
             return stub;
@@ -393,15 +750,6 @@ public class ProActive {
         }
     }
 
-    /**
-     * Clean the threadpool used by the newActiveInParallel
-     * @see java.lang.Object#finalize()
-     */
-    protected void finalize() throws Throwable {
-        if (threadpool != null) {
-            threadpool.clean();
-        }
-    }
 
     /**
      * <p>Create a set of active objects  with given construtor parameters.
@@ -412,6 +760,7 @@ public class ProActive {
      * <b>constructorParameters.length == nodes.length</b></p>
      *
      * @param className the name of the class to instanciate as active.
+     * @param genericParameters genericParameters parameterizing types 
      * @param constructorParameters the array that contains the parameters used
      * to build the active objects. All active objects have the same constructor
      * parameters.
@@ -420,7 +769,7 @@ public class ProActive {
      * created active objects.
      * @throws ClassNotFoundException in the case of className is not a class.
      */
-    public static Object[] newActiveInParallel(String className,
+    public static Object[] newActiveInParallel(String className, Class[] genericParameters,
         Object[][] constructorParameters, Node[] nodes)
         throws ClassNotFoundException {
         if (constructorParameters.length != nodes.length) {
@@ -437,7 +786,7 @@ public class ProActive {
 
         // The Virtual Node is already activate
         for (int i = 0; i < constructorParameters.length; i++) {
-            threadpool.addAJob(new ProcessForAoCreation(result, className,
+            threadpool.addAJob(new ProcessForAoCreation(result, className, genericParameters,
                     constructorParameters[i], nodes[i % nodes.length]));
         }
         threadpool.complete();
@@ -456,6 +805,7 @@ public class ProActive {
      * deploying.</p>
      *
      * @param className the name of the class to instanciate as active.
+     * @param genericParameters genericParameters parameterizing types 
      * @param constructorParameters the array that contains the parameters used
      * to build the active objects. All active objects have the same constructor
      * parameters.
@@ -466,7 +816,7 @@ public class ProActive {
      * activated and throws an exception.
      * @throws ClassNotFoundException in the case of className is not a class.
      */
-    public static Object[] newActiveInParallel(String className,
+    public static Object[] newActiveInParallel(String className, Class[] genericParameters,
         Object[] constructorParameters, VirtualNode virtualNode)
         throws NodeException, ClassNotFoundException {
         // Creation of the thread pool
@@ -478,14 +828,14 @@ public class ProActive {
             // The Virtual Node is already activate
             Node[] nodes = virtualNode.getNodes();
             for (int i = 0; i < nodes.length; i++) {
-                threadpool.addAJob(new ProcessForAoCreation(result, className,
+                threadpool.addAJob(new ProcessForAoCreation(result, className, genericParameters,
                         constructorParameters, nodes[i]));
             }
             threadpool.complete();
         } else {
             // Use the node creation event mechanism
             ((NodeCreationEventProducerImpl) virtualNode).addNodeCreationEventListener(new NodeCreationListenerForAoCreation(
-                    result, className, constructorParameters, threadpool));
+                    result, className, genericParameters, constructorParameters, threadpool));
             virtualNode.activate();
             ((VirtualNodeImpl) virtualNode).waitForAllNodesCreation();
             threadpool.complete();
@@ -501,6 +851,7 @@ public class ProActive {
      * This group will contain one active object per node mapped onto the virtual node
      * given as a parameter.
      * @param classname classname the name of the class to instanciate as active
+     * @param genericParameters genericParameters parameterizing types 
      * @param constructorParameters constructorParameters the parameters of the constructor.
      * @param virtualnode The virtualnode where to create active objects. Active objects will be created
      * on each node mapped to the given virtualnode in XML deployment descriptor.
@@ -508,10 +859,10 @@ public class ProActive {
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
      */
-    public static Object newActiveAsGroup(String classname,
+    public static Object newActiveAsGroup(String classname, Class[] genericParameters,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        return ProActive.newActiveAsGroup(classname, constructorParameters,
+        return ProActive.newActiveAsGroup(classname, genericParameters, constructorParameters,
             virtualnode, null, null);
     }
 
@@ -521,6 +872,7 @@ public class ProActive {
      * This group will contain one active object per node mapped onto the virtual node
      * given as a parameter.
      * @param classname classname the name of the class to instanciate as active
+     * @param genericParameters genericParameters parameterizing types 
      * @param constructorParameters constructorParameters the parameters of the constructor.
      * @param virtualnode The virtualnode where to create active objects. Active objects will be created
      * on each node mapped to the given virtualnode in XML deployment descriptor.
@@ -533,7 +885,7 @@ public class ProActive {
      * @throws NodeException if the virtualnode was null
      *
      */
-    public static Object newActiveAsGroup(String classname,
+    public static Object newActiveAsGroup(String classname, Class[] genericParameters,
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
@@ -545,7 +897,7 @@ public class ProActive {
             Group aoGroup = null;
             try {
                 aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
-                            classname));
+                            classname, genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
                     "Cannot create group of active objects" + e);
@@ -554,8 +906,8 @@ public class ProActive {
                     "Cannot create group of active objects" + e);
             }
             for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = newActive(classname, constructorParameters,
-                        (Node) nodeTab[i], activity, factory);
+                Object tmp = newActive(classname, null,
+                        constructorParameters, (Node) nodeTab[i], activity, factory);
                 aoGroup.add(tmp);
             }
 
@@ -565,6 +917,83 @@ public class ProActive {
                 "VirtualNode is null, unable to activate the object");
         }
     }
+    
+    
+    
+  
+    /**
+     * Turns a Java object into an Active Object and send it to a remote Node or to a
+     * local node if the given node is null.
+     * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+     * A Stub is dynamically generated for the existing object. The result of the call
+     * will be an instance of the Stub class pointing to the proxy object pointing
+     * to the body object pointing to the existing object. The body can be remote
+     * or local depending if the existing is sent remotely or not.
+     * @param target The object to turn active
+     * @param genericParameters parameterizing types (of class @param classname)
+     * @param nameOfTargetType the fully qualified name of the type the stub class should
+     * inherit from. That type can be less specific than the type of the target object.
+     * @param node The Node the object should be sent to or null to create the active
+     *       object in the local JVM
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this classe for more information.
+     * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+     * @return a reference (possibly remote) on a Stub of the target object
+     * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object turnActive(Object target, String nameOfTargetType, Class[] genericParameters,
+        Node node, Active activity, MetaObjectFactory factory)
+        throws ActiveObjectCreationException, NodeException {
+        if (node == null) {
+            //using default proactive node
+            node = NodeFactory.getDefaultNode();
+        }
+
+        if (factory == null) {
+            factory = ProActiveMetaObjectFactory.newInstance();
+        }
+
+        ProActiveSecurityManager factorySM = factory.getProActiveSecurityManager();
+
+        MetaObjectFactory clonedFactory = factory;
+
+        if (factorySM != null) {
+            try {
+                clonedFactory = (MetaObjectFactory) factory.clone();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+
+            clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
+                                                             .generateSiblingCertificate(nameOfTargetType));
+
+            ProActiveLogger.getLogger(Loggers.SECURITY)
+                           .debug("new active object with security manager");
+        }
+
+        try {
+            return createStubObject(target, nameOfTargetType, genericParameters, node,
+                activity, clonedFactory);
+        } catch (MOPException e) {
+            Throwable t = e;
+
+            if (e.getTargetException() != null) {
+                t = e.getTargetException();
+            }
+
+            throw new ActiveObjectCreationException(t);
+        }
+    }
+
+    
+
+
+ 
+
+
+    
 
     /**
      * Creates a new ProActive component over the specified base class, according to the
@@ -574,6 +1003,7 @@ public class ProActive {
      *
      * @param classname the name of the base class. "Composite" if the component is a composite,
      * "ParallelComposite" if the component is a parallel composite component
+     * @param genericParameters genericParameters parameterizing types 
      * @param constructorParameters the parameters of the constructor of the object
      *    to instantiate as active. If some parameters are primitive types, the wrapper
      *    class types should be given here. null can be used to specify that no parameter
@@ -588,11 +1018,10 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Component newActiveComponent(String classname,
+    public static Component newActiveComponent(String classname, Class[] genericParameters,
         Object[] constructorParameters, Node node, Active activity,
         MetaObjectFactory factory, ComponentParameters componentParameters)
         throws ActiveObjectCreationException, NodeException {
-        // COMPONENTS
         try {
             Component boot = Fractal.getBootstrapComponent();
             GenericFactory cf = Fractal.getGenericFactory(boot);
@@ -626,6 +1055,7 @@ public class ProActive {
      *
      * @param className the name of the base class. "Composite" if the component is a composite,
      * "ParallelComposite" if the component is a parallel composite component
+     * @param genericParameters genericParameters parameterizing types 
      * @param constructorParameters the parameters of the constructor of the object
      *    to instantiate as active. If some parameters are primitive types, the wrapper
      *    class types should be given here. null can be used to specify that no parameter
@@ -637,11 +1067,10 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Component newActiveComponent(String className,
+    public static Component newActiveComponent(String className, Class[] genericParameters,
         Object[] constructorParameters, VirtualNode vn,
         ComponentParameters componentParameters)
         throws ActiveObjectCreationException, NodeException {
-        // COMPONENTS
         try {
             Component boot = Fractal.getBootstrapComponent();
             ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
@@ -659,18 +1088,21 @@ public class ProActive {
             }
         }
     }
-
+    
+    
+    
     /**
      * Turns the target object into an ActiveObject attached to a default node in the local JVM.
      * The type of the stub is is the type of the existing object.
      * @param target The object to turn active
+     * @param genericParameters genericParameters parameterizing types 
      * @return a reference (possibly remote) on a Stub of the existing object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target)
+    public static Object turnActive(Object target, Class[] genericParameters)
         throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, (Node) null);
+        return turnActive(target, genericParameters, (Node)null, (Active)null, (MetaObjectFactory)null);
     }
 
     /**
@@ -678,19 +1110,20 @@ public class ProActive {
      * identified by the given url.
      * The type of the stub is is the type of the existing object.
      * @param target The object to turn active
+     * @param genericParameters genericParameters parameterizing types 
      * @param nodeURL the URL of the node where to create the active object on. If null, the active object
      *       is created localy on a default node
      * @return a reference (possibly remote) on a Stub of the existing object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nodeURL)
+    public static Object turnActive(Object target, Class[] genericParameters, String nodeURL)
         throws ActiveObjectCreationException, NodeException {
         if (nodeURL == null) {
-            return turnActive(target, target.getClass().getName(), null, null,
+            return turnActive(target, genericParameters, target.getClass().getName(), null, null,
                 null);
         } else {
-            return turnActive(target, target.getClass().getName(),
+            return turnActive(target, genericParameters, target.getClass().getName(),
                 NodeFactory.getNode(nodeURL), null, null);
         }
     }
@@ -700,15 +1133,16 @@ public class ProActive {
      * or to a default node in the local JVM if the given node is null.
      * The type of the stub is is the type of the target object.
      * @param target The object to turn active
+     * @param genericParameters genericParameters parameterizing types 
      * @param node The Node the object should be sent to or null to create the active
      *       object in the local JVM
      * @return a reference (possibly remote) on a Stub of the target object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Node node)
+    public static Object turnActive(Object target, Class[] genericParameters, Node node)
         throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, target.getClass().getName(), node, null, null);
+        return turnActive(target, genericParameters, target.getClass().getName(), node, null, null);
     }
 
     /**
@@ -716,6 +1150,7 @@ public class ProActive {
      * or to a default node in the local JVM if the given node is null.
      * The type of the stub is is the type of the target object.
      * @param target The object to turn active
+     * @param genericParameters genericParameters parameterizing types 
      * @param node The Node the object should be sent to or null to create the active
      *       object in the local JVM
      * @param activity the possibly null activity object defining the different step in the activity of the object.
@@ -726,10 +1161,10 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Node node, Active activity,
+    public static Object turnActive(Object target, Class[] genericParameters, Node node, Active activity,
         MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, target.getClass().getName(), node, activity,
+        return turnActive(target, genericParameters, target.getClass().getName(), node, activity,
             factory);
     }
 
@@ -738,6 +1173,7 @@ public class ProActive {
      * local node if the given node is null.
      * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
      * @param target The object to turn active
+     * @param genericParameters genericParameters parameterizing types 
      * @param nameOfTargetType the fully qualified name of the type the stub class should
      * inherit from. That type can be less specific than the type of the target object.
      * @param node The Node the object should be sent to or null to create the active
@@ -746,9 +1182,9 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nameOfTargetType,
+    public static Object turnActive(Object target, Class[] genericParameters, String nameOfTargetType,
         Node node) throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, nameOfTargetType, node, null, null);
+        return turnActive(target, genericParameters, nameOfTargetType, node, null, null);
     }
 
     /**
@@ -760,6 +1196,7 @@ public class ProActive {
      * to the body object pointing to the existing object. The body can be remote
      * or local depending if the existing is sent remotely or not.
      * @param target The object to turn active
+     * @param genericParameters genericParameters parameterizing types 
      * @param nameOfTargetType the fully qualified name of the type the stub class should
      * inherit from. That type can be less specific than the type of the target object.
      * @param node The Node the object should be sent to or null to create the active
@@ -772,7 +1209,7 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nameOfTargetType,
+    public static Object turnActive(Object target, Class[] genericParameters, String nameOfTargetType,
         Node node, Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
         if (node == null) {
@@ -803,8 +1240,8 @@ public class ProActive {
         }
 
         try {
-            return createStubObject(target, nameOfTargetType, node, activity,
-                clonedFactory);
+            return createStubObject(target, nameOfTargetType, genericParameters, node,
+                activity, clonedFactory);
         } catch (MOPException e) {
             Throwable t = e;
 
@@ -815,12 +1252,14 @@ public class ProActive {
             throw new ActiveObjectCreationException(t);
         }
     }
-
+    
+    
     /**
      * Turns a Java object into a group of Active Objects and sends the elements of the group
      * to remote Nodes mapped to the given virtualnode in the XML deployment descriptor.
      * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
      * @param target The object to turn active
+     * @param genericParameters parameterizing types (of class @param classname)
      * @param nameOfTargetType the fully qualified name of the type the stub class should
      * inherit from. That type can be less specific than the type of the target object.
      * @param virtualnode The VirtualNode where the target object will be turn into an Active Object
@@ -829,15 +1268,15 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActiveAsGroup(Object target,
-        String nameOfTargetType, VirtualNode virtualnode)
+    public static Object turnActiveAsGroup(Object target, Class[] genericParameters,
+        String nameOfTargetType,  VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
         if (virtualnode != null) {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
             try {
                 aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
-                            target.getClass().getName()));
+                            target.getClass().getName(), genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
                     "Cannot create group of active objects" + e);
@@ -847,7 +1286,7 @@ public class ProActive {
             }
 
             for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = turnActive(target, nameOfTargetType,
+                Object tmp = turnActive(target, genericParameters, nameOfTargetType, 
                         (Node) nodeTab[i], null, null);
                 aoGroup.add(tmp);
             }
@@ -924,6 +1363,16 @@ public class ProActive {
      */
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
+    	
+//    	try {
+//    		// this ensures the class server is initialized,
+//    		// which ensures that the java.rmi.server.codebase property is initialized,
+//    		// which ensures parameters are annotated with the correct codebase in RMI communications
+//			RuntimeFactory.getDefaultRuntime();
+//		} catch (ProActiveException e1) {
+//			throw new ActiveObjectCreationException("Exception occured when trying to get default runtime",e1);
+//		}
+    	
         UniversalBody b = null;
 
         String protocol = UrlBuilder.getProtocol(url);
@@ -1869,7 +2318,7 @@ public class ProActive {
         try {
             return createStubObject(body.getReifiedObject(),
                 new Object[] { body },
-                body.getReifiedObject().getClass().getName());
+                body.getReifiedObject().getClass().getName(), null);
         } catch (MOPException e) {
             throw new ProActiveRuntimeException(
                 "Cannot create Stub for this Body e=" + e);
@@ -1878,22 +2327,22 @@ public class ProActive {
 
     public static Object createStubObject(String className, UniversalBody body)
         throws MOPException {
-        return createStubObject(className, null, new Object[] { body });
+        return createStubObject(className, null, null, new Object[] { body });
     }
 
-    private static Object createStubObject(String className,
+    private static Object createStubObject(String className, Class[] genericParameters, 
         Object[] constructorParameters, Node node, Active activity,
         MetaObjectFactory factory) throws MOPException {
-        return createStubObject(className, constructorParameters,
-            new Object[] { node, activity, factory, ProActive.getJobId() });
+        return createStubObject(className, genericParameters,
+            constructorParameters, new Object[] { node, activity, factory, ProActive.getJobId() });
     }
 
     private static Object createStubObject(String className,
-        Object[] constructorParameters, Object[] proxyParameters)
+        Class[] genericParameters, Object[] constructorParameters, Object[] proxyParameters)
         throws MOPException {
         try {
-            return MOP.newInstance(className, constructorParameters,
-                Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
+            return MOP.newInstance(className,
+                genericParameters, constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
         } catch (ClassNotFoundException e) {
             throw new ConstructionOfProxyObjectFailedException(
                 "Class can't be found e=" + e);
@@ -1901,19 +2350,19 @@ public class ProActive {
     }
 
     private static Object createStubObject(Object target,
-        String nameOfTargetType, Node node, Active activity,
-        MetaObjectFactory factory) throws MOPException {
+        String nameOfTargetType, Class[] genericParameters, Node node,
+        Active activity, MetaObjectFactory factory) throws MOPException {
         return createStubObject(target,
             new Object[] { node, activity, factory, ProActive.getJobId() },
-            nameOfTargetType);
+            nameOfTargetType, genericParameters);
     }
 
     private static StubObject createStubObject(Object object,
-        Object[] proxyParameters, String nameOfTargetType)
+        Object[] proxyParameters, String nameOfTargetType, Class[] genericParameters)
         throws MOPException {
         try {
             return (StubObject) MOP.turnReified(nameOfTargetType,
-                Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object);
+                Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object, genericParameters);
         } catch (ClassNotFoundException e) {
             throw new ConstructionOfProxyObjectFailedException(
                 "Class can't be found e=" + e);

@@ -164,8 +164,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 itfType = (ProActiveInterfaceType)ProActiveTypeFactoryImpl.instance().createFcItfType(name, signature, false, false, false);
         	}
         	String interfaceName = Utils.getMetaObjectComponentRepresentativeClassName(itfType.getFcItfName(), itfType.getFcItfSignature());
-            boolean isFunctionalInterface = (!Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName)
-                                                   .endsWith("-controller"));
             CtMethod[] reifiedMethods;
             CtClass generatedCtClass = pool.makeClass(representativeClassName);
             
@@ -209,6 +207,15 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             methodsField.setModifiers(Modifier.STATIC);
 
             generatedCtClass.addField(methodsField);
+            
+            // field for remembering generic parameters
+            CtField genericTypesMappingField = new CtField(pool.get(
+            "java.util.Map"), "genericTypesMapping",
+            generatedCtClass);
+
+            genericTypesMappingField.setModifiers(Modifier.STATIC);
+            generatedCtClass.addField(genericTypesMappingField);
+            
             
             String bodyForImplGetterAndSetter = "{throw new org.objectweb.proactive.core.ProActiveRuntimeException(\" representative interfaces do not implement getFcItfImpl or setFcItfImpl methods\");}";
             
@@ -279,7 +286,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             JavassistByteCodeStubBuilder.createStaticInitializer(
                     generatedCtClass,
                     reifiedMethods,
-                    classesIndexer);
+                    classesIndexer, itfType.getFcItfSignature(), null);
 
             createReifiedMethods(generatedCtClass, reifiedMethods, itfType);
 
@@ -389,7 +396,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             body += (
                 "myProxy.reify(org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall("
                 + "(java.lang.reflect.Method)overridenMethods[" + i + "]"
-                + ", parameters, getFcItfName(), senderItfID))"
+                + ", parameters, null, getFcItfName(), senderItfID))"
             );
 
             if (postWrap != null) {

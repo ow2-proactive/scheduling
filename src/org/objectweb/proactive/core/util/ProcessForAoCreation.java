@@ -52,20 +52,22 @@ public class ProcessForAoCreation extends AbstractProcessForGroup
     implements Runnable {
     private Vector result;
     private String className;
+    private Class[] genericParameters;
     private Object[] param;
     private Node node;
 
-    public ProcessForAoCreation(Vector result, String className,
+    public ProcessForAoCreation(Vector result, String className, Class[] genericParameters,
         Object[] param, Node node) {
         this.result = result;
         this.className = className;
+        this.genericParameters = genericParameters;
         this.param = param;
         this.node = node;
     }
 
     public void run() {
         try {
-            this.result.add(ProActive.newActive(this.className, this.param,
+            this.result.add(ProActive.newActive(this.className, this.genericParameters, this.param,
                     this.node));
         } catch (Exception e) {
             BodyNonFunctionalException bnfe = new NewActiveFailedNFE("The activation failed",

@@ -34,8 +34,10 @@ import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -59,7 +61,6 @@ import sun.rmi.server.MarshalInputStream;
  */
 public class MethodCall implements java.io.Serializable, Cloneable {
     
-    ComponentMethodCallMetadata componentMetaData = null;
 
     //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
@@ -125,6 +126,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private String key;
 
     private transient MethodCallExceptionContext exceptioncontext;
+
+    ComponentMethodCallMetadata componentMetaData = null;
+    
+    private transient Map<TypeVariable, Class> genericTypesMapping = null;
+
 
     /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
@@ -204,9 +210,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      *        @return        a MethodCall object representing an invocation of method
      *        <code>reifiedMethod</code> with arguments <code>effectiveArguments</code>
      */
-    public synchronized static MethodCall getMethodCall(Method reifiedMethod,
+    public synchronized static MethodCall getMethodCall(Method reifiedMethod, Map<TypeVariable,Class> genericTypesMapping,
         Object[] effectiveArguments, MethodCallExceptionContext exceptioncontext) {
-    	exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
+        exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
 
         if (MethodCall.getRecycleMethodCallObject()) {
             // Finds a recycled MethodCall object in the pool, cleans it and
@@ -218,19 +224,20 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 MethodCall.recyclePool[MethodCall.index] = null;
                 // Refurbishes the object
                 result.reifiedMethod = reifiedMethod;
+                result.genericTypesMapping = genericTypesMapping;
                 result.effectiveArguments = effectiveArguments;
                 result.key = buildKey(reifiedMethod);
                 result.exceptioncontext = exceptioncontext;
                 return result;
             }
         }
-        return new MethodCall(reifiedMethod, effectiveArguments, exceptioncontext);
+        return new MethodCall(reifiedMethod, genericTypesMapping, effectiveArguments, exceptioncontext);
     }
 
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
-        Object[] effectiveArguments) {
+        Object[] effectiveArguments, Map<TypeVariable,Class> genericTypesMapping) {
         MethodCallExceptionContext exceptioncontext = ExceptionHandler.getContextForCall(reifiedMethod);
-        return getMethodCall(reifiedMethod, effectiveArguments, exceptioncontext);
+        return getMethodCall(reifiedMethod, genericTypesMapping, effectiveArguments, exceptioncontext);
     }
 
     /**
@@ -243,9 +250,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * @return MethodCall
      */
     public synchronized static MethodCall getComponentMethodCall(
-        Method reifiedMethod, Object[] effectiveArguments,
+        Method reifiedMethod,  Object[] effectiveArguments, Map<TypeVariable,Class> genericTypesMapping,
         String interfaceName, ItfID senderItfID, short priority) {
-        MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
+        MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments, genericTypesMapping);
         
         mc.componentMetaData = new ComponentMethodCallMetadata();
         mc.componentMetaData.setComponentInterfaceName(interfaceName);
@@ -256,10 +263,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     }
 
     public synchronized static MethodCall getComponentMethodCall(
-        Method reifiedMethod, Object[] effectiveArguments,
+        Method reifiedMethod, Object[] effectiveArguments,Map<TypeVariable,Class> genericTypesMapping, 
         String interfaceName, ItfID senderItfID ) {
         return MethodCall.getComponentMethodCall(reifiedMethod,
-            effectiveArguments, interfaceName, senderItfID,
+        		effectiveArguments, genericTypesMapping, interfaceName, senderItfID,
             ComponentRequest.STRICT_FIFO_PRIORITY);
     }
 
@@ -278,6 +285,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 // garbage-collecting the objects referenced in here
                 mc.componentMetaData = null;
                 mc.reifiedMethod = null;
+                mc.genericTypesMapping = null;
                 mc.effectiveArguments = null;
                 mc.tagsForBarrier = null;
                 mc.key = null;
@@ -301,16 +309,17 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // This constructor is private to this class
     // because we want to enforce the use of factory methods for getting fresh
     // instances of this class (see <I>Factory</I> pattern in GoF).
-    public MethodCall(Method reifiedMethod, Object[] effectiveArguments,
-        MethodCallExceptionContext exceptioncontext) {
+    public MethodCall(Method reifiedMethod, Map<TypeVariable,Class> genericTypesMapping, Object[] effectiveArguments, 
+        MethodCallExceptionContext exceptionContext) {
         this.reifiedMethod = reifiedMethod;
+        this.genericTypesMapping = (genericTypesMapping!=null && genericTypesMapping.size()>0)?genericTypesMapping:null;
         this.effectiveArguments = effectiveArguments;
         this.key = buildKey(reifiedMethod);
-        this.exceptioncontext = MethodCallExceptionContext.optimize(exceptioncontext);
+        this.exceptioncontext = MethodCallExceptionContext.optimize(exceptionContext);
     }
 
-    public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
-        this(reifiedMethod, effectiveArguments, null);
+    public MethodCall(Method reifiedMethod, Map<TypeVariable,Class> genericTypesMapping, Object[] effectiveArguments) {
+        this(reifiedMethod, genericTypesMapping, effectiveArguments, null);
     }
 
     /**
@@ -586,7 +595,12 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             cached.reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
             if (!cached.reifiable) {
                 try {
-                    MOP.checkClassIsReifiable(m.getReturnType());
+                	if (getGenericTypesMapping()!=null && getGenericTypesMapping().containsKey(m.getGenericReturnType())) {
+                		// if return type is a parameterized type, check with actual parameterizing type
+                		MOP.checkClassIsReifiable(getGenericTypesMapping().get(m.getGenericReturnType()));
+                	} else {
+                		MOP.checkClassIsReifiable(m.getReturnType());
+                	}
                     cached.reifiable = true;
                 } catch (ClassNotReifiableException e) {
                     cached.reason = e.getMessage();
@@ -650,6 +664,15 @@ public class MethodCall implements java.io.Serializable, Cloneable {
 
         return exceptioncontext;
     }
+    
+    public ComponentMethodCallMetadata getComponentMetadata() {
+        return componentMetaData;
+    }
+    
+    public Map<TypeVariable, Class> getGenericTypesMapping() {
+    	return genericTypesMapping;
+    }
+    
 
     //
     // --- INNER CLASSES -----------------------------------------------------------------------
@@ -729,9 +752,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         }
     }
     
-    public ComponentMethodCallMetadata getComponentMetadata() {
-        return componentMetaData;
-    }
+
 
     // end inner class FixWrapper
 }

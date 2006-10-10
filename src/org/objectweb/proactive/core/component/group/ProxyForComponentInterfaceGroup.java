@@ -97,7 +97,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                         interfaceType.getFcItfName());
                 }
                 mc = MethodCall.getComponentMethodCall(adaptedMethod,
-                        mc.getEffectiveArguments(),
+                        mc.getEffectiveArguments(), mc.getGenericTypesMapping(),
                         mc.getComponentMetadata().getComponentInterfaceName(),
                         mc.getComponentMetadata().getSenderItfID(),
                         mc.getComponentMetadata().getPriority());
@@ -178,7 +178,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                     Class returnTypeForGroup = (Class) ((ParameterizedType) mc.getReifiedMethod()
                                                                               .getGenericReturnType()).getActualTypeArguments()[0];
                     result = MOP.newInstance(returnTypeForGroup.getName(),
-                            null, ProxyForGroup.class.getName(), paramProxy);
+                    		null, null, ProxyForGroup.class.getName(), paramProxy);
                     ((ProxyForGroup) ((StubObject) result).getProxy()).setClassName(returnTypeForGroup.getName());
                 } catch (Exception e) {
                     e.printStackTrace();

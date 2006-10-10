@@ -86,7 +86,7 @@ public class ProActiveComponentGroup {
         throws ClassNotFoundException, ClassNotReifiableException {
         try {
             Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(),
-                    null, ProxyForComponentInterfaceGroup.class.getName(), null);
+            		null, null, ProxyForComponentInterfaceGroup.class.getName(), null);
 
             ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result).getProxy();
             proxy.className = Interface.class.getName();

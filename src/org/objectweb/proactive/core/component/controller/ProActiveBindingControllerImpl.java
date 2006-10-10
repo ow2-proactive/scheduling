@@ -278,6 +278,10 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
     public void bindFc(String clientItfName, Object serverItf)
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
+    	
+    	// get value of (eventual) future before casting
+    	serverItf = ProActive.getFutureValue(serverItf);
+    	
         ProActiveInterface sItf = (ProActiveInterface) serverItf;
         if (controllerLogger.isDebugEnabled()) {
             String serverComponentName;

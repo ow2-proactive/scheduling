@@ -154,11 +154,21 @@ public class MetaObjectInterfaceClassGenerator
                         implField);
                 generatedCtClass.addMethod(implSetter);
 
+				// field for overriden methods
                 CtField methodsField = new CtField(pool.get(
                             "java.lang.reflect.Method[]"), "overridenMethods",
                         generatedCtClass);
                 methodsField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(methodsField);
+                
+                // field for generics parameters
+                CtField genericTypesMappingField = new CtField(pool.get(
+                "java.util.Map"), "genericTypesMapping",
+                generatedCtClass);
+
+                genericTypesMappingField.setModifiers(Modifier.STATIC);
+                generatedCtClass.addField(genericTypesMappingField);
+
 
                 // list all methods to implement
                 Map methodsToImplement = new HashMap();
@@ -213,9 +223,9 @@ public class MetaObjectInterfaceClassGenerator
                 v.copyInto(validMethods);
 
                 reifiedMethods = validMethods;
-
+                
                 JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
-                    reifiedMethods, classesIndexer);
+                    reifiedMethods, classesIndexer, interfaceType.getFcItfSignature(), null);
 
                 createMethods(generatedCtClass, reifiedMethods, interfaceType);
 

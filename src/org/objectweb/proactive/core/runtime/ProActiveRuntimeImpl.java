@@ -949,7 +949,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //                    classData = bsb.create();
             //                } else 
             if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                classData = JavassistByteCodeStubBuilder.create(classname);
+                classData = JavassistByteCodeStubBuilder.create(classname, null);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(

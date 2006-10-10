@@ -30,6 +30,9 @@
  */ 
 package org.objectweb.proactive.core.body.request;
 
+import java.lang.reflect.TypeVariable;
+import java.util.Map;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
@@ -61,7 +64,7 @@ public class BodyRequest extends MessageImpl implements Request,
 			}
 		}
 		methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName,
-				paramClasses), params);
+				paramClasses), params, (Map<TypeVariable, Class>)null);
 		this.isPriority = isPriority;
 	}
 
@@ -77,7 +80,7 @@ public class BodyRequest extends MessageImpl implements Request,
     		}
     	}
     	methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName,
-    			paramClasses), params);
+    			paramClasses), params, (Map<TypeVariable, Class>)null);
     	
     	this.isNFRequest = isNFRequest;
     	this.nfRequestPriority = nfRequestPriority;

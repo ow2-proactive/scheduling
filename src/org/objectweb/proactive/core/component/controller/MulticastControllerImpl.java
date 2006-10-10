@@ -341,7 +341,7 @@ public class MulticastControllerImpl
                                                                                        .get(generatedMethodCallIndex); // initialize
                 }
 
-                result.put(new MethodCall(matchingMethodInServerInterface,
+                result.put(new MethodCall(matchingMethodInServerInterface, mc.getGenericTypesMapping(), 
                         individualEffectiveArguments, mc.getExceptionContext()),
                     generatedMethodCallIndex % delegatee.size());
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers

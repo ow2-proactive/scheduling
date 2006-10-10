@@ -48,19 +48,21 @@ public class NodeCreationListenerForAoCreation
     implements NodeCreationEventListener {
     private Vector result;
     private String className;
+    private Class[] genericParameters;
     private Object[] constructorParameters;
     private ThreadPool threadpool;
 
-    public NodeCreationListenerForAoCreation(Vector result, String className,
+    public NodeCreationListenerForAoCreation(Vector result, String className, Class[] genericParameters,
         Object[] constructorParameters, ThreadPool threadpool) {
         this.result = result;
         this.className = className;
+        this.genericParameters = genericParameters;
         this.constructorParameters = constructorParameters;
         this.threadpool = threadpool;
     }
 
     public void nodeCreated(NodeCreationEvent event) {
         threadpool.addAJob(new ProcessForAoCreation(this.result,
-                this.className, this.constructorParameters, event.getNode()));
+                this.className, this.genericParameters, this.constructorParameters, event.getNode()));
     }
 }

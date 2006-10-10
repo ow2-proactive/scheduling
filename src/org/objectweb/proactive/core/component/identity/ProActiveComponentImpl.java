@@ -521,6 +521,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     /**
      * see
      * {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
+     * There should be no generic return type in the methods of the representative class
      */
     public ProActiveComponent getRepresentativeOnThis() {
         // optimization : cache self reference 
@@ -535,7 +536,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                     ((StubObject) MOP.turnReified(body.getReifiedObject()
                                                       .getClass().getName(),
                         org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-                        new Object[] { body }, body.getReifiedObject())).getProxy(),
+                        new Object[] { body }, body.getReifiedObject(), null)).getProxy(),
                     getComponentParameters().getControllerDescription()
                         .getControllersConfigFileLocation());
         } catch (Exception e) {

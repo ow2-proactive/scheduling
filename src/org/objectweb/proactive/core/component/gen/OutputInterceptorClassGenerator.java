@@ -149,8 +149,15 @@ public class OutputInterceptorClassGenerator
                 methodsField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(methodsField);
 
+				// field for remembering generic parameters
+                CtField genericTypesMappingField = new CtField(pool.get(
+                "java.util.Map"), "genericTypesMapping",
+                generatedCtClass);
+
+                genericTypesMappingField.setModifiers(Modifier.STATIC);
+                generatedCtClass.addField(genericTypesMappingField);
+                
                 // add outputInterceptorsField
-                // TODO_M change the list for a table
                 CtField outputInterceptorsField = new CtField(pool.get(
                             List.class.getName()), "outputInterceptors",
                         generatedCtClass);
@@ -217,7 +224,7 @@ public class OutputInterceptorClassGenerator
                 reifiedMethods = validMethods;
 
                 JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
-                    reifiedMethods, classesIndexer);
+                    reifiedMethods, classesIndexer, interfaceType.getFcItfSignature(), null);
 
                 createReifiedMethods(generatedCtClass, reifiedMethods,
                     isFunctionalInterface);
@@ -251,6 +258,7 @@ public class OutputInterceptorClassGenerator
 
             return reference;
         } catch (Exception e) {
+        	e.printStackTrace();
             throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
                 e);
         }
@@ -275,7 +283,7 @@ public class OutputInterceptorClassGenerator
 
             body += ("org.objectweb.proactive.core.mop.MethodCall methodCall = org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
             "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, interfaceName, senderItfID);\n");
+            ", parameters, null, interfaceName, senderItfID);\n");
 
             // delegate to outputinterceptors
             body += "java.util.ListIterator it = outputInterceptors.listIterator();\n";
@@ -354,8 +362,8 @@ public class OutputInterceptorClassGenerator
             }
             body += ";";
             body += "\n}";
-            //                     System.out.println("method : " + reifiedMethods[i].getName() +
-            //                         " : \n" + body);
+//                                 System.out.println("method : " + reifiedMethods[i].getName() +
+//                                     " : \n" + body);
             CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
                     reifiedMethods[i].getName(),
                     reifiedMethods[i].getParameterTypes(),

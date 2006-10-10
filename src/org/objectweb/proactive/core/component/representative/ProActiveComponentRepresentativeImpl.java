@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.representative;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -232,7 +233,7 @@ public class ProActiveComponentRepresentativeImpl
         try {
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     Class.forName(className).getDeclaredMethod(methodName,
-                        parameterTypes), effectiveParameters, (String) null, null,
+                        parameterTypes), effectiveParameters, null, (String) null, null,
                     priority));
 
             // functional interface name is null
@@ -376,7 +377,7 @@ public class ProActiveComponentRepresentativeImpl
 		try {
 			result = proxy.reify((MethodCall) MethodCall.getMethodCall(
 			         Class.forName(Object.class.getName()).getDeclaredMethod("hashCode",
-			             new Class[] {}), new Object[] {}));
+			             new Class[] {}), new Object[] {}, (Map<TypeVariable, Class>)null));
 	        return ((Integer) result).intValue();
 		} catch (SecurityException e) {
 			throw new ProActiveRuntimeException(e.toString());

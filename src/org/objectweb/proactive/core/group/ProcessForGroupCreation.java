@@ -43,14 +43,16 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     implements Runnable {
     private ProxyForGroup proxyGroup;
     private String className;
+    private Class[] genericParameters;
     private Object[] param;
     private Node node;
     private int index;
 
-    public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className,
+    public ProcessForGroupCreation(ProxyForGroup proxyGroup, String className, Class[] genericParameters,
         Object[] param, Node node, int index) {
         this.proxyGroup = proxyGroup;
         this.className = className;
+        this.genericParameters = genericParameters;
         this.param = param;
         this.node = node;
         this.index = index;
@@ -59,7 +61,7 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup
     public void run() {
         try {
             this.proxyGroup.set(this.index,
-                ProActive.newActive(className, param, node));
+                ProActive.newActive(className, genericParameters, param, node));
             //			this.proxyGroup.decrementWaitedAndNotifyAll();
         } catch (Exception e) {
             e.printStackTrace();

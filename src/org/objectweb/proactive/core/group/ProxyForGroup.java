@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.group;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,6 +53,7 @@ import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.exceptions.proxy.FailedGroupRendezVousException;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
+import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -260,17 +263,25 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         }
 
         // Creates a stub + ProxyForGroup for representing the result
+        String returnTypeClassName = null;
         try {
             Object[] paramProxy = new Object[0];
-            result = MOP.newInstance(mc.getReifiedMethod().getReturnType()
-                                       .getName(), null,
-                    ProxyForGroup.class.getName(), paramProxy);
-            ((ProxyForGroup) ((StubObject) result).getProxy()).className = mc.getReifiedMethod()
-                                                                             .getReturnType()
-                                                                             .getName();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            Type t = mc.getReifiedMethod().getGenericReturnType();
+            if (t instanceof TypeVariable) {
+            	returnTypeClassName = mc.getGenericTypesMapping().get(t).getName();
+            } else {
+            	returnTypeClassName = mc.getReifiedMethod().getReturnType().getName();
+            }
+
+            result = MOP.newInstance(returnTypeClassName,
+                    null, null, ProxyForGroup.class.getName(), paramProxy);
+            
+            ((ProxyForGroup) ((StubObject) result).getProxy()).className = returnTypeClassName;
+            
+        } catch (ClassNotReifiableException e1) {
+            throw new InvocationTargetException(e1, "Method " + mc.getReifiedMethod().toGenericString() + " : cannot return a group of results for the non reifiable type " + returnTypeClassName);
+        } catch (Exception e2) {
+        	throw new InvocationTargetException(e2, "Method " + mc.getReifiedMethod().toGenericString() + " : cannot create group of results");
         }
 
         int size = this.memberList.size();
@@ -305,7 +316,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                     }
                 this.threadpool.addAJob(new ProcessForAsyncCall(this,
                         this.memberList, memberListOfResultGroup, index,
-                        new MethodCall(mc.getReifiedMethod(),
+                        new MethodCall(mc.getReifiedMethod(), mc.getGenericTypesMapping(),
                             individualEffectiveArguments, mc.getExceptionContext()),
                         body));
             }
@@ -387,7 +398,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                     }
                 this.threadpool.addAJob(new ProcessForOneWayCall(this,
                         this.memberList, index,
-                        new MethodCall(mc.getReifiedMethod(),
+                        new MethodCall(mc.getReifiedMethod(), mc.getGenericTypesMapping(),
                             individualEffectiveArguments, mc.getExceptionContext()),
                         body, exceptionList));
             }
@@ -400,7 +411,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         }
     }
 
-    /* ------------------- THE COLLECTION'S METHOD ------------------ */
+    /* ------------------- java.util.List methods------------------ */
 
     /**
      * If o is a reified object and if it is "assignableFrom" the class of the group, add it into the group<br>
@@ -708,8 +719,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     public Object getGroupByType() {
         Object result;
         try { // a new proxy is generated
-            result = MOP.newInstance(this.className, null,
-                    ProxyForGroup.class.getName(), null);
+            result = MOP.newInstance(this.className, 
+                    null, null, ProxyForGroup.class.getName(), null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -1072,7 +1083,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param params - an array that contains the parameters for the constructor of member.
      * @param nodeList - the nodes where the member will be created.
      */
-    public void createMemberWithMultithread(String className,
+    public void createMemberWithMultithread(String className, Class[] genericParameters,
         Object[][] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < params.length; i++) {
@@ -1080,7 +1091,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         }
         for (int i = 0; i < params.length; i++) {
             this.threadpool.addAJob(new ProcessForGroupCreation(this,
-                    className, params[i], nodeList[i % nodeList.length], i));
+                    className, genericParameters, params[i], nodeList[i % nodeList.length], i));
         }
         this.threadpool.complete();
     }
@@ -1091,7 +1102,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param params - the parameters for the constructor of members.
      * @param nodeList - the nodes where the member will be created.
      */
-    protected void createMemberWithMultithread(String className,
+    protected void createMemberWithMultithread(String className, Class[] genericParameters,
         Object[] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < nodeList.length; i++) {
@@ -1099,7 +1110,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         }
         for (int i = 0; i < nodeList.length; i++) {
             this.threadpool.addAJob(new ProcessForGroupCreation(this,
-                    className, params, nodeList[i], i));
+                    className, genericParameters, params, nodeList[i], i));
         }
         this.threadpool.complete();
     }

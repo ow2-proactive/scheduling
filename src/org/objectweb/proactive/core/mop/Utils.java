@@ -34,6 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -60,6 +61,10 @@ public abstract class Utils extends Object {
             "java.lang.Throwable");
     public static final String STUB_DEFAULT_PREFIX = "Stub_";
     public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
+    // stub on generic types are generated in a different package
+    public static final String STUB_GENERICS_PACKAGE="parameterized.";
+    // stub on generic types are generated with a suffix that indicates the parameterizing types
+    public static final String STUB_GENERICS_SUFFIX="_Generics_";
 
     /**
      * Static methods
@@ -432,17 +437,18 @@ public abstract class Utils extends Object {
         }
     }
 
-    public static String convertClassNameToStubClassName(String classname) {
+    public static String convertClassNameToStubClassName(String classname, Class[] genericParameters) {
         if (classname.length() == 0) {
             return classname;
         }
         int n = classname.lastIndexOf('.');
+        String genericsDifferentiator = ((genericParameters==null || genericParameters.length==0) ?"":STUB_GENERICS_SUFFIX +Arrays.deepToString(genericParameters).replace('.', '_').replace("class ", "").replace(" ", "").replace(",","%") );
         if (n == -1) {
             // no package
-            return STUB_DEFAULT_PACKAGE + STUB_DEFAULT_PREFIX + classname;
+            return STUB_DEFAULT_PACKAGE + ((genericParameters==null || genericParameters.length==0) ?"":STUB_GENERICS_PACKAGE) + STUB_DEFAULT_PREFIX + classname + genericsDifferentiator;
         } else {
-            return STUB_DEFAULT_PACKAGE + classname.substring(0, n + 1) +
-            STUB_DEFAULT_PREFIX + classname.substring(n + 1);
+            return STUB_DEFAULT_PACKAGE + ((genericParameters==null || genericParameters.length==0) ?"":STUB_GENERICS_PACKAGE) + classname.substring(0, n + 1) +
+            STUB_DEFAULT_PREFIX + classname.substring(n + 1) + genericsDifferentiator;
         }
     }
 
@@ -462,10 +468,23 @@ public abstract class Utils extends Object {
 
     public static String convertStubClassNameToClassName(String stubclassname) {
         if (isStubClassName(stubclassname)) {
-            String temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
+        	String temp ="";
+        	if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
+                // remove generics stuff
+        		temp = stubclassname.substring((Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE).length());
+        	} else {
+        		temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
+        	}
             String packageName = Utils.getPackageName(temp);
             String stubClassSimpleName = Utils.getSimpleName(temp);
+
             String classsimplename = stubClassSimpleName.substring(Utils.STUB_DEFAULT_PREFIX.length());
+            
+            // remove generics stuff
+            if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
+            	classsimplename = classsimplename.substring(0, classsimplename.lastIndexOf(Utils.STUB_GENERICS_SUFFIX));
+            }
+            	
 
             // consider the "no package" case
             String result;
@@ -481,6 +500,28 @@ public abstract class Utils extends Object {
         } else {
             return stubclassname;
         }
+    }
+    
+    // TODO manage existing delimiters in user class names
+    public static String[] getNamesOfParameterizingTypesFromStubClassName(String stubClassName) {
+    	
+    	if (!isStubClassName(stubClassName)) {
+    		return new String[] {};
+    	}
+    	String temp ="";
+    	if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
+            // remove generics prefix
+    		temp = stubClassName.substring((Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE).length());
+    	} else {
+    		// no generics
+    		return new String[] {};
+    	}
+    	
+    	
+    	// remove brackets
+    	temp.replace("[", "");
+    	temp.replace("]", "");
+    	return temp.split("%");
     }
 
     /**
@@ -525,7 +566,7 @@ public abstract class Utils extends Object {
             return MOP.forName(classname);
         } catch (ClassNotFoundException e) {
             System.err.println(
-                "Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classe " +
+                "Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load class " +
                 classname);
             return null;
         }

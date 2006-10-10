@@ -104,7 +104,7 @@ public class ProActiveClassLoaderHelper {
 //                class_data = bsb.create();
 //            } else 
                 if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                class_data = JavassistByteCodeStubBuilder.create(classname);
+                class_data = JavassistByteCodeStubBuilder.create(classname, null);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(

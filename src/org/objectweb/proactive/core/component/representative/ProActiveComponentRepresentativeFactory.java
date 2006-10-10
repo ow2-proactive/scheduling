@@ -97,7 +97,7 @@ public class ProActiveComponentRepresentativeFactory {
         ComponentParameters componentParameters = (ComponentParameters) proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     ComponentParametersController.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {  }),
-                    new Object[] {  },
+                    new Object[] {  }, null, 
                     Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                     ComponentRequest.STRICT_FIFO_PRIORITY));
         ((BodyProxy) proxy).getBody().getRemoteAdapter().removeImmediateService("getComponentParameters",

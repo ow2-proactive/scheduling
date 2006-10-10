@@ -687,7 +687,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                                                                  .getActiveObjects(P2P_NODE_NAME,
                 P2PService.class.getName()).get(0);
         return (P2PService) MOP.newInstance(P2PService.class.getName(),
-            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-            new Object[] { body });
+        		null,
+            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, new Object[] { body });
     }
 }

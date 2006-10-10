@@ -30,6 +30,9 @@
  */ 
 package org.objectweb.proactive.core.body.proxy;
 
+import java.lang.reflect.GenericDeclaration;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -220,8 +223,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
         // Creates a stub + FutureProxy for representing the result
         try {
-            Class returnType = methodCall.getReifiedMethod().getReturnType();
+            Class returnType = null;
+            Type t = methodCall.getReifiedMethod().getGenericReturnType();
+            if (t instanceof TypeVariable) {
+            	returnType = methodCall.getGenericTypesMapping().get(t);
+            } else {
+            	returnType = methodCall.getReifiedMethod().getReturnType();
+            }
+            
 
+            
             if (returnType.equals(java.lang.Void.TYPE)) {
                 /* A future for a void call is used to put the potential exception inside */
                 futureobject = (StubObject) MOP.newInstance(VoidFuture.class,

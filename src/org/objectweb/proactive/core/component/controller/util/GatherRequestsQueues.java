@@ -246,7 +246,7 @@ public class GatherRequestsQueues implements Serializable {
 
                 // create the request
                 MethodCall gatherMC = MethodCall.getComponentMethodCall(gatherMethod,
-                        gatherEffectiveArguments, serverItfName,
+                        gatherEffectiveArguments, null, serverItfName,
                         new ItfID(serverItfName, owner.getID()));
                 long sequenceID = ((ComponentBodyImpl) ProActive.getBodyOnThis()).getNextSequenceID();
                 

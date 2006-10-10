@@ -123,8 +123,9 @@ public class StubGenerator {
 //                stubClassName = Utils.convertClassNameToStubClassName(className);
 //            } else 
                 if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                data = JavassistByteCodeStubBuilder.create(className);
-                stubClassName = Utils.convertClassNameToStubClassName(className);
+                	
+                data = JavassistByteCodeStubBuilder.create(className, null);
+                stubClassName = Utils.convertClassNameToStubClassName(className, null);
             } else {
                 // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
                 System.err.println(

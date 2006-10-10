@@ -110,37 +110,20 @@ public class ProActiveGroup {
     }
 
     /**
-     * Creates an object representing an empty group specifying the upper class of members.
+     * Creates an object representing a group (a typed group) and creates members on the default node.
      * @param className the name of the (upper) class of the group's members.
-     * @return an empty group of type <code>className</code>.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
     public static Object newGroup(String className)
-        throws ClassNotFoundException, ClassNotReifiableException {
-        MOP.checkClassIsReifiable(MOP.forName(className));
-
-        Object result = null;
-
-        try {
-            result = MOP.newInstance(className, null,
-                    DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
-
-            ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ((StubObject) result).getProxy();
-            proxy.className = className;
-            proxy.stub = (StubObject) result;
-        } catch (ClassNotReifiableException e) {
-            logger.error("**** ClassNotReifiableException ****");
-        } catch (InvalidProxyClassException e) {
-            logger.error("**** InvalidProxyClassException ****");
-        } catch (ConstructionOfProxyObjectFailedException e) {
-            logger.error("**** ConstructionOfProxyObjectFailedException ****");
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            logger.error("**** ConstructionOfReifiedObjectFailedException ****");
-        }
-
-        return result;
+    throws ClassNotFoundException, ClassNotReifiableException {
+    	return ProActiveGroup.newGroup(className, (Class[])null);
     }
+    
+    
 
     /**
      * Creates an object representing a group (a typed group) and creates members on the default node.
@@ -161,6 +144,7 @@ public class ProActiveGroup {
 
         return ProActiveGroup.newGroup(className, params, nodeList);
     }
+    
 
     /**
      * Creates an object representing a group (a typed group) and creates all members with params on the node.
@@ -225,6 +209,7 @@ public class ProActiveGroup {
     /**
      * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
      * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
      * @param params the array that contain the parameters used to build the group's members.
      * If <code>params</code> is <code>null</code>, builds an empty group.
      * @param nodeList the nodes where the members are created.
@@ -234,11 +219,11 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroup(String className, Object[][] params,
+    public static Object newGroup(String className, Class[] genericParameters, Object[][] params,
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
+        Object result = ProActiveGroup.newGroup(className, genericParameters);
         Group g = ProActiveGroup.getGroup(result);
 
         if (params != null) {
@@ -249,6 +234,14 @@ public class ProActiveGroup {
         }
 
         return result;
+    }
+    
+    
+    public static Object newGroup(String className, Object[][] params,
+            Node[] nodeList)
+            throws ClassNotFoundException, ClassNotReifiableException, 
+                ActiveObjectCreationException, NodeException {
+    	return ProActiveGroup.newGroup(className, (Class[])null, params, nodeList);
     }
 
     /**
@@ -285,7 +278,7 @@ public class ProActiveGroup {
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
+        Object result = ProActiveGroup.newGroup(className, (Class[])null);
         Group g = ProActiveGroup.getGroup(result);
 
         if (params != null) {
@@ -389,7 +382,7 @@ public class ProActiveGroup {
     public static Object turnActiveGroup(Object ogroup)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup),
+        return ProActive.turnActive(ogroup, null, ProActiveGroup.getType(ogroup),
             (Node) null, null, null);
     }
 
@@ -407,7 +400,7 @@ public class ProActiveGroup {
     public static Object turnActiveGroup(Object ogroup, Node node)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup),
+        return ProActive.turnActive(ogroup, null, ProActiveGroup.getType(ogroup),
             node, null, null);
     }
 
@@ -424,7 +417,7 @@ public class ProActiveGroup {
     public static Object turnActiveGroup(Object ogroup, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup),
+        return ProActive.turnActive(ogroup, null, ProActiveGroup.getType(ogroup),
             NodeFactory.getNode(nodeName), null, null);
     }
 
@@ -472,10 +465,10 @@ public class ProActiveGroup {
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
+        Object result = ProActiveGroup.newGroup(className, (Class[])null);
         ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
-        proxy.createMemberWithMultithread(className, params, nodeList);
+        proxy.createMemberWithMultithread(className, null, params, nodeList);
 
         return result;
     }
@@ -569,10 +562,10 @@ public class ProActiveGroup {
         Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
+        Object result = ProActiveGroup.newGroup(className, (Class[])null);
         ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
-        proxy.createMemberWithMultithread(className, params, nodeList);
+        proxy.createMemberWithMultithread(className, null, params, nodeList);
 
         return result;
     }
@@ -617,10 +610,7 @@ public class ProActiveGroup {
     public static Object newGroupInParallel(String className, Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Node[] nodeList = new Node[1];
-        nodeList[0] = NodeFactory.getDefaultNode();
-
-        return ProActiveGroup.newGroupInParallel(className, params, nodeList);
+    	return newGroupInParallel(className, null, params);
     }
 
     /**
@@ -639,12 +629,7 @@ public class ProActiveGroup {
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
-
-        proxy.createMemberWithMultithread(className, params, nodeList);
-
-        return result;
+    	return newGroupInParallel(className, null, params, nodeList);
     }
 
     /**
@@ -664,11 +649,7 @@ public class ProActiveGroup {
         Object[][] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Node[] nodeListString = new Node[nodeList.length];
-        for (int i = 0; i < nodeList.length; i++)
-            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
-        return ProActiveGroup.newGroupInParallel(className, params,
-            nodeListString);
+    	return newGroupInParallel(className, null, params, nodeList);
     }
 
     /**
@@ -688,8 +669,7 @@ public class ProActiveGroup {
         Object[][] params, VirtualNode virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActiveGroup.newGroupInParallel(className, params,
-            virtualNode.getNodes());
+    	return newGroupInParallel(className, null, params, virtualNode);
     }
 
     /**
@@ -709,11 +689,7 @@ public class ProActiveGroup {
         String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Node[] nodeListString = new Node[nodeList.length];
-        for (int i = 0; i < nodeList.length; i++)
-            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
-        return ProActiveGroup.newGroupInParallel(className, params,
-            nodeListString);
+        return newGroupInParallel(className, null, params, nodeList);
     }
 
     /**
@@ -732,12 +708,7 @@ public class ProActiveGroup {
         Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        Object result = ProActiveGroup.newGroup(className);
-        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
-
-        proxy.createMemberWithMultithread(className, params, nodeList);
-
-        return result;
+    	return newGroupInParallel(className, null, params, nodeList);
     }
 
     /**
@@ -757,9 +728,476 @@ public class ProActiveGroup {
         VirtualNode virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActiveGroup.newGroupInParallel(className, params,
+        return ProActiveGroup.newGroupInParallel(className, null, params, virtualNode);
+    }
+    
+
+    //// generic methods
+    /**
+     * Creates an object representing a group (a typed group) and creates members on the default node.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the array that contain the parameters used to build the group's member.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, Object[][] params)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = NodeFactory.getDefaultNode();
+
+        return ProActiveGroup.newGroupInParallel(className, genericParameters, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
+     * Threads are used to build the group's members. This methods returns when all members were created.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the array that contain the parameters used to build the group's member.
+     * @param nodeList the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, 
+        Object[][] params, Node[] nodeList)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Object result = ProActiveGroup.newGroup(className, genericParameters);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, genericParameters, params, nodeList);
+
+        return result;
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
+     * Threads are used to build the group's members. This methods returns when all members were created.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the array that contain the parameters used to build the group's member.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param nodeList the names of the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, 
+        Object[][] params, String[] nodeList)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeListString = new Node[nodeList.length];
+        for (int i = 0; i < nodeList.length; i++)
+            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
+        return ProActiveGroup.newGroupInParallel(className, genericParameters, params,
+            nodeListString);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the vitual node.
+     * Threads are used to build the group's members. This methods returns when all members were created.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the array that contain the parameters used to build the group's member.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param virtualNode the virtual node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, 
+        Object[][] params, VirtualNode virtualNode)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActiveGroup.newGroupInParallel(className, genericParameters, params,
             virtualNode.getNodes());
     }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
+     * Threads are used to build the group's members. This methods returns when all members were created.
+     * @param className the name of the (upper) class of the group's members.
+     * @param params the parameters used to build all the group's members.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param nodeList the names of the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, Object[] params,
+        String[] nodeList)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeListString = new Node[nodeList.length];
+        for (int i = 0; i < nodeList.length; i++)
+            nodeListString[i] = NodeFactory.getNode(nodeList[i]);
+        return ProActiveGroup.newGroupInParallel(className, genericParameters, params,
+            nodeListString);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
+     * Threads are used to build the group's members. This methods returns when all members were created.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the parameters used to build all the group's member.
+     * @param nodeList the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, Object[] params,
+        Node[] nodeList)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Object result = ProActiveGroup.newGroup(className, genericParameters);
+        ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
+
+        proxy.createMemberWithMultithread(className, genericParameters, params, nodeList);
+
+        return result;
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with the same params cycling on the nodes of the vitual node.
+     * Threads are used to build the group's members. This methods returns when all members were created.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the parameters used to build all the group's member.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param virtualNode the virtual node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroupInParallel(String className, Class[] genericParameters, Object[] params,
+        VirtualNode virtualNode)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActiveGroup.newGroupInParallel(className, genericParameters, params,
+            virtualNode.getNodes());
+    }
+
+    
+    
+    /**
+     * Creates an object representing an empty group specifying the upper class of members.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @return an empty group of type <code>className</code>.
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     */
+    public static Object newGroup(String className, Class[] genericParameters)
+        throws ClassNotFoundException, ClassNotReifiableException {
+        MOP.checkClassIsReifiable(MOP.forName(className));
+
+        Object result = null;
+
+        try {
+            result = MOP.newInstance(className,
+                    genericParameters, null, DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
+
+            ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ((StubObject) result).getProxy();
+            proxy.className = className;
+            proxy.stub = (StubObject) result;
+        } catch (ClassNotReifiableException e) {
+            logger.error("**** ClassNotReifiableException ****");
+        } catch (InvalidProxyClassException e) {
+            logger.error("**** InvalidProxyClassException ****");
+        } catch (ConstructionOfProxyObjectFailedException e) {
+            logger.error("**** ConstructionOfProxyObjectFailedException ****");
+        } catch (ConstructionOfReifiedObjectFailedException e) {
+            logger.error("**** ConstructionOfReifiedObjectFailedException ****");
+        }
+
+        return result;
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members on the default node.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the array that contain the parameters used to build the group's members.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[][] params)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = NodeFactory.getDefaultNode();
+
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+    
+
+    /**
+     * Creates an object representing a group (a typed group) and creates all members with params on the node.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the array that contain the parameters used to build the group's members.
+     * @param nodeName the name (String) of the node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[][] params,
+        String nodeName)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = NodeFactory.getNode(nodeName);
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the array that contain the parameters used to build the group's members.
+     * @param nodeListString the names of the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[][] params,
+        String[] nodeListString)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[nodeListString.length];
+        for (int i = 0; i < nodeListString.length; i++)
+            nodeList[i] = NodeFactory.getNode(nodeListString[i]);
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates all members with params on the node.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the array that contain the parameters used to build the group's members.
+     * @param node the node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[][] params, Node node)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = node;
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+
+    
+    /**
+     * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the virtual node.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the array that contain the parameters used to build the group's members.
+     * If <code>params</code> is <code>null</code>, builds an empty group.
+     * @param virtualNode the virtual where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[][] params,
+        VirtualNode virtualNode)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActiveGroup.newGroup(className, genericParameters, params, virtualNode.getNodes());
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the parameters used to build all the group's members.
+     * @param nodeList the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[] params,
+        Node[] nodeList)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Object result = ProActiveGroup.newGroup(className, (Class[])genericParameters);
+        Group g = ProActiveGroup.getGroup(result);
+
+        if (params != null) {
+            for (int i = 0; i < nodeList.length; i++) {
+                g.add(ProActive.newActive(className, genericParameters, params,
+                        nodeList[i % nodeList.length]));
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the parameters used to build all the group's members.
+     * @param virtualNode the virtual node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[] params,
+        VirtualNode virtualNode)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActiveGroup.newGroup(className, genericParameters, params, virtualNode.getNodes());
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates all members with the same params on the node.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the parameters used to build all the group's members.
+     * @param node the node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[] params, Node node)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = node;
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates all members with the same params on the node.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the parameters used to build all the group's members.
+     * @param nodeName the name of the node where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[] params,
+        String nodeName)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[1];
+        nodeList[0] = NodeFactory.getNode(nodeName);
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+
+    /**
+     * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
+     * @param className the name of the (upper) class of the group's members.
+     * @param genericParameters genericParameters parameterizing types 
+     * @param params the parameters used to build all the group's members.
+     * @param nodeListString the names of the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Class[] genericParameters, Object[] params,
+        String[] nodeListString)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        Node[] nodeList = new Node[nodeListString.length];
+        for (int i = 0; i < nodeListString.length; i++)
+            nodeList[i] = NodeFactory.getNode(nodeListString[i]);
+        return ProActiveGroup.newGroup(className, genericParameters, params, nodeList);
+    }
+    
+    
+    /**
+     * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a default
+     * node in the local JVM.
+     * @param ogroup the typed group to turn active.
+     * @return a reference on the active object produced.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created.
+     */
+    public static Object turnActiveGroup(Object ogroup, Class[] genericParameters)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActive.turnActive(ogroup, genericParameters, ProActiveGroup.getType(ogroup),
+            (Node) null, null, null);
+    }
+
+    /**
+     * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a specified node.
+     * @param ogroup the typed group to turn active.
+     * @param node the node where to create the active object on. If <code>null</code>,
+     * the active object is created localy on a default node
+     * @return a reference (possibly remote) on the active object produced.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the specified node can not be reached.
+     */
+    public static Object turnActiveGroup(Object ogroup, Class[] genericParameters, Node node)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActive.turnActive(ogroup, genericParameters, ProActiveGroup.getType(ogroup),
+            node, null, null);
+    }
+
+    /**
+     * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a specified node.
+     * @param ogroup the typed group to turn active.
+     * @param nodeName the name of the node where to create the active object on.
+     * @return a reference (possibly remote) on the active object produced.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the specified node can not be reached.
+     */
+    public static Object turnActiveGroup(Object ogroup, Class[] genericParameters, String nodeName)
+        throws ClassNotFoundException, ClassNotReifiableException, 
+            ActiveObjectCreationException, NodeException {
+        return ProActive.turnActive(ogroup, genericParameters, ProActiveGroup.getType(ogroup),
+            NodeFactory.getNode(nodeName), null, null);
+    }
+
+
 
     /**
      * Gives a view of the group
@@ -770,7 +1208,7 @@ public class ProActiveGroup {
         Object result = null;
 
         try {
-            result = ProActiveGroup.newGroup(ProActiveGroup.getType(ogroup));
+            result = ProActiveGroup.newGroup(ProActiveGroup.getType(ogroup), (Class[])null);
         } catch (ClassNotReifiableException e) {
             logger.error("**** ClassNotReifiableException ****");
             e.printStackTrace();

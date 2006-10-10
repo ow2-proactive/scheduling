@@ -271,7 +271,7 @@ public class ProSPMD {
         Object result = ProActiveGroup.newGroup(className);
         ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
-        proxy.createMemberWithMultithread(className, params, nodeList);
+        proxy.createMemberWithMultithread(className, null, params, nodeList);
 
         proxy.setSPMDGroup(result);
 

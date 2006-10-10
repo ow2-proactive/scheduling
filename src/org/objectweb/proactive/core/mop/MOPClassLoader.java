@@ -153,15 +153,20 @@ public class MOPClassLoader extends URLClassLoader {
     }
 
     public Class loadClass(String name) throws ClassNotFoundException {
-        return this.loadClass(name, null, false);
+        return this.loadClass(name, null, null, false);
+    }
+    
+    
+    public Class loadClass(String name, Class[] genericParameters) throws ClassNotFoundException {
+        return this.loadClass(name, genericParameters, null, false);
     }
 
-    public Class loadClass(String name, ClassLoader cl)
+    public Class loadClass(String name, Class[] genericParameters, ClassLoader cl)
         throws ClassNotFoundException {
-        return this.loadClass(name, cl, false);
+        return this.loadClass(name, genericParameters, cl, false);
     }
 
-    protected synchronized Class loadClass(String name, ClassLoader cl,
+    protected synchronized Class loadClass(String name, Class[] genericParameters, ClassLoader cl,
         boolean resolve) throws ClassNotFoundException {
         if (this.getParent() != null) {
             try {
@@ -200,7 +205,7 @@ public class MOPClassLoader extends URLClassLoader {
 //                    MOPClassLoader.classDataCache.put(name, data);
 //                } else 
                     if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                    data = JavassistByteCodeStubBuilder.create(classname);
+                    data = JavassistByteCodeStubBuilder.create(classname, genericParameters);
                     MOPClassLoader.classDataCache.put(name, data);
                 } else {
                     // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable

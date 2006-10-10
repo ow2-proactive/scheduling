@@ -391,8 +391,8 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             // 3 possibilities : either the component is created on a node (or
             // null), it is created on a virtual node, or on multiple nodes
             ao = ProActive.newActive(contentDesc.getClassName(),
-                    contentDesc.getConstructorParameters(), node,
-                    contentDesc.getActivity(), contentDesc.getFactory());
+                    null, contentDesc.getConstructorParameters(),
+                    node, contentDesc.getActivity(), contentDesc.getFactory());
 
             // Find the proxy
             org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) ao).getProxy();
