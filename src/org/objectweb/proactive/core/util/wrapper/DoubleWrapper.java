@@ -77,4 +77,18 @@ public class DoubleWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
+    
+    @Override
+    public boolean equals(Object arg0) {
+        if (arg0 instanceof DoubleWrapper) {
+            return ((DoubleWrapper) arg0).doubleValue() == this.value;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new Double(this.value).hashCode();
+    }
+
 }

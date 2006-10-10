@@ -77,4 +77,18 @@ public class BooleanWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
+    
+    @Override
+    public boolean equals(Object arg0) {
+        if (arg0 instanceof BooleanWrapper) {
+            return ((BooleanWrapper) arg0).booleanValue() == this.value;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new Boolean(this.value).hashCode();
+    }
+
 }

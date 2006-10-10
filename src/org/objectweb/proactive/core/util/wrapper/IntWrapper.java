@@ -77,4 +77,18 @@ public class IntWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
+    
+    @Override
+    public boolean equals(Object arg0) {
+        if (arg0 instanceof IntWrapper) {
+            return ((IntWrapper) arg0).intValue() == this.value;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new Integer(this.value).hashCode();
+    }
+
 }

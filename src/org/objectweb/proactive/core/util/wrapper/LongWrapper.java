@@ -77,4 +77,18 @@ public class LongWrapper implements Serializable {
     public String toString() {
         return this.value + "";
     }
+
+    @Override
+    public boolean equals(Object arg0) {
+        if (arg0 instanceof LongWrapper) {
+            return ((LongWrapper) arg0).longValue() == this.value;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new Long(this.value).hashCode();
+    }
+
 }
