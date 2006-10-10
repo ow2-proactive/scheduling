@@ -25,34 +25,58 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.examples.findprimes;
+package org.objectweb.proactive.calcium.examples.nqueens.bt1;
 
 import java.util.Vector;
+
+import org.objectweb.proactive.calcium.examples.nqueens.Board;
 import org.objectweb.proactive.calcium.interfaces.Divide;
 
-public class ChallengeDivide implements Divide<Challenge>{
-	
-	private int id;
-	
-	public ChallengeDivide(int id){
-		this.id=id;
+public class DivideBT1 implements Divide<Board>{
+
+	public Vector<Board> divide(Board board) {
+
+		if(board.isRootBoard()){
+			return initDivideBT1(board);
+		}
+		
+		return divideBT1(board);
 	}
 	
-	public Vector<Challenge> divide(Challenge param) {
+	private Vector<Board> initDivideBT1(Board board) {
 		
-		Challenge ttUp = new Challenge(1+param.min+(param.max-param.min)/2,param.max,param.solvableSize);
-
-		Challenge ttDown = new Challenge(param.min,
-				param.min+(param.max-param.min)/2, param.solvableSize);
-		
-		Vector<Challenge> v = new Vector<Challenge>();
-		v.add(ttUp);
-		v.add(ttDown);
-		
+		Vector<Board> v = new Vector<Board>();
+		//We set row 0 and 1 for backtrack1
+		for (int i = board.n - 2; i >= 2; i--) {
+			int bit = 1 << i;
+			v.add(new BoardBT1(board.n, board.solvableSize, 2, (2 | bit) << 1,	1 | bit, bit >> 1,i,null));
+		}
+	
 		return v;
 	}
 
-	public int getMuscleId() {
-		return id;
+	protected Vector<Board> divideBT1(Board param) {
+		int mask = (1 << param.n) - 1;
+
+		Vector<Board> v = new Vector<Board>();
+
+		int bitmap = mask & ~(param.left | param.down | param.right);
+		int bit;
+
+		if (param.row < param.bound1) {
+			bitmap &= 0xFFFFFFFD; // 1111...01
+		}
+		
+		//expand this row
+		while (bitmap != 0) {
+			bitmap ^= param.board[param.row] = bit = -bitmap & bitmap;
+
+			v.add(new BoardBT1(param.n, param.solvableSize, param.row + 1, (param.left | bit) << 1, param.down
+					| bit, (param.right | bit) >> 1, param.bound1, param.board));
+		} 
+
+		return v;
 	}
+	
+
 }

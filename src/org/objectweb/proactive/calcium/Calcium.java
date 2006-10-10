@@ -39,7 +39,6 @@ import org.objectweb.proactive.calcium.statistics.Stats;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 /**
- * 
  * This class corresponds to the entry point of the skeleton framework.
  * 
  * In order to instantiate this class, a resource Manager must be provided.

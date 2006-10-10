@@ -40,14 +40,12 @@ import org.objectweb.proactive.calcium.Task;
  */
 public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 
-	private long initTime, finitTime, computationTime;
 	private int processingQueueLength, waitingQueueLength, readyQueueLength, resultsQueueLength;
 	private int solvedNumberTasks, solvedRootTasks;
-	private long processingTime, waitingTime, readyTime, resultsTime, wallclockTime;
+	private long processingTime, waitingTime, readyTime, resultsTime, wallclockTime,computationTime;
 	
 	public StatsGlobalImpl(){
 		solvedNumberTasks=solvedRootTasks=readyQueueLength=0;
-		initTime=finitTime=computationTime=0;
 	}
 	
 	public void setQueueLengths(int readyQ, int processingQ, int waitingQ, int resultsQ){
@@ -55,18 +53,6 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 		this.processingQueueLength=processingQ;
 		this.waitingQueueLength=waitingQ;
 		this.resultsQueueLength=resultsQ;
-	}
-		
-	public void markStart(){
-		if(initTime == 0){
-			initTime=System.currentTimeMillis();
-		}
-	}
-	
-	public void markFinish(){
-		if(finitTime == 0){
-			finitTime=System.currentTimeMillis();
-		}
 	}
 	
 	public synchronized void increaseSolvedTasks(Task<?> task){
@@ -76,7 +62,7 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 		processingTime += taskStats.getProcessingTime();
 		readyTime += taskStats.getReadyTime();
 		resultsTime += taskStats.getResultsTime();
-		waitingTime += taskStats.getResultsTime();
+		waitingTime += taskStats.getWaitingTime();
 		wallclockTime += taskStats.getProcessingTime();
 		
 		if(task.isRootTask()){
@@ -97,7 +83,8 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 		"Computed Tasks: "+getSolvedNumberOfRootTasks() +"[Root] " + getSolvedNumberOfTasks()+"[Total]";
 	}
 
-	//INTERFACE METHODS BEGIN HERE
+	
+	// ********* INTERFACE METHODS BEGIN HERE   ************
 	
 	public int getReadyQueueLength(){
 		return readyQueueLength;
@@ -109,13 +96,6 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 	
 	public int getSolvedNumberOfRootTasks(){
 		return solvedRootTasks;
-	}
-	
-	public long getUptime(){
-		if(finitTime==0){
-			return System.currentTimeMillis()-initTime;
-		}
-		return finitTime-initTime;
 	}
 	
 	public int getProccessingQueueLength() {
@@ -131,26 +111,32 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal{
 	}
 
 	public long getAverageWallClockTime() {
+		if(solvedNumberTasks == 0 ) return 0;
 		return wallclockTime/solvedNumberTasks;
 	}
 
 	public long getAverageProcessingTime() {
+		if(solvedNumberTasks == 0 ) return 0;
 		return processingTime/solvedNumberTasks;
 	}
 
 	public long getAverageWaitingTime() {
+		if(solvedNumberTasks == 0 ) return 0;
 		return waitingTime/solvedNumberTasks;
 	}
 
 	public long getAverageResultsTime() {
+		if(solvedNumberTasks == 0 ) return 0;
 		return resultsTime/solvedNumberTasks;
 	}
 	
 	public long getAverageReadyTime() {
+		if(solvedNumberTasks == 0 ) return 0;
 		return readyTime/solvedNumberTasks;
 	}
 	
 	public long getAverageComputationTime(){
+		if(solvedNumberTasks == 0 ) return 0;
 		return computationTime/solvedNumberTasks;
 	}
 }

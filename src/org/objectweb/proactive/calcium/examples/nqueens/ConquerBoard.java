@@ -32,7 +32,7 @@ import java.util.Vector;
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 
 public class ConquerBoard implements Conquer<Board>{
-
+	
 	public Board conquer(Board parent, Vector<Board> boards) {
 		
 		Board first = boards.firstElement();

@@ -25,23 +25,43 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.skeletons;
 
-import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.Task;
+import org.objectweb.proactive.calcium.interfaces.Instruction;
+import org.objectweb.proactive.calcium.interfaces.Skeleton;
 
-/**
- * This class is used to conquer a vector of parameters
- * into a single parameters. It is usefull for skeletons
- * such as: divide&conquer and map.
- * 
- * @author The ProActive Team (mleyton)
- *
- * @param <T>
- */
-public interface Conquer<T> extends Muscle{
+public class For<T> implements Instruction<T>, Skeleton<T> {
 
-	public T conquer(T parent, Vector<T> param) throws RuntimeException, SchedulingException;
+	Skeleton<T> child;
+	int times;
+	
+	public For(int times, Skeleton<T> child){
+		this.child=child;
+		this.times=times;
+	}
+	
+	public Vector<Instruction<T>> getInstructionStack() {
+		Vector<Instruction<T>> v = new Vector<Instruction<T>>();
+		v.add(this);
+		return v;
+	}
+	
+	public Task<T> compute(Task<T> task) throws Exception {
+		
+		if(times > 0){
+			//Get Child stack
+			Vector<Instruction<T>> childStack=child.getInstructionStack();
+			
+			//Add the For with one less time to execute
+			childStack.add(0,new For<T>(times-1,child)); 
+			
+			Vector<Instruction<T>> taskStack = task.getStack();
+			taskStack.addAll(childStack);
+			task.setStack(taskStack);
+		}
+		return task;
+	}
 }

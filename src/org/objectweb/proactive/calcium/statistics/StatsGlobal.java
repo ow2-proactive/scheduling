@@ -28,8 +28,6 @@
 package org.objectweb.proactive.calcium.statistics;
 
 public interface StatsGlobal {
-
-	public long getUptime();
 	
 	public int getReadyQueueLength();
 	public int getProccessingQueueLength();

@@ -25,11 +25,11 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.examples.nqueens;
+package org.objectweb.proactive.calcium.examples.nqueens.bt2;
 
-import java.util.Vector;
+import org.objectweb.proactive.calcium.examples.nqueens.Board;
 
-public class BoardBT2 extends BoardBT1 {
+public class BoardBT2 extends Board {
 	
 	int bound2, sidemask, lastmask, endbit;
 	
@@ -68,13 +68,13 @@ public class BoardBT2 extends BoardBT1 {
 			int bound1, int bound2, int sidemask, int lastmask, int topbit,
 			int mask, int endbit, int board[]) {
 		
-		super(n,solvableSize, row, left, down, right, bound1, board);
+		super(n,solvableSize, row, left, down, right, bound1);
 		
+		this.topbit = topbit;
+		this.mask = mask;
 		this.bound2 = bound2;
 		this.sidemask = sidemask;
 		this.lastmask = lastmask;
-		this.topbit = topbit;
-		this.mask = mask;
 		this.endbit = endbit;
 
 		if (row == 1)
@@ -94,38 +94,4 @@ public class BoardBT2 extends BoardBT1 {
 	public boolean isBT1(){
 		return false;
 	}
-	
-	@Override
-	public Vector<Board> divide() {
-
-		Vector<Board> v = new Vector<Board>();
-
-		int mask = (1 << n) - 1;
-		int bitmap = mask & ~(left | down | right);
-		int bit;
-
-		if (row < bound1) {
-			bitmap |= sidemask;
-			bitmap ^= sidemask;
-		} else if (row == bound2) {
-			if ((down & sidemask) == 0) {
-				// "return;" original alogirithm is converted into
-				v.add(new Board(n, solvableSize)); //dummy child task
-				return v; // no more search is required in this branch
-			}
-			if ((down & sidemask) != sidemask)
-				bitmap &= sidemask;
-		}
-		while (bitmap != 0) {
-			bitmap ^= board[row] = bit = -bitmap & bitmap;
-			v.add(new BoardBT2(n, solvableSize, row + 1, (left | bit) << 1,
-							down | bit, (right | bit) >> 1, bound1,
-							bound2, sidemask, lastmask, topbit, mask,
-							endbit, board));
-		} // while-generando
-
-		return v;
-	}
-	
-	
 }

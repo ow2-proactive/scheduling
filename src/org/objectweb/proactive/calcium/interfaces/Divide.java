@@ -41,7 +41,7 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  *
  * @param <T>
  */
-public interface Divide<T> extends Serializable{
+public interface Divide<T> extends Muscle{
 
 	public Vector<T> divide(T param) throws RuntimeException, SchedulingException;
 }

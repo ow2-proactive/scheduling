@@ -61,11 +61,8 @@ public class Skernel<T> implements Serializable{
 	private Vector<Task<T>> results; //Finished root-tasks
 	private Hashtable<Task<T>,Task<T>> processing; //Tasks being processed at this moment
 	
-	private PanicException panicException;
-	
-	//Statistics
-
-	private StatsGlobalImpl stats;
+	private PanicException panicException;  //In case the system colapses
+	private StatsGlobalImpl stats; 	//Statistics
 	
 	public Skernel(){
 		this.ready= new PriorityQueue<Task<T>>();
@@ -96,7 +93,8 @@ public class Skernel<T> implements Serializable{
 			
 		Task<T> resultTask=results.remove(0);
 		resultTask.getStats().exitResultsState();
-		//keep stats for future use
+		
+		stats.increaseSolvedTasks(resultTask);
 		
 		if(resultTask.hasException()){
 			//Only runtime exception can be found here
@@ -149,7 +147,6 @@ public class Skernel<T> implements Serializable{
 	
 	public synchronized void putTask(Task<T> task){
 		
-		stats.markStart();
 		//TODO think about throwing an exception here!
 		//if(isPaniqued()) throw panicException;
 		
@@ -240,18 +237,17 @@ public class Skernel<T> implements Serializable{
 		}
 		
 		task.markFinishTime();
-		stats.increaseSolvedTasks(task);
 		
 		if(task.isRootTask()){ //Task finished
 			if(logger.isDebugEnabled()){
 				logger.debug("Adding to results task="+task);
 			}
 			results.add(task);
-			if(isFinished()) {
-				stats.markFinish(); //only mark if not already marked
-			}
+
 		}
 		else{ //task is a subtask
+			stats.increaseSolvedTasks(task);
+			
 			int parentId=task.getParentId();
 			if(!this.waiting.containsKey(parentId)){
 				logger.error("Error. Parent task id="+parentId+" is not waiting for child tasks");

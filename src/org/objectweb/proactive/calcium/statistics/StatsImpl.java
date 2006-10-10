@@ -27,18 +27,21 @@
  */
 package org.objectweb.proactive.calcium.statistics;
 
+import java.util.HashMap;
+
+import org.objectweb.proactive.calcium.interfaces.Muscle;
+
 public class StatsImpl implements Stats {
 	
 	private long computationTime;
 	private long waitingTime, processingTime, readyTime, resultsTime;
 	private long initTime, finitTime;
 	private long currentStateStart;
-
+	private Workout workout;
+	
+	
 	//sub task related stats
-	private long subTreeProcessingTime,subTreeReadyTime, subTreeWaitingTime,
-		subTreeResultsTime, subTreeComputationTime, subTreeWallClockTime;
 	private int subTreeSize;
-	private int numberDirectSubNodes;
 	private int numberLeafs;
 	
 	public StatsImpl() {
@@ -48,15 +51,16 @@ public class StatsImpl implements Stats {
 		finitTime=0;
 		currentStateStart=initTime;
 		
-		subTreeProcessingTime = subTreeSize = numberDirectSubNodes=numberLeafs=0;
-	}
-	
-	public void addComputationTime(long time){
-		computationTime+=time;
+		subTreeSize =numberLeafs=0;
+		workout= new Workout(8);
 	}
 	
 	public long getComputationTime(){
 		return computationTime;
+	}
+	
+	public void addComputationTime(long time){
+		computationTime+=time;
 	}
 	
 	public void exitReadyState() {
@@ -83,39 +87,51 @@ public class StatsImpl implements Stats {
 	
 	@Override
 	public String toString(){
-		String ls= " ";//System.getProperty("line.separator");
+		String ls= System.getProperty("line.separator");
+		
 		return  
-			"Time: "+processingTime + "/"+subTreeProcessingTime +"P "+ 
-			                readyTime+"/"+subTreeReadyTime +"R " + 
-			                waitingTime +"/"+subTreeWaitingTime+ "W "+
-			                resultsTime +"/"+subTreeResultsTime+ "F "+ 
-			                getWallClockTime()+"/"+subTreeWallClockTime+"L "
-			                +getComputationTime()+"/"+subTreeComputationTime+"C[ms]"+ ls+
-			"Nodes:" + +getNumberInnerNodes()+  "[Inner]/"+ getNumberLeafs() +"[Leafs] Ratio:"+ ratioInnerLeaf()+ ls+
-			"Avg-Branches:" + avgNumBranches();
+			"Time: "+processingTime      + "P " + 
+			         readyTime           + "R " + 
+			         waitingTime         + "W " +
+			         resultsTime         + "F " + 
+			         getWallClockTime()  + "L " +
+			         getComputationTime()+ "C [ms] "+
+			"TreeSize:" + getTreeSize() + " " +
+			"TreeSpan:" + getTreeSpan() + " " +
+			"TreeDepth:"+ getTreeDepth() + ls+
+			workout;
 	}
 	
 	public void markFinishTime(){
 		finitTime=System.currentTimeMillis();
 	}
 	
-	public void addChildStats(StatsImpl stats) {
-
-		this.subTreeProcessingTime +=stats.getProcessingTime()+stats.getSubTreeProcessingTime();
-		this.subTreeWaitingTime +=stats.getWaitingTime()+stats.getSubTreeWaitingTime();
-		this.subTreeReadyTime +=stats.getReadyTime()+stats.getSubTreeReadyTime();
-		this.subTreeResultsTime +=stats.getResultsTime()+stats.getSubTreeResultsTime();
-		this.subTreeWallClockTime +=stats.getWallClockTime()+stats.getSubTreeWallClockTime();
-		this.subTreeComputationTime +=stats.getComputationTime()+stats.getSubTreeComputationTime();
-		
-		this.subTreeSize += stats.getTreeSize();
-		this.numberLeafs += stats.getNumberLeafs();
-		this.numberDirectSubNodes++;
+	public Workout getWorkout(){
+		return workout;
 	}
 	
-	/*
-	 * INTERFACE METHODS
-	 */
+	public void addChildStats(StatsImpl stats) {
+
+		this.processingTime += stats.getProcessingTime();
+		this.computationTime += stats.getComputationTime();
+		this.readyTime +=stats.getReadyTime();
+		
+		this.subTreeSize += stats.getTreeSize();
+		this.numberLeafs += stats.getNumberLeafs()==0 ? 1 : stats.getNumberLeafs();
+		
+		this.workout.track(stats.workout);
+	}
+	
+	private int getNumberLeafs() {
+		return numberLeafs;
+	}
+	
+	private int getNumberInnerNodes(){
+		return getTreeSize()-getNumberLeafs();
+	}	
+
+	
+	// **************   INTERFACE METHODS   *****************
 	public long getWallClockTime(){
 		if(finitTime==0){
 			return System.currentTimeMillis()-initTime;
@@ -123,105 +139,40 @@ public class StatsImpl implements Stats {
 		return finitTime-initTime;
 	}
 
-	public int getNumberLeafs() {
-		if (numberDirectSubNodes <=0 ) return 1;
-		return numberLeafs;
-	}
-	
-	public int getNumberInnerNodes(){
-		return getTreeSize()-getNumberLeafs();
-	}
-	
-	public float ratioInnerLeaf(){
-		return ((float)getNumberInnerNodes())/getNumberLeafs();
-	}
-
-	public float avgNumBranches(){
-		if(getNumberInnerNodes() == 0) return 0;
-		return ((float)getTreeSize()-1)/getNumberInnerNodes();
-	}
-
-	/**
-	 * @return Returns the accumulated processing time for all the subtree nodes.
-	 */
-	public long getSubTreeProcessingTime() {
-		return subTreeProcessingTime;
-	}
-
-	/**
-	 * @return Returns the number of branches for this level of the tree.
-	 */
-	public int getNumberDirectSubNodes() {
-		return numberDirectSubNodes;
-	}
-
-	/**
-	 * @return Returns the time spent in the processing state by this node..
-	 */
 	public long getProcessingTime() {
 		return processingTime;
 	}
 
-	/**
-	 * @return Returns the time spent in ready state by this node.
-	 */
 	public long getReadyTime() {
 		return readyTime;
 	}
 
-	/**
-	 * @return Returns the time this node spent in the results state.
-	 */
 	public long getResultsTime() {
 		return resultsTime;
 	}
 
-	/**
-	 * @return Returns the number of nodes in this subtree (including this node).
-	 */
 	public int getTreeSize() {
 		return subTreeSize+1;
 	}
 
-	/**
-	 * @return Returns the time this node spent in waiting state.
-	 */
 	public long getWaitingTime() {
 		return waitingTime;
 	}
 
-	/**
-	 * @return Returns the subTreeReadyTime.
-	 */
-	public long getSubTreeReadyTime() {
-		return subTreeReadyTime;
+	public float getTreeDepth() {
+		float base=getTreeSpan();
+		if(base <= 0) return 0;
+
+		return (float) (Math.log(subTreeSize)/Math.log(base));
+	}
+	
+	public float getTreeSpan(){
+		if(getNumberInnerNodes() == 0) return 0;
+
+		return subTreeSize/getNumberInnerNodes();
 	}
 
-	/**
-	 * @return Returns the subTreeResultsTime.
-	 */
-	public long getSubTreeResultsTime() {
-		return subTreeResultsTime;
-	}
-
-	/**
-	 * @return Returns the subTreeWallClockTime.
-	 */
-	public long getSubTreeWallClockTime() {
-		return subTreeWallClockTime;
-	}
-
-	/**
-	 * @return Returns the subTreeComputationTime.
-	 */
-	public long getSubTreeComputationTime() {
-		return subTreeComputationTime;
-	}
-
-	/**
-	 * @return Returns the subTreeWaitingTime.
-	 */
-	public long getSubTreeWaitingTime() {
-		return subTreeWaitingTime;
+	public Exercise getExcercise(Muscle muscle) {
+		return workout.getWorkout(muscle);
 	}
 }

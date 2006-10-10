@@ -39,7 +39,7 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  *
  * @param <T>
  */
-public interface Execute<T> extends Serializable{
+public interface Execute<T> extends Muscle{
 
 	public T execute(T param) throws RuntimeException, SchedulingException;
 }

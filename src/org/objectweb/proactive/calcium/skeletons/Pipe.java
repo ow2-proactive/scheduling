@@ -73,7 +73,7 @@ public class Pipe<T> implements Skeleton<T> {
 			instruction.addAll(stages.get(i).getInstructionStack());
 		}	
 		
-		/*A 2 stage Pipe. Only here for historical/educational purpose.
+		/*A 2 stage Pipe. Only here for hystorical/educational purposes.
 
 		Vector<Instruction> v1= child1.getInstructionStack();
 		Vector<Instruction> v2= child2.getInstructionStack();

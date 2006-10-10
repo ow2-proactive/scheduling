@@ -37,6 +37,7 @@ import org.objectweb.proactive.calcium.interfaces.Conquer;
 import org.objectweb.proactive.calcium.interfaces.Divide;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
  * This skeleton represents Divide and Conquer parallelism (data parallelism).
@@ -92,7 +93,12 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		//Else no children are present
 
 		//Split the task if required
-		if(cond.evalCondition(t.getObject())){
+		Timer timer = new Timer();
+		boolean evalCondition=cond.evalCondition(t.getObject());
+		timer.stop();
+		t.getStats().getWorkout().track(cond, timer);
+		
+		if(evalCondition){
 			return divide(t);
 		}
 		//else solve the tasks
@@ -116,7 +122,9 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		 * of divide will be then encapsulated by a Task, and 
 		 * the Tasks will be held in an array  
 		 */	
+		Timer timer = new Timer();
 		Vector<T> childObjects=div.divide(parent.getObject());
+		timer.stop();
 		
 		if(childObjects.size()<=0){
 			String msg="Parameter was divided into less than 1 part.";
@@ -132,7 +140,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 
 		//Now we put a DaC (conquer) on the instruction stack of the parent 
 		parent.pushInstruction(this);
-		
+		parent.getStats().getWorkout().track(div, timer);
 		return parent;
 	}
 	
@@ -158,9 +166,12 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 			throw new ParameterException(msg);
 		}
 		
+		Timer timer = new Timer();
  		T resultObject=conq.conquer(parent.getObject(), childObjects);
+ 		timer.stop();
  		Task<T> resultTask=parent.reBirth(resultObject);
  		
+ 		resultTask.getStats().getWorkout().track(conq, timer);
 		return resultTask;
 	}
 

@@ -33,6 +33,7 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.interfaces.Condition;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
  * The while skeleton represents conditioned iteration.
@@ -60,8 +61,12 @@ public class While<T> implements Instruction<T>, Skeleton<T> {
 	}
 	
 	public Task<T> compute(Task<T> task) throws Exception{
+		Timer timer = new Timer();
+		boolean evalCondition=cond.evalCondition(task.getObject());
+		timer.stop();
+		task.getStats().getWorkout().track(cond, timer);
 		
-		if(cond.evalCondition(task.getObject())){
+		if(evalCondition){
 			//Get Child stack
 			Vector<Instruction<T>> childStack=child.getInstructionStack();
 			
@@ -73,6 +78,7 @@ public class While<T> implements Instruction<T>, Skeleton<T> {
 			taskStack.addAll(childStack);
 			task.setStack(taskStack);
 		}
+
 		return task;
 	}
 }

@@ -25,19 +25,13 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.examples.nqueens;
+package org.objectweb.proactive.calcium.examples.nqueens.bt1;
 
 import java.util.Vector;
 
-public class BoardBT1 extends Board{
+import org.objectweb.proactive.calcium.examples.nqueens.Board;
 
-	int bound1, topbit, mask; 
-	
-	public int row; // fila de la ultima reina fijada
-	public int column; // columna de la ultima reina fijada
-	public int left; // vector de diagonales hacia la izquierda
-	public int down; // vector de columnas
-	public int right; // vector de diagonales hacia la derecha
+public class BoardBT1 extends Board{
 
 	/**
 	 * Constructor for backtrac1 boards
@@ -53,13 +47,8 @@ public class BoardBT1 extends Board{
 	public BoardBT1(int n, int solvableSize, int row, int left, int down, int right,
 			int bound1, int board[]) {
 		
-		super(n,solvableSize);
-		this.row = row;
-		this.left = left;
-		this.right = right;
-		this.down = down;
-		this.bound1 = bound1;
-
+		super(n,solvableSize, row, left, down, right, bound1);
+		
 		if (row == 2) {
 			this.board[0] = 1;
 			this.board[1] = 1 << bound1;
@@ -83,29 +72,5 @@ public class BoardBT1 extends Board{
 	@Override
 	public boolean isRootBoard(){
 		return false;
-	}
-	
-	@Override
-	public Vector<Board> divide() {
-		int mask = (1 << this.n) - 1;
-
-		Vector<Board> v = new Vector<Board>();
-
-		int bitmap = mask & ~(this.left | this.down | this.right);
-		int bit;
-
-		if (this.row < this.bound1) {
-			bitmap &= 0xFFFFFFFD; // 1111...01
-		}
-		
-		//expand this row
-		while (bitmap != 0) {
-			bitmap ^= this.board[this.row] = bit = -bitmap & bitmap;
-
-			v.add(new BoardBT1(this.n, solvableSize, this.row + 1, (this.left | bit) << 1, this.down
-					| bit, (this.right | bit) >> 1, this.bound1, this.board));
-		} 
-
-		return v;
 	}
 }

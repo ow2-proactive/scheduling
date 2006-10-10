@@ -34,6 +34,7 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.statistics.Timer;
 
 
 /**
@@ -48,9 +49,11 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
 public class Seq<T> implements Skeleton<T>, Instruction<T> {
 
 	Execute<T> secCode;
+	int muscleId;
 	
 	public Seq(Execute<T> secCode){
 		this.secCode=secCode;
+		muscleId=0;
 	}
 	
 	public Vector<Instruction<T>> getInstructionStack() {
@@ -61,12 +64,20 @@ public class Seq<T> implements Skeleton<T>, Instruction<T> {
 	}
 
 	public Task<T> compute(Task<T> t) throws RuntimeException, SchedulingException {
+		
+		Timer timer = new Timer();
 		T resultObject=secCode.execute(t.getObject());
-		Task<T> resultTask= t.reBirth(resultObject);
-		resultTask.setStack(t.getStack());
-		return resultTask; 
+		timer.stop();
+		
+		//Task<T> resultTask= t.reBirth(resultObject);
+		//resultTask.getStats().trackWorkout(secCode, timer);
+		//return resultTask;
+		
+		t.setObject(resultObject);
+		t.getStats().getWorkout().track(secCode,timer);
+		return t;
 	}
-	
+
 	public String toString(){
 		return "Seq("+this.secCode.getClass()+")";
 	}

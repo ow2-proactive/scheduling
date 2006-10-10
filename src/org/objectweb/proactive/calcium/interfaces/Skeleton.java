@@ -43,6 +43,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public interface Skeleton<T> extends Serializable{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_STRUCTURE);
-	
+
 	public Vector<Instruction<T>> getInstructionStack();
 }

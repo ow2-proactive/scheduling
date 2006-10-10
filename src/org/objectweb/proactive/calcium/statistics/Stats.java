@@ -29,6 +29,8 @@ package org.objectweb.proactive.calcium.statistics;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.calcium.interfaces.Muscle;
+
 public interface Stats extends Serializable{
 
 	/**
@@ -46,44 +48,6 @@ public interface Stats extends Serializable{
 	 * @return Returns the computation time spent by this task.
 	 */
 	public long getComputationTime();
-	
-	/**
-	 * @return Returns the number of leafs in this tree.
-	 */
-	public int getNumberLeafs();
-	
-	/**
-	 * @return Returns the number of inner nodes in this tree.
-	 */
-	public int getNumberInnerNodes();
-	
-	/**
-	 * @return Returns the ratio of inner nodes and leafs.
-	 */
-	public float ratioInnerLeaf();
-
-	/**
-	 * @return Returns the average number of branches for an internal node.
-	 * This value is computed as the ratio between the tree size -1
-	 * (minus the root) and the number of inner nodes. 
-	 */
-	public float avgNumBranches();
-	
-	/**
-	 * @return Returns the accumulated processing time for all the subtree nodes.
-	 */
-	public long getSubTreeProcessingTime();
-
-	public long getSubTreeReadyTime();
-	public long getSubTreeWaitingTime();
-	public long getSubTreeResultsTime();
-	public long getSubTreeComputationTime();
-	public long getSubTreeWallClockTime();
-	
-	/**
-	 * @return Returns the number of directly referenced sub nodes for this level of the tree.
-	 */
-	public int getNumberDirectSubNodes();
 	
 	/**
 	 * The processing time represents the time this node was asigned to some
@@ -108,14 +72,36 @@ public interface Stats extends Serializable{
 	public long getReadyTime();
 	
 	/**
-	 * The results time represents the time since the node is considered finished,
+	 * The results time represents the time since the task is considered finished,
 	 * and the time the client actually asks (and gets) the result.
-	 * @return Returns the time spent by this node in results state.
+	 * @return Returns the time spent by this tasks in results state.
 	 */
 	public long getResultsTime();
 
 	/**
-	 * @return Returns the number of nodes in this tree (including this node).
+	 * The tree span is the average number of branches of internal tree nodes.
+	 * It is calculated as: (#Nodes - 1)/(# Inner Nodes).
+	 * 
+	 * @return Returns the average number of branches of this tree.
+	 */
+	public float getTreeSpan();
+	
+	/**
+	 * The average depth of the tree, calculated as logB(#Nodes -1), 
+	 * where the base B is the average tree span.
+	 * @return The average depth of the tree.
+	 */
+	public float getTreeDepth(); 
+
+	/**
+	 * @return Returns the number of nodes in the tree.
 	 */
 	public int getTreeSize();
+	
+	/**
+	 * @param The muscle of interest
+	 * @return The excercise of the specified muscle, or null if no 
+	 * statistics are available for this muscle.
+	 */
+	public Exercise getExcercise(Muscle muscle);
 }

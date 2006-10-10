@@ -35,6 +35,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.statistics.StatsImpl;
+import org.objectweb.proactive.calcium.statistics.Timer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -229,6 +230,10 @@ public class Task<T> implements Serializable, Comparable<Task>{
 		
 	public T getObject(){
 		return object;	
+	}
+	
+	public void setObject(T object){
+		this.object=object;
 	}
 
 	/**

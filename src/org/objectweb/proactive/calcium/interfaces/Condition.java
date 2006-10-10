@@ -41,7 +41,7 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  * @param <T>
  * 
  */
-public interface Condition<T> extends Serializable{
+public interface Condition<T> extends Muscle{
 
 	public boolean evalCondition(T param) throws RuntimeException, SchedulingException;
 }

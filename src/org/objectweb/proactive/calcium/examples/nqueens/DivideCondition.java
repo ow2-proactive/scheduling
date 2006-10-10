@@ -25,23 +25,27 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.examples.nqueens;
 
-import java.io.Serializable;
-import java.util.Vector;
+import org.objectweb.proactive.calcium.interfaces.Condition;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+public class DivideCondition implements Condition<Board> {
 
-/**
- * This class is used to conquer a vector of parameters
- * into a single parameters. It is usefull for skeletons
- * such as: divide&conquer and map.
- * 
- * @author The ProActive Team (mleyton)
- *
- * @param <T>
- */
-public interface Conquer<T> extends Muscle{
-
-	public T conquer(T parent, Vector<T> param) throws RuntimeException, SchedulingException;
+	/**
+	 * Divide while condition holds
+	 * @param board
+	 * @return true if board should be divided, false otherwise
+	 */
+	public boolean evalCondition(Board board){
+		
+		if(board.isRootBoard()){
+			return true;
+		}
+		else{
+			if(board.row+board.solvableSize<board.n){
+				return true;
+			}
+		}	
+		return false;
+	}
 }

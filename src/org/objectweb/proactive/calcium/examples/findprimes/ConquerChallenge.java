@@ -34,6 +34,12 @@ import org.objectweb.proactive.calcium.interfaces.Conquer;
 
 public class ConquerChallenge implements Conquer<Challenge>{
 	
+	private int id;
+	
+	public ConquerChallenge(int id){
+		this.id=id;
+	}
+	
 	public Challenge conquer(Challenge parent, Vector<Challenge> p) {
 			
 		for(Challenge param:p){
@@ -44,5 +50,9 @@ public class ConquerChallenge implements Conquer<Challenge>{
 
 		Collections.sort(parent.primes);
 		return parent;
+	}
+
+	public int getMuscleId() {
+		return id;
 	}
 }

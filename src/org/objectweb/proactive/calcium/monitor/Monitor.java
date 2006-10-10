@@ -25,23 +25,10 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.monitor;
 
-import java.io.Serializable;
-import java.util.Vector;
+public interface Monitor {
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
-
-/**
- * This class is used to conquer a vector of parameters
- * into a single parameters. It is usefull for skeletons
- * such as: divide&conquer and map.
- * 
- * @author The ProActive Team (mleyton)
- *
- * @param <T>
- */
-public interface Conquer<T> extends Muscle{
-
-	public T conquer(T parent, Vector<T> param) throws RuntimeException, SchedulingException;
+	public void start();
+	public void stop();
 }

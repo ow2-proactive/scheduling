@@ -33,6 +33,7 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.calcium.interfaces.Condition;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.statistics.Timer;
 
 /**
  * This class provides If conditioning. 
@@ -65,7 +66,11 @@ public class If<T> implements Skeleton<T>, Instruction<T> {
 	public Task<T> compute(Task<T> t) throws Exception{
 		
 		Vector<Instruction<T>> childStack;
-		if(cond.evalCondition(t.getObject())){
+		Timer timer = new Timer();
+		boolean evalCondition= cond.evalCondition(t.getObject());
+		timer.stop();
+		
+		if(evalCondition){
 			childStack= ifChild.getInstructionStack();
 		}
 		else{
@@ -75,6 +80,7 @@ public class If<T> implements Skeleton<T>, Instruction<T> {
 		Vector<Instruction<T>> taskStack = t.getStack();
 		taskStack.addAll(childStack);
 		t.setStack(taskStack);
+		t.getStats().getWorkout().track(cond, timer);
 		
 		return t;
 	}

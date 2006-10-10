@@ -41,6 +41,15 @@ public class Board implements java.io.Serializable {
 	// the board
 	public int board[];
 	
+	
+	public int bound1, topbit, mask; 
+	
+	public int row; // fila de la ultima reina fijada
+	public int column; // columna de la ultima reina fijada
+	public int left; // vector de diagonales hacia la izquierda
+	public int down; // vector de columnas
+	public int right; // vector de diagonales hacia la derecha
+	
 	public Board (int n, int solvableSize){
 		this.n=n;
 		this.solvableSize=solvableSize;
@@ -53,6 +62,17 @@ public class Board implements java.io.Serializable {
 		}
 	}
 	
+	public Board(int n, int solvableSize, int row, int left, int down, int right,
+			int bound1) {
+		
+		this(n,solvableSize);
+		this.row = row;
+		this.left = left;
+		this.right = right;
+		this.down = down;
+		this.bound1 = bound1;
+	}
+	
 	public boolean isRootBoard(){
 		return true;
 	}
@@ -60,60 +80,13 @@ public class Board implements java.io.Serializable {
 	public boolean isBT1(){
 		return false;
 	}
-	
+	/*
 	public Vector<Board> divide(){
 		
 		Vector<Board> v = new Vector<Board>();
 		v.addAll(initDivideBT1());
 		v.addAll(initDivideBT2());
 		return v;
-	}
-	
-	private Vector<Board> initDivideBT1() {
-		
-		Vector<Board> v = new Vector<Board>();
-		//We set row 0 and 1 for backtrack1
-		for (int i = this.n - 2; i >= 2; i--) {
-			int bit = 1 << i;
-			v.add(new BoardBT1(this.n, solvableSize, 2, (2 | bit) << 1,	1 | bit, bit >> 1,i,null));
-		}
-		
-		return v;
-	}
-	
-	private Vector<Board> initDivideBT2() {
-		
-		Vector<Board> v = new Vector<Board>();
-		
-		int sidemask = (1 << (n - 1)) | 1;
-		int lastmask = sidemask;
-		int topbit = 1 << (n - 1);
-		int mask = (1 << n) - 1;
-		int endbit = topbit >> 1;
-
-		for (int i = 1, j = n - 2; i < j; i++, j--) {
-			//bound1 = i; //bound2 = j;
-			int bit = 1 << i;
-			
-			v.add(
-				new BoardBT2(n, solvableSize, 1, bit << 1, bit, bit >> 1, i, j, sidemask, lastmask,
-					topbit,	mask, endbit, null));
-
-			lastmask |= lastmask >> 1 | lastmask << 1;
-			endbit >>= 1;
-		}
-		
-		return v;
-	}
-	/*
-	@Override
-	public int hashCode(){
-		return id;
-	}
-	
-	@Override
-	public boolean equals(Object o){
-		return hashCode() == o.hashCode();
 	}
 	*/
 }

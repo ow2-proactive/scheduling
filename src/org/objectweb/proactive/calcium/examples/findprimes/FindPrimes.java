@@ -52,10 +52,10 @@ public class FindPrimes implements Serializable{
 	
 	public FindPrimes(){
 		
-		root= new DaC<Challenge>( new ChallengeDivide(),
-				new ChallengeDivideCondition(), 
-				new Seq<Challenge>(new SolveChallenge()),
-				new ConquerChallenge());
+		root= new DaC<Challenge>( new ChallengeDivide(1),
+				new ChallengeDivideCondition(2), 
+				new Seq<Challenge>(new SolveChallenge(3)),
+				new ConquerChallenge(4));
 	}
 	
 	public void solve(){

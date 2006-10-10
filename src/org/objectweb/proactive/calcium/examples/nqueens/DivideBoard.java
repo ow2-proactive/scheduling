@@ -29,11 +29,14 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 
 import java.util.Vector;
 
+import org.objectweb.proactive.calcium.examples.nqueens.bt1.BoardBT1;
+import org.objectweb.proactive.calcium.exceptions.SchedulingException;
 import org.objectweb.proactive.calcium.interfaces.Condition;
 import org.objectweb.proactive.calcium.interfaces.Divide;
 
-public class DivideBoard implements Divide<Board>, Condition<Board>{
-
+abstract public class DivideBoard implements Divide<Board>{
+	
+	/*
 	public Vector<Board> divide(Board b) {
 
 		Vector<Board> v= new Vector<Board>();
@@ -51,24 +54,6 @@ public class DivideBoard implements Divide<Board>, Condition<Board>{
 
 		return v;
 	}
-	
-	/**
-	 * Divide while condition holds
-	 * @param board
-	 * @return true if board should be divided, false otherwise
-	 */
-	public boolean evalCondition(Board board) {
-		
-		if(board.isRootBoard()){
-			return true;
-		}
-		else{
-			BoardBT1 boardBT1=(BoardBT1)board;
-			if(boardBT1.row+boardBT1.solvableSize<boardBT1.n){
-				return true;
-			}
-		}
-		
-		return false;
-	}
+  */
+
 }

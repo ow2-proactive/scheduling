@@ -25,23 +25,52 @@
  * 
  * ################################################################
  */
-package org.objectweb.proactive.calcium.interfaces;
+package org.objectweb.proactive.calcium.statistics;
 
 import java.io.Serializable;
-import java.util.Vector;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+public class Exercise implements Serializable{
 
-/**
- * This class is used to conquer a vector of parameters
- * into a single parameters. It is usefull for skeletons
- * such as: divide&conquer and map.
- * 
- * @author The ProActive Team (mleyton)
- *
- * @param <T>
- */
-public interface Conquer<T> extends Muscle{
+	private long computationTime;
+	private int numberExecutedTimes;
 
-	public T conquer(T parent, Vector<T> param) throws RuntimeException, SchedulingException;
+	Exercise(){
+		computationTime=computationTime=0;
+	}
+	
+	Exercise(Timer timer) {
+		this.computationTime = timer.getTime();
+		this.computationTime = 1;
+	}
+
+	/**
+	 * @return Returns the computationTime.
+	 */
+	public long getComputationTime() {
+		return computationTime;
+	}
+
+	/**
+	 * @return Returns the numberExecutedTimes.
+	 */
+	public long getNumberExecutedTimes() {
+		return numberExecutedTimes;
+	}
+
+	/**
+	 * @param computationTime The computationTime to increment in.
+	 */
+	void incrementComputationTime(Timer time) {
+		this.computationTime += time.getTime();
+		numberExecutedTimes += time.getNumberOfActivatedTimes();
+	}
+	
+	void incrementComputationTime(Exercise exercise) {
+		this.computationTime += exercise.computationTime;
+		this.numberExecutedTimes += exercise.numberExecutedTimes;
+	}
+	
+	public String toString(){
+		return computationTime+"/"+numberExecutedTimes;
+	}
 }

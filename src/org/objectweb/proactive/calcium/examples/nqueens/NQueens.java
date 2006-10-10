@@ -30,14 +30,20 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 import java.io.Serializable;
 
 import org.objectweb.proactive.calcium.Calcium;
+import org.objectweb.proactive.calcium.MonoThreadedManager;
+import org.objectweb.proactive.calcium.MultiThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
+import org.objectweb.proactive.calcium.examples.nqueens.bt1.*;
+import org.objectweb.proactive.calcium.examples.nqueens.bt2.*;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.exceptions.ParameterException;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.monitor.Monitor;
+import org.objectweb.proactive.calcium.monitor.SimpleLogMonitor;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
 import org.objectweb.proactive.calcium.skeletons.DaC;
+import org.objectweb.proactive.calcium.skeletons.Pipe;
 import org.objectweb.proactive.calcium.skeletons.Seq;
-import org.objectweb.proactive.calcium.statistics.StatsGlobal;
 
 public class NQueens implements Serializable{
 
@@ -46,34 +52,50 @@ public class NQueens implements Serializable{
 	public static void main(String[] args) {
 		
 		NQueens nq = new NQueens();
-		nq.start(new Board(15,14));
+		if(args.length != 5){
+			nq.start(15,13,1,NQueens.class.getResource("LocalDescriptor.xml").getPath(),"local");
+		}
+		else{
+			nq.start(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]), args[3], args[4] );
+		}
 	}
 	
 	public NQueens(){
 		
-		root= new DaC<Board>(new DivideBoard(), 
-				new DivideBoard(), 
-				new Seq<Board>(new SolveBoard()),
-				new ConquerBoard());
+		Skeleton<Board> BT1 = new DaC<Board>(new DivideBT1(), 
+				  new DivideCondition(), 
+	              new Seq<Board>(new SolveBT1()),
+	              new ConquerBoard());
+	              
+		Skeleton<Board> BT2 =  new DaC<Board>(new DivideBT2(), 
+	   		      new DivideCondition(), 
+			      new Seq<Board>(new SolveBT2()),
+			      new ConquerBoard());
+
+		root = new Pipe<Board>(BT1, BT2);
+					  
 	}
 	
-	public void start(Board board){
+	public void start(int boardSize, int solvableSize, int times, String descriptor, String virtualNode){
 		
-		String descriptor=
-				NQueens.class.getResource("LocalDescriptor.xml")
-				.getPath();
-		//descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
 		ResourceManager manager= 
 			//new MonoThreadedManager();
-			//new MultiThreadedManager(4);
-		 	//new ProActiveThreadedManager(descriptor, "local");
-			new ProActiveManager(descriptor, "local");
+			//new MultiThreadedManager(1);
+		 	//new ProActiveThreadedManager(descriptor, virtualNode);
+			new ProActiveManager(descriptor, virtualNode);
 		
-		Calcium<Board> calcium = new Calcium<Board>(manager, root);	
-		calcium.inputParameter(board);
+		Calcium<Board> calcium = new Calcium<Board>(manager, root);
+		Monitor monitor= new SimpleLogMonitor(calcium, 5);
+		
+		for(int i=0;i<times;i++){
+			calcium.inputParameter(new Board(boardSize,solvableSize));
+		}
+
+		monitor.start();
 		calcium.eval();
 		
 		try {
+
 			for(Board res = calcium.getResult(); res != null; res = calcium.getResult()){
 				long total=0;
 				for(int i=0;i<res.solutions.length;i++){
@@ -89,8 +111,7 @@ public class NQueens implements Serializable{
 		} catch (PanicException e) {
 			e.printStackTrace();
 		}
-
-		StatsGlobal stats = calcium.getStatsGlobal();
-		System.out.println(stats);
+		
+		monitor.stop();
 	}
 }
