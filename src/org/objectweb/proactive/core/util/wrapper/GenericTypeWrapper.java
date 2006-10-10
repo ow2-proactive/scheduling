@@ -39,7 +39,7 @@ import java.io.Serializable;
  *
  * @author ProActive Team
  */
-public class GenericWrapper<T extends Object> implements Serializable {
+public class GenericTypeWrapper<T extends Object> implements Serializable {
 
     /**
          *
@@ -51,14 +51,14 @@ public class GenericWrapper<T extends Object> implements Serializable {
      * Empty no args Constructor
      *
      */
-    public GenericWrapper() {
+    public GenericTypeWrapper() {
     }
 
     /**
      * Constructor for  the wrapper
      * @param o the object to wrap
      */
-    public GenericWrapper(T o) {
+    public GenericTypeWrapper(T o) {
         this.o = o;
     }
 
@@ -74,8 +74,8 @@ public class GenericWrapper<T extends Object> implements Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object arg) {    	
-    	  if (arg  instanceof GenericWrapper) {
-              return ((GenericWrapper)arg).getObject().equals(this.o);
+    	  if (arg  instanceof GenericTypeWrapper) {
+              return ((GenericTypeWrapper)arg).getObject().equals(this.o);
           }
           return false;
     }
