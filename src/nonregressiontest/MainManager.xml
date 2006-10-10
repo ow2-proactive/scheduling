@@ -23,6 +23,7 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.turnactive.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.generics.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.request.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.request.immediateservice.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.request.terminate.Test" />
@@ -90,6 +91,7 @@
 			<unitTest exclude="no" class="nonregressiontest.ft.pml.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.loadbalancing.Test" />
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
+			<unitTest exclude="no" class="nonregressiontest.forwarder.interfaceconsistency.Test" />
 		    <unitTest exclude="yes" class="nonregressiontest.security.SecurityTests"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>

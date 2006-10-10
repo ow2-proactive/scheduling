@@ -3,12 +3,12 @@
  */
 package nonregressiontest.group.creation;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+import nonregressiontest.group.A;
+
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
-
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
 
 import testsuite.test.FunctionalTest;
 
@@ -88,5 +88,21 @@ public class Test extends FunctionalTest {
 
         // are the agents at the correct location with the correct names ?
         return (rightLocations && rightNames);
+    }
+    
+    
+ public static void main(String[] args) {
+        
+        Test test = new Test();
+        try {
+            test.action();
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

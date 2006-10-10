@@ -72,12 +72,12 @@ public class Test extends FunctionalTest {
         server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
-        a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" },
-                TestNodes.getSameVMNode(), null,
-                MixedLocationMetaObjectFactory.newInstance());
+        a = (A) ProActive.newActive(A.class.getName(), null,
+                new Object[] { "toto" }, TestNodes.getSameVMNode(),
+                null, MixedLocationMetaObjectFactory.newInstance());
         migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
-                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                MixedLocationMetaObjectFactory.newInstance());
+                null, new Object[] { "toto" }, TestNodes.getSameVMNode(),
+                null, MixedLocationMetaObjectFactory.newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
         migratableA.moveTo(TestNodes.getLocalVMNode());
         Thread.sleep(3000);

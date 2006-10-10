@@ -62,9 +62,9 @@ public class Test extends FunctionalTest {
 //        ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(baseclassName);
 //        data = bsb.create();
 //        } else if ("javassist".equals(System.getProperty("byteCodeManipulator"))) {
-            data = JavassistByteCodeStubBuilder.create(baseclassName);
+            data = JavassistByteCodeStubBuilder.create(baseclassName, null);
 //        }
-        stubClassName = Utils.convertClassNameToStubClassName(baseclassName);
+        stubClassName = Utils.convertClassNameToStubClassName(baseclassName, null);
     }
 
     /**

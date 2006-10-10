@@ -36,6 +36,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -130,6 +132,22 @@ public class Test extends FunctionalTest {
             }
             reader.close();
             writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void main(String[] args) {
+        try {
+        	System.setProperty("nonregressiontest.descriptor.defaultnodes.file", "/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml");
+        	TestNodes tn = new TestNodes();
+        	tn.action();
+        Test test = new Test();
+        test.initTest();
+        test.action();
+        test.endTest();
+        boolean success = test.postConditions();
+        System.out.println(success?"SUCCESS":"FAILURE");
         } catch (Exception e) {
             e.printStackTrace();
         }

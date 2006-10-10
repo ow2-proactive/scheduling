@@ -57,13 +57,12 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         StringInterface i1 = (StringInterface) MOP.newInstance("nonregressiontest.stub.stubinterface.StringInterface",
                 "nonregressiontest.stub.stubinterface.StringInterfaceImpl",
-                new Object[] { "toto" },
-                "nonregressiontest.stub.stubinterface.ProxyOne", new Object[0]);
+                null,
+                new Object[] { "toto" }, "nonregressiontest.stub.stubinterface.ProxyOne", new Object[0]);
         result1 = i1.getMyString();
 
         StringInterfaceImpl i2 = (StringInterfaceImpl) MOP.newInstance("nonregressiontest.stub.stubinterface.StringInterfaceImpl",
-                new Object[] { "titi" },
-                "nonregressiontest.stub.stubinterface.ProxyOne", new Object[0]);
+                null, new Object[] { "titi" }, "nonregressiontest.stub.stubinterface.ProxyOne", new Object[0]);
         result2 = i2.getMyString();
     }
 
@@ -81,5 +80,21 @@ public class Test extends FunctionalTest {
 
     public boolean postConditions() throws Exception {
         return (result1.equals("toto") && result2.equals("titi"));
+    }
+    
+    
+public static void main(String[] args) {
+        
+        Test test = new Test();
+        try {
+            test.action();
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

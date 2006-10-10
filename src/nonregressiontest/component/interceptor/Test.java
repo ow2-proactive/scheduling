@@ -146,7 +146,7 @@ public class Test extends ComponentTest {
         Test test = new Test();
         test.action();
         boolean success = test.postConditions();
-        System.out.println(success?"SUCESS":"FAILED");
+        System.out.println(success?"SUCCESS":"FAILURE");
         } catch (Exception e) {
             e.printStackTrace();
         }

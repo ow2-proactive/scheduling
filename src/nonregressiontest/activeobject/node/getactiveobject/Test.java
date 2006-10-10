@@ -30,10 +30,10 @@
  */
 package nonregressiontest.activeobject.node.getactiveobject;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import testsuite.test.FunctionalTest;
 
@@ -84,4 +84,20 @@ public class Test extends FunctionalTest {
         return (a.getName().equals("toto") &&
         a.getNodeUrl().equals(node.getNodeInformation().getURL()));
     }
+    
+    
+    public static void main(String[] args) {
+            
+            Test test = new Test();
+            try {
+                test.action();
+                if (test.postConditions()) {
+                    System.out.println("TEST SUCCEEDED");
+                } else {
+                    System.out.println("TEST FAILED");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 }
