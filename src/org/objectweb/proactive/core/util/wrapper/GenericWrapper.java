@@ -75,7 +75,7 @@ public class GenericWrapper<T extends Object> implements Serializable {
      */
     public boolean equals(Object arg) {    	
     	  if (arg  instanceof GenericWrapper) {
-              return arg.equals(this.o);
+              return ((GenericWrapper)arg).getObject().equals(this.o);
           }
           return false;
     }
