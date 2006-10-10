@@ -201,6 +201,40 @@
 	</target>
 	
 	<!-- ================================================================ -->
+	<!--                      Compile Calcium Stubs                       -->
+	<!--  =============================================================== -->
+	<target name="calcium" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/calcium/**/*.java" />
+		</javac>
+		<!-- Calcium stubs generation -->
+		<echo message="Calcium stubs generating..." />
+		<property name="stub_calcium.classdir" value="${basedir}/../classes" />
+		<path id="calciumClassDir">
+			<pathelement path="${stub_calcium.classdir}" />
+		</path>
+		<pathconvert pathsep=" " property="calciumClassesDir" refid="calciumClassDir" />
+		<path id="calciumClasses">
+			<fileset dir="${classes.dir}/org/objectweb/proactive/calcium/proactive">
+				<include name="**/*.class" />
+				<exclude name="**/*$*" />
+			</fileset>
+			<fileset dir="${classes.dir}/org/objectweb/proactive/calcium/">
+				<include name="**/*Task.class"/>
+				<exclude name="**/*$*" />
+			</fileset>
+		</path>
+		<pathconvert pathsep=" " property="calcium-files" refid="calciumClasses">
+			<map from="${calciumClassesDir}" to="" />
+		</pathconvert>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+			<arg line="-d ${classes.dir} ${calcium-files}" />
+		</java>
+	</target>
+	
+	<!-- ================================================================ -->
 	<!--                          Compile Scheduler                       -->
 	<!--  =============================================================== -->
 	
