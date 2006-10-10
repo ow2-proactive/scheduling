@@ -44,6 +44,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ConquerResults implements Conquer<BlastParameters> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
+    public int id;
+    
+    public ConquerResults(int id){
+    	this.id=id;
+    }
+    
     public BlastParameters conquer(BlastParameters parent, Vector<BlastParameters> param) {
         try {
 
@@ -85,4 +91,8 @@ public class ConquerResults implements Conquer<BlastParameters> {
         }
         br.close();
     }
+
+	public int getMuscleId() {
+		return id;
+	}
 }

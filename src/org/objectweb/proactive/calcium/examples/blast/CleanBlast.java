@@ -34,6 +34,12 @@ import org.objectweb.proactive.calcium.interfaces.Execute;
 
 public class CleanBlast implements Execute<BlastParameters> {
 
+	private int id;
+	
+	public CleanBlast(int id) {
+		this.id = id;
+	}
+
 	public BlastParameters execute(BlastParameters param) throws RuntimeException, SchedulingException {
 		
 		String[] file={param.getDatabaseFile().getAbsolutePath(), param.getQueryFile().getAbsolutePath()};
@@ -48,5 +54,9 @@ public class CleanBlast implements Execute<BlastParameters> {
 		
 		param.getDatabaseFile().delete();
 		return param;
+	}
+
+	public int getMuscleId() {
+		return id;
 	}
 }

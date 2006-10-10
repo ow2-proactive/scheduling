@@ -33,9 +33,19 @@ import org.objectweb.proactive.calcium.interfaces.Condition;
 
 public class DivideDBCondition implements Condition<BlastParameters>{
 
+	private int id;
+	
+	public DivideDBCondition(int id){
+		this.id=id;
+	}
+	
 	public boolean evalCondition(BlastParameters param) {
 
 		File file = param.getDatabaseFile();
 		return file.length() > param.getMaxDBSize();
+	}
+
+	public int getMuscleId() {
+		return id;
 	}
 }

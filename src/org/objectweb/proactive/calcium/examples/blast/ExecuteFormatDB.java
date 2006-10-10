@@ -36,8 +36,13 @@ import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class ExceuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters> {
+public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters> {
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
+	public int id;
+	
+	public ExecuteFormatDB(int id){
+		this.id=id;
+	}
 	
 	public BlastParameters execute(BlastParameters param) throws SchedulingException {
 		
@@ -67,6 +72,8 @@ public class ExceuteFormatDB extends AbstractExecuteCommand implements Execute<B
 
 		return url;
 	}
-	
-	
+
+	public int getMuscleId() {
+		return id;
+	}
 }

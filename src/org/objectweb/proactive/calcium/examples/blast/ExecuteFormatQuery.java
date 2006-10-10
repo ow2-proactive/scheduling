@@ -39,6 +39,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ExecuteFormatQuery extends AbstractExecuteCommand implements Execute<BlastParameters> {
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 	
+	private int id;
+	
+	public ExecuteFormatQuery(int id){
+		this.id=id;
+	}
+	
 	public BlastParameters execute(BlastParameters param) throws SchedulingException {
 		
 		if(logger.isDebugEnabled()){
@@ -66,5 +72,9 @@ public class ExecuteFormatQuery extends AbstractExecuteCommand implements Execut
 		}
 		
 		return url;
+	}
+
+	public int getMuscleId() {
+		return id;
 	}
 }

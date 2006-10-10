@@ -45,6 +45,12 @@ public class DivideDB implements Divide<BlastParameters> {
 
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 	
+	private int id;
+	
+	public DivideDB(int id){
+		this.id=id;
+	}
+	
 	public Vector<BlastParameters> divide(BlastParameters param) {
 
 		if(logger.isDebugEnabled()){
@@ -155,5 +161,9 @@ public class DivideDB implements Divide<BlastParameters> {
 		for(File f:files){
 			System.out.println(f.getAbsolutePath()+" "+ f.length()+"[bytes]");
 		}
+	}
+
+	public int getMuscleId() {
+		return id;
 	}
 }

@@ -57,21 +57,20 @@ public class Blast {
          * 2.3 Blast the database
          * 2.4 Cleanup
          */
-        List<Skeleton<BlastParameters>>  array = new ArrayList<Skeleton<BlastParameters>>();
-        array.add(new Seq<BlastParameters>(new ExceuteFormatDB()));
-        array.add(new Seq<BlastParameters>(new ExecuteFormatQuery()));
-        array.add(new Seq<BlastParameters>(new CleanBlast()));
-        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(array);
-        						  
+        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(new Seq<BlastParameters>(new ExecuteFormatDB(1)),
+        						  new Seq<BlastParameters>(new ExecuteFormatQuery(2)),
+                				  new Seq<BlastParameters>(new ExecuteBlast(3)),
+                				  new Seq<BlastParameters>(new CleanBlast(4))
+                				  );
 
         /* 1   Divide the database
          * 2   Blast the database with the query
          * 3   Conquer the query results
          */
-        root = new DaC<BlastParameters>(new DivideDB(), 
-        								new DivideDBCondition(),
+        root = new DaC<BlastParameters>(new DivideDB(5), 
+        								new DivideDBCondition(6),
         								blastPipe, 
-        								new ConquerResults());
+        								new ConquerResults(7));
         			
     }
 
