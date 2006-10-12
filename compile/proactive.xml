@@ -319,7 +319,7 @@
 		<antcall target="nbody3d" />
 	</target>
 
-	<available property="java3d_present" classname="com.sun.j3d.utils.behaviors.mouse.MouseRotate" />
+	<available property="java3d_present" classname="com.sun.j3d.utils.behaviors.mouse.MouseWheelZoom" />
 
 	<target name="check_java3d" unless="java3d_present" depends="init">
 		<echo message="Info: Java 3D dependencies were not resolved." />
