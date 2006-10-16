@@ -15,6 +15,7 @@
 		<prop key="proactive.future.ac" value="enable"/>
 		<prop key="proactive.future.maxdelay" value="0"/> <!-- 0: no timeout -->
 		<prop key="proactive.stack_trace" value="false"/> <!-- complete stack traces in requests -->
+		<prop key="proactive.build_topology" value="true"/> <!-- remember which proxies an AO knows -->
 		<prop key="schema.validation" value="enable"/>
 		<prop key="name_server" value="localhost"/>
 		<prop key="name_server_pool" value="rutget"/>

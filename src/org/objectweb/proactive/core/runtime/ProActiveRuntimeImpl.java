@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -60,6 +61,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
+import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
@@ -605,6 +607,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             nodeName);
         registerBody(nodeName, localBody);
 
+        if (GarbageCollector.isBuildingTopology()) {
+        	((AbstractBody) localBody).updateReferences(UniversalBodyProxy.getIncomingReferences());
+        }
+        
         if (isLocal) {
             // if the body and proxy are on the same vm, returns the local view
             //System.out.println("body and proxy on the same vm");

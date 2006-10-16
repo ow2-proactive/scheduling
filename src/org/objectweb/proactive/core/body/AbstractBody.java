@@ -35,6 +35,7 @@ import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.Body;
@@ -44,11 +45,13 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -134,6 +137,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     /** whether the body has been killed. A killed body has no more activity although
        stopping the activity thread is not immediate */
     private transient boolean isDead;
+    
+    // GC
+    private GarbageCollector gc;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -187,6 +193,21 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             isSecurityOn = psm.getCertificate() != null;
             internalBodySecurity = new InternalBodySecurity(null); // SECURITY
         }
+        this.gc = new GarbageCollector(this);
+    }
+    
+    public void updateReference(UniversalBodyProxy ref) {
+    	this.gc.addProxy(ref);
+    }
+    
+    public void updateReferences(Collection<UniversalBodyProxy> newReferences) {
+   		for (UniversalBodyProxy ubp : newReferences) {
+   			this.gc.addProxy(ubp);
+    	}
+    }
+
+    public Collection<UniversalBodyProxy> getReferences() {
+    	return this.gc.getReferences();
     }
 
     //
@@ -248,6 +269,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
             this.registerIncomingFutures();
             ftres = this.internalReceiveRequest(request);
+            if (GarbageCollector.isBuildingTopology()) {
+            	updateReferences(UniversalBodyProxy.getIncomingReferences());
+            }
         } finally {
             this.exitFromThreadStore();
         }
@@ -288,6 +312,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             }
             this.registerIncomingFutures();
             ftres = internalReceiveReply(reply);
+            if (GarbageCollector.isBuildingTopology()) {
+            	updateReferences(UniversalBodyProxy.getIncomingReferences());
+            }
         } finally {
             exitFromThreadStore();
         }

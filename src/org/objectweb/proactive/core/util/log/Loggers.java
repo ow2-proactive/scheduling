@@ -48,6 +48,7 @@ public interface Loggers {
     public static final String SYNC_CALL = "proactive.sync_call";
     static final public String GROUPS = "proactive.groups";
     public static final String NFE = "proactive.nfe";
+    public static final String GC = CORE + ".gc";
     public static final String HTTP_TRANSPORT = "proactive.communication.transport.http";
     public static final String MIGRATION = "proactive.migration";
     public static final String REQUESTS = "proactive.communication.requests";

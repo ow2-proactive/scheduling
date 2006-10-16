@@ -32,19 +32,23 @@ package org.objectweb.proactive.core.body.proxy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
@@ -68,6 +72,12 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     protected transient UniversalBody universalBody;
     protected transient boolean isLocal;
 
+    private static ThreadLocal<Collection<UniversalBodyProxy>> incomingReferences = new ThreadLocal<Collection<UniversalBodyProxy>>() {
+    	protected synchronized Collection<UniversalBodyProxy> initialValue() {
+            return new Vector<UniversalBodyProxy>();
+        }
+    };
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -146,6 +156,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy
             if (logger.isDebugEnabled()) {
                 //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
             }
+        }
+
+        if (GarbageCollector.isBuildingTopology()) {
+        	((AbstractBody)ProActive.getBodyOnThis()).updateReference(this);
         }
     }
 
@@ -319,6 +333,12 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         }
     }
 
+    public static Collection<UniversalBodyProxy> getIncomingReferences() {
+    	Collection<UniversalBodyProxy> res = incomingReferences.get();
+    	incomingReferences.set(new Vector<UniversalBodyProxy>());
+    	return res;
+    }
+
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         Body localBody = LocalBodyStore.getInstance().getLocalBody(bodyID);
@@ -339,6 +359,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         }
         if (logger.isDebugEnabled()) {
             logger.debug("universalBody is " + universalBody);
+        }
+        
+        if (GarbageCollector.isBuildingTopology()) {
+        	incomingReferences.get().add(this);
         }
     }
 }
