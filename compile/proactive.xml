@@ -44,6 +44,7 @@
 			<include name="unicore/*.jar" />
 			<include name="glite/*.jar" />
 			<include name="scilab/*.jar" />
+			<include name="timit/*.jar" />
 		</fileset>
 		<fileset dir="${lib}/ws">
 			<include name="*.jar" />
@@ -54,7 +55,6 @@
 		<path refid="project.classpath" />
 		<pathelement location="${base}/dev/lib/xml-apis.jar" />
 		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar" />
-		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar" />
 		<pathelement location="${base}/dev/lib/jmf.jar" />
 	</path>
 	<path id="examples.classpath">
@@ -90,7 +90,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p,loadbalancing, scheduler, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
+	<target name="compile" depends="ic2d, bnb, p2p,loadbalancing, scheduler, timit, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -198,6 +198,16 @@
 			<arg line="-d ${classes.dir}
         ${bnb-files}" />
 		</java>
+	</target>
+	
+	<!-- ================================================================ -->
+	<!--                      Compile TimIt for benchmarking              -->
+	<!--  =============================================================== -->
+	<target name="timit" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="off" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/benchmarks/timit/**/*.java" />
+		</javac>
 	</target>
 	
 	<!-- ================================================================ -->
@@ -386,7 +396,7 @@
 	<!-- ================================================================ -->
 	<!--                      All the junk targets                        -->
 	<!--  =============================================================== -->
-	<target name="alljunk" depends="compile, migration, nonregressiontest, benchmark" />
+	<target name="alljunk" depends="compile, migration, nonregressiontest" />
 
 
 	<!-- ================================================================ -->
@@ -768,48 +778,8 @@
 		</java>
 	</target>
 
-
 	<!-- ================================================================ -->
-	<!--                       Compile benchmark                          -->
-	<!-- ================================================================ -->
-	<target name="microTimer" depends="testsuite">
-		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="g++" os="Linux">
-			<arg line=" -shared -o libMicroTimer.so  MicroTimer.cc" />
-		</exec>
-		<!--<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/ld" os="Linux">
-      <arg line="  -G MicroTimer.o -o  libMicroTimer.so"/>
-    </exec>-->
-		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib}" />
-		<!--<copy toDir="${lib}">
-      <fileset dir="${src.dir}">
-        <include name="**/*.so"/>
-        <include name="**/*.o"/>
-      </fileset>
-    </copy> -->
-	</target>
-
-	<target name="benchmark" depends="testsuite, microTimer">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="test.classpath" />
-		</javac>
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--                 Run benchmark with TestSuite API                  -->
-	<!-- ================================================================ -->
-	<target name="runBench" depends="testsuite, benchmark" description="Run benchmarks">
-		<java classname="benchmark.BenchCenter" fork="true">
-			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro" />
-			<classpath refid="test.classpath" />
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
-			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro" />
-		</java>
-	</target>
-
-
-	<!-- ================================================================ -->
-	<!--                         Compile mpi                     -->
+	<!--                         Compile mpi                              -->
 	<!-- ================================================================ -->
 
 	<target name="mpi" depends="core" description="Compile mpi classes for simple wrapping">

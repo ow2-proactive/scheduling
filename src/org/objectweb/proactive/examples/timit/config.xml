@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timit>
+
+	<!-- GLOBAL VARIABLES DEFINITION -->
+	<globalVariables>
+		<descriptorVariable name="VMARGS" value="-Xmx16M -Xms16M" />
+		<descriptorVariable name="BENCH_CLASS"
+			value="org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher" />
+		<descriptorVariable name="CLASS" value="A,B,C" />
+		<descriptorVariable name="KERNEL" value="CG,EP,IS"/>
+		<descriptorVariable name="NP" value="4" />
+		<descriptorVariable name="RUN" value="10" />
+		<descriptorVariable name="WARMUP" value="2" />
+		<descriptorVariable name="TITLE" value="kernel with 4 nodes" />
+		<descriptorVariable name="TIMIT_ACTIVATE" value="total,init,work,end,add,foo,nbComms"/>
+	</globalVariables>
+	
+	<!--
+	<serie result="results/${KERNEL}.A.1.xml" class="${BENCH_CLASS}"
+		descriptorBase="descriptors/local-4.xml">
+		<benchmarks>
+			<benchmark name="${KERNEL} ${CLASS}"
+				run="${RUN}" warmup="${WARMUP}" timeout="500"
+				descriptorGenerated="descriptors/generated.xml"
+				parameters="descriptors/generated.xml ${NP}"
+				output="results/${KERNEL}/${CLASS}/${NP}.xml" />
+		</benchmarks>
+	</serie>
+    -->
+	<serie descriptorBase="descriptors/local-4.xml"
+		result="results/${KERNEL}.ABC.1-32.xml"
+		class="${BENCH_CLASS}">
+		<charts>
+			<chart type="HierarchicalBarChart"
+				filter="total,init,foo" title="${KERNEL} ${TITLE}"
+				subtitle="Timing values" width="800" height="600"
+				xaxislabel="Benchmarks" yaxislabel="Time in seconds"
+				filename="results/${KERNEL}.ABC.1-32.Timing" />
+			<chart type="MatrixChart"
+				eventName="communication pattern"
+				title="${KERNEL} ${TITLE}" subtitle="Communications pattern"
+				xaxislabel="Receiver rank" yaxislabel="Sender rank"
+				scalemode="logarithmic" legendFormatMode="pow2"
+				filename="results/${KERNEL}.ABC.1-32.Pattern" />
+			<chart type="Line2dChart"
+				tag="timers" filter="total,init,work,add" attribute="avg"
+				title="${KERNEL} ${TITLE}" subtitle="Total time with init and work"
+				xaxislabel="Benchmarks" yaxislabel="Time in seconds"
+				filename="results/${KERNEL}.ABC.1-32.Timing.2D" />
+			<chart type="Line2dChart"
+				tag="events" filter="rand1,rand2" attribute="avg"
+				title="${KERNEL} ${TITLE}" subtitle="Total number of communications"
+				xaxislabel="Benchmarks" yaxislabel="Nb communications"
+				filename="results/${KERNEL}.ABC.1-32.Randoms.2D" />
+		</charts>
+		<benchmarks>
+			<benchmark name="${KERNEL} ${CLASS}"
+				run="${RUN}" warmup="${WARMUP}" timeout="100"
+				descriptorGenerated="descriptors/generated-${KERNEL}-${CLASS}-${NP}.xml"
+				removeExtremums="true"
+				note="My first test"
+				parameters="descriptors/generated-${KERNEL}-${CLASS}-${NP}.xml ${NP}"
+				output="results/${KERNEL}/${CLASS}/${NP}.xml">
+				<descriptorVariable name="VMARGS" value="${VMARGS1}" />
+				<descriptorVariable name="CLASS" value="${CLASS}"/>
+			    <descriptorVariable name="KERNEL" value="${KERNEL}"/>
+			</benchmark>
+			<benchmark name="${KERNEL} C"
+				run="${RUN}" warmup="${WARMUP}" timeout="100"
+				descriptorGenerated="descriptors/generated-${KERNEL}-C-${NP}.xml"
+				removeExtremums="true"
+				note="My first test"
+				parameters="descriptors/generated-${KERNEL}-C-${NP}.xml ${NP}"
+				output="results/${KERNEL}/C/${NP}.xml">
+			</benchmark>
+		</benchmarks>
+	</serie>
+
+	<serie descriptorBase="descriptors/helios.xml"
+		result="results/IS.A.1.xml"
+		class="${BENCH_CLASS}">
+		<charts>
+			<chart type="HierarchicalBarChart" tag="timer"
+				filter="total,serialize" title="Here is the chart's title"
+				subtitle="Here is the subtitle" width="800" height="600"
+				xaxislabel="Benchmarks" yaxislabel="Time in seconds"
+				scalemode="linear"
+				filename="results/IS.A.1" />
+		</charts>
+		<benchmarks>
+			<benchmark name="IS A"
+				run="${RUN}" warmup="${WARMUP}" timeout="500"
+				note="My first test"
+				parameters="descriptors/local-4.xml 4"
+				output="results/IS/A/1.xml">
+			</benchmark>
+		</benchmarks>
+	</serie>
+</timit>

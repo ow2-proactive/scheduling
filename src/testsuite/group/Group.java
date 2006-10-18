@@ -45,9 +45,6 @@ import testsuite.exception.BrowsePackageException;
 import testsuite.manager.AbstractManager;
 import testsuite.result.ResultsCollections;
 import testsuite.test.AbstractTest;
-import testsuite.test.Benchmark;
-import testsuite.timer.Timeable;
-
 
 /** It is a collection of tests.
  * @author Alexandre di Costanzo
@@ -255,8 +252,11 @@ public class Group {
             }
         }
     }
-
-    public void initGroup(Timeable timer) throws Exception {
+    
+    /** Run the init method of all tests and set the tests loggers with the group logger.
+     * @throws Exception if error during the initialization of tests.
+     */
+    public void initGroup() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Beginning groupTest " + name + "' initialization");
         }
@@ -264,20 +264,10 @@ public class Group {
         while (it.hasNext()) {
             AbstractTest test = it.next();
             test.uponInitOfGroupOfTests();
-            if (timer != null) {
-                ((Benchmark) test).setTimer(timer);
-            }
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Finnishing groupTest " + name + "' initialization");
         }
-    }
-
-    /** Run the init method of all tests and set the tests loggers with the group logger.
-     * @throws Exception if error during the initialization of tests.
-     */
-    public void initGroup() throws Exception {
-        this.initGroup(null);
     }
 
     /** run the end method of all tests.
