@@ -139,7 +139,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     private transient boolean isDead;
     
     // GC
-    private GarbageCollector gc;
+    private transient GarbageCollector gc;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -1008,6 +1008,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
+        this.gc = new GarbageCollector(this);
         in.defaultReadObject();
 
         // FAULT TOLERANCE
