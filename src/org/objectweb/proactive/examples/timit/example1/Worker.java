@@ -28,10 +28,9 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.benchmarks.timit.examples.example1;
+package org.objectweb.proactive.examples.timit.example1;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
@@ -41,7 +40,6 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEv
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEventObserver;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventObserver;
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 

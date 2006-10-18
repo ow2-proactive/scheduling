@@ -1,4 +1,4 @@
-package org.objectweb.proactive.benchmarks.timit.examples.jacobi;
+package org.objectweb.proactive.examples.timit.jacobi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

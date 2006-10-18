@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.benchmarks.timit.examples.example2;
+package org.objectweb.proactive.examples.timit.example2;
 
 import java.util.Iterator;
 

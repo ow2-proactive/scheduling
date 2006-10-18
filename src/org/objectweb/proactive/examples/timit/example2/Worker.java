@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.benchmarks.timit.examples.example2;
+package org.objectweb.proactive.examples.timit.example2;
 
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.TimerCounter;

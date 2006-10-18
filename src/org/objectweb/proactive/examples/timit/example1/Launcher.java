@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.benchmarks.timit.examples.example1;
+package org.objectweb.proactive.examples.timit.example1;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
