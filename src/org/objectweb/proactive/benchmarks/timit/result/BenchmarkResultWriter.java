@@ -128,15 +128,14 @@ public class BenchmarkResultWriter {
         while( it.hasNext() ) {
             size++;
             Element timers = it.next();
-            double value = Double.valueOf(
-                    timers.getChild("timer").getAttributeValue("avg"));
+            Element eTimer = timers.getChild("timer");
+            if( eTimer == null ) { continue; }
+            double value = Double.valueOf(eTimer.getAttributeValue("avg"));
             if( value > vMax ) {
-                System.err.println("  new Max : " + value);
                 vMax = value;
                 max = timers;
             }
             if( value < vMin ) {
-                System.err.println("  new Min : " + value);
                 vMin = value;
                 min = timers;
             }

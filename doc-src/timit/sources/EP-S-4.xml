@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timit>
+  <!--
+IMPORTANT:
+For FinalStatistics :
+  min=min of all runs
+  max=max of all runs
+  avg=avg of all runs
+  dev from avg of all runs.
+
+For each BenchmarkStatistics :
+  min=min of all workers
+  max=max of all workers
+  avg=avg of all workers
+  dev between all workers.
+-->
+  <FinalStatistics date="2006-09-06 11:33:15.491">
+    <Note>Try EP Kernel</Note>
+    <timers>
+      <timer name="Total" min="2.988" avg="6.675" max="7.986" dev="0.000">
+        <timer name="Gaussian" min="2.371" avg="3.430" max="4.302" dev="0.000" />
+        <timer name="Random" min="0.453" avg="0.826" max="1.4" dev="0.000" />
+        <timer name="Tabulation" min="0.16" avg="2.413" max="3.948" dev="0.000" />
+      </timer>
+    </timers>
+    <events />
+    <Environment>org.objectweb.proactive.benchmarks.NAS.EP.EPProblemClass
+KERNEL_NAME: EP
+PROBLEM_CLASS_NAME:S
+NUM_PROCS: 4
+OPERATION_TYPE: Random numbers generated
+Verification : true
+Worker0 is OK
+Worker2 OK
+Worker1 OK
+Worker3 OK
+Available processors by JVM : 2
+Total Memory by JVM: 4.26953125MB
+OS Version : i386 Linux 2.6.11-1.35_FC3smp
+Java Version : 1.5.0_08
+Proactive Version : 3.1</Environment>
+  </FinalStatistics>
+  <BenchmarkStatistics>
+    <timers>
+      <timer name="Total" min="2.988" avg="6.675" max="7.986" dev="2.130">
+        <timer name="Gaussian" min="2.371" avg="3.430" max="4.302" dev="0.764" />
+        <timer name="Random" min="0.453" avg="0.826" max="1.400" dev="0.351" />
+        <timer name="Tabulation" min="0.160" avg="2.413" max="3.948" dev="1.392" />
+      </timer>
+    </timers>
+    <events />
+    <Information>org.objectweb.proactive.benchmarks.NAS.EP.EPProblemClass
+KERNEL_NAME: EP
+PROBLEM_CLASS_NAME:S
+NUM_PROCS: 4
+OPERATION_TYPE: Random numbers generated
+Verification : true
+Worker0 is OK
+Worker2 OK
+Worker1 OK
+Worker3 OK</Information>
+  </BenchmarkStatistics>
+</timit>
+

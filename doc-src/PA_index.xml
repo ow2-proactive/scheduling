@@ -59,6 +59,7 @@
 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
 <!ENTITY loadbalancing SYSTEM "LoadBalancing.xml">
+<!ENTITY TimIt SYSTEM "timit/TimIt.xml">
 ]>
 <book>
    &bookinfo;
@@ -133,6 +134,7 @@
     &IC2D;
     &plugin;
     &scilab;
+    &TimIt;
    </part>
 
    <part id="ProActiveExtensions">

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<timit descriptor_base="descriptors/local-4.xml">
+	
+	<!-- GLOBAL VARIABLES DEFINITION -->
+    <globalVariables>
+        <descriptorVariable name="VMARGS1" value="-Xmx128M -Xms128M"/>
+        <descriptorVariable name="BENCH_CLASS" 
+			value="org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher"/>
+		<descriptorVariable name="NP" value="1" />
+		<descriptorVariable name="RUN" value="5" />
+    </globalVariables>
+
+	    
+    <!-- CHART DEFINITION ( only png format available ) -->
+    <chart fileName="result/ALL-Graph"
+           title="Example on 4 nodes"
+           width="640"
+           height="480"/> 
+	
+	
+	<!-- BENCHMARK SUITE DEFINITION -->
+    <benchmark	name="1 node"
+				run="${RUN}"
+				descriptor="descriptors/generated.xml"
+				timeout="120" >
+        <note>A basic run just for test</note>
+        <bench_class>${BENCH_CLASS}</bench_class>
+        <bench_param>descriptors/generated.xml 1</bench_param>
+        <outputFile>result/1.xml</outputFile>
+        <variables>
+            <descriptorVariable name="VMARGS" value="${VMARGS1}"/>
+        </variables>
+    </benchmark>
+	
+	<benchmark	name="4 node"
+				run="${RUN}"
+				descriptor="descriptors/generated.xml"
+				timeout="120" >
+        <note>A basic run just for test</note>
+        <bench_class>${BENCH_CLASS}</bench_class>
+        <bench_param>descriptors/generated.xml 4</bench_param>
+        <outputFile>result/4.xml</outputFile>
+        <variables>
+            <descriptorVariable name="VMARGS" value="${VMARGS1}"/>
+        </variables>
+    </benchmark>
+
+</timit>

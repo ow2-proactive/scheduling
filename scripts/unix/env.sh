@@ -227,6 +227,47 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/scilab/javasci.jar
 fi 
 
+#--------------------------------------------------------
+# when using TimIt
+if [ -f $PROACTIVE/lib/timit/batik-awt-util.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/batik-awt-util.jar
+fi
+if [ -f $PROACTIVE/lib/timit/batik-dom.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/batik-dom.jar
+fi
+if [ -f $PROACTIVE/lib/timit/batik-svggen.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/batik-svggen.jar
+fi
+if [ -f $PROACTIVE/lib/timit/batik-util.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/batik-util.jar
+fi
+if [ -f $PROACTIVE/lib/timit/batik-xml.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/batik-xml.jar
+fi
+if [ -f $PROACTIVE/lib/timit/commons-cli-1.0.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/commons-cli-1.0.jar
+fi
+if [ -f $PROACTIVE/lib/timit/jcommon-1.0.6.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/jcommon-1.0.6.jar
+fi
+if [ -f $PROACTIVE/lib/timit/jdom.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/jdom.jar
+fi
+if [ -f $PROACTIVE/lib/timit/jfreechart-1.0.2.jar ]
+then
+	CLASSPATH=$CLASSPATH:$PROACTIVE/lib/timit/jfreechart-1.0.2.jar
+fi
+
+
+
 #echo "CLASSPATH"=$CLASSPATH 
 export CLASSPATH
 
