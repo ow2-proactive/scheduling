@@ -1,49 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<timit descriptor_base="descriptors/local-4.xml">
+<timit>
+	<!-- GLOBAL VARIABLES DEFINITION
+		Will replace those in deployment descriptor -->
+	<globalVariables>
+		<descriptorVariable name="VMARGS" value="-Xmx32M -Xms32M" />
+		<descriptorVariable name="CLASS_PREFIX"
+			value="org.objectweb.proactive.examples.timit" />
+		<descriptorVariable name="NP" value="4,8" />
+		<descriptorVariable name="RUN" value="3" />
+		<descriptorVariable name="WARMUP" value="1" />
+	</globalVariables>
 	
-	<!-- GLOBAL VARIABLES DEFINITION -->
-    <globalVariables>
-        <descriptorVariable name="VMARGS1" value="-Xmx128M -Xms128M"/>
-        <descriptorVariable name="BENCH_CLASS" 
-			value="org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher"/>
-		<descriptorVariable name="NP" value="1" />
-		<descriptorVariable name="RUN" value="5" />
-    </globalVariables>
-
-	    
-    <!-- CHART DEFINITION ( only png format available ) -->
-    <chart fileName="result/ALL-Graph"
-           title="Example on 4 nodes"
-           width="640"
-           height="480"/> 
-	
-	
-	<!-- BENCHMARK SUITE DEFINITION -->
-    <benchmark	name="1 node"
-				run="${RUN}"
-				descriptor="descriptors/generated.xml"
-				timeout="120" >
-        <note>A basic run just for test</note>
-        <bench_class>${BENCH_CLASS}</bench_class>
-        <bench_param>descriptors/generated.xml 1</bench_param>
-        <outputFile>result/1.xml</outputFile>
-        <variables>
-            <descriptorVariable name="VMARGS" value="${VMARGS1}"/>
-        </variables>
-    </benchmark>
-	
-	<benchmark	name="4 node"
-				run="${RUN}"
-				descriptor="descriptors/generated.xml"
-				timeout="120" >
-        <note>A basic run just for test</note>
-        <bench_class>${BENCH_CLASS}</bench_class>
-        <bench_param>descriptors/generated.xml 4</bench_param>
-        <outputFile>result/4.xml</outputFile>
-        <variables>
-            <descriptorVariable name="VMARGS" value="${VMARGS1}"/>
-        </variables>
-    </benchmark>
-
+	<!-- Running example1 suite and generate a communication pattern chart
+		and line 2d chart -->
+	<serie descriptorBase="descriptors/TimIt.xml"
+		result="results/example1.4-8.xml"
+		class="${CLASS_PREFIX}.example1.Launcher">
+		<charts>
+			<chart type="MatrixChart"
+				eventName="commPattern"
+				title="Example1"
+				subtitle="Communications pattern"
+				xaxislabel="Receiver rank" yaxislabel="Sender rank"
+				scalemode="logarithmic" legendFormatMode="pow2"
+				filename="results/example1.Pattern" />
+			<chart type="Line2dChart"
+				tag="events" filter="nbComms" attribute="avg"
+				title="Example1" subtitle="Total number of communications"
+				xaxislabel="Benchmarks" yaxislabel="Nb communications"
+				filename="results/example1.nbComms" />
+		</charts>
+		<benchmarks>
+			<benchmark name="Example1 ${NP}"
+				run="${RUN}" warmup="${WARMUP}" timeout="100"
+				descriptorGenerated="descriptors/generated.xml"
+				removeExtremums="true"
+				note="My first test"
+				parameters="descriptors/generated.xml ${NP}"
+				output="results/example1-${NP}.xml">
+				<descriptorVariable name="NODES" value="${NP}" />
+			</benchmark>
+		</benchmarks>
+	</serie>
 </timit>

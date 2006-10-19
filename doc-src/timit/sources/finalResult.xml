@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<timit>
+  <FinalStatistics name="CG A-1" runs="10" timeoutErrors="0" date="2006-10-17 10:42:33.952">
+    <timers>
+      <timer name="Total" min="6.201" avg="7.005" max="9.491" dev="1.063" sum="6.964">
+        <timer name="Computation" min="5.781" avg="6.070" max="6.441" dev="0.189" sum="0.000" />
+        <timer name="Communication" min="0.261" avg="0.894" max="3.681" dev="1.161" sum="0.000" />
+      </timer>
+    </timers>
+    <events>
+      <event name="mflops" min="157.804" avg="217.977" max="241.637" dev="27.130">234.07789770061004</event>
+    </events>
+    <informations>
+      <deployer jvm="BEA Systems, Inc. BEA JRockit(R) R26.4.0-63-63688-1.5.0_06-20060626-2259-linux-x86_64 - Version 1.5.0_06" os="amd64 Linux 2.4.21-40.ELsmp" processors="4" />
+    </informations>
+  </FinalStatistics>
+  <FinalStatistics name="CG A-2" runs="10" timeoutErrors="0" date="2006-10-17 10:49:52.265">
+    <timers>
+      <timer name="Total" min="3.901" avg="21.638" max="43.703" dev="15.764" sum="19.032">
+        <timer name="Computation" min="2.951" avg="3.320" max="3.641" dev="0.223" sum="0.000" />
+        <timer name="Communication" min="0.451" avg="15.712" max="36.222" dev="14.213" sum="0.000" />
+      </timer>
+    </timers>
+    <events>
+      <event name="mflops" min="34.248" avg="149.172" max="384.398" dev="125.786">48.43853175373859</event>
+    </events>
+    <informations>
+      <deployer jvm="BEA Systems, Inc. BEA JRockit(R) R26.4.0-63-63688-1.5.0_06-20060626-2259-linux-x86_64 - Version 1.5.0_06" os="amd64 Linux 2.4.21-40.ELsmp" processors="4" />
+    </informations>
+  </FinalStatistics>
+</timit>
