@@ -44,6 +44,13 @@ import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class ConfigReader {
+    
+    public static String PROJECT_PATH;
+    
+    static {
+        String classesPath = ConfigReader.class.getResource(".").getPath();                
+        ConfigReader.PROJECT_PATH = classesPath.substring(0, classesPath.indexOf("/classes"));        
+    }
 
     private Document document;
 
@@ -51,7 +58,7 @@ public class ConfigReader {
 
     private HashMap<String, String> globalVariables; // <variable name,value>
 
-    private Serie[] series;
+    private Serie[] series;        
 
     public ConfigReader(String filename) {
 
@@ -61,6 +68,10 @@ public class ConfigReader {
 
         // Get global variables
         this.globalVariables = new HashMap<String, String>();
+        
+        // Add the default global variable PROJECT_PATH        
+        this.globalVariables.put("PROJECT_PATH",PROJECT_PATH);
+        
         Iterator it = this.eTimit.getChild("globalVariables").getChildren()
                 .iterator();
         while (it.hasNext()) {

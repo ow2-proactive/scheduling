@@ -83,7 +83,7 @@ public class MatrixChart implements Chart {
      */
     private static final long serialVersionUID = -9045078395503131290L;
 
-    public static final String logoFile = MatrixChart.class.getResource("/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png").getPath();
+    public static final String logoFile = org.objectweb.proactive.benchmarks.timit.config.ConfigReader.PROJECT_PATH+"/src/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png";
 
     private Chart.LegendFormat legendFormatMode;
 
@@ -102,11 +102,11 @@ public class MatrixChart implements Chart {
     private JFreeChart mainChart;
 
     /** The legend containing chart */
-    private JFreeChart legendChart;
+    private JFreeChart legendChart;    
 
     public void generateChart(Element eTimit, BenchmarkStatistics bstats,
-            ConfigChart cChart) {
-
+            ConfigChart cChart) {                       
+        
         String name = cChart.get("eventName");
         int[][] a = (int[][]) bstats.getEventsStatistics().getEventDataValue(
                 name);
