@@ -76,6 +76,33 @@ IF EXIST %PROACTIVE%\lib\ws\commons-discovery.jar set CLASSPATH=%CLASSPATH%;%PRO
 IF EXIST %PROACTIVE%\lib\ws\mail.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\mail.jar
 IF EXIST %PROACTIVE%\lib\ws\xml-apis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\xml-apis.jar
 
+rem -------------------------------------------------
+rem jars for Web Services
+rem -------------------------------------------------
+IF EXIST %PROACTIVE%\lib\ws\soap.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\soap.jar
+IF EXIST %PROACTIVE%\lib\ws\wsdl4j.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\wsdl4j.jar
+IF EXIST %PROACTIVE%\lib\ws\axis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\axis.jar
+IF EXIST %PROACTIVE%\lib\ws\jaxrpc.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\jaxrpc.jar
+IF EXIST %PROACTIVE%\lib\ws\activation.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\activation.jar
+IF EXIST %PROACTIVE%\lib\ws\saaj-api.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\saaj-api.jar
+IF EXIST %PROACTIVE%\lib\ws\commons-logging.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\commons-logging.jar
+IF EXIST %PROACTIVE%\lib\ws\commons-discovery.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\commons-discovery.jar
+IF EXIST %PROACTIVE%\lib\ws\mail.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\mail.jar
+IF EXIST %PROACTIVE%\lib\ws\xml-apis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\xml-apis.jar
+
+rem -------------------------------------------------
+rem jars for TimIt
+rem -------------------------------------------------
+IF EXIST %PROACTIVE%\lib\timit\batik-awt-util.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\batik-awt-util.jar
+IF EXIST %PROACTIVE%\lib\timit\batik-dom.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\batik-dom.jar
+IF EXIST %PROACTIVE%\lib\timit\batik-svggen.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\batik-svggen.jar
+IF EXIST %PROACTIVE%\lib\timit\batik-util.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\batik-util.jar
+IF EXIST %PROACTIVE%\lib\timit\batik-xml.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\batik-xml.jar
+IF EXIST %PROACTIVE%\lib\timit\commons-cli-1.0.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\commons-cli-1.0.jar
+IF EXIST %PROACTIVE%\lib\timit\jcommon-1.0.6.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\jcommon-1.0.6.jar
+IF EXIST %PROACTIVE%\lib\timit\jdom.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\jdom.jar
+IF EXIST %PROACTIVE%\lib\timit\jfreechart-1.0.2.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\timit\jfreechart-1.0.2.jar
+
 
 rem echo CLASSPATH=%CLASSPATH%
 
