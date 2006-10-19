@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Dgc Plug-in
+Bundle-SymbolicName: org.objectweb.proactive.ic2d.dgc; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.dgc.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.objectweb.proactive.ic2d.monitoring,
+ org.eclipse.gef,
+ org.objectweb.proactive.ic2d.lib
+Eclipse-LazyStart: true
+Export-Package: org.objectweb.proactive.ic2d.dgc.views

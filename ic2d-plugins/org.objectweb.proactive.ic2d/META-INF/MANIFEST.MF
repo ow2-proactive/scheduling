@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: IC2D RCP
+Bundle-SymbolicName: org.objectweb.proactive.ic2d; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.Activator
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.objectweb.proactive.ic2d.lib,
+ org.objectweb.proactive.ic2d.monitoring
+Eclipse-LazyStart: true

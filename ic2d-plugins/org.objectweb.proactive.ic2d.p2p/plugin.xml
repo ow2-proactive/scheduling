@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="P2PMonitoring.category1"
+            class="org.objectweb.proactive.ic2d.p2PMonitoring.views.P2PView"
+            id="P2PMonitoring.view1"
+            name="P2PMonitoring"/>
+      <category
+            id="P2PMonitoring.category1"
+            name="P2P Monitoring "/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.objectweb.proactive.ic2d.p2PMonitoring.perspective.P2PPerspective"
+            id="org.objectweb.proactive.ic2d.p2PMonitoring.perspectives.P2PPerspective"
+            name="P2PMonitoring"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.objectweb.proactive.ic2d.p2PMonitoring.perspectives.P2PPerspective">
+         <view
+               id="P2PMonitoring.view1"
+               relationship="stack"/>
+         <actionSet id="P2PMonitoring.actionSet1"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="P2PMonitoring.actionSet1"
+            label="P2PMonitoring"
+            visible="false">
+         <menu
+               id="P2PMonitoring.menu1"
+               label="P2P Monitoring"/>
+         <action
+               class="org.objectweb.proactive.ic2d.p2PMonitoring.actions.DumpFileChooserAction"
+               id="P2PMonitoring.action1"
+               label="Load File"
+               menubarPath="P2PMonitoring.menu1/content"
+               />
+         <action
+               class="org.objectweb.proactive.ic2d.p2PMonitoring.actions.DumpP2PNetworkAction"
+               id="P2PMonitoring.action2"
+               label="Dump P2P network"
+               menubarPath="P2PMonitoring.menu1/content"/>
+      </actionSet>
+   </extension>
+</plugin>

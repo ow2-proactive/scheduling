@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<mainDefinition id="main" class="A">
+		<mapToVirtualNode value="lVNmain" />
+	</mainDefinition>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="lVNmain" />
+			<virtualNode name="lVN1" />
+			<virtualNode name="lVN2" />
+			<virtualNode name="lVN3" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="lVNmain">
+				<jvmSet>
+					<vmName value="JvmMain" />
+				</jvmSet>
+			</map>
+			<map virtualNode="lVN1">
+				<jvmSet>
+					<vmName value="Jvm1" />
+				</jvmSet>
+			</map>
+			<map virtualNode="lVN2">
+				<jvmSet>
+					<vmName value="Jvm2" />
+				</jvmSet>
+			</map>
+			<map virtualNode="lVN3">
+				<jvmSet>
+					<vmName value="Jvm3" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="JvmMain">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<creation>
+					<processReference refid="localJVM" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/classes' />
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/log4j.jar'/>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/xercesImpl.jar'/>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/asm.jar'/>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/javassist.jar'/>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/jsch.jar'/>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/bouncycastle.jar'/>
+						<absolutePath value='/user/jmlegait/home/workspace/ProActive/lib/components/fractal.jar'/>
+					</classpath>
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: P2PMonitoring Plug-in
+Bundle-SymbolicName: P2PMonitoring; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.ic2d.p2PMonitoring.P2PMonitoringPlugin
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ log4j,
+ proactive,
+ xercesImpl,
+ jung,
+ org.eclipse.gef
+Eclipse-AutoStart: true

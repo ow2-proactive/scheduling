@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.objectweb.proactive.ic2d.Application">
+         </run>
+      </application>
+   </extension>
+  
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.objectweb.proactive.ic2d.application"
+            name="IC2D">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
+         <property
+               name="aboutImage"
+               value="icons/alt_about.gif"/>
+         <property
+               name="startupProgressRect"
+               value="0,300,455,20"/>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+               class="org.objectweb.proactive.ic2d.DefaultPerspective"
+               id="org.objectweb.proactive.ic2d.DefaultPerspective"
+               name="Default"/>
+   </extension>
+
+</plugin>
