@@ -3,7 +3,6 @@
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Hello" property="multiple"/>
-			<virtualNode name="Hello2" property="multiple"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -14,11 +13,6 @@
 					<vmName value="Jvm1"/>
 				</jvmSet>
 			</map>
-           	<map virtualNode="Hello2">
-           		<jvmSet>
-           			<vmName value="Jvm1"/>
-           		</jvmSet>
-           	</map>
            </mapping>
 		<jvms>
 			<jvm name="Jvm1">
