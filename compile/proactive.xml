@@ -420,6 +420,7 @@
 		<mkdir dir="${dist.dir}/ProActive" />
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
+				<include name="DescriptorSchema.xsd"/>
 				<include name="${proactive.dir}/**" />
 				<exclude name="${proactive.dir}/examples/**" />
 				<exclude name="${proactive.dir}/ic2d/**" />
