@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd">
         <variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="ProActive_RELEASE"/>
 		<descriptorVariable name="REMOTE_HOME" value="/user/amangin/home"/>
@@ -82,7 +82,7 @@
                                <environment>
                                     <variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
                                     <variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-                                   <variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+                                    <variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
                                </environment>
                                <processReference refid="localJVM"/>
                             </rshProcess>

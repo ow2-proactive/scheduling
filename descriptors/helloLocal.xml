@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Hello" property="multiple"/>
+			<virtualNode name="Hello2" property="multiple"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -13,7 +14,12 @@
 					<vmName value="Jvm1"/>
 				</jvmSet>
 			</map>
-		</mapping>
+           	<map virtualNode="Hello2">
+           		<jvmSet>
+           			<vmName value="Jvm1"/>
+           		</jvmSet>
+           	</map>
+           </mapping>
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>

@@ -1584,8 +1584,14 @@ public class ProActive {
         org.objectweb.proactive.core.xml.VariableContract.xmlproperties = variableContract;
 
         //Get the pad
-        ProActiveDescriptor pad = internalGetProActiveDescriptor(xmlDescriptorUrl,
-                variableContract, hierarchicalSearch);
+        ProActiveDescriptor pad;
+		try {
+			pad = internalGetProActiveDescriptor(xmlDescriptorUrl,
+			        variableContract, hierarchicalSearch);
+		} catch (ProActiveException e) {
+			org.objectweb.proactive.core.xml.VariableContract.lock.release();
+			throw e;
+		}
 
         //No further modifications can be donde on the xmlproperties, thus we close the contract
         variableContract.close();
@@ -1593,6 +1599,7 @@ public class ProActive {
         //Check the contract (proposed optimization: Do this when parsing </variable> tag instead of here!)
         if (!variableContract.checkContract()) {
         	logger.error(variableContract.toString());
+        	org.objectweb.proactive.core.xml.VariableContract.lock.release();
             throw new ProActiveException("Variable Contract has not been met!");
         }
 

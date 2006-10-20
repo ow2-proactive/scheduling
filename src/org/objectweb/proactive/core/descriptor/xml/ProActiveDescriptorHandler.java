@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.core.xml.io.SAXParserErrorHandlerTerminating;
 import org.objectweb.proactive.scheduler.Scheduler;
 
 
@@ -136,7 +137,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         //String uri = "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
         org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                    uri), h);
+                    uri), h, null, new SAXParserErrorHandlerTerminating());
         sr.read();
     }
 
@@ -152,14 +153,26 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             InitialHandler h = new InitialHandler(xmlDescriptorUrl,
                     variableContract);
             String uri = xmlDescriptorUrl;
-            org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                        uri), h);
+            // we get the schema from the class location
+            java.net.URL urlSchema = ProActiveDescriptorHandler.class.getResource("/DescriptorSchema.xsd");
+            java.io.File fileSchema = new java.io.File(urlSchema.getPath());
+            org.objectweb.proactive.core.xml.io.StreamReader sr = null;
+            if (fileSchema.exists())
+            {
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+                        uri), h, fileSchema, new SAXParserErrorHandlerTerminating());
+            }
+            else
+            {
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+                        uri), h, null, new SAXParserErrorHandlerTerminating());
+            }
             sr.read();
             return (ProActiveDescriptorHandler) h.getResultObject();
         } catch (org.xml.sax.SAXException e) {
             //e.printStackTrace();
-            logger.fatal(
-                "a problem occurs when getting the ProActiveDescriptorHandler");
+            //logger.fatal(
+            //    "a problem occurs when getting the ProActiveDescriptorHandler");
             throw e;
         }
     }

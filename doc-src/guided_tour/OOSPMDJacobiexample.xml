@@ -517,7 +517,7 @@ private static void printMessageAndWait() {
         configurations (e.g classpath, java path,...).</para>
 
        <programlisting lang="xml"> &lt;ProActiveDescriptor
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;  
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;  
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
@@ -577,7 +577,7 @@ private static void printMessageAndWait() {
         on them.</para>
 
        <programlisting lang="xml"> &lt;ProActiveDescriptor
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;  
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;  
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
@@ -752,7 +752,7 @@ private static void printMessageAndWait() {
 
         <programlisting> &lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;      
+ xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;      
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"
@@ -805,7 +805,7 @@ private static void printMessageAndWait() {
 
        <programlisting>&lt;ProActiveDescriptor
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;      
+ xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;      
   &lt;componentDefinition&gt;
    &lt;virtualNodesDefinition&gt;
     &lt;virtualNode name="<emphasis role="bold">matrixNode</emphasis>"

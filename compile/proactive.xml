@@ -106,6 +106,9 @@
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
 			</fileset>
 		</copy>
+		<!-- copy descriptor schema -->
+		<copy todir="${classes.dir}" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>		
+		<copy todir="${base}/descriptors/examples" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 
 	<target name="osgi" depends="core" description="Compile osgi related stuff">
@@ -498,7 +501,8 @@
 				<exclude name="p2p/config/inria/**" />
 				<exclude name="**/.svn" />
 			</fileset>
-		</copy>
+		</copy>		
+		
 		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh" />
 		<chmod file="${PAdist.dir}/compile/build" perm="755" />
 		<!--  create zip version of ProActive without source  -->

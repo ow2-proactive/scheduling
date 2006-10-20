@@ -228,7 +228,7 @@
 
         <programlisting lang="xml">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;
+&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
 	&lt;variables&gt;
 		&lt;descriptorVariable name="PROACTIVE_HOME" value="****"/&gt; 
 		&lt;descriptorVariable name="REMOTE_HOME" value="****"/&gt;

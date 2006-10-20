@@ -48,6 +48,7 @@
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.javapropertiesProgram.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.programdefaultvariable.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.programvariable.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.mistakes.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.extendedjvm.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.rmilookup.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.p2p.Test" />

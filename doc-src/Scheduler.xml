@@ -194,7 +194,7 @@
 
       <programlisting lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;
+ xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
   &lt;mainDefinition id="main" class="org.objectweb.proactive.scheduler.jobTemplate.Hello"&gt;
      &lt;arg value="param1"/&gt;
      &lt;arg value="param2"/&gt;
