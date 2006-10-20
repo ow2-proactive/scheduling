@@ -64,16 +64,12 @@ do
 
 	if [ "$OPT_K" == "YES" ] ;
 	then
-		echo -e "\n-> Killing JVMs & rmiregistries on each nodes of $CLUSTER"
- 	 	$SSH_CMD $(get_oar_hostname $CLUSTER) \
- 			'for i in $(oarnodes | egrep "^\w") ; do echo -e "$i" ; ssh  -o NumberOfPasswordPrompts=0 $i pkill -9 java   ;done' 
+		NODES=`ssh $(get_oar_hostname $CLUSTER) oarnodes -l`
+		mussh -t 20 -m0 -P -c "killall -9 java rmid" -h $NODES
 	fi
 
 	if [ "$OPT_C" == "YES" ] ;
 	then	
-		for i in $(g5k_reservedNodes -s $CLUSTER) ; do
-			echo "[i] Clean -> $i"
-			${SSH_CMD} $i killall -9 java rmid 2> /dev/null
-		done
+		mussh -t 20 -m0 -P -c "killall -9 java rmid" -h "$(g5k_reservedNodes -s $CLUSTER)"
 	fi
 done

@@ -11,7 +11,39 @@ function print_help {
 	exit 1
 }
 
-ARGS="cn:"
+function check_node_is_ok {
+	USED_MEM=$(free | head -n 3 | tail -n 1 | awk '{print $3}')
+	if [ "$?" -ne 0 ] || [ $USED_MEM -gt 100000 ] ; then
+		if [ "$VERBOSE" == "Yes" ] ; then 
+			echo "Excluding $node, USED_MEM=$USED_MEM" 1>&2
+		fi 	
+		exit 0
+	fi
+
+	LOAD=$(cat /proc/loadavg | cut -d'.' -f1 )
+	if [ $LOAD -ge 1 ] ; then
+		if [ "$VERBOSE" == "Yes" ] ; then 
+			echo "Excluding $node, LOAD=$LOAD" 1>&2
+		fi 	
+		exit 0
+	fi
+
+	PS=$(ps  aux| awk '{print $1 "\n"}' | grep -v USER|  grep -v $USER | sort | uniq)
+	for user in $PS ; do
+		user_home=$(eval echo ~$user) # Erk !
+		if [ "$(expr "$user_home" : '\(/home/\).*/.*')" == "/home/" ] ; then
+			if [ "$VERBOSE" == "Yes" ] ; then 
+				echo "Excluding $node, $user is running processes on this node" 1>&2
+			fi 	
+			exit 0
+	  	fi			
+	done
+
+	echo USEME
+	exit 0
+} 
+
+ARGS="lcn:"
 OPT_C=NO
 OPT_N=NO
 modopt_parse $ARGS "$@"
@@ -21,6 +53,7 @@ do
 	c) OPT_C=YES  ;;
 	n) OPT_N=$OPTARG ;;
 	h) print_help ;;
+	l) check_node_is_ok ;; # This option is _PRIVATE_
 	*)
 		modopt_error_handle $Option
 		if [ "$?" -eq 0 ] ; then
@@ -31,68 +64,24 @@ do
 	;;
 	esac
 done
-		
-function check_node_is_ok {
-	NODE=$1
-
-	$SSH_CMD $node true
-	if [ $? -ne 0 ] ;	then return 0 ; fi
-
-	USED_MEM=$($SSH_CMD $node free | head -n 3 | tail -n 1 | awk '{print $3}')
-	if [ $? -ne 0 ] || [ $USED_MEM -gt 100000 ] ; then
-		if [ "$VERBOSE" == "Yes" ] ; then 
-			echo "Excluding $node, USED_MEM=$USED_MEM" 1>&2
-		fi 	
-		return 0
-  fi
-
-	LOAD=$($SSH_CMD $node cat /proc/loadavg | cut -d'.' -f1 )
-	if [ $LOAD -ge 1 ] ; then
-		if [ "$VERBOSE" == "Yes" ] ; then 
-			echo "Excluding $node, LOAD=$LOAD" 1>&2
-		fi 	
-		return 0
-  fi
-
-  PS=$($SSH_CMD $node ps  aux| awk '{print $1 "\n"}' | grep -v USER|  grep -v $USER | sort | uniq)
-	for user in $PS ; do
-		user_home=$(eval echo ~$user) # Erk !
-		if [ "$(expr "$user_home" : '\(/home/\).*/.*')" == "/home/" ] ; then
-			if [ "$VERBOSE" == "Yes" ] ; then 
-				echo "Excluding $node, $user is running processes on this node" 1>&2
-			fi 	
-			return 0
-  	fi			
-	done
-
-	return 1
-} 
-
+	
 OUTPUT=""
 for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
 do
 	CLUSTER=${OPTIONS_CLUSTERS[$i]}
-
 	NODES=$(cd $(dirname $0) && $SSH_CMD $(get_oar_hostname $CLUSTER) $PWD/g5klocal_reservedNodes)
-	if [ ! $? -eq 0 ] ;
-	then
-			echo $ERR_PREFIX "Cannot retrieve reserved nodes from $CLUSTER" 1>&2
-			continue
-	fi
 
-	if [ "$OPT_C" == "YES" ] ;
-  	then
-		for node in $NODES ;
-    		do
-			if [ "$VERBOSE" == "Yes" ] ; then echo "Checking that $node is really free" 1>&2 ; fi
-			check_node_is_ok $node
-			if [ $? -eq 1 ] ;
-			then	
-				OUTPUT="$OUTPUT $node"
-			fi
-		done
-	else
-		OUTPUT="$OUTPUT $NODES"
+	if [ -n "$NODES" ] ;
+	then
+		if [ "$OPT_C" == "YES" ] ;
+	 	then
+			tmpfile=`mktemp -t nodeslist.XXXXXXXXXX`
+			mussh -t 20 -m0 -P -c "g5k_reservedNodes -l" -h "$NODES" > $tmpfile
+			OUTPUT=`cat $tmpfile | while read MUSSH_LINE ; do expr "$MUSSH_LINE" : "\(.*\): USEME$"; done`
+			rm $tmpfile
+		else
+			OUTPUT="$OUTPUT $NODES"
+		fi
 	fi
 done
 

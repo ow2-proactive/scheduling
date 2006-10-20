@@ -1,0 +1,603 @@
+#!/bin/bash
+#
+# $Id: mussh,v 1.9 2005/08/11 20:54:58 doughnut Exp $
+MUSSH_VERSION="0.6"
+#
+# Description:  This script is used to execute the same command(s) on
+#               many hosts.
+#
+# by doughnut
+#
+
+
+
+
+########################
+# INITAILIZE THIS CRAP #
+########################
+DEBUG=0
+SSH_VERBOSE="-q"
+QUIET=0
+FORCE_AGENT=0
+UNIQUE_HOSTS=1
+PROXY_SSH_ARGS="-o PasswordAuthentication=no"
+SSH_ARGS="-o BatchMode=yes"
+AGENT_LOADED=0
+REMOTE_SHELL='bash'
+TEMP_BASE=/tmp
+CONCURRENT=''
+
+############################
+# GOTTA LOVE DOCUMENTATION #
+############################
+USAGE="Usage: mussh [OPTIONS] <-h host.. | -H hostfile> [-c cmd] [-C scriptfile]
+mussh --help        for full help text"
+HELPTEXT="
+Send a command or list of commands to multiple hosts.
+
+OPTIONS:
+        --help          This text.
+        -d[n]           Verbose debug.  Prints each action, all hosts
+                        and commands to be executed to STDERR.  'n' can
+                        be from 0 to 2.
+        -v[n]           Ssh debug levels.  Can be from 0 to 3.
+        -m[n]           Run concurrently on 'n' hosts at a time (asynchronous).
+                        Use '0' (zero) for infinate. (default)
+        -q              No output unless necessary. 
+        -i <identity> [identity ..]
+                        Load an identity file.  May be used
+                        more than once.
+        -o <ssh-args>   Args to pass to ssh with -o option.
+        -a              Force loading ssh-agent.
+        -A              Do NOT load ssh-agent.
+        -b              Print each hosts' output in a block without mingling
+                        with other hosts' output.
+        -B              Allow hosts' output to mingle. (default)
+        -u              Unique.  Eliminate duplicate hosts. (default)
+        -U              Do NOT make host list unique.
+        -P              Do NOT fall back to passwords on any host.  This will
+                        skip hosts where keys fail.
+	-l <login>      Use 'login' when no other is specified with hostname.
+	-L <login>      Force use of 'login' name on all hosts.
+        -s <shell>      Path to shell on remote host. (Default: $REMOTE_SHELL)
+	-t <timeout>    Specify timeout in seconds
+        -V              Print version info and exit.
+PROXY ARGS:
+        -p [user@]<host>
+                        Host to use as proxy.  (Must have mussh installed)
+        -po <ssh-args>        Args to pass to ssh on proxy with -o option.
+HOST ARGS:
+        -h [user@]<host> [[user@]<host> ..]
+                        Add a host to list of hosts.  May be
+                        used more than once.
+        -H <file> [file ..]
+                        Add contents of file(s) to list of hosts.
+                        Files should have one host per line.  Use
+                        \"#\" for comments.
+COMMAND ARGS:
+If neither is specified, commands will be read from standard input.
+        -c <command>    Add a command or quoted list of commands and
+                        args to list of commands to be executed on
+                        each host.  May be used more than once.
+        -C <file> [file ..]
+                        Add file contents to list of commands to be
+                        executed on each host.  May be used more
+                        than once.
+
+At least one host is required.  Arguments are in no particular order.
+
+EXAMPLES:
+mussh -H ./linuxhosts -C spfiles/testscript.sh
+mussh -c \"cat /etc/hosts\" -h myhost.mydomain.com
+
+Comments and Bug Reports: doughnut_@users.sourceforge.net
+"
+
+###########################
+# FUNCTIONS FOR SSH-AGENT #
+###########################
+load_keys() {
+        [ "$AGENT_LOADED" = "0" -a "$IDENT" = "" ] && return
+        [ "$DEBUG" -ge 1 ] && echo "DEBUG: Adding Keys" 1>&2
+        ssh-add $* 1>&2
+}
+
+start_agent() {
+        [ "$DEBUG" -ge 1 ] && echo "DEBUG: Starting Agent" 1>&2
+        if [ "$FORCE_AGENT" -ge 1 ] ; then
+                # Load it anyway
+                [ "$DEBUG" -ge 1 ] && echo "DEBUG: Forcing SSH Agent" 1>&2
+        elif [ -S "$SSH_AUTH_SOCK" ] ; then
+                [ "$DEBUG" -ge 1 ] && echo "DEBUG: SSH Agent already loaded" 1>&2
+                return
+        fi
+        eval $(ssh-agent -s) >/dev/null
+        AGENT_LOADED=1
+}
+stop_agent() {
+        # get rid of the keys that we added (if any)
+        if [ "$IDENT" != "" ] ; then
+                [ "$DEBUG" -ge 1 ] && echo "DEBUG: Removing keys from agent" 1>&2
+                ssh-add -d $IDENT > /dev/null 2>&1
+        fi
+        [ "$AGENT_LOADED" = "0" ] && return
+        [ "$DEBUG" -ge 1 ] && echo "DEBUG: Stopping Agent" 1>&2
+	eval $(ssh-agent -s -k) >/dev/null
+}
+
+####################################
+# FUNCTIONS FOR REMOTE CONNECTIONS #
+####################################
+proxy_connect() {
+        [ "$DEBUG" -ge 1 ] && echo "DEBUG: PROXY CONNECT $PROXY" 1>&2
+        echo "$THESCRIPT" \
+                | ssh -T $SSH_ARGS $PROXY \
+                        "mussh -h $HOSTLIST \
+                                -C - \
+                                -D$DEBUG \
+                                $PROXY_SSH_ARGS 2>&1 " \
+				| while read SSH_LINE ; do
+				    if [ "$QUIET" -lt 1 -a "$SSH_LINE" != "" ] ; then
+					    echo "$SSH_LINE" | sed -e "s/^/$HOST: /"
+				    fi
+				done
+}
+
+ssh_connect() {
+	echo "$THESCRIPT" \
+	    | ssh -T $SSH_ARGS $HOST "$REMOTE_SHELL" 2>&1 \
+	    | while read SSH_LINE ; do
+		if [ "$QUIET" -lt 1 -a "$SSH_LINE" != "" ] ; then
+			echo "$SSH_LINE" | sed -e "s/^/$HOST: /"
+		fi
+	    done
+}
+
+##############################
+# FUNCTIONS FOR FORKED PROCS #
+##############################
+set_hostlist() {
+# Create a hostlist file.
+	[ "$DEBUG" -ge 1 ] && echo "DEBUG: BUILDING HOST LIST FILE $TEMP_DIR/hostlist" 1>&2
+	rm -f $TEMP_DIR/hostlist || exit 1
+	for HOST in $HOSTLIST ; do
+		echo $HOST >> "$TEMP_DIR/hostlist" || exit 1
+	done
+}
+
+get_next_host() {
+# lock file
+	while [ 1 ] ; do
+		echo $CHILDNUM >> "$TEMP_DIR/hostlist.lock"
+		TOP_PID=$(head -1 "$TEMP_DIR/hostlist.lock" 2>/dev/null)
+		if [ "$TOP_PID" = $CHILDNUM ] ; then
+			break
+		fi
+		[ "$DEBUG" -ge 2 ] && echo "DEBUG[#$CHILDNUM]: hostlist file already locked.  Sleep..." 1>&2
+		#usleep 1000
+		sleep 1
+	done
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG[#$CHILDNUM]: Locked hostfile." 1>&2
+
+# get next host
+	NEXT_HOST=$(head -1 $TEMP_DIR/hostlist)
+	HOSTFILE_LEN=$(wc -l $TEMP_DIR/hostlist | awk '{print $1}')
+        if [ -z "$HOSTFILE_LEN" -o "$HOSTFILE_LEN" = 0 ] ; then
+		rm -f "$TEMP_DIR/hostlist.lock"
+		return
+	fi
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG[#$CHILDNUM]: Next host: $NEXT_HOST" 1>&2
+
+# re-write file removing new host
+	rm -f "$TEMP_DIR/hostlist.new"
+	echo tail -$(expr $HOSTFILE_LEN - 1) $TEMP_DIR/hostlist > $TEMP_DIR/hostlist.new || exit 1
+	tail -$(expr $HOSTFILE_LEN - 1) $TEMP_DIR/hostlist > $TEMP_DIR/hostlist.new || exit 1
+        rm -f "$TEMP_DIR/hostlist"
+	mv "$TEMP_DIR/hostlist.new" "$TEMP_DIR/hostlist"
+
+# unlock file
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG[#$CHILDNUM]: Removing hostfile lock." 1>&2
+	rm -f "$TEMP_DIR/hostlist.lock"
+
+# return hostname
+	echo $NEXT_HOST
+}
+
+run_child() {
+	trap "exit 0" SIGHUP
+	CHILDNUM=$1
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG: FORKING CHILD #$CHILDNUM of $CONCURRENT (pid $!/$$)" 1>&2
+	while [ 1 ] ; do
+
+# issue:  Cannot call get_next_host inside $() or `` because our trap won't be able to kill that.
+# solution: avoid subshell here by directing to a file.
+		rm -f $TEMP_DIR/$CHILDNUM.next_host
+		get_next_host >$TEMP_DIR/$CHILDNUM.next_host
+		HOST=$(<$TEMP_DIR/$CHILDNUM.next_host)
+		if [ -z "$HOST" ] ; then
+			rm -f "$TEMP_DIR/$CHILDNUM.pid"
+			break
+		fi
+		[ "$DEBUG" -ge 1 ] && echo "DEBUG[#$CHILDNUM]: CONNECT $HOST" 1>&2
+
+		rm -f "$TEMP_DIR/$CHILDNUM.active"
+		echo "$HOST" > "$TEMP_DIR/$CHILDNUM.active"
+		if [ -n "$BLOCKING" ] ; then
+			ssh_connect > $TEMP_DIR/$HOST.out 
+			cat $TEMP_DIR/$HOST.out 
+		else
+			ssh_connect
+		fi
+	done
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG: CHILD #$CHILDNUM done" 1>&2
+	rm -f "$TEMP_DIR/$CHILDNUM.pid" "$TEMP_DIR/$CHILDNUM.active"
+}
+
+
+###########################
+# FUNCTIONS FOR TEMP DIRS #
+###########################
+create_temp() {
+	MKTEMP=$(which mktemp 2>/dev/null)
+	if [ -x "$MKTEMP" ] ; then
+        	[ "$DEBUG" -ge 2 ] && echo "DEBUG: using mktemp ($MKTEMP)." 1>&2
+		TEMP_DIR=$(mktemp -d $TEMP_BASE/$(basename $0).XXXXXX) || exit 1
+	else
+        	[ "$DEBUG" -ge 2 ] && echo "DEBUG: can't find mktemp... using alternate." 1>&2
+        	TEMP_DIR="$TEMP_BASE/$(basename $0).$(date +%s)"
+        	[ "$DEBUG" -ge 1 ] && echo "DEBUG: Creating temp dir ($TEMP_DIR)." 1>&2
+		if [ -e "$TEMP_DIR" ] ; then
+			echo "$0: Temp dir \"$TEMP_DIR\" already exists!" 1>&2
+			exit 1
+		fi
+		mkdir -m 700 $TEMP_DIR
+	fi
+}
+
+destroy_temp() {
+	if [ -d "$TEMP_DIR" ] ; then
+        	[ "$DEBUG" -ge 2 ] && echo "DEBUG: Removing temp dir ($TEMP_DIR)." 1>&2
+		rm -rf "$TEMP_DIR" 2>/dev/null
+	fi
+}
+
+
+
+########################################
+# REMEMBER TO CLEAN UP BEFORE WE PANIC #
+########################################
+shutdown() {
+	[ "$DEBUG" -ge 1 ] && echo "DEBUG: shutting down children." 1>&2
+	CPIDS=$(cat $TEMP_DIR/*.pid 2>/dev/null)
+	for CPID in $CPIDS ; do 
+		[ "$DEBUG" -ge 2 ] && echo "DEBUG: Killing pid: $CPID" 1>&2
+		kill -HUP $CPID
+	done
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG: shutting down ssh-agent" 1>&2
+	stop_agent
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG: removing temp dir" 1>&2
+	destroy_temp
+	[ "$DEBUG" -ge 2 ] && echo "DEBUG: done shutting down." 1>&2
+        exit 1
+}
+
+spew_hostlist() {
+	echo "HOSTS RUNNING:"  1>&2
+	cat $TEMP_DIR/*.active | sed 's/^/    /'  1>&2
+	echo "HOSTS REMAINING:"  1>&2
+	cat "$TEMP_DIR/hostlist" | sed 's/^/    /'  1>&2
+	return
+}
+
+trap shutdown SIGINT
+trap shutdown SIGTERM
+trap spew_hostlist SIGQUIT
+trap "exit 0" SIGHUP
+
+#############################
+# PARSE THE COMMAND OPTIONS #
+#############################
+while [ "$1" != "" ]; do
+        case "$1" in
+        ###########
+        # OPTIONS #
+        ###########
+          -A)
+                NO_AGENT=1
+                shift
+                  ;;
+          -a)
+                FORCE_AGENT=1
+                shift
+                ;;
+          -b)
+                BLOCKING=1
+                shift
+                ;;
+          -B)
+                unset BLOCKING
+                shift
+                ;;
+          -q)
+                QUIET=1
+                DEBUG=0
+                SSH_VERBOSE="-q"
+                shift
+                ;;
+          -o)
+                SSH_ARGS="$SSH_ARGS -o $2"
+                shift 2
+                ;;
+          -u)
+                UNIQUE_HOSTS=1
+                shift
+                ;;
+          -U)
+                UNIQUE_HOSTS=0
+                shift
+                ;;
+          -l)
+                DEFAULT_LOGIN=$2
+                shift 2
+                ;;
+          -L)
+                FORCE_LOGIN=$2
+                shift 2
+                ;;
+          -s)
+                REMOTE_SHELL=$2
+                shift 2
+                ;;
+          -t)
+		GLOBAL_TIMEOUT=$2
+                shift 2 
+                ;; 
+          -m|-m[0-9]|-m[0-9][0-9]|-m[0-9][0-9][0-9])  # -m0 .. -m999
+                CONCURRENT="${1#-m}"
+                CONCURRENT="${CONCURRENT:=0}"
+                shift
+                  ;;
+          -d|-d[0-5])
+                DEBUG="${1#-d}"
+                DEBUG="${DEBUG:=1}"
+                shift
+                  ;;
+          -v|-v[0-3])
+                TMP_ARG="${1#-v}"
+                TMP_ARG="${DEBUG:=1}"
+                SSH_VERBOSE="-v"
+                [ "$TMP_ARG" -ge 2 ] && SSH_VERBOSE="$SSH_VERBOSE -v"
+                [ "$TMP_ARG" -ge 3 ] && SSH_VERBOSE="$SSH_VERBOSE -v"
+                shift
+                  ;;
+          -V)
+                echo "Version: $MUSSH_VERSION"
+                exit
+                  ;;
+          -P)
+                SSH_ARGS="$SSH_ARGS -o PasswordAuthentication=no"
+                shift
+                  ;;
+          --help)
+                # print help text
+                echo "$USAGE"
+                echo "$HELPTEXT"
+                exit 
+                ;;
+          -i)
+                # Load the identity file in ssh-agent 
+                  while [ "$2" != "" -a "${2#-}" = "$2" ] ; do
+                        IDENT="$IDENT $2"
+                        shift
+                done
+                shift
+                ;;
+        ##############
+        # PROXY ARGS #
+        ##############
+          -p)
+                PROXY=$2
+                SSH_ARGS="$SSH_ARGS -o ForwardAgent=yes"
+                shift 2
+                  ;;
+          -po)
+                PROXY_SSH_ARGS="$PROXY_SSH_ARGS -o $2"
+                shift 2
+                  ;;
+        #############
+        # HOST ARGS #
+        #############
+          -h)
+                while [ "$2" != "" -a "${2#-?*}" = "$2" ] ; do
+                          HOSTLIST="$2
+$HOSTLIST"
+                        shift
+                done
+                shift 
+                  ;;
+          -H)
+                while [ "$2" != "" -a "${2#-?*}" = "$2" ] ; do
+                        HOSTFILE="$2"
+                        if [ ! -e "$HOSTFILE" -a "$HOSTFILE" != "-" ] ; then
+                                echo "mussh: Host file '$HOSTFILE' does not exist!" 1>&2
+                                exit 1
+                        fi
+                        HOSTLIST="$(cat $HOSTFILE | sed -e 's/#.*//' | egrep -v "^ *$" )
+$HOSTLIST"
+                        shift
+                done
+                shift 
+                ;;
+        ################
+        # COMMAND ARGS #
+        ################
+          -c)
+                THESCRIPT="$THESCRIPT
+$2"
+                #set "" ; shift
+                shift 2
+                ;;
+          -C)
+                while [ "$2" != "" -a "${2#-?*}" = "$2" ] ; do
+                        SCRIPTFILE="$2"
+                          if [ ! -e "$SCRIPTFILE" -a "$SCRIPTFILE" != "-" ] ; then
+                                echo "mussh: Script File '$SCRIPTFILE' does not exist!" 1>&2
+                                exit 1
+                        fi
+                        THESCRIPT="$THESCRIPT
+$(cat $SCRIPTFILE )"
+                        shift
+                done
+                shift
+                ;;
+          *)
+                echo "mussh: invalid command - \"$1\"" 1>&2
+                echo "$USAGE" 1>&2
+                exit 1
+                ;;
+        esac
+done
+
+#####################
+# EXPRESS VERBOSITY #
+#####################
+[ "$DEBUG" -ge 1 ] && echo "DEBUG LEVEL: $DEBUG" 1>&2
+[ "$DEBUG" -ge 1 ] && echo "SSH DEBUG LEVEL: $SSH_VERBOSE" 1>&2
+
+#####################
+# CLEAN UP HOSTLIST #
+#####################
+HOSTLIST=$(echo "$HOSTLIST" | sed -e 's/#.*//' | egrep -v "^ *$" )
+
+if [ "$FORCE_LOGIN" != "" ] ; then
+	[ "$DEBUG" -ge 1 ] && echo "DEBUG: FORCE_LOGIN: $FORCE_LOGIN" 1>&2
+	HOSTLIST=$(echo "$HOSTLIST" | sed -e "s/^\(.*@\)\{0,1\}\([^@]*\)\$/$FORCE_LOGIN@\2/")
+elif [ "$DEFAULT_LOGIN" != "" ] ; then
+	[ "$DEBUG" -ge 1 ] && echo "DEBUG: DEFUALT_LOGIN: $DEFAULT_LOGIN" 1>&2
+	HOSTLIST=$(echo "$HOSTLIST" | sed -e "s/^\([^@]*\)\$/$DEFAULT_LOGIN@\1/")
+fi
+[ $UNIQUE_HOSTS -ge 1 ] && HOSTLIST=$(echo "$HOSTLIST" | sort -uf )
+
+
+################
+# CHECK SYNTAX #
+################
+if [ "$HOSTLIST" = "" ] ; then
+        echo "mussh: ERROR: You must supply at least one host!" 1>&2
+        echo "$USAGE" 1>&2
+        exit 1
+fi
+
+###################################
+# DEFAULT TO STDIN IF NO COMMANDS #
+###################################
+if [ "$THESCRIPT" = "" ] ; then
+        echo "Enter your script here.  End with single \".\" or EOF." 1>&2
+        while read THISLINE
+        do 
+                if [ "$THISLINE" = "." ] ; then
+                        break
+                fi
+        THESCRIPT="$THESCRIPT
+$THISLINE"
+        done
+fi
+
+###################################################
+# INFINATE CONCURRENCY IS REALLY JUST ALL AT ONCE #
+###################################################
+if [ "$CONCURRENT" = "0" ] ; then
+	CONCURRENT=$(echo "$HOSTLIST" | wc -w)
+	[ "$DEBUG" -ge 1 ] && echo "DEBUG: setting conncurrency (-m) to $CONCURRENT (all hosts)" 1>&2
+fi
+[ "$DEBUG" -ge 1 ] && echo "DEBUG: Concurrency: $CONCURRENT" 1>&2
+
+############################
+# PRINT VERBOSE DEBUG INFO #
+############################
+if [ "$DEBUG" -ge 2 ] ; then
+        echo "DEBUG: HOSTLIST: " $HOSTLIST 1>&2
+        echo "DEBUG: THE SCRIPT: $THESCRIPT" 1>&2
+        echo "DEBUG: SSH ARGS: $SSH_ARGS" 1>&2
+fi
+
+############################
+# LOAD SSH-AGENT WITH KEYS #
+############################
+if [ "$NO_AGENT" = "1" ] ; then
+        [ "$DEBUG" -ge 1 ] && echo "DEBUG: Not using ssh-agent" 1>&2
+elif [ "$IDENT" != "" ] ; then
+        start_agent
+        load_keys "$IDENT"
+elif [ ! -f "$HOME/.ssh/identity" -a ! -f "$HOME/.ssh/id_dsa" ]  ; then
+        [ "$DEBUG" -ge 1 ] && echo "DEBUG: No identity file found.  Skipping agent."
+else
+        start_agent 
+        load_keys "$IDENT"
+fi
+#echo
+
+###################
+# CREATE TEMP DIR #
+###################
+create_temp
+
+########################
+# EXECUTE THE COMMANDS #
+########################
+if [ -z "$CONCURRENT" ] ; then
+CONCURRENT=1
+fi
+
+if [ "$PROXY" != "" ] ; then
+        proxy_connect
+
+# Don't background process when we're only doing one at a time
+#elif [ -z "$CONCURRENT" -o "$CONCURRENT" = 1 ] ; then
+#        set $HOSTLIST
+#        while [ "$1" != "" ] ; do
+#                HOST="$1"
+#                [ "$DEBUG" -ge 1 ] && echo "DEBUG: CONNECT $HOST" 1>&2
+#		shift
+#		ssh_connect 
+#	done
+else
+# Fork $CONCURRENT children
+	
+	if [ -n "$GLOBAL_TIMEOUT" ] ; then
+		trap "echo Timeout reached exiting ; shutdown; exit 12" USR1
+		( echo $$ ; sleep $GLOBAL_TIMEOUT && kill -USR1 $$ 2> /dev/null ) &
+		disown $!
+	fi
+
+	set_hostlist
+	for CHILDNUM in $(seq 1 $CONCURRENT) ; do
+		run_child $CHILDNUM &
+		[ "$DEBUG" -ge 2 ] && echo "DEBUG: FORKED CHILD #$CHILDNUM with pid $!" 1>&2
+		rm -f "$TEMP_DIR/$CHILDNUM.pid"
+		echo $! > "$TEMP_DIR/$CHILDNUM.pid"
+        done
+	wait
+# since trap causes waits to stop waiting with a return value >128
+# We need to check that we really meant to stop waiting.
+	RETVAL=$?
+	while [ "$RETVAL" -gt 128 ] ; do
+		[ "$DEBUG" -ge 2 ] && echo "DEBUG: wait returned with a value of $RETVAL" 1>&2
+		DO_WAIT=0
+		for CPID in $(cat $TEMP_DIR/*.pid 2>/dev/null) ; do
+			if [ -d "/proc/$CPID" ] ; then 
+				DO_WAIT=1
+				[ "$DEBUG" -ge 2 ] && echo "DEBUG: $CPID is still running." 1>&2
+			fi
+		done
+		[ "$DO_WAIT" = 0 ] && break
+		wait
+	done
+fi
+
+############
+# CLEAN UP #
+############
+destroy_temp
+stop_agent
+

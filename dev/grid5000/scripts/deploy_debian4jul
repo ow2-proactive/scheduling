@@ -28,37 +28,50 @@ do
 done
 
 SSH=$(dirname $0)/deploy/ssh_autologin.exp
+TEMPDIR=`mktemp -d -t debian4all.XXXXXXXXXX`
 
-for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
-do
-	CLUSTER=${OPTIONS_CLUSTERS[$i]}
-	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
-	KADEPLOY_ARGS="-l jleduc -e debian4jul -p $(get_kadeploy_part $CLUSTER)"
+function reboot_cluster {
+	cluster=$1
+	echo "#### $cluster: Reboot started at `date`"
+
+	NODES=$(`dirname $0`/g5k_reservedNodes -s $cluster)
+	KADEPLOY_ARGS="-l jleduc -e debian4jul -p $(get_kadeploy_part $cluster)"
 
 	for j in $NODES ; do KADEPLOY_ARGS="$KADEPLOY_ARGS -m $j " ; done
-	ssh $(get_oar_hostname $CLUSTER) kadeploy $KADEPLOY_ARGS &
+	ssh $(get_oar_hostname $cluster) kadeploy $KADEPLOY_ARGS 
 
-done
-
-while true ; do
-	if [ "$(ps aux | grep $USER | grep kadeploy|grep -v grep)" = "" ] ; then break ; fi
-	sleep 15
-done
-
-for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
-do
-	CLUSTER=${OPTIONS_CLUSTERS[$i]}
-	NODES=$(`dirname $0`/g5k_reservedNodes -s $CLUSTER)
-	
 	for j in $NODES ; 
 	do 
 		# WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!
 		# PLEASE SHUT UP !
 		#sed -i "s/^$j.*//"  ~/.ssh/known_hosts
-		rm  ~/.ssh/known_hosts
-
-		$SSH $ROOT_PASSWD $j groupadd  -g `id -g` sophia 
-		$SSH $ROOT_PASSWD $j useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+		rm -f  ~/.ssh/known_hosts
+		ping -q -c1 $j > /dev/null
+		if [ "$?" = 0 ] ; then
+			$SSH $ROOT_PASSWD $j groupadd  -g `id -g` sophia  
+			$SSH $ROOT_PASSWD $j useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+		fi
 	done
-done
 
+	echo "#### $cluster: Reboot ended at `date`"
+}
+
+
+# Reboot all the clusters in an asynchronous way
+# If all cluster have not rebooted in $TIMEOUT seconds just continue
+TIMEOUT=1200 # 20 minutes
+
+trap "echo Timeout reached ;" USR1
+( echo $$ ; sleep $TIMEOUT && kill -USR1 $$ 2> /dev/null ) &
+disown $!
+
+for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; do
+	CLUSTER=${OPTIONS_CLUSTERS[$i]}
+	( reboot_cluster $CLUSTER | tee $TEMPDIR/$CLUSTER) &
+done
+wait 
+
+grep -h deployed $TEMPDIR/*
+echo
+echo
+grep -h error $TEMPDIR/*
