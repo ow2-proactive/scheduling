@@ -339,6 +339,9 @@ public class TimIt {
                         if (run > warmup) {
                             benchResults.addResult(bstats, name + " [" + run
                                     + "/" + nbRuns + "]");
+                            if( b.get("writeEveryRun").equalsIgnoreCase("true") ) {
+                            	benchResults.writeResult();
+                            }
                         }
                         startable.kill();
                     }
@@ -347,6 +350,7 @@ public class TimIt {
                     }
                     startable.masterKill();
                     threadsCleaning();
+                    benchResults.writeResult();
                     if( b.get("removeExtremums").equalsIgnoreCase("true") ) {
                         benchResults.removeExtremums();
                     }
@@ -372,7 +376,7 @@ public class TimIt {
     /**
      * @deprecated
      */
-    public static void threadsCleaning() {
+    private static void threadsCleaning() {
         ThreadGroup tg = Thread.currentThread().getThreadGroup().getParent();
         Thread[] threads = new Thread[200];
         int len = tg.enumerate(threads,true);

@@ -77,6 +77,9 @@ public class Benchmark extends Tag {
         if (name.equals("removeextremums")) {
             return "false";
         }
+        if (name.equals("writeeveryrun")) {
+        	return "true";
+        }
         if (name.equals("descriptorgenerated")) {
             return "";
         }

@@ -104,7 +104,13 @@ public class BenchmarkResultWriter {
         Element informationElement = new Element("Information");
         informationElement.addContent("" + bstats.getInformation());
         benchResult.addContent(informationElement);
-
+    }
+    
+    /**
+     * Write results into the file
+     *
+     */
+    public void writeResult() {
         // Save modification into file
         XMLHelper.writeFile(this.document, this.filename);
     }
