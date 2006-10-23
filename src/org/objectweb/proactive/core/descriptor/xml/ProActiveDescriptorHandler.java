@@ -170,7 +170,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 				urlSchema = ProActiveDescriptorHandler.class.getResource("/");
 				pathSchema = urlSchema.getPath();
 				pathSchema = pathSchema
-						.concat("../descriptors/DescriptorSchema.xsd");
+						.concat(".." + java.io.File.separator + "descriptors" + java.io.File.separator + "DescriptorSchema.xsd");
 
 			} else {
 				pathSchema = urlSchema.getPath();
