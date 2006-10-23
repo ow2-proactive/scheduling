@@ -155,7 +155,21 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             String uri = xmlDescriptorUrl;
             // we get the schema from the class location
             java.net.URL urlSchema = ProActiveDescriptorHandler.class.getResource("/DescriptorSchema.xsd");
-            java.io.File fileSchema = new java.io.File(urlSchema.getPath());
+            String pathSchema;
+            if (urlSchema == null)
+            {	
+            	// In case the application is executed neither via the ant script, nor via the jar file, we need to find the schema manually
+            	urlSchema = ProActiveDescriptorHandler.class.getResource("/");
+            	pathSchema = urlSchema.getPath();
+            	pathSchema = pathSchema.concat("../descriptors/DescriptorSchema.xsd");
+            	
+            }
+            else
+            {
+            	pathSchema = urlSchema.getPath();
+            }
+            	
+            java.io.File fileSchema = new java.io.File(pathSchema);
             org.objectweb.proactive.core.xml.io.StreamReader sr = null;
             if (fileSchema.exists())
             {
