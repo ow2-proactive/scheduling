@@ -178,6 +178,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 pathSchema = urlSchema.getPath();
             }
 
+            logger.debug("Using XML shema at location: "+pathSchema);
             java.io.File fileSchema = new java.io.File(pathSchema);
             org.objectweb.proactive.core.xml.io.StreamReader sr = null;
             sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
