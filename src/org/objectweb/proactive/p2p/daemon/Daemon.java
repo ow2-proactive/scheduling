@@ -1,34 +1,55 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.p2p.daemon;
+
+import org.apache.log4j.Appender;
+import org.apache.log4j.Layout;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
+import org.apache.log4j.WriterAppender;
+import org.apache.log4j.nt.NTEventLogAppender;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
+import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.core.xml.io.StreamReader;
+import org.objectweb.proactive.p2p.service.StartP2PService;
+
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,10 +59,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -53,25 +78,6 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.Stack;
 import java.util.Vector;
-
-import org.apache.log4j.Appender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.nt.NTEventLogAppender;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
-import org.objectweb.proactive.core.xml.io.Attributes;
-import org.objectweb.proactive.core.xml.io.StreamReader;
-import org.objectweb.proactive.p2p.service.StartP2PService;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 
 /*
@@ -171,6 +177,7 @@ class Moment implements Comparable {
 
     public int compareTo(Object o) {
         Moment m = (Moment) o;
+
         return absoluteMinutes - m.absoluteMinutes;
     }
 
@@ -180,6 +187,7 @@ class Moment implements Comparable {
 
     public int minutesFromNow() {
         Moment now = new Moment();
+
         return absoluteMinutes - now.absoluteMinutes;
     }
 
@@ -193,6 +201,8 @@ class Moment implements Comparable {
 
 
 class IntervalTime implements Comparable {
+    /* <Debug> */
+    private static Random random = new Random();
     private Moment start;
     private Moment end;
     private boolean valid;
@@ -230,11 +240,13 @@ class IntervalTime implements Comparable {
 
     public int compareTo(Object o) {
         IntervalTime it = (IntervalTime) o;
+
         return start.compareTo(it.start);
     }
 
     public boolean equals(Object o) {
         IntervalTime interval = (IntervalTime) o;
+
         return start.equals(interval.start) && end.equals(interval.end);
     }
 
@@ -253,9 +265,6 @@ class IntervalTime implements Comparable {
     public void setStart(Moment start) {
         this.start = start;
     }
-
-    /* <Debug> */
-    private static Random random = new Random();
 
     public String toString() {
         return "[" + start + " - " + end + "]";
@@ -288,8 +297,10 @@ class WorkTime {
             intersected.setEnd(interval.getEnd());
 
             List<IntervalTime> toDelete = new ArrayList<IntervalTime>();
+
             while (iter.hasNext()) {
                 IntervalTime next = iter.next();
+
                 if (intersected.contains(next)) {
                     toDelete.add(next);
                 } else if (intersected.intersect(next)) {
@@ -301,6 +312,7 @@ class WorkTime {
             }
 
             Iterator<IntervalTime> toDeleteIter = toDelete.iterator();
+
             while (toDeleteIter.hasNext()) {
                 IntervalTime toDeleteItem = toDeleteIter.next();
                 intervals.remove(toDeleteItem);
@@ -316,8 +328,10 @@ class WorkTime {
         }
 
         ListIterator<IntervalTime> iter = intervals.listIterator();
+
         while (iter.hasNext()) {
             IntervalTime inList = iter.next();
+
             if (inList.intersect(interval)) {
                 if (inList.contains(interval)) {
                     return true;
@@ -328,11 +342,13 @@ class WorkTime {
 
             if (interval.compareTo(inList) < 0) {
                 iter.previous();
+
                 break;
             }
         }
 
         iter.add(interval);
+
         return true;
     }
 
@@ -354,8 +370,10 @@ class WorkTime {
     public IntervalTime getCurrentWorkInterval() {
         Moment now = new Moment();
         Iterator<IntervalTime> iter = intervals.iterator();
+
         while (iter.hasNext()) {
             IntervalTime interval = iter.next();
+
             if (interval.getEnd().equals(now)) {
                 continue;
             }
@@ -375,8 +393,10 @@ class WorkTime {
     public IntervalTime getNextWorkInterval() {
         Moment now = new Moment();
         Iterator<IntervalTime> iter = intervals.iterator();
+
         while (iter.hasNext()) {
             IntervalTime interval = iter.next();
+
             if (interval.getStart().compareTo(now) >= 0) {
                 return interval;
             }
@@ -387,17 +407,18 @@ class WorkTime {
 
     public int computeDuration(IntervalTime work) {
         Moment end = work.getEnd();
+
         if (!end.equals(Moment.END_OF_WEEK)) {
             return end.minutesFromNow();
         }
 
         if (work.getStart().equals(Moment.START_OF_WEEK)) {
-
             /* Infinite */
             return -1;
         }
 
         IntervalTime first = intervals.get(0);
+
         if (!first.getStart().equals(Moment.START_OF_WEEK)) {
             return end.minutesFromNow();
         }
@@ -414,9 +435,11 @@ class WorkTime {
         Iterator<IntervalTime> iter = intervals.iterator();
         IntervalTime previous = null;
         IntervalTime current = null;
+
         while (iter.hasNext()) {
             previous = current;
             current = iter.next();
+
             if (!current.isValid()) {
                 return false;
             }
@@ -435,10 +458,12 @@ class WorkTime {
         if (intervals.isEmpty()) {
             return "()";
         }
+
         String res = "(" + intervals.get(0);
 
         Iterator<IntervalTime> iter = intervals.iterator();
         iter.next();
+
         while (iter.hasNext()) {
             IntervalTime current = iter.next();
             res += (", " + current);
@@ -465,6 +490,15 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     private static String hostname = null;
     private WorkTime work;
     private Vector<String> url;
+
+    /* Used when parsing */
+    private boolean rightHost;
+    private boolean rightConfig;
+    private Stack<File> currentConfigFile;
+    private Moment start;
+    private Moment end;
+    private boolean parsed;
+    private Collection<String> parsedXML;
 
     public XMLConfig(WorkTime work, Vector<String> url) {
         this.work = work;
@@ -494,18 +528,8 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     }
 
     public void warning(SAXParseException e) throws SAXException {
-
         /* Ignore the warning */
     }
-
-    /* Used when parsing */
-    private boolean rightHost;
-    private boolean rightConfig;
-    private Stack<File> currentConfigFile;
-    private Moment start;
-    private Moment end;
-    private boolean parsed;
-    private Collection<String> parsedXML;
 
     public void startElement(String name, Attributes attributes)
         throws SAXException {
@@ -525,8 +549,9 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         }
 
         if (name.equals("loadconfig")) {
-            String path = attributes.getValue("path").replace('/',
-                    File.separatorChar);
+            String path = attributes.getValue("path")
+                                    .replace('/', File.separatorChar);
+
             if (!new File(path).isAbsolute()) {
                 File current = currentConfigFile.peek();
                 path = new File(current.getParentFile(), path).getAbsolutePath();
@@ -560,8 +585,17 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         }
     }
 
-    private static File getXMLSchema() {
-        return new File(CONFIG_PREFIX + "proactivep2p.xsd");
+    private static java.net.URL getXMLSchema() {
+        java.net.URL url = null;
+
+        try {
+            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURL();
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return url;
     }
 
     private static String getDefaultConfig(boolean hostDependant) {
@@ -586,6 +620,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         }
 
         StreamReader stream;
+
         try {
             File file = new File(configFile);
             Reader reader = new FileReader(file);
@@ -618,7 +653,6 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
 
         if (parseConfigFile(getDefaultConfig(true)) ||
                 parseConfigFile(getDefaultConfig(false))) {
-
             /* Nothing */
         }
 
@@ -629,8 +663,6 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
 
 
 public class Daemon {
-    private WorkTime work;
-    private Vector<String> url;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_DAEMON);
 
     /* Logging */
@@ -652,52 +684,8 @@ public class Daemon {
     private static final String KILL_CMD = "killdaemon";
     private static final String ALIVE_CMD = "alive";
     private static final String FLUSH_CMD = "flush";
-
-    static void log(String msg, boolean isError) {
-        msg = LOG_HEADER + msg;
-        try {
-            if (isError) {
-                logger.error(msg);
-            } else {
-                logger.info(msg);
-            }
-        } catch (Exception e) {
-
-            /* Log the logging exception ;-) */
-            System.out.println(e.getMessage() + " when logging : " + msg);
-        }
-    }
-
-    private static void configureLogging() {
-        Appender appender;
-        try {
-            appender = new NTEventLogAppender("ProActiveP2P");
-        } catch (java.lang.UnsatisfiedLinkError e) {
-            String hostname = XMLConfig.getLocalHostName();
-
-            Layout layout = new PatternLayout(LOG_PATTERN);
-            String filename = LOG_DIR + hostname;
-            RollingFileAppender rfa;
-            try {
-                new File(LOG_DIR).mkdir();
-                rfa = new RollingFileAppender(layout, filename, true);
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-                return;
-            }
-
-            rfa.setMaxBackupIndex(0);
-            rfa.setMaxFileSize(MAX_SIZE);
-            rfa.setImmediateFlush(false);
-            writerAppender = rfa;
-            appender = rfa;
-        }
-        Logger root = Logger.getRootLogger();
-        root.addAppender(appender);
-
-        /* First message :) */
-        log("Starting P2P Daemon", false);
-    }
+    private WorkTime work;
+    private Vector<String> url;
 
     private Daemon(boolean nextRun) {
         work = new WorkTime();
@@ -729,6 +717,7 @@ public class Daemon {
         }
 
         IntervalTime current = work.getCurrentWorkInterval();
+
         if ((current == null) || nextRun) {
             IntervalTime next = work.getNextWorkInterval();
             int minutes;
@@ -738,16 +727,19 @@ public class Daemon {
                 minutes = 24 * 60; /* 2424 => sleep one day */
             } else {
                 minutes = next.getStart().minutesFromNow();
+
                 if (minutes < 0) {
                     minutes += Moment.MINUTES_IN_WEEK; /* Next week */
                 }
             }
+
             log("Waiting for " + minutes + " minutes before working", false);
             sleep(minutes);
             current = next;
         }
 
         int minutes = work.computeDuration(current);
+
         try {
             setDestructionTimeout(minutes);
         } catch (Exception e) {
@@ -756,6 +748,56 @@ public class Daemon {
         }
 
         startWorking();
+    }
+
+    static void log(String msg, boolean isError) {
+        msg = LOG_HEADER + msg;
+
+        try {
+            if (isError) {
+                logger.error(msg);
+            } else {
+                logger.info(msg);
+            }
+        } catch (Exception e) {
+            /* Log the logging exception ;-) */
+            System.out.println(e.getMessage() + " when logging : " + msg);
+        }
+    }
+
+    private static void configureLogging() {
+        Appender appender;
+
+        try {
+            appender = new NTEventLogAppender("ProActiveP2P");
+        } catch (java.lang.UnsatisfiedLinkError e) {
+            String hostname = XMLConfig.getLocalHostName();
+
+            Layout layout = new PatternLayout(LOG_PATTERN);
+            String filename = LOG_DIR + hostname;
+            RollingFileAppender rfa;
+
+            try {
+                new File(LOG_DIR).mkdir();
+                rfa = new RollingFileAppender(layout, filename, true);
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+
+                return;
+            }
+
+            rfa.setMaxBackupIndex(0);
+            rfa.setMaxFileSize(MAX_SIZE);
+            rfa.setImmediateFlush(false);
+            writerAppender = rfa;
+            appender = rfa;
+        }
+
+        Logger root = Logger.getRootLogger();
+        root.addAppender(appender);
+
+        /* First message :) */
+        log("Starting P2P Daemon", false);
     }
 
     static void sleep(long minutes) {
@@ -781,9 +823,11 @@ public class Daemon {
     static String readCommand(BufferedReader reader) {
         char[] tab = new char[256];
         int offset = 0;
+
         do {
             try {
                 int nbRead = reader.read(tab, offset, tab.length - offset);
+
                 if (nbRead <= 0) {
                     break;
                 }
@@ -795,6 +839,7 @@ public class Daemon {
 
             String line = new String(tab);
             String trimmed = line.trim();
+
             if (!trimmed.equals(line)) {
                 return trimmed;
             }
@@ -815,7 +860,6 @@ public class Daemon {
             out.write("OK".getBytes("US-ASCII"));
             out.close();
         } catch (IOException e) {
-
             /* The client left, we won't process its request */
             return;
         }
@@ -850,6 +894,7 @@ public class Daemon {
                     } catch (IOException ioe) {
                         log(ioe.getMessage(), true);
                         System.exit(1);
+
                         return; /* To avoid a javac error */
                     }
 
@@ -892,7 +937,9 @@ public class Daemon {
 
     private void startWorking() {
         log("Start to work", false);
+
         StartP2PService service = new StartP2PService(url);
+
         try {
             service.start();
         } catch (ProActiveException e) {
@@ -903,6 +950,7 @@ public class Daemon {
     public static void main(String[] args) {
         try {
             boolean nextRun = false;
+
             for (int i = 0; i < args.length; i++)
                 if ("-n".equals(args[i])) {
                     nextRun = true;

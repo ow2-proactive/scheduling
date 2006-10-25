@@ -42,6 +42,8 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.SAXParserErrorHandlerTerminating;
 import org.objectweb.proactive.scheduler.Scheduler;
 
+import java.net.URISyntaxException;
+
 
 /**
  * This class receives deployment events
@@ -163,26 +165,33 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             // we get the schema from the class location
             java.net.URL urlSchema = ProActiveDescriptorHandler.class.getResource(
                     "/DescriptorSchema.xsd");
-            String pathSchema;
 
             if (urlSchema == null) {
                 // In case the application is executed neither via the ant
                 // script, nor via the jar file, we need to find the schema
                 // manually
                 urlSchema = ProActiveDescriptorHandler.class.getResource("/");
-                pathSchema = urlSchema.getPath();
-                pathSchema = pathSchema.concat(".." + java.io.File.separator +
+
+                java.net.URI uriSchema;
+
+                try {
+                    uriSchema = urlSchema.toURI();
+
+                    uriSchema.resolve(".." + java.io.File.separator +
                         "descriptors" + java.io.File.separator +
                         "DescriptorSchema.xsd");
-            } else {
-                pathSchema = urlSchema.getPath();
+                    urlSchema = uriSchema.toURL();
+                } catch (URISyntaxException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
 
-            logger.debug("Using XML shema at location: "+pathSchema);
-            java.io.File fileSchema = new java.io.File(pathSchema);
+            logger.debug("Using XML shema at location: " + urlSchema);
+
             org.objectweb.proactive.core.xml.io.StreamReader sr = null;
             sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                        uri), h, fileSchema,
+                        uri), h, urlSchema,
                     new SAXParserErrorHandlerTerminating());
 
             sr.read();
