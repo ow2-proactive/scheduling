@@ -71,9 +71,9 @@ public class Test extends FunctionalTest {
     	}
     	catch (Exception e)
     	{
-    		// Mistake found as expected
-    		super.getLogger().info("Mistake found as expected");
-    		super.getLogger().info(e.getMessage());
+    		// no log, as this is expected behaviour
+//    		super.getLogger().info("Mistake found as expected");
+//    		super.getLogger().info(e.getMessage());
     	}
 
 		if (pad != null)
@@ -90,8 +90,7 @@ public class Test extends FunctionalTest {
     	catch (Exception e)
     	{
     		// Mistake found but not expected
-    		System.out.println(e.getMessage());
-    		testSuccess = false;
+    		throw e;
     	}
     	
     	if (pad1 != null)
