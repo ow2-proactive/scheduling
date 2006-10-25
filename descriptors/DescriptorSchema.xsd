@@ -1063,18 +1063,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="BooleanOrVariableType" use="optional"/>
 		<xs:attribute name="jobname" type="xs:string" use="optional"/>
-		<xs:attribute name="queue" use="optional">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="normal"/>
-					<xs:enumeration value="priority"/>
-					<xs:enumeration value="night"/>
-					<xs:enumeration value="short"/>
-					<xs:enumeration value="idle"/>
-					<xs:enumeration value="exclusive"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
+		<xs:attribute name="queue"  type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="BsubOptionType">
