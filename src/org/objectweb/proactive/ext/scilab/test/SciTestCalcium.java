@@ -8,7 +8,7 @@ import javasci.SciDoubleMatrix;
 import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
@@ -54,10 +54,10 @@ public class SciTestCalcium implements Serializable{
 			sciTask.addDataIn(sciMatrix);
 			sciTask.addDataOut(sciMatrix);
 			sciTask.setJob(sciMatrix.getName() + "=" +  sciMatrix.getName() + "* 2;");
-			calcium.inputParameter(sciTask);
+			calcium.input(sciTask);
 		}
 		
-		calcium.eval();
+		calcium.boot();
 
 		
 		try {
@@ -71,7 +71,7 @@ public class SciTestCalcium implements Serializable{
 			}
 			
 			
-		} catch (ParameterException e) {
+		} catch (MuscleException e) {
 			e.printStackTrace();
 		} catch (PanicException e) {
 			e.printStackTrace();
