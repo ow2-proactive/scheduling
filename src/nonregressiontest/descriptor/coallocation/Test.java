@@ -32,6 +32,7 @@ package nonregressiontest.descriptor.coallocation;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
@@ -75,7 +76,11 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
-        proActiveDescriptor.activateMappings();
+        // We activate the mapping in reverse order
+        // when two vns refer to the same vm, the first vn which creates the vm becomes the creator of the vm
+        // we want to verify this behavior (in addition to coallocation)
+        proActiveDescriptor.activateMapping("covn2");
+        proActiveDescriptor.activateMapping("covn1");
         VirtualNode vn1 = proActiveDescriptor.getVirtualNode("covn1");
         VirtualNode vn2 = proActiveDescriptor.getVirtualNode("covn2");
         node1 = vn1.getNode();
@@ -96,8 +101,10 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
+    	VirtualNode vn1 = proActiveDescriptor.getVirtualNode("covn1");
+    	VirtualMachine vm = vn1.getVirtualMachine();
         return node1.getProActiveRuntime().getURL().equals(node2.getProActiveRuntime()
-                                                                .getURL());
+                                                                .getURL()) && vm.getCreatorId().equals("covn2");
     }
 
     public static void main(String[] args) {
