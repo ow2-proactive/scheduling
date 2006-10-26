@@ -416,7 +416,7 @@
 	<!-- ================================================================ -->
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
-	<target name="proActiveJar" depends="ext,tools, bnb, p2p" description="Create the ProActive jar, to be used for instance on a distant host">
+	<target name="proActiveJar" depends="ext,tools, bnb, p2p, calcium" description="Create the ProActive jar, to be used for instance on a distant host">
 		<mkdir dir="${dist.dir}/ProActive" />
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
