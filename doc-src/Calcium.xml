@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Calcium">
-  <title>The Calcium Skeleton Framework</title>
+  <title>High Level Patterns -- The Calcium Skeleton Framework</title>
 
   <sect1>
     <title>Introduction</title>
@@ -9,13 +9,12 @@
     <sect2>
       <title>About Calcium</title>
 
-      <para>Calcium is part of the ProActive Grid Middleware. Calcium uses
-      ProActive's framework for programming structured parallel and
-      distributed applications. The framework provides a basic set of
-      structured patterns (skeletons) that can be nested to represents more
-      complex patterns. Skeletons are considered a high level programming
-      model because all the parallelisms detailes are hidden from the
-      programmer. In Calcium, distributed programming is achieved by using
+      <para>Calcium is part of the ProActive Grid Middleware for programming
+      structured parallel and distributed applications. The framework provides
+      a basic set of structured patterns (skeletons) that can be nested to
+      represents more complex patterns. Skeletons are considered a high level
+      programming model because all the parallelisms detailes are hidden from
+      the programmer. In Calcium, distributed programming is achieved by using
       ProActive deployment framework and active object model.</para>
     </sect2>
 
@@ -74,8 +73,8 @@
   <sect1>
     <title>Quick Example</title>
 
-    <para>In this example we will implement a skeleton that finds prime
-    numbers for an interval of numbers.</para>
+    <para>In this example we will implement skeleton that finds prime numbers
+    for an interval of numbers using a naive approach.</para>
 
     <sect2>
       <title>Define the skeleton structure</title>
@@ -117,9 +116,9 @@ public int max, min, solvableSize;
 
     /**
      * Creates a new challenge for finding primes.
-     * @param min  Number from which to start.
-     * @param max  Maximum number to stop
-     * @param solvableSize Size of problems to solve 
+     * @param min  The minimum of the interval.
+     * @param max  The maximum of the interval.
+     * @param solvableSize The size of the problems to be solved.
      */
     public Challenge(int min, int max, int solvableSize){
         this.min=min;
@@ -171,7 +170,7 @@ public int max, min, solvableSize;
             <area coords="???" id="???" />
           </areaspec>
 
-          <screen>public class ChallengeDivideCondition <emphasis role="bold">implements  Condition&lt;Challenge&gt;</emphasis>{
+          <screen>public class ChallengeDivideCondition <emphasis role="bold">implements Condition&lt;Challenge&gt;</emphasis>{
     
     public <emphasis role="bold">boolean evalCondition(Challenge params)</emphasis> {
         
@@ -202,7 +201,7 @@ public int max, min, solvableSize;
         
         return param;
     }
-    ...
+    //...
 }</screen>
         </screenco>
       </sect3>
@@ -246,9 +245,11 @@ public int max, min, solvableSize;
         </areaspec>
 
         <screen>Skeleton&lt;Challenge&gt; root = ...; //Step 1
-ResourceManager manager= new ProActiveManager(descriptor, "local");
+<emphasis role="bold">ResourceManager</emphasis> manager= new <emphasis
+            role="bold">ProActiveManager</emphasis>(descriptor, "local");
 
-Calcium&lt;Challenge&gt; calcium = new Calcium&lt;Challenge&gt;(manager, root);</screen>
+<emphasis role="bold">Calcium</emphasis>&lt;Challenge&gt; calcium = new <emphasis
+            role="bold">Calcium</emphasis>&lt;Challenge&gt;(manager, root);</screen>
       </screenco>
     </sect2>
 
@@ -267,7 +268,7 @@ Calcium&lt;Challenge&gt; calcium = new Calcium&lt;Challenge&gt;(manager, root);<
 calcium.input(new Challenge(1,100,20));
 calcium.input(new Challenge(1,640,64));
 
-calcium.eval(); //begin the evaluation</screen>
+calcium.<emphasis role="bold">boot</emphasis>(); //begin the evaluation</screen>
       </screenco>
     </sect2>
 
@@ -281,8 +282,11 @@ calcium.eval(); //begin the evaluation</screen>
           <area coords="???" id="???" />
         </areaspec>
 
-        <screen>for(Challenge res = calcium.getResult(); res != null; res = calcium.getResult())
-    System.out.println(res); //print results</screen>
+        <screen>for(Challenge res = calcium.<emphasis role="bold">getResult()</emphasis>; res != null; res = calcium.<emphasis
+            role="bold">getResult()</emphasis>)
+    System.out.println(res); //print results
+
+calcium.<emphasis role="bold">shutdown</emphasis>(); //release the resources</screen>
       </screenco>
     </sect2>
 
@@ -296,7 +300,8 @@ calcium.eval(); //begin the evaluation</screen>
           <area coords="???" id="???" />
         </areaspec>
 
-        <screen>Stats stats=calcium.getStats(res);
+        <screen><emphasis role="bold">Stats</emphasis> stats=calcium.<emphasis
+            role="bold">getStats</emphasis>(res);
 System.out.println(stats);</screen>
       </screenco>
     </sect2>
@@ -312,7 +317,7 @@ System.out.println(stats);</screen>
         <area coords="???" id="???" />
       </areaspec>
 
-      <screen>S := farm(S)|pipe(S1,S2)|if(cond,S1,S2)|while(cond,S)|For(i,S)|D&amp;C(cond,div,S,conq)|Map(div, S, conq)|Seq(f)</screen>
+      <screen>S := farm(S)|pipe(S1,S2)|if(cond,S1,S2)|while(cond,S)|for(i,S)|D&amp;C(cond,div,S,conq)|map(div, S, conq)|Seq(f)</screen>
     </screenco>
 
     <para>Each skeleton represents a different parallelism described as
@@ -420,16 +425,28 @@ ResourceManager manager = new MultiThreadedManager(2); //Two threads</screen>
         </listitem>
       </itemizedlist>
 
-      <para>To retrieve this statistics, a monitor must be activated. In the
-      following example we activate a simple logger monitor that prints the
-      statistics every 5 seconds.</para>
+      <para>Statistics for a specific moment can be directly retrieved from
+      the Calcium instance:</para>
 
       <screenco>
         <areaspec>
           <area coords="???" id="???" />
         </areaspec>
 
-        <screen>Monitor monitor= new SimpleLogMonitor(calcium, 5);
+        <screen>StatsGlobal statsGlobal = calcium.getStatsGlobal()</screen>
+      </screenco>
+
+      <para>An alternative is to create a monitor that can be performe
+      functions based on the statistics. In the following example we activate
+      a simple logger monitor that prints the statistics every 5
+      seconds.</para>
+
+      <screenco>
+        <areaspec>
+          <area coords="???" id="???" />
+        </areaspec>
+
+        <screen>Monitor monitor= new SimpleLogMonitor(<emphasis role="bold">calcium</emphasis>, 5);
 
 monitor.start();
 ...
@@ -469,4 +486,22 @@ monitor.stop();</screen>
       </itemizedlist>
     </sect2>
   </sect1>
+
+  <sect1>
+    <title>Future Work</title>
+
+    <para></para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Handle fault tolerance</para>
+      </listitem>
+
+      <listitem>
+        <para>Allow scalability on the number of resources used</para>
+      </listitem>
+    </itemizedlist>
+  </sect1>
+
+  <lot></lot>
 </chapter>
