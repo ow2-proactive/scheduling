@@ -30,7 +30,7 @@ package org.objectweb.proactive.calcium.interfaces;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 /**
  * This class is used to conquer a vector of parameters
@@ -43,5 +43,5 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  */
 public interface Conquer<T> extends Muscle{
 
-	public T conquer(T parent, Vector<T> param) throws RuntimeException, SchedulingException;
+	public T conquer(T parent, Vector<T> param) throws RuntimeException, EnvironmentException;
 }

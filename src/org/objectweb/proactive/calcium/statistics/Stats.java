@@ -40,10 +40,13 @@ public interface Stats extends Serializable{
 	public long getWallClockTime();
 	
 	/**
-	 * The computation time will ideally correspond to the CPU Time or
-	 * the best aproximation possible.
+	 * The computation time will ideally correspond to the CPU Time or,
+	 * if the JVM does not support it, the wallclock time.
 	 * In comparison with the processing time, this time does not
 	 * include the network and other overheads.
+	 * 
+	 * Note that if the measured code executed a fork, the child's cpu time
+	 * will not be reflected.
 	 * 
 	 * @return Returns the computation time spent by this task.
 	 */

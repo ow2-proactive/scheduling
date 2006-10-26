@@ -28,12 +28,11 @@
 package org.objectweb.proactive.calcium;
 
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
+import org.objectweb.proactive.calcium.statistics.Timer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -64,7 +63,7 @@ public class Interpreter implements Serializable {
 	
 	public <T> Task<T> interpret(Task<T> task){
 		
-		long init=getCurrenTime();
+		Timer timer=new Timer(true);
 		while(task.hasInstruction()){
 			if(logger.isDebugEnabled()){
 				logger.debug("--Stack Top-- Task="+task.getId()+" "+task.getObject());
@@ -98,26 +97,15 @@ public class Interpreter implements Serializable {
 			
 			//If child tasks are present, that's all folks (for now)
 			if(task.hasReadyChildTask()){
-				task.getStats().addComputationTime(getCurrenTime()-init);
+				timer.stop();
+				task.getStats().addComputationTime(timer.getTime());
 				return task;
 			}
 		}//while
 
 		//The task is finished
-		task.getStats().addComputationTime(getCurrenTime()-init);
+		timer.stop();
+		task.getStats().addComputationTime(timer.getTime());
 		return task;
-	}
-	
-	private long getCurrenTime(){
-		ThreadMXBean tmb=ManagementFactory.getThreadMXBean();
-		if(tmb.isThreadCpuTimeSupported()){
-			
-			if(!tmb.isThreadCpuTimeEnabled()){
-				tmb.setThreadCpuTimeEnabled(true);
-			}
-			return tmb.getCurrentThreadCpuTime()/1000000;
-		}
-
-		return System.currentTimeMillis();
 	}
 }

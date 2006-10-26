@@ -36,7 +36,7 @@ import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.examples.nqueens.bt1.*;
 import org.objectweb.proactive.calcium.examples.nqueens.bt2.*;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.monitor.Monitor;
 import org.objectweb.proactive.calcium.monitor.SimpleLogMonitor;
@@ -79,20 +79,20 @@ public class NQueens implements Serializable{
 	public void start(int boardSize, int solvableSize, int times, String descriptor, String virtualNode){
 		
 		ResourceManager manager= 
-			//new MonoThreadedManager();
-			//new MultiThreadedManager(1);
+			new MonoThreadedManager();
+			//new MultiThreadedManager(10);
 		 	//new ProActiveThreadedManager(descriptor, virtualNode);
-			new ProActiveManager(descriptor, virtualNode);
+			//new ProActiveManager(descriptor, virtualNode);
 		
 		Calcium<Board> calcium = new Calcium<Board>(manager, root);
 		Monitor monitor= new SimpleLogMonitor(calcium, 5);
 		
 		for(int i=0;i<times;i++){
-			calcium.inputParameter(new Board(boardSize,solvableSize));
+			calcium.input(new Board(boardSize,solvableSize));
 		}
 
 		monitor.start();
-		calcium.eval();
+		calcium.boot();
 		
 		try {
 
@@ -106,12 +106,12 @@ public class NQueens implements Serializable{
 				System.out.println("Total="+total);				
 				System.out.println(calcium.getStats(res));
 			}
-		} catch (ParameterException e) {
+		} catch (MuscleException e) {
 			e.printStackTrace();
 		} catch (PanicException e) {
 			e.printStackTrace();
 		}
-		
+		calcium.shutdown();
 		monitor.stop();
 	}
 }

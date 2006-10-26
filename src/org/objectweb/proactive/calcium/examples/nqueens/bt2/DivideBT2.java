@@ -30,13 +30,12 @@ package org.objectweb.proactive.calcium.examples.nqueens.bt2;
 import java.util.Vector;
 
 import org.objectweb.proactive.calcium.examples.nqueens.Board;
-import org.objectweb.proactive.calcium.examples.nqueens.DivideBoard;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Divide;
 
 public class DivideBT2 implements Divide<Board>{
 	
-	public Vector<Board> divide(Board board) throws RuntimeException, SchedulingException {
+	public Vector<Board> divide(Board board) throws RuntimeException, EnvironmentException {
 
 		if(board.isRootBoard()){
 			return initDivideBT2(board);

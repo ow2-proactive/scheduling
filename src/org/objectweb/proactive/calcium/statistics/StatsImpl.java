@@ -27,8 +27,6 @@
  */
 package org.objectweb.proactive.calcium.statistics;
 
-import java.util.HashMap;
-
 import org.objectweb.proactive.calcium.interfaces.Muscle;
 
 public class StatsImpl implements Stats {

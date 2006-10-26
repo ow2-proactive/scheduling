@@ -29,18 +29,12 @@ package org.objectweb.proactive.calcium.examples.blast;
 
 import java.io.File;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 
 public class CleanBlast implements Execute<BlastParameters> {
 
-	private int id;
-	
-	public CleanBlast(int id) {
-		this.id = id;
-	}
-
-	public BlastParameters execute(BlastParameters param) throws RuntimeException, SchedulingException {
+	public BlastParameters execute(BlastParameters param) throws RuntimeException, EnvironmentException {
 		
 		String[] file={param.getDatabaseFile().getAbsolutePath(), param.getQueryFile().getAbsolutePath()};
 		String ext[] = {"nsq","nsi", "nsd", "nin", "nhr"};
@@ -52,11 +46,7 @@ public class CleanBlast implements Execute<BlastParameters> {
 			}
 		}
 		
-		param.getDatabaseFile().delete();
+		if(!param.isRootParameter()) param.getDatabaseFile().delete();
 		return param;
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }

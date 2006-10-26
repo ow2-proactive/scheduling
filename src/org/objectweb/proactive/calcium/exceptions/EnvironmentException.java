@@ -28,19 +28,18 @@
 package org.objectweb.proactive.calcium.exceptions;
 
 /**
- * A Parameter Exception indicates that the execution of the task related with this parameter
- * can not continue, and the execution of related tasks (parent, brothers, children) must 
- * also be stoped.
- *  
+ * This exception is thrown when a task encounters environment
+ * problems that normally would not be present on other hosts.
+ * 
+ * Re-executing the task on another (more proper) host should lead to a 
+ * successful execution.
+ * 
  * @author The ProActive Team (mleyton)
+ *
  */
-public class ParameterException extends RuntimeException {
+public class EnvironmentException extends Exception {
 
-	public ParameterException(String msg){
+	public EnvironmentException(String msg){
 		super(msg);
-	}
-	
-	public ParameterException(Exception e){
-		super(e);
 	}
 }

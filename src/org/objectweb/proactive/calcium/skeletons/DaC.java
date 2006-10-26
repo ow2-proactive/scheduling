@@ -30,8 +30,8 @@ package org.objectweb.proactive.calcium.skeletons;
 import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Condition;
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 import org.objectweb.proactive.calcium.interfaces.Divide;
@@ -83,7 +83,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		return v;
 	}
 
-	public Task<T> compute(Task<T> t) throws SchedulingException{
+	public Task<T> compute(Task<T> t) throws EnvironmentException{
 		
 		//Conquer if children are present
 		if(t.hasFinishedChild()){
@@ -115,7 +115,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		return t;
 	}
 	
-	protected Task<T> divide(Task<T> parent) throws SchedulingException{
+	protected Task<T> divide(Task<T> parent) throws EnvironmentException{
 		
 		/*
 		 * We pass the t.object to the div. Each result
@@ -129,7 +129,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		if(childObjects.size()<=0){
 			String msg="Parameter was divided into less than 1 part.";
 			logger.debug(msg);
-			throw new ParameterException(msg);
+			throw new MuscleException(msg);
 		}
 		
 		for(T o:childObjects){
@@ -144,7 +144,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		return parent;
 	}
 	
-	protected Task<T> conquer(Task<T> parent) throws SchedulingException {
+	protected Task<T> conquer(Task<T> parent) throws EnvironmentException {
 		
 		/**
 		 * We get the result objects from the child
@@ -163,7 +163,7 @@ public class DaC<T> implements Skeleton<T>, Instruction<T> {
 		if(childObjects.size() <=0 ){
 			String msg="Can't conquer less than one child parameter!";
 			logger.error(msg);
-			throw new ParameterException(msg);
+			throw new MuscleException(msg);
 		}
 		
 		Timer timer = new Timer();

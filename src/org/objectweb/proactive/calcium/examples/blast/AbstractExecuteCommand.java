@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -81,9 +81,9 @@ public abstract class AbstractExecuteCommand {
 		}
 	}
 	
-	protected abstract URL getProgramURL() throws SchedulingException, ParameterException;
+	protected abstract URL getProgramURL() throws EnvironmentException, MuscleException;
 	
-	protected void execProcess(String arguments, File workingDirectory) throws SchedulingException {
+	protected void execProcess(String arguments, File workingDirectory) throws EnvironmentException {
 		
 		URL programURL =getProgramURL(); 		
 
@@ -92,12 +92,12 @@ public abstract class AbstractExecuteCommand {
 			if(	process.waitFor() != 0){
 				String msg= "Command did not finish successfully: "+programURL+" "+arguments;
 				logger.error(msg);
-				throw new ParameterException(msg);
+				throw new MuscleException(msg);
 			}
 
 			//TODO perhaps do some verification here?
 		} catch (Exception e) {
-			throw new ParameterException(e);
+			throw new MuscleException(e);
 		}
 	}
 }

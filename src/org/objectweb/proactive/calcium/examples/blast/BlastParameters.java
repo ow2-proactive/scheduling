@@ -28,10 +28,13 @@
 package org.objectweb.proactive.calcium.examples.blast;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class BlastParameters implements Serializable {
+import org.objectweb.proactive.calcium.environment.AbstractEnvironmentParameter;
+
+public class BlastParameters extends AbstractEnvironmentParameter{
+	
+	private boolean isRootParameter;
 	
 	private File queryFile;			//query file
 	private File databaseFile;		//database file
@@ -48,7 +51,9 @@ public class BlastParameters implements Serializable {
 	private long maxDBSize;  		//maximum database size to accept
 	private File workingDirectory; 
 	
-	public BlastParameters(File queryFile, File databaseFile, boolean isNucleotide){
+	public BlastParameters(File queryFile, File databaseFile, boolean isNucleotide, long maxDBSize){
+		this.isRootParameter=false;
+		
 		this.queryFile=queryFile;
 		this.databaseFile=databaseFile;
 		this.isNucleotide=isNucleotide;
@@ -57,7 +62,7 @@ public class BlastParameters implements Serializable {
 		this.workingDirectory=queryFile.getParentFile();
 		
 		this.divideDBInto=2;
-		this.maxDBSize=5*1024;
+		this.maxDBSize=maxDBSize;
 	}
 	
 	public String getBlastParemeterString(){
@@ -150,5 +155,16 @@ public class BlastParameters implements Serializable {
 	 */
 	public File getOutPutFile() {
 		return new File(workingDirectory+System.getProperty("file.separator")+"/"+databaseFile.getName()+"-"+queryFile.getName()+".blast");
+	}
+	
+	public void setRootParameter(boolean value){
+		this.isRootParameter=value;
+	}
+
+	/**
+	 * @return Returns the isRootParameter.
+	 */
+	protected boolean isRootParameter() {
+		return isRootParameter;
 	}
 }

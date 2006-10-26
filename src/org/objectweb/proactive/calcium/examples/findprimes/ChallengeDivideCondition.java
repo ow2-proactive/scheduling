@@ -31,18 +31,8 @@ import org.objectweb.proactive.calcium.interfaces.Condition;
 
 public class ChallengeDivideCondition implements  Condition<Challenge>{
 
-	private int id;
-	
-	public ChallengeDivideCondition(int id){
-		this.id=id;
-	}
-	
 	public boolean evalCondition(Challenge params) {
 		
 		return params.max-params.min > params.solvableSize;
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }

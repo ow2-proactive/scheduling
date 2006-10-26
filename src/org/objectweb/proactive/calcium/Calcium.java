@@ -30,13 +30,16 @@ package org.objectweb.proactive.calcium;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.statistics.Stats;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class corresponds to the entry point of the skeleton framework.
@@ -54,7 +57,8 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobal;
  * @param <T> The type of the parameter used.
  */
 public class Calcium<T>{
-
+	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
+	
 	private ResourceManager manager;
 	private Skernel<T> skernel;
 	private Skeleton<T> skeleton;
@@ -68,13 +72,21 @@ public class Calcium<T>{
 		this.taskStats = new Hashtable<T, Stats>();
 	}
 
-	public void inputParameter(T param){
+	/**
+	 * Inputs a new T to be computed.
+	 * @param param The T to be computed.
+	 */
+	public void input(T param){
 		Vector<T> paramV= new Vector<T>(1);
 		paramV.add(param);
-		inputParameters(paramV);
+		input(paramV);
 	}
 	
-	public void inputParameters(Vector<T> paramV){
+	/**
+	 * Inputs a vector of T to be computed.
+	 * @param paramV A vector containing the T.
+	 */
+	public void input(Vector<T> paramV){
 		
 		Vector<Instruction<T>> v = (Vector<Instruction<T>>) skeleton.getInstructionStack();
 
@@ -86,7 +98,18 @@ public class Calcium<T>{
 		}
 	}
 	
-	public T getResult() throws PanicException, ParameterException{
+	/**
+	 * This method returns the result of the computation for
+	 * every inputed parameter. If no parameter is yet available
+	 * this method will block. 
+	 * 
+	 * @return The result of the computation on a parameter, or null if there are no more
+	 * parameters being computed.
+	 * @throws PanicException Is thrown if a unrecoverable error takes place inside the framework.
+	 * @throws MuscleException Is thrown if a functional exception happens during the execution
+	 * of the skeleton's muscle.
+	 */
+	public T getResult() throws PanicException, MuscleException{
 		
 		if(!skernel.hasResults() && skernel.isFinished()) {			
 			return null;
@@ -97,26 +120,44 @@ public class Calcium<T>{
 		//TODO Temporary ProActive generics bug workaround 
 		//This is the supelec trick
 		taskResult=(Task<T>)ProActive.getFutureValue(taskResult);
-
-		if(skernel.isFinished()){
-			manager.finish();
-		}
-		
+	
 		T res= taskResult.getObject();
 		this.taskStats.put(res,taskResult.getStats());
 		
 		return res;
 	}
 	
-	public void eval(){
+	/**
+	 * This method starts the framwork's computation.
+	 */
+	public void boot(){
 		skernel=manager.start(skernel);
 	}
 
+	/**
+	 * @return The current status of the global statistics.
+	 */
 	public StatsGlobal getStatsGlobal() {
 		return skernel.getStatsGlobal();
 	}
 
+	/**
+	 * After a T has been computed and obtained through getResult(),
+	 * this method retrieves the statistics for this T .
+	 * @param res The T obtained through getResult()
+	 * @return The statistics of this T, or null if the parameter is unknown.
+	 */
 	public Stats getStats(T res) {
 		return this.taskStats.get(res);
+	}
+	
+	/**
+	 * Stops the current computation by shuting down the acquired resources.
+	 */
+	public void shutdown(){
+		if(!skernel.isFinished()){
+			logger.warn("Warning: Stopping resources while there are still pending tasks.");
+		}
+		manager.finish();
 	}
 }

@@ -27,10 +27,9 @@
  */
 package org.objectweb.proactive.calcium.interfaces;
 
-import java.io.Serializable;
 import java.util.Vector;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 /**
  * This class is used to divide a parameter
@@ -43,5 +42,5 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  */
 public interface Divide<T> extends Muscle{
 
-	public Vector<T> divide(T param) throws RuntimeException, SchedulingException;
+	public Vector<T> divide(T param) throws RuntimeException, EnvironmentException;
 }

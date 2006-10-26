@@ -28,7 +28,7 @@
 package org.objectweb.proactive.calcium.interfaces;
 
 import java.io.Serializable;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 /**
  * Classes implementing this interface can be executed.
@@ -41,5 +41,5 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  */
 public interface Execute<T> extends Muscle{
 
-	public T execute(T param) throws RuntimeException, SchedulingException;
+	public T execute(T param) throws RuntimeException, EnvironmentException;
 }

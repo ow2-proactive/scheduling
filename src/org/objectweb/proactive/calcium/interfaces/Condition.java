@@ -29,7 +29,7 @@ package org.objectweb.proactive.calcium.interfaces;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 
 /**
@@ -43,5 +43,5 @@ import org.objectweb.proactive.calcium.exceptions.SchedulingException;
  */
 public interface Condition<T> extends Muscle{
 
-	public boolean evalCondition(T param) throws RuntimeException, SchedulingException;
+	public boolean evalCondition(T param) throws RuntimeException, EnvironmentException;
 }

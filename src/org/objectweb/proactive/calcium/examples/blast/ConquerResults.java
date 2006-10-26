@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -44,12 +44,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ConquerResults implements Conquer<BlastParameters> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public int id;
-    
-    public ConquerResults(int id){
-    	this.id=id;
-    }
-    
     public BlastParameters conquer(BlastParameters parent, Vector<BlastParameters> param) {
         try {
 
@@ -71,7 +65,7 @@ public class ConquerResults implements Conquer<BlastParameters> {
             bw.close();
             return parent;
         } catch (Exception e) {
-            throw new ParameterException(e);
+            throw new MuscleException(e);
         }
     }
 
@@ -91,8 +85,4 @@ public class ConquerResults implements Conquer<BlastParameters> {
         }
         br.close();
     }
-
-	public int getMuscleId() {
-		return id;
-	}
 }

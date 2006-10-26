@@ -30,13 +30,6 @@ package org.objectweb.proactive.calcium.examples.findprimes;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 
 public class SolveChallenge implements Execute<Challenge>{
-	
-	private int id;
-	
-	public SolveChallenge(int id){
-		this.id=id;
-	}
-	
 	public Challenge execute(Challenge param) {
 		for(int i=param.min;i<=param.max;i++){
 			if(isPrime(i)){
@@ -53,9 +46,5 @@ public class SolveChallenge implements Execute<Challenge>{
 			if(p%i==0) return false;
 		}
 		return true;
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }

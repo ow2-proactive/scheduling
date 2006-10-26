@@ -32,12 +32,6 @@ import org.objectweb.proactive.calcium.interfaces.Divide;
 
 public class ChallengeDivide implements Divide<Challenge>{
 	
-	private int id;
-	
-	public ChallengeDivide(int id){
-		this.id=id;
-	}
-	
 	public Vector<Challenge> divide(Challenge param) {
 		
 		Challenge ttUp = new Challenge(1+param.min+(param.max-param.min)/2,param.max,param.solvableSize);
@@ -50,9 +44,5 @@ public class ChallengeDivide implements Divide<Challenge>{
 		v.add(ttDown);
 		
 		return v;
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }

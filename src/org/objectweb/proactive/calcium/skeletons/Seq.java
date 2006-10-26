@@ -30,7 +30,7 @@ package org.objectweb.proactive.calcium.skeletons;
 import java.util.Vector;
 
 import org.objectweb.proactive.calcium.Task;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
@@ -63,7 +63,7 @@ public class Seq<T> implements Skeleton<T>, Instruction<T> {
 		return v;
 	}
 
-	public Task<T> compute(Task<T> t) throws RuntimeException, SchedulingException {
+	public Task<T> compute(Task<T> t) throws RuntimeException, EnvironmentException {
 		
 		Timer timer = new Timer();
 		T resultObject=secCode.execute(t.getObject());

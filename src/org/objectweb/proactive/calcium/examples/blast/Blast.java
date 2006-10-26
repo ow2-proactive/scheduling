@@ -28,15 +28,14 @@
 package org.objectweb.proactive.calcium.examples.blast;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
+import org.objectweb.proactive.calcium.MultiThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.examples.nqueens.NQueens;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
 import org.objectweb.proactive.calcium.skeletons.DaC;
@@ -57,26 +56,29 @@ public class Blast {
          * 2.3 Blast the database
          * 2.4 Cleanup
          */
-        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(new Seq<BlastParameters>(new ExecuteFormatDB(1)),
-        						  new Seq<BlastParameters>(new ExecuteFormatQuery(2)),
-                				  new Seq<BlastParameters>(new ExecuteBlast(3)),
-                				  new Seq<BlastParameters>(new CleanBlast(4))
+        Pipe<BlastParameters> blastPipe = new Pipe<BlastParameters>(new Seq<BlastParameters>(new ExecuteFormatDB()),
+        						  new Seq<BlastParameters>(new ExecuteFormatQuery()),
+                				  new Seq<BlastParameters>(new ExecuteBlast()),
+                				  new Seq<BlastParameters>(new CleanBlast())
                 				  );
 
         /* 1   Divide the database
          * 2   Blast the database with the query
-         * 3   Conquer the query results
-         */
-        root = new DaC<BlastParameters>(new DivideDB(5), 
-        								new DivideDBCondition(6),
+         * 3   Conquer the query results  */
+        root = new DaC<BlastParameters>(new DivideDB(), 
+        								new DivideDBCondition(),
         								blastPipe, 
-        								new ConquerResults(7));
+        								new ConquerResults());
         			
     }
 
     public static void main(String[] args) {
+    	BlastParameters param = new BlastParameters(
+    			new File("/tmp/blast.query"), 
+    			new File("/tmp/blast.db"), true, 100*1024);
+    	param.setRootParameter(true);
         Blast blast = new Blast();
-        blast.start(new BlastParameters(new File("/tmp/10seq"), new File("/tmp/10"), true));
+        blast.start(param);
     }
 
     private void start(BlastParameters parameters) {
@@ -84,21 +86,23 @@ public class Blast {
                                          .getPath();
 
         //descriptor="/home/mleyton/workspace/ProActive/descriptors/examples/SSH_SGE_Example.xml";
-        ResourceManager manager = new MonoThreadedManager();
-            //new MultiThreadedManager(8);
+        ResourceManager manager = 
+        	//new MonoThreadedManager();
+            new MultiThreadedManager(8);
             //new ProActiveThreadedManager(descriptor, "local");
-            new ProActiveManager(descriptor, "local");
+            //new ProActiveManager(descriptor, "local");
 
         Calcium<BlastParameters> calcium = new Calcium<BlastParameters>(manager, root);
-        calcium.inputParameter(parameters);
-        calcium.eval();
+        calcium.input(parameters);
+        calcium.boot();
 
 		try {
 			for(BlastParameters res = calcium.getResult(); 	res != null; res = calcium.getResult()){
 				File outPutFile=res.getOutPutFile();
 				System.out.println("Result in:"+outPutFile.getAbsolutePath()+ +outPutFile.length() + " [bytes]");
+				System.out.println(calcium.getStats(res));
 			}
-		} catch (ParameterException e) {
+		} catch (MuscleException e) {
 			e.printStackTrace();
 		} catch (PanicException e) {
 			e.printStackTrace();
@@ -106,5 +110,6 @@ public class Blast {
         
         StatsGlobal stats = calcium.getStatsGlobal();
         System.out.println(stats);
+        calcium.shutdown();
     }
 }

@@ -28,18 +28,19 @@
 package org.objectweb.proactive.calcium.exceptions;
 
 /**
- * This exception is thrown when a task encounters environment
- * problems that normally would not be present on other hosts.
- * 
- * Re-executing the task on another (more proper) host should lead to a 
- * successful execution.
- * 
+ * A Parameter Exception indicates that the execution of the task related with this parameter
+ * can not continue, and the execution of related tasks (parent, brothers, children) must 
+ * also be stoped.
+ *  
  * @author The ProActive Team (mleyton)
- *
  */
-public class SchedulingException extends Exception {
+public class MuscleException extends RuntimeException {
 
-	public SchedulingException(String msg){
+	public MuscleException(String msg){
 		super(msg);
+	}
+	
+	public MuscleException(Exception e){
+		super(e);
 	}
 }

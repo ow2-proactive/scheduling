@@ -30,8 +30,8 @@ package org.objectweb.proactive.calcium.examples.blast;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -39,13 +39,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ExecuteFormatQuery extends AbstractExecuteCommand implements Execute<BlastParameters> {
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 	
-	private int id;
-	
-	public ExecuteFormatQuery(int id){
-		this.id=id;
-	}
-	
-	public BlastParameters execute(BlastParameters param) throws SchedulingException {
+	public BlastParameters execute(BlastParameters param) throws EnvironmentException {
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("Formating query file:"+param.getQueryFile().getAbsolutePath());
@@ -57,24 +51,20 @@ public class ExecuteFormatQuery extends AbstractExecuteCommand implements Execut
 	}
 
 	@Override
-	public URL getProgramURL() throws SchedulingException {
+	public URL getProgramURL() throws EnvironmentException {
 
 		String osName = System.getProperty("os.name");
 		
 		if(!osName.equals("Linux")){
-			throw new SchedulingException("Linux machines are required");
+			throw new EnvironmentException("Linux machines are required");
 		}
 		
 		URL url = Blast.class.getClass().getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
 		
 		if(url==null){
-			throw new ParameterException("Unable to find formatdb binary");
+			throw new MuscleException("Unable to find formatdb binary");
 		}
 		
 		return url;
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }

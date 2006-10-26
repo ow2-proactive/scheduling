@@ -28,13 +28,22 @@
 package org.objectweb.proactive.calcium.statistics;
 
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 
 public class Timer implements Serializable{
 
 	long t, accumulated;
     int numberActivatedTimes;
+    boolean cpuTime;
+    
+    public Timer(boolean useCPUTime){
+    	cpuTime=useCPUTime;
+    	reset();
+    }
+    
     public Timer() {
-         reset();
+    	this(false);
     }
 
     /**
@@ -51,7 +60,7 @@ public class Timer implements Serializable{
 	 */
 	public long stop(){
 		if(t>0)
-		accumulated+=System.currentTimeMillis() - t;
+		accumulated+=getCurrentTime() - t;
 		t=-1;
 		return accumulated;
 	}
@@ -62,7 +71,7 @@ public class Timer implements Serializable{
 	 * the previous time.
 	 */
 	public void resume(){
-    	t=System.currentTimeMillis();
+    	t=getCurrentTime();
     	numberActivatedTimes++;
     }
 
@@ -70,7 +79,7 @@ public class Timer implements Serializable{
 	 * Resets the timer state.
 	 */
     private void reset() {
-        t = System.currentTimeMillis();
+        t = getCurrentTime();
         accumulated=0;
         numberActivatedTimes=1;
     }
@@ -79,7 +88,7 @@ public class Timer implements Serializable{
      * @return The currently accumulated time of this timer.
      */
     public long getTime(){
-    	if(t>0) return accumulated + System.currentTimeMillis() - t;
+    	if(t>0) return accumulated + getCurrentTime() - t;
     	
     	return accumulated;
     }
@@ -90,5 +99,21 @@ public class Timer implements Serializable{
      */
 	public int getNumberOfActivatedTimes() {
 		return numberActivatedTimes;
+	}
+	
+	private long getCurrentTime(){
+		
+		if(!cpuTime) return System.currentTimeMillis();
+		
+		ThreadMXBean tmb=ManagementFactory.getThreadMXBean();
+		if(tmb.isThreadCpuTimeSupported()){
+			
+			if(!tmb.isThreadCpuTimeEnabled()){
+				tmb.setThreadCpuTimeEnabled(true);
+			}
+			return tmb.getCurrentThreadCpuTime()/1000000;
+		}
+
+		return System.currentTimeMillis();
 	}
 }

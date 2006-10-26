@@ -28,7 +28,7 @@
 package org.objectweb.proactive.calcium.skeletons;
 
 import org.objectweb.proactive.calcium.Task;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Conquer;
 import org.objectweb.proactive.calcium.interfaces.Divide;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
@@ -52,7 +52,7 @@ public class Map<T> extends DaC<T> {
 	}
 	
 	//Override parent method to avoid using the condition
-	public Task<T> compute(Task<T> t) throws SchedulingException {
+	public Task<T> compute(Task<T> t) throws EnvironmentException {
 		
 		//Split the task if not already splitted
 		if(!t.hasFinishedChild()){

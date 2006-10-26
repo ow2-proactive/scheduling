@@ -30,21 +30,16 @@ package org.objectweb.proactive.calcium.examples.blast;
 import java.net.URL;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
-import org.objectweb.proactive.calcium.exceptions.SchedulingException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
+import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.calcium.interfaces.Execute;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<BlastParameters> {
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
-	public int id;
 	
-	public ExecuteFormatDB(int id){
-		this.id=id;
-	}
-	
-	public BlastParameters execute(BlastParameters param) throws SchedulingException {
+	public BlastParameters execute(BlastParameters param) throws EnvironmentException {
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("Formating database file:"+param.getDatabaseFile().getAbsolutePath());
@@ -56,24 +51,20 @@ public class ExecuteFormatDB extends AbstractExecuteCommand implements Execute<B
 	}
 
 	@Override
-	public URL getProgramURL() throws SchedulingException, ParameterException{
+	public URL getProgramURL() throws EnvironmentException, MuscleException{
 
 		String osName = System.getProperty("os.name");
 		
 		if(!osName.equals("Linux")){
-			throw new SchedulingException("Linux machines are required");
+			throw new EnvironmentException("Linux machines are required");
 		}
 		
 		URL url=  Blast.class.getClass().getResource("/org/objectweb/proactive/calcium/examples/blast/bin/linux/formatdb");
 		
 		if(url==null){
-			throw new ParameterException("Unable to find formatdb binary");
+			throw new MuscleException("Unable to find formatdb binary");
 		}
 
 		return url;
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }

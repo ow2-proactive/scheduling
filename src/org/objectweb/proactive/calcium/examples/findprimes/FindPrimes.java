@@ -33,7 +33,7 @@ import org.objectweb.proactive.calcium.Calcium;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Seq;
@@ -52,10 +52,10 @@ public class FindPrimes implements Serializable{
 	
 	public FindPrimes(){
 		
-		root= new DaC<Challenge>( new ChallengeDivide(1),
-				new ChallengeDivideCondition(2), 
-				new Seq<Challenge>(new SolveChallenge(3)),
-				new ConquerChallenge(4));
+		root= new DaC<Challenge>( new ChallengeDivide(),
+				new ChallengeDivideCondition(), 
+				new Seq<Challenge>(new SolveChallenge()),
+				new ConquerChallenge());
 	}
 	
 	public void solve(){
@@ -71,11 +71,11 @@ public class FindPrimes implements Serializable{
 		
 		Calcium<Challenge> calcium = new Calcium<Challenge>(manager, root);
 		
-		calcium.inputParameter(new Challenge(1,6400,300));
-		calcium.inputParameter(new Challenge(1,100,20));
-		calcium.inputParameter(new Challenge(1,640,64));
+		calcium.input(new Challenge(1,6400,300));
+		calcium.input(new Challenge(1,100,20));
+		calcium.input(new Challenge(1,640,64));
 		
-		calcium.eval();
+		calcium.boot();
 		
 		try {
 			for(Challenge res = calcium.getResult(); 
@@ -87,7 +87,7 @@ public class FindPrimes implements Serializable{
 				System.out.println();
 				System.out.println(calcium.getStats(res));
 			}
-		} catch (ParameterException e) {
+		} catch (MuscleException e) {
 			e.printStackTrace();
 		} catch (PanicException e) {
 			e.printStackTrace();
@@ -97,5 +97,6 @@ public class FindPrimes implements Serializable{
 		
 		StatsGlobal stats = calcium.getStatsGlobal();
 		System.out.println(stats);
+		calcium.shutdown();
 	}
 }

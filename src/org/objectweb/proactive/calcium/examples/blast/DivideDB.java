@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.calcium.exceptions.ParameterException;
+import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Divide;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -44,12 +44,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class DivideDB implements Divide<BlastParameters> {
 
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
-	
-	private int id;
-	
-	public DivideDB(int id){
-		this.id=id;
-	}
 	
 	public Vector<BlastParameters> divide(BlastParameters param) {
 
@@ -63,11 +57,15 @@ public class DivideDB implements Divide<BlastParameters> {
 		try {
 			files = divideFile(param.getDatabaseFile(),param.getDivideDBInto());
 		} catch (IOException e) {
-			throw new ParameterException(e);
+			throw new MuscleException(e);
 		}
 		
 		for(File newDBFile:files){
-			BlastParameters newParam = new BlastParameters(param.getQueryFile(),newDBFile, param.isNucleotide());
+			BlastParameters newParam = new BlastParameters(
+					param.getQueryFile(),
+					newDBFile, 
+					param.isNucleotide(), 
+					param.getMaxDBSize());
 			
 			//TODO send the files somewhere?
 			children.add(newParam);
@@ -161,9 +159,5 @@ public class DivideDB implements Divide<BlastParameters> {
 		for(File f:files){
 			System.out.println(f.getAbsolutePath()+" "+ f.length()+"[bytes]");
 		}
-	}
-
-	public int getMuscleId() {
-		return id;
 	}
 }
