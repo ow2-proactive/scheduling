@@ -30,9 +30,7 @@ package org.objectweb.proactive.calcium.examples.blast;
 import java.io.File;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.calcium.environment.AbstractEnvironmentParameter;
-
-public class BlastParameters extends AbstractEnvironmentParameter{
+public class BlastParameters {
 	
 	private boolean isRootParameter;
 	
