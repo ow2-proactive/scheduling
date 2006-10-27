@@ -50,6 +50,31 @@ function reboot_cluster {
 		if [ "$?" = 0 ] ; then
 			$SSH $ROOT_PASSWD $j groupadd  -g `id -g` sophia  
 			$SSH $ROOT_PASSWD $j useradd -d $HOME -g `id -g` -p grid5000 -u `id -u` $USER
+			
+			# Temporary bug fix since debian4jul image is broken
+			case $cluster in 
+				bordeaux)
+					$SSH $ROOT_PASSWD $j mount nfs.bordeaux.grid5000.fr:/home/local /home;;
+				icluster2.grenoble)
+					$SSH $ROOT_PASSWD $j mount 129.88.98.101:/home /home;; 
+				lille)
+					$SSH $ROOT_PASSWD $j mount nfs.lille.grid5000.fr:/baie/home /home;; 
+				*.lyon)
+					$SSH $ROOT_PASSWD $j mount nfs.lyon.grid5000.fr:/home /home;; 
+				nancy)
+					$SSH $ROOT_PASSWD $j mount nfs.nancy.grid5000.fr:/export/home /home;; 
+				orsay)
+					$SSH $ROOT_PASSWD $j mkdir -p /home/sophia ;; 
+					$SSH $ROOT_PASSWD $j mount frontgdx1:/home/sophia /home/sophia ;; 
+				*.rennes)
+					$SSH $ROOT_PASSWD $j mount nfs-grid5000:/srv/home  /home;; 
+				*.sophia)
+					$SSH $ROOT_PASSWD $j mount 138.96.20.229:/export/home  /home ;; 
+				toulouse)
+					$SSH $ROOT_PASSWD $j mount 192.168.22.2:/home /home;; 
+				*)
+					echo "[E] NO MOUNTPOINT DEFNINED FOR $cluster" ;;
+			esac
 		fi
 	done
 
