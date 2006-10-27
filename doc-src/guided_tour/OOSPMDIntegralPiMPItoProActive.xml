@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="OOSPMDJacobiexample">
-  <title>SPMD PROGRAMMING</title>
+<chapter id="OOSPMDIntegralPiExample">
+  <title>SPMD PROGRAMMING from MPI to ProActive</title>
 
   <sect1>
     <title>OO SPMD on a Integral Pi example MPI to ProActive
@@ -39,15 +39,15 @@
 
         <itemizedlist>
           <listitem>
-            <para>int_pi2.c : the original MPI implementation</para>
+            <para>ProActive/doc-src/mpi_files/int_pi2.c : the original MPI implementation</para>
           </listitem>
 
           <listitem>
-            <para>Launcher.java : the main class</para>
+            <para>ProActive/trunk/src/org/objectweb/proactive/examples/integralpi/Launcher.java : the main class</para>
           </listitem>
 
           <listitem>
-            <para>Worker.java : the class implementing the SPMD code</para>
+            <para>ProActive/trunk/src/org/objectweb/proactive/examples/integralpi/Worker.java : the class implementing the SPMD code</para>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -83,7 +83,7 @@
         parameters and the nodes specified in the deployement
         descriptor.</para>
 
-        <programlisting>  // Group creation           
+        <programlisting lang="java">  // Group creation           
   Worker workers = (Worker) ProSPMD.newSPMDGroup(
          Worker.class.getName(), params, provideNodes(args[0]));
 
@@ -92,11 +92,11 @@
   DoubleWrapper results = workers.start( numOfIterations );</programlisting>
 
         <para>The ProSPMD layer provides similar to MPI initialization
-        primitives. In Worker.java you can identify this initialisation. Note
+        primitives. In Worker.java you can identify this initialization. Note
         that one-to-one communications will be done thanks to an array view on
         the created group.</para>
 
-        <programlisting>  // Worker initialization
+        <programlisting lang="java">  // Worker initialization
   rank = ProSPMD.getMyRank();
   groupSize = ProSPMD.getMySPMDGroupSize();
 
@@ -116,22 +116,22 @@
         other process and sums the received values.</para>
 
         <figure>
-          <title>Communication pattern - step 1</title>
+          <title>Communication pattern - Step 1</title>
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/nbody/MPI_step1.png"
+              <imagedata fileref="guided_tour/pics/IntegralPI/MPI_step1.png"
                          format="PNG" />
             </imageobject>
           </mediaobject>
         </figure>
 
         <figure>
-          <title>Communication pattern -step 2</title>
+          <title>Communication pattern - Step 2</title>
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/nbody/MPI_step1.png"
+              <imagedata fileref="guided_tour/pics/IntegralPI/MPI_step2.png"
                          format="PNG" />
             </imageobject>
           </mediaobject>
@@ -189,7 +189,7 @@
         non-blocking ) by default, therefore we need to specify explicitely to
         block until a specific request.</para>
 
-        <programlisting>  // The leader collects partial results.
+        <programlisting lang="java">  // The leader collects partial results.
   // Others just send their computed data to the rank 0.
   
   if ( rank==0 ) { // Check if i'm the leader worker 
@@ -210,31 +210,61 @@
   } </programlisting>
       </sect3>
 
-      <sect3>
-        <title>Some eqivalences</title>
+      <sect3>                    
+        <title>MPI to ProActive Summary</title>       
+        
+        <table>
+            <title>MPI to ProActive</title>
+            <tgroup cols="2" >
+                <colspec colnum="1" colname="col1" colwidth="2*"/>
+                <colspec colnum="2" colname="col2" colwidth="2*"/>
+                <thead>
+                    <row>
+                        <entry>MPI</entry>                
+                        <entry>ProActive</entry>
+                    </row>
+                </thead>
+                <tbody>
+                    <row>
+                        <entry>MPI_Init and MPI_Finalize</entry>
+                        <entry>Activities creation</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Comm_Size</entry>
+                        <entry>ProSPMD.getMyGroupSize</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Comm_Rank</entry>
+                        <entry>ProSPMD.getMyRank</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Send and MPI_Recv</entry>
+                        <entry>Method call</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Barrier</entry>
+                        <entry>ProSPMD.barrier</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Bcast</entry>
+                        <entry>Method call on a group</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Scatter</entry>
+                        <entry>Method call with a scatter group as parameter</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Gather</entry>
+                        <entry>Result of a group communication</entry>
+                    </row>
+                    <row>
+                        <entry>MPI_Reduce</entry>
+                        <entry>Programmer's method</entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </table>                         
 
-        <para>MPI to ProActive Summary :</para>
-
-        <para>MPI_Run -&gt; Deployement</para>
-
-        <para>MPI_Init and MPI_Finalize -&gt; Activities creation</para>
-
-        <para>MPI_Comm_Size -&gt; ProSPMD.getMyGroupSize</para>
-
-        <para>MPI_Comm_Rank -&gt; ProSPMD.getMyRank</para>
-
-        <para>MPI_Send and MPI_Recv -&gt; Method call</para>
-
-        <para>Barrier -&gt; ProSPMD.barrier</para>
-
-        <para>MPI_Bcast -&gt; Method call on a group</para>
-
-        <para>MPI_Scatter -&gt; Method call with a scatter group as
-        parameter</para>
-
-        <para>MPI_Gather -&gt; Result of a group communication </para>
-
-        <para>MPI_Reduce -&gt; Programmer's method</para>
       </sect3>
     </sect2>
 
