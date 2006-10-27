@@ -78,7 +78,8 @@ public class Launcher {
             
             String input = "";
             long numOfIterations = 1;
-            double result, error;
+            double result, error;            
+            DoubleWrapper results;
             
             while( numOfIterations > 0 ){
                 
@@ -97,7 +98,7 @@ public class Launcher {
                 if ( numOfIterations <= 0 ) break;
                 
                 // Workers starts their job and return a group of Futures
-                DoubleWrapper results = workers.start( numOfIterations );
+                results = workers.start( numOfIterations );
                 
                 result = ((DoubleWrapper)ProActiveGroup.getGroup(results).get(0)).doubleValue();
                 error =  result - Math.PI;
@@ -139,7 +140,7 @@ public class Launcher {
     
     private static void finish(){
         try {
-            pad.killall(false);
+            pad.killall(true);
             ProActive.exitSuccess();
         } catch (ProActiveException ex) {
             ex.printStackTrace();
