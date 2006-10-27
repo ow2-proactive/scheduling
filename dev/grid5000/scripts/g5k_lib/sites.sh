@@ -15,7 +15,7 @@ SITES=(
 # Available clusters
 CLUSTERS=(
 	bordeaux
-	idpot.grenoble
+#	idpot.grenoble
 	icluster2.grenoble
 	lille
 	capricorne.lyon
