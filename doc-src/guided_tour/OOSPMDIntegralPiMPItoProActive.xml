@@ -39,7 +39,7 @@
 
         <itemizedlist>
           <listitem>
-            <para>int_pi2.c : the original MPI implementation </para>
+            <para>int_pi2.c : the original MPI implementation</para>
           </listitem>
 
           <listitem>
@@ -187,7 +187,7 @@
         <para>The ProActive implementation is quite similar to MPI one. The
         fact is that all communications in ProActive are asynchronous (
         non-blocking ) by default, therefore we need to specify explicitely to
-        block until a specific request. </para>
+        block until a specific request.</para>
 
         <programlisting>  // The leader collects partial results.
   // Others just send their computed data to the rank 0.
@@ -203,11 +203,38 @@
 
         <para>The leader blocks his request queue until another worker will do
         a distant call on the leader's <emphasis
-        role="bold">updateX</emphasis> method which is : </para>
+        role="bold">updateX</emphasis> method which is :</para>
 
         <programlisting>  public void updateX(double value){
      this.x = value;
   } </programlisting>
+      </sect3>
+
+      <sect3>
+        <title>Some eqivalences</title>
+
+        <para>MPI to ProActive Summary :</para>
+
+        <para>MPI_Run -&gt; Deployement</para>
+
+        <para>MPI_Init and MPI_Finalize -&gt; Activities creation</para>
+
+        <para>MPI_Comm_Size -&gt; ProSPMD.getMyGroupSize</para>
+
+        <para>MPI_Comm_Rank -&gt; ProSPMD.getMyRank</para>
+
+        <para>MPI_Send and MPI_Recv -&gt; Method call</para>
+
+        <para>Barrier -&gt; ProSPMD.barrier</para>
+
+        <para>MPI_Bcast -&gt; Method call on a group</para>
+
+        <para>MPI_Scatter -&gt; Method call with a scatter group as
+        parameter</para>
+
+        <para>MPI_Gather -&gt; Result of a group communication </para>
+
+        <para>MPI_Reduce -&gt; Programmer's method</para>
       </sect3>
     </sect2>
 
@@ -231,16 +258,14 @@
         <screen>build examples</screen>
 
         <para>2 source files must appear as being recompiled.</para>
-
-        <para>Following the recompilation, rerun the examples as explained in
-        section 1.2 above, and observe the differences.</para>
       </sect3>
 
       <sect3>
         <title>Running ProActive example</title>
 
-        <para>In ProActive/scripts/unix or windows run integralpi.sh, you can
-        specify the number of workers from the command line.</para>
+        <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
+        you can specify the number of workers from the command line. Feel free
+        to edit scripts to specify another deployement descriptor.</para>
 
         <screen>bash-3.00$ ./integralpi.sh
 
