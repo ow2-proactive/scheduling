@@ -172,22 +172,22 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                 // manually
                 urlSchema = ProActiveDescriptorHandler.class.getResource("/");
 
-                java.net.URI uriSchema;
-
                 try {
+                    java.net.URI uriSchema;
                     uriSchema = urlSchema.toURI();
 
-                    uriSchema.resolve(".." + java.io.File.separator +
-                        "descriptors" + java.io.File.separator +
-                        "DescriptorSchema.xsd");
-                    urlSchema = uriSchema.toURL();
+                    urlSchema = uriSchema.resolve(".." +
+                            java.io.File.separator + "descriptors" +
+                            java.io.File.separator + "DescriptorSchema.xsd")
+                                         .toURL();
                 } catch (URISyntaxException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
+                    urlSchema = null;
                 }
             }
 
-            logger.debug("Using XML shema at location: " + urlSchema);
+            logger.debug("Using XML shema: " + urlSchema);
 
             org.objectweb.proactive.core.xml.io.StreamReader sr = null;
             sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
