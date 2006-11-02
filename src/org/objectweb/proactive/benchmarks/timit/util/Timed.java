@@ -33,6 +33,8 @@ package org.objectweb.proactive.benchmarks.timit.util;
 import java.io.Serializable;
 
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
+import org.objectweb.proactive.benchmarks.timit.util.observing.RealEventObservable;
+import org.objectweb.proactive.benchmarks.timit.util.observing.FakeEventObservable;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObservable;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 
@@ -42,7 +44,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
  * 
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
-public class Timed extends EventObservable implements Serializable {
+public class Timed implements Serializable {
 
     /**
      * 
@@ -50,6 +52,8 @@ public class Timed extends EventObservable implements Serializable {
     private static final long serialVersionUID = -5295024562082646228L;
 
     private HierarchicalTimer timer;
+    
+    private EventObservable delegatedObservable;
 
     private TimItReductor timitReductor;
 
@@ -57,6 +61,11 @@ public class Timed extends EventObservable implements Serializable {
      * Singleton pattern
      */
     public Timed() {
+        if ( true ) { // Here we can switch to a fake observable
+            this.delegatedObservable = new RealEventObservable();
+        } else {
+            this.delegatedObservable = new FakeEventObservable();
+        }
     }
 
     /**
@@ -90,7 +99,7 @@ public class Timed extends EventObservable implements Serializable {
         }
         if (events != null) {
             for (EventObserver element : events) {
-                super.addObserver(element);
+                this.delegatedObservable.addObserver(element);
             }
         }
     }
@@ -122,9 +131,13 @@ public class Timed extends EventObservable implements Serializable {
         }
         if (events != null) {
             for (EventObserver element : events) {
-                super.addObserver(element);
+                this.delegatedObservable.addObserver(element);
             }
         }
+    }
+    
+    public EventObservable getEventObservable(){
+        return this.delegatedObservable;
     }
 
     /**
@@ -152,7 +165,7 @@ public class Timed extends EventObservable implements Serializable {
      */
     public void finalizeTimed(int rank, String information) {
         if( this.timitReductor == null ) return;
-        EventDataBag eventDataBag = super.getEventDataBag(rank);
+        EventDataBag eventDataBag = this.delegatedObservable.getEventDataBag(rank);
         this.timitReductor.receiveAll(eventDataBag, this.timer, information);
     }
 }

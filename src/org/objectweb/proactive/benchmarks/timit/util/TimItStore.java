@@ -102,7 +102,7 @@ public class TimItStore {
     
     public EventObserver addEventObserver( EventObserver eo ) {
         if( Arrays.binarySearch(this.activation, eo.getName()) > 0 ) {
-            this.timed.addObserver(eo);
+            this.timed.getEventObservable().addObserver(eo);
         }
         return eo;
     }
