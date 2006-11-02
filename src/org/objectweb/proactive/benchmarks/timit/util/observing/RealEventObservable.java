@@ -30,14 +30,25 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
+import java.util.Vector;
+
 /**
- * This interface defines the Observable.
+ * This class is the Observable.
  * Part of the specialized Observer/Observable pattern.
  * 
  * @author Brian Amedro, Vladimir Bodnartchouk
  * 
  */
-public interface EventObservable extends java.io.Serializable {
+public class RealEventObservable implements EventObservable {
+    private boolean changed = false;
+
+    private Vector<EventObserver> eventDataObservers;
+
+    /** Construct an Observable with zero Observers. */
+
+    public RealEventObservable() {
+        this.eventDataObservers = new Vector<EventObserver>();
+    }
 
     /**
      * Adds an observer to the set of observers for this object, provided that
@@ -50,7 +61,14 @@ public interface EventObservable extends java.io.Serializable {
      * @throws NullPointerException
      *             if the parameter o is null.
      */
-    public void addObserver(EventObserver o);
+    public synchronized void addObserver(EventObserver o) {
+        if (o == null) {
+            throw new NullPointerException();
+        }
+        if (!this.eventDataObservers.contains(o)) {
+            this.eventDataObservers.addElement(o);
+        }
+    }
 
     /**
      * Deletes an observer from the set of observers of this object. Passing
@@ -59,7 +77,9 @@ public interface EventObservable extends java.io.Serializable {
      * @param o
      *            the observer to be deleted.
      */
-    public void deleteObserver(EventObserver o);
+    public synchronized void deleteObserver(EventObserver o) {
+        this.eventDataObservers.removeElement(o);
+    }
 
     /**
      * If this object has changed, as indicated by the <code>hasChanged</code>
@@ -76,7 +96,9 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#hasChanged()
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
-    public void notifyObservers();
+    public void notifyObservers() {
+        this.notifyObservers(null);
+    }
 
     /**
      * If this object has changed, as indicated by the <code>hasChanged</code>
@@ -93,18 +115,50 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#hasChanged()
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
-    public void notifyObservers(Object arg);
+    public void notifyObservers(Object arg) {
+        /*
+         * a temporary array buffer, used as a snapshot of the state of current
+         * Observers.
+         */
+        Object[] arrLocal;
+        this.setChanged();
+        synchronized (this) {
+            /*
+             * We don't want the Observer doing callbacks into arbitrary code
+             * while holding its own Monitor. The code where we extract each
+             * Observable from the Vector and store the state of the Observer
+             * needs synchronization, but notifying observers does not (should
+             * not). The worst result of any potential race-condition here is
+             * that: 1) a newly-added Observer will miss a notification in
+             * progress 2) a recently unregistered Observer will be wrongly
+             * notified when it doesn't care
+             */
+            if (!this.changed) {
+                return;
+            }
+            arrLocal = this.eventDataObservers.toArray();
+            this.clearChanged();
+        }
+
+        for (int i = arrLocal.length - 1; i >= 0; i--) {
+            ((EventObserver) arrLocal[i]).update(this, arg);
+        }
+    }
 
     /**
      * Clears the observer list so that this object no longer has any observers.
      */
-    public void deleteObservers();
+    public synchronized void deleteObservers() {
+        this.eventDataObservers.removeAllElements();
+    }
 
     /**
      * Marks this <tt>Observable</tt> object as having been changed; the
      * <tt>hasChanged</tt> method will now return <tt>true</tt>.
      */
-    public void setChanged();
+    public synchronized void setChanged() {
+        this.changed = true;
+    }
 
     /**
      * Indicates that this object has no longer changed, or that it has already
@@ -116,7 +170,9 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#notifyObservers()
      * @see java.util.Observable#notifyObservers(java.lang.Object)
      */
-    public void clearChanged();
+    public synchronized void clearChanged() {
+        this.changed = false;
+    }
 
     /**
      * Tests if this object has changed.
@@ -128,14 +184,18 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#clearChanged()
      * @see java.util.Observable#setChanged()
      */
-    public boolean hasChanged();
+    public synchronized boolean hasChanged() {
+        return this.changed;
+    }
 
     /**
      * Returns the number of observers of this <tt>Observable</tt> object.
      * 
      * @return the number of observers of this object.
      */
-    public int countObservers();
+    public synchronized int countObservers() {
+        return this.eventDataObservers.size();
+    }
 
     /**
      * Returns a vector of StatData of the Observers of the current
@@ -143,5 +203,25 @@ public interface EventObservable extends java.io.Serializable {
      * 
      * @return the vector of observed datas.
      */
-    public EventDataBag getEventDataBag(int subjectRank);
+    public synchronized EventDataBag getEventDataBag(int subjectRank) {
+        EventDataBag result = new EventDataBag(subjectRank);
+        Vector<EventData> v = new Vector<EventData>();
+        EventObserver eventDataObserver = null;
+        EventData eventData = null;
+        for (int i = 0; i < this.eventDataObservers.size(); i++) {
+            eventDataObserver = this.eventDataObservers.get(i);
+            if (eventDataObserver == null) {
+                throw new NullPointerException();
+            } else {
+                eventData = eventDataObserver.getEventData();
+                if (eventData == null) {
+                    throw new NullPointerException();
+                } else {
+                    v.add(eventData);
+                }
+            }
+        }
+        result.setBag(v);
+        return result;
+    }
 }

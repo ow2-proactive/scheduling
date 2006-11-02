@@ -31,13 +31,16 @@
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
 /**
- * This interface defines the Observable.
+ * This class is the Observable.
  * Part of the specialized Observer/Observable pattern.
  * 
  * @author Brian Amedro, Vladimir Bodnartchouk
  * 
  */
-public interface EventObservable extends java.io.Serializable {
+public class FakeEventObservable implements EventObservable {       
+
+    /** Construct an FakeObservable with zero Observers. */
+    public FakeEventObservable() {}
 
     /**
      * Adds an observer to the set of observers for this object, provided that
@@ -50,7 +53,7 @@ public interface EventObservable extends java.io.Serializable {
      * @throws NullPointerException
      *             if the parameter o is null.
      */
-    public void addObserver(EventObserver o);
+    public void addObserver(EventObserver o) {}
 
     /**
      * Deletes an observer from the set of observers of this object. Passing
@@ -59,7 +62,7 @@ public interface EventObservable extends java.io.Serializable {
      * @param o
      *            the observer to be deleted.
      */
-    public void deleteObserver(EventObserver o);
+    public void deleteObserver(EventObserver o){}
 
     /**
      * If this object has changed, as indicated by the <code>hasChanged</code>
@@ -76,7 +79,7 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#hasChanged()
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
-    public void notifyObservers();
+    public void notifyObservers() {}
 
     /**
      * If this object has changed, as indicated by the <code>hasChanged</code>
@@ -93,18 +96,18 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#hasChanged()
      * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
      */
-    public void notifyObservers(Object arg);
+    public void notifyObservers(Object arg) {}
 
     /**
      * Clears the observer list so that this object no longer has any observers.
      */
-    public void deleteObservers();
+    public void deleteObservers() {}
 
     /**
      * Marks this <tt>Observable</tt> object as having been changed; the
      * <tt>hasChanged</tt> method will now return <tt>true</tt>.
      */
-    public void setChanged();
+    public void setChanged(){}
 
     /**
      * Indicates that this object has no longer changed, or that it has already
@@ -116,7 +119,7 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#notifyObservers()
      * @see java.util.Observable#notifyObservers(java.lang.Object)
      */
-    public void clearChanged();
+    public void clearChanged() {}
 
     /**
      * Tests if this object has changed.
@@ -128,14 +131,14 @@ public interface EventObservable extends java.io.Serializable {
      * @see java.util.Observable#clearChanged()
      * @see java.util.Observable#setChanged()
      */
-    public boolean hasChanged();
+    public boolean hasChanged() { return false;}
 
     /**
      * Returns the number of observers of this <tt>Observable</tt> object.
      * 
      * @return the number of observers of this object.
      */
-    public int countObservers();
+    public int countObservers() { return 0; }
 
     /**
      * Returns a vector of StatData of the Observers of the current
@@ -143,5 +146,6 @@ public interface EventObservable extends java.io.Serializable {
      * 
      * @return the vector of observed datas.
      */
-    public EventDataBag getEventDataBag(int subjectRank);
+    public EventDataBag getEventDataBag(int subjectRank) { return null; }
 }
+
