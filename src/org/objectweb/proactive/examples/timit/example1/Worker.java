@@ -144,13 +144,13 @@ public class Worker extends Timed {
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 1) % this.groupSize;
                 // Notification of the nbCommObserver observer
-                super.notifyObservers(new CommEvent(this.nbCommObserver,
+                super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver,
                         destRank, 1));
                 // Notification of the commSizeObserver observer
-                super.notifyObservers(new CommEvent(this.commSizeObserver,
+                super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver,
                         destRank, 2));
                 // Notification of the defaultObserver observer
-                super.notifyObservers(new Event(this.defaultObserver, 1.0));
+                super.getEventObservable().notifyObservers(new Event(this.defaultObserver, 1.0));
                 // Perform the distant call
                 this.workersArray[destRank].toto(i);
             }
@@ -159,13 +159,13 @@ public class Worker extends Timed {
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 2) % this.groupSize;
                 // Notification of the nbCommObserver observer
-                super.notifyObservers(new CommEvent(this.nbCommObserver,
+                super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver,
                         destRank, 1));
                 // Notification of the commSizeObserver observer
-                super.notifyObservers(new CommEvent(this.commSizeObserver,
+                super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver,
                         destRank, 160));
                 // Notification of the defaultObserver observer
-                super.notifyObservers(new Event(this.defaultObserver, 1));
+                super.getEventObservable().notifyObservers(new Event(this.defaultObserver, 1));
                 // Perform the distant call
                 this.workersArray[destRank].toto(i);
             }

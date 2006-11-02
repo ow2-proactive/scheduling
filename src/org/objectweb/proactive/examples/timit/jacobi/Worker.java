@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.TimerCounter;
@@ -431,7 +432,7 @@ public class Worker extends Timed implements java.io.Serializable {
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
                 this
                         .notifyOneRank(this.up_id,
-                                Worker.getObjectSize(upline) + 4);
+                             TimIt.getObjectSize(upline) + 4);
             }
             this.up.receiveBoundary(Worker.DOWN, upline, this.iteration);
         }
@@ -442,22 +443,22 @@ public class Worker extends Timed implements java.io.Serializable {
             }
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
                 this.notifyOneRank(this.down_id,
-                        Worker.getObjectSize(downline) + 4);
+                        TimIt.getObjectSize(downline) + 4);
             }
             this.down.receiveBoundary(Worker.UP, downline, this.iteration);
         }
         if (this.left != null) {
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
-                this.notifyOneRank(this.left_id, Worker
-                        .getObjectSize(this.subMatrix[0]) + 4);
+                this.notifyOneRank(this.left_id, 
+                        TimIt.getObjectSize(this.subMatrix[0]) + 4);
             }
             this.left.receiveBoundary(Worker.RIGHT, this.subMatrix[0],
                     this.iteration);
         }
         if (this.right != null) {
             if (Worker.COMMUNICATION_PATTERN_OBSERVING_MODE) {
-                this.notifyOneRank(this.right_id, Worker
-                        .getObjectSize(this.subMatrixSize - 1) + 4);
+                this.notifyOneRank(this.right_id, 
+                        TimIt.getObjectSize(this.subMatrixSize - 1) + 4);
             }
             this.right.receiveBoundary(Worker.LEFT,
                     this.subMatrix[this.subMatrixSize - 1], this.iteration);
@@ -602,36 +603,12 @@ public class Worker extends Timed implements java.io.Serializable {
     // //////////////////////////////////////////////////////////////////////////
     private void notifyOneRank(int destRank, int messageSize) {
         // Notification of 1 communication with the dest rank
-        super.setChanged();
-        super.notifyObservers(new CommEvent(this.nbCommObserver, destRank, 1));
+        super.getEventObservable().setChanged();
+        super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver, destRank, 1));
 
         // Notification
-        super.setChanged();
-        super.notifyObservers(new CommEvent(this.commSizeObserver, destRank,
+        super.getEventObservable().setChanged();
+        super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver, destRank,
                 messageSize));
-    }
-
-    /**
-     * 
-     * @param object
-     * @return
-     */
-    private static int getObjectSize(Object object) {
-        if (object == null) {
-            System.err.println("Object is null. Cannot measure.");
-            return -1;
-        }
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(object);
-            byte[] bytes = baos.toByteArray();
-            oos.close();
-            baos.close();
-            return bytes.length;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
+    }   
 }

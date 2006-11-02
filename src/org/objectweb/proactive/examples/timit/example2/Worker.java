@@ -140,9 +140,9 @@ public class Worker extends Timed {
 
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 1) % this.groupSize;
-                super.notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
-                super.notifyObservers(new CommEvent(this.E_SIZE, destRank, 2));
-                super.notifyObservers(new Event(this.E_COMM, 1.0));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_SIZE, destRank, 2));
+                super.getEventObservable().notifyObservers(new Event(this.E_COMM, 1.0));
                 this.workersArray[destRank].toto(i);
             }
 
@@ -152,13 +152,13 @@ public class Worker extends Timed {
                 } else {
                     destRank = this.rank - 1;
                 }
-                super.notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
-                super.notifyObservers(new CommEvent(this.E_SIZE, destRank, 160));
-                super.notifyObservers(new Event(this.E_COMM, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_SIZE, destRank, 160));
+                super.getEventObservable().notifyObservers(new Event(this.E_COMM, 1));
                 this.workersArray[destRank].toto(i);
             }
-            super.notifyObservers(new Event(this.E_RAND1, Math.random()));
-            super.notifyObservers(new Event(this.E_RAND2, Math.random()));
+            super.getEventObservable().notifyObservers(new Event(this.E_RAND1, Math.random()));
+            super.getEventObservable().notifyObservers(new Event(this.E_RAND2, Math.random()));
 
             
             // ************** WORKING
