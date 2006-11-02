@@ -77,7 +77,7 @@ do
 	 	then
 			tmpfile=`mktemp -t nodeslist.XXXXXXXXXX`
 			mussh -t 20 -m0 -P -c "g5k_reservedNodes -l" -h "$NODES" > $tmpfile
-			OUTPUT=`cat $tmpfile | while read MUSSH_LINE ; do expr "$MUSSH_LINE" : "\(.*\): USEME$"; done`
+			OUTPUT="$OUTPUT `cat $tmpfile | while read MUSSH_LINE ; do expr "$MUSSH_LINE" : "\(.*\): USEME$"; done`"
 			rm $tmpfile
 		else
 			OUTPUT="$OUTPUT $NODES"
