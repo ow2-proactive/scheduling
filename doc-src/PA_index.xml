@@ -59,6 +59,8 @@
 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
 <!ENTITY loadbalancing SYSTEM "LoadBalancing.xml">
 <!ENTITY TimIt SYSTEM "timit/TimIt.xml">
+<!ENTITY IC2D_EclipsePlugin SYSTEM "ic2d/IC2D_EclipsePlugin.xml">
+<!ENTITY extendingIC2D SYSTEM "ic2d/extendingIC2D.xml">
 ]>
 <book>
    &bookinfo;
@@ -128,9 +130,12 @@
    </part>
 
    <part id="ProActiveTools">
-    <title>User Interface and tools</title>
+    <title>Graphical User Interface (GUI) and tools</title>
+    <!--
     &IC2D;
     &plugin;
+    -->
+    <!-- &IC2D_EclipsePlugin;-->
     &scilab;
     &TimIt;
    </part>
@@ -138,6 +143,7 @@
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
     &writeDoc;
+   <!--   &extendingIC2D; -->
     &developingConventions;
     &testSuiteAPI;
     &DescriptorProcess;

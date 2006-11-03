@@ -568,7 +568,7 @@
 
     <para>We are currently developping an eclipse plugin that will help
     developpers to create easily ProActive applications. Have a look at the
-    plugin documentation page, <xref linkend="plugin" />.</para>
+    plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
   </sect1>
 
   <sect1>
