@@ -64,7 +64,7 @@ function reboot_cluster {
 				nancy)
 					$SSH $ROOT_PASSWD $j mount nfs.nancy.grid5000.fr:/export/home /home;; 
 				orsay)
-					$SSH $ROOT_PASSWD $j mkdir -p /home/sophia ;; 
+					$SSH $ROOT_PASSWD $j mkdir -p /home/sophia  
 					$SSH $ROOT_PASSWD $j mount frontgdx1:/home/sophia /home/sophia ;; 
 				*.rennes)
 					$SSH $ROOT_PASSWD $j mount nfs-grid5000:/srv/home  /home;; 
