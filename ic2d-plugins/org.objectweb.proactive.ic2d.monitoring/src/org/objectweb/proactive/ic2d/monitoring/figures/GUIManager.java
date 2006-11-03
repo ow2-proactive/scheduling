@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.figures;
 
+import org.eclipse.swt.widgets.Display;
+
 public class GUIManager{
 
 	/** To know if we should repaint */
@@ -42,10 +44,10 @@ public class GUIManager{
 
 
 	/** Time To Sleep (in seconds) */
-	private float tts = 0.01f;
+	private float tts = 0.1f;
 
 	public GUIManager(AbstractFigure figure){
-		this.thread = new Thread(new Painter(figure));
+		//this.thread = new Thread(new Painter(figure));
 	}
 
 	public void setAlive(boolean isAlive) {
@@ -56,7 +58,7 @@ public class GUIManager{
 		dirty = true;
 		switch (thread.getState()) {
 		case NEW:
-			thread.start();
+			//thread.start();
 			break;
 		default:
 			break;
@@ -79,16 +81,19 @@ public class GUIManager{
 		public void run() {
 			if(figure==null)
 				return;
-			while(isAlive) {
+			//while(isAlive) {
 				if(dirty){
 					if(figure==null)
 						return;
-					figure.refresh();
+					/*Display.getDefault().asyncExec(new Runnable() {
+						public void run () {
+							//figure.repaint();//refresh();
+						}});*/
+					}
+					try {
+						Thread.sleep((long) (tts * 1000));
+					} catch (InterruptedException e) {/* Do nothing */}
 				}
-				try {
-					Thread.sleep((long) (tts * 1000));
-				} catch (InterruptedException e) {/* Do nothing */}
-			}
+			//}
 		}
 	}
-}

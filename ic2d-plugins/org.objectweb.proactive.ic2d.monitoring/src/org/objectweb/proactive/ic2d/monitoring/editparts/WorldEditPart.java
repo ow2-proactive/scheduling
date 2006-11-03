@@ -38,6 +38,7 @@ import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
+import org.objectweb.proactive.ic2d.monitoring.figures.GUIRefresher;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
@@ -47,6 +48,8 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 
 	private MonitoringView monitoringView;
 	
+	private GUIRefresher guiRefresher;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -54,6 +57,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	public WorldEditPart(WorldObject model, MonitoringView monitoringView) {
 		super(model);
 		this.monitoringView = monitoringView;
+		this.guiRefresher = new GUIRefresher();
 	}
 
 	//
@@ -77,7 +81,16 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	public MonitoringView getMonitoringView(){
 		return this.monitoringView;
 	}
+	
+	@Override
+	public WorldEditPart getWorldEditPart(){
+		return this;
+	}
 
+	
+	public GUIRefresher getGUIRefresher(){
+		return this.guiRefresher;
+	}	
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//

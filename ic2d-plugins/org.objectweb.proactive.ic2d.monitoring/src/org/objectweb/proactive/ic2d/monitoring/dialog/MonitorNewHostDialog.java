@@ -240,6 +240,7 @@ public class MonitorNewHostDialog extends Dialog {
 	 * @param message
 	 */
 	private void displayMessage(final String message) {
+		System.out.println("MonitorNewHostDialog.displayMessage()");
 		// Print the message in the UI Thread in async mode
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {

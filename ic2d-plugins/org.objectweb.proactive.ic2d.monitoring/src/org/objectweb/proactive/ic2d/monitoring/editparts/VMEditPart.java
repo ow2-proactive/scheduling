@@ -67,6 +67,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 
 	@Override
 	public void update(Observable o, Object arg) {
+		//System.out.println("VMEditPart.update()");
 		final Object param = arg;
 //		final VMEditPart vmEditPart = this;
 		
@@ -78,9 +79,12 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 					deactivate();
 //					((AbstractIC2DEditPart)getParent()).removeChildVisual(vmEditPart);
 				}
-				refresh();	
+				refresh();
 			}
 		});
+		
+		
+		//getWorldEditPart().getGUIRefresher().refresh(this);	
 	}
 
 	//

@@ -9,10 +9,12 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
+import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AbstractFigure;
+import org.objectweb.proactive.ic2d.monitoring.figures.Refresher;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
-public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer {
+public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer, Runnable {
 
 	
 	//
@@ -60,11 +62,15 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				refresh();		
-			}
-		});
+		//System.out.println("AbstractMonitoringEditPart.update()");
+//		Display.getDefault().asyncExec(new Runnable() {
+//			public void run () {
+//				//System.out.println("AbstractMonitoringEditPart ---- refresh()");
+//				refresh();
+//				//getWorldEditPart().getGUIRefresher().refresh(this);		
+//			}
+//		});
+		Display.getDefault().asyncExec(this);
 	}
 	
 	@Override
@@ -86,5 +92,21 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 			return null;
 		else
 			return ((AbstractMonitoringEditPart) parent).getMonitoringView();
+	}
+	
+	/**
+	 * Returns the current World Edit Part
+	 * @return The WorldEditPart, or null if the parent of this object is null.
+	 */
+	public WorldEditPart getWorldEditPart(){
+		return ((AbstractMonitoringEditPart)getParent()).getWorldEditPart();
+	}
+	
+	public void test(){
+		System.out.println("AbstractMonitoringEditPart.test()");
+	}
+	
+	public void run(){
+		refresh();
 	}
 }

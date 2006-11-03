@@ -71,6 +71,7 @@ import org.objectweb.proactive.ic2d.monitoring.actions.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.editparts.MonitoringEditPartFactory;
+import org.objectweb.proactive.ic2d.monitoring.figures.Refresher;
 import org.objectweb.proactive.ic2d.monitoring.figures.RoundedLine;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
 import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListenerImpl;
@@ -108,6 +109,9 @@ public class MonitoringView extends ViewPart {
 		super();
 		world = new WorldObject();
 		title = world.getName();
+		
+		// We add the Graphical Refresher to the Graphical Thread of SWT
+		//Display.getDefault().asyncExec(Refresher.getInstance());
 	}
 
 	//

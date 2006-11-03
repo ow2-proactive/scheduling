@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class ModelRecorder extends Observable{
 
 	private static Integer counter = 1;
 
-	private Hashtable<String, WorldObject> models = new Hashtable<String, WorldObject>();
+	private Map<String, WorldObject> models = new ConcurrentHashMap<String, WorldObject>();
 
 	private ModelRecorder(){
 	}
@@ -34,7 +35,7 @@ public class ModelRecorder extends Observable{
 	 * @param model The model to add.
 	 * @return The title of the model
 	 */
-	public synchronized String addModel(WorldObject model){
+	public String addModel(WorldObject model){
 		String title = "Monitoring#"+counter++;
 		models.put(title, model);
 		setChanged();

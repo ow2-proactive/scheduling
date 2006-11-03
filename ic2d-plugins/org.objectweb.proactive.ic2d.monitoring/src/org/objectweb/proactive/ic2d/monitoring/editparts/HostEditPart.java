@@ -42,62 +42,71 @@ import org.objectweb.proactive.ic2d.monitoring.figures.HostFigure;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.HostListener;
 
 public class HostEditPart extends AbstractMonitoringEditPart {
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	
+
 	public HostEditPart(HostObject model) {
 		super(model);
 	}
-	
+
 	//
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
-	
+
 	/**
-     * Convert the result of EditPart.getModel()
-     * to HostObject (the real type of the model).
-     * @return the casted model
-     */
+	 * Convert the result of EditPart.getModel()
+	 * to HostObject (the real type of the model).
+	 * @return the casted model
+	 */
 	public HostObject getCastedModel(){
 		return (HostObject)getModel();
 	}
-	
-	
+
+
 	@Override
 	public void update(Observable o, Object arg) {
+		//System.out.println("HostEditPart.update()");
 		final Object param = arg;
 //		final HostEditPart hostEditPart = this;
 
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run () {
-				if(param instanceof State && (State)param == State.NOT_MONITORED) {
-					deactivate();
-//					((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
-				}
-				refresh();
+		/*Display.getDefault().asyncExec(new Runnable() {
+			public void run () {*/
+		if(param instanceof State && (State)param == State.NOT_MONITORED) {
+			deactivate();
+//			((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
+		}
+		/*refresh();
+				//getWorldEditPart().getGUIRefresher().refresh(this);
 			}
-		});
+		});*/
+		
+		Display.getDefault().asyncExec(this);
 	}
-	
+
+	@Override
+	public void run(){
+		refresh();
+	}
+
 	//
 	// -- PROTECTED METHODS -----------------------------------------------
 	//
-	
- 	/**
- 	 * Returns a new view associated
- 	 * with the type of model object the
- 	 * EditPart is associated with. So here, it returns a new HostFigure.
- 	 * @return a new HostFigure view associated with the HostObject model.
- 	 */
+
+	/**
+	 * Returns a new view associated
+	 * with the type of model object the
+	 * EditPart is associated with. So here, it returns a new HostFigure.
+	 * @return a new HostFigure view associated with the HostObject model.
+	 */
 	protected IFigure createFigure() {
 		HostFigure figure = new HostFigure(getCastedModel().getFullName());
 		figure.addMouseListener(new HostListener(getCastedModel(), figure, getMonitoringView()));
 		return figure;
 	}
-	
+
 	/**
 	 * Returns a List containing the children model objects.
 	 * @return the List of children
@@ -105,8 +114,8 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	protected List<AbstractDataObject> getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
-	
-	
+
+
 	/**
 	 * Fills the view with data extracted from the model object 
 	 * associated with the EditPart.
@@ -114,16 +123,16 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	 * the figure, and may also be called in response to 
 	 * notifications from the model. 
 	 */
-/*	protected void refreshVisuals(){ 
+	/*	protected void refreshVisuals(){ 
 		//TODO
 	}
-	*/
-	
+	 */
+
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
 	protected void createEditPolicies() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

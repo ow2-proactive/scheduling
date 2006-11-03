@@ -83,7 +83,7 @@ public class NodeObject extends AbstractDataObject{
 		} catch (java.net.UnknownHostException e) {
 			currentHost = "localhost";
 		}
-		//System.out.println("current host: "+currentHost);
+		// System.out.println("current host: "+currentHost);
 		try {
 			SPY_LISTENER_NODE = NodeFactory.createNode(UrlBuilder.buildUrlFromProperties(
 					currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
@@ -105,6 +105,8 @@ public class NodeObject extends AbstractDataObject{
 		this.url = node.getNodeInformation().getURL();
 		this.key = node.getNodeInformation().getName();
 		this.jobID = node.getNodeInformation().getJobID();
+		
+		this.allMonitoredObjects.put(getKey(), this);
 	}
 
 	//
@@ -143,6 +145,7 @@ public class NodeObject extends AbstractDataObject{
 	
 	/**
 	 * Returns the node's protocol
+	 * 
 	 * @return The protocol used
 	 */
 	public Protocol getProtocol() {
@@ -169,10 +172,10 @@ public class NodeObject extends AbstractDataObject{
 		return this.jobID;
 	}
 	
-	@Override
-	public synchronized AOObject findActiveObjectById(UniqueID id) {
-		return (AOObject) monitoredChildren.get(id.toString());
-	}
+// @Override
+// public synchronized AOObject findActiveObjectById(UniqueID id) {
+// return (AOObject) monitoredChildren.get(id.toString());
+// }
 
 
 	public void setHighlight(boolean highlighted) {
@@ -227,7 +230,10 @@ public class NodeObject extends AbstractDataObject{
 	protected void addSpy(){
 		try {
 			SpyEventListener spyEventListener = new SpyEventListenerImpl(this);
-			SpyListenerImpl spyListener = new SpyListenerImpl(/*new SpyEventListenerImpl(this)*/spyEventListener);
+			SpyListenerImpl spyListener = new SpyListenerImpl(/*
+																 * new
+																 * SpyEventListenerImpl(this)
+																 */spyEventListener);
 			this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,SPY_LISTENER_NODE);
 			this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] { activeSpyListener }, node);
 		} 
@@ -243,10 +249,12 @@ public class NodeObject extends AbstractDataObject{
 	 * Destroys the spy of node.
 	 */
 	protected synchronized void destroySpy(){
-		this.spy.terminate();
-		this.activeSpyListener.terminate();
-		this.spy = null;
-		this.activeSpyListener = null;
+		if ((this.spy != null) && (this.activeSpyListener != null)) {
+			this.spy.terminate();
+			this.activeSpyListener.terminate();
+			this.spy = null;
+			this.activeSpyListener = null;
+		}
 	}
 
 	@Override
@@ -303,8 +311,11 @@ public class NodeObject extends AbstractDataObject{
 		} catch (Exception e) {
 			// TODO spy not responding
 			this.notResponding();
-			/*Console.getInstance(Activator.CONSOLE_NAME).err("NodeObject.alreadyMonitored() -> not responding !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			e.printStackTrace();*/
+			/*
+			 * Console.getInstance(Activator.CONSOLE_NAME).err("NodeObject.alreadyMonitored() ->
+			 * not responding !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			 * e.printStackTrace();
+			 */
 		}
 	}
 
@@ -314,6 +325,7 @@ public class NodeObject extends AbstractDataObject{
 
 	/**
 	 * Get the typed parent
+	 * 
 	 * @return the typed parent
 	 */
 	private VMObject getTypedParent() {
@@ -322,19 +334,29 @@ public class NodeObject extends AbstractDataObject{
 
 	/**
 	 * TODO
-	 * @param activeObjects names' list of active objects containing in this NodeObject
+	 * 
+	 * @param activeObjects
+	 *            names' list of active objects containing in this NodeObject
 	 */
 	private void handleActiveObjects(List<List<Object>> activeObjects){
 		for (int i = 0, size = activeObjects.size(); i < size; ++i) {
 			List<Object> aoWrapper = activeObjects.get(i);
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
-			AOObject ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
-			if(FilterProcess.getInstance().filter(ao)) {
-				AOObject.cancelCreation();
-				return;
-			}
+			
+			AOObject ao = null;
+			
+			if (! allMonitoredObjects.containsKey(ub.getID().toString())) {
+			  ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
+			
+			
+//			if (FilterProcess.getInstance().filter(ao)) {
+//				AOObject.cancelCreation();
+//				return;
+//			}
+			
 			exploreChild(ao);
+			}
 		}
 	}
 }

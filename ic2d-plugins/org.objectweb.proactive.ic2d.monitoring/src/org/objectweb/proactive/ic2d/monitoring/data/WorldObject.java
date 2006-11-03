@@ -36,6 +36,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
@@ -62,6 +63,9 @@ public class WorldObject extends AbstractDataObject {
 	/** Set of all the active object names */
 	private Map<String, String> recorededFullNames = new Hashtable<String, String>();
 	
+	/** Used to slow down the events sent by the spies. */
+	private EventRetarder retarder;
+	
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -71,12 +75,16 @@ public class WorldObject extends AbstractDataObject {
 	 */
 	public WorldObject() {
         super(null);
-        vnChildren = new HashMap<String, VNObject>();
+        vnChildren = new ConcurrentHashMap<String, VNObject>();
         monitorThread = new MonitorThread(this);
         addObserver(monitorThread);
         
+        retarder = new EventRetarder();
+        
         // Record the model
         this.name = ModelRecorder.getInstance().addModel(this);
+        
+        this.allMonitoredObjects.put(getKey(), this);
     }
 	
 	
@@ -150,7 +158,7 @@ public class WorldObject extends AbstractDataObject {
 	 * @param child the host added
 	 */
 	@Override
-	protected synchronized void putChild(AbstractDataObject child) {
+	protected void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
 		setChanged();
 		if(monitoredChildren.size() == 1)
@@ -162,7 +170,7 @@ public class WorldObject extends AbstractDataObject {
 	 * 
 	 * @param vn
 	 */
-	protected synchronized void putVNChild(VNObject vn) {
+	protected void putVNChild(VNObject vn) {
 		vnChildren.put(vn.getKey(), vn);
 		setChanged();
 		notifyObservers(vn);

@@ -38,7 +38,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-public abstract class AbstractFigure extends Figure {
+public abstract class AbstractFigure extends Figure implements Runnable{
 	
 	// the space between top and the first child
 	protected final static int topShift = 25;
@@ -86,6 +86,7 @@ public abstract class AbstractFigure extends Figure {
 	public abstract ConnectionAnchor getAnchor();
 	
 	public void paintFigure(Graphics graphics){
+		//System.out.println("AbstractFigure.paintFigure()");
 		graphics.setAntialias(SWT.ON);
 		super.paintFigure(graphics);
 		paintIC2DFigure(graphics);
@@ -130,5 +131,10 @@ public abstract class AbstractFigure extends Figure {
 	protected abstract void paintIC2DFigure(Graphics graphics);
 
 	protected abstract Color getDefaultBorderColor();
+	
+	public void run(){
+		//System.out.println("###run run#####===##"+ this.getTitle() );
+		repaint();
+	}
 	
 }

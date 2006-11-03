@@ -61,6 +61,7 @@ public class VirtualNodesGroup implements Observer {
 
 	
 	public void update(Observable o, Object arg) {
+		//System.out.println("VirtualNodesGroup.update()");
 		if(arg instanceof VNObject) {
 			final VNObject vn = (VNObject)arg;
 			Display.getDefault().asyncExec(new Runnable() {

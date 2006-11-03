@@ -60,7 +60,7 @@ public class DragAndDrop {
 	
 	public void setDrag(boolean canDrag){
 		this.canDrag = canDrag;
-		if(!canDrag)
+		if(!canDrag && sourceFigure!=null)
 			sourceFigure.setHighlight(null);
 	}
 	

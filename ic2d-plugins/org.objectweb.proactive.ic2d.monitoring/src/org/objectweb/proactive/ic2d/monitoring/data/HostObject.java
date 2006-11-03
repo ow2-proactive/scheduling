@@ -82,6 +82,8 @@ public class HostObject extends AbstractDataObject {
 			throw new HostAlreadyExistsException(hostAlreadyExists);
 
 		this.parent.putChild(this);
+		
+		this.allMonitoredObjects.put(getKey(), this);
 	}
 
 	//

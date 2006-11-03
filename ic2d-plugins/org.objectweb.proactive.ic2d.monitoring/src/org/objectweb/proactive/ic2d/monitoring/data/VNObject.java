@@ -47,6 +47,8 @@ public class VNObject extends AbstractDataObject {
 		this.name = name;
 		this.jobID = jobID;
 		world.putVNChild(this);
+		
+		this.allMonitoredObjects.put(getKey(), this);
 	}
 
 	

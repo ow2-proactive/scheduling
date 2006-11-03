@@ -59,7 +59,7 @@ public class MonitorThread implements Observer {
 		this.ttr = DEFAULT_TTR;
 
 		this.refresh = false;
-		this.refresher = new Thread(new Refresher(world));
+		this.refresher = new Thread(new MonitorThreadRefresher(world));
 	}
 
 	//
@@ -122,7 +122,7 @@ public class MonitorThread implements Observer {
 	protected void startRefreshing(WorldObject world) {
 		refresh = true;
 		if(refresher.getState()==Thread.State.TERMINATED){
-			refresher = new Thread(new Refresher(world));
+			refresher = new Thread(new MonitorThreadRefresher(world));
 		}
 		refresher.start();
 	}
@@ -137,12 +137,12 @@ public class MonitorThread implements Observer {
 	// -- INNER CLASS -----------------------------------------------
 	//
 
-	private class Refresher implements Runnable {
+	private class MonitorThreadRefresher implements Runnable {
 
 		/** The World to refresh*/
 		private WorldObject world;
 		
-		public Refresher(WorldObject world){
+		public MonitorThreadRefresher(WorldObject world){
 			this.world = world;
 		}
 		

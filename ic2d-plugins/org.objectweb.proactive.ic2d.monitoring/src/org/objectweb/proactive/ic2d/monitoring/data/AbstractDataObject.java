@@ -32,7 +32,7 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +54,8 @@ public abstract class AbstractDataObject extends Observable {
 	protected Map<String, AbstractDataObject> monitoredChildren;
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
 	protected Map<String, AbstractDataObject> skippedChildren;
+	/** a collection of all the monitored objects */
+	protected static Map<String, AbstractDataObject> allMonitoredObjects = new ConcurrentHashMap<String, AbstractDataObject>();
 
 	protected boolean isAlive;
 
@@ -69,8 +71,8 @@ public abstract class AbstractDataObject extends Observable {
 	protected AbstractDataObject(AbstractDataObject parent) {
 		this.isAlive = true;
 		this.parent = parent;
-		this.monitoredChildren = new HashMap<String, AbstractDataObject>();
-		this.skippedChildren = new HashMap<String, AbstractDataObject>();
+		this.monitoredChildren = new ConcurrentHashMap<String, AbstractDataObject>();
+		this.skippedChildren = new ConcurrentHashMap<String, AbstractDataObject>();
 	}
 
 
@@ -78,10 +80,25 @@ public abstract class AbstractDataObject extends Observable {
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
+	/**
+	 * Search only in the monitored children.
+	 */
 	public AbstractDataObject getChild(String key){
 		return monitoredChildren.get(key);
 	}
 
+	/**
+	 * Search in all the children.
+	 * @param key
+	 * @return
+	 */
+	public AbstractDataObject getChildInAllChildren(String key){
+		AbstractDataObject object = getChild(key);
+		if(object==null)
+			return skippedChildren.get(key);
+		return object;
+	}
+	
 	/**
 	 * Returns the object's key. It is an unique identifier.
 	 * @return the object's key
@@ -174,17 +191,19 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param id The UniqueID of the active object
 	 * @return The active object, or null.
 	 */
-	public synchronized AOObject findActiveObjectById(UniqueID id) {
+	public AOObject findActiveObjectById(UniqueID id) {
 		// We search in the monitored objects.
-		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-		while (iterator.hasNext()) {
-			AbstractDataObject object = iterator.next();
-			AOObject activeObject = object.findActiveObjectById(id);
-			if (activeObject != null) {
-				return activeObject;
-			}
-		}
-		return null;
+		return (AOObject) allMonitoredObjects.get(id.toString());
+		
+//		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
+//		while (iterator.hasNext()) {
+//			AbstractDataObject object = iterator.next();
+//			AOObject activeObject = object.findActiveObjectById(id);
+//			if (activeObject != null) {
+//				return activeObject;
+//			}
+//		}
+//		return null;
 	}
 
 
@@ -241,7 +260,7 @@ public abstract class AbstractDataObject extends Observable {
 	 * Warning : You musn't call this method, call filterAndPutChild.
 	 * @param child the object to add
 	 */
-	protected synchronized void putChild(AbstractDataObject child) {
+	protected void putChild(AbstractDataObject child) {
 		monitoredChildren.put(child.getKey(), child);
 		setChanged();
 		notifyObservers();
@@ -251,7 +270,7 @@ public abstract class AbstractDataObject extends Observable {
 	 * Remove a child to this object.
 	 * @param child the object to remove
 	 */
-	public synchronized void removeChild(AbstractDataObject child) {
+	public void removeChild(AbstractDataObject child) {
 		monitoredChildren.remove(child.getKey());
 		this.parent.skippedChildren.put(getKey(), this);
 		setChanged();

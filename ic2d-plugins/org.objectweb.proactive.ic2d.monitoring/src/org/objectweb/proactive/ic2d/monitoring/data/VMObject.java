@@ -64,6 +64,8 @@ public class VMObject extends AbstractDataObject {
 		this.key = this.runtime.getVMInformation()/*.getVMID().toString()*/.getName();
 		this.runtime = runtime;
 		this.jobID = runtime.getJobID();
+		
+		this.allMonitoredObjects.put(getKey(), this);
 	}
 
 	//

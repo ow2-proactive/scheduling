@@ -70,7 +70,9 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * @param o the observable object (instance of AbstractDataObject).
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
+	@Override
 	public void update(Observable o, Object arg) {
+		//System.out.println("NodeEditPart.update()");
 		final Object param = arg;
 //		final NodeEditPart nodeEditPart = this;
 
@@ -83,9 +85,11 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 				else if(param instanceof State) {
 					((NodeFigure)getFigure()).setHighlight(getMonitoringView().getVirtualNodesGroup().getColor(((NodeObject)getModel()).getVNParent()));
 					refresh();
+					//getWorldEditPart().getGUIRefresher().refresh(this);
 				}
 				else {
 					refresh();
+					//getWorldEditPart().getGUIRefresher().refresh(this);
 				}
 			}
 		});
