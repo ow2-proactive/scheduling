@@ -1,0 +1,1995 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+<chapter id="newIC2D">
+
+	<title>Adding Grahical User Interfaces and Eclipse Plugins</title>
+
+	<sect1 id="archiDoc">
+
+		<title>Architecture and documentation</title>
+
+		<para>IC2D is composed of several plugins:</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d
+					</emphasis>
+					: This plugin is the "frame" which contains the
+					other plugins. It is only needed in the standalone
+					version.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d.monitoring
+					</emphasis>
+					: provides graphical representation of hosts, runtimes, virtual
+					nodes and active objects topology, also displaying communications between active objects.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d.jobmonitoring
+					</emphasis>
+					: provides tree-based representation of hosts, runtimes , virtual
+					nodes and active objects.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d.launcher
+					</emphasis>
+					: initiates application deployment using deployment descriptors
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d.lib
+					</emphasis>
+					: provides Java archives (jar) required by the other plugins which are not provided by
+					the Eclipse like ProActive.jar, log4j.jar, etc.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d.console
+					</emphasis>
+					: provides logging capability through the Eclipse
+					console.
+				</para>
+			</listitem>
+		</itemizedlist>
+
+
+
+		<sect2 id="org.objectweb.proactive.ic2d.monitoring">
+
+			<title>org.objectweb.proactive.ic2d.monitoring</title>
+<para>The aim of this plugin is to provide the essential features for monitoring of ProActive applications. 
+ Monitorable entities are </para>
+			<para>
+				<xref linkend="graphicalHierarchy" />
+				shows the graphical representation of
+				<emphasis role="bold">hosts</emphasis>,
+				<emphasis role="bold">virtual nodes</emphasis>,
+				<emphasis role="bold">runtimes (ProActive JVM)</emphasis>,
+				<emphasis role="bold">nodes</emphasis>, and
+				<emphasis role="bold">active objects</emphasis>.
+			</para>
+
+			<figure id="graphicalHierarchy"  >
+				<title>Graphical representation of the data</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata 
+							fileref="ic2d/images/architecture/graphicalHierarchy.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+
+
+
+			<sect3 id="hierarchyPart">
+
+				<title>Class Diagrams</title>
+
+				<para>
+					The diagram	<xref linkend="hierarchy" /> describes relationships between Java classes:
+				</para>
+				<itemizedlist>
+				     <listitem>
+						<para>
+							The AOObject class represents an Active Object.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The NodeObject class represents a node. Nodes contain Active Objects.
+						</para>
+					</listitem>
+					<listitem>
+						<para>The VMObject represents a runtime. Runtimes contain nodes</para>
+					</listitem>
+					<listitem>
+						<para>
+							The VNObject class represents a virtual node. The virtual node is a logical
+							entity which has no real existence at runtime. When using Deployment Descriptors, 
+							it is the mapping of a virtual node on a runtime that leads to the creation of one
+							or more nodes on this runtime. Virtual nodes can be mapped on more than one runtime, 
+							thus as shown in the figure, a node is bound to both a runtime and a virtual node.
+						</para>
+					</listitem>
+					<listitem>
+						<para>The HostObject class represents the hardware that hosts the runtime, it is possible to coallocate several runtimes on the same host</para>
+					</listitem>
+					<listitem>
+						<para>
+							The WorldObject class is a "special" object that
+							allows to gather hosts and virtual nodes under a common root.
+						</para>
+					</listitem>
+					
+					
+				
+					
+				</itemizedlist>
+
+				<figure id="hierarchy" >
+					<title>Class diagram</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center"
+								fileref="ic2d/images/architecture/Classdiagram_2_transparancy.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+			</sect3><!-- Hierarchy of the data -->
+
+
+
+			<sect3 id="exploration">
+
+				<title>Monitoring in detail</title>
+
+				<para>
+					When IC2D is used to monitor a host, it 
+					looks for any available runtimes on the host, then enumerates any nodes,
+					virtual nodes and active objects contained within
+					each runtime.
+				</para>
+				<para>
+					In order to do this, it grabs the URL entered by the user,
+					then creates a new HostObject and add it to the WorldObject.
+					Next, a thread starts and regularly queries the WorldObject to 
+					<emphasis role="bold">explore</emphasis> itself.
+					The following sequence diagram explains how a WorldObject explores itself for the first time 
+					(<xref linkend="exploreSequenceDiagram"/>).
+				</para>
+					<!--			
+					<listitem>
+						<para>
+							The WorldObject queries its HostObjects to
+							explore themselves
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Each HostObject looks for ProActive Runtimes
+							on the current host then creates
+							<emphasis role="bold">VMObject</emphasis>
+							s corresponding to the newly discovered
+							runtimes
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Each VMObject explores itself, looking for
+							Nodes contained within its ProActiveRuntime.
+							Each Node is mapped into a
+							<emphasis role="bold">NodeObject</emphasis>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Each NodeObject looks for contained active
+							objects asking it to the ProActiveRuntime of
+							its parent (VMObject) and creates the
+							corresponding
+							<emphasis role="bold">AOObject</emphasis>
+							s.
+						</para>
+					</listitem>
+				</itemizedlist>
+				-->
+
+				<figure id="exploreSequenceDiagram" >
+					<title>The world exploring itself for the first time</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center"
+								fileref="ic2d/images/architecture/sequenceDiagram.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<para>
+					Now all objects are found. And these operation will
+					be regularly repeated until the user stops
+					monitoring.
+				</para>
+
+			</sect3><!-- How to find data? -->
+
+
+
+			<sect3 id="mvc">
+
+				<title>Model View Controller (MVC)</title>
+
+				<sect4 id="gef">
+					<title>The Graphical Editing Framework (GEF)</title>
+
+					<para>
+						The
+						<ulink url="http://www.eclipse.org/gef">
+							Graphical Editing Framework (GEF)
+						</ulink>
+						allows developers to take an existing
+						application model and quickly create a rich
+						graphical interface.
+					</para>
+
+					<para>
+						GEF employs an MVC (Model View Controller)
+						architecture which enables simple changes to be
+						applied to the model from the view.
+					</para>
+
+					<para>
+						This section introduces the needed to the
+						comprehension of GEF. For more details about GEF
+						go to the
+						<xref linkend="GEFLinks" />
+						.
+					</para>
+
+					<para>
+						We describe here the implementation of the MVC
+						pattern used within IC2D:
+					</para>
+
+					<itemizedlist>
+						<listitem>
+							<para>
+								The Models (
+								<xref linkend="models" />
+								)
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Controllers = In GEF the controllers
+								are subclasses of
+								<emphasis role="bold">
+									EditPart
+								</emphasis>
+								(
+								<xref linkend="controllers" />
+								)
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Views = The
+								<emphasis role="bold">Figure</emphasis>
+								s (
+								<xref linkend="figures" />
+								)
+							</para>
+						</listitem>
+					</itemizedlist>
+
+					<figure id="models">
+						<title>The Models</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/GEFDataTransparency.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<figure id="controllers">
+						<title>The Controllers and the factory</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/GEFEditPartTransparency.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<figure id="figures">
+						<title>The Views</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/GEFFigureTransparency.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<para>
+						<emphasis role="bold">
+							Three things to not forget
+						</emphasis>
+					</para>
+
+
+
+					<itemizedlist>
+						<listitem>
+							<para>
+								The data must be organized in
+								<emphasis role="bold">
+									a tree structure.
+								</emphasis>
+								. See
+								<xref linkend="treeGEF" />
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In GEF the controllers are subclasses of
+								<emphasis role="bold">
+									EditPart
+								</emphasis>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								A
+								<emphasis role="bold">factory</emphasis>
+								(implementing
+								<emphasis role="bold">
+									EditPartFactory
+								</emphasis>
+								) allows GEF to create the controller
+								corresponding to the model.
+							</para>
+						</listitem>
+					</itemizedlist>
+
+
+					<para>
+						In blue, the data which we use with GEF. As you
+						can see it, they are organized in a tree
+						structure.
+					</para>
+
+					<figure id="treeGEF">
+						<title>
+							The data strucure of the monitoring plugin
+						</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/treeArchitectureGef.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<para>
+						<emphasis role="bold">
+							Description of the creation of the
+							controllers and the figures step by step :
+						</emphasis>
+					</para>
+
+					<orderedlist>
+						<listitem>
+							<para>
+								We indicate to GEF the root element of
+								the tree, and the factory.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								GEF queries the factory to create the
+								controller corresponding to the root.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								GEF queries the obtained controller to
+								create the figure corresponding to the
+								model.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								GEF queries the root to provide it its
+								sons.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								On each one of these children, GEF do
+								the same process.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								GEF queries the factory to create the
+								controller corresponding to the first
+								child.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								GEF queries the obtained controller to
+								create the figure corresponding to the
+								model.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								GEF queries the model to provide it its
+								sons.
+							</para>
+						</listitem>
+						<listitem>
+							<para>etc...</para>
+						</listitem>
+					</orderedlist>
+
+					</sect4>
+					<sect4 id="GEFLinks">
+						<title>Links</title>
+						<para>
+							The official site of GEF:
+							<ulink url="http://www.eclipse.org/gef/"></ulink>
+						</para>
+						<para>
+							A web page referring a lot of very
+							interesting links about GEF:
+							<ulink
+								url="http://eclipsewiki.editme.com/GEF">
+								http://eclipsewiki.editme.com/GEF
+							</ulink>
+						</para>
+						<para>
+							A detailed description of GEF :
+							<ulink
+								url="http://eclipse-wiki.info/GEFDescription">
+								http://eclipse-wiki.info/GEFDescription
+							</ulink>
+						</para>
+						<para>
+							A tutorial : 'Building a GEF-based Eclipse
+							editor' :
+							<ulink
+								url="http://home.izforge.com/index.php/2005/08/08/160-building-a-gef-based-eclipse-editor-part-0">
+								Part 0
+							</ulink>
+							,
+							<ulink
+								url="http://home.izforge.com/index.php/2005/08/09/161-building-a-gef-based-eclipse-editor-part-1">
+								Part 1
+							</ulink>
+							,
+							<ulink
+								url="http://home.izforge.com/index.php/2005/08/18/166-building-a-gef-based-eclipse-editor-part-2">
+								Part 2
+							</ulink>
+							,
+							<ulink
+								url="http://home.izforge.com/index.php/2005/09/01/170-building-a-gef-based-eclipse-editor-part-3">
+								Part 3
+							</ulink>
+							.
+						</para>
+
+						<para>
+							Somes GEF examples :
+							<ulink
+								url="http://eclipse-wiki.info/GEFExamples">
+								http://eclipse-wiki.info/GEFExamples
+							</ulink>
+						</para>
+
+					</sect4><!-- Links -->
+
+
+				
+
+				<sect4 id="observerObservable">
+					<title>Observer/Observable</title>
+
+					<para>
+						The pattern Observer/Observable is used to
+						update the figures when the model changes.
+					</para>
+					<para>
+						In the
+						<xref linkend="observable" />
+						you can see all the observable objects with
+						methods which can call
+						<emphasis role="bold">notifyObservers</emphasis>
+						.
+					</para>
+
+					<figure id="observable">
+						<title>Observable objects</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/ObservableTransparency.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<para>
+						In the
+						<xref linkend="observer" />
+						, you can see all the observer objects and where
+						the method
+						<emphasis role="bold">update</emphasis>
+						is overriden.
+					</para>
+
+					<figure id="observer">
+						<title>Observer objects</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/ObserverTransparency.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<para>
+						In the
+						<xref linkend="observerObservableTable" />
+						, you can see each observable with their
+						observers.
+					</para>
+
+					<table id="observerObservableTable">
+						<title>Observable and Observer objects</title>
+						<tgroup cols="2">
+
+							<thead>
+								<row>
+									<entry>
+										<para>Observable</para>
+									</entry>
+									<entry>
+										<para>Observer</para>
+									</entry>
+								</row>
+							</thead>
+							<tbody>
+								<row>
+									<entry morerows='2'
+										valign='middle'>
+										<para>WorldObject</para>
+									</entry>
+									<entry>
+										<para>WorldEditPart</para>
+									</entry>
+								</row>
+								<row>
+									<entry>
+										<para>MonitorThread</para>
+									</entry>
+								</row>
+								<row>
+									<entry>
+										<para>VirtualNodesGroup</para>
+									</entry>
+								</row>
+								<row>
+									<entry>
+										<para>HostObject</para>
+									</entry>
+									<entry>
+										<para>HostEditPart</para>
+									</entry>
+								</row>
+								<row>
+									<entry>
+										<para>VMObject</para>
+									</entry>
+									<entry>
+										<para>VMEditPart</para>
+									</entry>
+								</row>
+								<row>
+									<entry>
+										<para>NodeObject</para>
+									</entry>
+									<entry>
+										<para>NodeEditPart</para>
+									</entry>
+								</row>
+								<row>
+									<entry>
+										<para>AOObject</para>
+									</entry>
+									<entry>
+										<para>AOEditPart</para>
+									</entry>
+								</row>
+							</tbody>
+						</tgroup>
+					</table>
+
+				</sect4><!-- Observer/Observable -->
+
+			</sect3><!-- Model View Controller -->
+
+			<sect3 id="spy">
+				<title>The espionage of the active objects</title>
+
+				<para>
+					In the following diagram, you can see all classes
+					necessary to the espionage of the active objects.
+				</para>
+
+				<figure id="spyDiagram">
+					<title>Spy classes</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata align="center"
+								fileref="ic2d/images/architecture/SpyTransparency.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<para>
+					When a node is found for the first time,
+					IC2D put a spy in the node.
+				</para>
+				
+				<sect4>
+					<title>How an event of a proactive object arrive to the monitoring plugin?</title>
+				
+					<para>
+						Once the spy is in the node, it
+						regularly asks to the <emphasis role="bold">SpyEventManager</emphasis>
+						to provide all the events. The next step is explained in the <xref linkend="spySequenceDiagram"/>. 
+					</para>
+					
+					<figure id="spySequenceDiagram">
+						<title>Active Objects' events management</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/architecture/sequenceDiagramSpies.png"
+									format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+					
+				<!--
+				</listitem>
+						<listitem>
+							<para>
+								Then the Spy transmits all these events
+								to the
+								<emphasis role="bold">
+									SpyListener
+								</emphasis>
+								.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								For the each event, the SpyListener
+								calls the corresponding method on
+								<emphasis role="bold">
+									SpyEventListener
+								</emphasis>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The SpyEventListener searches the
+								<emphasis role="bold">
+									AOObject
+								</emphasis>
+								concerned with this event (thanks to the
+								Node attribut of his class). And it
+								modifies the state of this object.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The AOObject notify its observers.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The
+								<emphasis role="bold">
+									AOEditPart
+								</emphasis>
+								, which is an AOObject observer, update
+								the view of this Active Object.
+							</para>
+						</listitem>
+					</orderedlist>
+				-->
+				</sect4>
+				
+
+				<sect4 id="newSpyWhen">
+					<title>When a new Spy is created?</title>
+
+					<para>
+						A new spy is created each time that a new Node
+						is found.
+					</para>
+				</sect4>
+
+				<sect4 id="newSpyHow">
+					<title>How a new Spy is created?</title>
+
+					<para>
+						The NodeObject calls its "addSpy()" method :
+					</para>
+
+					<orderedlist>
+						<listitem>
+							<para>
+								This method creates a
+								<emphasis role="bold">
+									SpyEventListener
+								</emphasis>
+								with the
+								<emphasis role="bold">
+									NodeObject
+								</emphasis>
+								in parameter.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								It creates also a
+								<emphasis role="bold">
+									SpyListener
+								</emphasis>
+								with the SpyEventListener in parameter.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Next,it
+								<emphasis role="bold">
+									turns active
+								</emphasis>
+								the previous SpyListener.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								And creates a new Active Object (with
+								the
+								<emphasis role="bold">
+									ProActive.newActive
+								</emphasis>
+								method) which is the spy with 2
+								parameters : the turned active object
+								(SpyListener) , and the
+								<emphasis role="bold">node</emphasis>
+								. (This node is given in parameter at
+								the constructor of the NodeObject)
+							</para>
+						</listitem>
+					</orderedlist>
+
+				</sect4>
+
+				<sect4>
+					<title>
+						How an active object is added to the objects to
+						monitor?
+					</title>
+
+					<para></para>
+
+					<orderedlist>
+						<listitem>
+							<para>
+								When an active object is found for the
+								first time, we ask to the
+								<emphasis role="bold">
+									NodeObject
+								</emphasis>
+								to provide us the spy.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								We call the '
+								<emphasis role="bold">
+									addMessageEventListener
+								</emphasis>
+								' method on the
+								<emphasis role="bold">Spy</emphasis>
+								.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The Spy calls on its
+								<emphasis role="bold">
+									SpyEventManager
+								</emphasis>
+								the '
+								<emphasis role="bold">
+									addMessageEventListener
+								</emphasis>
+								' method.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								The SpyEventManager adds a
+								<emphasis role="bold">
+									MessageEvent
+								</emphasis>
+								listener to the
+								<emphasis role="bold">body</emphasis>
+								of the active object.
+							</para>
+						</listitem>
+					</orderedlist>
+
+				</sect4>
+
+			</sect3><!-- The espionage of the active objects -->
+
+
+			<sect3 id="filters">
+
+				<title>How to create and use filters</title>
+
+				<para>
+					In some cases, you may want to hide some objects to
+					the users, i.e. don't monitor some internal objects.
+					For example, spy objects used by IC2D for monitoring
+					JVMs. That's why we introduce the concept of
+					filtering in the monitoring plugin.
+				</para>
+
+				<para>
+					The package
+					<emphasis role="bold">
+						org.objectweb.proactive.monitoring.filters
+					</emphasis>
+					contains:
+				</para>
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">Filter</emphasis>
+							: an abstract class, which has to be
+							extended by all filter classes. This class
+							provides the method
+							<emphasis role="bold">filter</emphasis>
+							(AbstractDataObject) that returns true if it
+							matches the filter, otherwise false.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">
+								FilterProcess
+							</emphasis>
+							: provides the method
+							<emphasis role="bold">filter</emphasis>
+							(AbstractDataObject object).This is the
+							first method called when a new object is
+							discovered. It applies all filters on the
+							object and if at least one filter returns
+							true the object is not monitored.
+						</para>
+					</listitem>
+				</itemizedlist>
+
+			</sect3>
+
+		</sect2>
+
+		<sect2 id="org.objectweb.proactive.ic2d.console">
+
+			<title>org.objectweb.proactive.ic2d.console</title>
+
+			<para>
+				This plugin provides several methods to log in the
+				console :
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">log</emphasis>
+						(String message)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">warn</emphasis>
+						(String message)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">err</emphasis>
+						(String message)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">logException</emphasis>
+						(Throwable e)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">debug</emphasis>
+						(String message)
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<emphasis role="bold">debug</emphasis>
+						(Throwable e)
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>
+				You can have several different consoles. For example,
+				the plugin monitoring logs in a console named
+				"Monitoring", all the log4j messages are logged in the
+				console "Log4j", ...
+			</para>
+
+			<para>
+				If you want to add your own console, you must choose a
+				unique name. and call the method Console.
+				<emphasis role="bold">getInstance</emphasis>
+				(String yourUniqueName) to obtain the console (if it
+				didn't exist it is created). Then you can call the
+				methods above on your console.
+			</para>
+
+		</sect2><!-- org.objectweb.proactive.ic2d.console -->
+
+
+
+		<sect2 id="org.objectweb.proactive.ic2d.lib">
+
+			<title>org.objectweb.proactive.ic2d.lib</title>
+
+			<para>
+				This plugin contains all jar (which are not provided by
+				Eclipse) necessary to the other plugins (like
+				ProActive.jar, log4j.jar, ...). So if you modify the
+				code and need a new jar, you have to add it to the
+				plugin lib. And if you create a new plugin which needs a
+				jar which is in the plugin lib, it must be dependent of
+				this plugin.
+			</para>
+
+		</sect2>
+
+	</sect1><!-- Architecture and documentation -->
+
+	<!-- ************************************************************************************************** -->
+
+	<sect1>
+		<title>Extending IC2D</title>
+
+
+		<sect2 id="checkout">
+			<title>How to checkout IC2D</title>
+
+			<para>
+				Here is the IC2D SVN repository :
+				<emphasis role="bold">
+					svn://scm.gforge.inria.fr/svn/proactive/branches/proactive_newIC2D
+				</emphasis>
+			</para>
+
+			<para>You have to checkout :</para>
+			<itemizedlist>
+				<listitem>
+					<para>org.objectweb.proactive.ic2d</para>
+				</listitem>
+				<listitem>
+					<para>org.objectweb.proactive.ic2d.monitoring</para>
+				</listitem>
+				<listitem>
+					<para>org.objectweb.proactive.ic2d.lib</para>
+				</listitem>
+				<listitem>
+					<para>org.objectweb.proactive.ic2d.console</para>
+				</listitem>
+				<listitem>
+					<para>org.objectweb.proactive.ic2d.launcher</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>
+				If you are using
+				<emphasis role="bold">Eclipse</emphasis>
+				and its plugin
+				<emphasis role="bold">Subclipse</emphasis>
+				, open the
+				<emphasis role="bold">
+					SVN Repository perspective
+				</emphasis>
+				and checkout all those folders as
+				<emphasis role="bold">new Java projects</emphasis>
+				.
+			</para>
+
+			<figure id="svnRepository">
+				<title>SVN Repository</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="ic2d/images/extending/svnRepository.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+
+			<para>
+				You'll maybe have to replace the proactive.jar file in
+				the plugin org.objectweb.proactive.ic2d.lib, it depends
+				on your ProActive version.
+			</para>
+
+			<para>
+				Now, you can run IC2D clicking on the link
+				<emphasis role="bold">Launch the product</emphasis>
+				in
+				<emphasis role="bold">ic2d.product</emphasis>
+				in the org.objectweb.proactive.ic2d project.
+			</para>
+
+			<figure id="launch">
+				<title>ic2d.product</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="ic2d/images/extending/launch.png" format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+
+		</sect2>
+
+
+		<sect2 id="implementAPlugin">
+
+			<title>How to implement a plug-in for IC2D</title>
+
+			<para>
+				IC2D is a
+				<emphasis role="bold">
+					Rich Client Platform (RCP)
+				</emphasis>
+				based on the familiar
+				<emphasis role="bold">
+					Eclipse plug-in architecture
+				</emphasis>
+				.
+			</para>
+
+			<sect3 id="createAProject">
+
+				<title>
+					Create a project with the plug-in project wizard
+				</title>
+
+				<para>
+					If you want to create a plug-in for IC2D, you have
+					to use the Eclipse's
+					<emphasis role="bold">
+						Plug-in Development Environment (PDE)
+					</emphasis>
+					. This is a complete environment that Eclipse
+					provides for plug-in development. The PDE adds a new
+					perspective and several views and wizards that help
+					you create, maintain, and publish plug-ins. The PDE
+					creates boilerplate starter code that you can use to
+					build your plug-in. This section explains how to use
+					the
+					<emphasis role="bold">
+						plug-in project wizard
+					</emphasis>
+					to create your plug-in.
+				</para>
+
+				<orderedlist>
+					<listitem>
+						<para>
+							Select
+							<emphasis role="bold">
+								File &gt; New &gt; Project
+							</emphasis>
+							from the menu bar to open the new project
+							wizard.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Select
+							<emphasis role="bold">
+								Plug-in Project
+							</emphasis>
+							in
+							<emphasis role="bold">
+								Plug-in Development
+							</emphasis>
+							.
+						</para>
+					</listitem>
+				</orderedlist>
+
+				<figure id="newProject">
+					<title>Create a new project</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/new_project.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<orderedlist continuation="continues">
+					<listitem>
+						<para>
+							Click
+							<emphasis role="bold">Next</emphasis>
+							.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							In the
+							<emphasis role="bold">
+								Project name
+							</emphasis>
+							field, enter a name for the plug-in. For
+							example, we chose
+							org.objectweb.proactive.ic2d.example. You
+							must use the fully-qualified name to ensure
+							its uniqueness.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							In the Project contents pane, accept the
+							default directory value.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Make sure the
+							<emphasis role="bold">
+								Create a Java project
+							</emphasis>
+							option is selected since we want our project
+							to contain Java files. Accept the default
+							values of the other options.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Beginning in Eclipse 3.1 you will get best
+							results by using the
+							<emphasis role="bold">
+								OSGi bundle manifest
+							</emphasis>
+							. In contrast to previous versions, this is
+							now the default.
+						</para>
+					</listitem>
+				</orderedlist>
+
+				<figure id="newPluginProject">
+					<title>Specify name and plug-in structure</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/new_plugin_project.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<orderedlist continuation="continues">
+					<listitem>
+						<para>
+							Click
+							<emphasis role="bold">Next</emphasis>
+							.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Now enter the fully qualified
+							<emphasis role="bold">
+								ID of the plug-in
+							</emphasis>
+							. By default it is the same as its project
+							name.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Accept the default values of the other
+							options.
+						</para>
+					</listitem>
+				</orderedlist>
+
+				<figure id="newPluginProject2">
+					<title>Specify plug-in content</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/new_plugin_project_2.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<orderedlist continuation="continues">
+					<listitem>
+						<para>
+							Click
+							<emphasis role="bold">Finish</emphasis>
+							.
+						</para>
+					</listitem>
+				</orderedlist>
+
+			</sect3>
+			<!-- createAProject -->
+
+			<sect3 id="pluginStructure">
+
+				<title>The plug-in structure</title>
+
+				<para>
+					The plug-in project has the file structure
+					illustrated in the followed figure.
+				</para>
+
+				<figure id="pluginStructureScreenshot">
+					<title>The plug-in structure</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/package_explorer.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<sect4 id="pluginManifest">
+
+					<title>Plug-in manifest</title>
+
+					<para>
+						The plug-in manifest ties all the code and
+						resources together. When you first create a
+						plug-in, Eclipse will create and open the
+						manifest for you automatically. The manifest is
+						split into two files:
+						<emphasis role="bold">MANIFEST.MF</emphasis>
+						and
+						<emphasis role="bold">plugin.xml</emphasis>
+						. PDE provides a fancy editor to modify the
+						options stored in these files (see
+						<xref linkend="PDEOverview" />
+						) but also allows you to edit the source
+						directly.
+					</para>
+
+					<figure id="PDEOverview">
+						<title>
+							Interface for editing the manifest and
+							related files.
+						</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/extending/overview.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<para>
+						<emphasis role="bold">MANIFEST.MF</emphasis>
+					</para>
+
+					<para>
+						The
+						<emphasis role="bold">
+							OSGi bundle manifest
+						</emphasis>
+						is stored in MANIFEST.MF. OSGi is the name of a
+						standard that Eclipse uses for dynamically
+						loading plug-ins.
+						<xref linkend="manifestMFListing" />
+						shows the OSGi bundle manifest generated by the
+						plug-in wizard. Everything in this file can be
+						edited by the Manifest editor, so
+						<emphasis role="bold">
+							there should be no need to edit it by hand
+						</emphasis>
+						. However if you need to, just double-click it
+						in the Package Explorer to bring up the Manifest
+						editor, then click on the MANIFEST.MF tab in the
+						editor to see and modify the source.
+					</para>
+
+					<example id="manifestMFListing">
+						<title>MANIFEST.MF</title>
+						<screen>
+							Manifest-Version: 1.0
+							Bundle-ManifestVersion: 2 Bundle-Name:
+							Example Plug-in Bundle-SymbolicName:
+							org.objectweb.proactive.ic2d.example
+							Bundle-Version: 1.0.0 Bundle-Activator:
+							org.objectweb.proactive.ic2d.example.ExamplePlugin
+							Bundle-Localization: plugin Require-Bundle:
+							org.eclipse.ui, org.eclipse.core.runtime
+							Eclipse-AutoStart: true
+						</screen>
+					</example>
+
+					<para>
+						<emphasis role="bold">plugin.xml</emphasis>
+					</para>
+
+					<para>
+						The Eclipse extension manifest is called
+						plugin.xml. It's used for defining and using
+						Eclipse
+						<emphasis role="bold">
+							extension points
+						</emphasis>
+						, so if you're not using extension points then
+						this file may be omitted. Extension points are
+						the fundamental way that Eclipse plug-ins are
+						tied together. This new plug-in is not yet using
+						extension points so the plug-in wizard didn't
+						generate the plugin.xml file.
+					</para>
+
+				</sect4><!-- pluginManifest -->
+
+				<sect4 id="pluginClass">
+
+					<title>Plug-in class</title>
+
+					<para>
+						The plug-in class is an optional singleton class
+						that can be used to store global information for
+						the plug-in. It's also a convenient place to put
+						a few static utility functions used by other
+						classes in the plug-in. See the listing
+						<xref linkend="pluginClassListing" />
+						for the plug-in class that was created for us by
+						the plug-in wizard.
+					</para>
+
+					<example id="pluginClassListing">
+						<title>ExamplePlugin.java</title>
+						<programlisting lang="java">
+							<![CDATA[package org.objectweb.proactive.ic2d.example;
+
+import org.eclipse.ui.plugin.*;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.osgi.framework.BundleContext;
+
+/**
+ * The main plugin class to be used in the desktop.
+ */
+public class ExamplePlugin extends AbstractUIPlugin {
+
+	//The shared instance.
+	private static ExamplePlugin plugin;
+	
+	/**
+	 * The constructor.
+	 */
+	public ExamplePlugin() {
+		plugin = this;
+	}
+
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+	}
+
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+		plugin = null;
+	}
+
+	/**
+	 * Returns the shared instance.
+	 */
+	public static ExamplePlugin getDefault() {
+		return plugin;
+	}
+
+	/**
+	 * Returns an image descriptor for the image file at the given
+	 * plug-in relative path.
+	 *
+	 * @param path the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return AbstractUIPlugin.imageDescriptorFromPlugin("org.objectweb.proactive.ic2d.example", path);
+	}
+}]]>
+						</programlisting>
+					</example>
+
+				</sect4><!-- pluginClass -->
+
+				<sect4 id="buildProperties">
+
+					<title>Build properties</title>
+
+					<para>
+						The
+						<emphasis role="bold">
+							build.properties
+						</emphasis>
+						file (see
+						<xref linkend="buildPropertiesListing" />
+						) will be needed when
+						<emphasis role="bold">
+							exporting the application for others to use
+						</emphasis>
+						. In particular if your application needs any
+						resources like icons they should be listed here
+						in the bin.includes section. The Plug-in
+						Manifest editor provides a convenient interface
+						to modify this file that is less error-prone
+						than modifying it by hand.
+					</para>
+
+					<example id="buildPropertiesListing">
+						<title>build.properties</title>
+						<screen>
+							source.. = src/ output.. = bin/ bin.includes
+							= META-INF/,\ .
+						</screen>
+					</example>
+
+				</sect4><!-- buildProperties -->
+
+			</sect3><!-- pluginStructure -->
+
+			<sect3 id="addPluginToIC2D">
+
+				<title>How to add your plugin to IC2D</title>
+
+				<para>
+					In the project
+					<emphasis role="bold">
+						org.objectweb.proactive.ic2d
+					</emphasis>
+					, open
+					<emphasis role="bold">ic2d.product</emphasis>
+					. In the Configuration tab, click
+					<emphasis role="bold">Add</emphasis>
+					.
+				</para>
+
+				<figure id="ic2dConfiguration">
+					<title>Configuration</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/ic2d_product.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<para>Then select your plug-in.</para>
+
+				<figure id="pluginSelection">
+					<title>Plug-in selection</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/plugin_selection.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<orderedlist>
+					<listitem>
+						<para>
+							Now, click Add
+							<emphasis role="bold">
+								Required Plug-ins
+							</emphasis>
+							.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Return to the
+							<emphasis role="bold">Overview</emphasis>
+							tab and click
+							<emphasis role="bold">Synchronize</emphasis>
+							. Now launch ic2d by clicking
+							<emphasis role="bold">
+								Launch the product
+							</emphasis>
+							.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							You can verify that your plug-in is
+							integrated : in the IC2D frame, go to
+							<emphasis role="bold">
+								Help &gt; About product &gt; Plug-in
+								Details
+							</emphasis>
+							.
+						</para>
+					</listitem>
+				</orderedlist>
+
+				<figure id="aboutPlugin">
+					<title>About product Plug-ins</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/product_plugins.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+			</sect3><!-- addPluginToIC2D -->
+
+			<sect3 id="perspectivesViewsEditors">
+
+				<title>Perspectives, views and editors</title>
+
+				<figure id="workbenchStructure">
+					<title>Workbench structure</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/extending/workbench_decomposed.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+
+				<sect4 id="ic2dPerspectives">
+					<title>Perspectives</title>
+
+					<para>
+						Perspectives provide an additional layer of
+						organization inside the workbench page. A
+						perspective defines an appropriate
+						<emphasis role="bold">
+							collection of views
+						</emphasis>
+						, their layout, and applicable actions for a
+						given user task. Users can switch between
+						perspectives as they move across tasks. From an
+						implementation point of view, the user's active
+						perspective controls which views are shown on
+						the workbench page and their positions and
+						sizes. Editors are not affected by a change in
+						perspective.
+					</para>
+
+					<para>
+						A new perspective is added to the workbench
+						using a simple two step process :
+					</para>
+
+					<orderedlist>
+						<listitem>
+							<para>
+								<emphasis role="bold">
+									Add a perspective extension to the
+									plugin.xml file.
+								</emphasis>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis role="bold">
+									Define a perspective class for the
+									extension within the plug-in.
+								</emphasis>
+							</para>
+						</listitem>
+					</orderedlist>
+
+					<para>
+						<emphasis role="bold">
+							Step 1 : Add a Perspective Extension to the
+							plugin.xml file
+						</emphasis>
+					</para>
+
+					<orderedlist>
+						<listitem>
+							<para>
+								Open
+								<emphasis role="bold">
+									MANIFEST.MF
+								</emphasis>
+								with the Plug-in Manifest Editor
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Open the
+								<emphasis role="bold">
+									Extensions
+								</emphasis>
+								tab
+							</para>
+						</listitem>
+					</orderedlist>
+
+					<figure id="extensions_0">
+						<title>Extensions tab (no extensions)</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/extending/extensions-0.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<orderedlist continuation="continues">
+						<listitem>
+							<para>
+								Click
+								<emphasis role="bold">Add</emphasis>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								In the
+								<emphasis role="bold">
+									Extensions Points
+								</emphasis>
+								tab, select
+								<emphasis role="bold">
+									org.eclipse.ui.perspectives
+								</emphasis>
+							</para>
+						</listitem>
+					</orderedlist>
+
+					<para>
+						<emphasis role="bold">
+							Ajouter un screenshot
+						</emphasis>
+					</para>
+
+					<orderedlist continuation="continues">
+						<listitem>
+							<para>
+								Click
+								<emphasis role="bold">Finish</emphasis>
+							</para>
+						</listitem>
+					</orderedlist>
+
+					<figure id="extensions_1">
+						<title>
+							Extensions tab (org.eclipse.ui.perspectives)
+						</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/extending/extensions-1.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<orderedlist continuation="continues">
+						<listitem>
+							<para>
+								Right click the new extension :
+								<emphasis role="bold">
+									New &gt; perspective
+								</emphasis>
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								Now, enter the
+								<emphasis role="bold">ID</emphasis>
+								, the
+								<emphasis role="bold">name</emphasis>
+								and the
+								<emphasis role="bold">class</emphasis>
+								corresponding to the perspective.
+							</para>
+						</listitem>
+					</orderedlist>
+
+					<figure id="extensions_2">
+						<title>Extensions tab (Example)</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/extending/extensions-2.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+					<para>
+						If the plugin.xml file didn't exist, it is now
+						created.
+						<xref linkend="pluginXMLexample" />
+						shows the plugin.xml file that was created.
+					</para>
+
+					<example id="pluginXMLexample">
+						<title>plugin.xml</title>
+						<programlisting lang="xml">
+							<![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.objectweb.proactive.ic2d.example.ExamplePerspective"
+            id="org.objectweb.proactive.ic2d.example.ExamplePerspective"
+            name="Example"/>
+   </extension>
+</plugin>]]>
+						</programlisting>
+					</example>
+
+
+
+
+					<para>
+						<emphasis role="bold">
+							Step 2 : Define a Perspective Class for the
+							Extension within the Plug-in
+						</emphasis>
+					</para>
+
+					<para>
+						Now we need to define the perspective class
+						which must implements the IPerspectiveFactory
+						interface :
+					</para>
+
+					<example id="examplePlugin">
+						<title>ExamplePlugin.java</title>
+						<programlisting lang="java">
+							<![CDATA[package org.objectweb.proactive.ic2d.example;
+
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPerspectiveFactory;
+
+public class ExamplePerspective implements IPerspectiveFactory {
+
+	public static final String ID="org.objectweb.proactive.ic2d.example.ExamplePerspective";
+	
+	public void createInitialLayout(IPageLayout layout) {
+		// TODO Auto-generated method stub
+
+	}
+
+}]]>
+						</programlisting>
+					</example>
+
+					<para>
+						You have created your first perspective !
+					</para>
+
+				</sect4><!-- perspectives -->
+
+				<sect4 id="views">
+
+					<title>Views</title>
+
+					<para>
+						A view is typically used to navigate a hierarchy
+						of information, open an editor, or display
+						properties for the active editor.
+					</para>
+
+					<para>
+						Create a view looks like create a perspective.
+						You have to
+						<emphasis role="bold">
+							add a perspective extension to the
+							plugin.xml file
+						</emphasis>
+						and to
+						<emphasis role="bold">
+							define a view class for the extension within
+							the plug-in
+						</emphasis>
+						.
+					</para>
+
+					<para>
+						<emphasis role="bold">
+							Step 1 : Add a View Extension to the
+							plugin.xml file
+						</emphasis>
+					</para>
+
+					<para>
+						Add an extension : org.eclipse.ui.views, then
+						add a view and configure it. You should obtain
+						something like that is shown in the
+						<xref linkend="extensions_3" />
+						.
+					</para>
+
+					<figure id="extensions_3">
+						<title>
+							Extensions tab
+							(org.objectweb.proactive.ic2d.example.view)
+						</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/extending/extensions-3.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+
+				</sect4><!-- views -->
+
+				<sect4 id="editor">
+					<title>Editors</title>
+
+					<para>
+						An editor is a visual component within a
+						workbench page. It is used to interact with the
+						primary focus of attention, which may be a
+						document, data object, or person. The primary
+						focus of attention is a reflection of the
+						primary task.
+					</para>
+				</sect4><!-- editor -->
+
+			</sect3><!-- perspectivesViewsEditors -->
+
+			<sect3 id="links">
+				<title>Useful links</title>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							<ulink
+								url="http://devresource.hp.com/drc/technical_articles/ePlugIn/index.jsp">
+								Creating Eclipse plug-ins
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://www.eclipse.org/articles/Article-RCP-1/tutorial1.html">
+								Rich Client Tutorial Part 1
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://www.eclipse.org/articles/Article-RCP-2/tutorial2.html">
+								Rich Client Tutorial Part 2
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://www.eclipse.org/articles/Article-RCP-3/tutorial3.html">
+								Rich Client Tutorial Part 3
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://www.eclipsecon.org/2005/presentations/EclipseCon2005_Tutorial26.pdf">
+								Developing for the Rich Client Platform
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://wiki.eclipse.org/images/d/d9/EclipseCon_RCP_Tutorial_2006.pdf">
+								Rich Client Application Development
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://www.eclipse.org/articles/viewArticle/ViewArticle2.html">
+								Creating an Eclipse View
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://www.eclipse.org/articles/using-perspectives/PerspectiveArticle.html">
+								Using Perspectives in the Eclipse UI
+							</ulink>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<ulink
+								url="http://wiki.eclipse.org/index.php/Eclipse_FAQs">
+								The Official Eclipse FAQs
+							</ulink>
+						</para>
+					</listitem>
+				</itemizedlist>
+
+			</sect3><!-- links -->
+
+		</sect2><!-- implementAPlugin -->
+
+	</sect1>
+
+</chapter><!-- newIC2D -->

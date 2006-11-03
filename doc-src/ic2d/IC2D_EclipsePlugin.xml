@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+
+<chapter id="IC2D_EclipsePlugin">
+	
+	<title>
+		IC2D: Interactive Control and Debugging of Distribution and Eclipse plugin
+	</title>
+	
+	
+	<para>
+		<emphasis role="bold">IC2D</emphasis> is a
+		<emphasis role="bold">graphical environment</emphasis>
+		for remote monitoring and steering of
+		<emphasis role="bold">distributed and grid applications</emphasis>.
+		IC2D is built on top of <emphasis role="bold">ProActive</emphasis>
+		that provides asynchronous calls and migration.
+	</para>
+	<para>IC2D is available in two forms :</para>
+	<itemizedlist>
+		<listitem><para>
+			A <emphasis role="bold">Java standalone application</emphasis> based on
+			<ulink url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+				Eclipse Rich Client Platform (RCP)</ulink>, available for any platform
+			(Windows, Linux, Mac OSX,Solaris, ...)
+		</para></listitem>
+		<listitem><para>
+			A set of <emphasis role="bold"><ulink url="http://www.eclipse.org">Eclipse</ulink> plugins</emphasis>:
+			with all the functionnalities within the standalone	application, enhanced with a tool that makes easier the
+			development of Grid Applications, including:
+			<itemizedlist>
+				<listitem><para>
+					ProActive Editor (error highlighting, ...)
+				</para></listitem>
+				<listitem><para>
+					ProActive Wizards
+				</para></listitem>
+				<listitem><para>
+					Cheat Sheets for ProActive (Guided Tour)
+				</para></listitem>
+			</itemizedlist>
+		</para></listitem>
+	</itemizedlist>
+	
+	<!-- ************************************************************************************ -->
+	
+	<sect1 id="MonitoringControl">
+		
+		<title>Monitoring and Control</title>
+		
+		<para>
+			IC2D is based on a <emphasis role="bold">plugin architecture</emphasis>
+			and provides 2 plugins in relation to the 
+			<emphasis role="bold">monitoring</emphasis> and the 
+			<emphasis role="bold">control</emphasis> of ProActive applications: 
+		</para>
+		
+		<itemizedlist>
+			<listitem><para>
+				The <emphasis role="bold">Monitoring plugin</emphasis> which provides a
+				<emphasis role="bold">graphical visualisation</emphasis>
+				for hosts, Java Virtual Machines, and active objects,
+				including the topology and the volume of communications
+			</para></listitem>
+			<listitem><para>
+				The <emphasis role="bold">Job Monitoring plugin</emphasis> which provides a
+				<emphasis role="bold">tree representation</emphasis>
+				of all these objects.
+			</para></listitem>
+		</itemizedlist>
+		
+		
+		
+		<sect2>
+			
+			<title>The Monitoring plugin</title>
+			
+			<sect3>
+				
+				<title>The Monitoring perspective</title>
+				
+				<para>
+					The Monitoring plugin provides the <emphasis role="bold">Monitoring 
+						<ulink url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">perspective</ulink>
+					</emphasis> displayed in the <xref linkend="monitoringPerspective"/>. 
+				</para>
+				
+				<para>
+					This perspective defines the following set of <ulink url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">views</ulink>:
+				</para>
+				
+				<itemizedlist>
+					<listitem><para>
+						The <emphasis role="bold">Monitoring</emphasis> view: contains the graphical visualisation for ProActive objects
+					</para></listitem>
+					<listitem><para>
+						The <emphasis role="bold">Legend</emphasis> view: contains the legend corresponding to the Monitoring view's content
+					</para></listitem>
+					<listitem><para>
+						The <emphasis role="bold">Console</emphasis> view: contains log corresponding to the Monitoring view's events
+					</para></listitem>
+				</itemizedlist>
+				
+				<figure id="monitoringPerspective">
+					<title>The Monitoring Perspective</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+			</sect3> <!-- The Monitoring perspective -->
+			
+			<sect3>
+				
+				<title>Monitor a new host</title>
+				
+				<para>
+					In order to monitor a new host:
+				</para>
+				
+				<orderedlist>
+					<listitem><para>
+						open the Monitoring Perspective:
+						<emphasis role="bold">Window->Open Perspective->Other...->Monitoring</emphasis>
+						(in the standalone IC2D, it should be already opened because it is the default perspective)
+					</para></listitem>
+					<listitem><para>
+						select <emphasis role="bold">Monitoring->Monitor a new host...</emphasis>,
+						it opens the "Monitor a new Host" dialog displayed in the <xref linkend="monitorNewHost"/>
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">enter informations required</emphasis> about the host to monitor, and click
+						<emphasis role="bold">OK</emphasis>
+					</para></listitem>
+				</orderedlist>
+				
+				
+				<figure id="monitorNewHost">
+					<title>Monitor New Host Dialog</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/monitor_new_host.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+			</sect3><!-- Monitor a new host -->
+			
+			<sect3>
+				
+				<title>The Virtual Nodes list</title>
+				
+				<para>
+					At the top of the Monitoring View, one can find the <emphasis role="bold">Virtual Nodes list</emphasis>.
+					When some nodes are monirored, their virtual nodes are added to this list. And when a virtual node is checked,
+					all its nodes are highlighted.
+				</para>
+				
+				<figure id="virtualNodesList">
+					<title>Virtual nodes List</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="ic2d/images/features/virtualnodes.png" format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+			</sect3><!-- The Virtual Nodes list -->
+			
+			<sect3>
+				
+				<title>Management of the communications display</title>
+				
+				<para>
+					At the bottom of the Monitoring view, one can find a set of buttons
+					used to manage the communications display:
+				</para>
+				<orderedlist>
+					<listitem><para>
+						<emphasis role="bold">Display topology</emphasis>: show/hide communications
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Proportional</emphasis>: arrows thickness is proportional to the number of requests
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Ratio</emphasis>: ???
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Filaire</emphasis>: arrows always have the same thickness whatever the number of communications
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Reset topology</emphasis>: erase all communications
+					</para></listitem>
+					<listitem><para>
+						<emphasis role="bold">Monitoring enable</emphasis>: listen or not communications between active objects
+					</para></listitem>
+				</orderedlist>
+				
+			</sect3><!-- The management of the communications display -->
+			
+			<sect3>
+			<title> Example </title>
+			<para>
+				The <xref linkend="monitoring"/> shows an example where 3 hosts are monitored.
+				The applications running are philosophers
+				and C3D (<xref linkend="C3D_example"/>). 
+			</para>
+			</sect3>
+		</sect2> <!-- The Monitoring plugin -->
+		
+		<sect2>
+			
+			<title>The Job Monitoring plugin</title>
+			
+			
+			<para>
+				To look at the <emphasis role="bold">tree representation</emphasis>
+				of the monitored objects, one have to open the 
+				<emphasis role="bold">Job Monitoring view</emphasis>.
+			</para>
+			<para>
+				For that,
+				select <emphasis role="bold">Window->Show view->Other...->Job Monitoring->Job Monitoring</emphasis>.
+			</para>
+			
+			<figure id="openJobMonitoringView">
+				<title>Select the Job Monitoring view in the list</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="ic2d/images/features/showViewJobMonitoring.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			
+			<para>
+				One can see in the <xref linkend="monitoring"/> an example of a tree representation of some monitored objects.
+			</para>
+
+		<figure id="monitoring">
+			<title>Monitoring of 2 applications</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="ic2d/images/features/RunMonitoring3.png" format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+			
+		</sect2><!-- The Job Monitoring plugin -->
+		
+		
+	</sect1><!-- Monitoring and Control -->
+	
+	<!-- ************************************************************************************ -->
+	
+	<sect1 id="LauncherScheduler">
+		
+		<title>Launcher and Scheduler</title>
+		
+		<sect2>
+			<title>The Launcher plug-in</title>
+			
+			<para>
+				In order to launch a
+				<emphasis role="bold">deployment descriptor</emphasis>
+				, you must open your file with the
+				<emphasis role="bold">IC2D XML Editor</emphasis>
+				.
+			</para>
+			
+			<para>To use this editor, you have two possibilities:</para>
+			
+			<sect3>
+				<title>First possibility</title>
+				
+				<para>
+					Open the
+					<emphasis role="bold">
+						Launcher perspective
+					</emphasis>
+					. Select:
+					<emphasis role="bold">
+						Window > Open perspective > Other... > Launcher
+					</emphasis>
+				</para>
+				
+				<para>
+					<figure>
+						<title>The "Open Perspective" window</title>
+						
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/features/perspectiveLauncher.png"
+									format="PNG" contentwidth="100" width="6in" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+				
+				<para>
+					Then select:
+					<emphasis role="bold">File > Open File...</emphasis>
+					and open your deployment descriptor, it will be
+					opened with the IC2D XML editor. And its name will
+					appear in the
+					<emphasis role="bold">
+						Deployment descriptors
+					</emphasis>
+					list.
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>Second possibility</title>
+				<para>
+					In the Navigator view, or another similar, a right
+					click on the XML file allows you to open your file
+					with the
+					<emphasis role="bold">IC2D XML editor</emphasis>
+					.
+				</para>
+				<para>
+					<figure>
+						<title>The open with action</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/features/openWith.png" format="PNG"
+									contentwidth="100" width="6in" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+			</sect3>
+			
+			<sect3>
+				<title>The Launcher perspective</title>
+				
+				<para>
+					The
+					<xref linkend="launcherPerspective" />
+					represents the Launcher perspective containing an
+					<emphasis role="bold">XML editor</emphasis>
+					, a
+					<emphasis role="bold">console</emphasis>
+					, and the
+					<emphasis role="bold">
+						list of deployment descriptors
+					</emphasis>
+					.
+				</para>
+				
+				<para>
+					To
+					<emphasis role="bold">launch</emphasis>
+					an application, select your file in the deployment
+					descriptors list, and click on the launch icon.
+				</para>
+				
+				<para>
+					You can
+					<emphasis role="bold">kill</emphasis>
+					the applications launched from a popup-menu in the
+					"Deployment descriptors" list.
+				</para>
+				
+				<para>
+					To see your application running, open the
+					"Monitoring perspective" and monitor the
+					corresponding host.
+				</para>
+				
+				<para>
+					<figure id="launcherPerspective">
+						<title>The Launcher perspective</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata align="center"
+									fileref="ic2d/images/features/LauncherPerspective.png"
+									format="PNG" contentwidth="100" width="6in" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+				
+			</sect3>
+		</sect2> <!-- The Launcher plug-in -->
+		
+		
+		
+		<sect2>
+			<title>The Scheduler plug-in</title>
+			
+			<para>Coming soon ...</para>	
+			
+		</sect2> <!-- The Scheduler plug-in -->
+		
+	</sect1><!-- Launcher and Scheduler -->
+	
+	<!-- ************************************************************************************ -->
+	
+	<sect1 id="ProgrammingTools">
+		
+		<title>Programming Tools</title>
+		
+		<sect2>
+			<title>ProActive Wizards</title>
+			<para>
+				These wizards will guide developpers to make complex
+				operations with ProActive, such as installation,
+				integration, configuration, or execution :
+			</para>
+			<orderedlist>
+				<listitem>
+					<para>a ProActive installation wizard</para>
+				</listitem>
+				<listitem>
+					<para>
+						a wizard that create applications using
+						ProActive
+					</para>
+				</listitem>
+				<listitem>
+					<para>an active object creation wizard</para>
+				</listitem>
+				<listitem>
+					<para>a configuration and execution wizard</para>
+				</listitem>
+			</orderedlist>
+			<figure>
+				<title>A wizard popup</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="development/plugin_files/wizard_active.jpg" format="JPG"
+							contentwidth="100" width="6in" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</sect2>
+		
+		<sect2>
+			<title>The ProActive Editor</title>
+			<para>
+				This editor checks coding rules. It informs the
+				developper of error concerning ProActive in his classes
+				and can resolve some of these errors.
+			</para>
+			<figure>
+				<title>The editor error highlighting</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="development/plugin_files/editor.jpg" format="JPG"
+							contentwidth="100" width="6in" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</sect2>
+		
+	</sect1><!-- Programming Tools-->
+	
+	<!-- ************************************************************************************ -->
+	
+	<sect1><!-- The Guided Tours as Plugin  -->
+		<title>The Guided Tour as Plugin</title>
+		<para>
+			The aim of the guided tour is to provide a step by step
+			explanation to the ProActive beginners.
+		</para>
+		<figure>
+			<title>The plugin's interface</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="development/plugin_files/guided_tour.jpg" format="JPG"
+						contentwidth="100" width="6in" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>
+			This guided tour (that is actually eclipse cheat sheet)
+			purposes:
+		</para>
+		<itemizedlist>
+			<listitem>
+				<para>To Explain ProActive to beginners</para>
+			</listitem>
+			<listitem>
+				<para>
+					To make interactions with the user with simple
+					situations
+				</para>
+			</listitem>
+			<listitem>
+				<para>To Show the important points</para>
+			</listitem>
+		</itemizedlist>
+	</sect1>
+	
+</chapter>
