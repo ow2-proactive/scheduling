@@ -135,7 +135,7 @@
     &IC2D;
     &plugin;
     -->
-    <!-- &IC2D_EclipsePlugin;-->
+    &IC2D_EclipsePlugin;
     &scilab;
     &TimIt;
    </part>
