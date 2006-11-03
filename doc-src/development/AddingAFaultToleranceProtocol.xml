@@ -4,7 +4,7 @@
  <title>Adding a Fault-Tolerance Protocol</title>
   
     <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
- ProActive. A more complete version should be released with the version 3.1. If you wish to get
+ ProActive. A more complete version should be released with the version 3.2. If you wish to get
  more informations, please feel free to send a mail to <email>proactive@objectweb.org</email>.</para>
 <sect1  id="FaultTolerance_html_objectives" >
       <title> Overview</title>

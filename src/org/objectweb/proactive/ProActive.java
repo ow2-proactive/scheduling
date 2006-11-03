@@ -2586,6 +2586,6 @@ public class ProActive {
      * @return String 
      */
     public static String getProActiveVersion() {
-    	return "3.1";
+    	return "3.2 Beta";
     }
 }

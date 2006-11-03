@@ -145,27 +145,27 @@
           <listitem>
             <para>BROADCAST, which copies a list of parameters and sends a
             copy to each connected server interface. <programlisting
-            language="java">ParamDispatchMode.BROADCAST</programlisting></para>
+            lang="java">ParamDispatchMode.BROADCAST</programlisting></para>
           </listitem>
 
           <listitem>
             <para>ONE-TO-ONE, which sends the ith parameter to the connected
             server interface of index i. This implies that the number of
             elements in the annotated list is equal to the number of connected
-            server interfaces. <programlisting language="java">ParamDispatchMode.ONE_TO_ONE</programlisting></para>
+            server interfaces. <programlisting lang="java">ParamDispatchMode.ONE_TO_ONE</programlisting></para>
           </listitem>
 
           <listitem>
             <para>ROUND-ROBIN, which distributes each element of the list
             parameter in a round-robin fashion to the connected server
-            interfaces. <programlisting language="java">ParamDispatchMode.ROUND_ROBIN</programlisting></para>
+            interfaces. <programlisting lang="java">ParamDispatchMode.ROUND_ROBIN</programlisting></para>
           </listitem>
         </itemizedlist>
 
         <para>It is also possible to define a custom distribution by
         specifying the distribution algorithm in a class which implements the
         org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch
-        interface. <programlisting language="java">@ParamDispatchMetadata(mode =ParamDispatchMode.CUSTOM, customMode = CustomParametersDispatch.class))</programlisting></para>
+        interface. <programlisting lang="java">@ParamDispatchMetadata(mode =ParamDispatchMode.CUSTOM, customMode = CustomParametersDispatch.class))</programlisting></para>
       </sect3>
 
       <sect3>
@@ -181,7 +181,7 @@
         Valid return types for methods of multicast interfaces are illustrated
         as follows:</para>
 
-        <programlisting language="java">public List&lt;Something&gt; foo();
+        <programlisting lang="java">public List&lt;Something&gt; foo();
 
 public void bar();</programlisting>
       </sect3>
@@ -189,6 +189,11 @@ public void bar();</programlisting>
 
     <sect2>
       <title>Configuration through annotations</title>
+      
+      <para>Note that our implementation of collective interfaces extensively
+      uses new features of the Java language introduced in Java 5, such as
+      generics and annotations.</para>
+      
 
       <para>The distribution of parameters in our framework is specified in
       the definition of the multicast interface, using annotations.</para>
@@ -213,7 +218,7 @@ public void bar();</programlisting>
         <para>and is used as follows:</para>
 
         <para>
-          <programlisting language="java">@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
+          <programlisting lang="java">@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
 interface MyMulticastItf {
 
   public void foo(List&lt;T&gt; parameters);
@@ -236,7 +241,7 @@ interface MyMulticastItf {
         <para>and is used as follows:</para>
 
         <para>
-          <programlisting language="java">@MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode =ParamDispatchMode.BROADCAST))
+          <programlisting lang="java">@MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode =ParamDispatchMode.BROADCAST))
 public void foo(List&lt;T&gt; parameters);</programlisting>
         </para>
       </sect3>
@@ -251,13 +256,11 @@ public void foo(List&lt;T&gt; parameters);</programlisting>
         <para>and is used as follows:</para>
 
         <para>
-          <programlisting language="java">public void foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST) List&lt;T&gt; parameters);</programlisting>
+          <programlisting lang="java">public void foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST) List&lt;T&gt; parameters);</programlisting>
         </para>
       </sect3>
 
-      <para>Note that our implementation of collective interfaces extensively
-      uses new features of the Java language introduced in Java 5, such as
-      generics and annotations.</para>
+	<sect3><title>Automatic type conversion</title>
 
       <para>For each method invoked and returning a result of type
       <literal>T</literal>, a multicast invocation returns an aggregation of
@@ -270,6 +273,7 @@ public void foo(List&lt;T&gt; parameters);</programlisting>
       conversion between return types, which is just an aggregation of
       elements of type <literal>T</literal> into a structure of type
       <literal>list&lt;T&gt;</literal>.</para>
+      </sect3>
     </sect2>
 
     <sect2>

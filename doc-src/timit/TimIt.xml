@@ -59,12 +59,14 @@
 	   file as you can see in next parts, but also in ProActive
 	   descriptor file.</para>
 				</listitem>
+				<listitem>
 				        <para>
 		<emphasis role="bold">Serie</emphasis>
 	   A Serie represent a suite of benchmarks. For example, if you want to
 	   benchmark two algorithms with different parameters each, you can specify
 	   two Series (one for each algorithm) and then specify different benchmarks
 	   for all parameters.</para>
+	   </listitem>
 				<listitem>
 					<para>
 		<emphasis role="bold">Chart definition</emphasis>

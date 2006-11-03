@@ -75,7 +75,6 @@
       </listitem>
     </itemizedlist>
 
-    <beginpage />
 
     <itemizedlist>
       <listitem>
@@ -194,7 +193,8 @@
 
       <programlisting lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
+ xsi:noNamespaceSchemaLocation=
+ "http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
   &lt;mainDefinition id="main" class="org.objectweb.proactive.scheduler.jobTemplate.Hello"&gt;
      &lt;arg value="param1"/&gt;
      &lt;arg value="param2"/&gt;
@@ -741,7 +741,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             <para><emphasis role="bold">isEmpty</emphasis>(): true if the
             queue is empty, false otherwise.</para>
 
-            <programlisting language="java">public boolean isEmpty();</programlisting>
+            <programlisting lang="java">public boolean isEmpty();</programlisting>
           </listitem>
         </itemizedlist>
 
@@ -750,7 +750,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             <para><emphasis role="bold">values</emphasis>(): returns a
             collection of the genericJob description</para>
 
-            <programlisting language="java">public Collection values();</programlisting>
+            <programlisting lang="java">public Collection values();</programlisting>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -831,7 +831,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             the list of the running tasks to find out if there is one that's
             finished so that we can free the allocated ressources.</para>
 
-            <programlisting language="java">public void checkRunningTasks();</programlisting>
+            <programlisting lang="java">public void checkRunningTasks();</programlisting>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -919,7 +919,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             the information about the nodes (state, job running, properties
             ...) Returns a vector of the nodes description.</para>
 
-            <programlisting language="java">public Vector nodes(String nodeURL);</programlisting>
+            <programlisting lang="java">public Vector nodes(String nodeURL);</programlisting>
           </listitem>
 
           <listitem>
@@ -1028,7 +1028,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             the scheduler. Calls the createScheduler method and creates a new
             scheduler.</para>
 
-            <programlisting language="java">public static void start(String policyName);</programlisting>
+            <programlisting lang="java">public static void start(String policyName);</programlisting>
           </listitem>
 
           <listitem>
@@ -1169,7 +1169,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             minimum we mark that if the right policy is selected this number
             would be judged as suffisant to start the application.</para>
 
-            <programlisting language="java">public void setMinNodeNumber(int nodeNumber);</programlisting>
+            <programlisting lang="java">public void setMinNodeNumber(int nodeNumber);</programlisting>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -1282,7 +1282,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             the command. Returns true if the execution occured normaly, false
             otherwise.</para>
 
-            <programlisting language="java">private boolean handleCommand(String command);</programlisting>
+            <programlisting lang="java">private boolean handleCommand(String command);</programlisting>
           </listitem>
 
           <listitem>
@@ -1290,7 +1290,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             Starts the command listener object and begins with to take the
             commands.</para>
 
-            <programlisting language="java">private void startCommandListener();</programlisting>
+            <programlisting lang="java">private void startCommandListener();</programlisting>
           </listitem>
 
           <listitem>
@@ -1300,7 +1300,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             nodes to be displayed and specific is set to true if the command
             demands the view of a specific node.</para>
 
-            <programlisting language="java">public void viewNodes(Vector nodes, boolean specific);</programlisting>
+            <programlisting lang="java">public void viewNodes(Vector nodes, boolean specific);</programlisting>
           </listitem>
 
           <listitem>
@@ -1311,7 +1311,7 @@ The commands available are: sub, stat, del, nodes, kill, exit
             indicates wether the command needs the description of a specific
             job or that of all the jobs.</para>
 
-            <programlisting language="java">public void viewJobs(Vector jobs, boolean specific);</programlisting>
+            <programlisting lang="java">public void viewJobs(Vector jobs, boolean specific);</programlisting>
           </listitem>
         </itemizedlist>
       </sect3>
@@ -1386,10 +1386,10 @@ The commands available are: sub, stat, del, nodes, kill, exit
             <para>Modify the genericJob:</para>
 
             <para>This code contain the description of the job as pre-cited
-            before in the <xref linkend="GenericJob" /><parameter> paragraphe.
+            before in the <xref linkend="GenericJob" /> paragraphe.
             In this object we shall add this new attribute and add also some
             setters and some getters to manipulate this new
-            addition.</parameter></para>
+            addition.</para>
           </listitem>
 
           <listitem>

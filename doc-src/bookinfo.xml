@@ -30,6 +30,10 @@
     </mediaobject>
    
     <revhistory>  
+        <revision>
+        <revnumber>3.2 Beta</revnumber>
+        <date>2006-11-03</date>
+    </revision>
     <revision>
         <revnumber>3.1</revnumber>
         <date>2006-06-30</date>
@@ -39,8 +43,10 @@
         <date>2005-12-16</date>
     </revision>
     </revhistory>
-    
+  
     <abstract>
+      <title>Disclaimer</title>
+    <para><emphasis role="bold">New features are not fully documented yet.</emphasis></para>
       <para><emphasis role="bold">ProActive</emphasis> is a <emphasis
       role="bold">GRID</emphasis> middleware Java library for <emphasis
       role="bold">parallel</emphasis>, <emphasis
