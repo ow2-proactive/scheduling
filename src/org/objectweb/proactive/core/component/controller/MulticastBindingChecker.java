@@ -28,7 +28,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
 public class MulticastBindingChecker implements Serializable {
     
     /**
-     * client method List<A> foo (B, List<C>) throws E; <br>
+     * client method List&lst;A&gt; foo (B, List<C>) throws E; <br>
      * must be matched by <br>
      * server method A foo(B, C (or list<C>, depending on the dispatch mode) ) throws E;
      * @param clientSideMethod

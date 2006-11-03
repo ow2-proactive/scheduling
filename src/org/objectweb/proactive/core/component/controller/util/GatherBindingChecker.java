@@ -17,7 +17,7 @@ public class GatherBindingChecker implements Serializable {
     /**
      * client method B foo (A) throws E;
      * must be matched by
-     *  server method List<B> foo(List<A>) throws E;
+     *  server method List<B> foo(List&lst;A&gt;) throws E;
      * @param clientSideMethod
      * @param serverSideMethods
      * @param clientItfIsMulticast TODO
