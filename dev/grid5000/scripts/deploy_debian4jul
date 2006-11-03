@@ -86,7 +86,7 @@ function reboot_cluster {
 # If all cluster have not rebooted in $TIMEOUT seconds just continue
 TIMEOUT=1200 # 20 minutes
 
-trap "echo Timeout reached ;" USR1
+trap "echo Timeout reached ; kill 0 ; sleep 5 ; kill -9 0" USR1
 ( echo $$ ; sleep $TIMEOUT && kill -USR1 $$ 2> /dev/null ) &
 disown $!
 
