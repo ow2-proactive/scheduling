@@ -30,7 +30,7 @@
         <imageobject>
           <imagedata fileref="timit/pics/chartsExamples.png" format="PNG" />
         </imageobject>
-      </mediaobject> <programlisting lang="xml" xml:space="preserve">&lt;timit&gt;
+      </mediaobject> <programlisting lang="xml">&lt;timit&gt;
 
   &lt;FinalStatistics name="Example2 4" runs="10" timeoutErrors="0"
                    date="2006-11-05 10:46:56.742"&gt;
@@ -514,7 +514,9 @@
   <sect1>
     <title>Usage</title>
 
-    <para>TimIt provide different kind of services :</para>
+    <para>TimIt provide different kind of services. By combinig them, you will
+    be able to measure many parameters of your application. TimIt package
+    contains few examples for using these services in your application.</para>
 
     <sect2>
       <title>Timer counters</title>
@@ -560,8 +562,7 @@
 
       <para>The code associated to this example is :</para>
 
-      <para>
-        <programlisting lang="java">T_TOTAL.start();
+      <para><programlisting lang="java">T_TOTAL.start();
 
   T_INIT.start();
     // Initialization part...
@@ -577,8 +578,7 @@
     T_COMM.stop();
   T_WORK.stop();
 
-T_TOTAL.stop();</programlisting>
-      </para>
+T_TOTAL.stop();</programlisting></para>
     </sect2>
 
     <sect2>
@@ -591,15 +591,12 @@ T_TOTAL.stop();</programlisting>
 
       <itemizedlist>
         <listitem>
-          <para>
-            <emphasis>Default event</emphasis>
-          </para>
+          <para><emphasis>Default event</emphasis></para>
 
           <para>This event manage a <emphasis>single value</emphasis> (a
-          <emphasis>
-              <emphasis>double</emphasis>
-            </emphasis>). It can be useful to compute mflops or total number
-          of performed communications.</para>
+          <emphasis><emphasis>double</emphasis></emphasis>). It can be useful
+          to compute mflops or total number of performed
+          communications.</para>
 
           <para>Example of usage :</para>
 
@@ -625,9 +622,7 @@ for( int i=0; i&lt;10; i++ ) {
         </listitem>
 
         <listitem>
-          <para>
-            <emphasis>Communication event</emphasis>
-          </para>
+          <para><emphasis>Communication event</emphasis></para>
 
           <para>This event were designed for communications. It manage a
           <emphasis>square matrix</emphasis> which can be used by example to
@@ -665,10 +660,6 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
         </listitem>
       </itemizedlist>
     </sect2>
-
-    <para>By combining these services, you will be able to measure many
-    parameters of your application. TimIt package contains few examples for
-    using these services in your application.</para>
   </sect1>
 
   <sect1>
