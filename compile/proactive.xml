@@ -410,6 +410,7 @@
 		<delete dir="${dist.dir}" />
 		<delete dir="${docs.dir}" />
 		<delete dir="${classlibs.dir}" />
+		<delete file="tests.log" />
 	</target>
 
 
