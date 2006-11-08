@@ -97,7 +97,7 @@ public class MainManager extends FunctionalTestManager {
                 path = MainManager.class.getResource(args[0]).getPath();	
         }  else {
              path = MainManager.class.getResource(
-                "/nonregressiontest/MainManager.xml").getPath();
+                "/nonregressiontest/testsuite.xml").getPath();
 }
         File xml = new File(path);
 
@@ -109,8 +109,8 @@ public class MainManager extends FunctionalTestManager {
 
         // Launch all unit tests and interlinked tests
         manager.execute();
-        logger.info(
-            "You can see the results in the test.html file in your ProActive directory.");
+//        logger.info(
+//            "You can see the results in the test.html file in your ProActive directory.");
         System.exit(0);
     }
 }

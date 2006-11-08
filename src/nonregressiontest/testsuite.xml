@@ -7,7 +7,7 @@
 	<!-- all classes in package nonregressiontest are added, only the specified
 		tests are sorted. -->
 	<packageGroup name="Unit test group" description="group of unit tests" 
-		dir="../classes" 
+		dir="../test-classes" 
 		packageName="nonregressiontest" >
 			<unitTest class="nonregressiontest.runtime.defaultruntime.Test" />
 			<unitTest exclude="no" class="nonregressiontest.runtime.interfaceconsistency.Test" />
@@ -135,7 +135,7 @@
 	</interLinkedGroup> 
 	
 	<packageGroup name="Security tests group" description="Check security architecture" 
-		dir="../classes" packageName="nonregressiontest.security" >
+		dir="../test-classes" packageName="nonregressiontest.security" >
 		    <unitTest exclude="no" class="nonregressiontest.security.SecurityTests"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.applicationlifecycle.SecurityTestApplicationLifeCycle"/>
 			<unitTest exclude="yes" class="nonregressiontest.security.dynamicsecuritypropagation.SecurityTestContextPropagation"/>
@@ -147,7 +147,7 @@
 
 	<!--<log4j>../compile/proactive-log4j</log4j>-->
 	
-	<result type="html" file="../test.html" />
+<!--  <result type="html" file="../test.html" />-->
 	
 	<!--<properties>
 		<prop key="RemoteHostname" value="nahuel />

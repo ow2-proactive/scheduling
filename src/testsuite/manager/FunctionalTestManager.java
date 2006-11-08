@@ -97,8 +97,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             initManager();
         } catch (Exception e) {
-            logger.fatal("Can't init the manager", e);
-            results.add(AbstractResult.ERROR, "Can't init the manager", e);
+            logger.fatal("Cannot initialize the manager", e);
+            results.add(AbstractResult.ERROR, "Cannot initialize the manager", e);
             return;
         }
         if (logger.isInfoEnabled()) {
@@ -157,9 +157,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.endGroup();
             } catch (Exception e) {
-                logger.warn("Cannot end group of tests: " + group.getName(), e);
+                logger.warn("Cannot terminate group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Cannot end group of tests: " + group.getName(), e);
+                    "Cannot terminate group of tests: " + group.getName(), e);
                 continue;
             }
             results.addAll(resultsGroup);
@@ -213,10 +213,10 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 try {
                     group.endGroup();
                 } catch (Exception e) {
-                    logger.warn("Can't ending group of tests: " +
+                    logger.warn("Cannot terminate group of tests: " +
                         group.getName(), e);
                     resultsGroup.add(AbstractResult.ERROR,
-                        "Can't ending group of tests: " + group.getName(), e);
+                        "Cannot terminate group of tests: " + group.getName(), e);
                     continue;
                 }
                 results.addAll(resultsGroup);
@@ -228,15 +228,15 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             endManager();
         } catch (Exception e) {
-            logger.fatal("Can't ending the manager", e);
-            results.add(AbstractResult.ERROR, "Can't ending the manager", e);
+            logger.fatal("Cannot terminate the manager", e);
+            results.add(AbstractResult.ERROR, "Cannot terminate the manager", e);
             return;
         }
 
         results.add(AbstractResult.IMP_MSG, "... Finish");
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
-            logger.info(">>> Succeeded tests: " + this.runs + " / " +
+            logger.info(">>> Successful tests: " + this.runs + " / " +
                 (this.runs + this.errors));
         }
         if (this.errors > 0) {
@@ -298,8 +298,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             initManager();
         } catch (Exception e) {
-            logger.fatal("Can't init the manager", e);
-            results.add(AbstractResult.ERROR, "Can't init the manager", e);
+            logger.fatal("Cannot initialize the manager", e);
+            results.add(AbstractResult.ERROR, "Cannot initialize the manager", e);
             return;
         }
         if (logger.isInfoEnabled()) {
@@ -311,9 +311,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             group.initGroup();
         } catch (Exception e) {
-            logger.warn("Can't init group of tests: " + group.getName(), e);
+            logger.warn("Cannot initialize group of tests: " + group.getName(), e);
             resultsGroup.add(AbstractResult.ERROR,
-                "Can't init group of tests: " + group.getName(), e);
+                "Cannot initialize group of tests: " + group.getName(), e);
         }
 
         for (int i = 0; i < getNbRuns(); i++) {
@@ -326,17 +326,17 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             group.endGroup();
         } catch (Exception e) {
-            logger.warn("Can't ending group of tests: " + group.getName(), e);
+            logger.warn("Cannot terminate group of tests: " + group.getName(), e);
             resultsGroup.add(AbstractResult.ERROR,
-                "Can't ending group of tests: " + group.getName(), e);
+                "Cannot terminate group of tests: " + group.getName(), e);
         }
 
         results.addAll(resultsGroup);
         try {
             endManager();
         } catch (Exception e) {
-            logger.fatal("Can't ending the manager", e);
-            results.add(AbstractResult.ERROR, "Can't ending the manager", e);
+            logger.fatal("Cannot terminate the manager", e);
+            results.add(AbstractResult.ERROR, "Cannot terminate the manager", e);
             return;
         }
 
@@ -344,7 +344,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
         results.add(AbstractResult.IMP_MSG, "... Finish");
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
-            logger.info(">>> Succeeded tests: " + this.runs + " / " +
+            logger.info(">>> Successful tests: " + this.runs + " / " +
                 (this.runs + this.errors));
         }
         if (this.errors > 0) {
@@ -363,8 +363,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             initManager();
         } catch (Exception e) {
-            logger.fatal("Can't init the manager", e);
-            results.add(AbstractResult.ERROR, "Can't init the manager", e);
+            logger.fatal("Cannot initialize the manager", e);
+            results.add(AbstractResult.ERROR, "Cannot initialize the manager", e);
             return;
         }
         if (logger.isInfoEnabled()) {
@@ -381,9 +381,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.initGroup();
             } catch (Exception e) {
-                logger.warn("Can't init group of tests: " + group.getName(), e);
+                logger.warn("Cannot initialize group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't init group of tests: " + group.getName(), e);
+                    "Cannot initialize group of tests: " + group.getName(), e);
                 continue;
             }
 
@@ -416,9 +416,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.endGroup();
             } catch (Exception e) {
-                logger.warn("Can't ending group of tests: " + group.getName(), e);
+                logger.warn("Cannot terminate group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't ending group of tests: " + group.getName(), e);
+                    "Cannot terminate group of tests: " + group.getName(), e);
                 continue;
             }
             results.addAll(resultsGroup);
@@ -427,8 +427,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             endManager();
         } catch (Exception e) {
-            logger.fatal("Can't ending the manager", e);
-            results.add(AbstractResult.ERROR, "Can't ending the manager", e);
+            logger.fatal("Cannot terminate the manager", e);
+            results.add(AbstractResult.ERROR, "Cannot terminate the manager", e);
             return;
         }
 

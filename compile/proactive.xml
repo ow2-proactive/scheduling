@@ -10,6 +10,7 @@
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext" />
 	<property name="proactive.tools.dir" value="${proactive.dir}/tools" />
 	<property name="classes.dir" value="${base}/classes" />
+	<property name="test.classes.dir" value="${base}/test-classes" />
 	<property name="classlibs.dir" value="${base}/classlibs" />
 	<property name="dist.dir" value="${base}/dist" />
 	<property name="doc.src" value="${base}/doc-src" />
@@ -30,8 +31,8 @@
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
-	<path id="project.classpath">
-		<pathelement location="${base}/classes" />
+	
+	<path id="project.libs">
 		<fileset dir="${lib}">
 			<include name="*.jar" />
 			<include name="jini/*.jar" />
@@ -51,12 +52,18 @@
 			<include name="components/*.jar" />
 		</fileset>
 	</path>
-	<path id="test.classpath">
-		<path refid="project.classpath" />
-		<pathelement location="${base}/dev/lib/xml-apis.jar" />
-		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar" />
-		<pathelement location="${base}/dev/lib/jmf.jar" />
+		
+	<path id="project.classpath">
+		<pathelement location="${base}/classes" />
+		<path refid="project.libs"/>
 	</path>
+	
+	<path id="test.classpath">
+		<pathelement location="${dist.dir}/ProActive/ProActive.jar"/>
+		<path refid="project.libs"/>
+		<pathelement location="${test.classes.dir}"/>
+	</path>
+	
 	<path id="examples.classpath">
 		<path refid="project.classpath" />
 		<pathelement location="${lib}/examples/clibwrapper_jiio.jar" />
@@ -99,10 +106,10 @@
 	<target name="configurationCopy">
 		<copy toDir="${classes.dir}">
 			<fileset dir="${src.dir}">
-				<include name="**/*.xml" />
-				<include name="**/*.fractal" />
-				<include name="**/*.properties" />
-				<include name="**/*.xsd" />
+				<include name="org/**/*.xml" />
+				<include name="org/**/*.fractal" />
+				<include name="org/**/*.properties" />
+				<include name="org/**/*.xsd" />
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
 			</fileset>
 		</copy>
@@ -366,8 +373,9 @@
 	<!--                      Compile Test Suite                         -->
 	<!--  =============================================================== -->
 	<target name="testsuite" depends="ext, copyDivers">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="test.classpath" />
+		<mkdir dir="${test.classes.dir}"/>
+		<javac srcdir="${src.dir}" destdir="${test.classes.dir}" includes="testsuite/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
 		</javac>
 	</target>
 
@@ -410,7 +418,8 @@
 		<delete dir="${dist.dir}" />
 		<delete dir="${docs.dir}" />
 		<delete dir="${classlibs.dir}" />
-		<delete file="tests.log" />
+		<delete dir="${test.classes.dir}" />
+        <delete file="tests.log" />
 	</target>
 
 
@@ -477,14 +486,8 @@
 		<mkdir dir="${dist.dir}" />
 		<property name="PAdist.dir" value="${dist.dir}/ProActive" />
 		<mkdir dir="${PAdist.dir}" />
-		<!-- Put everything in ${classes} into the ProActive.jar file -->
-		<jar jarfile="${PAdist.dir}/ProActive.jar">
-			<fileset dir="${classes.dir}">
-				<include name="${proactive.dir}/**" />
-				<exclude name="${proactive.dir}/examples/**" />
-				<exclude name="${proactive.dir}/ic2d/**" />
-			</fileset>
-		</jar>
+		<antcall target="proActiveJar"/>
+		
 		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**" />
 		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**" />
 		<!--        copy docs / scripts / src / compile / lib      -->
@@ -503,8 +506,8 @@
 				<exclude name="p2p/config/inria/**" />
 				<exclude name="**/.svn" />
 			</fileset>
-		</copy>
-
+		</copy>		
+		
 		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh" />
 		<chmod file="${PAdist.dir}/compile/build" perm="755" />
 		<!--  create zip version of ProActive without source  -->
@@ -751,8 +754,16 @@
 	<!--            Compile non regression test                            -->
 	<!-- ================================================================ -->
 	<target name="nonregressiontest" depends="testsuite, compile">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="test.classpath" />
+		<copy toDir="${test.classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="nonregressiontest/**/*.xml" />
+				<include name="nonregressiontest/**/*.fractal" />
+				<include name="nonregressiontest/**/*.properties" />
+				<include name="nonregressiontest/**/*.xsd" />
+			</fileset>
+		</copy>
+		<javac srcdir="${src.dir}" destdir="${test.classes.dir}" includes="nonregressiontest/**" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
 		</javac>
 	</target>
 

@@ -108,7 +108,7 @@ public class TestNodes extends FunctionalTest {
 
     /**
      * TODO : remove this method, as it is used as a walkaround to use deployed nodes
-     * outside of the first packageGroup group of the MainManager.xml
+     * outside of the first packageGroup group of the testsuite.xml
      * (the endTest() method, that kills all the deployed nodes, is indeed called at the end of each
      * group of tests)
      *
