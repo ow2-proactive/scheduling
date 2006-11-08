@@ -107,7 +107,7 @@
 			</fileset>
 		</copy>
 		<!-- copy descriptor schema -->
-		<copy todir="${classes.dir}" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>		
+		<copy todir="${classes.dir}" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
 		<copy todir="${base}/descriptors/examples" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 
@@ -202,7 +202,7 @@
         ${bnb-files}" />
 		</java>
 	</target>
-	
+
 	<!-- ================================================================ -->
 	<!--                      Compile TimIt for benchmarking              -->
 	<!--  =============================================================== -->
@@ -212,7 +212,7 @@
 			<include name="${proactive.dir}/benchmarks/timit/**/*.java" />
 		</javac>
 	</target>
-	
+
 	<!-- ================================================================ -->
 	<!--                      Compile Calcium Stubs                       -->
 	<!--  =============================================================== -->
@@ -246,11 +246,11 @@
 			<arg line="-d ${classes.dir} ${calcium-files}" />
 		</java>
 	</target>
-	
+
 	<!-- ================================================================ -->
 	<!--                          Compile Scheduler                       -->
 	<!--  =============================================================== -->
-	
+
 	<target name="scheduler" depends="core">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
@@ -502,8 +502,8 @@
 				<exclude name="p2p/config/inria/**" />
 				<exclude name="**/.svn" />
 			</fileset>
-		</copy>		
-		
+		</copy>
+
 		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh" />
 		<chmod file="${PAdist.dir}/compile/build" perm="755" />
 		<!--  create zip version of ProActive without source  -->
@@ -595,25 +595,12 @@
 		</java>
 
 	</target>-->
-	
-	<taskdef name="j2h"
-	    classname="de.java2html.anttasks.Java2HtmlTask"
-		classpath="${base}/dev/lib/j2h.jar" />
 
 	<!-- TODO tempory fix for java 1.5, do not generate index.html -->
 	<!-- http://www.java2html.de /dev/lib/j2h.jar -->
 	<target name="java2html">
-	<j2h
-	       srcdir="${src.dir}/${proactive.dir}"
-	       destdir="${docs.dir}/ProActive_src_html"
-	       includes="**/*.java"
-	       style="eclipse"
-	       showLineNumbers="false"
-	       showFileName="true"
-	       showTableBorder="false"
-		useshortfilename="true"
-	outputFormat="html"
-	/>
+		<taskdef name="j2h" classname="de.java2html.anttasks.Java2HtmlTask" classpath="${base}/dev/lib/j2h.jar" />
+		<j2h srcdir="${src.dir}/${proactive.dir}" destdir="${docs.dir}/ProActive_src_html" includes="**/*.java" style="eclipse" showLineNumbers="false" showFileName="true" showTableBorder="false" useshortfilename="true" outputFormat="html" />
 	</target>
 
 
