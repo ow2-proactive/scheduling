@@ -120,6 +120,8 @@ public class HostsInfos {
     /**
      *
      */
+    final static String REGEXP_KEYVAL="(([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]{1,3}\\.){3}[0-9]{1,3})";
+	
     private void loadProperties() {
         String userNames = System.getProperty("proactive.ssh.username");
 
@@ -127,6 +129,19 @@ public class HostsInfos {
             userNames = System.getProperty("user.name");
         }
         parseUserNames(userNames);
+        
+        String secondaryNames = System.getProperty("proactive.secondaryNames");
+        if (secondaryNames != null) {
+        	
+        	if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL + ")?")) {
+        		for (String keyval : secondaryNames.split(",")) {
+        			String [] tmp = keyval.split(":");
+        			setSecondaryName(tmp[0], tmp[1]);
+        		}	
+        	} else {
+        		logger.error("Invalid value for proactive.secondaryNames: " + secondaryNames);
+        	}
+        }
     }
 
     /**
