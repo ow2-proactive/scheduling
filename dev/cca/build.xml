@@ -46,7 +46,20 @@
 		<echo message="Please run: $ ant -v -projecthelp" />
 	</target>
 
-	<target depends="build" name="archive">
+	<target name="resource">
+		<copy todir="classes">
+			<fileset dir="src">
+				<include name="**/*.xml"/>
+				<include name="**/*.ks"/>
+				<include name="**/*.gif"/>
+				<include name="**/*.png"/>
+				<include name="**/*.jpg"/>
+				<include name="**/*.properties"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target depends="build,resource" name="archive">
 		<jar compress="true" destfile="${services.dir}/gcmcca/starter-component.jar">
 			<fileset dir="classes">
 				<include name="**/CCAStarterComponent.class" />
