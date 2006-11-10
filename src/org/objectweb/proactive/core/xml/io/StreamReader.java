@@ -84,9 +84,7 @@ public class StreamReader implements XMLReader {
         //parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
         parser.setContentHandler(adaptor);
 
-        if ((schema != null) || (errorHandler != null) ||
-                "enable".equals(
-                    ProActiveConfiguration.getSchemaValidationState())) {
+        if ((schema != null) || (errorHandler != null)) {
             try {
                 parser.setErrorHandler((errorHandler == null)
                     ? new SAXParserErrorHandler() : errorHandler);

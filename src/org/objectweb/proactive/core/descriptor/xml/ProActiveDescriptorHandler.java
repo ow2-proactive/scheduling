@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -43,6 +44,9 @@ import org.objectweb.proactive.core.xml.io.SAXParserErrorHandlerTerminating;
 import org.objectweb.proactive.scheduler.Scheduler;
 
 import java.net.URISyntaxException;
+import java.net.URL;
+
+import java.util.Enumeration;
 
 
 /**
@@ -142,8 +146,19 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         // String uri =
         // "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
-        org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                    uri), h, null, new SAXParserErrorHandlerTerminating());
+        org.objectweb.proactive.core.xml.io.StreamReader sr;
+        
+        if ("enable".equals(ProActiveConfiguration.getSchemaValidationState()))
+        {
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+                    uri), h, null,
+                new SAXParserErrorHandlerTerminating());
+        }
+        else {
+        	sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+                    uri), h);
+        }
+
         sr.read();
     }
 
@@ -163,36 +178,97 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             String uri = xmlDescriptorUrl;
 
             // we get the schema from the class location
-            java.net.URL urlSchema = ProActiveDescriptorHandler.class.getResource(
-                    "/DescriptorSchema.xsd");
+            ClassLoader classLoader = ProActiveDescriptorHandler.class.getClassLoader();
+            Enumeration<URL> schemaURLs = classLoader.getResources(
+                    "org/objectweb/proactive/core/descriptor/xml/DescriptorSchema.xsd");
 
-            if (urlSchema == null) {
-                // In case the application is executed neither via the ant
-                // script, nor via the jar file, we need to find the schema
-                // manually
-                urlSchema = ProActiveDescriptorHandler.class.getResource("/");
+            // among the various descriptor schema that we may find, we will always favor the one that is in the jar file
+            URL schemaURLcandidate = null;
 
-                try {
-                    java.net.URI uriSchema;
-                    uriSchema = urlSchema.toURI();
+            while (schemaURLs.hasMoreElements()) {
+                URL schemaURL = schemaURLs.nextElement();
 
-                    urlSchema = uriSchema.resolve(".." +
-                            java.io.File.separator + "descriptors" +
-                            java.io.File.separator + "DescriptorSchema.xsd")
-                                         .toURL();
-                } catch (URISyntaxException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    urlSchema = null;
+                if (schemaURL.getProtocol().equals("jar")) {
+                    schemaURLcandidate = schemaURL;
+                } else if (schemaURLcandidate == null) {
+                    schemaURLcandidate = schemaURL;
                 }
             }
 
-            logger.debug("Using XML shema: " + urlSchema);
+            if (schemaURLcandidate == null) {
+                // In case the application is executed neither via the ant
+                // script, nor via the jar file, we need to find the schema
+                // manually
+
+                // we locate the proactive code
+                Enumeration<URL> classURLs = ProActiveDescriptorHandler.class.getClassLoader()
+                                                                             .getResources("org/objectweb/proactive/core/descriptor/xml/");
+
+                // we make sure that we found a file structure (and not a jar)
+                URL classURLcandidate = null;
+
+                while (classURLs.hasMoreElements()) {
+                    URL classURL = classURLs.nextElement();
+
+                    if (classURL.getProtocol().equals("file")) {
+                        classURLcandidate = classURL;
+                    }
+                }
+
+                try {
+                    
+                    if (classURLcandidate != null) {
+                    	java.net.URI uriSchema;
+                        uriSchema = classURLcandidate.toURI();
+                        // we navigate to the descriptor schema
+                        uriSchema = uriSchema.resolve(".." +
+                                java.io.File.separator + ".." +
+                                java.io.File.separator + ".." +
+                                java.io.File.separator + ".." +
+                                java.io.File.separator + ".." +
+                                java.io.File.separator + ".." +
+                                java.io.File.separator + ".." +
+                                java.io.File.separator +
+                                java.io.File.separator + "descriptors" +
+                                java.io.File.separator +
+                                "DescriptorSchema.xsd");
+
+                        java.io.File test = new java.io.File(uriSchema);
+
+                        // we make sure that we have found the right file
+                        if (test.isFile() &&
+                                test.getName().equals("DescriptorSchema.xsd")) {
+                            schemaURLcandidate = uriSchema.toURL();
+                        } else {
+                            logger.error(
+                                "The Proactive.jar file doesn't contain the Descriptor Schema.");
+                        }
+                    }
+                    else {
+                    	logger.error(
+                        "The descriptor schema could not be located in your environment.");
+                    }
+                } catch (URISyntaxException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    schemaURLcandidate = null;
+                }
+            }
+
+            logger.debug("Using XML shema: " + schemaURLcandidate);
 
             org.objectweb.proactive.core.xml.io.StreamReader sr = null;
-            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                        uri), h, urlSchema,
+            
+            if ("enable".equals(ProActiveConfiguration.getSchemaValidationState()))
+            {
+                sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+                        uri), h, schemaURLcandidate,
                     new SAXParserErrorHandlerTerminating());
+            }
+            else {
+            	sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
+                        uri), h);
+            }
 
             sr.read();
 
