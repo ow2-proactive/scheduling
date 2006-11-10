@@ -47,9 +47,6 @@
   <infrastructure>
     <processes>
       <processDefinition id="linuxJVM">
-        <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-      </processDefinition>
-      <processDefinition id="linuxJVM">
         <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
           <jvmParameters>
             <parameter value="-Dproactive.future.ac=enable"/>
