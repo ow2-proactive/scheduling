@@ -114,7 +114,7 @@
 			</fileset>
 		</copy>
 		<!-- copy descriptor schema -->
-		<copy todir="${classes.dir}" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
+		<copy todir="${classes.dir}/org/objectweb/proactive/core/descriptor/xml/" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>		
 		<copy todir="${base}/descriptors/examples" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 
@@ -420,6 +420,7 @@
 		<delete dir="${classlibs.dir}" />
 		<delete dir="${test.classes.dir}" />
         <delete file="tests.log" />
+        <delete file="descriptors/examples/DescriptorExamples.xsd"/>
 	</target>
 
 
@@ -430,7 +431,7 @@
 		<mkdir dir="${dist.dir}/ProActive" />
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
-				<include name="DescriptorSchema.xsd"/>
+				<include name="${proactive.dir}/core/descriptor/xml/DescriptorSchema.xsd"/>
 				<include name="${proactive.dir}/**" />
 				<exclude name="${proactive.dir}/examples/**" />
 				<exclude name="${proactive.dir}/ic2d/**" />
