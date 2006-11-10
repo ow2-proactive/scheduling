@@ -15,7 +15,7 @@
 			</map>
 		</mapping>
 		<jvms>
-			<jvm name="Jvm1" nodeNumber="3">
+			<jvm name="Jvm1" askedNodes="3">
 				<creation>
 					<processReference refid="linuxJVM"/>
 				</creation>

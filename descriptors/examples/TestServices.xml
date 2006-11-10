@@ -36,11 +36,11 @@
 			</processes>
 		<services>
 			<serviceDefinition id="p2plookup">
-				<P2PLookup nodeNumber="2" timeout="70000" lookupFrequence="5000">
+				<P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10" TTU="60000" TTL="10">
 					<peerSet>
 						<peer>localhost</peer>
 					</peerSet>
-				</P2PLookup>
+				</P2PService>
 			</serviceDefinition>
 			<serviceDefinition id="rmiLookup">
 				<RMIRegistryLookup url="//localhost/PA_JVM1"></RMIRegistryLookup>
