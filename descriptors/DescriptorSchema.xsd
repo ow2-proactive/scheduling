@@ -13,81 +13,58 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="mainDefinition"/>
 			<xs:field xpath="id"/>
 		</xs:unique>
-		<xs:unique name="processDefid">
-			<xs:selector xpath="infrastructure/processes/processDefinition"/>
-			<xs:field xpath="@id"/>
-			<!--Uniqueness of the id attribute for infrastructure/processes/processDefinition element-->
-		</xs:unique>
-		<xs:unique name="serviceDefid">
-			<xs:selector xpath="infrastructure/services/serviceDefinition"/>
-			<xs:field xpath="@id"/>
-			<!--Uniqueness of the id attribute for infrastructure/services/serviceDefinition element-->
-		</xs:unique>
-		<xs:unique name="filetransferDefid">
-			<xs:selector xpath="fileTransferDefinitions/fileTransfer"/>
-			<xs:field xpath="@id"/>
-			<!--Uniqueness of the id attribute for FileTransferDefinitions/FileTransfer element-->
-		</xs:unique>
-		<xs:unique name="MapToVirtualNodeDefid">
-			<xs:selector xpath="mainDefinition/mapToVirtualNode"/>
-			<xs:field xpath="@value"/>
-		</xs:unique>
-		<xs:unique name="technicalServiceDefid">
-			<xs:selector xpath="technicalServices/technicalServiceDefinition"/>
-			<xs:field xpath="@id"/>
-		</xs:unique>
 		<xs:keyref name="MapToVirtualNodeValue" refer="MapToVNName">
-			<xs:selector xpath="mainDefinition/mapToVirtualNode"/>
+			<xs:selector xpath="./mainDefinition/mapToVirtualNode"/>
 			<xs:field xpath="@value"/>
 		</xs:keyref>
 		<xs:keyref name="VirtNodeName" refer="vnName">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
 		<xs:keyref name="VirtNodeDeployFileTransfer" refer="filetransferid">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@fileTransferDeploy"/>
 		</xs:keyref>
 		<xs:keyref name="VirtNodeRetrieveFileTransfer" refer="filetransferid">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@fileTransferRetrieve"/>
 		</xs:keyref>
 		<xs:keyref name="vnFtServiceId" refer="serviceid">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@ftServiceId"/>
 		</xs:keyref>
 		<xs:keyref name="vnNameinAcquisitionPart" refer="virtualNodeNameForLookup">
-			<xs:selector xpath="componentDefinition/virtualNodesAcquisition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesAcquisition/virtualNode"/>
 			<xs:field xpath="@name"/>
 			<!--This section references the virtualNodeNameForLookup key defined above to ensure that the value of attribute name in virtualNodeAcquisition/virtualNode element will have the corresponding definition in deployment/lookup@virtualNode -->
 		</xs:keyref>
 		<xs:keyref name="vnNameinRegisterPart" refer="virtualNodeDefinitionName">
-			<xs:selector xpath="deployment/register"/>
+			<xs:selector xpath="./deployment/register"/>
 			<xs:field xpath="@virtualNode"/>
 			<!--This section references the virtualNodeDefinitionName key defined above to ensure that the virtualNode attribute of element register has a corresponding value defined in attribute name of  componentDefinition/virtualNodesDefinition/virtualNode-->
 		</xs:keyref>
 		<xs:keyref name="vmNameinMappingPart" refer="jvmNameinJvmsPart">
-			<xs:selector xpath="deployment/mapping/map/jvmSet/vmName"/>
+			<xs:selector xpath="./deployment/mapping/map/jvmSet/vmName"/>
 			<xs:field xpath="@value"/>
 			<!--This section references the jvmNameinJvmsPart key defined above to ensure that the value attribute of element mapping/map/jvmSet/vmName has a corresponding value defined in attribute name of  jvms/jvm-->
 		</xs:keyref>
 		<xs:keyref name="vnNameinLookupPart" refer="virtualNodeAcquisitionName">
-			<xs:selector xpath="deployment/lookup"/>
+			<xs:selector xpath="./deployment/lookup"/>
 			<xs:field xpath="@virtualNode"/>
 			<!--This section references the virtualNodeAcquisitionName key defined above to ensure that the virtualNode attribute of element lookup  has a corresponding value defined in attribute name of  componentDefinition/virtualNodesAcquisition/virtualNode-->
 		</xs:keyref>
 		<xs:keyref name="jvmReferenceid" refer="processid">
-			<xs:selector xpath="infrastructure/processes/processDefinition/jvmProcess/extendedJvm"/>
+			<xs:selector xpath="./infrastructure/processes/processDefinition/jvmProcess/extendedJvm"/>
 			<xs:field xpath="@refid"/>
 			<!-- This section references the processid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="processReferenceid" refer="processid">
-			<xs:selector xpath="deployment/jvms/jvm/creation/processReference"/>
+			<xs:selector xpath="./deployment/jvms/jvm/creation/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!-- This section references the processid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="serviceReferenceid" refer="serviceid">
-			<xs:selector xpath="deployment/jvms/jvm/acquisition/serviceReference"/>
+			<xs:selector xpath="./deployment/jvms/jvm/acquisition/serviceReference"/>
 			<xs:field xpath="@refid"/>
 			<!-- This section references the serviceid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
@@ -98,132 +75,138 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:keyref>-->
 		<xs:keyref name="processListReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/processList/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/processList/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/processList/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="processListbyHostReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/processListbyHost/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/processListbyHost/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/processListbyHost/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="rshprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/rshProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/rshProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="MapRshprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/maprshProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/maprshProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/maprshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="sshprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/sshProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/sshProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This sectionreferences the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/sshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="rloginprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/rloginProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/rloginProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rloginProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="bsubprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/bsubProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/bsubProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/bsubProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="globusprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/globusProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/globusProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="unicoreprocessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/unicoreProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/unicoreProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/unicoreProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="hierarchicalprocessProcessReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/hierarchicalProcess/processReference"/>
+				xpath="./infrastructure/processes/processDefinition/hierarchicalProcess/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/hierarchicalProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="hierarchicalprocessHierarchicalReferenceid" refer="processid">
 			<xs:selector
-				xpath="infrastructure/processes/processDefinition/hierarchicalProcess/hierarchicalReference"/>
+				xpath="./infrastructure/processes/processDefinition/hierarchicalProcess/hierarchicalReference"/>
 			<xs:field xpath="@refid"/>
 			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/hierarchicalProcess/hierarchicalReference has a corresponding value in infrastructure/processes/processDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="tsReferenceid" refer="technicalServiceid">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@technicalServiceId"/>
 		</xs:keyref>
 		<xs:key name="virtualNodeDefinitionName">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
 			<!-- Key definition for the attribute name located at componentDefinition/virtualNodesDefinition/virtualNode. This key will be used to ensure that the virtualNode attribute of deployment/register element has a corresponding definition in componentDefinition/virtualNodesDefinition/virtualNode@name-->
 		</xs:key>
 		<xs:key name="virtualNodeAcquisitionName">
-			<xs:selector xpath="componentDefinition/virtualNodesAcquisition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesAcquisition/virtualNode"/>
 			<xs:field xpath="@name"/>
 			<!-- Key definition for the attribute name located at componentDefinition/virtualNodesAcquisition/virtualNode. This key will be used to ensure that the virtualNode attribute of deployment/lookup element has a corresponding definition in componentDefinition/virtualNodesAcquisition/virtualNode@name-->
 		</xs:key>
 		<xs:key name="vnName">
-			<xs:selector xpath="deployment/mapping/map"/>
+			<xs:selector xpath="./deployment/mapping/map"/>
 			<xs:field xpath="@virtualNode"/>
 			<!-- Key definition for the attribute virtualNode located at deployment/mapping/map. This key will be used to ensure that the name attribute of virtualNodes/virtualNode element has a corresponding definition in deployment/mapping/map@virtualNode-->
 		</xs:key>
 		<xs:key name="MapToVNName">
-			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:selector xpath="./componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
 			<!-- Key definition for the attribute virtualNode located at deployment/mapping/map. This key will be used to ensure that the name attribute of virtualNodes/virtualNode element has a corresponding definition in deployment/mapping/map@virtualNode-->
 		</xs:key>
 		<xs:key name="jvmNameinJvmsPart">
-			<xs:selector xpath="deployment/jvms/jvm"/>
+			<xs:selector xpath="./deployment/jvms/jvm"/>
 			<xs:field xpath="@name"/>
 			<!--Key definition for the attribute name located at deployment/jvms/jvm. This key will be used to ensure that the value attribute of deployment/mapping/map/jvmSet/vmName element has a corresponding value defined in attribue name of jvms/jvm  -->
 		</xs:key>
 		<xs:key name="virtualNodeNameForLookup">
-			<xs:selector xpath="deployment/lookup"/>
+			<xs:selector xpath="./deployment/lookup"/>
 			<xs:field xpath="@virtualNode"/>
 			<!--Key definition for the attribute virtualNode located at deployment/lookup. This key will be used to ensure that the name attribute of componentDefinition/virtualNodesAcquisition/virtualNode element has a corresponding value defined in attribue virtualNode of deployment/lookup  -->
 		</xs:key>
 		<xs:key name="processid">
-			<xs:selector xpath="infrastructure/processes/processDefinition"/>
+			<xs:selector xpath="./infrastructure/processes/processDefinition"/>
 			<xs:field xpath="@id"/>
 			<!-- Key definition for the attribute id located at  infrastructure/processes/processDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id and also that the refid attribute defined in infrastructure/processDefinition/rshProcess-sshProcess-rloginProcess-bsubProcess-globusProcess/processReference@refid has a correponding value in infrastructure/processes/processDefinition@id -->
 		</xs:key>
 		<xs:key name="serviceid">
-			<xs:selector xpath="infrastructure/services/serviceDefinition"/>
+			<xs:selector xpath="./infrastructure/services/*"/>
 			<xs:field xpath="@id"/>
 			<!-- Key definition for the attribute id located at  infrastructure/processes/processDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id and also that the refid attribute defined in infrastructure/processDefinition/rshProcess-sshProcess-rloginProcess-bsubProcess-globusProcess/processReference@refid has a correponding value in infrastructure/processes/processDefinition@id -->
 		</xs:key>
 		<!-- Key definition for the attribute id located at  infrastructure/services/serviceDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/services/serviceDefinition@id -->
-<!--		<xs:key name="serviceid">
+		<!--		<xs:key name="serviceid">
 			<xs:selector xpath="infrastructure/services/serviceDefinition"/>
 			<xs:field xpath="@id"/>
-		</xs:key>-->
+			</xs:key>-->
 		<xs:key name="filetransferid">
-			<xs:selector xpath="fileTransferDefinitions/fileTransfer"/>
+			<xs:selector xpath="./fileTransferDefinitions/fileTransfer"/>
 			<xs:field xpath="@id"/>
 			<!-- Key definition for the attribute id located at FileTransferDefinitions/FileTransfer. This key will be used to ensure that the FileTransferDeploy & FileTransferRetrieve attribute defined in the VirtualNodeExtType has a correponding value in FileTransferDefinitions/FileTransfer@id -->
 		</xs:key>
 		<xs:key name="technicalServiceid">
-			<xs:selector xpath="technicalServices/technicalServiceDefinition"/>
+			<xs:selector xpath="./technicalServices/technicalServiceDefinition"/>
 			<xs:field xpath="@id"/>
 		</xs:key>
+
 	</xs:element>
-	<!--processReference element is defined as a global element, hence it can be referenced in many part of the document. It has one attribute: refid that must occur once and only once. This element must reference a process defined elsewhere in the infrastructure section. Hence in the infrastructure section there must be an element ProcessDefinition with the corresponding value for id attribute   -->
+	<!--processReference and serviceReference elements is defined as a global element, hence it can be referenced in many part of the document. It has one attribute: refid that must occur once and only once. This element must reference a process defined elsewhere in the infrastructure section. Hence in the infrastructure section there must be an element ProcessDefinition with the corresponding value for id attribute   -->
+	<!-- please note that if the processReference or serviceReference are not declared as global elements the keyref checking mechanism during validation doesn't work (probably due to a scope problem) -->
 	<xs:element name="processReference" type="ProcessReferenceType"/>
 	<xs:complexType name="ProcessReferenceType">
+		<xs:attribute name="refid" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:element name="serviceReference" type="ServiceReferenceType"/>
+	<xs:complexType name="ServiceReferenceType">
 		<xs:attribute name="refid" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--commandPath element is defined as a global element, hence it can be referenced in many part of the document. It has one attribute: value that must occur once and only once. This element represents the path of the command to be executed   -->
@@ -246,7 +229,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--variableRefType is defined as a global element, it will be used to define references to variables.-->
 	<xs:simpleType name="variableRefType">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="\$\{[A-Za-z0-9.]+\}"/>
+			<xs:pattern value="\$\{[A-Za-z0-9._]+\}"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<!--PosintOrVariableType is defined as a union of a positive integer or a variable ref-->
@@ -467,7 +450,8 @@ The following element ProActiveDescriptor defines the root of the schema
 				</xs:attribute>
 				<xs:attribute name="ftServiceId" type="xs:string" use="optional"/>
 				<xs:attribute name="timeout" type="PosintOrVariableType" use="optional"/>
-				<xs:attribute name="waitForTimeout" type="BooleanOrVariableType" use="optional" default="false"/>
+				<xs:attribute name="waitForTimeout" type="BooleanOrVariableType" use="optional"
+					default="false"/>
 				<xs:attribute name="fileTransferDeploy" type="xs:string" use="optional"/>
 				<xs:attribute name="fileTransferRetrieve" type="xs:string" use="optional"/>
 				<xs:attribute name="technicalServiceId" type="xs:string" use="optional"/>
@@ -588,11 +572,8 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--acquisition element has one element: serviceReference that identifies uniquely the service to use in order to acquire the jvm. -->
 	<xs:complexType name="AcquisitionType">
 		<xs:sequence>
-			<xs:element name="serviceReference" type="ServiceReferenceType"/>
+			<xs:element ref="serviceReference"/>
 		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="ServiceReferenceType">
-		<xs:attribute name="refid" use="required"/>
 	</xs:complexType>
 	<!--creation element has one child: processReference element defined as global element. This element must occur once and only once. The reference is used to map the jvm with a process defined in infrastructure section. This process will originate jvm's creation. Hence such process must exist in the infrastructure section. -->
 	<xs:complexType name="CreationType">
@@ -1063,7 +1044,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="BooleanOrVariableType" use="optional"/>
 		<xs:attribute name="jobname" type="xs:string" use="optional"/>
-		<xs:attribute name="queue"  type="xs:string" use="optional"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="BsubOptionType">
