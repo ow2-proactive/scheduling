@@ -322,13 +322,13 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="programVariable">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
-					<xs:attribute name="value" type="xs:string" use="optional" fixed=""/>
+					<xs:attribute name="value" type="xs:string" use="optional"/>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="javaPropertyVariable">
 				<xs:complexType>
 					<xs:attribute name="name" type="xs:string" use="required"/>
-					<xs:attribute name="value" type="xs:string" use="optional" fixed=""/>
+					<xs:attribute name="value" type="xs:string" use="optional"/>
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="javaPropertyDescriptorDefault">
