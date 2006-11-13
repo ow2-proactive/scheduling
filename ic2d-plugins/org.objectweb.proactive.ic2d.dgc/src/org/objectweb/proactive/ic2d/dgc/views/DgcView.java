@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.eclipse.gef.EditPartFactory;
 import org.eclipse.swt.widgets.Composite;
-import org.objectweb.proactive.ic2d.dgc.data.DgcAOObjectWrapper;
 import org.objectweb.proactive.ic2d.dgc.data.ObjectGraph;
 import org.objectweb.proactive.ic2d.dgc.editparts.DgcIC2DEditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.data.AOObject;
@@ -33,7 +32,7 @@ public class DgcView extends MonitoringView implements Runnable {
         for (Map.Entry<AOObject, Collection<AOObject>> e : s) {
             AOObject srcAO = e.getKey();
             for (AOObject destAO : e.getValue()) {
-                srcAO.addCommunication(new DgcAOObjectWrapper(destAO));
+                srcAO.addCommunication(destAO);
             }
         }
     }
