@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.component.adl.implementations;
 
 import java.util.List;
@@ -79,7 +79,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                 controller = cc.getController().getDescriptor();
             }
         }
-        
+
         String name = null;
         if (container instanceof Definition) {
             name = ((Definition) container).getName();
@@ -95,8 +95,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                     "definition");
         }
 
-//        Component[] comps = ((ComponentContainer) container).getComponents();
-
+        //        Component[] comps = ((ComponentContainer) container).getComponents();
         VirtualNode n = null;
         if (container instanceof VirtualNodeContainer) {
             try {
@@ -133,30 +132,28 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
 
         if (implementation == null) {
             // a composite component 
-            if ("composite".equals(controller)) {
+            if ("composite".equals(controller) || (controller == null)) {
                 controllerDesc = new ControllerDescription(name,
                         Constants.COMPOSITE);
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {
-            	controllerDesc = new ControllerDescription(name,Constants.COMPOSITE, getClass().getResource(controller).getPath());
+                controllerDesc = new ControllerDescription(name,
+                        Constants.COMPOSITE,
+                        getClass().getResource(controller).getPath());
             }
         } else {
             // a primitive component
             if (implementation instanceof String) {
                 // that seems to be the case with the fractaladl
                 contentDesc = new ContentDescription((String) implementation);
-                if (controller !=null) {
-                	if ("primitive".equals(controller)) {
-                		controllerDesc = new ControllerDescription(name,
-                                Constants.PRIMITIVE);
-                	} else {
-//                		System.out.println("CONTROLLER = " + controller);
-                	controllerDesc = new ControllerDescription(name,
-                        Constants.PRIMITIVE, getClass().getResource(controller).getPath());
-                	}
-                } else {
-                	controllerDesc = new ControllerDescription(name,
+                if ("primitive".equals(controller) || (controller == null)) {
+                    controllerDesc = new ControllerDescription(name,
                             Constants.PRIMITIVE);
+                } else {
+                    // System.out.println("CONTROLLER = " + controller);
+                    controllerDesc = new ControllerDescription(name,
+                            Constants.PRIMITIVE,
+                            getClass().getResource(controller).getPath());
                 }
             }
         }
