@@ -80,7 +80,7 @@ public class MOPClassLoader extends URLClassLoader {
         if (cb == null) {
         	if (logger.isDebugEnabled()) {
         		logger.debug(
-                	"MOPClassLoader: class not found, trying to generate it");
+                	"MOPClassLoader: class " + classname + " not found, trying to generate it");
         	}
             try {
                 this.loadClass(classname);
