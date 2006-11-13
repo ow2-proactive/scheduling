@@ -49,15 +49,15 @@ import org.objectweb.proactive.core.component.adl.Launcher;
 
 
 /**
- * This example is a mix from the helloworld examples in the Fractal distribution : the example from Julia, and the one from the FractalADL.<b>
- * The differences are the following : <b>
- *     - from FractalADL : <b>
+ * This example is a mix from the helloworld examples in the Fractal distribution : the example from Julia, and the one from the FractalADL.<br>
+ * The differences are the following : <br>
+ *     - from FractalADL : <br>
  *             * this one uses a custom parser, based on the standard FractalADL, but it is able to add cardinality to virtual nodes and
- * allows the composition of virtual nodes.<b>
+ * allows the composition of virtual nodes.<br>
  *             * there are 4 .fractal files corresponding to definitions of the system in the current vm, in distributed vms (this uses
  * the ProActive deployment capabilities), a version with wrapping composite components and a version without wrapping components.
  *
- * Use the "parser" parameter to make it work.<b>
+ * Use the "parser" parameter to make it work.<br>
  *     - from Julia :
  *
  *
@@ -90,7 +90,7 @@ public class HelloWorld {
             //      // -------------------------------------------------------------------
             String arg0 = "-fractal"; // using the fractal component model
             String arg1; // which component definition to load
-            String arg2 = "m";
+            String arg2 = "r";
             String arg3 = HelloWorld.class.getResource(
                     "/org/objectweb/proactive/examples/components/helloworld/deployment.xml")
                                           .getPath(); // the deployment descriptor for proactive
