@@ -142,7 +142,7 @@ public class Launcher {
             }
             result[0] = args[0];
             result[1] = args[1];
-            result[2] = (args.length == 3) ? args[2] : "run";
+            result[2] = (args.length == 3 || args.length == 4) ? args[2] : "run";
             result[3] = (args.length == 4) ? args[3] : null;
         } else {
             result[0] = "-java";
