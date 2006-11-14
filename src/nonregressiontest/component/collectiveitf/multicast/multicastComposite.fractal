@@ -7,5 +7,4 @@
 	<component name="server1" definition="nonregressiontest.component.collectiveitf.multicast.server(1)"/>
     <binding client="this.multicastServerItf" server="server0.serverItf"/>
 	<binding client="this.multicastServerItf" server="server1.serverItf"/>
-	<controller desc="composite"/>
 </definition>

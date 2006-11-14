@@ -6,5 +6,4 @@
 	<interface signature="nonregressiontest.component.collectiveitf.multicast.MulticastTestItf" role="client" name="clientItf"/>
     <interface signature="nonregressiontest.component.collectiveitf.multicast.MulticastTestItf" role="client" name="multicastClientItf" cardinality="multicast"/>
 	<content class="nonregressiontest.component.collectiveitf.multicast.TesterImpl"/>
-	<controller desc="primitive"/>
 </definition>
