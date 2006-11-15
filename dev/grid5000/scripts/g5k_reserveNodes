@@ -1,0 +1,67 @@
+#! /bin/sh
+
+source $(dirname $0)/g5k_lib.sh
+
+function print_help {
+	echo -e "Usage: $0 -n nb [-a|-o|-s cluster]"
+	echo -e "Print statistics about nodes and OAR Jobs\n"
+	echo -e "\t-n       , number of nodes to be reserved"
+	modopt_print_help
+	exit 1
+}
+
+ARGS="n:"
+OPT_N=No
+
+modopt_parse $ARGS $*
+while getopts "${MODOPT_OPTS}${ARGS}" Option
+do
+	case $Option in
+	n) OPT_N=$OPTARG ;;
+	h) print_help ;;
+	*)
+		modopt_error_handle $Option
+		if [ "$?" -eq 0 ] ; then
+			echo -e "Invalid option: $Option" 1>&2
+			print_help
+			exit 1
+		fi
+	;;
+	esac
+done
+
+if [ "$OPT_N" = "No" ] ;  then
+	echo "Option -n is mandatory" 1>&2 
+	exit 1
+fi
+
+# TODO check that $OPT_N is a positive integer
+
+for i in `seq 0 $((${#OPTIONS_CLUSTERS[@]}-1))` ; 
+do
+	CLUSTER=${OPTIONS_CLUSTERS[$i]}
+
+	ask=0
+	freeNodes=$(get_freenodes $CLUSTER)
+	if [ "$freeNodes" -eq "0" ] ; then
+		continue
+	elif [ "$freeNodes" -gt "$OPT_N" ] ; then
+		ask=$OPT_N
+	else
+		ask=$freeNodes
+	fi
+	echo "Asking $ask nodes on $CLUSTER"
+	ssh $(get_oar_hostname $CLUSTER) oarsub -r "$(date "+%Y-%m-%d\ %H:%M:00")" -l nodes=$ask,walltime=00:30:00
+	OPT_N=`expr $OPT_N - $freeNodes`
+	if [ "$OPT_N" -le "0" ] ; then
+		exit 0
+	fi
+done
+
+if [ "$OPT_N" -gt "0" ] ; then
+	echo "Not enough free nodes"
+	echo "You can delete your reservations by using g5k_clean -a -r"
+fi
+	
+
+
