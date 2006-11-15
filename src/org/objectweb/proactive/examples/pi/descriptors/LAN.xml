@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="computers-vn" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="computers-vn">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>
+					<vmName value="Jvm4"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="rsh-1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+					<processReference refid="rsh-2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<creation>
+					<processReference refid="rsh-3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm4">
+				<creation>
+					<processReference refid="rsh-4"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="/user/pnaoumen/home/proactivefiles/ProActive.jar"/>
+						<!--/user/pnaoumen/home/proactivefiles/ProActive.jar" -->
+  						<absolutePath value="/user/pnaoumen/home/proactivefiles/activation.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/aelfred-1.2.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/ajo.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/ant-trax.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/asm-2.2.1.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/avalon.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/axis.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-awt-util.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-dom.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-svggen.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-util.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-xml.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/bouncycastle.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cenquatasks.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/classad.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/clibwrapper_jiio.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/client.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/clover.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cog-jglobus-1.2.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cog-jglobus.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cog-ogce.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/commons-cli-1.0.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/commons-discovery.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/commons-logging.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cryptix32.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cryptix-asn1.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cryptix.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/dtdparser.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fop.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal-adl.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal-gui.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal-swing.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/getopt-1.0.9.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/glite-wms-jdlj.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/http.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/ibis.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/j2h.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jai_codec.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jai_core.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jai_imageio.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jalopy-ant-0.6.2.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jalopy-console-1.0.4.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jalopy.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/Jama-1.0.1.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/javassist.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jaxp-1.2.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jaxrpc.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jcommon-0.8.7.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jcommon-1.0.6.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jdom.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jfreechart-1.0.2.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jh.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jini-core.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jini-ext.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jsch.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/julia-asm.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/julia-mixins.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/julia-runtime.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/log4j.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/mail.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/mlibwrapper_jai.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/moduleloader.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/njs_client.jar"/>
+                        <absolutePath value="/user/pnaoumen/home/proactivefiles/oro-2.0.6.jar"/>
+					</classpath>
+					<javaPath>
+				    	<absolutePath value="/user/mmorel/home/NOSAVE/softs/jdk1.5.0-bis/jre/bin/java"/>
+					</javaPath>
+					<policyFile>
+					    <absolutePath value="/user/mmorel/home/tutorial/config/proactive.java.policy"/>
+				    </policyFile>
+				    <log4jpropertiesFile>
+					    <absolutePath value="/user/pnaoumen/home/proactivefiles/proactive-log4j"/>
+				    </log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="rsh-1">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe">
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh-2">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple">
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh-3">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="trinidad">
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh-4">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amda">
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="computers-vn" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="computers-vn">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="ssh-cluster"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="clusterJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/ProActive.jar"/>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/asm.jar"/>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/log4j.jar"/>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/xercesImpl.jar"/>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/bouncycastle.jar"/>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/fractal.jar"/>
+						<absolutePath value="/user/mmorel/home/tutorial/libs/jsch.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="/usr/local/jdk1.4.0/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath value="/user/mmorel/home/tutorial/config/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath value="/user/mmorel/home/tutorial/config/proactive-log4j"/>
+					</log4jpropertiesFile>
+				<ProActiveUserPropertiesFile>
+					<absolutePath value="/user/mmorel/home/tutorial/config/proactive-config-sophia-cluster.xml"/>
+				</ProActiveUserPropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="bsubInriaCluster">
+				<bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess" interactive="true">
+					<processReference refid="clusterJVM"/>
+					<bsubOption>
+						<!--<hostlist>linux-nina</hostlist>-->
+						<processor>6</processor>
+						<scriptPath>
+							<absolutePath value="/user/mmorel/home/tutorial/scripts/startRuntime.sh"/>
+						</scriptPath>
+					</bsubOption>
+				</bsubProcess>
+			</processDefinition>
+			<processDefinition id="ssh-cluster">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="cluster.inria.fr" >
+					<processReference refid="bsubInriaCluster"/>
+					<commandPath value="/usr/local/bin/ssh -i /user/mmorel/home/tutorial/ssh/deployer/sophia"/>
+				</sshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
