@@ -399,6 +399,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             int padding = 0;
+            int repeat = 1;
             String className = attributes.getValue("class");
 
             if (!checkNonEmpty(className)) {
@@ -420,14 +421,19 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             String domain = attributes.getValue("domain");
             String spadding = attributes.getValue("padding");
             String hostlist = attributes.getValue("hostlist");
-
+            String srepeat = attributes.getValue("repeat");
+            
             if (checkNonEmpty(spadding)) {
                 padding = Integer.parseInt(spadding);
+            }
+            
+            if (checkNonEmpty(srepeat)) {
+            	repeat = Integer.parseInt(srepeat);
             }
 
             if (checkNonEmpty(fixedName) && checkNonEmpty(list)) {
                 ((AbstractListProcessDecorator) targetProcess).setHostConfig(fixedName,
-                    list, domain, padding);
+                    list, domain, padding, repeat);
             }
 
             if (checkNonEmpty(hostlist)) {

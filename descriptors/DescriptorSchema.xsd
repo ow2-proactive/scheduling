@@ -933,6 +933,7 @@ by fixedName that is the fixed part of hostnames, list that represents the seque
 		<xs:attribute name="fixedName" type="xs:string" use="required"/>
 		<xs:attribute name="list" type="PatternType" use="required"/>
 		<xs:attribute name="padding" type="PosintOrVariableType" use="optional"/>
+		<xs:attribute name="repeat" type="PosintOrVariableType" use="optional"/>
 		<xs:attribute name="domain" type="xs:string" use="required"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 	</xs:complexType>

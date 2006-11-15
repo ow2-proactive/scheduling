@@ -62,6 +62,7 @@ public abstract class AbstractListProcessDecorator
     protected String beginIndex;
     protected String endIndex;
     protected int padding = 1;
+    protected int repeat = 1;
     protected int step = 1;
     protected ArrayList excludeArray = new ArrayList();
     protected int nodeNumber = 0;
@@ -71,17 +72,20 @@ public abstract class AbstractListProcessDecorator
     }
 
     public void setHostConfig(String fixedName, String list, String domain,
-        int padding) {
+        int padding, int repeat) {
         this.fixedName = fixedName;
         this.domain = domain;
         this.padding = padding;
+        this.repeat = repeat;
         this.list = list.replaceAll("\\s", "");
         setAllIndex(this.list);
         for (int i = Integer.parseInt(beginIndex);
                 i <= Integer.parseInt(endIndex); i = i + step) {
             tmp = "" + i; //we change as String to check the array
             if (!excludeArray.contains(tmp)) {
-                setHostname(handlePadding(tmp));
+            	for (int count=0; count<repeat; count++) {
+            		setHostname(handlePadding(tmp));
+            	}
             }
         }
         baseProcess = (ExternalProcessDecorator) processes.get(0);
