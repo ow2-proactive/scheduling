@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.core.xml.io;
 
+import org.xml.sax.SAXException;
+
 
 /**
  *
@@ -54,8 +56,9 @@ public interface Attributes {
      * @param qName The qualified (prefixed) name.
      * @return The attribute value as a string, or null if the attribute is not in the list or if
      *         qualified names are not available.
+     * @throws SAXException 
      */
-    public String getValue(String qName);
+    public String getValue(String qName) throws SAXException;
 
     /**
      * Looks up the index of an attribute by Namespace name.
@@ -63,7 +66,7 @@ public interface Attributes {
      * @param localPart The attribute's local name.
      * @return The attribute value as a string, or null if the attribute is not in the list.
      */
-    public String getValue(String uri, String localPart);
+    public String getValue(String uri, String localPart) throws SAXException;
 
     /**
      * Returns the number of attributes in the list.

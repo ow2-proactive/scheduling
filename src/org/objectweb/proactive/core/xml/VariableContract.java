@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.descriptor.xml.VariablesHandler;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -304,7 +305,7 @@ public class VariableContract implements Serializable {
      * @param         text        Text with variables inside.
      * @return        The text with the values
      */
-    public String transform(String text) {
+    public String transform(String text) throws SAXException {
     	if(text==null) return null;
     	
     	Matcher m=variablePattern.matcher(text);
@@ -312,13 +313,13 @@ public class VariableContract implements Serializable {
     	while(m.find()){
 
     		if(!isLegalName(m.group(1)))
-    			throw new IllegalArgumentException("Error, malformed variable:"+m.group(1));
+    			throw new SAXException("Error, malformed variable:"+m.group(1));
     		
     		String name=m.group(2);
     		String value=getValue(name);
 
     		if(value==null || value.length()<=0)
-    			throw new IllegalArgumentException("Error, variable value not found: "+name+"=?");
+    			throw new SAXException("Error, variable value not found: "+name+"=?");
     			
     		if(logger.isDebugEnabled()){
     			logger.debug("Matched:"+name+" = "+value);
