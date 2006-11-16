@@ -38,7 +38,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
@@ -80,7 +80,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     /** All runtimes known by this forwarder
      * <UniqueRuntimeID, ProActiveRuntimeAdapter> */
-    protected Hashtable<UniqueRuntimeID, ProActiveRuntime> registeredRuntimes;
+    protected ConcurrentHashMap<UniqueRuntimeID, ProActiveRuntime> registeredRuntimes;
 
     /** Processes to deploy
      * <String, ExternalProcess> */
@@ -99,7 +99,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     protected ProActiveRuntimeForwarderImpl() {
         super();
-        registeredRuntimes = new Hashtable<UniqueRuntimeID, ProActiveRuntime>();
+        registeredRuntimes = new ConcurrentHashMap<UniqueRuntimeID, ProActiveRuntime>();
         hierarchicalProcesses = new HashMap<Object, ExternalProcess>();
         bodyForwarder = new BodyForwarderImpl();
 
