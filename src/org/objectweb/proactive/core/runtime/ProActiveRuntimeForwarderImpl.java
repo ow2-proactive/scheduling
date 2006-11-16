@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.runtime;
 
 import java.io.IOException;
@@ -38,6 +38,7 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
@@ -79,7 +80,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     /** All runtimes known by this forwarder
      * <UniqueRuntimeID, ProActiveRuntimeAdapter> */
-    protected HashMap registeredRuntimes;
+    protected Hashtable<UniqueRuntimeID, ProActiveRuntime> registeredRuntimes;
 
     /** Processes to deploy
      * <String, ExternalProcess> */
@@ -98,7 +99,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
 
     protected ProActiveRuntimeForwarderImpl() {
         super();
-        registeredRuntimes = new HashMap();
+        registeredRuntimes = new Hashtable<UniqueRuntimeID, ProActiveRuntime>();
         hierarchicalProcesses = new HashMap<Object, ExternalProcess>();
         bodyForwarder = new BodyForwarderImpl();
 
@@ -258,7 +259,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
         ProActiveRuntime part = (ProActiveRuntime) registeredRuntimes.get(urid);
 
         if (part == null) {
-            logger.warn("No runtime associated to this urid (" + urid + ")");
+            logErrorAndDumpTable(urid);
 
             return null;
         }
@@ -288,8 +289,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 return part.createLocalNode(nodeName, replacePreviousBinding,
                     psm, vnName, jobId);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -305,8 +305,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.killAllNodes();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -321,8 +320,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.killNode(nodeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -337,8 +335,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.createVM(remoteProcess);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -353,8 +350,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getLocalNodeNames();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -370,8 +366,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getVMInformation();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -392,8 +387,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 part.register(proActiveRuntimeDist, proActiveRuntimeUrl,
                     creatorID, creationProtocol, rurid);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -412,8 +406,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 part.unregister(proActiveRuntimeDist, proActiveRuntimeUrl,
                     creatorID, creationProtocol, rurid);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -428,8 +421,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getProActiveRuntimes();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -446,8 +438,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getProActiveRuntime(proActiveRuntimeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -464,8 +455,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.addAcquaintance(proActiveRuntimeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -480,8 +470,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getAcquaintances();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -498,8 +487,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.rmAcquaintance(proActiveRuntimeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -514,8 +502,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.killRT(softly);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -529,8 +516,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getURL();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -547,8 +533,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getActiveObjects(nodeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -565,8 +550,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getActiveObjects(nodeName, className);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -583,8 +567,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getVirtualNode(virtualNodeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -602,8 +585,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.registerVirtualNode(virtualNodeName, replacePreviousBinding);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -618,8 +600,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.unregisterVirtualNode(virtualNodeName);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -634,8 +615,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.unregisterAllVirtualNodes();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -650,8 +630,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getJobID(nodeUrl);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -668,8 +647,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.receiveBody(nodeName, body);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -686,8 +664,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.receiveCheckpoint(nodeURL, ckpt, inc);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -707,8 +684,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 return part.getProcessToDeploy(proActiveRuntimeDist, creatorID,
                     vmName, padURL);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -725,8 +701,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getVNName(Nodename);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -743,8 +718,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getEntities();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -761,8 +735,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getPolicy(sc);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -779,8 +752,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getClassDataFromThisRuntime(className);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -797,8 +769,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getClassDataFromParentRuntime(className);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -815,8 +786,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getCertificate();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -833,8 +803,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getCertificateEncoded();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -851,8 +820,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getPublicKey();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -873,8 +841,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                 return part.publicKeyExchange(sessionID, myPublicKey,
                     myCertificate, signature);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -893,8 +860,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.randomValue(sessionID, clientRandomValue);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -919,8 +885,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
                     encodedIVParameters, encodedClientMacKey, encodedLockData,
                     parametersSignature);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -938,8 +903,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.startNewSession(policy);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -956,8 +920,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.terminateSession(sessionID);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -972,8 +935,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getDescriptor(url, isHierarchicalSearch);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -989,8 +951,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getJobID();
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
 
@@ -1008,8 +969,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.launchMain(className, parameters);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -1024,8 +984,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 part.newRemote(className);
             } else {
-                logger.warn("No runtime associated to this urid (" + urid +
-                    ")");
+                logErrorAndDumpTable(urid);
             }
         }
     }
@@ -1041,11 +1000,17 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.setLocalNodeProperty(nodeName, key, value);
             } else {
-                logger.warn("No runtime associated to this urid (" + runtimeID +
-                    ")");
             }
         }
         return null;
+    }
+
+    public void logErrorAndDumpTable(UniqueRuntimeID runtimeID) {
+        logger.warn("No runtime associated to this urid :" + runtimeID);
+        logger.warn("Registered runtimes are:");
+        for (UniqueRuntimeID urid : registeredRuntimes.keySet()) {
+            logger.warn("\t" + urid);
+        }
     }
 
     public String getLocalNodeProperty(UniqueRuntimeID runtimeID,
@@ -1058,8 +1023,7 @@ public class ProActiveRuntimeForwarderImpl extends ProActiveRuntimeImpl
             if (part != null) {
                 return part.getLocalNodeProperty(nodeName, key);
             } else {
-                logger.warn("No runtime associated to this urid (" + runtimeID +
-                    ")");
+                logErrorAndDumpTable(runtimeID);
             }
         }
         return null;

@@ -123,7 +123,7 @@ public class ProActiveRuntimeAdapterForwarderImpl
             if (!partf.registeredRuntimes.containsKey(urid)) {
                 try {
                     // Add this unknown runtime to the table of forwarded runtimes
-                    partf.registeredRuntimes.put(urid, this.clone());
+                    partf.registeredRuntimes.put(urid, (ProActiveRuntime)this.clone());
                 } catch (CloneNotSupportedException e) {
                     runtimeLogger.warn(e);
                 }
