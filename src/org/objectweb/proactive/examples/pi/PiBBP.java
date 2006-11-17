@@ -41,9 +41,7 @@ public class PiBBP implements Serializable {
 
     public PiBBP() {
     }
-    
-    
-
+  
     public PiBBP(String[] args) {
         parseProgramArguments(args);
     }
@@ -116,7 +114,7 @@ public class PiBBP implements Serializable {
                 "\nCreating a group of computers on the given virtual node ...");
 
             // create a group of computers on the virtual node computersVN
-            piComputer = (PiComputer) ProActiveGroup.newGroupBuiltWithMultithreading(PiComputer.class.getName(),
+            piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(PiComputer.class.getName(),
                     new Object[] { new Integer(nbDecimals_) },
                     computersVN.getNodes());
             
@@ -170,7 +168,7 @@ public class PiBBP implements Serializable {
             // a private method
             Interval intervals = null;
             try {
-                intervals = distributeIntervals(nbNodes, nbDecimals_);
+                intervals = PiUtil.dividePI(nbNodes, nbDecimals_);
             } catch (Exception e) {
                 e.printStackTrace();
                 return "";
@@ -189,21 +187,14 @@ public class PiBBP implements Serializable {
         // invocation on group, parameters are scattered, result is a
         // group
         Result results = piComputers.compute(intervals);
-
+        Group resultsGroup = ProActiveGroup.getGroup(results);
+        
         // the following is displayed because the "compute" operation is
         // asynchronous (non-blocking)
         System.out.println("Intervals sent to the computers...\n");
 
-        // get a group view on the results
-        Group resultsGroup = ProActiveGroup.getGroup(results);
+        Result total = PiUtil.conquerPI(results);
 
-        // sum the results
-        Result total = new Result(new BigDecimal(0), 0);
-        Group piComputers_group = ProActiveGroup.getGroup(piComputers);
-        for (int i = 0; i < piComputers_group.size(); i++) {
-            total.addNumericalResult(((Result) resultsGroup.get(i)).getNumericalResult());
-            total.addComputationTime(((Result) resultsGroup.get(i)).getComputationTime());
-        }
         long timeAtEndOfComputation = System.currentTimeMillis();
 
         //*************************************************************
@@ -270,6 +261,7 @@ public class PiBBP implements Serializable {
     
     
     // distributes the computation data to the available computers
+    /*
     private static Interval distributeIntervals(int length, int scale)
         throws Exception {
         int intervalSize = scale / length;
@@ -283,7 +275,7 @@ public class PiBBP implements Serializable {
         }
         return intervals;
     }
-
+     */
     public boolean isWebService() {
         return ws_;
     }

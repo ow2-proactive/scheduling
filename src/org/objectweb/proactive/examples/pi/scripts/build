@@ -10,10 +10,9 @@ fi
 
 
 currentDir=`dirname $0`
-
+proactiveDir=../../../../../../..
 
 #build file for Unix system
-
-$JAVA_HOME/bin/java -classpath $JAVA_HOME/lib/tools.jar:$currentDir/libs/ant-launcher.jar:$currentDir/libs/ant.jar:$CLASSPATH org.apache.tools.ant.Main -emacs -buildfile $currentDir/build.xml $@
+$JAVA_HOME/bin/java -classpath $JAVA_HOME/lib/tools.jar:$proactiveDir/compile/ant-launcher.jar:$proactiveDir/compile/ant.jar: org.apache.tools.ant.Main -emacs -buildfile $currentDir/build.xml $@
 
 #$JAVA_HOME/bin/java -classpath $JAVA_HOME/lib/tools.jar:$currentDir/ant.jar:$currentDir/ant-launcher.jar:$currentDir/xercesImpl.jar:$currentDir/xml-apis.jar:$CLASSPATH org.apache.tools.ant.Main -emacs -buildfile $currentDir/proactive.xml $@

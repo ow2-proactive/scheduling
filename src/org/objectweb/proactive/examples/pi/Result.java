@@ -41,5 +41,5 @@ public class Result implements Serializable{
     }
     
     public String toString () {
-        return (bd != null ? bd.doubleValue()+"" : null) ;}
+        return (bd != null ? bd.toString()+"" : null) ;}
 }

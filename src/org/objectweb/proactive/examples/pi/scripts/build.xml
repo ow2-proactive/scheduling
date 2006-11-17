@@ -34,6 +34,7 @@
 		<echo message="  compile : compile the program" />
 		<echo message="  clean   : delete generated files" />
 		<echo message="  run     : run the program" />
+		<echo message="  mypi    : run your implementation of Pi" />
 		<echo message="" />
 		<echo message="==========================================" />
 	</target>
@@ -194,6 +195,19 @@
 		</java>
 	</target>
 
-	
+	<target name="mypi">
+		<antcall target="clean"/>
+		<antcall target="compile"/>
+		<property name="decimals"  value="10" />
+		<property name="descriptor"  value="../descriptors/localhost.xml" />
+		<java classname="org.objectweb.proactive.examples.pi.MyPi" fork="true">
+			<classpath refid="tutorial.classpath" />
+			<jvmarg value="-Djava.security.policy=${proactive.dir}/scripts/proactive.java.policy" />
+			<jvmarg value="-Dlog4j.configuration=file:${proactive.dir}/scripts/proactive-log4j" />
+			<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" />
+			<arg value="${decimals}" />
+			<arg value="${descriptor}" />
+		</java>
+	</target>
 
 </project>
