@@ -104,7 +104,7 @@ public class JSchSingleton {
                             try {
                                 logger.debug("adding identity " +
                                     privKeyFile.getPath());
-                                _jsch.addIdentity(privKeyFile.getPath(), null);
+                                _jsch.addIdentity(privKeyFile.getPath(), (String)null);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
