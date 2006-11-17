@@ -767,6 +767,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="pbsProcess" type="PbsProcessType"/>
 			<xs:element name="oarProcess" type="oarProcessType"/>
 			<xs:element name="oarGridProcess" type="oarGridProcessType"/>
+			<xs:element name="clusterForkProcess" type="clusterForkProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
 			<xs:element name="prunProcess" type="prunProcessType"/>
 			<xs:element name="gridEngineProcess" type="sgeProcessType"/>
@@ -1194,6 +1195,15 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="bookingDuration" type="xs:string" minOccurs="0"/>
 			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
+	</xs:complexType>
+	<!-- clusterForkProcessType -->
+	<xs:complexType name="clusterForkProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" 
+			fixed="org.objectweb.proactive.core.process.rocks.ClusterForkProcess"/>
 	</xs:complexType>
 	<!--oarProcess-->
 	<xs:complexType name="oarProcessType">

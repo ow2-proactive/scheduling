@@ -86,6 +86,7 @@ public interface ProActiveDescriptorConstants {
     public static final String PRUN_PROCESS_TAG = "prunProcess";
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
+    public static final String CLUSTERFORK_PROCESS_TAG = "clusterForkProcess";
     public static final String GLITE_PROCESS_TAG = "gLiteProcess";
     public static final String DEPENDENT_PROCESS_SEQUENCE_TAG = "dependentProcessSequence";
     public static final String SEQUENTIAL_PROCESS_TAG = "independentProcessSequence";

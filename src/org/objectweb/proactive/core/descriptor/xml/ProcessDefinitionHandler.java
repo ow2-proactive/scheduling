@@ -1,37 +1,40 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
+import java.util.StringTokenizer;
 
+import javax.naming.directory.InvalidAttributeValueException;
+
+import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
@@ -52,6 +55,7 @@ import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
 import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
+import org.objectweb.proactive.core.process.rocks.ClusterForkProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
 import org.objectweb.proactive.core.util.HostsInfos;
@@ -63,12 +67,7 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
-
-import java.util.StringTokenizer;
-
-import javax.naming.directory.InvalidAttributeValueException;
 
 
 //import org.xml.sax.SAXException;
@@ -122,6 +121,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new UnicoreProcessHandler(proActiveDescriptor));
         this.addHandler(NG_PROCESS_TAG,
             new NGProcessHandler(proActiveDescriptor));
+        this.addHandler(CLUSTERFORK_PROCESS_TAG,
+            new ClusterForkProcessHandler(proActiveDescriptor));
     }
 
     /**
@@ -422,13 +423,13 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             String spadding = attributes.getValue("padding");
             String hostlist = attributes.getValue("hostlist");
             String srepeat = attributes.getValue("repeat");
-            
+
             if (checkNonEmpty(spadding)) {
                 padding = Integer.parseInt(spadding);
             }
-            
+
             if (checkNonEmpty(srepeat)) {
-            	repeat = Integer.parseInt(srepeat);
+                repeat = Integer.parseInt(srepeat);
             }
 
             if (checkNonEmpty(fixedName) && checkNonEmpty(list)) {
@@ -609,10 +610,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
 
-              String queueName = (attributes.getValue("queue"));
-                    if (checkNonEmpty(queueName)) {
-                        ((GridEngineSubProcess) targetProcess).setQueueName(queueName);
-                    }
+            String queueName = (attributes.getValue("queue"));
+            if (checkNonEmpty(queueName)) {
+                ((GridEngineSubProcess) targetProcess).setQueueName(queueName);
+            }
         }
 
         protected class GridEngineOptionHandler
@@ -660,6 +661,18 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
             }
+        }
+    }
+
+    protected class ClusterForkProcessHandler extends ProcessHandler {
+        public ClusterForkProcessHandler(
+            ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws SAXException {
+            super.startContextElement(name, attributes);
         }
     }
 
