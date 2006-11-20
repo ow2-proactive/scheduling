@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="CLUSTER_PROACTIVE_HOME" value="/home/pnaoumen/ProActiveCluster/ProActive"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="CLUSTER_JARS_FOLDER" value="/home/pnaoumen/proactivefiles"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_POLICY_FILE" value="/home/pnaoumen/ProActiveCluster/ProActive/scripts/proactive.java.policy"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="LOG4J_FILE" value="/home/pnaoumen/ProActiveCluster/ProActive/scripts/proactive-log4j"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" value="/usr/java/jdk1.5.0_05/bin"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="QSUB_PATH" value="/opt/torque/bin/qsub"/>
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="computers-vn" property="multiple"/>
@@ -16,56 +24,130 @@
 		<jvms>
 			<jvm name="Jvm1">
 				<creation>
-					<processReference refid="ssh-cluster"/>
+					<processReference refid="pbsProcess"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
+		
 			<processDefinition id="clusterJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/ProActive.jar"/>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/asm.jar"/>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/log4j.jar"/>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/xercesImpl.jar"/>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/bouncycastle.jar"/>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/fractal.jar"/>
-						<absolutePath value="/user/mmorel/home/tutorial/libs/jsch.jar"/>
+						<absolutePath value="${CLUSTER_PROACTIVE_HOME}/classes"/>
+						<absolutePath value="${CLUSTER_JARS_FOLDER}/activation.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/aelfred-1.2.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/ajo.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/ant-trax.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/asm-2.2.1.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/avalon.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/axis.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/batik-awt-util.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/batik-dom.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/batik.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/batik-svggen.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/batik-util.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/batik-xml.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/bouncycastle.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cenquatasks.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/classad.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/clibwrapper_jiio.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/client.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/clover.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cog-jglobus-1.2.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cog-jglobus.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cog-ogce.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/commons-cli-1.0.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/commons-discovery.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/commons-logging.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cryptix32.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cryptix-asn1.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/cryptix.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/dtdparser.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fop.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-adl.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-gui.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/fractal-swing.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/getopt-1.0.9.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/glite-wms-jdlj.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/http.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/ibis.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/j2h.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jai_codec.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jai_core.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jai_imageio.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jalopy-ant-0.6.2.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jalopy-console-1.0.4.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jalopy.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/Jama-1.0.1.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/javassist.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jaxp-1.2.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jaxrpc.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jcommon-0.8.7.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jcommon-1.0.6.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jdom.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jfreechart-1.0.2.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jh.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jini-core.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jini-ext.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/jsch.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-asm.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-mixins.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-runtime.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/log4j.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/mail.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/mlibwrapper_jai.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/moduleloader.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/njs_client.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/oro-2.0.6.jar"/>
 					</classpath>
 					<javaPath>
-						<absolutePath value="/usr/local/jdk1.4.0/bin/java"/>
+						<absolutePath value="${JAVA_HOME}/java"/>
 					</javaPath>
 					<policyFile>
-						<absolutePath value="/user/mmorel/home/tutorial/config/proactive.java.policy"/>
+						<absolutePath value="${PROACTIVE_POLICY_FILE}"/>
 					</policyFile>
 					<log4jpropertiesFile>
-						<absolutePath value="/user/mmorel/home/tutorial/config/proactive-log4j"/>
+						<absolutePath value="${LOG4J_FILE}"/>
 					</log4jpropertiesFile>
-				<ProActiveUserPropertiesFile>
-					<absolutePath value="/user/mmorel/home/tutorial/config/proactive-config-sophia-cluster.xml"/>
-				</ProActiveUserPropertiesFile>
+					 <jvmParameters>
+                       <parameter value="-Dproactive.rmi.port=1102"/>
+		       		   <parameter value="-Xms1024m -Xmx1024m" />
+                   </jvmParameters>
 				</jvmProcess>
 			</processDefinition>
-			<processDefinition id="bsubInriaCluster">
-				<bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess" interactive="true">
-					<processReference refid="clusterJVM"/>
-					<bsubOption>
-						<!--<hostlist>linux-nina</hostlist>-->
-						<processor>6</processor>
+			
+			<processDefinition id="pbsProcess">
+			<!--<pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess">
+					<processReference refid="clusterJVM" />
+					<commandPath value="${QSUB_PATH}" />
+					<pbsOption>
+						<hostsNumber>4</hostsNumber>
+						<processorPerNode>1</processorPerNode>
+						<bookingDuration>00:5:00</bookingDuration>
+						<outputFile>${CLUSTER_PROACTIVE_HOME}/output.log</outputFile>
 						<scriptPath>
-							<absolutePath value="/user/mmorel/home/tutorial/scripts/startRuntime.sh"/>
+							<absolutePath value="${CLUSTER_PROACTIVE_HOME}/scripts/unix/cluster/pbsStartRuntime.sh" />
 						</scriptPath>
-					</bsubOption>
-				</bsubProcess>
-			</processDefinition>
-			<processDefinition id="ssh-cluster">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="cluster.inria.fr" >
-					<processReference refid="bsubInriaCluster"/>
-					<commandPath value="/usr/local/bin/ssh -i /user/mmorel/home/tutorial/ssh/deployer/sophia"/>
-				</sshProcess>
-			</processDefinition>
+					</pbsOption>
+				</pbsProcess>-->
+								<pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess">
+					<processReference refid="clusterJVM"/>
+					<commandPath value="/opt/torque/bin/qsub"/>
+					<pbsOption>
+						<hostsNumber>4</hostsNumber>
+						<processorPerNode>1</processorPerNode>
+						<bookingDuration>02:00:00</bookingDuration>
+						<outputFile>/home/pnaoumen/output.log</outputFile>
+						<scriptPath>
+							<absolutePath value="/home/pnaoumen/ProActiveCluster/ProActive/scripts/unix/cluster/pbsSshStartRuntime.sh"/>
+						</scriptPath>
+					</pbsOption>
+				</pbsProcess>
+			</processDefinition>	
+				
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="REMOTE_JARS_FOLDER" value="/user/pnaoumen/home/proactivefiles"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" value="/user/mmorel/home/NOSAVE/softs/jdk1.5.0-bis/jre/bin/java"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_POLICY_FILE" value="/user/mmorel/home/tutorial/config/proactive.java.policy"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="LOG4J_FILE" value="/user/pnaoumen/home/proactivefiles/proactive-log4j"/> <!--CHANGE ME!!!! -->
+	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="computers-vn" property="multiple"/>
@@ -44,83 +50,83 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="/user/pnaoumen/home/proactivefiles/ProActive.jar"/>
-						<!--/user/pnaoumen/home/proactivefiles/ProActive.jar" -->
-  						<absolutePath value="/user/pnaoumen/home/proactivefiles/activation.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/aelfred-1.2.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/ajo.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/ant-trax.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/asm-2.2.1.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/avalon.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/axis.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-awt-util.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-dom.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-svggen.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-util.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/batik-xml.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/bouncycastle.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cenquatasks.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/classad.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/clibwrapper_jiio.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/client.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/clover.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cog-jglobus-1.2.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cog-jglobus.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cog-ogce.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/commons-cli-1.0.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/commons-discovery.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/commons-logging.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cryptix32.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cryptix-asn1.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/cryptix.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/dtdparser.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fop.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal-adl.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal-gui.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/fractal-swing.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/getopt-1.0.9.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/glite-wms-jdlj.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/http.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/ibis.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/j2h.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jai_codec.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jai_core.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jai_imageio.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jalopy-ant-0.6.2.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jalopy-console-1.0.4.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jalopy.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/Jama-1.0.1.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/javassist.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jaxp-1.2.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jaxrpc.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jcommon-0.8.7.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jcommon-1.0.6.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jdom.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jfreechart-1.0.2.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jh.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jini-core.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jini-ext.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/jsch.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/julia-asm.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/julia-mixins.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/julia-runtime.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/log4j.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/mail.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/mlibwrapper_jai.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/moduleloader.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/njs_client.jar"/>
-                        <absolutePath value="/user/pnaoumen/home/proactivefiles/oro-2.0.6.jar"/>
+						<absolutePath value="${REMOTE_JARS_FOLDER}/ProActive.jar"/>
+						<!--{REMOTE_JARS_FOLDER}/ProActive.jar" -->
+  						<absolutePath value="${REMOTE_JARS_FOLDER}/activation.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/aelfred-1.2.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/ajo.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/ant-trax.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/asm-2.2.1.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/avalon.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/axis.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/batik-awt-util.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/batik-dom.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/batik.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/batik-svggen.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/batik-util.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/batik-xml.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/bouncycastle.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cenquatasks.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/classad.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/clibwrapper_jiio.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/client.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/clover.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cog-jglobus-1.2.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cog-jglobus.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cog-ogce.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/commons-cli-1.0.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/commons-discovery.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/commons-logging.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cryptix32.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cryptix-asn1.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/cryptix.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/dtdparser.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/fop.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/fractal-adl.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/fractal-gui.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/fractal.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/fractal-swing.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/getopt-1.0.9.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/glite-wms-jdlj.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/http.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/ibis.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/j2h.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jai_codec.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jai_core.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jai_imageio.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jalopy-ant-0.6.2.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jalopy-console-1.0.4.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jalopy.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/Jama-1.0.1.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/javassist.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jaxp-1.2.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jaxrpc.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jcommon-0.8.7.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jcommon-1.0.6.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jdom.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jfreechart-1.0.2.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jh.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jini-core.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jini-ext.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/jsch.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/julia-asm.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/julia-mixins.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/julia-runtime.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/log4j.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/mail.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/mlibwrapper_jai.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/moduleloader.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/njs_client.jar"/>
+                        <absolutePath value="${REMOTE_JARS_FOLDER}/oro-2.0.6.jar"/>
 					</classpath>
 					<javaPath>
-				    	<absolutePath value="/user/mmorel/home/NOSAVE/softs/jdk1.5.0-bis/jre/bin/java"/>
+				    	<absolutePath value="${JAVA_HOME}"/>
 					</javaPath>
 					<policyFile>
-					    <absolutePath value="/user/mmorel/home/tutorial/config/proactive.java.policy"/>
+					    <absolutePath value="${PROACTIVE_POLICY_FILE}"/>
 				    </policyFile>
 				    <log4jpropertiesFile>
-					    <absolutePath value="/user/pnaoumen/home/proactivefiles/proactive-log4j"/>
+					    <absolutePath value="${LOG4J_FILE}"/>
 				    </log4jpropertiesFile>
 				</jvmProcess>
 			</processDefinition>
