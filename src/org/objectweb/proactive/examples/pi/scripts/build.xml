@@ -148,20 +148,17 @@
 		<echo message="0 : no deployment" />
 		<echo message="1 : localhost deployment" />
 		<echo message="2 : LAN deployment" />
-		<echo message="3 : acquisition of remote nodes" />
+		<echo message="3 : P2P Infra-Inria nodes acquisition" />
 		<echo message="4 : INRIA cluster deployment" />
-		<echo message="5 : Amsterdam cluster deployment" />
-		<echo message="6 : Amsterdam + INRIA cluster deployment" />
-		<echo message="7 : P2P Infra-Inria nodes acquisition" />
-		<echo message="8 : LAN + INRIA Sophia using forwarder" />
+		<echo message="5 : Custom deployment descriptor" />
 		<echo message="default : localhost deployment" />
 		<input message="? " addproperty="deployment" defaultvalue="1" />
 		<condition property="isP2P">
-			<equals arg1="${deployment}" arg2="7" />
+			<equals arg1="${deployment}" arg2="3" />
 		</condition>
 		<condition property="isNormal">
 			<not>
-				<equals arg1="${deployment}" arg2="7" />
+				<equals arg1="${deployment}" arg2="3" />
 			</not>
 		</condition>
 		<antcall target="p2p" />
@@ -173,8 +170,8 @@
 		<java classname="org.objectweb.proactive.examples.pi.PiBBP" fork="true">
 			<classpath refid="tutorial.classpath" />
 			<jvmarg value="-Djava.security.policy=${proactive.dir}/scripts/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:${proactive.dir}/scripts/proactive-log4j" />
-			<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" />
+			<jvmarg value="-Dlog4j.configuration=file:${proactive.dir}/compile/proactive-log4j" />
+			<!--<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" /> -->
 			<arg value="${nb-decimals}" />
 			<arg value="${run-mode}" />
 			<arg value="${deployment}" />
