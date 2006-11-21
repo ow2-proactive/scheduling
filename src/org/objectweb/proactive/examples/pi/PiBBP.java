@@ -296,13 +296,13 @@ public class PiBBP implements Serializable {
                 deploymentDescriptorLocation_ = "LAN.xml";
                 break;
             case 3:
-                deploymentDescriptorLocation_ = "acquisition.xml";
+                deploymentDescriptorLocation_ = "sophia-infra-p2p.xml";
                 break;
             case 4:
                 deploymentDescriptorLocation_ = "sophia-cluster.xml";
                 break;
-            case 7:
-                deploymentDescriptorLocation_ = "sophia-infra-p2p.xml";
+            case 5:
+                deploymentDescriptorLocation_ = "custom-descriptor.xml";
                 break;
             default:
                 deploymentDescriptorLocation_ = "localhost.xml";
