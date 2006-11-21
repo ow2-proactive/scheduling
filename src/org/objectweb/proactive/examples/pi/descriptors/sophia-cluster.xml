@@ -32,7 +32,7 @@
 	<infrastructure>
 		<processes>
 		
-			<processDefinition id="clusterJVM">CLUSTER_JARS_FOLDER
+			<processDefinition id="clusterJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath value="${CLUSTER_PROACTIVE_HOME}/classes"/>			                                                         
