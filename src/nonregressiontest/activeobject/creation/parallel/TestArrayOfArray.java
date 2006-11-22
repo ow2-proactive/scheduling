@@ -68,7 +68,6 @@ public class TestArrayOfArray extends FunctionalTest {
                         { "tata" }
                     }, vn.getNodes());
         } catch (Exception e) {
-        	System.out.println("Exception OK");
             this.aos = (A[]) ProActive.newActiveInParallel(A.class.getName(),
                     new Object[][] {
                         { "toto" },
@@ -95,7 +94,6 @@ public class TestArrayOfArray extends FunctionalTest {
     public boolean postConditions() throws Exception {
         if ((this.aos == null) || (this.aos.length != 4)) {
             this.vn.killAll(false);
-            System.out.println("wrong number of element");
             return false;
         }
         this.vn.killAll(false);
