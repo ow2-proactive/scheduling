@@ -33,12 +33,34 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-public class MyPi {
+public class MyPiSolved {
 
 	public static void main(String args[]) throws Exception{
 
 		Integer numberOfDecimals =  new Integer(args[0]);
 		String descriptorPath = args[1];
 		
+		ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(descriptorPath); 
+		descriptor.activateMappings();
+		VirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
+		Node[] nodes = virtualNode.getNodes();
+		
+		PiComputer piComputer = 
+			(PiComputer) ProActiveGroup.newGroupInParallel(
+					PiComputer.class.getName(),
+		            new Object[] { numberOfDecimals },
+		            nodes);
+		
+		int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();
+		
+		Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
+		ProActiveGroup.setScatterGroup(intervals);
+
+		Result results = piComputer.compute(intervals);
+		Result result= PiUtil.conquerPI(results);
+		System.out.println("Pi:"+result);
+		
+		descriptor.killall(true);
+		System.exit(0);
 	}
 }

@@ -35,6 +35,7 @@
 		<echo message="  clean   : delete generated files" />
 		<echo message="  run     : run the program" />
 		<echo message="  mypi    : run your implementation of Pi" />
+		<echo message="  onthefly: run Pi with on-the-fly deployment" />
 		<echo message="" />
 		<echo message="==========================================" />
 	</target>
@@ -206,5 +207,22 @@
 			<arg value="${descriptor}" />
 		</java>
 	</target>
-
+	
+	<target name="onthefly">
+		<antcall target="clean"/>
+		<antcall target="compile"/>
+		<property name="decimals"  value="10" />
+		<property name="descriptor"  value="../onthefly/descriptor.xml" />
+		<java classname="org.objectweb.proactive.examples.pi.MyPiSolved" fork="yes">
+			<classpath refid="tutorial.classpath" />
+			<jvmarg value="-Dproactive.dir=${proactive.dir}" />
+			<jvmarg value="-Djava.security.policy=${proactive.dir}/scripts/proactive.java.policy" />
+			<jvmarg value="-Dlog4j.configuration=file:../onthefly/proactive-log4j" />
+			<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" />
+			<jvmarg value="-Dproactive.rmi.port=3012" />
+			<arg value="${decimals}" />
+			<arg value="${descriptor}" />
+		</java>
+	</target>
+	
 </project>
