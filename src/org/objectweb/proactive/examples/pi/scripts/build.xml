@@ -35,7 +35,6 @@
 		<echo message="  clean   : delete generated files" />
 		<echo message="  run     : run the program" />
 		<echo message="  mypi    : run your implementation of Pi" />
-		<echo message="  onthefly: run Pi with on-the-fly deployment" />
 		<echo message="" />
 		<echo message="==========================================" />
 	</target>
@@ -151,19 +150,31 @@
 		<echo message="2 : LAN deployment" />
 		<echo message="3 : P2P Infra-Inria nodes acquisition" />
 		<echo message="4 : INRIA cluster deployment" />
-		<echo message="5 : Custom deployment descriptor" />
+		<echo message="5 : On-the-fly deployment"/>
+		<echo message="6 : Custom deployment descriptor" />
 		<echo message="default : localhost deployment" />
 		<input message="? " addproperty="deployment" defaultvalue="1" />
+		
 		<condition property="isP2P">
 			<equals arg1="${deployment}" arg2="3" />
 		</condition>
-		<condition property="isNormal">
-			<not>
-				<equals arg1="${deployment}" arg2="3" />
-			</not>
+		<condition property="isOnTheFly">
+			<equals arg1="${deployment}" arg2="5" />
 		</condition>
+		<condition property="isNormal">
+			<and>
+				<not>
+					<equals arg1="${deployment}" arg2="3" />
+				</not>
+				<not>
+					<equals arg1="${deployment}" arg2="5" />
+				</not>
+			</and>
+		</condition>
+		
 		<antcall target="p2p" />
 		<antcall target="normal" />
+		<antcall target="onthefly" />
 	</target>
 
 	<target name="normal" if="isNormal">
@@ -193,6 +204,22 @@
 		</java>
 	</target>
 
+	<target name="onthefly" if="isOnTheFly">
+		<antcall target="clean"/>
+		<antcall target="compile"/>
+		<property name="descriptor"  value="../onthefly/descriptor.xml" />
+		<java classname="org.objectweb.proactive.examples.pi.MyPiSolved" fork="yes">
+			<classpath refid="tutorial.classpath" />
+			<jvmarg value="-Dproactive.dir=${proactive.dir}" />
+			<jvmarg value="-Djava.security.policy=${proactive.dir}/scripts/proactive.java.policy" />
+			<jvmarg value="-Dlog4j.configuration=file:../onthefly/proactive-log4j" />
+			<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" />
+			<jvmarg value="-Dproactive.rmi.port=3012" />
+			<arg value="${nb-decimals}" />
+			<arg value="${descriptor}" />
+		</java>
+	</target>
+	
 	<target name="mypi">
 		<antcall target="clean"/>
 		<antcall target="compile"/>
@@ -203,23 +230,6 @@
 			<jvmarg value="-Djava.security.policy=${proactive.dir}/scripts/proactive.java.policy" />
 			<jvmarg value="-Dlog4j.configuration=file:${proactive.dir}/scripts/proactive-log4j" />
 			<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" />
-			<arg value="${decimals}" />
-			<arg value="${descriptor}" />
-		</java>
-	</target>
-	
-	<target name="onthefly">
-		<antcall target="clean"/>
-		<antcall target="compile"/>
-		<property name="decimals"  value="10" />
-		<property name="descriptor"  value="../onthefly/descriptor.xml" />
-		<java classname="org.objectweb.proactive.examples.pi.MyPiSolved" fork="yes">
-			<classpath refid="tutorial.classpath" />
-			<jvmarg value="-Dproactive.dir=${proactive.dir}" />
-			<jvmarg value="-Djava.security.policy=${proactive.dir}/scripts/proactive.java.policy" />
-			<jvmarg value="-Dlog4j.configuration=file:../onthefly/proactive-log4j" />
-			<jvmarg value="-Dproactive.configuration=file:${base}/config/proactive-config.xml" />
-			<jvmarg value="-Dproactive.rmi.port=3012" />
 			<arg value="${decimals}" />
 			<arg value="${descriptor}" />
 		</java>
