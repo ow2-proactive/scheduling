@@ -21,6 +21,7 @@ if [ $# -ne 1 ]; then
       + penguin
       + philosophers
       + readers
+      + pi
     "
     exit 1
 fi
