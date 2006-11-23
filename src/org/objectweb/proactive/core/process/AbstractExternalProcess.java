@@ -538,7 +538,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             //
             try {
                 while (shouldRun) {
-                    //threadMonitor.setActive(false);
+                    threadMonitor.setActive(false);
                     //                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
                     //						AbstractExternalProcess.clogger.debug(
                     //                            "ProcessInputHandler before readLine()");
