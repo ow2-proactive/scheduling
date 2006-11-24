@@ -48,6 +48,7 @@
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-mixins.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/julia-runtime.jar"/>
                         <absolutePath value="${CLUSTER_JARS_FOLDER}/log4j.jar"/>
+                        <absolutePath value="${CLUSTER_JARS_FOLDER}/xercesImpl.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/java"/>
