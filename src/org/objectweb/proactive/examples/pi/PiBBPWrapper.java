@@ -23,56 +23,83 @@
 package org.objectweb.proactive.examples.pi;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
 
-public class PiBBPWrapper extends PiBBP implements Runnable, BindingController {
+public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {
     
     HashMap nameToComputer = new HashMap(); // map between binding names and Components 
-    
+    PiCompMultiCast clientMultiCast;
     public PiBBPWrapper() {
     }
 
-    public void run() {
-        nbDecimals_ = 1000;                 // FIXME : this should be a parameter somewhere.  
-        piComputer.setScale(nbDecimals_);
-        try {
-            computeOnGroup(piComputer);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+   
 
     public String[] listFc() {
-        return new String[] { "computation" };
+        return new String[] { "multicastDispatcher" };
     }
 
     public Object lookupFc(final String cItf) {
-        return  nameToComputer.get(cItf);
+    	if(cItf.compareTo("multicastDispatcher")==0)
+    		return clientMultiCast;
+    	return null;
     }
 
     public void bindFc(final String cItf, final Object sItf) {
-        System.out.println("Adding bind called " + cItf + 
-                " between " + this.getClass().getName() +
-                " and " + sItf.getClass().getName()); 
-        if (piComputer == null)
-            try {
-                piComputer = (PiComp) ProActiveGroup.newGroup(PiComp.class.getName());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        if (cItf.startsWith("computation")) {
-            Group group = ProActiveGroup.getGroup(piComputer);
-            group.add(sItf);
+
+        if (cItf.startsWith("multicastDispatcher")) {
+           clientMultiCast=(PiCompMultiCast)sItf;
         }
     }
 
     public void unbindFc(final String cItf) {
-        Group group = ProActiveGroup.getGroup(piComputer);
-        Object piComp = nameToComputer.remove(cItf) ;
-        group.remove(piComp);
+    	if (cItf.startsWith("multicastDispatcher")) {
+            clientMultiCast=null;
+         }
     }
+
+	public void startComputation(List<Interval> params) {
+			
+		long timeAtBeginningOfComputation = System.currentTimeMillis();
+		   
+		   
+		List<Result> results=clientMultiCast.compute(params);
+		
+		System.out.println("Intervals sent to the computers...\n");
+
+        Result total = PiUtil.conquerPIList(results);
+
+        
+        
+        long timeAtEndOfComputation = System.currentTimeMillis();
+
+        //*************************************************************
+        // * results
+        // *************************************************************/
+        System.out.println("\nComputation finished ...");
+        System.out.println("Computed PI value is : " +
+            total.getNumericalResult().toString());
+        System.out.println("Time waiting for result : " +
+            (timeAtEndOfComputation - timeAtBeginningOfComputation) + " ms");
+        System.out.println("Cumulated time from all computers is : " +
+            total.getComputationTime() + " ms");
+        System.out.println("Ratio for " + results.size() +
+            " processors is : " +
+            (((double) total.getComputationTime() / ((double) (timeAtEndOfComputation -
+            timeAtBeginningOfComputation))) * 100) + " %");
+        
+        System.out.println(total.getNumericalResult().toString());
+		
+		
+		
+		
+		
+		
+		
+		
+	}
 }
