@@ -27,5 +27,5 @@ import org.objectweb.proactive.examples.pi.Result;
 
 public interface PiComp {
     public Result compute(Interval msg);
-    public void setScale(int scale);
+    public void setScale(Integer scale);
 }
