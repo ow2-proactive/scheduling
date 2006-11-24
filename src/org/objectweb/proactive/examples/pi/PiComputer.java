@@ -37,10 +37,10 @@ public class PiComputer implements PiComp{
                             + InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException ignored) {
         }
-        setScale(scaleObject.intValue());
+        setScale(scaleObject);
     }
     
-    public void setScale(int scale) {
+    public void setScale(Integer scale) {
         
         ZERO = ZERO.setScale(scale);
         ONE = ONE.setScale(scale);
@@ -74,8 +74,9 @@ public class PiComputer implements PiComp{
         BigDecimal bd = ZERO;
 
         // BBP formula for the given interval
+    
         for (int k = interval.getBeginning().intValue(); k <= interval.getEnd()
-                .intValue(); k++) {
+                .intValue(); k++) {        	
             bd = bd.add(f(k));
         }
 
