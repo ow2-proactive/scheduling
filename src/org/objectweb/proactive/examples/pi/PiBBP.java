@@ -179,7 +179,7 @@ public class PiBBP implements Serializable {
         m.startComputation(intervals);
         
         
-        deploymentDescriptor.killall(false);
+        //deploymentDescriptor.killall(false);
         
 //        Fractal.getLifeCycleController(root).startFc();
 //        ((Runnable)root.getFcInterface("r")).run();
