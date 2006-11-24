@@ -2,6 +2,6 @@
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
 <definition name="org.objectweb.proactive.examples.pi.fractal.PiBBPWrapperType">
-    <interface name="r" role="server" signature="java.lang.Runnable"/>
-    <interface name="computation" role="client" signature="org.objectweb.proactive.examples.pi.PiComp" cardinality="collection"/>
+    <interface name="s" role="server" signature="org.objectweb.proactive.examples.pi.MasterComputation"/>
+    <interface name="multicastDispatcher" role="client" signature="org.objectweb.proactive.examples.pi.PiCompMultiCast" cardinality="multicast"/>
 </definition>
