@@ -9,7 +9,7 @@
 	<property name="configfiles.dir" value="${proactive.dir}/classes/org/objectweb/proactive/examples/pi" />
 	<property name="name" value="ProActiveTutorial" />
 	<property name="debug" value="on" />
-	<property name="source" value="1.4" />
+	<property name="source" value="1.5" />
 	<!-- define the classpath -->
 	<path id="tutorial.classpath">
 		<pathelement location="${proactive.dir}/classes"/>
