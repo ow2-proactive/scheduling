@@ -2,7 +2,9 @@ package org.objectweb.proactive.examples.pi;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import nonregressiontest.component.descriptor.fractaladl.Test;
@@ -112,7 +114,7 @@ public class PiBBP implements Serializable {
             // *************************************************************/
             System.out.println(
                 "\nCreating a group of computers on the given virtual node ...");
-
+            
             // create a group of computers on the virtual node computersVN
             piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(PiComputer.class.getName(),
                     new Object[] { new Integer(nbDecimals_) },
@@ -137,7 +139,7 @@ public class PiBBP implements Serializable {
     public void runComponent() {
         try {
         String arg0 = "-fractal"; // using the fractal component model
-        String arg1 = "org.objectweb.proactive.examples.pi.fractal.bindings-distributed";
+        String arg1 = "org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper";
 //        String arg1 = "org.objectweb.proactive.examples.pi.fractal.bindings-local";
         String arg2 = "r";
         
@@ -147,9 +149,38 @@ public class PiBBP implements Serializable {
         Map context = new HashMap();
         ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(arg3);
         context.put("deployment-descriptor",deploymentDescriptor);
-        Component root = (Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.bindings-distributed",context);
-        Fractal.getLifeCycleController(root).startFc();
-        ((Runnable)root.getFcInterface("r")).run();
+        deploymentDescriptor.activateMappings();
+        int nbNodes=deploymentDescriptor.getVirtualNode("computers-vn").getNumberOfCreatedNodesAfterDeployment();
+        List<Interval> intervals= PiUtil.dividePIList(nbNodes, nbDecimals_);
+        Component master = (Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper",null);
+       
+        
+        Component worker;
+        List<Component> workers=new ArrayList<Component>();
+        for(int i=0;i<nbNodes;i++){
+        	worker=(Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiComputer",context);
+        	Fractal.getBindingController(master).bindFc("multicastDispatcher", worker.getFcInterface("computation"));
+        	workers.add(worker);
+        }
+        
+        Component w;
+        //Starting all the workers
+        PiComp picomp;
+        for (int j=0;j<workers.size();j++){
+        	w=(Component)workers.get(j);
+        	Fractal.getLifeCycleController(w).startFc();
+        	 picomp=(PiComp)w.getFcInterface("computation");
+           	 picomp.setScale(nbDecimals_);/*Normally, this is made when instanciating PiComputers, but with ADL instanciation, we have to make an explicit call to setScale */
+
+        }
+   	
+        Fractal.getLifeCycleController(master).startFc();
+        MasterComputation m=(MasterComputation)master.getFcInterface("s");
+        m.startComputation(intervals);
+        
+        
+//        Fractal.getLifeCycleController(root).startFc();
+//        ((Runnable)root.getFcInterface("r")).run();
 
         
         // FIXME : how do I elegantly reference the tutorial/descriptors directory ?
