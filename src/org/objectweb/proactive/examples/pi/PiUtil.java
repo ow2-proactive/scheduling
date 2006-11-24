@@ -28,6 +28,8 @@
 package org.objectweb.proactive.examples.pi;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -63,4 +65,38 @@ public class PiUtil {
 		
         return total;
 	}
+
+
+
+
+
+static public List<Interval> dividePIList(int length, int scale) throws ClassNotReifiableException, ClassNotFoundException{
+
+    int intervalSize = scale / length;
+    
+  List<Interval> intervals=new ArrayList<Interval>();
+  
+    for (int i = 0; i < length; i++) {
+        int beginning = i * intervalSize;
+        int end = ((i == (length - 1)) ? scale
+                                       : ((beginning + intervalSize) - 1));
+        intervals.add(new Interval(beginning, end));
+    }
+    return intervals;
 }
+
+static public Result conquerPIList(List<Result> results){
+	
+	
+	
+    Result total = new Result(new BigDecimal(0), 0);
+    
+    for (int i = 0; i < results.size(); i++) {
+        total.addNumericalResult(((Result) results.get(i)).getNumericalResult());
+        total.addComputationTime(((Result) results.get(i)).getComputationTime());
+    }
+	
+    return total;
+}
+}
+
