@@ -106,7 +106,7 @@ public class PiBBP implements Serializable {
             deploymentDescriptor_.activateMappings();
             VirtualNode computersVN = deploymentDescriptor_.getVirtualNode(
                     "computers-vn");
-
+            
             //            // create the remote nodes for the virtual node computersVN
             //           computersVN.activate();
             //*************************************************************
@@ -178,6 +178,8 @@ public class PiBBP implements Serializable {
         MasterComputation m=(MasterComputation)master.getFcInterface("s");
         m.startComputation(intervals);
         
+        
+        deploymentDescriptor.killall(false);
         
 //        Fractal.getLifeCycleController(root).startFc();
 //        ((Runnable)root.getFcInterface("r")).run();
@@ -258,6 +260,13 @@ public class PiBBP implements Serializable {
             break;
         case (PARALLEL_DISTRIBUTED):
             runParallelDistributed();
+        
+        try{
+        	deploymentDescriptor_.killall(false);
+        }
+        catch(Exception e){
+        	e.printStackTrace();
+        }
             break;
         case (COMPONENT):
             runComponent();
