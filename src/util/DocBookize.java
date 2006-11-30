@@ -39,9 +39,10 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -144,7 +145,8 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     public void startDocument() throws SAXException {
         // Create the output file
         try {
-            out = new BufferedWriter(new FileWriter(this.outputFileName));
+            out = new BufferedWriter(new OutputStreamWriter(
+                        new FileOutputStream(this.outputFileName), "UTF8"));
         } catch (IOException e) {
             throw new SAXException("I/O error opening temp file", e);
         }
