@@ -15,6 +15,7 @@
 <!ENTITY Migration SYSTEM "Migration.xml">
 <!ENTITY exceptions SYSTEM "exceptions.xml">
 <!ENTITY bnb SYSTEM "bnb.xml">
+<!ENTITY Calcium SYSTEM "Calcium.xml">
 <!ENTITY PAConfiguration SYSTEM "Configuration.xml">
 <!ENTITY Descriptor SYSTEM "Descriptor.xml">
 <!ENTITY VariableContract SYSTEM "VariableContract.xml">
@@ -95,6 +96,7 @@
     &Migration;
     &exceptions;
     &bnb;
+    &Calcium;
   </part>
 
   <part id="ProActiveDeployment">
