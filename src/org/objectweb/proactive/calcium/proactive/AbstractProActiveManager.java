@@ -79,7 +79,7 @@ public abstract class AbstractProActiveManager extends ResourceManager{
 	}
 	
 	@Override
-	public void finish(){
+	public void shutdown(){
 		if(vnode != null){
 			vnode.killAll(false);
 		}

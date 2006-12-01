@@ -36,11 +36,11 @@ public class ActiveObjectInterpreter {
 	
 	}
 	
-	public <T> void start(ActiveObjectSkernel<T> aom){
+	public void start(ActiveObjectSkernel aom){
 		
 		Interpreter interp = new Interpreter();
 		while(true){
-			Task<T> task = aom.getReadyTask();
+			Task<?> task = aom.getReadyTask();
 			if(task.isDummy()){
 				break;
 			}

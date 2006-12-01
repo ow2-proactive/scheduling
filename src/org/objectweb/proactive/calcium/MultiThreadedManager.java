@@ -51,16 +51,16 @@ public class MultiThreadedManager extends ResourceManager{
 	}
 	
 	@Override
-	public <T> Skernel<T> start(Skernel<T> skernel) {
+	public  Skernel boot(Skernel skernel) {
 		
 		for(int i=0;i<numThreads;i++){
-			threadPool.submit(new CallableInterpreter<T>(skernel));
+			threadPool.submit(new CallableInterpreter(skernel));
 		}
 		return skernel;
 	}
 	
 	@Override
-	public void finish(){
+	public void shutdown(){
 		threadPool.shutdownNow();
 	}
 	
@@ -68,22 +68,22 @@ public class MultiThreadedManager extends ResourceManager{
 	 * Callable class for invoking the interpret method in a new thread (processor).
 	 * 
 	 */
-	protected class CallableInterpreter<T> extends Interpreter implements Callable<Task<T>>{
+	protected class CallableInterpreter extends Interpreter implements Callable<Task<?>>{
 		
-		Skernel<T> skernel;
+		Skernel skernel;
 		
-		public CallableInterpreter(Skernel<T> skernel){
+		public CallableInterpreter(Skernel skernel){
 			this.skernel=skernel;
 		}
 
-		public Task<T> call() throws Exception {
+		public Task<?> call() throws Exception {
 			
-			Task<T> task = skernel.getReadyTask();
+			Task<?> task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
 			
 			while(task!=null){
 				task = super.interpret(task);
 				skernel.putTask(task);
-				task = skernel.getReadyTask();
+				task = skernel.getReadyTask(DEFAULT_GET_READY_TASK_TIMEOUT);
 			}
 			return task;
 		}

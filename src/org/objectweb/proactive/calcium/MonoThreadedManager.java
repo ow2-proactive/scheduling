@@ -40,10 +40,11 @@ public class MonoThreadedManager extends ResourceManager{
 	public MonoThreadedManager(){
 	}
 
-	public <T> Skernel<T> start(Skernel<T> skernel){
+	public  Skernel boot(Skernel skernel){
 		Interpreter interp=new Interpreter();
-		while(!skernel.isFinished()){
-			Task<T> task=skernel.getReadyTask(); //get a new task ready for execution
+
+		while(skernel.hasReadyTask()){
+			Task<?> task=skernel.getReadyTask(0); //get a new task ready for execution
 			task=interp.interpret(task); 		 //interpreter this new task
 			skernel.putTask(task);				 //return the interpreter result to the kernel
 		}
@@ -51,7 +52,7 @@ public class MonoThreadedManager extends ResourceManager{
 		return skernel;
 	}
 	
-	public void finish(){
+	public void shutdown(){
 		
 	}
 }

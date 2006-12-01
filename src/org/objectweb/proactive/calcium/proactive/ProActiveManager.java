@@ -29,6 +29,7 @@ package org.objectweb.proactive.calcium.proactive;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.calcium.Skernel;
+import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
@@ -48,17 +49,22 @@ public class ProActiveManager extends AbstractProActiveManager {
 	}
 	
 	@Override
-	public <T> Skernel<T> start(Skernel<T> skernel) {
-		ActiveObjectSkernel<T> aom=null;
+	public Skernel boot(Skernel skernel) {
+		ActiveObjectSkernel aom=null;
 		try{
 			if(logger.isDebugEnabled()){
 				logger.debug("Creating Active Object Skernel");
 			}
-			aom = (ActiveObjectSkernel<T>)ProActive.newActive(ActiveObjectSkernel.class.getName(), new Object[]{skernel});
+			aom = (ActiveObjectSkernel)ProActive.newActive(ActiveObjectSkernel.class.getName(), new Object[]{skernel});
 		}catch (Exception e){
 			e.printStackTrace();
 		}
 
+		//copy already inputted tasks
+		while(!skernel.hasReadyTask()){
+			aom.putTask(skernel.getReadyTask(0));
+		}
+		
 		try {
 			if(logger.isDebugEnabled()){
 				logger.debug("Creating Active Object Interpreters");

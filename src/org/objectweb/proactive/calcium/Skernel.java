@@ -39,7 +39,6 @@ import org.objectweb.proactive.calcium.statistics.StatsGlobalImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-
 /**
  * This class represents the skeleton kernel.
  * It handles the tasks that must be solved, which can be in
@@ -52,29 +51,30 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @param <T>
  */
-public class Skernel<T> implements Serializable{
+public class Skernel implements Serializable{
 	static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
 	
 	//State Queues
-	private PriorityQueue<Task<T>> ready; //Tasks ready for execution
-	private Hashtable<Task<T>,Task<T>> waiting; //Tasks waiting for subtasks completition
-	private Vector<Task<T>> results; //Finished root-tasks
-	private Hashtable<Task<T>,Task<T>> processing; //Tasks being processed at this moment
+	private PriorityQueue<Task<?>> ready; //Tasks ready for execution
+	private Hashtable<Task<?>,Task<?>> waiting; //Tasks waiting for subtasks completition
+	private Vector<Task<?>> results; //Finished root-tasks
+	private Hashtable<Task<?>,Task<?>> processing; //Tasks being processed at this moment
 	
 	private PanicException panicException;  //In case the system colapses
 	private StatsGlobalImpl stats; 	//Statistics
 	
 	public Skernel(){
-		this.ready= new PriorityQueue<Task<T>>();
-		this.waiting=new Hashtable<Task<T>,Task<T>>();
-		this.results=new Vector<Task<T>>();
-		this.processing=new Hashtable<Task<T>,Task<T>>();
+		this.ready= new PriorityQueue<Task<?>>();
+		this.waiting=new Hashtable<Task<?>,Task<?>>();
+		this.results = new Vector<Task<?>>();
+		this.processing=new Hashtable<Task<?>,Task<?>>();
 		this.stats=new StatsGlobalImpl();
 		this.panicException=null;
 	}
 	
-	public synchronized Task<T> getResult() throws PanicException{
+	public synchronized Task<?> getResult() throws PanicException{
 		while(results.size()<=0 && !isPaniqued()){
+
 			try {
 				if(logger.isDebugEnabled()){
 					logger.debug("Thread waiting for results:"+Thread.currentThread().getId());
@@ -91,7 +91,7 @@ public class Skernel<T> implements Serializable{
 			throw panicException;
 		}
 			
-		Task<T> resultTask=results.remove(0);
+		Task<?> resultTask=results.remove(0);
 		resultTask.getStats().exitResultsState();
 		
 		stats.increaseSolvedTasks(resultTask);
@@ -103,38 +103,44 @@ public class Skernel<T> implements Serializable{
 		
 		return resultTask;
 	}
-
+/*
+	public synchronized Task<?> getReadyTask(){
+		return getReadyTask(0);
+	}
+	*/
 	/**
-	 * This method is used to get task ready for execution.
+	 * This method is gets a task ready for execution.
 	 * If there are no ready tasks, then this method can do two things:
 	 * 1. Block until a ready task is available (only if there are taks being processed).
-	 * 2. Return null if no tasks are being processed.
+	 * 2. Return null if no tasks are available.
+	 * @param timeout specifies the number of milliseconds to wait for a task. 
+	 * If the timeout is smaller or equal to cero, then it waits indefenetly.
 	 * @return A task ready for execution or null.
 	 */
-	public synchronized Task<T> getReadyTask(){
+	public synchronized Task<?> getReadyTask(long timeout){
+		long lastinit = System.currentTimeMillis();
+		timeout=timeout>0?timeout:0; //if timeout<0 => timeout=0
 		
 		while(ready.isEmpty()){
-			
-			if(isFinished()) {
-				notifyAll();
-				return null;
-			}
-			
+
 			try {
 				if(logger.isDebugEnabled()){
 					logger.debug("Waiting for ready task:"+Thread.currentThread().getId());
 				}
-				wait();
+				wait(timeout);
+				long newinit=System.currentTimeMillis();
+				timeout-=newinit-lastinit;
+				lastinit=newinit;
 			} catch (InterruptedException e) {
-				logger.error("Error while waiting for ready task");
-				e.printStackTrace();
+				//logger.error("Error while waiting for ready task");
+				//e.printStackTrace();
 				return null;
 			}
+			
+			if(timeout <=0) return null;
 		}
-		
-		if(ready.isEmpty()) return null;
-		
-		Task<T> task = ready.poll(); //get the highest priority task
+			
+		Task<?> task = ready.poll(); //get the highest priority task
 		task.getStats().exitReadyState();
 
 		processing.put(task,task);
@@ -145,12 +151,12 @@ public class Skernel<T> implements Serializable{
 		return task;
 	}
 	
-	public synchronized void putTask(Task<T> task){
+	public synchronized void putTask(Task<?> task){
 		
 		//TODO think about throwing an exception here!
 		//if(isPaniqued()) throw panicException;
 		
-		Task<T> processingTask=processing.remove(task);
+		Task<?> processingTask=processing.remove(task);
 		if(processingTask==null && logger.isDebugEnabled()){
 			logger.debug("Enqueing new taskId="+task);
 		} else if( logger.isDebugEnabled()){
@@ -176,8 +182,9 @@ public class Skernel<T> implements Serializable{
 		else{
 			updateTask(task);
 		}
-
+		
 		if(!ready.isEmpty()){
+		//if(!ready.isEmpty() || results.size()!=0){
 			notifyAll();
 		}
 	}
@@ -187,7 +194,7 @@ public class Skernel<T> implements Serializable{
 		return this.panicException != null;
 	}
 	
-	private void updateExceptionedTask(Task<T> task){
+	private void updateExceptionedTask(Task<?> task){
 		
 		if(logger.isDebugEnabled()){
 			logger.debug("Updating Exceptioned Task taskId="+task);
@@ -223,7 +230,7 @@ public class Skernel<T> implements Serializable{
 		updateFinishedTask(task); 
 	}
 	
-	private void updateFinishedTask(Task<T> task){
+	private void updateFinishedTask(Task<?> task){
 		
 		if(!task.isFinished()){
 			String msg="Error, updating unfinished task as finished!";
@@ -243,7 +250,6 @@ public class Skernel<T> implements Serializable{
 				logger.debug("Adding to results task="+task);
 			}
 			results.add(task);
-
 		}
 		else{ //task is a subtask
 			stats.increaseSolvedTasks(task);
@@ -255,7 +261,7 @@ public class Skernel<T> implements Serializable{
 				return;
 			}
 			
-			Task<T> parent=waiting.get(parentId);
+			Task<?> parent=waiting.get(parentId);
 			if(!parent.setFinishedChild(task)){
 				logger.error("Parent did not recognize child task. Dropping task id="+task);
 				return;
@@ -275,12 +281,12 @@ public class Skernel<T> implements Serializable{
 		}
 	}//if its a child task, we update it as a finished task
 	
-	private void updateTask(Task<T> task){
+	private void updateTask(Task<?> task){
 		
 		//logger.debug("Unfinished taskId="+task);
 		if(task.hasReadyChildTask()){
 			while(task.hasReadyChildTask()){
-				Task<T> child=task.getReadyChild();
+				Task<?> child=task.getReadyChild();
 				if(logger.isDebugEnabled()){
 					logger.debug("Child taskId="+child.getId() +" is ready");
 				}
@@ -300,15 +306,20 @@ public class Skernel<T> implements Serializable{
 		}
 	}//method
 	
+	/*
 	public synchronized boolean isFinished(){
 
 		return ready.isEmpty() && processing.isEmpty();
-	}
-
+	} 
+    */
 	public synchronized boolean hasResults(){
 		return !results.isEmpty();
 	}
 
+	public synchronized boolean hasReadyTask(){
+		return !ready.isEmpty();
+	}
+	
 	public synchronized int getReadyQueueLength() {
 		return ready.size();
 	}
@@ -319,10 +330,10 @@ public class Skernel<T> implements Serializable{
 		return stats;
 	}
 	
-	private void deleteTaskFamilyFromQueues(Task<T> blackSheepTask){
+	private void deleteTaskFamilyFromQueues(Task<?> blackSheepTask){
 		
 		//1. Put the root tasks in the results queue
-		Task<T> root;
+		Task<?> root;
 		try {
 			root = getRootTask(blackSheepTask);
 			root.setException(blackSheepTask.getException());
@@ -333,7 +344,7 @@ public class Skernel<T> implements Serializable{
 		}
 		
 		//2. Delete ready family tasks
-		for(Task<T> task:ready){
+		for(Task<?> task:ready){
 			if(task.getFamilyId()==blackSheepTask.getFamilyId()){
 				ready.remove(task);
 				task.getStats().exitReadyState();
@@ -341,9 +352,9 @@ public class Skernel<T> implements Serializable{
 		}
 		
 		//3. Delete waiting family tasks
-		Enumeration<Task<T>> enumeration = waiting.elements();
+		Enumeration<Task<?>> enumeration = waiting.elements();
 		while(enumeration.hasMoreElements()){
-			Task<T> task = enumeration.nextElement();
+			Task<?> task = enumeration.nextElement();
 			if(task.getFamilyId()==blackSheepTask.getFamilyId()){
 				waiting.remove(task);
 				task.getStats().exitWaitingState();
@@ -353,7 +364,7 @@ public class Skernel<T> implements Serializable{
 		//4. Mark family tasks in the processing queue as tainted.
 		enumeration = processing.elements();
 		while(enumeration.hasMoreElements()){
-			Task<T> task = enumeration.nextElement();
+			Task<?> task = enumeration.nextElement();
 			if(task.getFamilyId()==blackSheepTask.getFamilyId()){
 				task.setTainted(true);
 			}
@@ -376,11 +387,11 @@ public class Skernel<T> implements Serializable{
 	 * @throws PanicException If the root task is found where it shouldn't be.
 	 * 
 	 */
-	private Task<T> getRootTask(Task<T> task) throws PanicException{
+	private Task<?> getRootTask(Task<?> task) throws PanicException{
 		if(task.isRootTask()) return task;
 		
 		if(this.waiting.contains(task.getFamilyId())){
-			Task<T> root = waiting.remove(task.getFamilyId());
+			Task<?> root = waiting.remove(task.getFamilyId());
 			root.getStats().exitWaitingState();
 			return root;
 		}
@@ -390,19 +401,21 @@ public class Skernel<T> implements Serializable{
 					+task.getFamilyId()+" found in processing queue");
 		}
 		
-		for(Task<T> r:ready){
+		for(Task<?> r:ready){
 			if(r.getId()==task.getFamilyId()){
 				throw new PanicException("Error, root taskId="
 						+task.getFamilyId()+" found in ready queue");
 			}
 		}
 		
-		for(Task<T> r:results){
+		/*
+		for(Task<?> r:results){
 			if(r.getId()==task.getFamilyId()){
 				throw new PanicException("Error, root taskId="
 						+task.getFamilyId()+" found in results queue");
 			}	
 		}
+		*/
 		
 		return null;
 	}

@@ -40,7 +40,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public abstract class ResourceManager{
 	protected static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_MANAGER);
-
-	abstract public <T> Skernel<T> start(Skernel<T> skernel);
-	abstract public void finish();
+	protected static long DEFAULT_GET_READY_TASK_TIMEOUT=1000;
+	
+	abstract public  Skernel boot(Skernel skernel);
+	abstract public void shutdown();
 }

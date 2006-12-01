@@ -30,6 +30,7 @@ package org.objectweb.proactive.calcium.examples.nqueens;
 import java.io.Serializable;
 
 import org.objectweb.proactive.calcium.Calcium;
+import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
 import org.objectweb.proactive.calcium.MultiThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
@@ -41,6 +42,7 @@ import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.monitor.Monitor;
 import org.objectweb.proactive.calcium.monitor.SimpleLogMonitor;
 import org.objectweb.proactive.calcium.proactive.ProActiveManager;
+import org.objectweb.proactive.calcium.proactive.ProActiveThreadedManager;
 import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Pipe;
 import org.objectweb.proactive.calcium.skeletons.Seq;
@@ -83,20 +85,20 @@ public class NQueens implements Serializable{
 			//new MultiThreadedManager(10);
 		 	//new ProActiveThreadedManager(descriptor, virtualNode);
 			//new ProActiveManager(descriptor, virtualNode);
-		
-		Calcium<Board> calcium = new Calcium<Board>(manager, root);
+
+		Calcium calcium = new Calcium(manager);
+		Stream<Board> stream = calcium.newStream(root);
 		Monitor monitor= new SimpleLogMonitor(calcium, 5);
 		
 		for(int i=0;i<times;i++){
-			calcium.input(new Board(boardSize,solvableSize));
+			stream.input(new Board(boardSize,solvableSize));
 		}
 
 		monitor.start();
 		calcium.boot();
-		
 		try {
 
-			for(Board res = calcium.getResult(); res != null; res = calcium.getResult()){
+			for(Board res = stream.getResult(); res != null; res = stream.getResult()){
 				long total=0;
 				for(int i=0;i<res.solutions.length;i++){
 					System.out.print(res.solutions[i]+"|");
@@ -104,7 +106,7 @@ public class NQueens implements Serializable{
 				}
 				System.out.println();
 				System.out.println("Total="+total);				
-				System.out.println(calcium.getStats(res));
+				System.out.println(stream.getStats(res));
 			}
 		} catch (MuscleException e) {
 			e.printStackTrace();

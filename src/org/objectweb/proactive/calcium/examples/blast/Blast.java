@@ -30,6 +30,7 @@ package org.objectweb.proactive.calcium.examples.blast;
 import java.io.File;
 
 import org.objectweb.proactive.calcium.Calcium;
+import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
 import org.objectweb.proactive.calcium.MultiThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
@@ -92,15 +93,16 @@ public class Blast {
             //new ProActiveThreadedManager(descriptor, "local");
             //new ProActiveManager(descriptor, "local");
 
-        Calcium<BlastParameters> calcium = new Calcium<BlastParameters>(manager, root);
-        calcium.input(parameters);
+        Calcium calcium = new Calcium(manager);
+        Stream<BlastParameters> stream = calcium.newStream(root);
+        stream.input(parameters);
         calcium.boot();
 
 		try {
-			for(BlastParameters res = calcium.getResult(); 	res != null; res = calcium.getResult()){
+			for(BlastParameters res = stream.getResult(); 	res != null; res = stream.getResult()){
 				File outPutFile=res.getOutPutFile();
 				System.out.println("Result in:"+outPutFile.getAbsolutePath()+ +outPutFile.length() + " [bytes]");
-				System.out.println(calcium.getStats(res));
+				System.out.println(stream.getStats(res));
 			}
 		} catch (MuscleException e) {
 			e.printStackTrace();

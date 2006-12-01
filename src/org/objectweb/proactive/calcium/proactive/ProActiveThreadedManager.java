@@ -55,13 +55,13 @@ public class ProActiveThreadedManager extends AbstractProActiveManager {
 	}
 
 	@Override
-	public <T> Skernel<T> start(Skernel<T> skernel) {
+	public Skernel boot(Skernel skernel) {
 		logger.info("ProActive skeleton manager is using "+nodes.length+" nodes");
 		threadPool=Executors.newCachedThreadPool();
 		try {
 			for(int i=0;i<nodes.length;i++){
 				Interpreter interp=(Interpreter)ProActive.newActive(Interpreter.class.getName(),null,nodes[i]);
-				threadPool.submit(new ProActiveCallableInterpreter<T>(skernel,interp));
+				threadPool.submit(new ProActiveCallableInterpreter(skernel,interp));
 			}
 		} catch (Exception e) {
 			logger.error("Error, unable to create interpreter active objects");
@@ -71,26 +71,26 @@ public class ProActiveThreadedManager extends AbstractProActiveManager {
 	}
 	
 	@Override
-	public void finish() {
-		super.finish();
+	public void shutdown() {
+		super.shutdown();
 		if(threadPool != null){
 			threadPool.shutdownNow();
 		}
 	}
 	
-	protected class ProActiveCallableInterpreter<T> implements Callable<Task<T>>{
+	protected class ProActiveCallableInterpreter implements Callable<Task<?>>{
 			
 		Interpreter interp;
-		Skernel<T> skernel;
+		Skernel skernel;
 		
-		public ProActiveCallableInterpreter(Skernel<T> skernel, Interpreter interp){
+		public ProActiveCallableInterpreter(Skernel skernel, Interpreter interp){
 			this.skernel=skernel;
 			this.interp=interp;
 		}
 
-		public Task<T> call() throws Exception {
+		public Task<?> call() throws Exception {
 			
-			Task<T> task = skernel.getReadyTask();
+			Task<?> task = skernel.getReadyTask(0);
 			
 			while(task!=null){
 				task = interp.interpret(task);
@@ -98,8 +98,10 @@ public class ProActiveThreadedManager extends AbstractProActiveManager {
 				ProActive.waitFor(task); //Wait for the future
 
 				skernel.putTask(task);
-				task = skernel.getReadyTask();
+
+				task = skernel.getReadyTask(0);
 			}
+
 			return task;
 		}
 	}

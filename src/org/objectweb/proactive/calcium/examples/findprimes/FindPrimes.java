@@ -30,11 +30,15 @@ package org.objectweb.proactive.calcium.examples.findprimes;
 import java.io.Serializable;
 
 import org.objectweb.proactive.calcium.Calcium;
+import org.objectweb.proactive.calcium.MultiThreadedManager;
+import org.objectweb.proactive.calcium.Stream;
 import org.objectweb.proactive.calcium.MonoThreadedManager;
 import org.objectweb.proactive.calcium.ResourceManager;
 import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
+import org.objectweb.proactive.calcium.proactive.ProActiveManager;
+import org.objectweb.proactive.calcium.proactive.ProActiveThreadedManager;
 import org.objectweb.proactive.calcium.skeletons.DaC;
 import org.objectweb.proactive.calcium.skeletons.Seq;
 import org.objectweb.proactive.calcium.statistics.StatsGlobal;
@@ -65,27 +69,30 @@ public class FindPrimes implements Serializable{
 				.getPath();
 		
 		ResourceManager manager= 
-			new MonoThreadedManager();
+			//new MonoThreadedManager();
 			//new MultiThreadedManager(5);
+			new ProActiveThreadedManager(descriptor, "local");
 		    //new ProActiveManager(descriptor, "local");
 		
-		Calcium<Challenge> calcium = new Calcium<Challenge>(manager, root);
+		Calcium calcium = new Calcium(manager);
 		
-		calcium.input(new Challenge(1,6400,300));
-		calcium.input(new Challenge(1,100,20));
-		calcium.input(new Challenge(1,640,64));
+		Stream<Challenge> stream = calcium.newStream(root);
+		
+		stream.input(new Challenge(1,6400,300));
+		stream.input(new Challenge(1,100,20));
+		stream.input(new Challenge(1,640,64));
 		
 		calcium.boot();
 		
 		try {
-			for(Challenge res = calcium.getResult(); 
-			res != null; res = calcium.getResult()){
+			for(Challenge res = stream.getResult(); 
+			res != null; res = stream.getResult()){
 				
 				for(Integer i: res.primes){
 					System.out.print(i+" ");
 				}
 				System.out.println();
-				System.out.println(calcium.getStats(res));
+				System.out.println(stream.getStats(res));
 			}
 		} catch (MuscleException e) {
 			e.printStackTrace();

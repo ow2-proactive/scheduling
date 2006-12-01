@@ -37,20 +37,19 @@ import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 
-public class ActiveObjectSkernel<T> extends Skernel<T> implements RunActive, Serializable {
+public class ActiveObjectSkernel<T> extends Skernel implements RunActive, Serializable {
 
 	public ActiveObjectSkernel(){
 	}
 
-	public ActiveObjectSkernel(Skernel<T> skernel){
+	public ActiveObjectSkernel(Skernel skernel){
 		super();
 		
 		while(skernel.getReadyQueueLength() >0){
-			this.putTask(skernel.getReadyTask());
+			this.putTask(skernel.getReadyTask(0));
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	//Producer-Consumer
 	public void runActivity(Body body) {
 		Service service = new Service(body);
@@ -58,20 +57,20 @@ public class ActiveObjectSkernel<T> extends Skernel<T> implements RunActive, Ser
 		while(true){
 			String allowedMethodNames="getStats|putTask|getReadyQueueLength|hasResults|isFinished|isPaniqued|getStatsGlobal";
 			
-			if(getReadyQueueLength() > 0 || isFinished()) allowedMethodNames +="getReadyTask|";
+			if(getReadyQueueLength() > 0 ) allowedMethodNames +="getReadyTask|";
 			if(hasResults()) allowedMethodNames += "getResult|";
-
+			
 			service.blockingServeOldest( new RequestFilterOnAllowedMethods(allowedMethodNames));
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Task<T> getReadyTask(){
-		Task<T> task= super.getReadyTask();
-		if(task==null){ //ProActive doesn't handle null
+	public Task<?> getReadyTask(){
+		Task<?> task= super.getReadyTask(0);
+		if(task==null){    //ProActive doesn't handle null
 			task= new Task<T>();
 			task.setDummy();
-			return task; //return dummy task
+			return task;   //return dummy task
 		}
 		return task;
 	}
