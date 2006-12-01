@@ -97,7 +97,7 @@ public class ComponentMethodCallMetadata implements Serializable {
     }
 
     /**
-     * @param sourceItfID The sourceItfID to set.
+     * @param senderItfID The sourceItfID to set.
      */
     public void setSenderItfID(ItfID senderItfID) {
         this.senderItfID = senderItfID;

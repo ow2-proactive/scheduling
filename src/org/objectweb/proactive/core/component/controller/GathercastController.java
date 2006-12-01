@@ -19,7 +19,7 @@ public interface GathercastController extends CollectiveInterfaceController {
 	/**
 	 * Notifies this component that a binding has been performed to one of its gathercast interfaces 
 	 * @param serverItfName the name of the gathercast interface
-	 * @param owner a reference on the component connecting to the gathercast interface
+	 * @param sender a reference on the component connecting to the gathercast interface
 	 * @param clientItfName the name of the interface connecting to the gathercast interface
 	 */
     public void addedBindingOnServerItf(String serverItfName,
