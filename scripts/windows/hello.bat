@@ -15,9 +15,16 @@ call init.bat
 IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\.
 
 REM JUST the hello launcher. No parameter. batch file asks a question.
-
-CHOICE /C:LR "Do you want to use a Local or remote descriptor file ? Simplest is local  "
 if errorlevel 1 GOTO remote
+
+:start
+set /p choice="Do you want to use a (1)local or (2)remote descriptor file ? Simplest is local : "
+if not '%choice%'=='' set choice=%choice:~0,1%
+if '%choice%'=='1' goto local
+if '%choice%'=='2' goto remote
+ECHO "%choice%" is not valid, using local
+ECHO.
+goto local
 
 :local 
 set XMLDESCRIPTOR=%PROACTIVE%\descriptors\helloLocal.xml
