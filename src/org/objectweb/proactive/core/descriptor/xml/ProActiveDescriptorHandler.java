@@ -242,15 +242,17 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
                         } else {
                             logger.error(
                                 "The Proactive.jar file doesn't contain the Descriptor Schema.");
+                            schemaURLcandidate = null;
                         }
                     }
                     else {
                     	logger.error(
                         "The descriptor schema could not be located in your environment.");
+                    	schemaURLcandidate = null;
                     }
-                } catch (URISyntaxException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                } catch (Exception e) {
+                	logger.error(
+                    "The descriptor schema could not be located in your environment.");
                     schemaURLcandidate = null;
                 }
             }
