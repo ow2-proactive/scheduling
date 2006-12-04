@@ -94,7 +94,7 @@ public class ResultsCollections implements ResultsExporter {
         return results.isEmpty();
     }
 
-    public Iterator iterator() {
+    public Iterator<AbstractResult> iterator() {
         return results.iterator();
     }
 

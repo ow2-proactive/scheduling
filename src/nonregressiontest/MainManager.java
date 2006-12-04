@@ -32,11 +32,13 @@ package nonregressiontest;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.xml.sax.SAXException;
 
 import testsuite.manager.FunctionalTestManager;
+import testsuite.result.AbstractResult;
 
 
 /**
@@ -109,8 +111,13 @@ public class MainManager extends FunctionalTestManager {
 
         // Launch all unit tests and interlinked tests
         manager.execute();
-//        logger.info(
-//            "You can see the results in the test.html file in your ProActive directory.");
+
+        // logger.info(
+        // "You can see the results in the test.html file in your ProActive directory.");
+        
+        if (manager.getErrors() > 0) {
+        		System.exit(1);
+        }
         System.exit(0);
     }
 }

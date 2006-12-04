@@ -476,4 +476,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
     public void execute() {
         super.execute();
     }
+
+	public int getErrors() {
+		return errors;
+	}
 }
