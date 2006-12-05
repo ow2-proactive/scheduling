@@ -258,9 +258,9 @@ public class OutputInterceptorClassGenerator
 
             return reference;
         } catch (Exception e) {
-        	e.printStackTrace();
-            throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
-                e);
+        	throw new InterfaceGenerationFailedException(
+                    "Cannot generate output interceptor on interface [" + interfaceName + "] with signature [" +  interfaceType.getFcItfSignature() + "] with javassist",
+                    e);
         }
     }
 

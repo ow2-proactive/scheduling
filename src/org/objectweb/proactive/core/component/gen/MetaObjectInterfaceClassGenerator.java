@@ -256,8 +256,9 @@ public class MetaObjectInterfaceClassGenerator
 
             return reference;
         } catch (Exception e) {
-            throw new InterfaceGenerationFailedException("Cannot generate representative with javassist",
-                e);
+        	throw new InterfaceGenerationFailedException(
+                    "Cannot generate meta object representative on interface [" + interfaceName + "] with signature [" +  interfaceType.getFcItfSignature() + "] with javassist because of " + Arrays.deepToString(e.getStackTrace()),
+                    e);
         }
     }
 
