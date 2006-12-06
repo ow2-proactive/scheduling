@@ -61,7 +61,22 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
+
     	
+    	// new active with reifiable parameter types
+    	// test before non reifiable return types to verify caching of synchronous/asynchrous method calls 
+    	// works fine with parameterized types
+        Pair<StringWrapper, IntWrapper> b = (Pair<StringWrapper, IntWrapper>) ProActive.newActive(Pair.class.getName(),
+                new Class[] { StringWrapper.class, IntWrapper.class },
+                new Object[] { new StringWrapper("toto"), new IntWrapper(12) });
+        Assertions.assertTrue(StringWrapper.class.isAssignableFrom(
+                b.getFirst().getClass()));
+        Assertions.assertTrue(IntWrapper.class.isAssignableFrom(
+                b.getSecond().getClass()));
+        Assertions.assertEquals("toto", b.getFirst().stringValue());
+        Assertions.assertEquals(12, b.getSecond().intValue());
+
+        
     	// new active with non reifiable parameter types
         Pair<String, Integer> a = (Pair<String, Integer>) ProActive.newActive(Pair.class.getName(),
                 new Class[] { String.class, Integer.class },
@@ -87,18 +102,6 @@ public class Test extends FunctionalTest {
         Assertions.assertEquals(42, activePair.getFirst());
         Assertions.assertEquals("X", activePair.getSecond());
         
-
-        
-//      new active with reifiable parameter types
-        Pair<StringWrapper, IntWrapper> b = (Pair<StringWrapper, IntWrapper>) ProActive.newActive(Pair.class.getName(),
-                new Class[] { StringWrapper.class, IntWrapper.class },
-                new Object[] { new StringWrapper("toto"), new IntWrapper(12) });
-        Assertions.assertTrue(StringWrapper.class.isAssignableFrom(
-                b.getFirst().getClass()));
-        Assertions.assertTrue(IntWrapper.class.isAssignableFrom(
-                b.getSecond().getClass()));
-        Assertions.assertEquals("toto", b.getFirst().stringValue());
-        Assertions.assertEquals(12, b.getSecond().intValue());
 
         
         // new active group with reifiable parameter types
