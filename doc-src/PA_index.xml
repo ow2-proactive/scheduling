@@ -147,7 +147,7 @@
    <part id="ProActiveExtensions">
     <title>Extending ProActive</title>
     &writeDoc;
-   <!--   &extendingIC2D; -->
+    &extendingIC2D;
     &developingConventions;
     &testSuiteAPI;
     &DescriptorProcess;
