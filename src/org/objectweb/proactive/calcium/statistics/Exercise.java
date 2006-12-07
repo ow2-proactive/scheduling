@@ -35,7 +35,7 @@ public class Exercise implements Serializable{
 	private int numberExecutedTimes;
 
 	Exercise(){
-		computationTime=computationTime=0;
+		computationTime=0;
 	}
 	
 	Exercise(Timer timer) {
