@@ -30,7 +30,7 @@
  */ 
 package org.objectweb.proactive.core.body.proxy;
 
-import java.util.HashMap;
+//import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
@@ -49,7 +49,7 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable,
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.NFE);
 
     // table of handlers associated to proxy
-    private HashMap proxyLevel;
+    //private HashMap proxyLevel;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
