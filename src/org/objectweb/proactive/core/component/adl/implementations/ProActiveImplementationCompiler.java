@@ -30,11 +30,9 @@
  */
 package org.objectweb.proactive.core.component.adl.implementations;
 
-import java.util.List;
-import java.util.Map;
-
 import org.objectweb.deployment.scheduling.component.api.FactoryProviderTask;
 import org.objectweb.deployment.scheduling.component.lib.AbstractInstanceProviderTask;
+
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Node;
@@ -46,12 +44,16 @@ import org.objectweb.fractal.adl.implementations.Implementation;
 import org.objectweb.fractal.adl.implementations.ImplementationCompiler;
 import org.objectweb.fractal.adl.implementations.ImplementationContainer;
 import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
+
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.type.Composite;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -63,24 +65,30 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
     public void compile(final List path, final ComponentContainer container,
         final TaskMap tasks, final Map context) throws ADLException {
         counter++;
+
         String implementation = null;
+
         if (container instanceof ImplementationContainer) {
             ImplementationContainer ic = (ImplementationContainer) container;
             Implementation i = ic.getImplementation();
+
             if (i != null) {
                 implementation = i.getClassName();
             }
         }
 
         String controller = null;
+
         if (container instanceof ControllerContainer) {
             ControllerContainer cc = (ControllerContainer) container;
+
             if (cc.getController() != null) {
                 controller = cc.getController().getDescriptor();
             }
         }
 
         String name = null;
+
         if (container instanceof Definition) {
             name = ((Definition) container).getName();
         } else if (container instanceof Component) {
@@ -88,6 +96,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         }
 
         String definition = null;
+
         if (container instanceof Definition) {
             definition = name;
         } else {
@@ -97,6 +106,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
 
         //        Component[] comps = ((ComponentContainer) container).getComponents();
         VirtualNode n = null;
+
         if (container instanceof VirtualNodeContainer) {
             try {
                 n = (VirtualNode) ((VirtualNodeContainer) container).getVirtualNode();
@@ -105,6 +115,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                     "DOCTYPE definition should be the following when using ProActive : \n" +
                     "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">");
             }
+
             if (n == null) {
                 // see Leclerq modification request : try to find a vn specified
                 // in a parent component
@@ -112,6 +123,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                     if (path.get(i) instanceof VirtualNodeContainer) {
                         try {
                             n = (VirtualNode) ((VirtualNodeContainer) path.get(i)).getVirtualNode();
+
                             if (n != null) {
                                 break;
                             }
@@ -143,24 +155,28 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
             }
         } else {
             // a primitive component
-            if (implementation instanceof String) {
-                // that seems to be the case with the fractaladl
-                contentDesc = new ContentDescription((String) implementation);
-                if ("primitive".equals(controller) || (controller == null)) {
-                    controllerDesc = new ControllerDescription(name,
-                            Constants.PRIMITIVE);
-                } else {
-                    // System.out.println("CONTROLLER = " + controller);
-                    controllerDesc = new ControllerDescription(name,
-                            Constants.PRIMITIVE,
-                            getClass().getResource(controller).getPath());
-                }
+            //if (implementation instanceof String) {
+            // that seems to be the case with the fractaladl
+            // contentDesc = new ContentDescription((String) implementation);
+            contentDesc = new ContentDescription(implementation);
+
+            if ("primitive".equals(controller) || (controller == null)) {
+                controllerDesc = new ControllerDescription(name,
+                        Constants.PRIMITIVE);
+            } else {
+                // System.out.println("CONTROLLER = " + controller);
+                controllerDesc = new ControllerDescription(name,
+                        Constants.PRIMITIVE,
+                        getClass().getResource(controller).getPath());
             }
+
+            //}
         }
 
         createTask = new CreateTask((ProActiveImplementationBuilder) builder,
                 container, name, definition, controllerDesc, contentDesc, n,
                 context);
+
         FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type",
                 container);
         createTask.setFactoryProviderTask(typeTask);
@@ -199,6 +215,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
             if (getInstance() != null) {
                 return;
             }
+
             Object type = getFactoryProviderTask().getFactory();
             Object result = builder.createComponent(type, name, definition,
                     controllerDesc, contentDesc, vn, (Map) context);
