@@ -390,6 +390,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String nodeFamilyRegexp,
         String vnName, String jobId) {
+        assert vnName != null : vnName;
+        assert jobId != null : jobId;
         Object[] params = new Object[5];
         params[0] = new Integer(numberOfNodes);
         params[1] = this.stubOnThis;
