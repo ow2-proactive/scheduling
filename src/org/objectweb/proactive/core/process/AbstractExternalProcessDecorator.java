@@ -198,8 +198,6 @@ public abstract class AbstractExternalProcessDecorator
      * Implementation of a MessageSink that can receive one message at a time
      */
     public static class CompositeMessageSink implements MessageSink {
-        private String message;
-        private boolean isActive = true;
         private MessageSink messageSink1;
         private MessageSink messageSink2;
 
