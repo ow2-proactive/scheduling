@@ -46,6 +46,10 @@ public class P2PNode implements Serializable {
     private Node node = null;
     private P2PNodeManager nodeManager = null;
 
+    public P2PNode(){
+    	
+    }
+    
     /**
      * Construct a new <code>P2PNode</code> with specified <code>node</code> or
      * <code>null</code>.

@@ -384,8 +384,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
      * @param nodeFamilyRegexp the regexp for the famili, null or empty String for all.
-     * @param vnName Virtual node name.
-     * @param jobId of the vn.
+     * @param vnName Virtual node name, cannot be null.
+     * @param jobId of the vn, cannot be null.
      * @return the number of asked nodes.
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String nodeFamilyRegexp,
@@ -433,8 +433,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
-     * @param vnName Virtual node name.
-     * @param jobId of the vn.
+     * @param vnName Virtual node name, cannot be null.
+     * @param jobId of the vn, cannot be null.
      * @return the number of asked nodes.
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
@@ -444,8 +444,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     /**
      * For asking a single node to the p2p infrastructure.
      * There no warranties that a node will be returned.
-     * @param vnName the virtual node name.
-     * @param jobId the job ID.
+     * @param vnName the virtual node name, cannot be null.
+     * @param jobId the job ID, cannot be null.
      * @return a free node.
      */
     public Node getANode(String vnName, String jobId) {
@@ -454,8 +454,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
     /**
      * <b>***For internal use only***
-     * @param vnName the virtual node name.
-     * @param jobId the job ID.
+     * @param vnName the virtual node name, cannot be null.
+     * @param jobId the job ID., cannot be null
      * @param service a stub on the requester
      * @return a free node.
      */
@@ -488,8 +488,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     /**
     * Put in a <code>P2PNodeLookup</code> all available nodes during all the
     * time where it is actived.
-    * @param vnName Virtual node name.
-    * @param jobId
+    * @param vnName Virtual node name, cannot be null.
+    * @param jobId cannot be null
     * @return an active object where nodes are received.
     */
     public P2PNodeLookup getMaximunNodes(String vnName, String jobId) {
