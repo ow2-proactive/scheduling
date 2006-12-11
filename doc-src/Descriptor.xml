@@ -3,9 +3,13 @@
 <chapter id="XML_Descriptors">
   <title>XML Deployment Descriptors</title>
 
-  <indexterm><primary>Descriptors</primary><secondary>definition</secondary></indexterm>
-  
-    <sect1  id="Descriptor_html_objectives">
+  <indexterm>
+    <primary>Descriptors</primary>
+
+    <secondary>definition</secondary>
+  </indexterm>
+
+  <sect1 id="Descriptor_html_objectives">
     <title>Objectives</title>
 
     <para>Parameters tied to the deployment of an application should be
@@ -35,10 +39,15 @@
               <para>lsf, pbs, sun grid engine, oar, prun</para>
             </listitem>
 
-              
             <listitem>
-							<indexterm><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
-              <para>globus(GT2, GT3 and GT4), unicore, glite, arc (nordugrid)</para>
+              <indexterm>
+                <primary>Globus</primary>
+
+                <secondary>XML Descriptor</secondary>
+              </indexterm>
+
+              <para>globus(GT2, GT3 and GT4), unicore, glite, arc
+              (nordugrid)</para>
             </listitem>
           </itemizedlist></para>
       </listitem>
@@ -83,7 +92,8 @@
             </listitem>
 
             <listitem>
-              <para>other protocols like globus, glite will be supported soon</para>
+              <para>other protocols like globus, glite will be supported
+              soon</para>
             </listitem>
           </itemizedlist></para>
       </listitem>
@@ -94,7 +104,7 @@
     source code</para>
   </sect1>
 
-  <sect1  id="Descriptor_Principles">
+  <sect1 id="Descriptor_Principles">
     <title>Principles</title>
 
     <itemizedlist>
@@ -246,9 +256,9 @@
     &lt;/processDefinition&gt;
    &lt;/processes&gt;
   &lt;/infrastructure&gt;
- &lt;/ProActiveDescriptor&gt;</programlisting> This example shows a VirtualNode called
-        <emphasis role="bold">Dispatcher</emphasis>, that is mapped to a jvm
-        called <emphasis role="bold">Jvm</emphasis>.</para>
+ &lt;/ProActiveDescriptor&gt;</programlisting> This example shows a
+        VirtualNode called <emphasis role="bold">Dispatcher</emphasis>, that
+        is mapped to a jvm called <emphasis role="bold">Jvm</emphasis>.</para>
 
         <para>This <emphasis role="bold">Jvm1</emphasis>will be created using
         the process called <emphasis role="bold">jvmProcess</emphasis> which
@@ -288,7 +298,7 @@
     get nodes associated to VirtualNodes.</para>
   </sect1>
 
-  <sect1 id="Descriptor_html_vn" >
+  <sect1 id="Descriptor_html_vn">
     <title>Different types of VirtualNodes</title>
 
     <sect2>
@@ -308,8 +318,8 @@
     &lt;vmName value='<emphasis role="bold">Jvm0</emphasis>'/&gt;
    &lt;/jvmSet&gt;
   &lt;/map&gt;
- &lt;/mapping&gt;</programlisting > Another possibility for the one to
-            one mapping is to map 1 VN to the jvm running the program. In that
+ &lt;/mapping&gt;</programlisting> Another possibility for the one to one
+            mapping is to map 1 VN to the jvm running the program. In that
             case the lookup protocol can be specified but is optionnal(default
             value is the property <emphasis
             role="bold">proactive.communication.protocol</emphasis>) as it is
@@ -488,12 +498,15 @@
     </sect2>
 
     <sect2>
+      <title>VirtualNodes Acquisition</title>
 
-     <title>VirtualNodes Acquisition</title>
+      <indexterm>
+        <primary>Acquisition</primary>
 
-		 <indexterm><primary>Acquisition</primary><secondary>VirtualNode</secondary></indexterm> 
-      
-		 <para>Descriptors provide the ability to acquire a VirtualNode already
+        <secondary>VirtualNode</secondary>
+      </indexterm>
+
+      <para>Descriptors provide the ability to acquire a VirtualNode already
       deployed by another application. Such VirtualNodes are defined in
       <emphasis role="bold">VirtualNodes Acquisition</emphasis> tag as it is
       done for <emphasis role="bold">VirtualNodesDefinition</emphasis> except
@@ -565,7 +578,7 @@
     </sect2>
   </sect1>
 
-  <sect1 id="Descriptor_html_jvms" >
+  <sect1 id="Descriptor_html_jvms">
     <title>Different types of JVMs</title>
 
     <sect2>
@@ -607,20 +620,22 @@
 
           <listitem>
             <para>This is the case when the process referenced is a cluster
-            process(LSF, PBS, GLOBUS, ....) or a process list
-            (see <xref linkend="Descriptor_html_processlist" />) </para>
+            process(LSF, PBS, GLOBUS, ....) or a process list (see <xref
+            linkend="Descriptor_html_processlist" />)</para>
           </listitem>
         </itemizedlist></para>
     </sect2>
 
     <sect2>
-     
-     
-     <title>Acquisition</title>
+      <title>Acquisition</title>
 
-		 <indexterm><primary>Acquisition</primary><secondary>JVM</secondary></indexterm> 
-      
-		 <para>Descriptors give the ability to acquire JVMs instead of creating
+      <indexterm>
+        <primary>Acquisition</primary>
+
+        <secondary>JVM</secondary>
+      </indexterm>
+
+      <para>Descriptors give the ability to acquire JVMs instead of creating
       them. To do so, it must be specified in the <emphasis
       role="bold">acquisition</emphasis> tag which service to use in oder to
       acquire the JVMs. Services will be described below, in the
@@ -646,7 +661,7 @@
     </sect2>
   </sect1>
 
-  <sect1 id="Descriptor_html_validation" >
+  <sect1 id="Descriptor_html_validation">
     <title>Validation against XML Schema</title>
 
     <para>To avoid mistake when building XML descriptors, ProActive provides
@@ -665,16 +680,14 @@
     transparent validation of the file using <ulink
     url="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</ulink> if
     the ProActive property <emphasis role="bold">schema.validation</emphasis>
-    is set to <emphasis role="bold">enable</emphasis>
-    (see <xref linkend="Configuration"/> for more details). If a
-    problem occurs during the validation, an error message is displayed
-    otherwise if the validation is successful no message appear. An XML
-    validation tool such as XMLSPY5.0(windows) can also be used to validate
-    XML descriptors.</para>
-
+    is set to <emphasis role="bold">enable</emphasis> (see <xref
+    linkend="Configuration" /> for more details). If a problem occurs during
+    the validation, an error message is displayed otherwise if the validation
+    is successful no message appear. An XML validation tool such as
+    XMLSPY5.0(windows) can also be used to validate XML descriptors.</para>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Complete description and examples</title>
 
     <para>Following XML files examples are used for the C3D application. The
@@ -815,8 +828,9 @@
     runtime.</para>
   </sect1>
 
-  <sect1 id="Descriptor_html_infrastructure" >
-    <title>Infrastructure and processes</title>
+  <sect1 id="Descriptor_html_infrastructure">
+    <title id="DESCRIPTOR_Infrastructure_and_processes">Infrastructure and
+    processes</title>
 
     <para>In the previous example, all defined JVMs will be created using
     <emphasis role="bold">jvmProcess</emphasis> process. This name is abstract
@@ -833,8 +847,10 @@
     <sect2>
       <title>Local JVMs</title>
 
-      <indexterm><primary>LocalJVM</primary></indexterm>
-      
+      <indexterm>
+        <primary>LocalJVM</primary>
+      </indexterm>
+
       <para>As said before, all processes are defined in the <emphasis
       role="bold">infrastructure</emphasis> part, under the <emphasis
       role="bold">processes</emphasis> tag. In the previous example, the
@@ -892,23 +908,27 @@
  &lt;/infrastructure&gt;
 </screen>
 
-<indexterm><primary>CLASSPATH</primary><secondary>deployment descriptor</secondary></indexterm>
-      
-<para>As shown in the example above, <emphasis
+      <indexterm>
+        <primary>CLASSPATH</primary>
+
+        <secondary>deployment descriptor</secondary>
+      </indexterm>
+
+      <para>As shown in the example above, <emphasis
       role="bold">ProActive</emphasis> provides the ability to define or
       change the <emphasis role="bold">classpath</emphasis> environment
       variable, the <emphasis role="bold">java path</emphasis>, the <emphasis
       role="bold">policy file path</emphasis>, the <emphasis role="bold">log4j
       properties file path</emphasis>, the <emphasis role="bold">ProActive
-      properties file path</emphasis> (see <xref linkend="Configuration"/>  for more details) and
-      also to pass <emphasis role="bold">parameters</emphasis> to the JVM to
-      be created. <emphasis role="bold">Note that parameters to be passed here
-      are related to the jvm in opposition to properties given in the 
-      configuration file (see <xref linkend="Configuration"/>), which is more focused on
-      ProActive or application behaviour. In fact parameters given here will
-      be part of the java command to create other jvms, whereas properties
-      given in the config file will be loaded once the jvm is
-      created.</emphasis></para>
+      properties file path</emphasis> (see <xref linkend="Configuration" />
+      for more details) and also to pass <emphasis
+      role="bold">parameters</emphasis> to the JVM to be created. <emphasis
+      role="bold">Note that parameters to be passed here are related to the
+      jvm in opposition to properties given in the configuration file (see
+      <xref linkend="Configuration" />), which is more focused on ProActive or
+      application behaviour. In fact parameters given here will be part of the
+      java command to create other jvms, whereas properties given in the
+      config file will be loaded once the jvm is created.</emphasis></para>
 
       <para>If not specified, there is a default value (except for the
       jvmParameters element) for each of these variables. In the first example
@@ -930,8 +950,10 @@
       role="bold">locally</emphasis>, i.e on the jvm reading the descriptor
       and not on the remote jvm that is going to be created.</para>
 
-     <para>As mentionned in the configuration file (see <xref linkend="Configuration"/>), if the &lt;ProActiveUserPropertiesFile&gt; is not defined
-      for remote jvms, they will load a default one once created.</para>
+      <para>As mentionned in the configuration file (see <xref
+      linkend="Configuration" />), if the &lt;ProActiveUserPropertiesFile&gt;
+      is not defined for remote jvms, they will load a default one once
+      created.</para>
 
       <para>Even if not shown in this example, a specific tag is provided for
       XbootClasspath option under the form</para>
@@ -971,12 +993,15 @@
       role="bold">jvmProcess</emphasis> to create a jvm(discussed
       previoulsy).</para>
 
-     <!-- This paragraph only appears in the html version  -->
-     <para os="html">You can find <ulink url="../examples/">here</ulink> several examples of
-      supported protocols and useful combinations.</para>
-     <!-- This paragraph only appears in the pdfversion  -->
-     <para os="pdf">You can find in <xref linkend="xmlFileSrc"/> several examples of
-      supported protocols and useful combinations.</para>
+      <!-- This paragraph only appears in the html version  -->
+
+      <para os="html">You can find <ulink url="../examples/">here</ulink>
+      several examples of supported protocols and useful combinations.</para>
+
+      <!-- This paragraph only appears in the pdfversion  -->
+
+      <para os="pdf">You can find in <xref linkend="xmlFileSrc" /> several
+      examples of supported protocols and useful combinations.</para>
 
       <para><emphasis role="bold">Note that it is mandatory for using all
       these features, that ProActive is installed on each host, of course on
@@ -1029,8 +1054,8 @@
           node will be created on sea.inria.fr thanks to the process defined
           by <emphasis role="bold">jvmProcess</emphasis>.</para>
 
-          <para>Check <xref role="xmlFileSrc" linkend="examples/RSH_Example.xml"/> for a
-          complete rsh deployment example.</para>
+          <para>Check <xref linkend="examples/RSH_Example.xml"
+          role="xmlFileSrc" /> for a complete rsh deployment example.</para>
         </listitem>
 
         <listitem>
@@ -1117,8 +1142,8 @@
           familiar with ssh, see <ulink
           url="http://www.openssh.org">openSSH</ulink></para>
 
-         <para>Check <xref role="xmlFileSrc" linkend="examples/SSH_Example.xml"/> 
-          for a complete ssh deployment example.</para>
+          <para>Check <xref linkend="examples/SSH_Example.xml"
+          role="xmlFileSrc" /> for a complete ssh deployment example.</para>
         </listitem>
 
         <listitem id="Descriptor_html_processlist" xreflabel="Process list">
@@ -1159,39 +1184,48 @@
  &lt;/processes&gt;
 </screen>
 
- <para>When using <emphasis role="bold">processList tag</emphasis>,
- the <emphasis role="bold">class</emphasis> attribute can take 3 values: 
-     <itemizedlist>
-      <listitem><para>
-       org.objectweb.proactive.core.process.ssh.SSHProcessList 
-       (see <xref role="javaFileSrc" linkend="core/process/ssh/SSHProcessList.java"/>),
-		 </para></listitem><listitem><para>
-       org.objectweb.proactive.core.process.rsh.RSHProcessList
-       (see <xref role="javaFileSrc" linkend="core/process/rsh/RSHProcessList.java"/>),
-		 </para></listitem><listitem><para>
-       org.objectweb.proactive.core.process.rlogin.RLoginProcessList
-       (see <xref role="javaFileSrc" linkend="core/process/rlogin/RLoginProcessList.java"/>),
-		 </para></listitem>
-   </itemizedlist>
-	 according to the protocol being used is ssh, rsh or rlogin. The
-	 <emphasis role="bold">fixedName</emphasis> attribute is mandatory
-	 and represents the fixed part shared by all machine's names. The
-	 <emphasis role="bold">list</emphasis> attribute is also mandatory
-	 and can take several forms: <emphasis role="bold">[m-n]</emphasis>
-	 means from m to n with a step 1, <emphasis role="bold">[m-n;k]</emphasis> 
-	 means from m to n with a step k (m, m+k, m+2k, ....), 
-	 <emphasis role="bold">[m-n]^[x,y]</emphasis> means from m to n exluding x and y, 
-	 <emphasis role="bold">[m-n]^[x,y-z]</emphasis> means from m to n exluding x
-	 and values from y to z, <emphasis role="bold">[m-n;k]^[x,y]</emphasis> same 
-	 as before except that the step is k. The <emphasis role="bold">padding</emphasis> 
-	 attribute is optional (default is 1) and represents the number of digits. Finally
-	 the <emphasis role="bold">domain</emphasis> attribute is mandatory
-	 and represents the last part shared by all machine's names. So in
-	 the exemple above, a jvm is going to be created using ssh on
-	 machines: node000.sophia.grid5000.fr,
-	 node002.sophia.grid5000.fr,..., node098.sophia.grid5000.fr,
-	 node100.sophia.grid5000.fr (note that step is 2) excluding machines:
-	 node010.sophia.grid5000.fr and node020.sophia.grid5000.fr.</para>
+          <para>When using <emphasis role="bold">processList tag</emphasis>,
+          the <emphasis role="bold">class</emphasis> attribute can take 3
+          values: <itemizedlist>
+              <listitem>
+                <para>org.objectweb.proactive.core.process.ssh.SSHProcessList
+                (see <xref linkend="core/process/ssh/SSHProcessList.java"
+                role="javaFileSrc" />),</para>
+              </listitem>
+
+              <listitem>
+                <para>org.objectweb.proactive.core.process.rsh.RSHProcessList
+                (see <xref linkend="core/process/rsh/RSHProcessList.java"
+                role="javaFileSrc" />),</para>
+              </listitem>
+
+              <listitem>
+                <para>org.objectweb.proactive.core.process.rlogin.RLoginProcessList
+                (see <xref
+                linkend="core/process/rlogin/RLoginProcessList.java"
+                role="javaFileSrc" />),</para>
+              </listitem>
+            </itemizedlist> according to the protocol being used is ssh, rsh
+          or rlogin. The <emphasis role="bold">fixedName</emphasis> attribute
+          is mandatory and represents the fixed part shared by all machine's
+          names. The <emphasis role="bold">list</emphasis> attribute is also
+          mandatory and can take several forms: <emphasis
+          role="bold">[m-n]</emphasis> means from m to n with a step 1,
+          <emphasis role="bold">[m-n;k]</emphasis> means from m to n with a
+          step k (m, m+k, m+2k, ....), <emphasis
+          role="bold">[m-n]^[x,y]</emphasis> means from m to n exluding x and
+          y, <emphasis role="bold">[m-n]^[x,y-z]</emphasis> means from m to n
+          exluding x and values from y to z, <emphasis
+          role="bold">[m-n;k]^[x,y]</emphasis> same as before except that the
+          step is k. The <emphasis role="bold">padding</emphasis> attribute is
+          optional (default is 1) and represents the number of digits. Finally
+          the <emphasis role="bold">domain</emphasis> attribute is mandatory
+          and represents the last part shared by all machine's names. So in
+          the exemple above, a jvm is going to be created using ssh on
+          machines: node000.sophia.grid5000.fr,
+          node002.sophia.grid5000.fr,..., node098.sophia.grid5000.fr,
+          node100.sophia.grid5000.fr (note that step is 2) excluding machines:
+          node010.sophia.grid5000.fr and node020.sophia.grid5000.fr.</para>
 
           <screen> ...........................                              
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
@@ -1225,16 +1259,19 @@
           attribute. In the example, a jvm is going to be created using ssh on
           crusoe.inria.fr, waha.inria.fr, nahuel.inria.fr.</para>
 
-         <para>Check <xref role="xmlFileSrc" linkend="examples/SSHList_example.xml"/> 
-          or <xref role="xmlFileSrc" linkend="examples/SSHListbyHost_Example.xml"/> 
+          <para>Check <xref linkend="examples/SSHList_example.xml"
+          role="xmlFileSrc" /> or <xref
+          linkend="examples/SSHListbyHost_Example.xml" role="xmlFileSrc" />
           for list examples.</para>
         </listitem>
 
         <listitem>
           <para>LSF</para>
 
-          <indexterm><primary>Cluster</primary></indexterm>
-          
+          <indexterm>
+            <primary>Cluster</primary>
+          </indexterm>
+
           <para>This protocol is used to create Nodes(JVMs) on a cluster.
           <emphasis role="bold">ProActive</emphasis> provides
           <literal>org.objectweb.proactive.core.process.lsf.LSFBSubProcess</literal>
@@ -1360,14 +1397,17 @@
           in the bsub command: interactive mode, and the name of the
           queue.</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_LSF_Example.xml"/> .</para>
+          <para>Check also <xref linkend="examples/SSH_LSF_Example.xml"
+          role="xmlFileSrc" /> .</para>
         </listitem>
 
         <listitem>
           <para>PBS</para>
-          
-          <indexterm><primary>Cluster</primary></indexterm>
-          
+
+          <indexterm>
+            <primary>Cluster</primary>
+          </indexterm>
+
           <para>This protocol is used to create jobs on cluster managed by
           PBS, PBSPro or Torque. ProActive provides
           <literal>org.objectweb.proactive.core.process.pbs.PBSBSubProcess</literal>
@@ -1428,14 +1468,17 @@
           frontend_host of the script pbsStartRuntime.sh(default is
           /user.home/ProActive/scripts/unix/cluster/pbsStartRuntime.sh).</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_PBS_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/SSH_PBS_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
           <para>Sun Grid Engine</para>
 
-          <indexterm><primary>Cluster</primary></indexterm>
-          
+          <indexterm>
+            <primary>Cluster</primary>
+          </indexterm>
+
           <para>This protocol is used to create jobs on cluster managed by Sun
           Grid Engine. ProActive provides
           <literal>org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess</literal>
@@ -1489,13 +1532,16 @@
           frontend_host of the script gridEngineStartRuntime.sh (default is
           /user.home/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh).</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_SGE_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/SSH_SGE_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
           <para>OAR:</para>
 
-          <indexterm><primary>Cluster</primary></indexterm>
+          <indexterm>
+            <primary>Cluster</primary>
+          </indexterm>
 
           <para>OAR is a cluster protocol developed at INRIA Alpes and used on
           <ulink url="http://www.grid5000.fr">Grid5000</ulink>. ProActive
@@ -1549,29 +1595,38 @@
           frontend_host of the script oarStartRuntime.sh (default is
           /user.home/ProActive/scripts/unix/cluster/oarStartRuntime.sh).</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_OAR_Example.xml"/> 
-          and <xref role="xmlFileSrc" linkend="examples/SSH_OARGRID_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/SSH_OAR_Example.xml"
+          role="xmlFileSrc" /> and <xref
+          linkend="examples/SSH_OARGRID_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
           <para>PRUN:</para>
-          
-          <indexterm><primary>Cluster</primary></indexterm>
 
-          <para>PRUN is a cluster protocol developed at Amsterdam to manage their 
-          <ulink url="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</ulink>.
+          <indexterm>
+            <primary>Cluster</primary>
+          </indexterm>
+
+          <para>PRUN is a cluster protocol developed at Amsterdam to manage
+          their <ulink
+          url="http://www.cs.vu.nl/das/prun/prun.1.html">cluster</ulink>.
           ProActive provides
           <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
           to use such protocol.</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_PRUN_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/SSH_PRUN_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
-         
-         <indexterm significance="preferred"><primary>Globus</primary><secondary>XML Descriptor</secondary></indexterm>
- 
-         <para>GLOBUS</para>
+          <indexterm significance="preferred">
+            <primary>Globus</primary>
+
+            <secondary>XML Descriptor</secondary>
+          </indexterm>
+
+          <para>GLOBUS</para>
 
           <para>Like <emphasis role="bold">ssh</emphasis>, using <emphasis
           role="bold">globus</emphasis> requires some steps to be performed.
@@ -1590,9 +1645,15 @@
           <para><emphasis role="bold">ProActive</emphasis> provides
           <literal>org.objectweb.proactive.core.process.globus.GlobusProcess</literal>
           to create <emphasis role="bold">globus</emphasis> process.</para>
-         
-         <indexterm><primary>Globus</primary><secondary>XML Descriptor</secondary><tertiary>GlobusProcess</tertiary></indexterm>
-           
+
+          <indexterm>
+            <primary>Globus</primary>
+
+            <secondary>XML Descriptor</secondary>
+
+            <tertiary>GlobusProcess</tertiary>
+          </indexterm>
+
           <screen> &lt;jvm name='<emphasis role="bold">Jvm2</emphasis>'&gt;                              
   &lt;creation&gt;
   &lt;processReference refid='<emphasis role="bold">globusProcess</emphasis>'/&gt;
@@ -1635,7 +1696,8 @@
           &lt;count&gt; element is 1. It represents the number of processor
           requested.</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/Globus_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/Globus_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
@@ -1645,7 +1707,8 @@
           <literal>org.objectweb.proactive.core.process.unicore.UnicoreProcess</literal>
           to use such protocol.</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/Unicore_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/Unicore_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
@@ -1659,19 +1722,25 @@
           url="http://ftp.nordugrid.org/download/index.php">ARC
           Client</ulink></para>
 
-        <para>Check also <xref role="xmlFileSrc" linkend="examples/NorduGrid_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/NorduGrid_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
           <para>GLITE</para>
 
-          <indexterm significance="preferred"><primary>GLITE</primary><secondary>XML Descriptor</secondary></indexterm>
-          
-            <para>ProActive provides
+          <indexterm significance="preferred">
+            <primary>GLITE</primary>
+
+            <secondary>XML Descriptor</secondary>
+          </indexterm>
+
+          <para>ProActive provides
           <literal>org.objectweb.proactive.core.process.glite.GLiteProcess</literal>
           to use such protocol.</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_GLite_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/SSH_GLite_Example.xml"
+          role="xmlFileSrc" />.</para>
         </listitem>
 
         <listitem>
@@ -1682,7 +1751,8 @@
           to use such protocol. You have to couple this process with the
           DependentListProcessDecorator explained below.</para>
 
-         <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_MPI_Example.xml"/>.</para>
+          <para>Check also <xref linkend="examples/SSH_MPI_Example.xml"
+          role="xmlFileSrc" />.</para>
 
           <para><screen>
 &lt;processDefinition id='<emphasis role="bold">mpiProcess</emphasis>'&gt;
@@ -1896,7 +1966,8 @@
       one must be a DependentProcess thus has to implement the
       org.objectweb.proactive.core.process.DependentProcess interface.</para>
 
-     <para>Check also <xref role="xmlFileSrc" linkend="examples/SSH_MPI_Example.xml"/>.</para>
+      <para>Check also <xref linkend="examples/SSH_MPI_Example.xml"
+      role="xmlFileSrc" />.</para>
 
       <para><screen>   &lt;processDefinition id='<emphasis role="bold">dependentProcessSequence</emphasis>'&gt;
     &lt;dependentProcessSequence class='<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcessDecorator</emphasis>'&gt;
@@ -1912,7 +1983,7 @@
     </sect2>
   </sect1>
 
-  <sect1 id="Descriptor_html_services" >
+  <sect1 id="Descriptor_html_services">
     <title>Infrastructure and services</title>
 
     <para>As mentionned previously, instead of creating jvms, ProActive gives
@@ -1986,7 +2057,7 @@
     role="bold">port</emphasis> represent the communication protocol and the
     listening port for the P2P Service, if a P2P Service is already running
     with this configuration the descriptor will use this one else a new one is
-    started.  <xref linkend="p2p"/> provides more information.</para>
+    started. <xref linkend="p2p" /> provides more information.</para>
 
     <para>The example above shows a VirtualNode <emphasis
     role="bold">VnTest</emphasis>, that is mapped with two jvms, <emphasis
@@ -1996,20 +2067,26 @@
     that will be found in the P2P infrastructure, so at the end 3 acquired
     jvms are expected.</para>
 
-    <para>Fault Tolerance can also be defined at the service level. See 
-     <xref linkend="faultTolerance"/> for more information.</para>
+    <para>Fault Tolerance can also be defined at the service level. See <xref
+    linkend="faultTolerance" /> for more information.</para>
 
     <para></para>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Killing the application</title>
 
-    <indexterm><primary>Kill</primary><secondary>Nodes</secondary></indexterm>
-    
+    <indexterm>
+      <primary>Kill</primary>
+
+      <secondary>Nodes</secondary>
+    </indexterm>
+
     <para>ProActive gives the ability to kill all JVMs and Nodes deployed with
-     an XML descriptor with the method: killall(boolean softly) in class ProActiveDescriptor
-     (this class's code is in <xref role="javaFileSrc" linkend ="core/descriptor/data/ProActiveDescriptor.java"/>) </para>
+    an XML descriptor with the method: killall(boolean softly) in class
+    ProActiveDescriptor (this class's code is in <xref
+    linkend="core/descriptor/data/ProActiveDescriptor.java"
+    role="javaFileSrc" />)</para>
 
     <para><programlisting lang="java">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
@@ -2025,10 +2102,9 @@ pad.killall(false);
     that originates the creation of a rmi registry waits until registry is
     empty before dying. To be more precise a thread is created to ask
     periodically the registry if objects are still registered.</para>
-
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Processes</title>
 
     <para>There is the possiblity to use only the infrastructure part in order
@@ -2038,12 +2114,10 @@ pad.killall(false);
     Deployment Descriptor. You can programmatically create such
     processes.</para>
 
-    <para>In order to get familiar on how to create processes programmatically,
-     see the Process package </para>
-     
+    <para>In order to get familiar on how to create processes
+    programmatically, see the Process package</para>
 
-	 <screen><ulink 
-url="../api/org/objectweb/proactive/core/process/package-summary.html">org.objectweb.proactive.core.process</ulink></screen>
-
+    <screen><ulink
+        url="../api/org/objectweb/proactive/core/process/package-summary.html">org.objectweb.proactive.core.process</ulink></screen>
   </sect1>
 </chapter>
