@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE book PUBLIC "-//INRIA//DTD DocBook V4.2-Based Subset V0.1//EN" 
-     "http://www-sop.inria.fr/oasis/proactive/doc/dtd/0.2/ProActiveManual.dtd" [
+     "ProActiveManual.dtd" [
 <!-- WARNING: Please do not edit with XXE -->
 <!-- This file is only meant as a concatenation of the other xml files -->
 <!ENTITY bookinfo SYSTEM "bookinfo.xml">
