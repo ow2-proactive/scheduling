@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.examples.integralpi;
 
-import com.sun.org.apache.bcel.internal.verifier.statics.LONG_Upper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
