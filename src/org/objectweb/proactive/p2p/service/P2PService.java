@@ -1,38 +1,39 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.p2p.service;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Random;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -60,7 +61,6 @@ import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
 
 /**
@@ -105,14 +105,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     /**
      * Sequence number list of received messages.
      */
-    private Vector oldMessageList = new Vector(MSG_MEMORY);
+    private Vector<UUID> oldMessageList = new Vector<UUID>(MSG_MEMORY);
     private P2PNodeManager nodeManager = null;
 
     /**
      * A collection of not full <code>P2PNodeLookup</code>.
      */
-    private Vector waitingNodesLookup = new Vector();
-    private Vector waitingMaximunNodesLookup = new Vector();
+    private Vector<P2PNodeLookup> waitingNodesLookup = new Vector<P2PNodeLookup>();
+    private Vector<P2PNodeLookup> waitingMaximunNodesLookup = new Vector<P2PNodeLookup>();
     private P2PService stubOnThis = null;
 
     // For asking nodes
@@ -205,8 +205,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @param uuid UUID of the message.
      * @param remoteService The original sender.
      */
-    public void exploring(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService) {
+    public void exploring(int ttl, UUID uuid, P2PService remoteService) {
         if (uuid != null) {
             logger.debug("Exploring message received with #" + uuid);
             ttl--;
@@ -232,7 +231,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             // Forwarding the message
             if (uuid == null) {
                 logger.debug("Generating uuid for exploring message");
-                uuid = generateUuid();
+                uuid = UUID.randomUUID();
             }
             this.acquaintances.exploring(ttl, uuid, remoteService);
             logger.debug("Broadcast exploring message with #" + uuid);
@@ -251,9 +250,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @param vnName Virtual node name.
      * @param jobId
      */
-    public void askingNode(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
-        String vnName, String jobId, String nodeFamilyRegexp) {
+    public void askingNode(int ttl, UUID uuid, P2PService remoteService,
+        int numberOfNodes, P2PNodeLookup lookup, String vnName, String jobId,
+        String nodeFamilyRegexp) {
         boolean broadcast;
         if (uuid != null) {
             logger.debug("AskingNode message received with #" + uuid);
@@ -269,7 +268,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         // Do not give a local node to a local request
         if ((uuid != null) || (numberOfNodes == MAX_NODE)) {
-            // Asking a node to the node manager
             if (numberOfNodes == MAX_NODE) {
                 Vector nodes = this.nodeManager.askingAllNodes(nodeFamilyRegexp);
                 for (int i = 0; i < nodes.size(); i++) {
@@ -327,13 +325,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         if (ProActive.isAwaited(nodeAck)) {
                             // Do not forward the message
                             // Prevent from deadlock
+                            logger.debug("Ack timeout expired");
                             this.nodeManager.noMoreNodeNeeded(nodeAvailable);
                             return;
                         }
                     }
 
-                    // Waiting ACK or NACK
-                    if (nodeAck.intValue() > -1) {
+                    if (nodeAck.intValue() != -1) {
                         // Setting vnInformation and JobId
                         if (vnName != null) {
                             try {
@@ -352,8 +350,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         logger.info("Giving 1 node to vn: " + vnName);
                     } else {
                         // It's a NACK node
-                        this.nodeManager.noMoreNodeNeeded(nodeAvailable);
                         logger.debug("NACK node received");
+                        this.nodeManager.noMoreNodeNeeded(nodeAvailable);
                         // No more nodes needed
                         return;
                     }
@@ -373,7 +371,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (broadcast) {
             if (uuid == null) {
                 logger.debug("Generating uuid for askingNode message");
-                uuid = generateUuid();
+                uuid = UUID.randomUUID();
             }
             this.acquaintances.askingNode(ttl, uuid, remoteService,
                 numberOfNodes, lookup, vnName, jobId, nodeFamilyRegexp);
@@ -527,25 +525,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     // -------------------------------------------------------------------------
 
     /**
-     * <b>* ONLY FOR INTERNAL USE *</b>
-     * @return a random UUID for sending message.
-     */
-    private UniversalUniqueID generateUuid() {
-        UniversalUniqueID uuid = UniversalUniqueID.randomUUID();
-        oldMessageList.add(uuid);
-        logger.debug(" UUID generated with #" + uuid);
-        return uuid;
-    }
-
-    /**
      * If not an old message and ttl > 1 return true else false.
      * @param ttl TTL of the message.
      * @param uuid UUID of the message.
      * @param remoteService P2PService of the first service.
      * @return tur if you should broadcats, false else.
      */
-    private boolean broadcaster(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService) throws P2POldMessageException {
+    private boolean broadcaster(int ttl, UUID uuid, P2PService remoteService)
+        throws P2POldMessageException {
         // is it an old message?
         boolean isAnOldMessage = this.isAnOldMessage(uuid);
 
@@ -609,7 +596,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @param uuid the uuid of the message.
      * @return <code>true</code> if it was an old message, <code>false</code> else.
      */
-    private boolean isAnOldMessage(UniversalUniqueID uuid) {
+    private boolean isAnOldMessage(UUID uuid) {
         if (uuid == null) {
             return false;
         }
@@ -688,8 +675,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         UniversalBody body = (UniversalBody) ProActiveRuntimeImpl.getProActiveRuntime()
                                                                  .getActiveObjects(P2P_NODE_NAME,
                 P2PService.class.getName()).get(0);
-        return (P2PService) MOP.newInstance(P2PService.class.getName(),
-        		null,
-            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, new Object[] { body });
+        return (P2PService) MOP.newInstance(P2PService.class.getName(), null,
+            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+            new Object[] { body });
     }
 }

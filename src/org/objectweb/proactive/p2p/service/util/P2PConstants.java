@@ -54,7 +54,7 @@ public interface P2PConstants {
     /**
      * <code>MAX_NODE</code>: special number for asking nodes every times.
      */
-    public static final int MAX_NODE = -1;
+    public static final int MAX_NODE = -69;
 
     /**
      * <code>VN_NAME</code>: name of the virtual node.
