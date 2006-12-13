@@ -49,6 +49,7 @@ public class HostRTFinderFactory {
 	public static HostRTFinder createHostRTFinder(Protocol protocol) {
 		switch (protocol) {
 		case RMI:
+		case RMISSH:
 			return new RMIHostRTFinder();
 		case HTTP:
 			return new HttpHostRTFinder();

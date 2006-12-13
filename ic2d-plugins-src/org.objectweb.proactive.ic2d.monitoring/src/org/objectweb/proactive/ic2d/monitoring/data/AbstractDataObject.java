@@ -32,11 +32,10 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -156,7 +155,6 @@ public abstract class AbstractDataObject extends Observable {
  
 	/**
 	 * Stop monitoring this object
-	 * @param log Indicates if you want to log a message in the console.
 	 * @param log Indicates if you want to log a message in the console.
 	 */
 	public void stopMonitoring(boolean log) {

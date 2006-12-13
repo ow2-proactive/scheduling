@@ -9,9 +9,7 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.monitoring.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.monitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.monitoring.figures.AbstractFigure;
-import org.objectweb.proactive.ic2d.monitoring.figures.Refresher;
 import org.objectweb.proactive.ic2d.monitoring.views.MonitoringView;
 
 public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPart implements Observer, Runnable {

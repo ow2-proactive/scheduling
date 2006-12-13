@@ -48,19 +48,21 @@ public class NodeFigure extends AbstractRectangleFigure{
 	private IFigure contentPane;
 	
 	public static final Color RMI_COLOR;
+	public static final Color RMISSH_COLOR;
 	
 	public static final Color DEFAULT_BORDER_COLOR;
 	
 	static {
 		Display device = Display.getCurrent();
 		RMI_COLOR = new Color(device, 208, 208, 224);
+		RMISSH_COLOR = new Color(device, 248, 255, 224);
 		DEFAULT_BORDER_COLOR = new Color(device, 0, 0, 128);
 	}
-	
-    //
-    // -- CONSTRUCTOR -----------------------------------------------
-    //
-	
+
+	//
+	// -- CONSTRUCTOR -----------------------------------------------
+	//
+
 	/**
 	 * Create a new node figure
 	 * @param text The text to display
@@ -90,8 +92,8 @@ public class NodeFigure extends AbstractRectangleFigure{
 		setProtocol(protocol);
 	}*/
 	//
-    // -- PUBLIC METHOD --------------------------------------------
-    //
+	// -- PUBLIC METHOD --------------------------------------------
+	//
 	
 	public IFigure getContentPane() {
 		return contentPane;
@@ -105,7 +107,7 @@ public class NodeFigure extends AbstractRectangleFigure{
 			backgroundColor = RMI_COLOR;
 			break;
 		case RMISSH:
-			backgroundColor = ColorConstants.white;
+			backgroundColor = RMISSH_COLOR;//ColorConstants.white;
 			break;
 		case JINI:
 			backgroundColor = ColorConstants.cyan;
@@ -117,10 +119,10 @@ public class NodeFigure extends AbstractRectangleFigure{
 			// TODO
 		}
 	}
-	
-    //
-    // -- PROTECTED METHODS --------------------------------------------
-    //
+
+	//
+	// -- PROTECTED METHODS --------------------------------------------
+	//
 	protected void initColor() {
 		Device device = Display.getCurrent();
 		borderColor = DEFAULT_BORDER_COLOR;
@@ -133,7 +135,7 @@ public class NodeFigure extends AbstractRectangleFigure{
 		setLayoutManager(layout);
 
 		add(label, BorderLayout.TOP);
-		
+
 		contentPane = new Figure();
 		ToolbarLayout contentPaneLayout = new NodeToolbarLayout();
 		contentPaneLayout.setSpacing(5);
@@ -146,28 +148,28 @@ public class NodeFigure extends AbstractRectangleFigure{
 	protected int getDefaultWidth() {
 		return DEFAULT_WIDTH;
 	}
-	
+
 	@Override
 	protected Color getDefaultBorderColor() {
 		return DEFAULT_BORDER_COLOR;
 	}
-	
+
 	//
-    // -- INNER CLASS --------------------------------------------
-    //
-	
+	// -- INNER CLASS --------------------------------------------
+	//
+
 	private class NodeBorderLayout extends BorderLayout {
-		
+
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			if(legend)
 				return super.calculatePreferredSize(container, wHint, hHint).expand(/*90*/50, /*5*/-5);
-			
+
 			return super.calculatePreferredSize(container, wHint, hHint).expand(15,0);
 		}
 	}
-	
+
 	private class NodeToolbarLayout extends ToolbarLayout {
-		
+
 		public NodeToolbarLayout() {
 			super(false);
 		}

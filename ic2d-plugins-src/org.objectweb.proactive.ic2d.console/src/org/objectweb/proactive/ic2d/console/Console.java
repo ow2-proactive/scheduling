@@ -34,6 +34,7 @@ package org.objectweb.proactive.ic2d.console;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
@@ -55,7 +56,7 @@ public class Console extends MessageConsole {
 	/**
 	 * Contains all consoles.
 	 */
-	private static HashMap<String, Console> consoles = new HashMap<String, Console>();
+	private static Map<String, Console> consoles = new HashMap<String, Console>();
 
 	/**
 	 * To know the date's format.

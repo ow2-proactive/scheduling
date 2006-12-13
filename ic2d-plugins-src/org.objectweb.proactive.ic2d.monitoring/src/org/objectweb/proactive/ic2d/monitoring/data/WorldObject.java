@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.monitoring.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -62,10 +61,7 @@ public class WorldObject extends AbstractDataObject {
 	
 	/** Set of all the active object names */
 	private Map<String, String> recorededFullNames = new Hashtable<String, String>();
-	
-	/** Used to slow down the events sent by the spies. */
-	private EventRetarder retarder;
-	
+		
 	//
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -78,8 +74,6 @@ public class WorldObject extends AbstractDataObject {
         vnChildren = new ConcurrentHashMap<String, VNObject>();
         monitorThread = new MonitorThread(this);
         addObserver(monitorThread);
-        
-        retarder = new EventRetarder();
         
         // Record the model
         this.name = ModelRecorder.getInstance().addModel(this);

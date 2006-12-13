@@ -59,7 +59,6 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart {
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable o, Object arg) {
-		System.out.println("VNTreeEditPart.update()");
 		final Observable obs = o;
 		final Object obj = arg;
 		Display.getDefault().asyncExec(new Runnable() {

@@ -32,24 +32,30 @@ package org.objectweb.proactive.ic2d.monitoring.data;
 
 public enum Protocol {
 	
-	RMI, RMISSH, IBIS, JINI, HTTP;
+	RMI, RMISSH, IBIS, JINI, HTTP, UNKNOWN;
 
 	public String toString(){
 		return super.toString().toLowerCase();
 	}
 	
+	/**
+	 * Get a protocol from a string.
+	 * Example: 'rmi' or 'rmi:' return RMI
+	 * @param s The string
+	 * @return A protocol
+	 */
 	public static Protocol getProtocolFromString(String s) {
-		if(s.compareTo("RMI") == 0)
+		if((s.compareToIgnoreCase("rmi") == 0)||(s.compareToIgnoreCase("rmi:") == 0))
 			return RMI;
-		else if(s.compareTo("RMISSH") == 0)
+		else if((s.compareToIgnoreCase("rmissh") == 0)||(s.compareToIgnoreCase("rmissh:") == 0))
 			return RMISSH;
-		else if(s.compareTo("IBIS") == 0)
+		else if((s.compareToIgnoreCase("ibis") == 0)||(s.compareToIgnoreCase("ibis:") == 0))
 			return IBIS;
-		else if(s.compareTo("JINI") == 0)
+		else if((s.compareToIgnoreCase("jini") == 0)||(s.compareToIgnoreCase("jini:") == 0))
 			return JINI;
-		else if(s.compareTo("HTTP") == 0)
+		else if((s.compareToIgnoreCase("http") == 0)||(s.compareToIgnoreCase("http:") == 0))
 			return HTTP;
-		else
-			return null; // !!!
+		else//Unknown protocol
+			return UNKNOWN; // !!!
 	}
 }

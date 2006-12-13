@@ -126,6 +126,8 @@ public class NodeObject extends AbstractDataObject{
 			notResponding();
 			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
 		}
+		if(activeObjects==null)
+			System.out.println("NodeObject.explore() activeObjects is null!!!!!!!");
 		handleActiveObjects(activeObjects);
 	}
 
@@ -144,14 +146,14 @@ public class NodeObject extends AbstractDataObject{
 	}
 	
 	/**
-	 * Returns the node's protocol
-	 * 
-	 * @return The protocol used
+	 * Returns the protocol used by the virtual machine containing this node.
+	 * @return The protocol
 	 */
-	public Protocol getProtocol() {
-		// TODO Uses the parent's protocol or the node's protocol ?
-		// return node.getNodeInformation().getProtocol();
-		return ((HostObject)this.parent.parent).getProtocol();
+	public Protocol getParentProtocol() {
+    	VMObject vm = (VMObject)getParent();
+    	String url = vm.getProActiveRuntime().getURL();
+    	String protocol = UrlBuilder.getProtocol(url);
+    	return Protocol.getProtocolFromString(protocol);
 	}
 
 	@Override

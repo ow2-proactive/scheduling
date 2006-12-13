@@ -106,7 +106,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 * @return a new NodeFigure view associated with the NodeObject model.
 	 */
 	protected IFigure createFigure() {
-		NodeFigure figure = new NodeFigure(getCastedModel().getFullName(),getCastedModel().getProtocol());
+		NodeFigure figure = new NodeFigure(getCastedModel().getFullName(),getCastedModel().getParentProtocol());
 		NodeListener listener = new NodeListener(getCastedModel(), figure, getMonitoringView());
 		figure.addMouseListener(listener);
 		figure.addMouseMotionListener(listener);
