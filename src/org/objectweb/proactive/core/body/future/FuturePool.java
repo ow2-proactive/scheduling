@@ -83,10 +83,6 @@ public class FuturePool extends Object implements java.io.Serializable {
         } else {
             this.acEnabled = false;
         }
-//        if (acEnabled) {
-//            queueAC = new ActiveACQueue();
-//            //queueAC.start(); //-> done in StartBody()
-//        }
     }
 
     //
