@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.xml.io;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 
 import org.apache.xerces.parsers.SAXParser;
@@ -39,6 +41,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
@@ -112,14 +115,9 @@ public class StreamReader implements XMLReader {
     }
 
     // -- implements XMLReader ------------------------------------------------------
-    public void read() throws java.io.IOException {
-        try {
+    public void read() throws SAXException, IOException {
             //parser.setFeature("http://xml.org/sax/features/validation",true);
             //parser.setFeature("http://apache.org/xml/features/validation/schema",true);
             parser.parse(inputSource);
-        } catch (org.xml.sax.SAXException e) {
-            //e.printStackTrace(); hides errors from properties tests
-            throw new java.io.IOException(e.toString());
-        }
     }
 }

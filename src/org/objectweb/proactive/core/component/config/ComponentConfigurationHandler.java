@@ -86,9 +86,10 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     public static ComponentConfigurationHandler createComponentConfigurationHandler(
         String componentsConfigurationLocation)
         throws IOException, SAXException, ProActiveException {
+        String url = null;
         try {
             InitialHandler initial_handler = new InitialHandler();
-            String url = null;
+
             if (ComponentConfigurationHandler.class.getResource(
                         componentsConfigurationLocation) != null) {
                 // it's in the classpath
@@ -104,7 +105,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
             return (ComponentConfigurationHandler) initial_handler.getResultObject();
         } catch (SAXException se) {
             logger.fatal(
-                "a problem occured while parsing the components descriptor : " +
+                "a problem occured while parsing the components descriptor \""+url+"\": " +
                 se.getMessage());
             se.printStackTrace();
             throw se;

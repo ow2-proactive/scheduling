@@ -1,11 +1,7 @@
 package org.objectweb.proactive.core.gc;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -13,6 +9,11 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 
 /**
@@ -43,6 +44,7 @@ public class GarbageCollector {
         for (ListIterator<Proxy> iter = this.proxies.listIterator();
                 iter.hasNext();) {
             Proxy p = iter.next();
+
             if (!p.setStrong()) {
                 iter.remove();
                 nrRemoved++;
@@ -72,9 +74,9 @@ public class GarbageCollector {
     public static String getDgcState(UniqueID bodyID) {
         UniversalBody body = LocalBodyStore.getInstance().getLocalBody(bodyID);
 
-        //System.out.println("Asked graph for " + bodyID);
         if (body == null) {
-            System.out.println("Body " + bodyID + " not found");
+            logger.error("Body " + bodyID + " not found");
+
             return "Body not found";
         }
 
@@ -84,10 +86,13 @@ public class GarbageCollector {
     public Collection<UniversalBodyProxy> getReferences() {
         Collection<UniversalBodyProxy> refs = new LinkedList<UniversalBodyProxy>();
         strongReferenceProxies();
+
         for (Proxy p : this.proxies) {
             refs.add(p.getStrong());
         }
+
         weakReferenceProxies();
+
         return refs;
     }
 

@@ -116,8 +116,8 @@ public class BodyRequest extends ReflectRequest implements Serializable {
             //                e.printStackTrace();
             throw new SecurityNotAvailableException(e.getCause());
         } catch (Exception e) {
-            System.out.println("----------------------- Exception : " +
-                e.getClass());
+//            System.out.println("----------------------- Exception : " +
+//                e.getClass());
             throw e;
         }
 

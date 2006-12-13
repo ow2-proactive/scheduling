@@ -533,7 +533,7 @@ public class UnicoreProActiveClient {
             System.out.println("Writing job in XML format to file " +
                 jc.getFilename() + " in " + timing + " milliseconds");
         } catch (Exception e) {
-            System.out.println("Exception en XML...");
+            System.out.println("Exception during XML serialization...");
             e.printStackTrace();
         }
     }

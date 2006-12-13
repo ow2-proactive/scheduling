@@ -109,7 +109,7 @@ public class Checkpoint implements java.io.Serializable {
      */
     public Body recover() {
         try {
-            System.out.println("[FT] Recovering body " + this.bodyID);
+            //System.out.println("[FT] Recovering body " + this.bodyID);
             ByteArrayInputStream bais = new ByteArrayInputStream(this.checkpointedBody);
             MarshalInputStream mis = new MarshalInputStream(bais);
             Body recoveredBody = (Body) (mis.readObject());

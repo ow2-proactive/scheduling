@@ -317,11 +317,11 @@ public class MulticastControllerImpl
 
         // need to find matching method in server interface
         try {
-            if (matchingMethods.get(mc.getComponentMetadata()
-                                          .getComponentInterfaceName()) == null) {
-                System.out.println("########## \n" +
-                    matchingMethods.toString());
-            }
+//            if (matchingMethods.get(mc.getComponentMetadata()
+//                                          .getComponentInterfaceName()) == null) {
+//                System.out.println("########## \n" +
+//                    matchingMethods.toString());
+//            }
             Method matchingMethodInServerInterface = matchingMethods.get(mc.getComponentMetadata()
                                                                            .getComponentInterfaceName())
                                                                     .get(new SerializableMethod(

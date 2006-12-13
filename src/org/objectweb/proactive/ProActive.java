@@ -1658,12 +1658,12 @@ public class ProActive {
         } catch (org.xml.sax.SAXException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
-                "a problem occurs when getting the proActiveDescriptor");
-            throw new ProActiveException(e);
+                "A problem occured when getting the proActiveDescriptor at location \""+xmlDescriptorUrl+"\".");
+            throw new ProActiveException("A problem occured when getting the proActiveDescriptor at location \""+xmlDescriptorUrl+"\"."+e);
         } catch (java.io.IOException e) {
             //e.printStackTrace(); hides errors when testing parameters in xml descriptors
             logger.fatal(
-                "a problem occurs during the ProActiveDescriptor object creation");
+                "A problem occured when getting the proActiveDescriptor at location \""+xmlDescriptorUrl+"\".");
             throw new ProActiveException(e);
         }
     }

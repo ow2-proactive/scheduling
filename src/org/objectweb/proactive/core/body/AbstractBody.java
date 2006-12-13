@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -105,6 +106,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // -- STATIC MEMBERS -----------------------------------------------
     //
     private static final String TERMINATED_BODY_EXCEPTION_MESSAGE = "The body has been Terminated";
+    
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -648,7 +651,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             psm.setBody(this);
             internalBodySecurity = new InternalBodySecurity(null);
         } catch (Exception e) {
-            System.out.println(
+        	
+            logger.error(
                 "Error when contructing a DefaultProActiveManager");
             e.printStackTrace();
         }
@@ -744,7 +748,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             if ((psm != null) && (psm.getPolicyServer() == null)) {
                 psm = new ProActiveSecurityManager(server);
                 isSecurityOn = true;
-                System.out.println("Security is on " + isSecurityOn);
+                logger.debug("Security is on " + isSecurityOn);
                 psm.setBody(this);
             }
         }

@@ -1781,7 +1781,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             if (name.equals(SERVICE_REFERENCE_TAG)) {
                 DependentListProcess dep = (DependentListProcess) targetProcess;
                 Object result = activeHandler.getResultObject();
-                System.out.println(" ON service found: " + (String) result);
+                //System.out.println(" ON service found: " + (String) result);
                 proActiveDescriptor.addServiceToSequenceList(dep,
                     (String) result);
             }

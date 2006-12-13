@@ -70,8 +70,8 @@ public class ClassServerServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
         //        try { 
-        System.out.println(
-            "*************************** DO GET ****************************** ");
+//        System.out.println(
+//            "*************************** DO GET ****************************** ");
         doPost(request, response);
         //            PrintWriter out = response.getWriter();
         //            out.println("Some informations about the ProActive runtime : \n");

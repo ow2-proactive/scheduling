@@ -83,6 +83,8 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
             sr.read();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
         }
     }
 

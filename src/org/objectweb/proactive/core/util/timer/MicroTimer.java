@@ -116,7 +116,7 @@ public class MicroTimer implements Timeable {
 
     public static void main(String[] args) {
         MicroTimer micro = new MicroTimer();
-        System.out.println("Debut du test");
+        System.out.println("Test starting...");
         micro.start();
         try {
             Thread.sleep(1000);
@@ -124,7 +124,7 @@ public class MicroTimer implements Timeable {
             e.printStackTrace();
         }
         micro.stop();
-        System.out.println("Apres 1000ms : " + micro.getCumulatedTime() +
+        System.out.println("After 1000ms : " + micro.getCumulatedTime() +
             micro.getUnit());
     }
 }

@@ -203,6 +203,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     // MPI Process
     ExternalProcess mpiProcess = null;
     private TechnicalService technicalService;
+    
+    private ProActiveDescriptor descriptor;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -219,7 +221,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     VirtualNodeImpl(String name,
         ProActiveSecurityManager proactiveSecurityManager, String padURL,
-        boolean isMainVN) {
+        boolean isMainVN, ProActiveDescriptor descriptor) {
         // if we launch several times the same application 
         // we have to change the name of the main VNs because of
         // the register, otherwise we will monitor each time all the last
@@ -1278,11 +1280,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // the timeToSleep is < 0. It means that the timeout expired
                     // that is why we catch the runtime exception
                     throw new NodeException(
-                        "After many retries, not even one node can be found");
+                        "After many retries, not even one node can be found for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
                 }
             } else {
                 throw new NodeException(
-                    "After many retries, not even one node can be found");
+                    "After many retries, not even one node can be found for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
             }
         }
 
@@ -1345,12 +1347,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // that is why we catch the runtime exception
                     throw new NodeException("After many retries, only " +
                         nbCreatedNodes + " nodes are created on " +
-                        tempNodeCount + " expected ");
+                        tempNodeCount + " expected for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
                 }
             } else {
                 throw new NodeException("After many retries, only " +
                     nbCreatedNodes + " nodes are created on " + tempNodeCount +
-                    " expected");
+                    " expected for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
             }
         }
     }

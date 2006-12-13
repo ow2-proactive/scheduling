@@ -475,11 +475,12 @@ public class ProActiveSecurityDescriptorHandler
     public static PolicyServer createPolicyServer(String xmlDescriptorUrl)
         throws InvalidPolicyFile {
         //static method added to replace main method
+    	String uri = null;
         try {
             InitialHandler h = new InitialHandler();
 
             // ProActiveSecurityDescriptorHandler h = new ProActiveSecurityDescriptorHandler();
-            String uri = xmlDescriptorUrl;
+            uri = xmlDescriptorUrl;
             org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
                         uri), h);
             sr.read();
@@ -489,7 +490,7 @@ public class ProActiveSecurityDescriptorHandler
         } catch (Exception e) {
             e.printStackTrace();
             ProActiveLogger.getLogger(Loggers.SECURITY)
-                           .warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler");
+                           .warn("a problem occurs when getting the security part of the ProActiveDescriptorHandler at location \""+uri+"\".");
             throw new InvalidPolicyFile(e);
         }
     }
@@ -508,7 +509,7 @@ public class ProActiveSecurityDescriptorHandler
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, org.xml.sax.SAXException {
         InitialHandler h = new InitialHandler();
 
         // ProActiveSecurityDescriptorHandler h = new ProActiveSecurityDescriptorHandler();

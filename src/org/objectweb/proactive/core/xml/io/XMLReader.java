@@ -30,6 +30,8 @@
  */ 
 package org.objectweb.proactive.core.xml.io;
 
+import org.xml.sax.SAXException;
+
 
 /**
  * A class implementing this interface is able to read XML data
@@ -43,5 +45,5 @@ public interface XMLReader {
     /**
      * Triggers the read of the XML document and start firing events to the registered XMLDeserializer
      */
-    public void read() throws java.io.IOException;
+    public void read() throws java.io.IOException, SAXException;
 }

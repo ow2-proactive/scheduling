@@ -372,7 +372,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 vn = new VirtualNodeLookup(vnName);
             } else {
                 vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
-                        this.url, isMainNode);
+                        this.url, isMainNode, this);
                 ((VirtualNodeImpl) vn).jobID = this.jobID;
 
                 //System.out.println("vn created with url: " + padURL + " and jobid : " + ((VirtualNodeImpl) vn).jobID);

@@ -254,7 +254,7 @@ public class MOPClassLoader extends URLClassLoader {
                     throw new ClassNotFoundException(ex.getMessage());
                 }
             } else {
-                System.out.println("Cannot generate class " + name + " as a stub class");
+                logger.debug("Cannot generate class " + name + " as a stub class");
                 throw e;
             }
         }

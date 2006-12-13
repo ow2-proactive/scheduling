@@ -199,7 +199,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#stopProcess()
      */
     public void stopProcess() {
-        System.out.println("PrunSubProcess.stopProcess()");
+        //System.out.println("PrunSubProcess.stopProcess()");
         super.stopProcess();
     }
 

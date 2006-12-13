@@ -250,7 +250,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     //
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-        System.out.println("----- IbisRemoteBodyImpl.readObject() ");
+        //System.out.println("----- IbisRemoteBodyImpl.readObject() ");
         in.defaultReadObject();
     }
 
