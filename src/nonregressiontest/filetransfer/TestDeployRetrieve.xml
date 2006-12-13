@@ -37,7 +37,6 @@
 	<fileTransferDefinitions>
 		<fileTransfer id="testRetrieve">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
-			<dir src=""></dir>
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
 		</fileTransfer>
 		<fileTransfer id="testDeploy">
