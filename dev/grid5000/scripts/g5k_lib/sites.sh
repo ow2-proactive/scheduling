@@ -113,7 +113,7 @@ function get_cluster_from_hostname {
 
 		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
 			echo "capricorne"
-		elif [ "$(expr $FQDN : '\(sagittaire-[0-9]\{1,2\}.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
+		elif [ "$(expr $FQDN : '\(sagittaire-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
 			echo "sagittaire"
 		else
 			echo ERR_PREFIX "lyon_get_cluster, Strange FQDN=$FQDN for lyon site. Aborting" 1>&2
