@@ -69,10 +69,9 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         FILE_SEPARATOR + "gridEngineStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PARALLEL_ENVIRONMENT = null;
-    protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
     protected String parallelEnvironment = DEFAULT_PARALLEL_ENVIRONMENT;
-    protected String bookingDuration = DEFAULT_BOOKING_DURATION;
+    protected String bookingDuration = null;
     protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
 
     //Following options are not yet included in the command
@@ -300,6 +299,10 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
                 logger.warn(
                     "You specified hostNumber without a parallelEnvironment. Your job will fail. Please update your schema");
             }
+        }
+        
+        if (this.bookingDuration != null) {
+        	qsubCommand.append(" -l s_rt=" + bookingDuration + " ") ;
         }
 
         qsubCommand.append(scriptLocation).append(" ");

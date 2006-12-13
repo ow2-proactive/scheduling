@@ -1299,7 +1299,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<xs:complexType name="GridEngineOptionType" mixed="true">
 		<xs:all>
 			<xs:element name="hostsNumber" type="PosintOrVariableType"/>
-			<xs:element name="bookingDuration" type="TimeOrVariableType"/>
+			<xs:element name="bookingDuration" type="PosintOrVariableType"/>
 			<xs:element name="scriptPath" type="FilePathType"/>
 			<xs:element name="hostlist" type="TextOrVariableType" minOccurs="0"/>
 			<xs:element name="parallelEnvironment" type="TextOrVariableType" minOccurs="1" maxOccurs="1"/>
