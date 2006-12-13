@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--  ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../descriptors/DescriptorSchema.xsd"-->
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../descriptors/DescriptorSchema.xsd">
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME" value="/user/mleyton/home/ProActive"/>
 		<descriptorVariable name="JAVA_HOME" value="/pcache/metanet/net/lib/jdk1.4.0/jdk1.4.0/linux-libc6"/>
@@ -9,7 +9,8 @@
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="test" fileTransferDeploy="testDeploy" fileTransferRetrieve="testRetrieve" />
+			<virtualNode name="test" fileTransferDeploy="testDeploy"
+				fileTransferRetrieve="testRetrieve"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -36,6 +37,7 @@
 	<fileTransferDefinitions>
 		<fileTransfer id="testRetrieve">
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
+			<dir src=""></dir>
 			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
 		</fileTransfer>
 		<fileTransfer id="testDeploy">
@@ -62,7 +64,7 @@
 			<processDefinition id="remoteJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<!-- javaPath><absolutePath value="${JAVA_HOME}/bin/java"/></javaPath-->
-				<classpath>
+					<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/bin/"/>
 						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
 						<absolutePath value="${PROACTIVE_HOME}/lib/ProActive.jar"/>

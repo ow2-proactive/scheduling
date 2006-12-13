@@ -55,7 +55,7 @@
 			<unitTest exclude="no" class="nonregressiontest.descriptor.launcher.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.technicalservice.Test" />
 			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestAPI" />
-			<unitTest exclude="yes" class="nonregressiontest.filetransfer.TestDeployRetrieve" />
+			<unitTest exclude="no" class="nonregressiontest.filetransfer.TestDeployRetrieve" />
 			<unitTest exclude="no" class="nonregressiontest.mpi.TestMPISpmd"/>
 			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.onewaycall.Test" />
