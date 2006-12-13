@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
-   <!-- <security file="../../descriptors/applicationPolicy.xml"></security> -->
+   <!-- <security file="../../descriptors/security/applicationPolicy.xml"></security> -->
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Locale" property="unique"/>
@@ -74,7 +74,7 @@
  				       <parameter value="-Xdebug" />
  				        <parameter value="-Xnoagent" />
  				        <parameter value="-Xrunjdwp:transport=dt_socket,address=8001,server=y,suspend=n" />
- 				        <parameter value="-Dproactive.runtime.security=/net/home/acontes/dev/ProActive/descriptors/jvm1-sec.xml" />
+ 				        <parameter value="-Dproactive.runtime.security=/net/home/acontes/dev/ProActive/descriptors/security/jvm1-sec.xml" />
  				        <parameter value="-Djava.compiler=NONE" />
 			       </jvmParameters>
 				</jvmProcess>
