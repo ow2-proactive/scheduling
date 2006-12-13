@@ -500,7 +500,7 @@
 
     <screen> 1:&lt;?xml version='1.0' encoding='UTF-8'?&gt;
  2:&lt;ProActiveDescriptor xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
- 3: &lt;security file='../../descriptors/applicationPolicy.xml'&gt;&lt;/security&gt;
+ 3: &lt;security file='../../descriptors/security/applicationPolicy.xml'&gt;&lt;/security&gt;
  4: &lt;componentDefinition&gt;
  5: &lt;virtualNodesDefinition&gt;
  6: &lt;virtualNode name='Locale' property='unique'/&gt;
@@ -517,7 +517,7 @@
  ....
  74: &lt;/classpath&gt;
  75: &lt;jvmParameters&gt;
- &lt;parameter value='-Dproactive.runtime.security=/.../descriptors/jvm1-sec.xml'/&gt;
+ &lt;parameter value='-Dproactive.runtime.security=/.../descriptors/security/jvm1-sec.xml'/&gt;
  82: &lt;/jvmParameters&gt;
  83: &lt;/jvmProcess&gt;
  84: &lt;/processDefinition&gt;
@@ -741,7 +741,7 @@
       to use the property proactive.runtime.security and give a path a
       security file descriptor.</para>
 
-      <para>Here an example: java -Dproactive.runtime.security=jvmlocal.xml
+      <para>Here an example: java -Dproactive.runtime.security=descriptors/security/jvmlocal.xml
       TestSecureDeployment secureDeployment.xml</para>
     </sect2>
   </sect1>
