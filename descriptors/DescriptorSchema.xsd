@@ -240,6 +240,12 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:simpleType name="BooleanOrVariableType">
 		<xs:union memberTypes="xs:boolean variableRefType"/>
 	</xs:simpleType>
+	<xs:simpleType name="TimeOrVariableType">
+		<xs:union memberTypes="xs:time variableRefType"/>
+	</xs:simpleType>
+	<xs:simpleType name="TextOrVariableType">
+		<xs:union memberTypes="xs:string variableRefType"/>
+	</xs:simpleType>
 	<!--ListType is defined as a union of a positive integer or a variable ref-->
 	<xs:simpleType name="ListType">
 		<xs:union memberTypes="variableRefType">
@@ -357,11 +363,11 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!--main definition must have at least one child, a mapToVirtualNode and a not-empty attribute, the main class name. It may also have, in first, a group of elements of type ArgType, which define the arguments of the main class.-->
 	<xs:complexType name="MainDefinitionType">
-		<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
 			<xs:group ref="ArgGroup" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:group ref="MapToVirtualNodeGroup" maxOccurs="unbounded"/>
 			<xs:group ref="ClassPathGroup" maxOccurs="unbounded"/>
-		</xs:sequence>
+		</xs:choice>
 		<xs:attribute name="class" type="xs:string" use="required"/>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -396,11 +402,11 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!--VirtualNodesGroup is composed of two elements VirtualNodesDefinition where are defined virtualNodes that will be built from the descriptor and VirtualNodesAcquisition where are defined virtualNodes created by performing a lookup with a given protocol(rmi or jini). Both element can appear 0 or more-->
 	<xs:group name="VirtualNodesGroup">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="virtualNodesDefinition" type="VirtualNodesDefintionType" minOccurs="0"/>
 			<xs:element name="virtualNodesAcquisition" type="virtualNodesAcquisitionType"
 				minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:group>
 	<!--virtualnodesDefinition element has one child: virtualNode element that must appear once or more-->
 	<xs:complexType name="VirtualNodesDefintionType">
@@ -589,7 +595,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="FileTransferType">
-		<xs:sequence>
+		<xs:choice minOccurs="0" maxOccurs="unbounded">
 			<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:attribute name="src" type="xs:string" use="required"/>
@@ -604,15 +610,30 @@ The following element ProActiveDescriptor defines the root of the schema
 					<xs:attribute name="excludes" type="xs:string" use="optional"/>
 				</xs:complexType>
 			</xs:element>
-		</xs:sequence>
+		</xs:choice>
+			<!--<xs:element name="file" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="src" type="xs:string" use="required"/>
+					<xs:attribute name="dest" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="dir" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="src" type="xs:string" use="required"/>
+					<xs:attribute name="dest" type="xs:string" use="optional"/>
+					<xs:attribute name="includes" type="xs:string" use="optional"/>
+					<xs:attribute name="excludes" type="xs:string" use="optional"/>
+				</xs:complexType>
+			</xs:element>-->
+
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--infrastructure element has two childs: processes and services element that can appear zero or  once -->
 	<xs:complexType name="InfrastructureType">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="processes" type="ProcessesType" minOccurs="0"/>
 			<xs:element name="services" type="ServicesType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<!--  Technical Service is a sequence of services -->
 	<xs:complexType name="TechnicalServiceType">
@@ -657,7 +678,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!-- ftService has -->
 	<xs:complexType name="faultToleranceType">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="protocol" type="protocolType"/>
 			<xs:element name="globalServer" type="serverType" minOccurs="0"/>
 			<xs:element name="locationServer" type="serverType" minOccurs="0"/>
@@ -665,7 +686,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="checkpointServer" type="serverType" minOccurs="0"/>
 			<xs:element name="resourceServer" type="serverType" minOccurs="0"/>
 			<xs:element name="ttc" type="ttcType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<xs:complexType name="protocolType">
 		<xs:attribute name="type" use="required">
@@ -743,7 +764,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!-- peerSet element has one child peer that can occurs once or more-->
 	<xs:complexType name="peerSetType">
 		<xs:sequence>
-			<xs:element name="peer" type="xs:string" maxOccurs="unbounded"/>
+			<xs:element name="peer" type="TextOrVariableType" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!--processes element has one child: processDefinition element that must appear once or more -->
@@ -783,7 +804,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!--jvmProcess element has six childs: bootclasspath, classpath, javaPath, policyFile, log4jpropertiesFile, jvmParameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess.log4jpropertiesFilerepresents the location of the log4j properties file.  jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. This element has also one attribute: class which is required. This attribute can take only one value: org.objectweb.proactive.core.process.JVMNodeProcess. This element is used to create a local jvm-->
 	<xs:complexType name="JvmProcessType">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="extendedJvm" type="ExtendedJVMType" minOccurs="0"/>
 			<xs:element name="bootclasspath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
@@ -792,7 +813,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="log4jpropertiesFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="ProActiveUserPropertiesFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -862,11 +883,11 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!-- FileTransfer Process Specific Information -->
 	<xs:complexType name="FileTransferStructureType">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="copyProtocol" minOccurs="0"/>
 			<xs:element name="sourceInfo" type="FileTransferStructureInfoType" minOccurs="0"/>
 			<xs:element name="destinationInfo" type="FileTransferStructureInfoType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="refid" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="FileTransferStructureInfoType">
@@ -876,23 +897,23 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="password" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="FileTransferRetrieveStructureType">
-		<xs:sequence>
+		<xs:all>
 			<xs:element name="sourceInfo" type="FileTransferRetrieveStructureInfoType" minOccurs="0"/>
 			<xs:element name="destinationInfo" type="FileTransferRetrieveStructureInfoType"
 				minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="refid" type="xs:string" use="required"/>
 	</xs:complexType>
 	<xs:complexType name="FileTransferRetrieveStructureInfoType">
 		<xs:attribute name="prefix" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
-	<xs:complexType name="RshProcessType">
-		<xs:sequence>
+	<xs:complexType name="RshProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required"
 			fixed="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -908,12 +929,12 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!-- The ProcessListType represents a list of ssh, rsh or rlogin processes, they are defined by the class attributes that identifies wich process is included in the list
 by fixedName that is the fixed part of hostnames, list that represents the sequence of number, padding and domain-->
-	<xs:complexType name="ProcessListType">
-		<xs:sequence>
+	<xs:complexType name="ProcessListType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
 				<xs:union memberTypes="variableRefType">
@@ -940,12 +961,12 @@ by fixedName that is the fixed part of hostnames, list that represents the seque
 	</xs:complexType>
 	<!-- The ProcessListbyHostType represents a list of ssh, rsh or rlogin processes, they are defined by the class attributes that identifies wich process is included in the list
 by hostlist which is a list of hostname and domain if all the host specified are in the same domain-->
-	<xs:complexType name="ProcessListbyHostType">
-		<xs:sequence>
+	<xs:complexType name="ProcessListbyHostType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
 				<xs:union memberTypes="variableRefType">
@@ -968,12 +989,12 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--maprshProcess element has two child: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote hosts with rsh protocol a jvm will be created on the remote host.This element has also  a scriptPath child which represents the location of the script oasis-exp.sh and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.rsh.maprsh.MapRSHProcess,  netgroup which is required and represents  group of remote hosts to log on with rsh. and parallelize which is optional and represents the parallelization degree -->
-	<xs:complexType name="MapRshProcessType">
-		<xs:sequence>
+	<xs:complexType name="MapRshProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
 				<xs:union memberTypes="variableRefType">
@@ -992,8 +1013,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="hostname" type="ListType" use="required"/>
 	</xs:complexType>
 	<!--sshProcess element has two child: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id).and environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.ssh.SSHJVMProcess or org.objectweb.proactive.core.process.ssh.SSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with ssh-->
-	<xs:complexType name="SshProcessType">
-		<xs:sequence>
+	<xs:complexType name="SshProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
@@ -1001,7 +1022,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				maxOccurs="1"/>
 			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType"
 				minOccurs="0" maxOccurs="1"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required"
 			fixed="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -1016,12 +1037,12 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		</xs:attribute>-->
 	</xs:complexType>
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
-	<xs:complexType name="RloginProcessType">
-		<xs:sequence>
+	<xs:complexType name="RloginProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -1029,12 +1050,12 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
-	<xs:complexType name="BsubProcessType">
-		<xs:sequence>
+	<xs:complexType name="BsubProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="bsubOption" type="BsubOptionType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -1049,8 +1070,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
-	<xs:complexType name="BsubOptionType">
-		<xs:sequence>
+	<xs:complexType name="BsubOptionType" mixed="true">
+		<xs:all>
 			<xs:element name="hostlist" type="ListType" minOccurs="0"/>
 			<xs:element name="processor" type="PosintOrVariableType" minOccurs="0"/>
 			<xs:element name="resourceRequirement" minOccurs="0">
@@ -1059,15 +1080,15 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<!--PBSProcess-->
-	<xs:complexType name="PbsProcessType">
-		<xs:sequence>
+	<xs:complexType name="PbsProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="pbsOption" type="PbsOptionType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.pbs.PBSSubProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -1075,7 +1096,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--PbsOption-->
-	<xs:complexType name="PbsOptionType">
+	<xs:complexType name="PbsOptionType" mixed="true">
 		<xs:complexContent>
 			<xs:extension base="prunOptionType">
 				<xs:sequence>
@@ -1090,16 +1111,16 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
 	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
 	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
-	<xs:complexType name="gLiteProcessType">
-		<xs:sequence>
+	<xs:complexType name="gLiteProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
-			<xs:element name="environment" type="xs:string" minOccurs="0"/>
-			<xs:element name="requirements" type="xs:string" minOccurs="0"/>
+			<xs:element name="environment" type="TextOrVariableType" minOccurs="0"/>
+			<xs:element name="requirements" type="TextOrVariableType" minOccurs="0"/>
 			<xs:element name="inputData" type="gLiteInputDataType" minOccurs="0"/>
 			<xs:element name="rank" minOccurs="0">
 				<xs:complexType>
 					<xs:simpleContent>
-						<xs:extension base="xs:string">
+						<xs:extension base="TextOrVariableType">
 							<xs:attribute name="fuzzyrank" type="xs:string"/>
 						</xs:extension>
 					</xs:simpleContent>
@@ -1108,7 +1129,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="gLiteOptions" type="gLiteOptionsType" minOccurs="0"/>
 			<xs:element name="JdlTransferDeploy" type="FileTransferStructureType" minOccurs="0"
 				maxOccurs="1"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.glite.GLiteProcess"/>
 		<xs:attribute name="hostname" type="xs:string"/>
@@ -1128,13 +1149,13 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="fuzzyrank" type="BooleanOrVariableType" default="false"/>
 	</xs:complexType>
 	<!--gLiteInputDataType-->
-	<xs:complexType name="gLiteInputDataType">
+	<xs:complexType name="gLiteInputDataType" mixed="true">
 		<xs:attribute name="dataAccessProtocol" type="xs:string"/>
 		<xs:attribute name="storageIndex" type="xs:string"/>
 		<xs:attribute name="dataCatalog" type="xs:string"/>
 	</xs:complexType>
 	<!--gLiteJobType-->
-	<xs:complexType name="gLiteJobType">
+	<xs:complexType name="gLiteJobType" mixed="true">
 		<xs:choice>
 			<xs:element name="Normal"/>
 			<xs:element name="Interactive">
@@ -1162,56 +1183,56 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		</xs:choice>
 	</xs:complexType>
 	<!--gLiteOptions-->
-	<xs:complexType name="gLiteOptionsType">
-		<xs:sequence>
+	<xs:complexType name="gLiteOptionsType" mixed="true">
+		<xs:all>
 			<xs:element name="configFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="JDLFilePath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="JDLRemoteFilePath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="jobType" type="gLiteJobType" minOccurs="0"/>
-			<xs:element name="arguments" type="xs:string" minOccurs="0"/>
-			<xs:element name="inputSandbox" type="xs:string" minOccurs="0"/>
-			<xs:element name="outputSandbox" type="xs:string" minOccurs="0"/>
-		</xs:sequence>
+			<xs:element name="arguments" type="TextOrVariableType" minOccurs="0"/>
+			<xs:element name="inputSandbox" type="TextOrVariableType" minOccurs="0"/>
+			<xs:element name="outputSandbox" type="TextOrVariableType" minOccurs="0"/>
+		</xs:all>
 	</xs:complexType>
 	<!-- end of gLiteProcessType -->
 	<!--prunProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, prunOption element that may not appear and represents different options of prun command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.prun.PrunSubProcess, interactive which is optinal to run prun command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run prun command-->
-	<xs:complexType name="prunProcessType">
-		<xs:sequence>
+	<xs:complexType name="prunProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="prunOption" type="prunOptionType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.prun.PrunSubProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--prunOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
-	<xs:complexType name="prunOptionType">
+	<xs:complexType name="prunOptionType" mixed="true">
 		<xs:sequence>
 			<xs:element name="hostlist" type="ListType" minOccurs="0"/>
 			<xs:element name="hostsNumber" type="PosintOrVariableType" minOccurs="0"/>
 			<xs:element name="processorPerNode" type="PosintOrVariableType" minOccurs="0"/>
-			<xs:element name="bookingDuration" type="xs:string" minOccurs="0"/>
-			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
+			<xs:element name="bookingDuration" type="TimeOrVariableType" minOccurs="0"/>
+			<xs:element name="outputFile" type="TextOrVariableType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!-- clusterForkProcessType -->
-	<xs:complexType name="clusterForkProcessType">
-		<xs:sequence>
+	<xs:complexType name="clusterForkProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required" 
 			fixed="org.objectweb.proactive.core.process.rocks.ClusterForkProcess"/>
 	</xs:complexType>
 	<!--oarProcess-->
-	<xs:complexType name="oarProcessType">
-		<xs:sequence>
+	<xs:complexType name="oarProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="oarOption" type="OarOptionType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.oar.OARSubProcess"/>
 		<xs:attribute name="bookedNodesAccess" use="optional">
@@ -1227,20 +1248,20 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--oarOption-->
-	<xs:complexType name="OarOptionType">
-		<xs:sequence>
-			<xs:element name="resources" type="xs:string" minOccurs="0"/>
+	<xs:complexType name="OarOptionType" mixed="true">
+		<xs:all>
+			<xs:element name="resources" type="TextOrVariableType" minOccurs="0"/>
 			<!--<xs:element name="properties" type="xs:string" minOccurs="0"/>-->
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<!--oarGridProcess-->
-	<xs:complexType name="oarGridProcessType">
-		<xs:sequence>
+	<xs:complexType name="oarGridProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="oarGridOption" type="OarGridOptionType"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.oar.OARGRIDSubProcess"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
@@ -1255,44 +1276,44 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 	</xs:complexType>
 	<!--oarGridOption-->
-	<xs:complexType name="OarGridOptionType">
-		<xs:sequence>
-			<xs:element name="resources" type="xs:string"/>
-			<xs:element name="walltime" type="xs:string" minOccurs="0"/>
+	<xs:complexType name="OarGridOptionType" mixed="true">
+		<xs:all>
+			<xs:element name="resources" type="TextOrVariableType"/>
+			<xs:element name="walltime" type="TextOrVariableType" minOccurs="0"/>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<!--sge process -->
-	<xs:complexType name="sgeProcessType">
-		<xs:sequence>
+	<xs:complexType name="sgeProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="gridEngineOption" type="GridEngineOptionType"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="BooleanOrVariableType" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
-	<xs:complexType name="GridEngineOptionType">
-		<xs:sequence>
-			<xs:element name="hostsNumber" type="xs:string"/>
-			<xs:element name="bookingDuration" type="xs:string"/>
+	<xs:complexType name="GridEngineOptionType" mixed="true">
+		<xs:all>
+			<xs:element name="hostsNumber" type="PosintOrVariableType"/>
+			<xs:element name="bookingDuration" type="TimeOrVariableType"/>
 			<xs:element name="scriptPath" type="FilePathType"/>
-			<xs:element name="hostlist" type="xs:string" minOccurs="0"/>
-			<xs:element name="parallelEnvironment" type="xs:string" minOccurs="1" maxOccurs="1"/>
-		</xs:sequence>
+			<xs:element name="hostlist" type="TextOrVariableType" minOccurs="0"/>
+			<xs:element name="parallelEnvironment" type="TextOrVariableType" minOccurs="1" maxOccurs="1"/>
+		</xs:all>
 	</xs:complexType>
 
 	<!--globusProcess element has three childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) , environment, and globusOption element  which represents different options of globus command.They may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.globus.GlobusProcess, and hostname which is required and represents the globus host where the RSL request is destinated -->
-	<xs:complexType name="GlobusProcessType">
-		<xs:sequence>
+	<xs:complexType name="GlobusProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<!--	<xs:element ref="commandPath" minOccurs="0"/>-->
 			<xs:element name="globusOption" type="GlobusOptionType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.globus.GlobusProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -1300,13 +1321,13 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--globusOption element has one child count element-->
-	<xs:complexType name="GlobusOptionType">
-		<xs:sequence>
+	<xs:complexType name="GlobusOptionType" mixed="true">
+		<xs:all>
 			<xs:element name="count" type="PosintOrVariableType" minOccurs="0"/>
 			<xs:element name="maxTime" type="PosintOrVariableType" minOccurs="0"/>
-			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
-			<xs:element name="errorFile" type="xs:string" minOccurs="0"/>
-		</xs:sequence>
+			<xs:element name="outputFile" type="TextOrVariableType" minOccurs="0"/>
+			<xs:element name="errorFile" type="TextOrVariableType" minOccurs="0"/>
+		</xs:all>
 	</xs:complexType>
 	<xs:complexType name="SecurityType">
 		<xs:attribute name="file" type="xs:string"/>
@@ -1314,8 +1335,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<!--unicoreProcess element has 4 childs: processReference element which represents a process defined elsewhere, unicoreDirPath
 	which represents the unicore client configuration directory, keyFilePath which represnets de unicore cliente certificate file and
 	the unicoreOption which represent a unicore site options-->
-	<xs:complexType name="unicoreProcessType">
-		<xs:sequence>
+	<xs:complexType name="unicoreProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element name="unicoreDirPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="keyFilePath" type="FilePathType" minOccurs="0"/>
@@ -1324,7 +1345,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				maxOccurs="1"/>
 			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType"
 				minOccurs="0" maxOccurs="1"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.unicore.UnicoreProcess"/>
 		<xs:attribute name="keypassword" type="xs:string" use="optional"/>
@@ -1335,11 +1356,11 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	</xs:complexType>
 	<!--unicoreOption has 2 childs: unicoreUsiteType represents the Unicore site, unicoreVsiteType represents the virtual site
 	within the Unicore site. Notice that not all unicore features are supported. -->
-	<xs:complexType name="unicoreOptionType">
-		<xs:sequence>
+	<xs:complexType name="unicoreOptionType" mixed="true">
+		<xs:all>
 			<xs:element name="usite" type="unicoreUsiteType" minOccurs="0"/>
 			<xs:element name="vsite" type="unicoreVsiteType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<xs:complexType name="unicoreUsiteType">
 		<xs:attribute name="name" type="xs:string" use="optional"/>
@@ -1379,8 +1400,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
-	<xs:complexType name="hierarchicalProcessType">
-		<xs:sequence>
+	<xs:complexType name="hierarchicalProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="processReference"/>
 			<xs:element name="hierarchicalReference" type="ProcessReferenceType"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
@@ -1388,7 +1409,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				maxOccurs="1"/>
 			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType"
 				minOccurs="0" maxOccurs="1"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -1404,8 +1425,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 		<xs:attribute name="internal_ip" type="xs:string" use="optional"/>
 	</xs:complexType>
-	<xs:complexType name="NGProcessType">
-		<xs:sequence>
+	<xs:complexType name="NGProcessType" mixed="true">
+		<xs:all>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
@@ -1414,7 +1435,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="fileTransferRetrieve" type="FileTransferRetrieveStructureType"
 				minOccurs="0" maxOccurs="1"/>
 			<xs:element name="ngOption" type="NGOptionType" minOccurs="0"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute name="class" type="xs:string" use="required"
 			fixed="org.objectweb.proactive.core.process.nordugrid.NGProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
@@ -1423,20 +1444,20 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="jobname" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--globusOption element has one child count element-->
-	<xs:complexType name="NGOptionType">
-		<xs:sequence>
+	<xs:complexType name="NGOptionType" mixed="true">
+		<xs:all>
 			<xs:element name="executable" type="FilePathType" minOccurs="0"/>
 			<xs:element name="count" type="PosintOrVariableType" minOccurs="0"/>
-			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
-			<xs:element name="errorFile" type="xs:string" minOccurs="0"/>
-		</xs:sequence>
+			<xs:element name="outputFile" type="TextOrVariableType" minOccurs="0"/>
+			<xs:element name="errorFile" type="TextOrVariableType" minOccurs="0"/>
+		</xs:all>
 	</xs:complexType>
 	<!-- mpiProcessType -->
-	<xs:complexType name="mpiProcessType">
-		<xs:sequence>
+	<xs:complexType name="mpiProcessType" mixed="true">
+		<xs:all>
 			<xs:element minOccurs="1" ref="commandPath"/>
 			<xs:element minOccurs="1" name="mpiOptions" type="mpiOptionsType"/>
-		</xs:sequence>
+		</xs:all>
 		<xs:attribute fixed="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
 			name="class" type="xs:string" use="required"/>
 		<xs:attribute name="mpiFileName" type="xs:string" use="required"/>
@@ -1444,17 +1465,17 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="mpiCommandOptions" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--mpiOptions-->
-	<xs:complexType name="mpiOptionsType">
-		<xs:sequence>
-			<xs:element minOccurs="1" name="processNumber" type="xs:string"/>
+	<xs:complexType name="mpiOptionsType" mixed="true">
+		<xs:all>
+			<xs:element minOccurs="1" name="processNumber" type="PosintOrVariableType"/>
 			<xs:element minOccurs="1" name="localRelativePath" type="FilePathType"/>
 			<xs:element minOccurs="0" name="remoteAbsolutePath" type="FilePathType"/>
-		</xs:sequence>
+		</xs:all>
 	</xs:complexType>
 	<!-- end mpiOptions-->
 	<!-- end of mpiProcessType -->
 	<!-- dependentProcessSequenceType -->
-	<xs:complexType name="dependentProcessSequenceType">
+	<xs:complexType name="dependentProcessSequenceType" mixed="true">
 		<xs:sequence>
 			<xs:choice minOccurs="1">
 				<xs:element name="serviceReference" type="ServiceReferenceType"/>
@@ -1467,7 +1488,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	</xs:complexType>
 	<!-- end of dependentProcessSequenceType -->
 	<!-- independentProcessSequenceType -->
-	<xs:complexType name="independentProcessSequenceType">
+	<xs:complexType name="independentProcessSequenceType" mixed="true">
 		<xs:sequence>
 			<xs:element maxOccurs="unbounded" ref="processReference"/>
 		</xs:sequence>
