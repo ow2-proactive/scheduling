@@ -22,7 +22,6 @@ CLUSTERS=(
 	sagittaire.lyon
 	nancy
 	orsay
-	paraci.rennes
 	parasol.rennes
 	paravent.rennes
 	tartopom.rennes
@@ -151,7 +150,6 @@ function get_cluster_from_hostname {
 		
 		# Frontals still use irisa.fr domain name
 		if   [ "$FQDN" = "parasol-dev.irisa.fr" ]  ; then echo parasol  ; 
-		elif [ "$FQDN" = "paraci-dev.irisa.fr" ]   ; then echo paraci   ; 
 		elif [ "$FQDN" = "paravent-dev.irisa.fr" ] ; then echo paravent ; 
 		elif [ "$FQDN" = "tartopom-dev.irisa.fr" ] ; then echo tartopom ; 
 
@@ -159,9 +157,6 @@ function get_cluster_from_hostname {
 		elif [ "$(expr $FQDN : '\(parasol[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
 		then
 			echo "parasol"
-		elif [ "$(expr $FQDN : '\(paraci[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
-		then
-			echo "paraci"
 		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
 		then
 			echo "paravent"
@@ -238,7 +233,6 @@ function get_cluster_from_hostname {
 
 function cluster2site {
   case $1 in
-    paraci.rennes)   echo rennes ;;
     parasol.rennes)  echo rennes ;;
     paravent.rennes) echo rennes ;;
     tartopom.rennes) echo rennes ;;
@@ -257,7 +251,6 @@ function resolv_cluster_alias {
   case $1 in
 	helios)    echo helios.sophia     ;;
 	azur)      echo azur.sophia       ;;
-	paraci)    echo paraci.rennes     ;;
 	parasol)   echo parasol.rennes    ;;
 	paravent)  echo paravent.rennes   ;;
 	tartopom)  echo tartopom.rennes   ;;
