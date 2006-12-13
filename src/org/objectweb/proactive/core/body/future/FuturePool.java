@@ -83,10 +83,10 @@ public class FuturePool extends Object implements java.io.Serializable {
         } else {
             this.acEnabled = false;
         }
-        if (acEnabled) {
-            queueAC = new ActiveACQueue();
-            //queueAC.start(); //-> done in StartBody()
-        }
+//        if (acEnabled) {
+//            queueAC = new ActiveACQueue();
+//            //queueAC.start(); //-> done in StartBody()
+//        }
     }
 
     //
@@ -188,8 +188,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * this FuturePool
      * */
     public void enableAC() {
-        this.queueAC = new ActiveACQueue();
-        this.queueAC.start();
+        // queueAC is created in a lazy manner (see receiveFutureValue)
         this.acEnabled = true;
     }
 
@@ -199,8 +198,10 @@ public class FuturePool extends Object implements java.io.Serializable {
      * */
     public void disableAC() {
         this.acEnabled = false;
-        this.queueAC.killMe();
-        this.queueAC = null;
+        if (this.queueAC!=null){
+            this.queueAC.killMe();
+            this.queueAC = null;
+        }
     }
 
     /**
@@ -253,7 +254,12 @@ public class FuturePool extends Object implements java.io.Serializable {
                     } catch (SecurityNotAvailableException e) {
                         psm = null;
                     }
-
+                    
+                    // lazy creation of the AC thread
+                    if (this.queueAC==null){
+                        this.queueAC = new ActiveACQueue();
+                        this.queueAC.start();
+                    }
                     //the added reply is a deep copy with the isAC tag set to true
                     queueAC.addACRequest(new ACService(bodiesToContinue,
                             new ReplyImpl(creatorID, id, null, result, psm, true)));
@@ -351,14 +357,6 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures.unsetMigrationTag();
     }
 
-    /**
-     * Start the AC thread if Automatic continuation mechanism is enable
-     */
-    public void startACThread() {
-        if (acEnabled) {
-            this.queueAC.start();
-        }
-    }
 
     //
     // -- PRIVATE METHODS -----------------------------------------------
@@ -376,17 +374,25 @@ public class FuturePool extends Object implements java.io.Serializable {
         setMigrationTag();
         out.defaultWriteObject();
         if (acEnabled) {
-            // send the queue of AC requests
-            out.writeObject(queueAC.getQueue());
-            // stop the ActiveQueue thread if this is not a checkpointing serialization
-            FTManager ftm = ((AbstractBody) (LocalBodyStore.getInstance()
-                                                           .getLocalBody(this.ownerBody))).getFTManager();
-            if (ftm != null) {
-                if (!ftm.isACheckpoint()) {
+            // queue could not be created because of lazy creation
+            if (this.queueAC==null){
+                // notify the reader that queueAC is null
+                out.writeBoolean(false);
+            } else {
+                // notify the reader that queueAC has been created
+                out.writeBoolean(true);
+                // send the queue of AC requests
+                out.writeObject(queueAC.getQueue());
+                // stop the ActiveQueue thread if this is not a checkpointing serialization
+                FTManager ftm = ((AbstractBody) (LocalBodyStore.getInstance()
+                        .getLocalBody(this.ownerBody))).getFTManager();
+                if (ftm != null) {
+                    if (!ftm.isACheckpoint()) {
+                        queueAC.killMe();
+                    }
+                } else {
                     queueAC.killMe();
                 }
-            } else {
-                queueAC.killMe();
             }
         }
     }
@@ -396,10 +402,14 @@ public class FuturePool extends Object implements java.io.Serializable {
         in.defaultReadObject();
         unsetMigrationTag();
         if (acEnabled) {
-            // create a new ActiveACQueue
-            java.util.ArrayList<ACService> queue = (java.util.ArrayList<ACService>) (in.readObject());
-            queueAC = new ActiveACQueue(queue);
-            //queueAC.start(); <-- done in ActiveBody.start();
+            // if queueExists is true, ACqueue has been created
+            boolean queueExists = in.readBoolean();
+            if (queueExists){
+                // create a new ActiveACQueue
+                java.util.ArrayList<ACService> queue = (java.util.ArrayList<ACService>) (in.readObject());
+                queueAC = new ActiveACQueue(queue);
+                queueAC.start(); 
+            }
         }
     }
 

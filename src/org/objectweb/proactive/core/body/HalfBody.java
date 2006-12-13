@@ -89,8 +89,6 @@ public class HalfBody extends AbstractBody {
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
-        //start the ACThread if ac is enable
-        this.localBodyStrategy.getFuturePool().startACThread();
 
         // FAULT TOLERANCE
         String ftstate = ProActiveConfiguration.getFTState();

@@ -196,8 +196,6 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         Thread t = new Thread(this,
                 shortClassName(getName()) + " on " + getNodeURL() + inc);
         t.start();
-        // start the Automatic Continuation thread if AC is enable
-        this.getFuturePool().startACThread();
     }
 
     /**
