@@ -154,7 +154,8 @@ public class SpyEventManager {
 		Iterator bodiesIterator = knownBodies.bodiesIterator();
 		while (bodiesIterator.hasNext()) {
 			Body activeObjectBody = (Body) bodiesIterator.next();
-			if (activeObjectBody.isActive()) {
+			// A spy listens only the active objects which are in the same spy node.
+			if (activeObjectBody.isActive() && activeObjectBody.getNodeURL().compareTo(spyBody.getNodeURL())==0) {
 				addListenersToNewBody(activeObjectBody);
 				spyEvents[i] = new BodyCreationSpyEvent(activeObjectBody.getID(),
 						activeObjectBody.getJobID(),
