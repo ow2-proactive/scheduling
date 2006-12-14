@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.monitoring.Activator;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
 public class VMObject extends AbstractDataObject {
@@ -77,6 +78,11 @@ public class VMObject extends AbstractDataObject {
 	 */
 	@Override
 	public void explore(){
+		
+		// Enable or not the P2P Node monitoring
+        boolean hideP2PNode = new Boolean(System.getProperty(
+                P2PConstants.HIDE_P2PNODE_MONITORING)).booleanValue();
+		
 		String[] namesOfNodes = null;
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
@@ -86,6 +92,11 @@ public class VMObject extends AbstractDataObject {
 		}
 		for (int i = 0; i < namesOfNodes.length; ++i) {
 			String nodeName = namesOfNodes[i];
+			// Enable or not the P2P Node monitoring
+			if (hideP2PNode &&
+                    (nodeName.compareTo(P2PConstants.P2P_NODE_NAME) == 0)) {
+                continue;
+            }
 			if (nodeName.indexOf("SpyListenerNode") == -1) {
 				handleNode(nodeName);
 			}
