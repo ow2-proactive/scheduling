@@ -126,7 +126,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private java.util.ArrayList<VirtualMachine> virtualMachines;
 
     /** the list of local virtual machine (normally one) associated with this VirtualNode */
-    private java.util.ArrayList localVirtualMachines;
+    private java.util.ArrayList<String> localVirtualMachines;
 
     /** index of the last associated jvm used */
     private int lastVirtualMachineIndex;
@@ -235,7 +235,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
-        localVirtualMachines = new java.util.ArrayList<VirtualMachine>();
+        localVirtualMachines = new java.util.ArrayList<String>();
         createdNodes = new java.util.ArrayList<Node>();
         createdRuntimeF = new ArrayList<ProActiveRuntime>();
         awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
@@ -547,7 +547,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             // local nodes creation
             for (int i = 0; i < localVirtualMachines.size(); i++) {
-                String protocol = (String) localVirtualMachines.get(i);
+                String protocol = localVirtualMachines.get(i);
                 internalCreateNodeOnCurrentJvm(protocol);
             }
 
