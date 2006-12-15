@@ -49,7 +49,7 @@ import java.util.ArrayList;
 public abstract class AbstractListProcessDecorator
     implements ExternalProcessDecorator {
     //Array of processes
-    protected ArrayList processes;
+    protected ArrayList<ExternalProcessDecorator> processes;
 
     //baseProcess is used to get the common configuration
     protected ExternalProcessDecorator baseProcess;
@@ -64,11 +64,11 @@ public abstract class AbstractListProcessDecorator
     protected int padding = 1;
     protected int repeat = 1;
     protected int step = 1;
-    protected ArrayList excludeArray = new ArrayList();
+    protected ArrayList<String> excludeArray = new ArrayList<String>();
     protected int nodeNumber = 0;
 
     public AbstractListProcessDecorator() {
-        processes = new ArrayList();
+        processes = new ArrayList<ExternalProcessDecorator>();
     }
 
     public void setHostConfig(String fixedName, String list, String domain,
@@ -88,7 +88,7 @@ public abstract class AbstractListProcessDecorator
             	}
             }
         }
-        baseProcess = (ExternalProcessDecorator) processes.get(0);
+        baseProcess = processes.get(0);
     }
 
     public void setHostList(String hostlistattr, String domain) {
@@ -106,7 +106,7 @@ public abstract class AbstractListProcessDecorator
                 setHostname(hostlist[i]);
             }
         }
-        baseProcess = (ExternalProcessDecorator) processes.get(0);
+        baseProcess =  processes.get(0);
     }
 
     //
@@ -124,7 +124,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void setTargetProcess(ExternalProcess targetProcess) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setTargetProcess(targetProcess);
+            ( processes.get(i)).setTargetProcess(targetProcess);
         }
     }
 
@@ -140,7 +140,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void setCompositionType(int compositionType) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setCompositionType(compositionType);
+            ( processes.get(i)).setCompositionType(compositionType);
         }
     }
 
@@ -180,7 +180,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void closeStream() {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).closeStream();
+            ( processes.get(i)).closeStream();
         }
     }
 
@@ -211,7 +211,7 @@ public abstract class AbstractListProcessDecorator
     public void setInputMessageLogger(
         RemoteProcessMessageLogger inputMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setInputMessageLogger(inputMessageLogger);
+            ( processes.get(i)).setInputMessageLogger(inputMessageLogger);
         }
     }
 
@@ -221,7 +221,7 @@ public abstract class AbstractListProcessDecorator
     public void setErrorMessageLogger(
         RemoteProcessMessageLogger errorMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setErrorMessageLogger(errorMessageLogger);
+            ( processes.get(i)).setErrorMessageLogger(errorMessageLogger);
         }
     }
 
@@ -230,7 +230,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setOutputMessageSink(outputMessageSink);
+            ( processes.get(i)).setOutputMessageSink(outputMessageSink);
         }
     }
 
@@ -246,7 +246,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void setEnvironment(String[] environment) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setEnvironment(environment);
+            ( processes.get(i)).setEnvironment(environment);
         }
     }
 
@@ -278,7 +278,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void setUsername(String username) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setUsername(username);
+            ( processes.get(i)).setUsername(username);
         }
     }
 
@@ -304,7 +304,7 @@ public abstract class AbstractListProcessDecorator
         if (nodeNumber == 0) {
             for (int i = 0; i < processes.size(); i++) {
                 nodeNumber = nodeNumber +
-                    ((ExternalProcessDecorator) processes.get(i)).getNodeNumber();
+                    ( processes.get(i)).getNodeNumber();
             }
         }
         return nodeNumber;
@@ -322,7 +322,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void startProcess() throws IOException {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).startProcess();
+            ( processes.get(i)).startProcess();
         }
     }
 
@@ -331,7 +331,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void stopProcess() {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).stopProcess();
+            ( processes.get(i)).stopProcess();
         }
     }
 
@@ -341,7 +341,7 @@ public abstract class AbstractListProcessDecorator
     public int waitFor() throws InterruptedException {
         int status = 0;
         for (int i = 0; i < processes.size(); i++) {
-            status = ((ExternalProcessDecorator) processes.get(i)).waitFor();
+            status = ( processes.get(i)).waitFor();
             if (status != 0) {
                 return status;
             }
@@ -355,7 +355,7 @@ public abstract class AbstractListProcessDecorator
     public boolean isStarted() {
         boolean started = true;
         for (int i = 0; i < processes.size(); i++) {
-            started = ((ExternalProcessDecorator) processes.get(i)).isStarted();
+            started = ( processes.get(i)).isStarted();
             if (!started) {
                 return started;
             }
@@ -369,7 +369,7 @@ public abstract class AbstractListProcessDecorator
     public boolean isFinished() {
         boolean finished = true;
         for (int i = 0; i < processes.size(); i++) {
-            finished = ((ExternalProcessDecorator) processes.get(i)).isFinished();
+            finished = ( processes.get(i)).isFinished();
             if (!finished) {
                 return finished;
             }
@@ -397,7 +397,7 @@ public abstract class AbstractListProcessDecorator
      */
     public void setCommandPath(String path) {
         for (int i = 0; i < processes.size(); i++) {
-            ((ExternalProcessDecorator) processes.get(i)).setCommandPath(path);
+            ( processes.get(i)).setCommandPath(path);
         }
     }
 
