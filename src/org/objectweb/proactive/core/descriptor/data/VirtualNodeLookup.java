@@ -392,7 +392,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         if (isWaitingForProperties()) {
             String exceptionMessage = "This VirtualNode has not yet been activated since, it is waiting for runtime properties ";
             for (int i = 0; i < runtimeProperties.size(); i++) {
-                exceptionMessage = exceptionMessage.concat((String) runtimeProperties.get(
+                exceptionMessage = exceptionMessage.concat(runtimeProperties.get(
                             i) + " ");
             }
             throw new ProActiveException(exceptionMessage);

@@ -41,14 +41,14 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 1.0.2
  */
 public class RuntimeDeploymentProperties implements java.io.Serializable {
-    protected java.util.ArrayList runtimeProperties;
+    protected java.util.ArrayList<String> runtimeProperties;
 
     public RuntimeDeploymentProperties() {
-        runtimeProperties = new java.util.ArrayList();
+        runtimeProperties = new java.util.ArrayList<String>();
     }
 
     protected void checkProperty(String property) throws ProActiveException {
-        if (!runtimeProperties.contains((String) property)) {
+        if (!runtimeProperties.contains(property)) {
             throw new ProActiveException("This runtime property " + property +
                 " does not exist or has already been set!");
         }
