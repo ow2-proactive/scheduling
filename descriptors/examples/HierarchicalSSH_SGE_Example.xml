@@ -65,7 +65,7 @@
 						<commandPath value="/opt/gridengine/bin/lx26-x86/qsub"/>
                 		<gridEngineOption>
                         	<hostsNumber>10</hostsNumber> 
-                            <bookingDuration>02:00:00</bookingDuration>
+                            <bookingDuration>7200</bookingDuration>
                             <scriptPath>
                             	<absolutePath value="/home/rquilici/ProActive/scripts/unix/cluster/gridEngineStartRuntime.sh"/>
                             </scriptPath>

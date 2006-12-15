@@ -2,7 +2,7 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 xsi:noNamespaceSchemaLocation=
 "http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
-	<!-- <security file="../../descriptors/c3dPolicy.xml"></security> -->
+	<!-- <security file="../../descriptors/security/c3dPolicy.xml"></security> -->
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Dispatcher" property="unique_singleAO"/>

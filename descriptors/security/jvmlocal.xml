@@ -3,10 +3,10 @@
 	xsi:noNamespaceSchemaLocation="SecuritySchema.xsd">
 	<ApplicationName>SampleSec</ApplicationName>
 	<Certificate>
-		/net/home/acontes/dev/ProActive/dev/security/certif/jvm2.cert
+		/net/home/acontes/dev/ProActive/dev/security/certif/jvmlocal.cert
 	</Certificate>
 	<PrivateKey>
-		/net/home/acontes/dev/ProActive/dev/security/certif/jvm2.l
+		/net/home/acontes/dev/ProActive/dev/security/certif/jvmlocal.l
 	</PrivateKey>
 	<CertificationAuthority>
 		<Certificate />

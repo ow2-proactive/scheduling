@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Policy>
- <Certificate>/net/home/acontes/dev/ProActive/dev/security/certif/jvm1.cert</Certificate>
- <PrivateKey>/net/home/acontes/dev/ProActive/dev/security/certif/jvm1.l</PrivateKey>
-    <CertificationAuthority>
-        <Certificate></Certificate>
-    </CertificationAuthority>
-    <TrustedCertificationAuthority>
-    </TrustedCertificationAuthority>
-    <Rules>
- 
-    </Rules>
+<Policy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="SecuritySchema.xsd">
+	<ApplicationName>SampleSec</ApplicationName>
+	<Certificate>
+		/net/home/acontes/dev/ProActive/dev/security/certif/jvm1.cert
+	</Certificate>
+	<PrivateKey>
+		/net/home/acontes/dev/ProActive/dev/security/certif/jvm1.l
+	</PrivateKey>
+	<CertificationAuthority>
+		<Certificate />
+	</CertificationAuthority>
+	<TrustedCertificationAuthority />
+
+	<Rules />
+
+
 </Policy>
