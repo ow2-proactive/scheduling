@@ -128,14 +128,6 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildSSHCommand() {
-        if (IS_WINDOWS_SYSTEM) {
-            return buildWindowsSSHCommand();
-        } else {
-            return buildUnixSSHCommand();
-        }
-    }
-
-    protected String buildUnixSSHCommand() {
         StringBuffer command = new StringBuffer();
         command.append(command_path);
         // append username
@@ -151,26 +143,6 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
         if (logger.isDebugEnabled()) {
             logger.debug(command.toString());
         }
-        return command.toString();
-    }
-
-    protected String buildWindowsSSHCommand() {
-        StringBuffer command = new StringBuffer();
-        command.append(command_path);
-      
-        // append username
-        if (username != null) {
-            command.append(" -l ");
-            command.append(username);
-        }
-        
-        // append host
-        command.append(" ");
-        command.append(hostname);
-      
-
-     
-        command.append(" ");
         return command.toString();
     }
 
