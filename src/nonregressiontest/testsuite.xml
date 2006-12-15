@@ -38,6 +38,7 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.activeobject.wrapper.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
+			<unitTest exclude="no" class="nonregressiontest.descriptor.validateall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.variablecontract.descriptordefaultvariable.Test" />
