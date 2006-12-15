@@ -83,28 +83,28 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     private String lastMainDefinitionID;
 
     /** map keys with mainDefinitions */
-    private Map mainDefinitionMapping;
+    private Map<String, MainDefinition> mainDefinitionMapping;
 
     /** map virtualNode name and objects */
-    private java.util.HashMap virtualNodeMapping;
+    private java.util.HashMap<String, VirtualNode> virtualNodeMapping;
 
     /** map jvm name and object */
-    private java.util.HashMap virtualMachineMapping;
+    private java.util.HashMap<String, VirtualMachine> virtualMachineMapping;
 
     /** map process id and process */
     private java.util.HashMap processMapping;
 
     /** map process id and process updater for later update of the process */
-    private java.util.HashMap pendingProcessMapping;
+    private java.util.HashMap<String, ProcessUpdater> pendingProcessMapping;
 
     /** map process id and service */
-    private java.util.HashMap serviceMapping;
+    private java.util.HashMap<String, UniversalService> serviceMapping;
 
     /** map process id and service updater for later update of the service */
     private java.util.HashMap pendingServiceMapping;
 
     /** map filetransfer-id and filetransfer */
-    private java.util.HashMap fileTransferMapping;
+    private java.util.HashMap<String, FileTransferDefinition> fileTransferMapping;
 
     /** map of the variable contract (ex XMLProperties) */
     private VariableContract variableContract;
@@ -120,24 +120,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     //  public X509Certificate creatorCertificate;
     public String securityFile;
-    private HashMap technicalServiceMapping;
+    private HashMap<String, TechnicalService> technicalServiceMapping;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
     public ProActiveDescriptorImpl(String url) {
-        mainDefinitionMapping = new HashMap();
-        virtualNodeMapping = new java.util.HashMap();
-        virtualMachineMapping = new java.util.HashMap();
+        mainDefinitionMapping = new HashMap<String, MainDefinition>();
+        virtualNodeMapping = new java.util.HashMap<String, VirtualNode>();
+        virtualMachineMapping = new java.util.HashMap<String, VirtualMachine>();
         processMapping = new java.util.HashMap();
-        pendingProcessMapping = new java.util.HashMap();
-        serviceMapping = new java.util.HashMap();
+        pendingProcessMapping = new java.util.HashMap<String, ProcessUpdater>();
+        serviceMapping = new java.util.HashMap<String, UniversalService>();
         pendingServiceMapping = new java.util.HashMap();
-        fileTransferMapping = new java.util.HashMap();
+        fileTransferMapping = new java.util.HashMap<String, FileTransferDefinition>();
         variableContract = new VariableContract();
         this.url = url;
         mainDefined = false;
-        this.technicalServiceMapping = new HashMap();
+        this.technicalServiceMapping = new HashMap<String, TechnicalService>();
     }
 
     //
@@ -212,12 +212,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             return;
         }
 
-        Set mainsId = mainDefinitionMapping.keySet();
-        Iterator it = mainsId.iterator();
-
-        while (it.hasNext()) {
-            String id = (String) it.next();
-            activateMain(id);
+        for (String id : mainDefinitionMapping.keySet()) {
+        	activateMain(id);
         }
     }
 
@@ -241,7 +237,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         return mainDefinitionMapping;
     }
 
-    public void setMainDefinitionMapping(HashMap newMapping) {
+    public void setMainDefinitionMapping(HashMap<String, MainDefinition> newMapping) {
         mainDefinitionMapping = newMapping;
     }
 
@@ -249,11 +245,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      * return the virtual nodes mapping
      * @return Map
      */
-    public Map getVirtualNodeMapping() {
+    public Map<String, VirtualNode> getVirtualNodeMapping() {
         return virtualNodeMapping;
     }
 
-    public void setVirtualNodeMapping(HashMap newMapping) {
+    public void setVirtualNodeMapping(HashMap<String, VirtualNode> newMapping) {
         virtualNodeMapping = newMapping;
     }
 
@@ -263,7 +259,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
      */
     public MainDefinition[] getMainDefinitions() {
         MainDefinition[] mainDefinitions = new MainDefinition[mainDefinitionMapping.size()];
-        Set mainsId = mainDefinitionMapping.keySet();
+        Set<String> mainsId = mainDefinitionMapping.keySet();
         Iterator it = mainsId.iterator();
         int i = 0;
 
@@ -290,11 +286,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public VirtualNode getVirtualNode(String name) {
-        return (VirtualNode) virtualNodeMapping.get(name);
+        return virtualNodeMapping.get(name);
     }
 
     public VirtualMachine getVirtualMachine(String name) {
-        return (VirtualMachine) virtualMachineMapping.get(name);
+        return virtualMachineMapping.get(name);
     }
 
     public ExternalProcess getProcess(String name) {
@@ -321,7 +317,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public UniversalService getService(String serviceID) {
-        return (UniversalService) serviceMapping.get(serviceID);
+        return serviceMapping.get(serviceID);
     }
 
     /**
@@ -446,7 +442,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         String fileTransferID) {
         //TODO throw new ProActiveException 
         //if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
-        FileTransferDefinition ft = (FileTransferDefinition) fileTransferMapping.get(fileTransferID);
+        FileTransferDefinition ft = fileTransferMapping.get(fileTransferID);
 
         if (ft == null) {
             ft = createFileTransferDefinition(fileTransferID);
@@ -636,7 +632,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //  ----- PRIVATE METHODS -----------------------------------------------------------------------------------
     //
     private MainDefinition getMainDefinition(String mainDefinitionID) {
-        return (MainDefinition) mainDefinitionMapping.get(mainDefinitionID);
+        return mainDefinitionMapping.get(mainDefinitionID);
     }
 
     /**
@@ -957,9 +953,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
     }
 
-    public TechnicalServiceWrapper getTechnicalService(
+    public TechnicalService getTechnicalService(
         String technicalServiceId) {
-        TechnicalServiceWrapper ts = (TechnicalServiceWrapper) this.technicalServiceMapping.get(technicalServiceId);
+        TechnicalService ts =  this.technicalServiceMapping.get(technicalServiceId);
 
         if (ts == null) {
             ts = new TechnicalServiceWrapper();

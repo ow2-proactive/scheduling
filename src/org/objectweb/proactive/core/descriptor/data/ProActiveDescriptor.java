@@ -35,7 +35,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
-import org.objectweb.proactive.core.descriptor.services.TechnicalServiceWrapper;
+import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.descriptor.services.TechnicalServiceXmlType;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
@@ -135,9 +135,9 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      */
     public Map getVirtualNodeMapping();
 
-    public void setMainDefinitionMapping(HashMap newMapping);
+    public void setMainDefinitionMapping(HashMap<String, MainDefinition> newMapping);
 
-    public void setVirtualNodeMapping(HashMap newMapping);
+    public void setVirtualNodeMapping(HashMap<String, VirtualNode> newMapping);
 
     /**
      * Returns a table containing all mainDefinitions conserving order
@@ -376,6 +376,6 @@ public interface ProActiveDescriptor extends java.io.Serializable {
     public void addTechnicalService(TechnicalServiceXmlType tsParsed)
         throws Exception;
 
-    public TechnicalServiceWrapper getTechnicalService(
+    public TechnicalService getTechnicalService(
         String technicalServiceId);
 }

@@ -1912,7 +1912,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.overlapping = overlapping;
     }
 
-    public void addTechnicalService(TechnicalServiceWrapper technicalWrapper) {
+    public void addTechnicalService(TechnicalService technicalWrapper) {
         this.technicalService = technicalWrapper;
     }
 
