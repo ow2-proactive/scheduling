@@ -257,6 +257,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // added for main infos
         this.mainVirtualNode = isMainVN;
         this.padURL = padURL;
+        
+        this.descriptor = descriptor;
     }
 
     //
