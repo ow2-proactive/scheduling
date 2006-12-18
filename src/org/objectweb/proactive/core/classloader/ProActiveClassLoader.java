@@ -1,39 +1,46 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.classloader;
 
+import java.io.File;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
-import sun.misc.URLClassPath;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -54,9 +61,10 @@ public class ProActiveClassLoader extends URLClassLoader {
     boolean runtimeReady = false;
     private Object helper;
     private Method helper_getClassData;
+    private final static Logger CLASSLOADER_LOGGER = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
 
     public ProActiveClassLoader() {
-        super(URLClassPath.pathToURLs(System.getProperty("java.class.path")));
+        super(pathToURLs(System.getProperty("java.class.path")));
     }
 
     /*
@@ -64,8 +72,7 @@ public class ProActiveClassLoader extends URLClassLoader {
      * @see ClassLoader#getSystemClassLoader()
      */
     public ProActiveClassLoader(ClassLoader parent) {
-        super(URLClassPath.pathToURLs(System.getProperty("java.class.path")),
-            parent);
+        super(pathToURLs(System.getProperty("java.class.path")), parent);
         try {
             // use a helper class so that the current class does not include any other proactive or application type 
             Class proActiveClassLoaderHelper = loadClass(
@@ -149,5 +156,48 @@ public class ProActiveClassLoader extends URLClassLoader {
             throw new ClassNotFoundException(name);
         }
         return c;
+    }
+
+    /**
+     * Transforms the string classpath to and URL array based classpath.
+     *
+     * The classpath string must be separated with the filesystem path separator.
+     *
+     * @param _classpath
+     *          a classpath string
+     * @return URL[] array of wellformed URL's
+     * @throws MalformedURLException
+     *           if a malformed URL has occurred in the classpath string.
+     */
+    public static URL[] pathToURLs(String _classpath) {
+        StringTokenizer tok = new StringTokenizer(_classpath, File.pathSeparator);
+        ArrayList<String> pathList = new ArrayList<String>();
+
+        while (tok.hasMoreTokens()) {
+            pathList.add(tok.nextToken());
+        }
+
+        URL[] urlArray = new URL[pathList.size()];
+
+        int count = 0;
+        for (int i = 0; i < pathList.size(); i++) {
+            try {
+                urlArray[i] = (new File((String) pathList.get(i))).toURI()
+                               .toURL();
+                count++;
+            } catch (MalformedURLException e) {
+                CLASSLOADER_LOGGER.info("MalformedURLException occured for " +
+                    urlArray[i].toString() +
+                    " during the ProActiveClassLoader creation");
+            }
+        }
+
+        if (count != pathList.size()) {
+            // A MalformedURLException occured
+            URL[] tmpUrlArray = new URL[count];
+            System.arraycopy(urlArray, 0, tmpUrlArray, 0, count);
+        }
+
+        return urlArray;
     }
 }
