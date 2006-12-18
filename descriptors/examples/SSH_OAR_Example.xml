@@ -57,7 +57,7 @@ xsi:noNamespaceSchemaLocation=
 					<processReference refid="linuxJVM1"/>
 					<commandPath value="/usr/bin/oarsub"/>
 					<oarOption>
-						<resources>node=2,weight=2</resources>
+						<resources>nodes=2,weight=2</resources>
 						 <scriptPath>
                                   <absolutePath  value="/home/sophia/rquilici/ProActive/scripts/unix/cluster/oarStartRuntime.sh"/>
                           </scriptPath>
