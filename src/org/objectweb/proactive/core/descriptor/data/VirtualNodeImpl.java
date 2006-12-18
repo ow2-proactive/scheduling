@@ -30,20 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.rmi.AlreadyBoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -88,6 +76,21 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.scheduler.SchedulerConstants;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.rmi.AlreadyBoundException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 /**
  * A <code>VirtualNode</code> is a conceptual entity that represents one or several nodes. After activation
@@ -102,7 +105,6 @@ import org.objectweb.proactive.scheduler.SchedulerConstants;
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNode, Serializable, RuntimeRegistrationEventListener,
         NodeCreationEventListener, ServiceUser {
-
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
@@ -205,8 +207,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     // MPI Process
     ExternalProcess mpiProcess = null;
     private TechnicalService technicalService;
-    
-    private ProActiveDescriptor descriptor;
+    private String descriptorURL;
+
+    //
+    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
+    //
+    ExecutorService threadpool = Executors.newCachedThreadPool();
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -257,8 +263,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // added for main infos
         this.mainVirtualNode = isMainVN;
         this.padURL = padURL;
-        
-        this.descriptor = descriptor;
+        this.descriptorURL = descriptor.getUrl();
     }
 
     //
@@ -313,6 +318,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // to various race conditions.
             logger.error(
                 "addVirtualMachine() cannot be called when the virtualNode has been activated");
+
             return;
         }
 
@@ -1028,11 +1034,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         return this.jobID;
     }
 
-    //
-    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
-    //
-    ExecutorService threadpool = Executors.newCachedThreadPool();
-
     public void runtimeRegistered(RuntimeRegistrationEvent event) {
         if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
             forwarderRuntimeRegisteredPerform(event);
@@ -1040,18 +1041,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // Try to avoid the contention at EventListener level
             // A listener shouldn't perform long computation, so a thread is spawned
             threadpool.execute(new RuntimeRegisteredPerform(event));
-        }
-    }
-
-    private class RuntimeRegisteredPerform implements Runnable {
-        private RuntimeRegistrationEvent event;
-
-        public RuntimeRegisteredPerform(RuntimeRegistrationEvent _event) {
-            this.event = _event;
-        }
-
-        public void run() {
-            runtimeRegisteredPerform(event);
         }
     }
 
@@ -1138,6 +1127,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                                // will gerate an other
                                                // random node's name and
                                                // try to register it again
+
                     String nodeName = this.name +
                         Integer.toString(ProActiveRuntimeImpl.getNextInt());
                     url = buildURL(nodeHost, nodeName, protocol, port);
@@ -1155,6 +1145,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         // Registration has succeded.
                         performOperations(proActiveRuntimeRegistered, url,
                             protocol, event.getVmName());
+
                         break;
                     } catch (AlreadyBoundException e) {
                         registerAttempts--;
@@ -1270,6 +1261,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             int registrationAttempts = REGISTRATION_ATTEMPTS;
 
             while (registrationAttempts > 0) { //If there is an AlreadyBoundException, we generate an other random node name
+
                 String nodeName = this.name +
                     Integer.toString(ProActiveRuntimeImpl.getNextInt());
 
@@ -1305,11 +1297,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // the timeToSleep is < 0. It means that the timeout expired
                     // that is why we catch the runtime exception
                     throw new NodeException(
-                        "After many retries, not even one node can be found for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
+                        "After many retries, not even one node can be found for Virtual Node \"" +
+                        this.name + "\" in descriptor " + this.descriptorURL +
+                        ".");
                 }
             } else {
                 throw new NodeException(
-                    "After many retries, not even one node can be found for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
+                    "After many retries, not even one node can be found for Virtual Node \"" +
+                    this.name + "\" in descriptor " + this.descriptorURL + ".");
             }
         }
 
@@ -1372,12 +1367,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // that is why we catch the runtime exception
                     throw new NodeException("After many retries, only " +
                         nbCreatedNodes + " nodes are created on " +
-                        tempNodeCount + " expected for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
+                        tempNodeCount + " expected for Virtual Node \"" +
+                        this.name + "\" in descriptor " + descriptorURL + ".");
                 }
             } else {
                 throw new NodeException("After many retries, only " +
                     nbCreatedNodes + " nodes are created on " + tempNodeCount +
-                    " expected for Virtual Node \"" + this.name + "\" in descriptor " + this.descriptor.getUrl() +".");
+                    " expected for Virtual Node \"" + this.name +
+                    "\" in descriptor " + descriptorURL + ".");
             }
         }
     }
@@ -1920,5 +1917,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public ArrayList getVirtualMachines() {
         return this.virtualMachines;
+    }
+
+    private class RuntimeRegisteredPerform implements Runnable {
+        private RuntimeRegistrationEvent event;
+
+        public RuntimeRegisteredPerform(RuntimeRegistrationEvent _event) {
+            this.event = _event;
+        }
+
+        public void run() {
+            runtimeRegisteredPerform(event);
+        }
     }
 }
