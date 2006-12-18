@@ -54,26 +54,26 @@ public class MainDefinition implements Serializable {
     //
 
     /** all virtualNodes are put in a List of VirtualNode */
-    private List virtualNodeList;
+    private List<VirtualNode> virtualNodeList;
 
     /** fully qualified name of the main Class */
     private String mainClass;
 
     /** List containing all parameters of the main method, as String */
-    private List parameters;
+    private List<String> parameters;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
-    public MainDefinition(String mainClass, List parameters,
-        List virtualNodeList) {
+    public MainDefinition(String mainClass, List<String> parameters,
+        List<VirtualNode> virtualNodeList) {
         this.virtualNodeList = virtualNodeList;
         this.mainClass = mainClass;
         this.parameters = parameters;
     }
 
     public MainDefinition(String mainClass) {
-        this(mainClass, new ArrayList(), new ArrayList());
+        this(mainClass, new ArrayList<String>(), new ArrayList<VirtualNode>());
     }
 
     public MainDefinition() {
@@ -99,7 +99,7 @@ public class MainDefinition implements Serializable {
      * set the list of virtual nodes
      * @param virtualNodeList new list
      */
-    public void setVirtualNodeList(List virtualNodeList) {
+    public void setVirtualNodeList(List<VirtualNode> virtualNodeList) {
         this.virtualNodeList = virtualNodeList;
     }
 
@@ -115,7 +115,7 @@ public class MainDefinition implements Serializable {
      * set the list of parameters
      * @param parameters list of String
      */
-    public void setParameters(List parameters) {
+    public void setParameters(List<String> parameters) {
         this.parameters = parameters;
     }
 
@@ -123,7 +123,7 @@ public class MainDefinition implements Serializable {
      * return the list of virtual nodes
      * @return list of virtual nodes
      */
-    public List getVirtualNodeList() {
+    public List<VirtualNode> getVirtualNodeList() {
         return virtualNodeList;
     }
 
@@ -134,7 +134,7 @@ public class MainDefinition implements Serializable {
     public VirtualNode[] getVirtualNodes() {
         VirtualNode[] result = new VirtualNode[virtualNodeList.size()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (VirtualNode) virtualNodeList.get(i);
+            result[i] = virtualNodeList.get(i);
         }
         return result;
     }
@@ -153,7 +153,7 @@ public class MainDefinition implements Serializable {
      * @return the i-th virtual node of the list
      */
     public VirtualNode getVirtualNode(int i) {
-        return (VirtualNode) virtualNodeList.get(i);
+        return virtualNodeList.get(i);
     }
 
     /**
@@ -171,7 +171,7 @@ public class MainDefinition implements Serializable {
     public String[] getParameters() {
         String[] result = new String[parameters.size()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = (String) parameters.get(i);
+            result[i] = parameters.get(i);
         }
         return result;
     }

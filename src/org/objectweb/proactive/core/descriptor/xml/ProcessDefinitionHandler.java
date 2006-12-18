@@ -34,7 +34,7 @@ import java.util.StringTokenizer;
 
 import javax.naming.directory.InvalidAttributeValueException;
 
-import org.glite.wms.jdlj.*; //glite-wms-jdlj.jar
+import org.glite.wms.jdlj.Jdl;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
@@ -55,7 +55,6 @@ import org.objectweb.proactive.core.process.oar.OARGRIDSubProcess;
 import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
-import org.objectweb.proactive.core.process.rocks.ClusterForkProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.process.unicore.UnicoreProcess;
 import org.objectweb.proactive.core.util.HostsInfos;
@@ -246,14 +245,14 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         // ------------------------------------------------------
         //
         protected class EnvironmentHandler extends BasicUnmarshaller {
-            private java.util.ArrayList variables;
+            private java.util.ArrayList<String> variables;
 
             public EnvironmentHandler() {
             }
 
             public void startContextElement(String name, Attributes attributes)
                 throws org.xml.sax.SAXException {
-                variables = new java.util.ArrayList();
+                variables = new java.util.ArrayList<String>();
             }
 
             public Object getResultObject() throws org.xml.sax.SAXException {

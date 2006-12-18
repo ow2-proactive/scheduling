@@ -68,7 +68,7 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
     // INNER
     public class TechnicalServiceDefinitionHandler
         extends PassiveCompositeUnmarshaller {
-        private Map argsMap = new Hashtable();
+        private Map<String, String> argsMap = new Hashtable<String, String>();
         private TechnicalServiceXmlType technicalService = new TechnicalServiceXmlType();
 
         public TechnicalServiceDefinitionHandler() {

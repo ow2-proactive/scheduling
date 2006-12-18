@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
+import java.net.URL;
+import java.util.Enumeration;
+
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
@@ -42,11 +45,6 @@ import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.SAXParserErrorHandlerTerminating;
 import org.objectweb.proactive.scheduler.Scheduler;
-
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import java.util.Enumeration;
 
 /**
  * This class receives deployment events
