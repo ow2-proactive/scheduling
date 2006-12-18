@@ -34,7 +34,7 @@ public class MulticastBindingChecker implements Serializable {
      * @param clientSideMethod
      * @param serverSideMethods
      * @param serverItfIsGathercast TODO
-     * @return
+     * @return the method found if any. Throws an exception, otherwise.
      * @throws ParameterDispatchException
      * @throws NoSuchMethodException
      */

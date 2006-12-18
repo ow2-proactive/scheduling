@@ -127,11 +127,11 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.ComponenParametersController ComponenParametersController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.ComponentParametersController ComponentParametersController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.ComponenParametersController ComponenParametersController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.ComponentParametersController ComponentParametersController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */

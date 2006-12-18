@@ -54,7 +54,6 @@ public class ContentDescription implements Serializable {
      * constructor
      * @param className the name of the base class of the component
      * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
-     * If the component is a parallel component, this class is by default
      * @param constructorParameters parameters of the constructor of the base class
      * @param activity the activity as defined in the ProActive model
      * @param factory overriden meta-object factory for the component. Can be null.
@@ -71,7 +70,6 @@ public class ContentDescription implements Serializable {
      * constructor
      * @param className the name of the base class of the component
      * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
-     * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
      * @param constructorParameters parameters of the constructor of the base class
      */
     public ContentDescription(String className, Object[] constructorParameters) {
@@ -83,7 +81,6 @@ public class ContentDescription implements Serializable {
      * constructor
      * @param className the name of the base class of the component
      * If the component is a composite component, this class is by default {@link org.objectweb.proactive.core.component.type.Composite}
-     * If the component is a parallel component, this class is by default {@link org.objectweb.proactive.core.component.type.ParallelComposite}
      */
     public ContentDescription(String className) {
         this(className, null, null, null);

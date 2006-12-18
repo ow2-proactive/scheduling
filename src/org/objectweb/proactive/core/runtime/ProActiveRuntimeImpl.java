@@ -181,7 +181,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
                 } else {
-                    logger.info(
+                    logger.debug(
                         "ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled ");
                 }
             } catch (InvalidPolicyFile e) {
