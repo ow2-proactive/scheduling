@@ -30,8 +30,20 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -76,21 +88,6 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.scheduler.SchedulerConstants;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.rmi.AlreadyBoundException;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 
 /**
  * A <code>VirtualNode</code> is a conceptual entity that represents one or several nodes. After activation
@@ -105,6 +102,7 @@ import java.util.concurrent.Executors;
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNode, Serializable, RuntimeRegistrationEventListener,
         NodeCreationEventListener, ServiceUser {
+
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
@@ -209,10 +207,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private TechnicalService technicalService;
     private String descriptorURL;
 
-    //
-    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
-    //
-    ExecutorService threadpool = Executors.newCachedThreadPool();
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -1033,6 +1027,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public String getJobID() {
         return this.jobID;
     }
+    
+    //
+    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
+    //
+    ExecutorService threadpool = Executors.newCachedThreadPool();
 
     public void runtimeRegistered(RuntimeRegistrationEvent event) {
         if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
@@ -1044,6 +1043,18 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
+    private class RuntimeRegisteredPerform implements Runnable {
+        private RuntimeRegistrationEvent event;
+
+        public RuntimeRegisteredPerform(RuntimeRegistrationEvent _event) {
+            this.event = _event;
+        }
+
+        public void run() {
+            runtimeRegisteredPerform(event);
+        }
+    }
+    
     private synchronized void forwarderRuntimeRegisteredPerform(
         RuntimeRegistrationEvent event) {
         VirtualMachine virtualMachine = null;
@@ -1127,7 +1138,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                                // will gerate an other
                                                // random node's name and
                                                // try to register it again
-
                     String nodeName = this.name +
                         Integer.toString(ProActiveRuntimeImpl.getNextInt());
                     url = buildURL(nodeHost, nodeName, protocol, port);
@@ -1261,7 +1271,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             int registrationAttempts = REGISTRATION_ATTEMPTS;
 
             while (registrationAttempts > 0) { //If there is an AlreadyBoundException, we generate an other random node name
-
                 String nodeName = this.name +
                     Integer.toString(ProActiveRuntimeImpl.getNextInt());
 
@@ -1919,15 +1928,4 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         return this.virtualMachines;
     }
 
-    private class RuntimeRegisteredPerform implements Runnable {
-        private RuntimeRegistrationEvent event;
-
-        public RuntimeRegisteredPerform(RuntimeRegistrationEvent _event) {
-            this.event = _event;
-        }
-
-        public void run() {
-            runtimeRegisteredPerform(event);
-        }
-    }
 }
