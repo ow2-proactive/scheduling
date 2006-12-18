@@ -207,7 +207,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private TechnicalService technicalService;
     private String descriptorURL;
 
-
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
@@ -257,7 +256,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // added for main infos
         this.mainVirtualNode = isMainVN;
         this.padURL = padURL;
+
         this.descriptorURL = descriptor.getProActiveDescriptorURL();
+
     }
 
     //
@@ -1031,15 +1032,19 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
-    ExecutorService threadpool = Executors.newCachedThreadPool();
+    private transient ExecutorService rrThreadpool = Executors.newCachedThreadPool();
 
+
+    //
+    //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
+    //
     public void runtimeRegistered(RuntimeRegistrationEvent event) {
         if (event.getType() == RuntimeRegistrationEvent.FORWARDER_RUNTIME_REGISTERED) {
             forwarderRuntimeRegisteredPerform(event);
         } else {
             // Try to avoid the contention at EventListener level
             // A listener shouldn't perform long computation, so a thread is spawned
-            threadpool.execute(new RuntimeRegisteredPerform(event));
+            rrThreadpool.execute(new RuntimeRegisteredPerform(event));
         }
     }
 
@@ -1353,6 +1358,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             fw.waitForAll(); //wait-by-necessity
         }
 
+//        rrThreadpool.shutdown();
+//        while (!rrThreadpool.isTerminated()) {
+//        	try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return;
     }
 
@@ -1589,7 +1602,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String url, String protocol, String vmName) {
         Node node = new NodeImpl(part, url, checkProtocol(protocol),
                 this.jobID, vmName);
-        createdNodes.add(node);
+       synchronized (createdNodes) {
+    	   createdNodes.add(node);	
+	}
+       
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
         nodeCreated = true;
@@ -1708,7 +1724,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 return;
             }
         }
-
+        
         out.defaultWriteObject();
     }
 
@@ -1716,6 +1732,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        rrThreadpool = Executors.newCachedThreadPool();
     }
 
     // -------------------------------------------------------------------------
