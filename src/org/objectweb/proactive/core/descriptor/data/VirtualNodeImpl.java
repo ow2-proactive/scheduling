@@ -257,7 +257,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // added for main infos
         this.mainVirtualNode = isMainVN;
         this.padURL = padURL;
-        this.descriptorURL = descriptor.getUrl();
+        this.descriptorURL = descriptor.getProActiveDescriptorURL();
     }
 
     //
@@ -767,7 +767,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             return node;
         } else {
-            throw new NodeException("Cannot get the node " + this.name);
+            throw new NodeException("Cannot get a node from Virtual Node " + this.name+". Descriptor in use : \""+descriptorURL+"\"." );
         }
     }
 
@@ -776,7 +776,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         if (node == null) {
             throw new NodeException(
-                "Cannot return the first node, no nodes hava been created");
+                "Cannot return the first node, no nodes hava been created for Virtual Node "+this.name+". Descriptor in use : \""+descriptorURL+"\".");
         }
 
         FileVector fw = fileTransferDeployedStatus.get(node.getNodeInformation()
@@ -810,7 +810,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             if (!MAX_P2P) {
                 throw new NodeException(
-                    "Cannot return nodes, no nodes have been created");
+                    "Cannot return nodes, no nodes have been created for Virtual Node "+this.name+". Descriptor in use : \""+descriptorURL+"\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
@@ -844,7 +844,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             if (!MAX_P2P) {
                 throw new NodeException(
-                    "Cannot return nodes, no nodes have been created");
+                    "Cannot return nodes, no nodes have been created for Virtual Node "+this.name+". Descriptor in use : \""+descriptorURL+"\".");
             } else {
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
@@ -882,7 +882,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         } else {
             throw new NodeException(
-                "Cannot return nodes, no nodes hava been created");
+                "Cannot return nodes, no nodes hava been created. Descriptor in use : \""+descriptorURL+"\".");
         }
     }
 
@@ -1307,13 +1307,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // that is why we catch the runtime exception
                     throw new NodeException(
                         "After many retries, not even one node can be found for Virtual Node \"" +
-                        this.name + "\" in descriptor " + this.descriptorURL +
-                        ".");
+                        this.name + "\" in descriptor \"" + this.descriptorURL +
+                        "\".");
                 }
             } else {
                 throw new NodeException(
                     "After many retries, not even one node can be found for Virtual Node \"" +
-                    this.name + "\" in descriptor " + this.descriptorURL + ".");
+                    this.name + "\" in descriptor \"" + this.descriptorURL + "\".");
             }
         }
 
@@ -1377,13 +1377,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     throw new NodeException("After many retries, only " +
                         nbCreatedNodes + " nodes are created on " +
                         tempNodeCount + " expected for Virtual Node \"" +
-                        this.name + "\" in descriptor " + descriptorURL + ".");
+                        this.name + "\" in descriptor \"" + descriptorURL + "\".");
                 }
             } else {
                 throw new NodeException("After many retries, only " +
                     nbCreatedNodes + " nodes are created on " + tempNodeCount +
                     " expected for Virtual Node \"" + this.name +
-                    "\" in descriptor " + descriptorURL + ".");
+                    "\" in descriptor \"" + descriptorURL + "\".");
             }
         }
     }

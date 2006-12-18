@@ -112,6 +112,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     /** Location of the xml file */
     private String url;
     private String jobID;
+    private String descriptorURL;
     private boolean mainDefined;
 
     /** security rules */
@@ -136,6 +137,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         fileTransferMapping = new java.util.HashMap<String, FileTransferDefinition>();
         variableContract = new VariableContract();
         this.url = url;
+        this.descriptorURL = url;
         mainDefined = false;
         this.technicalServiceMapping = new HashMap<String, TechnicalService>();
     }
@@ -145,6 +147,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     //
     public String getUrl() {
         return this.url;
+    }
+    
+    public String getProActiveDescriptorURL() {
+    	return descriptorURL;
     }
 
     /**

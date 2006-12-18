@@ -69,6 +69,12 @@ public interface ProActiveDescriptor extends java.io.Serializable {
      * This identifier is build from the pad url appended with the pad's jobId.
      */
     public String getUrl();
+    
+    /**
+     * Returns the descriptor's location
+     * @return the location of the xml proactive descriptor file used.
+     */
+    public String getProActiveDescriptorURL();
 
     public void setMainDefined(boolean mainDefined);
 
