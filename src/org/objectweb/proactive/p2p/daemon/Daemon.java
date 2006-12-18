@@ -589,7 +589,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         java.net.URL url = null;
 
         try {
-            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURL();
+            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURI().toURL();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
