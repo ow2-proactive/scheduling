@@ -49,7 +49,9 @@ public class TS implements TechnicalService {
     public void apply(Node node) {
         try {
             node.setProperty("arg1", this.arg1);
-            node.setProperty("arg2", this.arg2);
+            if (arg2 != null) {
+                node.setProperty("arg2", this.arg2);
+            }
         } catch (ProActiveException e) {
             throw new RuntimeException(e);
         }
