@@ -63,13 +63,13 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     // -- PRIVATE MEMBER -----------------------------------------------
     //
-    private Hashtable idToBodyMap;
+    private Hashtable<UniqueID, UniversalBody> idToBodyMap;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public BodyMap() {
-        idToBodyMap = new Hashtable();
+        idToBodyMap = new Hashtable<UniqueID, UniversalBody>();
     }
 
     //
@@ -114,7 +114,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     }
 
     public synchronized void removeBody(UniqueID id) {
-        UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
+        UniversalBody b = idToBodyMap.remove(id);
         notifyAll();
 
         if ((b != null) && hasListeners()) {
@@ -141,7 +141,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         return idToBodyMap.containsKey(id);
     }
 
-    public java.util.Iterator bodiesIterator() {
+    public java.util.Iterator<UniversalBody> bodiesIterator() {
         return idToBodyMap.values().iterator();
     }
 
@@ -167,7 +167,7 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     public Object clone() {
         BodyMap newLocationTable = new BodyMap();
-        newLocationTable.idToBodyMap = (java.util.Hashtable) idToBodyMap.clone();
+        newLocationTable.idToBodyMap = (Hashtable<UniqueID, UniversalBody>)idToBodyMap.clone();
 
         return newLocationTable;
     }
