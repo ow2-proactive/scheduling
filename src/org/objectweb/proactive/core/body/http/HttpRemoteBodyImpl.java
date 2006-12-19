@@ -493,7 +493,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
 
             try {
                 
-                return (ArrayList) req.getReturnedObject();
+                return (ArrayList<Entity>) req.getReturnedObject();
             } catch (SecurityNotAvailableException ex) {
                 throw ex;
             } catch (Exception e) {
