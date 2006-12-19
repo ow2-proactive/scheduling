@@ -45,7 +45,7 @@ public class PAObjectInputStream extends ObjectInputStream {
         super();
     }
 
-    protected Class resolveClass(ObjectStreamClass desc)
+    protected Class<?> resolveClass(ObjectStreamClass desc)
         throws IOException, ClassNotFoundException {
         try {
             super.resolveClass(desc);

@@ -46,18 +46,18 @@ public abstract class Utils extends Object {
     /**
      * Static variables
      */
-    public static final Class JAVA_LANG_NUMBER = silentForName(
+    public static final Class<?> JAVA_LANG_NUMBER = silentForName(
             "java.lang.Number");
-    public static final Class JAVA_LANG_CHARACTER = silentForName(
+    public static final Class<?> JAVA_LANG_CHARACTER = silentForName(
             "java.lang.Character");
-    public static final Class JAVA_LANG_BOOLEAN = silentForName(
+    public static final Class<?> JAVA_LANG_BOOLEAN = silentForName(
             "java.lang.Boolean");
-    public static final Class JAVA_LANG_VOID = silentForName("java.lang.Void");
-    public static final Class JAVA_LANG_RUNTIMEEXCEPTION = silentForName(
+    public static final Class<?> JAVA_LANG_VOID = silentForName("java.lang.Void");
+    public static final Class<?> JAVA_LANG_RUNTIMEEXCEPTION = silentForName(
             "java.lang.RuntimeException");
-    public static final Class JAVA_LANG_EXCEPTION = silentForName(
+    public static final Class<?> JAVA_LANG_EXCEPTION = silentForName(
             "java.lang.Exception");
-    public static final Class JAVA_LANG_THROWABLE = silentForName(
+    public static final Class<?> JAVA_LANG_THROWABLE = silentForName(
             "java.lang.Throwable");
     public static final String STUB_DEFAULT_PREFIX = "Stub_";
     public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
@@ -302,7 +302,7 @@ public abstract class Utils extends Object {
      * Tests if the class given as an argument is a wrapper class
      * How can we be sure that all subclasses of java.lang.Number are wrappers ??
      */
-    public static boolean isWrapperClass(Class cl) {
+    public static boolean isWrapperClass(Class<?> cl) {
         if (Utils.JAVA_LANG_NUMBER.isAssignableFrom(cl)) {
             return true;
         } else if (Utils.JAVA_LANG_BOOLEAN.isAssignableFrom(cl)) {
@@ -407,7 +407,7 @@ public abstract class Utils extends Object {
         }
     }
 
-    public static boolean isSuperTypeInArray(Class c, Class[] types) {
+    public static boolean isSuperTypeInArray(Class c, Class<?>[] types) {
         for (int i = 0; i < types.length; i++) {
             if (types[i].isAssignableFrom(c)) {
                 return true;

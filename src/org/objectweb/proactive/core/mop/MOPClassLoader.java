@@ -49,7 +49,7 @@ public class MOPClassLoader extends URLClassLoader {
     public static String BYTE_CODE_MANIPULATOR = (System.getProperty(
             "byteCodeManipulator") != null)
         ? System.getProperty("byteCodeManipulator") : "javassist";
-    protected static Hashtable classDataCache = new Hashtable();
+    protected static Hashtable<String, byte[]> classDataCache = new Hashtable<String, byte[]>();
     protected static MOPClassLoader mopCl = null;
 
     /**
@@ -76,7 +76,7 @@ public class MOPClassLoader extends URLClassLoader {
      */
     public byte[] getClassData(String classname) {
         byte[] cb = null;
-        cb = (byte[]) classDataCache.get(classname);
+        cb = classDataCache.get(classname);
         if (cb == null) {
         	if (logger.isDebugEnabled()) {
         		logger.debug(
@@ -87,7 +87,7 @@ public class MOPClassLoader extends URLClassLoader {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
-            cb = (byte[]) classDataCache.get(classname);
+            cb = classDataCache.get(classname);
         }
         return cb;
     }
@@ -148,11 +148,11 @@ public class MOPClassLoader extends URLClassLoader {
         return new MOPClassLoader(currentClassLoader, urls);
     }
 
-    protected Class findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         return super.findClass(name);
     }
 
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         return this.loadClass(name, null, null, false);
     }
     
