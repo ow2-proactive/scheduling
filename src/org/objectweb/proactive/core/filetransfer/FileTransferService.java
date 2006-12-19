@@ -65,13 +65,13 @@ public class FileTransferService implements ProActiveInternalObject {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = 8;
     public static final int DEFAULT_BUFFER_SIZE = 512 * 1024; //Bytes
-    protected HashMap readBufferMap; //Map for storing the opened reading sockets
-    protected HashMap writeBufferMap; //Map for storing the opened output sockets
+    protected HashMap<File, BufferedInputStream> readBufferMap; //Map for storing the opened reading sockets
+    protected HashMap<File, BufferedOutputStream> writeBufferMap; //Map for storing the opened output sockets
     protected FileForwarder forwardFile; 
     
     public FileTransferService() {
-        readBufferMap = new HashMap();
-        writeBufferMap = new HashMap();
+        readBufferMap = new HashMap<File, BufferedInputStream>();
+        writeBufferMap = new HashMap<File, BufferedOutputStream>();
         forwardFile = new FileForwarder(this);
     }
 
@@ -107,7 +107,7 @@ public class FileTransferService implements ProActiveInternalObject {
             }
         }
 
-        return (BufferedOutputStream) writeBufferMap.get(f);
+        return writeBufferMap.get(f);
     }
 
     private synchronized BufferedInputStream getReadingBuffer(File f) {
@@ -122,11 +122,11 @@ public class FileTransferService implements ProActiveInternalObject {
             }
         }
 
-        return (BufferedInputStream) readBufferMap.get(f);
+        return readBufferMap.get(f);
     }
 
     public synchronized void closeRead(File f) {
-        BufferedInputStream bis = (BufferedInputStream) readBufferMap.remove(f);
+        BufferedInputStream bis = readBufferMap.remove(f);
         try {
             if (bis != null) {
                 bis.close();
@@ -136,7 +136,7 @@ public class FileTransferService implements ProActiveInternalObject {
     }
 
     public synchronized BooleanWrapper closeWrite(File f) {
-        BufferedOutputStream bos = (BufferedOutputStream) writeBufferMap.remove(f);
+        BufferedOutputStream bos = writeBufferMap.remove(f);
         try {
             if (bos != null) {
                 bos.close();

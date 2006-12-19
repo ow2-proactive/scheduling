@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.filetransfer;
 
 import java.io.File;
@@ -50,16 +50,22 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 class FileForwarder {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    protected HashMap servingRequests; //Map of Vectors of FileTransferService holding remote FTS to send the file (key of the hash)
-    protected HashMap newRequests; //Map of Vectors of FileTransferService holding new remote FTS to send the file (key of the hash)
-    protected HashMap failedRequests; //Map of Vectors of failed FileTransferRequests
+
+    //  Map of Vectors of FileTransferService holding remote FTS to send the file (key of the hash)
+    protected HashMap<File, Vector<FileTransferRequest>> servingRequests;
+
+    //  Map of Vectors of FileTransferService holding new remote FTS to send the file (key of the hash)
+    protected HashMap<File, Vector<FileTransferRequest>> newRequests;
+
+    //  Map of Vectors of failed FileTransferRequests
+    protected HashMap<File, Vector<FileTransferRequest>> failedRequests;
     protected FileTransferService servingFTS;
     protected FileDispatcher dispatcher;
 
     public FileForwarder(FileTransferService fts) {
-        servingRequests = new HashMap();
-        newRequests = new HashMap();
-        failedRequests = new HashMap();
+        servingRequests = new HashMap<File, Vector<FileTransferRequest>>();
+        newRequests = new HashMap<File, Vector<FileTransferRequest>>();
+        failedRequests = new HashMap<File, Vector<FileTransferRequest>>();
         servingFTS = fts; //direct reference to the object (not a stub)
 
         try { //TODO handle the exception
@@ -80,10 +86,10 @@ class FileForwarder {
             logger.debug("Setting file transfer request for:" + fti);
         }
         if (!newRequests.containsKey(fti.getSrcFile())) {
-            newRequests.put(fti.getSrcFile(), new Vector());
+            newRequests.put(fti.getSrcFile(), new Vector<FileTransferRequest>());
         }
 
-        Vector requests = (Vector) newRequests.get(fti.getSrcFile());
+        Vector<FileTransferRequest> requests = newRequests.get(fti.getSrcFile());
         requests.add(fti);
     }
 
@@ -114,9 +120,9 @@ class FileForwarder {
             return; //nothing to do
         }
 
-        Vector forward = (Vector) servingRequests.get(srcFile);
+        Vector<FileTransferRequest> forward = servingRequests.get(srcFile);
         for (int i = 0; i < forward.size(); i++) {
-            FileTransferRequest ftr = (FileTransferRequest) forward.get(i);
+            FileTransferRequest ftr = forward.get(i);
             OperationStatus opStat = dispatcher.sendBlock(ftr.getDestinationFTS(),
                     block, ftr.getDstFile()); //async call
 
@@ -134,16 +140,16 @@ class FileForwarder {
             return; //nothing to do
         }
 
-        Vector forward = (Vector) servingRequests.get(srcFile);
+        Vector<FileTransferRequest> forward = servingRequests.get(srcFile);
         for (int i = 0; i < forward.size(); i++) {
-            FileTransferRequest ftr = (FileTransferRequest) forward.get(i);
+            FileTransferRequest ftr = forward.get(i);
             dispatcher.sendBlockFileBlockWithoutThrowingException(ftr.getDestinationFTS(),
                 block, ftr.getDstFile()); //async call
                                           /*
             if(opStat.hasException()){ //call failed
-                    forward.remove(i);
-                    ftr.setDstFuture(opStat);
-                    addToHash(failedRequests,srcFile, ftr);
+            forward.remove(i);
+            ftr.setDstFuture(opStat);
+            addToHash(failedRequests,srcFile, ftr);
             }
             */
         }
@@ -154,9 +160,9 @@ class FileForwarder {
             return; //nothing to do
         }
 
-        Vector forward = (Vector) servingRequests.get(srcFile);
+        Vector<FileTransferRequest> forward = servingRequests.get(srcFile);
         for (int i = 0; i < forward.size(); i++) {
-            FileTransferRequest ftr = (FileTransferRequest) forward.get(i);
+            FileTransferRequest ftr = forward.get(i);
             for (int j = 0; j < block.length; j++) {
                 dispatcher.sendBlockFileBlockWithoutThrowingException(ftr.getDestinationFTS(),
                     block[j], ftr.getDstFile()); //async call
@@ -189,9 +195,9 @@ class FileForwarder {
 
         servingFTS.closeWrite(file); //close the buffer to generate a flush
 
-        Vector requests = (Vector) newRequests.remove(file);
+        Vector<FileTransferRequest> requests = newRequests.remove(file);
         for (int i = 0; i < requests.size(); i++) {
-            FileTransferRequest ftr = (FileTransferRequest) requests.get(i);
+            FileTransferRequest ftr = requests.get(i);
 
             if (!ftr.getSrcFile().equals(file)) {
                 ftr.setDstFuture(new OperationStatus(
@@ -224,11 +230,12 @@ class FileForwarder {
         servingFTS.getWritingBuffer(file, true); //open the writting buffer for appending
     }
 
-    private void addToHash(HashMap hash, File file, FileTransferRequest ftr) {
+    private void addToHash(HashMap<File, Vector<FileTransferRequest>> hash,
+        File file, FileTransferRequest ftr) {
         if (!hash.containsKey(file)) {
-            hash.put(file, new Vector());
+            hash.put(file, new Vector<FileTransferRequest>());
         }
-        Vector v = (Vector) hash.get(file);
+        Vector<FileTransferRequest> v = hash.get(file);
 
         v.add(ftr);
     }
@@ -245,7 +252,7 @@ class FileForwarder {
             return;
         }
 
-        Vector opStat = new Vector();
+        Vector<OperationStatus> opStat = new Vector<OperationStatus>();
         for (int i = 0; i < requests.size(); i++) {
             FileTransferRequest ftr = (FileTransferRequest) requests.get(i);
             FileTransferService remoteFTS = ftr.getDestinationFTS();
@@ -276,9 +283,9 @@ class FileForwarder {
     public synchronized OperationStatus getFileTransferRequestStatus(
         FileTransferRequest ftr) {
         //check if the operation was never performed
-        Vector v = (Vector) newRequests.get(ftr.getSrcFile());
+        Vector<FileTransferRequest> v = newRequests.get(ftr.getSrcFile());
         for (int i = 0; (v != null) && (i < v.size()); i++) {
-            if (ftr.equals((FileTransferRequest) v.get(i))) {
+            if (ftr.equals(v.get(i))) {
                 v.remove(i);
                 return new OperationStatus(true);
             }
@@ -288,9 +295,9 @@ class FileForwarder {
         }
 
         //check if the operation encountered errors
-        v = (Vector) failedRequests.get(ftr.getSrcFile());
+        v = failedRequests.get(ftr.getSrcFile());
         for (int i = 0; (v != null) && (i < v.size()); i++) {
-            if (ftr.equals((FileTransferRequest) v.get(i))) {
+            if (ftr.equals(v.get(i))) {
                 v.remove(i);
                 return ftr.getOperationFuture();
             }
