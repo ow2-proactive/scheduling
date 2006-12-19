@@ -7,9 +7,9 @@
   url="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download</ulink>
   under a <ulink url="http://www.gnu.org/copyleft/lesser.txt">LGPL
   license</ulink>. ProActive requires the <ulink
-  url="http://java.sun.com/j2se/1.4/">JDK 1.4</ulink> or later to be installed
+  url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed
   on your computer. Please note that ProActive will NOT run with any version
-  prior to 1.4 since some features introduced in JDK 1.4 are essential.</para>
+  prior to 1.5 since some features introduced in JDK 1.5 are essential.</para>
 
   <sect1>
     <title>Quick Start</title>
@@ -61,22 +61,31 @@
             <secondary>configuration</secondary>
           </indexterm>
 
-          <para>Include in your <literal>CLASSPATH</literal> the following jar
-          files <literal>ProActive/ProActive.jar, ProActive/lib/asm.jar,
-          ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar,
-          ProActive/lib/components/fractal.jar,
+          <para>Include in your <literal>CLASSPATH</literal> the ProActive jar
+          file (ProActive/ProActive.jar) along with
+          <literal>ProActive/lib/javassist.jar,
+          ProActive/lib/components/asm-2.2.1.jar, ProActive/lib/log4j.jar,
+          ProActive/lib/xercesImpl.jar, ProActive/lib/components/fractal.jar,
           ProActive/lib/bouncycastle.jar</literal></para>
+        </listitem>
+
+        <listitem>
+          <para>Depending on your project needs, you might need to include
+          other libraries located in the ProActive/lib directory.</para>
         </listitem>
 
         <listitem>
           <para>Don't forget to launch the JVM with a <ulink
           url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">security
-          policy file</ulink>. You can also specify a <ulink
+          policy file</ulink> using the option
+          -Djava.security.policy=pathToFile. A basic policy file called
+          proactive.java.policy can be found within proactive. You can also
+          specify a <ulink
           url="http://logging.apache.org/log4j/docs/manual.html">log4j
           configuration file</ulink> with the property
           <literal>-Dlog4j.configuration=file:pathToFile</literal>. If not
           specified a default logger that logs on the console will be
-          created</para>
+          created.</para>
         </listitem>
       </itemizedlist>
 
@@ -318,9 +327,9 @@
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">lib/asm.jar</emphasis> ASM the default
-        bytecode manipulation framework used to dynamically generate the java
-        bytecode of the Stubs.</para>
+        <para><emphasis role="bold">lib/components/asm-2.2.1.jar</emphasis>
+        ASM the default bytecode manipulation framework used to dynamically
+        generate the java bytecode of the Stubs.</para>
       </listitem>
 
       <listitem>
@@ -421,13 +430,14 @@
     <para><emphasis>If you use the scripts provided with the distribution to
     run the examples an existing policy file named <emphasis
     role="bold">proactive.java.policy</emphasis> will be used by
-    default</emphasis></para>
+    default.</emphasis></para>
 
     <para>See <ulink
     url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions
-    in the JavaTM 2 SDK</ulink> to learn more about Java permissions. As a
-    first approximation to run your code you can create a simple policy file
-    granted all for everything :</para>
+    in the JavaTM 2 SDK</ulink> to learn more about Java permissions. The
+    option -Djava.security.policy=pathToFile will specify which policy file to
+    use within proactive. As a first approximation, you can create a simple
+    policy file granting all for everything :</para>
 
     <para><screen>grant {
     permission java.security.AllPermission;
@@ -461,11 +471,11 @@
   <sect1>
     <title>ProActive and IDEs (Eclipse, ...)</title>
 
-    <para>We highly recommend you to use the Eclispe IDE to develop your
-    ProActive applications. You can get this tool on the <ulink
+    <para>We recommend you to use the Eclispe IDE to develop your ProActive
+    applications. You can get this tool on the <ulink
     url="http://www.eclipse.org">Eclipse website</ulink> Just unzip and launch
     the eclipse executable. In order to develop your own ProActive
-    application, you have to create an eclipse project :</para>
+    application, you will need to create an eclipse project :</para>
 
     <para><emphasis role="bold">File -&gt; New ... -&gt;
     Project</emphasis></para>
@@ -482,14 +492,14 @@
       </mediaobject>
     </informalfigure>
 
-    <para>In order to separate class files from source files ( it can be
-    usefull when you write scripts that refer to these classes), you can check
-    the <emphasis role="bold">Create separate source and ouput
-    folders</emphasis> in the <emphasis role="bold">Project Layout</emphasis>
-    Frame, and click on <emphasis role="bold">configure default ...</emphasis>
-    to choose the folders names. Once you have choosen all informations about
-    <emphasis role="bold">Project Name</emphasis> , <emphasis
-    role="bold">Project location</emphasis> , you can click on <emphasis
+    <para>In order to separate class files from source files (it can be useful
+    if you write scripts which refer to these classes), you can check the
+    <emphasis role="bold">Create separate source and ouput folders</emphasis>
+    in the <emphasis role="bold">Project Layout</emphasis> Frame, and click on
+    <emphasis role="bold">configure default ...</emphasis> to choose the
+    folders names. Once you have choosen all informations about <emphasis
+    role="bold">Project Name</emphasis> , <emphasis role="bold">Project
+    location</emphasis> , you can click on <emphasis
     role="bold">Next</emphasis> .</para>
 
     <para>You have to specify some java settings in order to set the
@@ -592,7 +602,7 @@
         find ProActive's classes.</emphasis> Your <literal>CLASSPATH</literal>
         environment variable does not contain the entry for the ProActive's or
         ASM's or Log4j's or Xerces' or Fractal's or BouncyCastle's classes.
-        <literal>ProActive.jar,</literal><literal>asm.jar, log4j.jar,
+        <literal>ProActive.jar,</literal><literal>asmXX.jar, log4j.jar,
         xercesImpl.jar, fractal.jar, bouncycastle.jar</literal> must be in
         your <literal>CLASSPATH</literal>.</para>
       </listitem>
@@ -639,19 +649,19 @@ java.security.AccessControlException: access denied
       <listitem>
         <para><emphasis role="bold">Examples and compilation do not work at
         all under Windows system:</emphasis> Check if your java installation
-        is not in a directory with spaces like C:\Program Files\java or
-        C:\Documents and Settings\java. Indeed bat scripts do not run properly
-        when JAVA_HOME is set to such directories. To get rid of those
-        problems, the best thing is to install jdk in a directory whose name
-        does not contain spaces such as C:\java\j2sdk.... or D:\java\j2sdk...
-        and then to set the JAVA_HOME environment variable accordingly: set
-        JAVA_HOME=C:\java\j2sdk....</para>
+        is not in a path containing spaces like C:\Program Files\java or
+        C:\Documents and Settings\java. Batch scripts, indeed, do not run
+        properly when JAVA_HOME is set to such a directory. To get rid of
+        those problems, the best thing to do is to install the jdk under a
+        space-free directory and path (e.g. C:\java\j2sdk.... or
+        D:\java\j2sdk... ) and then set the JAVA_HOME environment variable
+        accordingly. </para>
       </listitem>
     </itemizedlist>
 
     <para>If you cannot solve the problem, feel free to email us for support
-    at <email>proactive@objectweb.org</email>. Make sure you include a precise
-    description of your problem along with a full copy of the error message
-    you get.</para>
+    at <email>proactive@objectweb.org</email>. Make sure that you include a
+    precise description of your problem along with a full copy of the error
+    message you get.</para>
   </sect1>
 </chapter>
