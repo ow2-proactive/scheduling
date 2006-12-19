@@ -70,7 +70,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * the default loader for this method.
      * @see RMIClassLoaderSpi#loadClass(java.lang.String, java.lang.String, java.lang.ClassLoader)
      */
-    public Class loadClass(String codebase, String name,
+    public Class<?> loadClass(String codebase, String name,
         ClassLoader defaultLoader)
         throws MalformedURLException, ClassNotFoundException {
         return rmiClassLoaderSpi.loadClass(codebase, name,
@@ -82,7 +82,7 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * the default loader for this method.
      * @see RMIClassLoaderSpi#loadProxyClass(java.lang.String, java.lang.String[], java.lang.ClassLoader)
      */
-    public Class loadProxyClass(String codebase, String[] interfaces,
+    public Class<?> loadProxyClass(String codebase, String[] interfaces,
         ClassLoader defaultLoader)
         throws MalformedURLException, ClassNotFoundException {
         return rmiClassLoaderSpi.loadProxyClass(codebase, interfaces,

@@ -90,7 +90,7 @@ public class ProActiveClassLoader extends URLClassLoader {
      * the search to a ProActiveClassLoaderHelper
      * @see ClassLoader#findClass(java.lang.String)
      */
-    protected Class findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         Class c = null;
         try {
             // 1. look in parents and classpath
@@ -123,7 +123,7 @@ public class ProActiveClassLoader extends URLClassLoader {
     /*
      * see ClassLoader#loadClass(java.lang.String)
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
         Class c = null;
         if ((c = findLoadedClass(name)) != null) {
             return c;
