@@ -126,7 +126,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * Create the jdl file with all the options specified in the descriptor
      */
     public void buildJdlFile() {
-        StringBuffer gLiteCommand = new StringBuffer();
+        StringBuilder gLiteCommand = new StringBuilder();
         String args;
         gLiteCommand.append(command_path);
         String initial_args = ((JVMProcess) getTargetProcess()).getCommand();

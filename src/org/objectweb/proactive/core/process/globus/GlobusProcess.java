@@ -144,7 +144,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         if (environment == null) {
             return "";
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String[] globusEnvironment = new String[environment.length];
         for (int i = 0; i < environment.length; i++) {
             globusEnvironment[i] = environment[i].replace('=', ' ');

@@ -67,7 +67,7 @@ public class UnicoreParameters implements java.io.Serializable {
     private String fileSep;
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("jobName=>").append(jobName).append("\n");
         sb.append("keyPassword=>").append(keyPassword).append("\n");
         sb.append("submitJob=>").append(submitJob).append("\n");
@@ -452,7 +452,7 @@ public class UnicoreParameters implements java.io.Serializable {
     }
 
     public String getCommandString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append(
             "java org.objectweb.proactive.core.process.unicore.UnicoreProActiveClient ");
@@ -496,7 +496,7 @@ public class UnicoreParameters implements java.io.Serializable {
      * @return A string for performing this on the remote site.
      */
     public String getDestMoveCommand() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String[] filesAndDirs = getDeployAllFilesAndDirectories();
 
         for (int i = 0; i < filesAndDirs.length; i++) {

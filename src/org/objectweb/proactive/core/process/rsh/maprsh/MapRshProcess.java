@@ -139,7 +139,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildMapRshCommand() {
-        StringBuffer command = new StringBuffer();
+        StringBuilder command = new StringBuilder();
         try {
             java.io.File script = new java.io.File(scriptLocation);
             byte[] b = getBytesFromInputStream(new java.io.FileInputStream(
@@ -178,7 +178,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
      * @return String
      */
     private String appendJavaCommand(String scriptText) {
-        StringBuffer newScriptText = new StringBuffer(scriptText.length());
+        StringBuilder newScriptText = new StringBuilder(scriptText.length());
         String targetCommand = targetProcess.getCommand();
 
         newScriptText.append(scriptText);

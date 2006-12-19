@@ -111,7 +111,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
         }
 
         //command
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(COMMAND);
 
         //arguments
@@ -163,7 +163,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
                 continue;
             }
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             //command
             sb.append(COMMAND).append(" ").append(PARAMS).append(" ");

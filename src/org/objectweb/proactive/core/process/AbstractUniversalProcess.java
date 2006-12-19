@@ -196,7 +196,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         toString(sb);
         return sb.toString();
     }
@@ -212,7 +212,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected void toString(StringBuffer sb) {
+    protected void toString(StringBuilder sb) {
         sb.append("Process ");
         sb.append(this.getClass().getName());
         sb.append(" hostname=");

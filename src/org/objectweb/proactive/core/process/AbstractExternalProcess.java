@@ -169,7 +169,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected String buildWindowsEnvironmentCommand() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < environment.length; i++) {
             inputMessageLogger.log("      exporting variable " +
                 environment[i]);
@@ -181,7 +181,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected String buildUnixEnvironmentCommand() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < environment.length; i++) {
             inputMessageLogger.log("      exporting variable " +
                 environment[i]);

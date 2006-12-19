@@ -112,7 +112,7 @@ public class CNLSFProcess extends LSFBSubProcess {
     protected String buildCNBSubCommand() {
         String executable = scriptLocation.substring(0,
                 scriptLocation.lastIndexOf("/") + 1) + "startExecutable.sh";
-        StringBuffer bSubCommand = new StringBuffer();
+        StringBuilder bSubCommand = new StringBuilder();
         bSubCommand.append("/bin/sh -c  'echo ");
         bSubCommand.append(targetProcess.getCommand());
         bSubCommand.append(" > ");

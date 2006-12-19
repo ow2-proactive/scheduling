@@ -264,7 +264,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      * echo "real command" | qsub -I ...   oarStartRuntime.sh
      */
     protected String internalBuildCommand() {
-        StringBuffer oarsubCommand = new StringBuffer();
+        StringBuilder oarsubCommand = new StringBuilder();
         oarsubCommand.append(
             "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do " +
             accessProtocol + " \\$i  ");

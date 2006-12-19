@@ -158,7 +158,7 @@ public class FileTransferDefinition implements Serializable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < files.size(); i++)
             sb.append(files.get(i)).append("\n");

@@ -118,7 +118,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     }
 
     public String toString() {
-        StringBuffer tmp = new StringBuffer();
+        StringBuilder tmp = new StringBuilder();
 
         tmp.append("Number of measures: ").append(this.getNumberOfValues());
         tmp.append("\nTotal time measured: ").append(this.getCumulatedTime());
@@ -139,7 +139,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
 
     public void dump() {
         int ln = name.length();
-        StringBuffer tmp = new StringBuffer();
+        StringBuilder tmp = new StringBuilder();
         tmp.append("------- ").append(name).append(" -------\n");
         tmp.append(this.toString());
         for (int i = 0; i <= (ln + 16); i++) {

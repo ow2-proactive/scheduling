@@ -78,7 +78,7 @@ public class MPIDependentProcess extends MPIProcess implements DependentProcess 
             String firstHostName = ((Node[]) dependencyParameters)[0].getNodeInformation()
                                                                      .getName();
 
-            StringBuffer sb = new StringBuffer(this.hostsFileName);
+            StringBuilder sb = new StringBuilder(this.hostsFileName);
             sb.append("_").append(firstHostName);
             this.hostsFileName = sb.toString();
         }

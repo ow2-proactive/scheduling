@@ -262,7 +262,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildCommand() {
-        StringBuffer qsubCommand = new StringBuffer();
+        StringBuilder qsubCommand = new StringBuilder();
 
         qsubCommand.append(command_path).append(" -S /bin/bash ");
 
@@ -309,13 +309,13 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         return qsubCommand.toString();
     }
 
-    protected StringBuffer buildResourceString() {
-        StringBuffer rs = new StringBuffer();
+    protected String buildResourceString() {
+        StringBuilder rs = new StringBuilder();
         rs.append(" -l walltime=").append(bookingDuration).append(",");
         //to specify nodes and processor per nodes, the syntax is different from
         //other resources
         rs.append("nodes=").append(hostNumber).append(":");
 
-        return rs;
+        return rs.toString();
     }
 }

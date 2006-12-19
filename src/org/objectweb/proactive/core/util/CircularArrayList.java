@@ -88,7 +88,7 @@ public class CircularArrayList extends java.util.AbstractList
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("CircularArray size=");
         sb.append(size);
         sb.append("\n");

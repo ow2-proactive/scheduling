@@ -96,7 +96,7 @@ public class FileTransferWorkShop implements Serializable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         //Queue variables
         sb.append("isImplicit     = ").append(isImplicit).append("\n");
@@ -166,7 +166,7 @@ public class FileTransferWorkShop implements Serializable {
     public CopyProtocol[] getCopyProtocols() {
         ArrayList<CopyProtocol> alist = new ArrayList<CopyProtocol>();
 
-        StringBuffer skippedProtocols = new StringBuffer();
+        StringBuilder skippedProtocols = new StringBuilder();
         for (int i = 0; i < copyProtocol.length; i++) {
             if (!isAllowedProtocol(copyProtocol[i])) {
                 skippedProtocols.append(copyProtocol[i]).append(" ");
@@ -417,7 +417,7 @@ public class FileTransferWorkShop implements Serializable {
         }
 
         //-case3: prefix is defined
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(prefix).append(fileSep).append(filename);
         return sb.toString();
     }
@@ -549,7 +549,7 @@ public class FileTransferWorkShop implements Serializable {
         }
 
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             sb.append("prefix        = ").append(prefix).append("\n");
             sb.append("hostname      = ").append(hostname).append("\n");

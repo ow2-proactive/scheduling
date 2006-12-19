@@ -276,7 +276,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildBSubCommand() {
-        StringBuffer bSubCommand = new StringBuffer();
+        StringBuilder bSubCommand = new StringBuilder();
         bSubCommand.append(command_path);
         if (interactive.equals("true")) {
             bSubCommand.append(" -I");

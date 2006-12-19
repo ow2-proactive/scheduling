@@ -595,7 +595,7 @@ public class UnicoreProActiveClient {
         } //while		
 
         if (i < args.length) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             while (i < args.length)
                 sb.append(args[i++]).append(" ");
 

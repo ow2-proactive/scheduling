@@ -86,7 +86,7 @@ public abstract class AbstractExternalProcessDecorator
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected void toString(StringBuffer sb) {
+    protected void toString(StringBuilder sb) {
         super.toString(sb);
         sb.append(" ---- Target Process ----- \n");
         if (targetProcess == null) {

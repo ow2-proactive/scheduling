@@ -65,7 +65,7 @@ public class VariableContract implements Serializable {
         public String setFrom; //Descriptor, Program
 
         public String toString() {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             sb.append(value).append(" type=").append(type).append(" setFrom=")
               .append(setFrom);
@@ -437,7 +437,7 @@ public class VariableContract implements Serializable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         PropertiesDatas var;
         String name;

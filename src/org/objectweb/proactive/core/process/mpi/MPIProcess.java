@@ -97,7 +97,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     }
 
     protected String buildMPICommand() {
-        StringBuffer mpiSubCommand = new StringBuffer();
+        StringBuilder mpiSubCommand = new StringBuilder();
         mpiSubCommand.append(this.command_path).append(" ");
         if (remotePath != null) {
             mpiSubCommand.append("-machinefile").append(" ");

@@ -148,7 +148,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         FileTransferWorkShop fts = getFileTransferWorkShopDeploy();
         FileTransferDefinition[] ftDefinitions = fts.getAllFileTransferDefinitions();
         Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ftDefinitions.length; i++) {
             //Files and Dirs
             FileDescription[] files = ftDefinitions[i].getAll();

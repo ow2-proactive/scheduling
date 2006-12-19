@@ -140,7 +140,7 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildUnixRSHCommand() {
-        StringBuffer command = new StringBuffer();
+        StringBuilder command = new StringBuilder();
         command.append(DEFAULT_RSHPATH);
         // append username
         if (username != null) {
@@ -156,7 +156,7 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildWindowsRSHCommand() {
-        StringBuffer command = new StringBuffer();
+        StringBuilder command = new StringBuilder();
         command.append("rsh");
         command.append(" ");
         command.append(hostname);

@@ -82,14 +82,14 @@ public class DOMAdaptor {
     }
 
     private void processChilds(Node node) throws org.xml.sax.SAXException {
-        StringBuffer sb = null;
+        StringBuilder sb = null;
         Node child = node.getFirstChild();
         while (child != null) {
             switch (child.getNodeType()) {
             case Node.TEXT_NODE:
             case Node.CDATA_SECTION_NODE:
                 if (sb == null) {
-                    sb = new StringBuffer();
+                    sb = new StringBuilder();
                 }
                 sb.append(((org.w3c.dom.CharacterData) child).getData());
                 break;

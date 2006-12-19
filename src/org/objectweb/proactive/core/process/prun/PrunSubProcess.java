@@ -374,7 +374,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildCommand() {
-        StringBuffer prunCommand = new StringBuffer();
+        StringBuilder prunCommand = new StringBuilder();
         prunCommand.append(command_path);
         if (interactive.equals("true")) {
             prunCommand.append(" -I");

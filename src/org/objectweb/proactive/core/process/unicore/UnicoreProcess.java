@@ -136,7 +136,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
                     continue;
                 }
 
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
 
                 sb.append(fullfilename);
 

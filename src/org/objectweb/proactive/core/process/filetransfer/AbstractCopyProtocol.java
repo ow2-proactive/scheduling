@@ -223,7 +223,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
      * @return the content of the stream
      */
     protected String getErrorMessage(InputStream in) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         byte[] b = new byte[1000];
         int read;
         while (true) {

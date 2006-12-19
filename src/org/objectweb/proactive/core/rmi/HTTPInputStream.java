@@ -62,7 +62,7 @@ public class HTTPInputStream extends DataInputStream {
      * is final in DataOutputStream
      */
     public String getLine() throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int c;
         boolean readAtLeastOneChar = false;
 
