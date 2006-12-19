@@ -172,15 +172,15 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
      * dirname.
      */
     protected DirectoryDescription[] getHeteronymousDirs() {
-        ArrayList aList = new ArrayList();
+        ArrayList<DirectoryDescription> aList = new ArrayList<DirectoryDescription>();
 
         for (int i = 0; i < fileTransfer.length; i++) {
-            FileDescription[] fd = fileTransfer[i].getHeteronymousDir();
+            DirectoryDescription[] fd = fileTransfer[i].getHeteronymousDir();
             for (int j = 0; j < fd.length; j++)
                 aList.add(fd[j]);
         }
 
-        return (DirectoryDescription[]) aList.toArray(new DirectoryDescription[0]);
+        return aList.toArray(new DirectoryDescription[0]);
     }
 
     protected FileDescription[] getHeteronymousAll() {

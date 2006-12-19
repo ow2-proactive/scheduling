@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -99,12 +98,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     //  ----------------------------------------------------------------------------------------
     //-----------------------Extends AbstractExternalProcessDecorator-------------------------
     //  ----------------------------------------------------------------------------------------
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger) {
-        super.setErrorMessageLogger(new CompositeMessageLogger(
-                new ParserMessageLogger(), errorMessageLogger));
-    }
-
+    
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -308,29 +302,6 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
                 weight = resTab[i].substring(resTab[i].indexOf("=") + 1,
                         resTab[i].length());
             }
-        }
-    }
-
-    /**
-     * Implementation of a RemoteProcessMessageLogger that look for the jobID of the launched job
-     */
-    public class ParserMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
-        private boolean foundJobID;
-        private boolean foundHostname;
-
-        public ParserMessageLogger() {
-        }
-
-        public void log(String message) {
-            // int nbProcessor = (new Integer(hostNumber)).intValue();
-            String h = parseHostname(message);
-        }
-
-        public void log(Throwable t) {
-        }
-
-        public void log(String message, Throwable t) {
         }
     }
 

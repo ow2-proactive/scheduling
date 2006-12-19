@@ -34,7 +34,6 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -98,12 +97,6 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     //----------------------------------------------------------------------------------------
     //-----------------------Extends AbstractExternalProcessDecorator-------------------------
     //  ----------------------------------------------------------------------------------------
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger) {
-        super.setErrorMessageLogger(new CompositeMessageLogger(
-                new ParserMessageLogger(), errorMessageLogger));
-    }
-
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -324,34 +317,5 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         rs.append("nodes=").append(hostNumber).append(":");
 
         return rs;
-    }
-
-    /**
-     * Implementation of a RemoteProcessMessageLogger that look for the jobID of the launched job
-     *
-     */
-    public class ParserMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
-        private boolean foundJobID;
-        private boolean foundHostname;
-
-        public ParserMessageLogger() {
-        }
-
-        public void log(String message) {
-            //System.out.println(" >>> log :" +message);
-            int nbProcessor = (new Integer(hostNumber)).intValue();
-            String h = parseHostname(message);
-
-            //            if (h != null) {
-            //                System.out.println(" ---- hostname " + h);
-            //            }
-        }
-
-        public void log(Throwable t) {
-        }
-
-        public void log(String message, Throwable t) {
-        }
     }
 }

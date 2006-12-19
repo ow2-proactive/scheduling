@@ -38,7 +38,6 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.SimpleExternalProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
 /**
@@ -63,9 +62,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * @since   ProActive 2.0
  */
 public class PrunSubProcess extends AbstractExternalProcessDecorator {
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
-
+	
     //    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
     //            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
     //        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
@@ -128,12 +125,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     //        super.setInputMessageLogger(new CompositeMessageLogger(
     //                new ParserMessageLogger(), inputMessageLogger));
     //    }
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger) {
-        super.setErrorMessageLogger(new CompositeMessageLogger(
-                new ParserMessageLogger(), errorMessageLogger));
-    }
-
+ 
     public void setOutputMessageSink(MessageSink outputMessageSink) {
         if (outputMessageSink == null) {
             super.setOutputMessageSink(new SimpleMessageSink());
@@ -429,41 +421,6 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
             }
         }
         return result;
-    }
-
-    //
-    // -- PRIVATE METHODS -----------------------------------------------
-    //
-    //
-    // -- INNER CLASSES -----------------------------------------------
-    //
-
-    /**
-     * Implementation of a RemoteProcessMessageLogger that look for the jobID of the launched job
-     */
-    public class ParserMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
-        private boolean foundJobID;
-        private boolean foundHostname;
-
-        public ParserMessageLogger() {
-        }
-
-        public void log(String message) {
-            //System.out.println(" >>> log :" +message);
-            int nbProcessor = (new Integer(hosts)).intValue();
-            String h = parseHostname(message);
-
-            //            if (h != null) {
-            //                System.out.println(" ---- hostname " + h);
-            //            }
-        }
-
-        public void log(Throwable t) {
-        }
-
-        public void log(String message, Throwable t) {
-        }
     }
 
     public String getFileTransferDefaultCopyProtocol() {
