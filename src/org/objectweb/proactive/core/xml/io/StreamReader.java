@@ -33,14 +33,9 @@ package org.objectweb.proactive.core.xml.io;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.apache.xerces.parsers.SAXParser;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;

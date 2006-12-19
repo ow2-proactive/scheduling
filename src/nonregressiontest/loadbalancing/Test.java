@@ -37,8 +37,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-
 import testsuite.test.FunctionalTest;
 
 

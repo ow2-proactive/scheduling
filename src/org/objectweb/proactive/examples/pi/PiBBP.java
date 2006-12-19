@@ -1,13 +1,10 @@
 package org.objectweb.proactive.examples.pi;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import nonregressiontest.component.descriptor.fractaladl.Test;
 
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
@@ -18,7 +15,6 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.runtime.StartRuntime;
 
 
 /**

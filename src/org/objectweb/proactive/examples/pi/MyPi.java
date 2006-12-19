@@ -27,11 +27,6 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.node.Node;
 
 public class MyPi {
 

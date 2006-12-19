@@ -27,7 +27,6 @@
  */
 package org.objectweb.proactive.calcium.examples.nqueens;
 
-import java.util.Vector;
 
 public class Board implements java.io.Serializable {
 	

@@ -27,8 +27,6 @@
  */
 package org.objectweb.proactive.calcium.examples.nqueens.bt1;
 
-import java.util.Vector;
-
 import org.objectweb.proactive.calcium.examples.nqueens.Board;
 
 public class BoardBT1 extends Board{

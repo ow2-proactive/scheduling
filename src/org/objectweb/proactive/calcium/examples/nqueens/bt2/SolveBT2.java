@@ -26,8 +26,8 @@
  * ################################################################
  */
 package org.objectweb.proactive.calcium.examples.nqueens.bt2;
-import org.objectweb.proactive.calcium.examples.nqueens.*;
-import org.objectweb.proactive.calcium.examples.nqueens.bt1.BoardBT1;
+import org.objectweb.proactive.calcium.examples.nqueens.Board;
+import org.objectweb.proactive.calcium.examples.nqueens.SolveBoard;
 
 public class SolveBT2 extends SolveBoard{
 	

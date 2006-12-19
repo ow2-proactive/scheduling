@@ -29,7 +29,6 @@ package org.objectweb.proactive.calcium.proactive;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.calcium.Skernel;
-import org.objectweb.proactive.calcium.Task;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 

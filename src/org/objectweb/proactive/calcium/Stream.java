@@ -31,9 +31,8 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.exceptions.MuscleException;
+import org.objectweb.proactive.calcium.exceptions.PanicException;
 import org.objectweb.proactive.calcium.interfaces.Instruction;
 import org.objectweb.proactive.calcium.interfaces.Skeleton;
 import org.objectweb.proactive.calcium.statistics.Stats;

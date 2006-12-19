@@ -32,13 +32,11 @@ package nonregressiontest;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.xml.sax.SAXException;
 
 import testsuite.manager.FunctionalTestManager;
-import testsuite.result.AbstractResult;
 
 
 /**

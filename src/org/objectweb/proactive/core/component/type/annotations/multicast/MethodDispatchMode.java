@@ -1,7 +1,6 @@
 package org.objectweb.proactive.core.component.type.annotations.multicast;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;

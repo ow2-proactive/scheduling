@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 
 public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {

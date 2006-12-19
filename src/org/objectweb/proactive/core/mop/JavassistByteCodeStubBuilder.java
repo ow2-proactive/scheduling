@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.mop;
 
 import java.io.Serializable;
 import java.lang.reflect.GenericDeclaration;
-import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Iterator;

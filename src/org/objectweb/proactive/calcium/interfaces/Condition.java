@@ -27,8 +27,6 @@
  */
 package org.objectweb.proactive.calcium.interfaces;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.calcium.exceptions.EnvironmentException;
 
 

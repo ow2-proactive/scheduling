@@ -1,11 +1,9 @@
 package org.objectweb.proactive.examples.timit.jacobi;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
-import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.TimerCounter;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;

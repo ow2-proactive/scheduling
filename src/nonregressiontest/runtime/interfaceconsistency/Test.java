@@ -32,16 +32,8 @@ package nonregressiontest.runtime.interfaceconsistency;
 
 import java.lang.reflect.Method;
 
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.UniqueRuntimeID;
-import org.objectweb.proactive.core.body.RemoteBody;
-import org.objectweb.proactive.core.body.RemoteBodyForwarder;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.UniversalBodyForwarder;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeForwarder;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
-import org.objectweb.proactive.core.runtime.RemoteProActiveRuntimeForwarder;
 
 import testsuite.test.FunctionalTest;
 

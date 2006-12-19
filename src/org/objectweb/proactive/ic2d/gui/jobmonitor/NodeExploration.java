@@ -44,7 +44,6 @@ import java.util.TreeSet;
 import javax.swing.DefaultListModel;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;

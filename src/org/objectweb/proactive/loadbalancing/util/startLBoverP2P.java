@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.StartP2PService;

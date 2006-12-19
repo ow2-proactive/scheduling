@@ -207,6 +207,8 @@ public class ProActive {
 
     static {
         ProActiveConfiguration.load();
+        
+        @SuppressWarnings("unused") // Execute RuntimeFactory's static blocks  
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
     }
 
