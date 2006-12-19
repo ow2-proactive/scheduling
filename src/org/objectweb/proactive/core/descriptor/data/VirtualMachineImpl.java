@@ -54,15 +54,6 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     /** number of nodes that will be deployed on this VM. One node is the default */
     private String nbNodes = "1";
 
-    /** the acquisition method to use to find the VirtualMachine once created */
-    private String acquisitionMethod;
-
-    /** the port number used during the acquisition */
-    private String portNumber;
-
-    /** the port number used during the acquisition */
-    private String protocol;
-
     /** indiquates if this machine results from a lookup or not  */
     private boolean hasProcess = true;
 

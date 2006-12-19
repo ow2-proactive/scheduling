@@ -72,7 +72,6 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
-import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -627,27 +626,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         return -1;
-    }
-
-    /**
-     *Check if the ExternalProcess is a gLiteProcess
-     *return boolean true if it's a gLiteProcess
-     **/
-    private int checkGLiteProcess(ExternalProcess process) {
-        int res = 0;
-
-        while (!(process instanceof JVMProcess)) {
-            if (process instanceof GLiteProcess) {
-                return ((GLiteProcess) process).getCpuNumber();
-            } else {
-                res++;
-                process = ((ExternalProcess) ((ExternalProcessDecorator) process).getTargetProcess());
-            }
-        }
-
-        return -1;
-
-        //return ((process.getClass().getName()).equals(GLiteProcess.class.getName()));
     }
 
     /**

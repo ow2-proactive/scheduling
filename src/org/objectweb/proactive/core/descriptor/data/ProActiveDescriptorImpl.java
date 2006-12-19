@@ -765,10 +765,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     private class CompositeServiceUpdater implements ServiceUpdater {
-        private java.util.ArrayList updaterList;
+        private java.util.ArrayList<ServiceUpdater> updaterList;
 
         public CompositeServiceUpdater() {
-            updaterList = new java.util.ArrayList();
+            updaterList = new java.util.ArrayList<ServiceUpdater>();
         }
 
         public void addServiceUpdater(ServiceUpdater s) {
@@ -776,10 +776,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
 
         public void updateService(UniversalService s) {
-            java.util.Iterator it = updaterList.iterator();
 
-            while (it.hasNext()) {
-                ServiceUpdater serviceUpdater = (ServiceUpdater) it.next();
+            for (ServiceUpdater serviceUpdater : updaterList) {
                 serviceUpdater.updateService(s);
             }
 
@@ -788,10 +786,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     private class CompositeProcessUpdater implements ProcessUpdater {
-        private java.util.ArrayList updaterList;
+        private java.util.ArrayList<ProcessUpdater> updaterList;
 
         public CompositeProcessUpdater() {
-            updaterList = new java.util.ArrayList();
+            updaterList = new java.util.ArrayList<ProcessUpdater>();
         }
 
         public void addProcessUpdater(ProcessUpdater p) {
@@ -799,11 +797,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
 
         public void updateProcess(ExternalProcess p) {
-            java.util.Iterator it = updaterList.iterator();
-
-            while (it.hasNext()) {
-                ProcessUpdater processUpdater = (ProcessUpdater) it.next();
-                processUpdater.updateProcess(p);
+           
+        	for (ProcessUpdater processUpdater : updaterList) {
+        		processUpdater.updateProcess(p);
             }
 
             updaterList.clear();
