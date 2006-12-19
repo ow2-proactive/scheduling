@@ -116,10 +116,9 @@ public class StartNode {
     private StartNode(String[] args) {
         if (args.length == 0) {
             nodeURL = null;
-            registryPortNumber = DEFAULT_PORT;
         } else {
             nodeURL = args[0];
-            registryPortNumber = getPort(nodeURL, DEFAULT_PORT);
+            registryPortNumber = UrlBuilder.getPortFromUrl(nodeURL);
             checkOptions(args, 1);
             readClassPath(args, 1);
         }
@@ -276,28 +275,9 @@ public class StartNode {
             noRegistry = true;
         } else if (MULTICAST_LOCATOR_NAME.equals(option)) {
             multicastLocator = true;
+        } else {
+        	printUsage();
         }
-    }
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Extracts the port number from the node URL
-     */
-    protected static int getPort(String nodeURL, int defaultValue) {
-        int deb = nodeURL.lastIndexOf(":");
-
-        if (deb > -1) {
-            //there is a port number specified
-            try {
-                //  System.out.println("StartNode: " + nodeURL.substring(deb + 1, nodeURL.lastIndexOf("/")));getporrt
-                return Integer.parseInt(nodeURL.substring(deb + 1,
-                        nodeURL.lastIndexOf("/")));
-            } catch (NumberFormatException e) {
-                return defaultValue;
-            }
-        }
-
-        return defaultValue;
     }
 
     //

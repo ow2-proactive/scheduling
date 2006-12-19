@@ -209,7 +209,6 @@ public class NodeFactory {
     public static Node getNode(String nodeURL) throws NodeException {
         ProActiveRuntime proActiveRuntime;
         String url;
-        String nodeName;
         String jobID;
 
         if (logger.isDebugEnabled()) {
