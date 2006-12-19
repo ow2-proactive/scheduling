@@ -50,7 +50,7 @@ public abstract class MOP {
      * The name of the interface that caracterizes all stub classes
      */
     protected static String STUB_OBJECT_INTERFACE_NAME = "org.objectweb.proactive.core.mop.StubObject";
-    protected static Class STUB_OBJECT_INTERFACE;
+    protected static Class<?> STUB_OBJECT_INTERFACE;
     static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     /**
@@ -83,21 +83,21 @@ public abstract class MOP {
     /**
      * A Hashtable to cache (proxy class, proxy class constructor) couples
      */
-    protected static java.util.Hashtable proxyTable = new java.util.Hashtable();
+    protected static java.util.Hashtable<String, Constructor> proxyTable = new java.util.Hashtable<String, Constructor>();
 
     /**
      * A Hashtable to cache (Class name, proxy class name) couples
      * this is meant for class-based reification
      */
     protected static java.util.Hashtable secondProxyTable = new java.util.Hashtable();
-    ;
+    
     protected static MOPClassLoader singleton = MOPClassLoader.getMOPClassLoader(); //MOPClassLoader.createMOPClassLoader();
 
     /**
      *        As this class is center to the API, its static initializer is
      *        a good place to initialize general stuff.
      */
-    protected static HashMap loadedClass = new HashMap();
+    protected static HashMap<String, Class<?>> loadedClass = new HashMap<String, Class<?>>();
 
     static {
         PROXY_CONSTRUCTOR_PARAMETERS_TYPES_ARRAY = new Class[] {
@@ -130,7 +130,7 @@ public abstract class MOP {
         } catch (ClassNotFoundException e) {
             //                System.out.println(
             //                   "MOP forName failed for class " + s + ", looking in table");
-            Class cl = (Class) loadedClass.get(s);
+            Class cl = loadedClass.get(s);
 
             //                  System.out.println("MOP forName failed, result is " +
             //                       cl);
@@ -583,7 +583,7 @@ public abstract class MOP {
         Constructor proxyConstructor;
 
         // Localizes the proxy class constructor
-        proxyConstructor = (Constructor) proxyTable.get(proxyClass.getName());
+        proxyConstructor = proxyTable.get(proxyClass.getName());
 
         //System.out.println("MOP: The class of the proxy is " + proxyClass.getName());
         // Cache miss
@@ -630,7 +630,7 @@ public abstract class MOP {
         //if we cannot load the stub class using its name
         //it is probably because it has been downloaded by another classloader
         //thus we ask the classloader of the target class to load it
-        Class baseClass = null;
+        Class<?> baseClass = null;
         try {
             baseClass = forName(nameOfBaseClass);
         } catch (ClassNotFoundException e) {
@@ -845,10 +845,10 @@ public abstract class MOP {
      * @return The constructor
      */
     private static Constructor findReifiedConstructor(Class targetClass,
-        Class[] targetConstructorArgs) {
+        Class<?>[] targetConstructorArgs) {
         Constructor[] publicConstructors;
         Constructor currentConstructor;
-        Class[] currentConstructorParameterTypes;
+        Class<?>[] currentConstructorParameterTypes;
         boolean match;
 
         publicConstructors = targetClass.getConstructors();
@@ -906,7 +906,7 @@ public abstract class MOP {
      * @return The resulting object
      * @throws ReifiedCastException if the class cast is invalid
      */
-    private static Object castInto(Object sourceObject, Class targetType, Class[] genericParameters)
+    private static Object castInto(Object sourceObject, Class<?> targetType, Class[] genericParameters)
         throws ReifiedCastException {
         // First, check if sourceObject is a reified object
         if (!(isReifiedObject(sourceObject))) {
@@ -915,7 +915,7 @@ public abstract class MOP {
         }
 
         // Gets a Class object representing the type of sourceObject
-        Class sourceType = sourceObject.getClass().getSuperclass();
+        Class<?> sourceType = sourceObject.getClass().getSuperclass();
 
         // Check if types are compatible
         // Here we assume that the 'type of the stub' (i.e, the type of the

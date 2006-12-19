@@ -112,7 +112,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     /**
      * The list of tags for barrier
      */
-    private LinkedList tagsForBarrier = null;
+    private LinkedList<String> tagsForBarrier = null;
 
     /**
      * The method corresponding to the call
@@ -652,11 +652,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * Set the tags for barrier to the method call (by copy)
      * @param barrierTags the list of tags
      */
-    public void setBarrierTags(LinkedList barrierTags) {
-        this.tagsForBarrier = new LinkedList();
-        Iterator it = barrierTags.iterator();
+    public void setBarrierTags(LinkedList<String> barrierTags) {
+        this.tagsForBarrier = new LinkedList<String>();
+        Iterator<String> it = barrierTags.iterator();
         while (it.hasNext()) {
-            this.tagsForBarrier.add(new String((String) it.next()));
+            this.tagsForBarrier.add(new String(it.next()));
         }
     }
 
