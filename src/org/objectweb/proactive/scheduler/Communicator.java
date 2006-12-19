@@ -101,7 +101,7 @@ public class Communicator {
             return (s);
         } else {
             int nblanks = pad_len - s.length();
-            StringBuffer blanks = new StringBuffer(nblanks);
+            StringBuilder blanks = new StringBuilder(nblanks);
 
             blanks.setLength(nblanks);
             for (int k = 0; k < blanks.length(); ++k)
@@ -125,7 +125,7 @@ public class Communicator {
         } else {
             int nblanks = pad_len - s.length();
             int half = nblanks / 2;
-            StringBuffer blanks = new StringBuffer(half);
+            StringBuilder blanks = new StringBuilder(half);
 
             blanks.setLength(half);
             for (int k = 0; k < blanks.length(); ++k)

@@ -189,7 +189,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n Class: ");
         sb.append(this.getClass().getName());
         sb.append("\n Name: ");
