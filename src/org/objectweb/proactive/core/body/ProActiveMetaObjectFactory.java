@@ -480,8 +480,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             out.flush();
             bout.close();
 
-            byte[] byteArray = bout.toByteArray();
-
             bout.close();
 
             ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
