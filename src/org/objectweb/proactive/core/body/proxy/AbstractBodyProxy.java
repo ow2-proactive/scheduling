@@ -30,7 +30,6 @@
  */ 
 package org.objectweb.proactive.core.body.proxy;
 
-import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
