@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 //the Unique instance of HostInfos
 public class HostsInfos {
-    private static HostsInfos hostsInfos = new HostsInfos();
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
 
     private static Hashtable<String, Hashtable<String, String>> hostsTable;

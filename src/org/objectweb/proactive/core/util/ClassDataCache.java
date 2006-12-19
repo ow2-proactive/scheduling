@@ -50,11 +50,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ClassDataCache {
     static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     private static ClassDataCache classCache = null;
-    private static Map classStorage;
-    private static String runtimeURL = null;
+    private static Map<String, byte[]> classStorage;
 
     private ClassDataCache() {
-        classStorage = new Hashtable();
+        classStorage = new Hashtable<String, byte[]>();
     }
 
     public static ClassDataCache instance() {
@@ -96,6 +95,6 @@ public class ClassDataCache {
             logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
                 " --> " + ("ClassDataCache was asked for class " + fullname));
         }
-        return (byte[]) classStorage.get(fullname);
+        return classStorage.get(fullname);
     }
 }
