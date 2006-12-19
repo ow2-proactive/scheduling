@@ -50,6 +50,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -164,7 +165,7 @@ public interface RemoteBodyForwarder {
     public byte[] getCertificateEncoded(UniqueID id)
         throws SecurityNotAvailableException, IOException;
 
-    public ArrayList getEntities(UniqueID id)
+    public ArrayList<Entity> getEntities(UniqueID id)
         throws SecurityNotAvailableException, IOException;
 
     public void terminateSession(UniqueID id, long sessionID)

@@ -53,6 +53,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -382,7 +383,7 @@ public class BodyAdapterForwarder extends BodyAdapter implements Cloneable,
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
      */
-    public ArrayList getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         return proxiedRemoteBody.getEntities(bodyID);
     }
