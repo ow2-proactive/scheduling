@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class SshTunnelFactory {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SSH);
-    private java.util.Hashtable _unused;
+    private java.util.Hashtable<String, UnusedTunnel> _unused;
     static private SshTunnelFactory _factory = null;
 
     static private SshTunnelFactory getFactory() {
@@ -71,7 +71,7 @@ public class SshTunnelFactory {
     }
 
     private SshTunnelFactory() {
-        _unused = new java.util.Hashtable();
+        _unused = new java.util.Hashtable<String, UnusedTunnel>();
         if (SshParameters.getUseTunnelGC()) {
             Thread gcThread = new Thread() {
                     public void run() {
@@ -95,7 +95,7 @@ public class SshTunnelFactory {
     private synchronized SshTunnel create(String host, int port)
         throws java.io.IOException {
         if (SshParameters.getUseTunnelGC()) {
-            UnusedTunnel unused = (UnusedTunnel) _unused.get(getKey(host, port));
+            UnusedTunnel unused = _unused.get(getKey(host, port));
             SshTunnel tunnel;
             if (unused == null) {
                 logger.debug("create tunnel " + host + ":" + port);
@@ -117,7 +117,7 @@ public class SshTunnelFactory {
             String host = tunnel.getDistantHost();
             int port = tunnel.getDistantPort();
             if (SshParameters.getUseTunnelGC()) {
-                UnusedTunnel prev = (UnusedTunnel) _unused.get(getKey(host, port));
+                UnusedTunnel prev = _unused.get(getKey(host, port));
                 if (prev != null) {
                     prev.getTunnel().realClose();
                     _unused.remove(getKey(host, port));
@@ -132,10 +132,10 @@ public class SshTunnelFactory {
     }
 
     private synchronized void GC() {
-        java.util.Enumeration keys = _unused.keys();
+        java.util.Enumeration<String> keys = _unused.keys();
         for (; keys.hasMoreElements();) {
-            String key = (String) keys.nextElement();
-            UnusedTunnel tunnel = (UnusedTunnel) _unused.get(key);
+            String key =  keys.nextElement();
+            UnusedTunnel tunnel = _unused.get(key);
             if (tunnel.isOldEnough()) {
                 try {
                     SshTunnel sshTunnel = tunnel.getTunnel();

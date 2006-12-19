@@ -112,7 +112,7 @@ public class SSHClient
             Session session = jsch.getSession(user, host, 22);
             session.setPassword(password);
 
-            java.util.Hashtable config = new java.util.Hashtable();
+            java.util.Hashtable<String, String> config = new java.util.Hashtable<String, String>();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
 

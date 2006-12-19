@@ -78,7 +78,7 @@ public class JSchSingleton {
 
     static private JSch getJSch() {
         if (_jsch == null) {
-            Hashtable config = new Hashtable();
+            Hashtable<String, String> config = new Hashtable<String, String>();
             config.put("StrictHostKeyChecking", "no");
             JSch.setConfig(config);
             _jsch = new JSch();
@@ -123,10 +123,10 @@ public class JSchSingleton {
     static public Session getSession(String username, String hostname,
         String sshPort) throws IOException {
         if (_hash == null) {
-            _hash = new Hashtable();
+            _hash = new Hashtable<String, Session>();
         }
         String key = sshPort + username + hostname;
-        Object val = _hash.get(key);
+        Session val = _hash.get(key);
         Session session;
         if (val == null) {
             int port = Integer.parseInt(sshPort);
@@ -138,7 +138,7 @@ public class JSchSingleton {
             }
             _hash.put(key, session);
         } else {
-            session = (Session) val;
+            session = val;
         }
         if (!session.isConnected()) {
             try {
@@ -165,16 +165,16 @@ public class JSchSingleton {
         return session;
     }
 
-    static private Hashtable _hash = null;
+    static private Hashtable<String, Session> _hash = null;
 
     static public void flushMaybe(String username, String hostname,
         String sshPort, int localPort) {
         String key = sshPort + username + hostname;
-        Object val = _hash.get(key);
+        Session val = _hash.get(key);
         if (val == null) {
             return;
         }
-        Session session = (Session) val;
+        Session session = val;
         try {
             session.delPortForwardingL(localPort);
             int nForward = session.getPortForwardingL().length;

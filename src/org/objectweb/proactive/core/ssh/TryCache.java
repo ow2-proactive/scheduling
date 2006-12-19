@@ -40,10 +40,10 @@ package org.objectweb.proactive.core.ssh;
  * never been contacted before.
  */
 public class TryCache {
-    private java.util.Hashtable _hash;
+    private java.util.Hashtable<String, Boolean> _hash;
 
     public TryCache() {
-        _hash = new java.util.Hashtable();
+        _hash = new java.util.Hashtable<String, Boolean>();
     }
 
     private String getKey(String host, int port) {
@@ -52,7 +52,7 @@ public class TryCache {
 
     public boolean everTried(String host, int port) {
         String key = getKey(host, port);
-        Boolean bool = (Boolean) _hash.get(key);
+        Boolean bool = _hash.get(key);
         if (bool != null) {
             // already tried this connection once.
             return true;
@@ -68,7 +68,7 @@ public class TryCache {
      */
     public boolean needToTry(String host, int port) {
         String key = getKey(host, port);
-        Boolean bool = (Boolean) _hash.get(key);
+        Boolean bool = _hash.get(key);
         if (bool != null) {
             if (bool.booleanValue()) {
                 // tried with success before.

@@ -90,7 +90,6 @@ public class SshSocket extends Socket {
         }
         logger.debug("try ssh socket to " + host + ":" + port);
         _tunnel = SshTunnelFactory.createTunnel(host, port);
-        byte[] ip = { 127, 0, 0, 1 };
         InetSocketAddress address = new InetSocketAddress("127.0.0.1",
                 _tunnel.getPort());
         _socket = new Socket();
