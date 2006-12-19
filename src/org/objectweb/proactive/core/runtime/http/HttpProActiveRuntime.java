@@ -64,6 +64,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 import org.objectweb.proactive.osgi.OsgiParameters;
 
 
@@ -1011,7 +1012,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         }
     }
 
-    public ArrayList getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, IOException {
         if (isLocal) {
             return localruntime.getEntities();
@@ -1024,7 +1025,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         req.send();
 
         try {
-            return (ArrayList) req.getReturnedObject();
+            return (ArrayList<Entity>) req.getReturnedObject();
         } catch (SecurityException e) {
             throw e;
         } catch (IOException e) {

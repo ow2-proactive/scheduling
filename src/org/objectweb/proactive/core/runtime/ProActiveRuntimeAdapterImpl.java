@@ -59,6 +59,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -622,7 +623,7 @@ public class ProActiveRuntimeAdapterImpl extends ProActiveRuntimeAdapter
         }
     }
 
-    public ArrayList getEntities() throws SecurityNotAvailableException {
+    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException {
         try {
             return proActiveRuntime.getEntities();
         } catch (IOException e) {

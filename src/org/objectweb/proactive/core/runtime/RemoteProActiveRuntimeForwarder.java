@@ -57,6 +57,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 /**
@@ -213,7 +214,7 @@ public interface RemoteProActiveRuntimeForwarder extends RemoteProActiveRuntime 
     public byte[] getCertificateEncoded(UniqueRuntimeID ruid)
         throws SecurityNotAvailableException, java.io.IOException;
 
-    public ArrayList getEntities(UniqueRuntimeID ruid)
+    public ArrayList<Entity> getEntities(UniqueRuntimeID ruid)
         throws SecurityNotAvailableException, java.io.IOException;
 
     public void terminateSession(UniqueRuntimeID ruid, long sessionID)

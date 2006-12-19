@@ -58,6 +58,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 import ibis.rmi.AlreadyBoundException;
 import ibis.rmi.Naming;
@@ -359,7 +360,7 @@ public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getCertificateEncoded();
     }
 
-    public ArrayList getEntities()
+    public ArrayList<Entity> getEntities()
         throws SecurityNotAvailableException, RemoteException, IOException {
         return proActiveRuntime.getEntities();
     }

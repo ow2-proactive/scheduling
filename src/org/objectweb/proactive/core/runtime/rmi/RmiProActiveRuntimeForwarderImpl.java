@@ -61,6 +61,7 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.securityentity.Entity;
 
 
 public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
@@ -147,7 +148,7 @@ public class RmiProActiveRuntimeForwarderImpl extends RmiProActiveRuntimeImpl
         return proActiveRuntimeF.getClassDataFromThisRuntime(urid, className);
     }
 
-    public ArrayList getEntities(UniqueRuntimeID urid)
+    public ArrayList<Entity> getEntities(UniqueRuntimeID urid)
         throws IOException, SecurityNotAvailableException {
         return proActiveRuntimeF.getEntities(urid);
     }
