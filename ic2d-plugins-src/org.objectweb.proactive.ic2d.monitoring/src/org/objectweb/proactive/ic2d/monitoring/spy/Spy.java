@@ -147,7 +147,7 @@ public class Spy implements RunActive, ProActiveInternalObject {
 	}
 	
 	public void runActivity(org.objectweb.proactive.Body body) {
-		spyEventManager = new SpyEventManager(body.getID());
+		spyEventManager = new SpyEventManager(body);
 		spyEventManager.addBodyEventListener();
 		spyEventManager.addFutureEventListener();
 		org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);

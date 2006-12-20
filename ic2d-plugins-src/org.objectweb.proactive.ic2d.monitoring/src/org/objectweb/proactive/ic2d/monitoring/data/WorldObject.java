@@ -71,6 +71,7 @@ public class WorldObject extends AbstractDataObject {
 	 */
 	public WorldObject() {
         super(null);
+        
         vnChildren = new ConcurrentHashMap<String, VNObject>();
         monitorThread = new MonitorThread(this);
         addObserver(monitorThread);
@@ -143,6 +144,33 @@ public class WorldObject extends AbstractDataObject {
 	public String getName(){
 		return name;
 	}
+	
+	@Override
+	public WorldObject getWorld() {
+		return this;
+	}
+	
+	/**
+	 * Returns the MonitorThread associated to this object.
+	 * @return The MonitorThread associated to this object.
+	 */
+	public MonitorThread getMonitorThread(){
+		return monitorThread;
+	}
+	
+	/**
+	 * Stop monitoring the host specified.
+	 * @param child the host to stop monitoring
+	 */
+	@Override
+	public void removeChild(AbstractDataObject child) {
+		monitoredChildren.remove(child.getKey());
+		setChanged();
+		if(monitoredChildren.size() == 0)
+			notifyObservers(methodName.REMOVE_CHILD);
+		notifyObservers();
+	}
+	
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -161,26 +189,13 @@ public class WorldObject extends AbstractDataObject {
 	}
     
 	/**
-	 * 
+	 * Add a virtual node to this object
 	 * @param vn
 	 */
 	protected void putVNChild(VNObject vn) {
 		vnChildren.put(vn.getKey(), vn);
 		setChanged();
 		notifyObservers(vn);
-	}
-	
-	/**
-	 * Stop monitoring the host specified.
-	 * @param child the host to stop monitoring
-	 */
-	@Override
-	public void removeChild(AbstractDataObject child) {
-		monitoredChildren.remove(child.getKey());
-		setChanged();
-		if(monitoredChildren.size() == 0)
-			notifyObservers(methodName.REMOVE_CHILD);
-		notifyObservers();
 	}
 	
 	
@@ -193,7 +208,7 @@ public class WorldObject extends AbstractDataObject {
     }
 	
 	/**
-	 * 
+	 * Returns a virtual node.
 	 * @param name
 	 * @return
 	 */
@@ -209,13 +224,4 @@ public class WorldObject extends AbstractDataObject {
 	@Override
 	protected void foundForTheFirstTime() {/* Do nothing */}
 
-
-	@Override
-	public WorldObject getWorld() {
-		return this;
-	}
-	
-	public MonitorThread getMonitorThread(){
-		return monitorThread;
-	}
 }

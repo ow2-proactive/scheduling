@@ -42,8 +42,15 @@ public class VNObject extends AbstractDataObject {
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
+	/**
+	 * Creates a nes VNObject
+	 * @param name
+	 * @param jobID
+	 * @param world
+	 */
 	protected VNObject(String name, String jobID, WorldObject world) {
 		super(world);
+		
 		this.name = name;
 		this.jobID = jobID;
 		world.putVNChild(this);
@@ -55,10 +62,7 @@ public class VNObject extends AbstractDataObject {
 	//
 	// -- PUBLIC METHOD -----------------------------------------------
 	//
-	
-	
-
-	
+		
 	@Override
 	public void explore() {/* Do nothing */}
 
@@ -77,6 +81,10 @@ public class VNObject extends AbstractDataObject {
 		return "vn";
 	}
 	
+	/**
+	 * Returns the job id
+	 * @return The job id
+	 */
 	public String getJobID() {
 		return jobID;
 	}

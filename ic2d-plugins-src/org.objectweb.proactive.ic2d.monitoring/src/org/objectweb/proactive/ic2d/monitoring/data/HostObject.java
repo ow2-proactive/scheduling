@@ -73,6 +73,7 @@ public class HostObject extends AbstractDataObject {
 	 */
 	public HostObject(String hostname, int port, Protocol protocol, WorldObject world) throws HostAlreadyExistsException{
 		super(world);
+		
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
@@ -80,7 +81,7 @@ public class HostObject extends AbstractDataObject {
 		HostObject hostAlreadyExists = (HostObject) this.parent.monitoredChildren.get(this.getKey());
 		if(hostAlreadyExists != null)
 			throw new HostAlreadyExistsException(hostAlreadyExists);
-
+		
 		this.parent.putChild(this);
 		
 		this.allMonitoredObjects.put(getKey(), this);
@@ -139,6 +140,7 @@ public class HostObject extends AbstractDataObject {
 
 
 	/**
+	 * Returns the name of this host
 	 * @return Name of this Host
 	 */
 	public String getHostName(){
@@ -146,6 +148,7 @@ public class HostObject extends AbstractDataObject {
 	}
 
 	/**
+	 * Returns the number of the port.
 	 * @return Number of the port
 	 */
 	public int getPort(){
@@ -199,17 +202,37 @@ public class HostObject extends AbstractDataObject {
 	protected WorldObject getTypedParent() {
 		return (WorldObject) parent;
 	}
+	
+	@Override
+	protected void alreadyMonitored() {/* Do nothing */}
+
+	@Override
+	protected void foundForTheFirstTime() {/* Do nothing */}
 
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
 
 	/**
-	 * TODO
+	 * Handles a ProActive Runtime in order to create a VMObject associated to this one.
+	 * And explore this object.
+	 * @param runtime A ProActiveRuntime
+	 * @param depth The depth to use.
 	 */
 	private void handleProActiveRuntime(ProActiveRuntime runtime, int depth){
-		VMObject vm = new VMObject(this, runtime);
+		VMObject vm = null;
+		
+		String key = runtime.getVMInformation().getName();
 
+		if ((! monitoredChildren.containsKey(key))
+			&&
+		    (! skippedChildren.containsKey(key))){
+			vm = new VMObject(this, runtime);
+		}
+		else{
+			vm = (VMObject)getChildInAllChildren(key);
+		}
+		
 		/*if (os == null) {
 			os = vm.getParent().getSystemProperty("os.name");
 			}
@@ -236,11 +259,4 @@ public class HostObject extends AbstractDataObject {
 			}
 		}
 	}
-
-	@Override
-	protected void alreadyMonitored() {/* Do nothing */}
-
-	@Override
-	protected void foundForTheFirstTime() {/* Do nothing */}
-
 }

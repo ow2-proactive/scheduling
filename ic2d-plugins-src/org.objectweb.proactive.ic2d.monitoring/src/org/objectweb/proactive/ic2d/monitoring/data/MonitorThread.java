@@ -54,6 +54,10 @@ public class MonitorThread implements Observer {
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
+	/**
+	 * Creates a new MonitorThread
+	 * @param worl A world object
+	 */
 	public MonitorThread(WorldObject world){
 		this.depth = DEFAULT_DEPTH;
 		this.ttr = DEFAULT_TTR;

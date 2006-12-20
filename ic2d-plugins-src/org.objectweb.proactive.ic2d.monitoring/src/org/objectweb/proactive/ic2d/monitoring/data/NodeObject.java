@@ -56,14 +56,14 @@ import org.objectweb.proactive.ic2d.monitoring.spy.SpyListenerImpl;
 
 public class NodeObject extends AbstractDataObject{
 
-	/* The virtual node containing this node */
+	/** The virtual node containing this node */
 	private VNObject vnParent;
 
-	/* The node name */
+	/** The node name */
 	private String key;
-	/* A ProActive Node */
+	/** A ProActive Node */
 	private Node node;
-	/**  */
+	/** A spy */
 	private Spy spy;
 	private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
 	private static Node SPY_LISTENER_NODE;
@@ -83,7 +83,6 @@ public class NodeObject extends AbstractDataObject{
 		} catch (java.net.UnknownHostException e) {
 			currentHost = "localhost";
 		}
-		// System.out.println("current host: "+currentHost);
 		try {
 			SPY_LISTENER_NODE = NodeFactory.createNode(UrlBuilder.buildUrlFromProperties(
 					currentHost, SPY_LISTENER_NODE_NAME), true, null, null);
@@ -97,8 +96,14 @@ public class NodeObject extends AbstractDataObject{
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
+	/**
+	 * Creates a new NodeObject
+	 * @param parent The VMObject parent
+	 * @param node The node to associate to this object
+	 */
 	public NodeObject(VMObject parent, Node node){
 		super(parent);
+		
 		Comparator<String> comparator = new AOObject.AOComparator();
 		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
 		this.node = node;
@@ -179,7 +184,10 @@ public class NodeObject extends AbstractDataObject{
 // return (AOObject) monitoredChildren.get(id.toString());
 // }
 
-
+	/**
+	 * Used to highlight this node, in a virtual node.
+	 * @param highlighted true, or false
+	 */
 	public void setHighlight(boolean highlighted) {
 		this.setChanged();
 		if (highlighted)
@@ -188,11 +196,18 @@ public class NodeObject extends AbstractDataObject{
 			this.notifyObservers(State.NOT_HIGHLIGHTED);
 	}
 
-
+	/**
+	 * Returns the virtual node parent
+	 * @return the virtual node parent
+	 */
 	public VNObject getVNParent() {
 		return vnParent;
 	}
 
+	/**
+	 * Changes the update frequence of the spy
+	 * @param updateFrequence
+	 */
 	public void setSpyUpdateFrequence(long updateFrequence) {
 		spy.setUpdateFrequence(updateFrequence);
 	}
@@ -203,6 +218,12 @@ public class NodeObject extends AbstractDataObject{
 		super.stopMonitoring(log);
 	}
 
+	/**
+	 * Migrates an active object from this node to another.
+	 * @param activeObjectID The UniqueID of the active object.
+	 * @param nodeTargetURL The target node.
+	 * @throws MigrationException
+	 */
 	public void migrateTo(UniqueID activeObjectID, String nodeTargetURL) throws MigrationException {
 		try {
 			spy.migrateTo(activeObjectID, nodeTargetURL);
@@ -214,8 +235,9 @@ public class NodeObject extends AbstractDataObject{
 	}
 
 	/**
+	 * Gets the system property indicated by the specified key.
 	 * @param key
-	 * @return
+	 * @return The system property
 	 */
 	public String getSystemProperty(String key){
             return spy.getSystemProperty(key);
@@ -232,10 +254,7 @@ public class NodeObject extends AbstractDataObject{
 	protected void addSpy(){
 		try {
 			SpyEventListener spyEventListener = new SpyEventListenerImpl(this);
-			SpyListenerImpl spyListener = new SpyListenerImpl(/*
-																 * new
-																 * SpyEventListenerImpl(this)
-																 */spyEventListener);
+			SpyListenerImpl spyListener = new SpyListenerImpl(spyEventListener);
 			this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener,SPY_LISTENER_NODE);
 			this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] { activeSpyListener }, node);
 		} 
@@ -313,11 +332,6 @@ public class NodeObject extends AbstractDataObject{
 		} catch (Exception e) {
 			// TODO spy not responding
 			this.notResponding();
-			/*
-			 * Console.getInstance(Activator.CONSOLE_NAME).err("NodeObject.alreadyMonitored() ->
-			 * not responding !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-			 * e.printStackTrace();
-			 */
 		}
 	}
 
@@ -326,8 +340,7 @@ public class NodeObject extends AbstractDataObject{
 	//
 
 	/**
-	 * Get the typed parent
-	 * 
+	 * Gets the typed parent
 	 * @return the typed parent
 	 */
 	private VMObject getTypedParent() {
@@ -335,10 +348,9 @@ public class NodeObject extends AbstractDataObject{
 	}
 
 	/**
-	 * TODO
-	 * 
-	 * @param activeObjects
-	 *            names' list of active objects containing in this NodeObject
+	 * Handles a list of Proactive active objects in order to create the AOObjects associated.
+	 * And explore this objects.
+	 * @param activeObjects Names' list of active objects containing in this NodeObject
 	 */
 	private void handleActiveObjects(List<List<Object>> activeObjects){
 		for (int i = 0, size = activeObjects.size(); i < size; ++i) {
@@ -351,6 +363,11 @@ public class NodeObject extends AbstractDataObject{
 			if (! allMonitoredObjects.containsKey(ub.getID().toString())) {
 			  ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
 			
+			/*if ((! monitoredChildren.containsKey(ub.getID().toString()))
+					&&
+				(! skippedChildren.containsKey(ub.getID().toString()))){
+				  ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
+			*/
 			
 //			if (FilterProcess.getInstance().filter(ao)) {
 //				AOObject.cancelCreation();

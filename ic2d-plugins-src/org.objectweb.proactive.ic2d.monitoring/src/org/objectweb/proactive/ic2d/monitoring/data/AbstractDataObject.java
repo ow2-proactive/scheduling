@@ -123,10 +123,6 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public String toString() {
 		return this.getFullName();
-		/*
-		return "DataObject " + abstractDataObjectName + "\n" +
-		monitoredChildren.toString();
-		 */
 	}
 
 	
@@ -166,7 +162,6 @@ public abstract class AbstractDataObject extends Observable {
 		this.parent.removeChild(this);
 		setChanged();
 		notifyObservers(State.NOT_MONITORED);
-
 	}
 
 	
@@ -205,6 +200,9 @@ public abstract class AbstractDataObject extends Observable {
 	}
 
 
+	/**
+	 * This method is called when the object doesn't answer
+	 */
 	public void notResponding() {
 		if(isAlive) {
 			this.isAlive = false;
@@ -230,8 +228,7 @@ public abstract class AbstractDataObject extends Observable {
 
 	
 	/**
-	 * TODO
-	 *
+	 * Remove all the communications of this object.
 	 */
 	public void resetCommunications() {
 		List<AbstractDataObject> children = getMonitoredChildren();
@@ -247,21 +244,6 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public WorldObject getWorld(){
 		return parent.getWorld();
-	}
-	
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
-
-	/**
-	 * Add a child to this object.
-	 * Warning : You musn't call this method, call filterAndPutChild.
-	 * @param child the object to add
-	 */
-	protected void putChild(AbstractDataObject child) {
-		monitoredChildren.put(child.getKey(), child);
-		setChanged();
-		notifyObservers();
 	}
 	
 	/**
@@ -280,14 +262,14 @@ public abstract class AbstractDataObject extends Observable {
 	 * @param child The child to explore
 	 */
 	public void exploreChild(AbstractDataObject child) {
+		if(child==null)
+			return;
 		if(!child.isAlive)
 			return;
 		if(skippedChildren.containsKey(child.getKey()))
 			return;
 
-
 		if(monitoredChildren.containsKey(child.getKey())) {
-
 			child = monitoredChildren.get(child.getKey());
 			child.alreadyMonitored();
 			child.explore();
@@ -297,15 +279,35 @@ public abstract class AbstractDataObject extends Observable {
 				skippedChildren.put(child.getKey(), child);
 			}
 			else { //child is new and must be monitored
-				// System.out.println("AbstractDataObject.exploreChild() ----------");
 				putChild(child);
 				child.foundForTheFirstTime();
 				child.explore();
 			}
 		}
 	}
+	
+	//
+	// -- PROTECTED METHODS -----------------------------------------------
+	//
 
+	/**
+	 * Add a child to this object.
+	 * Warning : You musn't call this method, call filterAndPutChild.
+	 * @param child the object to add
+	 */
+	protected void putChild(AbstractDataObject child) {
+		monitoredChildren.put(child.getKey(), child);
+		setChanged();
+		notifyObservers();
+	}
+
+	/**
+	 * This method is called when the object is found for the first time
+	 */
 	protected abstract void foundForTheFirstTime();
 
+	/**
+	 * This method is called when the object is already found.
+	 */
 	protected abstract void alreadyMonitored();
 }

@@ -74,7 +74,7 @@ public class SpyEventManager {
 	 */
 	protected List<SpyEvent> pendingSpyEvents;
 	protected UniqueID masterSpyID;
-
+	private Body spyBody;
 	/**
 	 * Every so often this Manager check if its master spy is still running ok
 	 */
@@ -83,8 +83,9 @@ public class SpyEventManager {
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
-	public SpyEventManager(UniqueID masterSpyID) {
-		this.masterSpyID = masterSpyID;
+	public SpyEventManager(Body spyBody) {
+		this.masterSpyID = spyBody.getID();
+		this.spyBody = spyBody;
 		messageEventListener = new MyMessageEventListener();
 		requestQueueEventListener = new MyRequestQueueEventListener();
 		bodyEventListener = new MyBodyEventListener();
@@ -246,7 +247,6 @@ public class SpyEventManager {
 	}
 
 	private void addEvent(SpyEvent event) {
-		//System.out.println("add event evt="+event+"   size="+pendingSpyEvents.size());
 		synchronized (pendingSpyEvents) {
 			pendingSpyEvents.add(event);
 		}
@@ -291,53 +291,42 @@ public class SpyEventManager {
 		// -- implements BodyEventListener -----------------------------------------------
 		//
 		public void bodyCreated(BodyEvent event) {
-
-			//System.out.println("# MyBodyEventListener.bodyCreated()");
-
 			Body body = checkBody(event.getBody());
 			if (body == null) {
 				return;
 			}
 
-			//System.out.println("bodyCreated name="+body.getNodeURL());
+			// We only want to know the objects which are created in the node of the spy.
+			if(!(body.getNodeURL().compareTo(spyBody.getNodeURL())==0))
+				return;
+
 			addEvent(new BodyCreationSpyEvent(body.getID(), body.getJobID(), body.getNodeURL(),
 					body.getName(),  body.isActive()));
 			addListenersToNewBody(body);
 		}
 
 		public void bodyDestroyed(BodyEvent event) {
-
-			//System.out.println("# MyBodyEventListener.bodyDestroyed()");
-
 			Body body = checkBody(event.getBody());
 			if (body == null) {
 				return;
 			}
 
-			//System.out.println("bodyDestroyed name="+body.getNodeURL());
 			addEvent(new BodySpyEvent(body.getID(), false, false));
 			removeListenersFromDeadBody(body);
 		}
 
 		public void bodyChanged(BodyEvent event) {
-
-			//System.out.println("# MyBodyEventListener.bodyChanged()");
-
 			Body body = checkBody(event.getBody());
 			if (body == null) {
 				return;
 			}
 
-			//System.out.println("bodyChanged name="+body.getNodeURL()+" isActive="+body.isActive());
 			addEvent(new BodySpyEvent(body.getID(), body.isActive(),
 					body.isAlive()));
 			removeListenersFromDeadBody(body);
 		}
 
 		private Body checkBody(UniversalBody uBody) {
-
-			//System.out.println("# MyBodyEventListener.checkBody()");
-
 			if (!(uBody instanceof Body)) {
 				return null;
 			}
@@ -359,9 +348,6 @@ public class SpyEventManager {
 		// -- implements RequestQueueEventListener -----------------------------------------------
 		//
 		public void requestQueueModified(RequestQueueEvent event) {
-
-			//System.out.println("# MyRequestQueueEventListener.requestQueueModified()");
-
 			if (event.getType() == RequestQueueEvent.WAIT_FOR_REQUEST) {
 				addEvent(new SpyEvent(SpyEvent.OBJECT_WAIT_FOR_REQUEST_TYPE,
 						event.getOwnerID()));
@@ -377,17 +363,11 @@ public class SpyEventManager {
 		// -- implements FutureEventListener -----------------------------------------------
 		//
 		public void waitingForFuture(FutureEvent event) {
-
-			//System.out.println("# MyFutureEventListener.waitingForFuture()");
-
 			addEvent(new SpyFutureEvent(
 					SpyEvent.OBJECT_WAIT_BY_NECESSITY_TYPE, event));
 		}
 
 		public void receivedFutureResult(FutureEvent event) {
-
-			//System.out.println("# MyFutureEventListener.receivedFutureResult()");
-
 			addEvent(new SpyFutureEvent(
 					SpyEvent.OBJECT_RECEIVED_FUTURE_RESULT_TYPE, event));
 		}
@@ -415,18 +395,15 @@ public class SpyEventManager {
 		}
 
 		public void requestReceived(MessageEvent event) {
-
 			addEvent(new SpyMessageEvent(
 					SpyEvent.REQUEST_RECEIVED_MESSAGE_TYPE, event));
 		}
 
 		public void replySent(MessageEvent event) {
-
 			addEvent(new SpyMessageEvent(SpyEvent.REPLY_SENT_MESSAGE_TYPE, event));
 		}
 
 		public void replyReceived(MessageEvent event) {
-
 			if (checkRequestSentEvent(event)) {
 				addEvent(new SpyMessageEvent(
 						SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE, event));
@@ -434,13 +411,11 @@ public class SpyEventManager {
 		}
 
 		public void voidRequestServed(MessageEvent event) {
-
 			addEvent(new SpyMessageEvent(SpyEvent.VOID_REQUEST_SERVED_TYPE,
 					event));
 		}
 
 		public void servingStarted(MessageEvent event) {
-
 			addEvent(new SpyMessageEvent(SpyEvent.SERVING_STARTED_TYPE, event));
 		}
 	} // end inner class MyMessageEventListener

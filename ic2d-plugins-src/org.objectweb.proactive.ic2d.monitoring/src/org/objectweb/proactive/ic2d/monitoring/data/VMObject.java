@@ -54,18 +54,19 @@ public class VMObject extends AbstractDataObject {
 
 	/** The JVM job ID */
 	private String jobID;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
 
 	public VMObject(HostObject parent, ProActiveRuntime runtime) {
 		super(parent);
+
 		this.runtime = runtime;
 		this.key = this.runtime.getVMInformation()/*.getVMID().toString()*/.getName();
 		this.runtime = runtime;
 		this.jobID = runtime.getJobID();
-		
+
 		this.allMonitoredObjects.put(getKey(), this);
 	}
 
@@ -78,11 +79,11 @@ public class VMObject extends AbstractDataObject {
 	 */
 	@Override
 	public void explore(){
-		
+
 		// Enable or not the P2P Node monitoring
-        boolean hideP2PNode = new Boolean(System.getProperty(
-                P2PConstants.HIDE_P2PNODE_MONITORING)).booleanValue();
-		
+		boolean hideP2PNode = new Boolean(System.getProperty(
+				P2PConstants.HIDE_P2PNODE_MONITORING)).booleanValue();
+
 		String[] namesOfNodes = null;
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
@@ -94,9 +95,9 @@ public class VMObject extends AbstractDataObject {
 			String nodeName = namesOfNodes[i];
 			// Enable or not the P2P Node monitoring
 			if (hideP2PNode &&
-                    (nodeName.compareTo(P2PConstants.P2P_NODE_NAME) == 0)) {
-                continue;
-            }
+					(nodeName.compareTo(P2PConstants.P2P_NODE_NAME) == 0)) {
+				continue;
+			}
 			if (nodeName.indexOf("SpyListenerNode") == -1) {
 				handleNode(nodeName);
 			}
@@ -113,6 +114,7 @@ public class VMObject extends AbstractDataObject {
 		return /*"JVM " + */key;
 	}
 
+	@Override
 	public String toString() {
 		return "JVM " + this.getKey();
 	}
@@ -122,10 +124,18 @@ public class VMObject extends AbstractDataObject {
 		return "JVM";
 	}
 
+	/**
+	 * Returns the ProActiveRuntime associated to this object
+	 * @return A ProActiveRuntime
+	 */
 	public ProActiveRuntime getRuntime() {
 		return this.runtime;
 	}
 	
+	/**
+	 * Retuns the job id
+	 * @return the job id
+	 */
 	public String getJobID() {
 		return jobID;
 	}
@@ -137,7 +147,7 @@ public class VMObject extends AbstractDataObject {
 		}
 		super.notResponding();
 	}
-	
+
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
@@ -179,7 +189,6 @@ public class VMObject extends AbstractDataObject {
 		try {
 			registered = runtime.getProActiveRuntimes();
 		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
 			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 		}
 		return new ArrayList<ProActiveRuntime>(Arrays.asList(registered));
@@ -190,27 +199,35 @@ public class VMObject extends AbstractDataObject {
 	//
 
 	/**
-	 * TODO
+	 * Handles node, in order to create a NodeObject associated to this one.
+	 * @param nodeName The name of the node.
 	 */
 	private void handleNode(String nodeName){
 		HostObject parent = getTypedParent();
 		String nodeUrl = UrlBuilder.buildUrl(parent.getHostName(), nodeName,
 				parent.getProtocol().toString (), parent.getPort());
-				Node node = null;
+		Node node = null;
 		try {
 			node = new NodeImpl(runtime, nodeUrl,UrlBuilder.getProtocol(nodeUrl), runtime.getJobID(nodeUrl));
 		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
-//			Console.getInstance(Activator.CONSOLE_NAME).logException(e);
 			notResponding();
 			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
 		}
-		NodeObject nodeObject = new NodeObject(this, node);
+
+		NodeObject nodeObject = null;
+
+		String key = node.getNodeInformation().getName();
+		if ((! monitoredChildren.containsKey(key))
+			&&
+		    (! skippedChildren.containsKey(key))){
+			nodeObject = new NodeObject(this, node);
+		}
+
 		this.exploreChild(nodeObject);
-		
+
 //		String os = parent.getOperatingSystem();
 //		if(os==null){
-//			parent.setOperatingSystem(nodeObject.getSystemProperty("os.name"));
+//		parent.setOperatingSystem(nodeObject.getSystemProperty("os.name"));
 //		}
 	}
 }
