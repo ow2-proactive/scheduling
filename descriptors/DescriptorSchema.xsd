@@ -1135,15 +1135,17 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="hostname" type="xs:string"/>
 		<xs:attribute name="virtualOrganisation" type="xs:string" use="required"/>
 		<xs:attribute name="JDLFileName" type="xs:string" use="required"/>
-		<xs:attribute name="Type" type="xs:string" default="Job"/>
-		<xs:attribute name="executable" type="xs:string" default="/bin/sh"/>
+		<xs:attribute name="Type" type="xs:string" default="job"/>
+        <xs:attribute name="jobType" type="gLiteJobType" default="normal"/>
+        <xs:attribute name="executable" type="xs:string" default="/bin/sh"/>
 		<xs:attribute name="stdOutput" type="xs:string" default="output.log"/>
 		<xs:attribute name="stdInput" type="xs:string" default="input.log"/>
 		<xs:attribute name="stdError" type="xs:string" default="error.log"/>
 		<xs:attribute name="outputse" type="xs:string"/>
 		<xs:attribute name="retryCount" type="xs:string"/>
 		<xs:attribute name="myProxyServer" type="xs:string"/>
-	</xs:complexType>
+        <xs:attribute name="nodeNumber" type="xs:string"/>
+    </xs:complexType>
 	<!--gLiteRankType-->
 	<xs:complexType name="gLiteRankType">
 		<xs:attribute name="fuzzyrank" type="BooleanOrVariableType" default="false"/>
@@ -1157,24 +1159,24 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	<!--gLiteJobType-->
 	<xs:complexType name="gLiteJobType" mixed="true">
 		<xs:choice>
-			<xs:element name="Normal"/>
-			<xs:element name="Interactive">
+			<xs:element name="normal"/>
+			<xs:element name="interactive">
 				<xs:complexType>
 					<xs:attribute name="listerport" type="xs:string"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="MPICH">
+			<xs:element name="mpich">
 				<xs:complexType>
 					<xs:attribute name="nodeNumber" type="PosintOrVariableType" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="Checkpointable">
+			<xs:element name="checkpointable">
 				<xs:complexType>
 					<xs:attribute name="currentStep" type="xs:string" use="required"/>
 					<xs:attribute name="jobStep" type="xs:string" use="required"/>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="Partitionable">
+			<xs:element name="partitionable">
 				<xs:complexType>
 					<xs:attribute name="currentStep" type="xs:string" use="required"/>
 					<xs:attribute name="jobStep" type="xs:string" use="required"/>

@@ -27,7 +27,7 @@
  *  Contributor(s): 
  * 
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.process.glite;
 
 import javax.naming.directory.InvalidAttributeValueException;
@@ -43,16 +43,22 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileDependant;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 
+import java.util.LinkedList;
+
 
 /**
  * GLite Process implementation.
  * This implementation works only for ProActive deployment, and not to submit single commands
- * @author  ProActive Team
- * @version 1.0,  2005/09/20
- * @since   ProActive 3.0
+ *
+ * JDL specification can be find at:
+ *   https://edms.cern.ch/file/555796/1/EGEE-JRA1-TEC-555796-JDL-Attributes-v0-8.pdf
+ *
+ * @author ProActive Team
+ * @version 1.0,  2006/11/10
+ * @since ProActive 3.1
  */
 public class GLiteProcess extends AbstractExternalProcessDecorator
-    implements FileDependant {
+        implements FileDependant {
 
     /**
      * Firsts parameters
@@ -68,7 +74,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             "user.home") + FILE_SEPARATOR + "out.log";
     protected static final String DEFAULT_CONFIG_FILE = System.getProperty(
             "user.home") + FILE_SEPARATOR + "public" + FILE_SEPARATOR + "JDL" +
-        FILE_SEPARATOR + "vo.conf";
+            FILE_SEPARATOR + "vo.conf";
     protected int jobID;
     protected String hostList;
     protected String processor = DEFAULT_PROCESSOR_NUMBER;
@@ -83,10 +89,28 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     protected boolean jdlRemote = false;
     protected String netServer;
     protected String logBook;
-    protected int cpuNumber = 1;
-
-    // WARNING : variable appartenant a toutes les instances de la classe GLiteProcess
-    public static GLiteJobAd jad;
+    /*jdl related fields*/
+    protected GLiteJobAd jad;
+    protected int jobNodeNumber = 2;
+    protected String jobType;
+    protected String jobJobType;
+    protected String jobExecutable;
+    protected String jobStdOutput;
+    protected String jobStdInput;
+    protected String jobStdError;
+    protected String jobOutput_se;
+    protected String jobVO;
+    protected String jobRetryCount;
+    protected String jobMyProxyServer;
+    protected String jobDataAccessProtocol;
+    protected String jobStorageIndex;
+    protected String jobEnvironment;
+    protected String jobRequirements;
+    protected String jobRank;
+    protected String jobFuzzyRank;
+    protected String jobArgument;
+    protected LinkedList jobInputSB;
+    protected LinkedList jobOutputSB;
 
     /**
      * Create a new GLiteProcess
@@ -102,8 +126,9 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
 
     /**
      * Create a new GLiteProcess
+     *
      * @param targetProcess The target process associated to this process. The target process
-     * represents the process that will be launched with the glite-job-submit command
+     *                      represents the process that will be launched with the glite-job-submit command
      */
     public GLiteProcess(ExternalProcess targetProcess) {
         super(targetProcess);
@@ -111,6 +136,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         this.hostname = null;
         jad = new GLiteJobAd();
     }
+
 
     public static void main(String[] args) {
         ProActiveDescriptor pad;
@@ -123,24 +149,95 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * Create the jdl file with all the options specified in the descriptor
+     * Create the jdl file with all the options specified in the descriptor.
+     * Creation will take place in the host that submit gLite job
      */
     public void buildJdlFile() {
-        StringBuilder gLiteCommand = new StringBuilder();
+        StringBuffer gLiteCommand = new StringBuffer();
         String args;
         gLiteCommand.append(command_path);
         String initial_args = ((JVMProcess) getTargetProcess()).getCommand();
-        String java_cmd = System.getProperty("java.home") + "/bin/java";
 
-        //if(jdlRemote) {
-        //args = initial_args.substring(initial_args.indexOf("-Djava"));
-        //}else { 
-        args = initial_args.substring(initial_args.indexOf(java_cmd) +
-                java_cmd.length());
-        //}
+        /**
+         *  gLiteStartRuntime.sh must be in InputSandBox within xml descriptor
+         */
+        if (this.getJobType().equals("MPICH")) {
+            args = this.getJobExecutable() + initial_args.substring(initial_args.indexOf("/bin/java") + "/bin/java".length());
+            /*arguments will be parsed again at script level within gLite environment*/
+            this.setJobExecutable("gLiteStartRuntime.sh");
+        } else {
+            args = initial_args.substring(initial_args.indexOf("/bin/java") + "/bin/java".length());
+        }
+    
         args = checkSyntax(args);
 
         try {
+            /*multiple job*/
+            if (this.getJobType().equals("job") && this.getJobJobType().equals("mpich") ) {
+                this.jad.addAttribute(Jdl.TYPE,  "job");
+                this.jad.addAttribute(Jdl.JOBTYPE,  Jdl.JOBTYPE_MPICH);
+                this.jad.addAttribute(Jdl.NODENUMB, this.getJobNodeNumber());
+
+            /*single job, number of nodes doesn t matter (so far)*/
+            } else if (this.getJobType() != null) {
+                this.jad.addAttribute(Jdl.TYPE, "job");
+            }
+
+            if (this.getJobExecutable() != null)
+                this.jad.addAttribute(Jdl.EXECUTABLE, this.getJobExecutable());
+
+            if (this.getJobStdOutput() != null)
+                this.jad.addAttribute(Jdl.STDOUTPUT, this.getJobStdOutput());
+
+            if (this.getJobStdInput() != null)
+                this.jad.addAttribute(Jdl.STDINPUT, this.getJobStdInput());
+
+            if (this.getJobStdError() != null)
+                this.jad.addAttribute(Jdl.STDERROR, this.getJobStdError());
+
+            if (this.getJobOutput_se() != null)
+                this.jad.addAttribute(Jdl.OUTPUT_SE, this.getJobOutput_se());
+
+            if (this.getJobVO() != null)
+                this.jad.addAttribute(Jdl.VIRTUAL_ORGANISATION, this.getJobVO());
+
+            if (this.getJobRetryCount() != null)
+                this.jad.addAttribute(Jdl.RETRYCOUNT, Integer.parseInt(getJobRetryCount()));
+
+            if (this.getJobMyProxyServer() != null)
+                this.jad.addAttribute(Jdl.MYPROXY, this.getJobMyProxyServer());
+
+            if (this.getJobEnvironment() != null)
+                this.jad.addAttribute(Jdl.ENVIRONMENT, this.getJobEnvironment());
+
+            if (this.getJobRequirements() != null)
+                this.jad.setAttributeExpr(Jdl.REQUIREMENTS, this.getJobRequirements());
+
+            if (this.getJobRank() != null)
+                this.jad.setAttributeExpr(Jdl.RANK, this.getJobRank());
+
+            if (this.getJobDataAccessProtocol() != null)
+                this.jad.addAttribute(Jdl.DATA_ACCESS, this.getJobDataAccessProtocol());
+
+            if (this.getJobStorageIndex() != null)
+                this.jad.addAttribute(Jdl.OD_STORAGE_ELEMENT, this.getJobStorageIndex());
+
+            if (this.getJobFuzzyRank() != null)
+                this.jad.addAttribute(Jdl.FUZZY_RANK, this.getJobFuzzyRank());
+
+            if (this.jobInputSB != null && this.jobInputSB.size() > 0) {
+                for (int i = 0; i < this.jobInputSB.size(); i++) {
+                    String entry = (String) jobInputSB.get(i);
+                    this.jad.addAttribute(Jdl.INPUTSB, entry);
+                }
+            }
+            if (this.jobOutputSB != null && this.jobOutputSB.size() > 0) {
+                for (int i = 0; i < this.jobOutputSB.size(); i++) {
+                    String entry = (String) jobOutputSB.get(i);
+                    this.jad.addAttribute(Jdl.OUTPUTSB, entry);
+                }
+            }
+            
             if (jad.hasAttribute(Jdl.ARGUMENTS)) {
                 jad.delAttribute(Jdl.ARGUMENTS);
             }
@@ -152,6 +249,8 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             //jad.setAttributeExpr(Jdl.REQUIREMENTS, "!(RegExp(\"*lxb2039*\",other.GlueCEUniqueID))");
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+        } catch (InvalidAttributeValueException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -162,12 +261,11 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * Add java arguments to the jdl file.
-     * Set the name of jdl file.
+     * Create jdl file
      * Mandatory attributes : Requirements, rank'
      *
-     * @throws llegalArgumentException, Exception
      * @return Empty string. Command line is not necessary there.
+     * @throws Exception
      */
     protected String buildGLiteCommand() {
         String path = filePath;
@@ -179,16 +277,17 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
 
         if (!confFileOption) {
             return DEFAULT_COMMAND_PATH + " " + path + FILE_SEPARATOR +
-            fileName;
+                    fileName;
         }
 
         return DEFAULT_COMMAND_PATH + " --config-vo " + configFile + " " +
-        path + FILE_SEPARATOR + fileName;
+                path + FILE_SEPARATOR + fileName;
     }
 
     /**
      * Check is java arguments are well formatted.
-     * @param java arguments
+     *
+     * @param args arguments
      * @return java argments well formatted
      */
     private String checkSyntax(String args) {
@@ -203,9 +302,11 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         return formatted_args;
     }
 
-    /************************************************************************
-     *                              GETTERS AND SETTERS                     *
-     ************************************************************************/
+    /**
+     * *********************************************************************
+     * GETTERS AND SETTERS                     *
+     * **********************************************************************
+     */
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
@@ -214,13 +315,15 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         return "glite_" + targetProcess.getProcessId();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
     public int getNodeNumber() {
-        return (new Integer(getProcessorNumber()).intValue());
+        return this.getJobNodeNumber();
     }
 
     /**
-     * Returns the number of processor requested for the job
-     * @return String
+     * @return String the number of processor requested for the job
      */
     public String getProcessorNumber() {
         return processor;
@@ -281,7 +384,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrName  attributes to add to the GliteJobAd object
      * @param attrValue value of the atributes
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
@@ -291,46 +394,46 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     /**
-     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrName  attributes to add to the GliteJobAd object
      * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, int attrValue)
-        throws Exception {
+            throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
     /**
-     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrName  attributes to add to the GliteJobAd object
      * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, double attrValue)
-        throws Exception {
+            throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
     /**
-     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrName  attributes to add to the GliteJobAd object
      * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, String attrValue)
-        throws Exception {
+            throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
     /**
-     * @param attrName attributes to add to the GliteJobAd object
+     * @param attrName  attributes to add to the GliteJobAd object
      * @param attrValue value of the added attrName
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
     public void addAtt(String attrName, boolean attrValue)
-        throws Exception {
+            throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -400,15 +503,286 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         return ft;
     }
 
-	public int getCpuNumber() {
-		return cpuNumber;
-	}
+    /**
+     *
+     * @return number of desidered CPUs (just useful if jobType = mpich)
+     */
+    public int getJobNodeNumber() {
+        return jobNodeNumber;
+    }
 
-	public void setCpuNumber(int cpuNumber) {
-		this.cpuNumber = cpuNumber;
-	}
+    /**
+     *
+     * @param jobNodeNumber number of desidered CPUs (just useful if jobType = mpich)
+     */
+    public void setJobNodeNumber(int jobNodeNumber) {
+        this.jobNodeNumber = jobNodeNumber;
+    }
 
-	
+    /**
+     * @return  type (so far,just "Job" is supported)
+     */
+    public String getJobType() {
+        return jobType;
+    }
+
+    /**
+     * @param jobType type (so far,just "Job" is supported)
+     */
+
+    public void setJobType(String jobType) {
+        this.jobType = jobType;
+    }
+
+    /**
+     *
+     * @return jobtype (so far, just "normal" and "mpich" are supported)
+     */
+    public String getJobJobType() {
+        return jobJobType;
+    }
+
+    /**
+     *
+     * @param jobJobType jobtype (so far, just "normal" and "mpich" are supported)  
+     */
+    public void setJobJobType(String jobJobType) {
+        this.jobJobType = jobJobType;
+    }
+
+    /**
+     * @return Executable command (usually absolute java command)
+     */
+
+    public String getJobExecutable() {
+        return jobExecutable;
+    }
+
+    /**
+     * @param jobExecutable Executable command (usually absolute java command)
+     */
+    public void setJobExecutable(String jobExecutable) {
+        this.jobExecutable = jobExecutable;
+    }
+
+    /**
+     * @return output filename (must also figure in the OutputSandbox to be usefull)
+     */
+    public String getJobStdOutput() {
+        return jobStdOutput;
+    }
+
+    /**
+     * @param jobStdOutput output filename (must also figure in the OutputSandbox to be usefull)
+     */
+    public void setJobStdOutput(String jobStdOutput) {
+        this.jobStdOutput = jobStdOutput;
+    }
+
+    /**
+     * @return input filename
+     */
+    public String getJobStdInput() {
+        return jobStdInput;
+    }
+
+    /**
+     * @param jobStdInput input filename
+     */
+    public void setJobStdInput(String jobStdInput) {
+        this.jobStdInput = jobStdInput;
+    }
+
+    /**
+     * @return stderr filename  (must also figure in the OutputSandbox to be usefull)
+     */
+    public String getJobStdError() {
+        return jobStdError;
+    }
+
+    /**
+     * @param jobStdError stderr filename  (must also figure in the OutputSandbox to be usefull)
+     */
+    public void setJobStdError(String jobStdError) {
+        this.jobStdError = jobStdError;
+    }
+
+    /**
+     * @return output se  (URL of the Storage Element where the user wants to store the output data)
+     */
+    public String getJobOutput_se() {
+        return jobOutput_se;
+    }
+
+    /**
+     * @param jobOutput_se output se (URL of the Storage Element where the user wants to store the output data).
+     */
+    public void setJobOutput_se(String jobOutput_se) {
+        this.jobOutput_se = jobOutput_se;
+    }
+
+    /**
+     * @return Virtual Organization name
+     */
+    public String getJobVO() {
+        return jobVO;
+    }
+
+    /**
+     * @param jobVO Virtual Organization name
+     */
+    public void setJobVO(String jobVO) {
+        this.jobVO = jobVO;
+    }
+
+    /**
+     * @return maximum number of deep job re-submissions to be done in case of failure due to some grid component (i.e. not to the job itself).
+     */
+    public String getJobRetryCount() {
+        return jobRetryCount;
+    }
+
+    /**
+     * @param jobRetryCount maximum number of deep job re-submissions to be done in case of failure due to some grid component (i.e. not to the job itself).
+     */
+    public void setJobRetryCount(String jobRetryCount) {
+        this.jobRetryCount = jobRetryCount;
+    }
+
+    /**
+     * @return hostname of a MyProxy server where the user has registered her/his long-term proxy certificate.
+     */
+
+    public String getJobMyProxyServer() {
+        return jobMyProxyServer;
+    }
+
+    /**
+     * @param jobMyProxyServer hostname of a MyProxy server where the user has registered her/his long-term proxy certificate.
+     */
+    public void setJobMyProxyServer(String jobMyProxyServer) {
+        this.jobMyProxyServer = jobMyProxyServer;
+    }
+
+    /**
+     * @return string or list of strings representing the protocol or the list of protocols that the application is able to "speak" for accessing files listed in InputData on a given SE.
+     */
+    public String getJobDataAccessProtocol() {
+        return jobDataAccessProtocol;
+    }
+
+    /**
+     * @param jobDataAccessProtocol string or list of strings representing the protocol or the list of protocols that the application is able to "speak" for accessing files listed in InputData on a given SE.
+     */
+    public void setJobDataAccessProtocol(String jobDataAccessProtocol) {
+        this.jobDataAccessProtocol = jobDataAccessProtocol;
+    }
+
+
+    /**
+     * @return attribute kept for backward compatibility and will be soon deprecated. Use DataRequirements attribute 3.14 instead.
+     */
+    public String getJobStorageIndex() {
+        return jobStorageIndex;
+    }
+
+    /**
+     * @param jobStorageIndex attribute kept for backward compatibility and will be soon deprecated. Use DataRequirements attribute 3.14 instead.
+     */
+    public void setJobStorageIndex(String jobStorageIndex) {
+        this.jobStorageIndex = jobStorageIndex;
+    }
+
+    /**
+     * @return list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
+     */
+    public String getJobEnvironment() {
+        return jobEnvironment;
+    }
+
+    /**
+     * @param jobEnvironment list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
+     */
+    public void setJobEnvironment(String jobEnvironment) {
+        this.jobEnvironment = jobEnvironment;
+    }
+
+
+    /**
+     * @return list of string representing environment settings that have to be performed on the execution machine and are needed by the job to run properly.
+     */
+    public String getJobRequirements() {
+        return jobRequirements;
+    }
+
+    /**
+     * @param jobRequirements Boolean ClassAd expression that uses C-like operators. It represents job requirements on resources. The Requirements expression can contain attributes that describe the
+
+     */
+    public void setJobRequirements(String jobRequirements) {
+        this.jobRequirements = jobRequirements;
+    }
+
+    /**
+     * @return ClassAd Floating-Point expression that states how to rank CEs that have already met the Requirements expression.
+     */
+    public String getJobRank() {
+        return jobRank;
+    }
+
+    /**
+     * @param jobRank ClassAd Floating-Point expression that states how to rank CEs that have already met the Requirements expression.
+     */
+    public void setJobRank(String jobRank) {
+        this.jobRank = jobRank;
+    }
+
+    /**
+     * @return a Boolean (true/false) attribute that enables fuzzyness in the ranking computation.
+     */
+    public String getJobFuzzyRank() {
+        return jobFuzzyRank;
+    }
+
+    /**
+     * @param jobFuzzyRank a Boolean (true/false) attribute that enables fuzzyness in the ranking computation.
+     */
+    public void setJobFuzzyRank(String jobFuzzyRank) {
+        this.jobFuzzyRank = jobFuzzyRank;
+    }
+
+    /**
+     * @param entry string representing a file that will be in the gLite InputSandbox
+     * @return true if sucsessfully added, false if not (does not asses file properties)
+     */
+    public boolean addInputSBEntry(String entry) {
+        if (jobInputSB == null) jobInputSB = new LinkedList();
+        return jobInputSB.add(entry);
+    }
+
+    /**
+     * @param entry string representing a file that will be in the gLite OutputSandbox
+     * @return job fails in the case file does not outputed during job
+     */
+    public boolean addOutputSBEntry(String entry) {
+        if (jobOutputSB == null) jobOutputSB = new LinkedList();
+        return jobOutputSB.add(entry);
+    }
+
+
+    /**
+     * @return arguments to the jobExecutable
+     */
+    public String getJobArgument() {
+        return jobArgument;
+    }
+
+    /**
+     * @param jobArgument arguments to the jobExecutable
+     */
+    public void setJobArgument(String jobArgument) {
+        this.jobArgument = jobArgument;
+    }
 
     /******************************************************************************************
      *                                END OF GETTERS AND SETTERS                              *

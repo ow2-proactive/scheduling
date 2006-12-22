@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+    <variables>
+        <descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
+    </variables>
+    <componentDefinition>
+        <virtualNodesDefinition>
+            <virtualNode name="plugtest"/>
+        </virtualNodesDefinition>
+    </componentDefinition>
+    
+    <deployment>
+        <mapping>
+            <map virtualNode="plugtest">
+                <jvmSet>
+                    <vmName value="JvmLAL"/>
+                </jvmSet>
+            </map>
+        </mapping>
+        <jvms>
+            <jvm name="JvmLAL">
+                <creation>
+                    <processReference refid="sshHierarchical"/>
+                </creation>
+            </jvm>           
+        </jvms>
+    </deployment>
+    
+    <infrastructure>
+        <processes>
+            <processDefinition id="ceJVM">
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+                    <classpath>
+                        <absolutePath value="jsch.jar"/>
+                        <absolutePath value="ProActive_examples.jar"/>
+                        <absolutePath value="ProActive.jar"/>
+                        <absolutePath value="asm.jar"/>
+                        <absolutePath value="log4j.jar"/>
+                        <absolutePath value="xercesImpl.jar"/>
+                        <absolutePath value="fractal.jar"/>
+                        <absolutePath value="bouncycastle.jar"/>
+                        <absolutePath value="servlet-api.jar"/>
+                        <absolutePath value="glite-wms-jdlj.jar"/>
+                        <absolutePath value="classad.jar"/>
+                        <absolutePath value="." />
+                    </classpath>
+                    <policyFile>
+                        <absolutePath value="proactive.java.policy"/>
+                    </policyFile>
+                    <log4jpropertiesFile>
+                        <absolutePath value="proactive-log4j"/>
+                    </log4jpropertiesFile>
+                    <!--<jvmParameters>
+                        <parameter value="-Dproactive.communication.protocol=rmissh"/>
+                    </jvmParameters>-->
+                </jvmProcess>                
+            </processDefinition>
+
+			<processDefinition id="uiJVM">
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+                    <classpath>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/classes.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/ProActive_examples.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/asm.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/jsch.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/ws/servlet-api.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/glite/glite-wms-jdlj.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/lib/glite/classad.jar"/>
+                        <absolutePath value="." />
+                    </classpath>
+					<javaPath>
+				      <absolutePath  value="/usr/java/j2sdk1.4.2_08/bin/java"/>
+				    </javaPath>
+                    <policyFile>
+                        <absolutePath value="${PROACTIVE_HOME}/scripts/proactive.java.policy"/>
+                    </policyFile>
+                    <log4jpropertiesFile>
+                        <absolutePath value="${PROACTIVE_HOME}/scripts/proactive-log4j"/>
+                    </log4jpropertiesFile>
+                    <jvmParameters>
+                        <parameter value="-Dproactive.communication.protocol=rmissh"/>
+                    </jvmParameters>
+                </jvmProcess>
+            </processDefinition>
+
+			
+			 <processDefinition id="frontendJVM">
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+                    <extendedJvm refid="uiJVM"/>
+                    <jvmParameters>
+                        <parameter value="-Dproactive.communication.protocol=rmissh"/>
+                        <parameter value="-Dproactive.rmi.port=2030"/>
+                    </jvmParameters>
+                </jvmProcess>
+            </processDefinition>
+
+            
+            <processDefinition id="gLiteProcess"> 
+                <gLiteProcess class="org.objectweb.proactive.core.process.glite.GLiteProcess" virtualOrganisation="proactive"  executable="/usr/java/jdk1.5.0_08/bin/java" JDLFileName="job.jdl" Type="job" jobType="normal"  stdError="error.log" stdOutput="stdout.log" retryCount="3" >
+                    <processReference refid="ceJVM"/> 
+	                <requirements>other.GlueCEUniqueID == "grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj"</requirements>
+                    <rank>-other.GlueCEStateEstimatedResponseTime</rank>
+                    <gLiteOptions>
+						<configFile>
+                            <absolutePath value="${PROACTIVE_HOME}/scripts/unix/proactiveVO/proactiveVO.conf"/>
+                        </configFile>
+                        <JDLFilePath>
+                            <absolutePath value="/users/dsksi/emathias/JDL"/> <!--CHANGE ME-->
+                        </JDLFilePath>
+                        <JDLRemoteFilePath>
+                            <absolutePath value="/users/dsksi/emathias/JDL"/> <!--CHANGE ME-->
+                        </JDLRemoteFilePath>
+                        <inputSandbox>
+							/home/user/ProActive/lib/jsch.jar
+                            /home/user/ProActive/lib/classes.jar                  
+                            /home/user/ProActive/lib/asm.jar
+                            /home/user/ProActive/lib/log4j.jar
+                            /home/user/ProActive/lib/xercesImpl.jar
+                            /home/user/ProActive/lib/components/fractal.jar
+                            /home/user/ProActive/lib/bouncycastle.jar
+                            /home/user/ProActive/lib/ws/servlet-api.jar   
+                            /home/user/ProActive/lib/glite/glite-wms-jdlj.jar
+                            /home/user/ProActive/lib/glite/classad.jar
+                            /home/user/ProActive/scripts/proactive.java.policy
+                            /home/user/ProActive/scripts/proactive-log4j
+						    /home/user/ProActive/scripts/unix/cluster/gLiteStartRuntime.sh
+                            <!--complete with your classes and input files -->
+						</inputSandbox>
+                        <outputSandbox>error.log stdout.log</outputSandbox>
+                    </gLiteOptions>
+                </gLiteProcess>
+            </processDefinition>
+
+ 
+			<processDefinition id="sshHierarchical">
+                <hierarchicalProcess class="org.objectweb.proactive.core.process.ssh.SSHHierarchicalProcess" hostname="lx2.lal.in2p3.fr" username="emathias">
+                    <processReference refid="uiJVM"/>
+                    <hierarchicalReference refid = "gLiteProcess"/>
+                </hierarchicalProcess>
+            </processDefinition>
+        </processes>
+    </infrastructure>
+</ProActiveDescriptor>
+
