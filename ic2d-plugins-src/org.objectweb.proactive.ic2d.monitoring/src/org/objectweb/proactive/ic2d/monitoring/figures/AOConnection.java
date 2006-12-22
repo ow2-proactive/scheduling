@@ -35,7 +35,6 @@ import java.util.List;
 
 import org.eclipse.draw2d.BendpointConnectionRouter;
 import org.eclipse.draw2d.Connection;
-import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RelativeBendpoint;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
@@ -61,7 +60,7 @@ public class AOConnection {
 		Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width/2, source.getBounds().height/2);
 		Point targetCenter = target.getLocation().getTranslated(target.getBounds().width/2, target.getBounds().height/2);
 
-		int position = sourceCenter.getPosition(targetCenter);
+		Position position = getPosition(sourceCenter, targetCenter);
 
 		Anchor sourceAnchor = (Anchor) source.getAnchor();
 		Anchor targetAnchor = (Anchor) target.getAnchor();
@@ -77,7 +76,8 @@ public class AOConnection {
 		List<RelativeBendpoint> bendPoints = new ArrayList<RelativeBendpoint>();
 
 		RelativeBendpoint middle = calculPoint(connection, sourceCenter, targetCenter, position);
-		bendPoints.add(middle);
+		if(middle!=null)
+			bendPoints.add(middle);
 
 		router.setConstraint(connection,bendPoints);
 
@@ -85,8 +85,7 @@ public class AOConnection {
 
 		return connection;
 	}
-
-
+	
 	/**
 	 * Calculate a relative point in order to display the arc of circle
 	 * @param connection The connection
@@ -94,30 +93,52 @@ public class AOConnection {
 	 * @param target The target of connection
 	 * @param position The relative position of the target to the source
 	 */
-	private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target, int position){
+	private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target, Position position){
 		double distance = source.getDistance(target);
 		RelativeBendpoint point = new RelativeBendpoint(connection);
 		int value = (int)(0.4*distance);
 		if(source==target){// If the source and the target are the same point
-			position=PositionConstants.NORTH;
+			position=Position.NORTH;
 			value = 90;
 		}
 		switch (position) {
-		case PositionConstants.NORTH:
+		case SAME:
+		case NORTH:
 			point.setRelativeDimensions(new Dimension(value, 0), new Dimension(value, 0));
 			break;
-		case PositionConstants.SOUTH:
+		case SOUTH:
 			point.setRelativeDimensions(new Dimension(-value, 0), new Dimension(-value, 0));
 			break;
-		case PositionConstants.EAST:
+		case EAST:
 			point.setRelativeDimensions(new Dimension(0, value/2+50), new Dimension(0, value/2+50));
 			break;
-		case PositionConstants.WEST:
+		case WEST:
 			point.setRelativeDimensions(new Dimension(0, -(value/2+50)), new Dimension(0, -(value/2+50)));
 			break;
 		default:
-			break;
+			return null;
 		}
 		return point;
+	}
+
+	/**
+	 * Calculates the relative position of the B Point to the A Point.
+	 */
+	private static Position getPosition(Point A, Point B){
+		if(A.x == B.x){
+			if(A.y < B.y)
+				return Position.SOUTH;
+			else if(A.y > B.y)
+				return Position.NORTH;
+			else
+				return Position.SAME;				
+		}
+		else if(A.y == B.y){
+			if(A.x < B.x)
+				return Position.EAST;
+			else if(A.x > B.x)
+				return Position.WEST;		
+		}
+		return Position.UNKNOWN;
 	}
 }

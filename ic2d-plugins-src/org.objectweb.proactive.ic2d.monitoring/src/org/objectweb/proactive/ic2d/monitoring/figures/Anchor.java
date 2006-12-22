@@ -32,18 +32,17 @@ package org.objectweb.proactive.ic2d.monitoring.figures;
 
 import org.eclipse.draw2d.EllipseAnchor;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
 public class Anchor extends EllipseAnchor{
 
-	private int orientation = PositionConstants.EAST;
+	private Position orientation = Position.UNKNOWN;
 
 	//
 	// -- PUBLIC METHODS -------------------------------------------
 	//
-	
+
 	/**
 	 * @see org.eclipse.draw2d.EllipseAnchor#EllipseAnchor(IFigure)
 	 */
@@ -75,21 +74,16 @@ public class Anchor extends EllipseAnchor{
 		float k = (float)(ref.y * r.width) / (ref.x * r.height);
 		k = k * k;
 
-		if(orientation == PositionConstants.EAST || orientation == PositionConstants.WEST)
+		if(orientation == Position.EAST || orientation == Position.WEST || orientation == Position.SAME)
 			return r.getCenter().translate((int)(r.width * dx),0);
-		else if(orientation == PositionConstants.SOUTH || orientation == PositionConstants.NORTH)
+		else if(orientation == Position.SOUTH || orientation == Position.NORTH)
 			return r.getCenter().translate(0,(int)(r.height * dy));
-		else
+		else{
 			return r.getCenter().translate((int)(r.width * dx / Math.sqrt(1 + k)),
 					(int)(r.height * dy / Math.sqrt(1 + 1 / k)));
-	}
+		}
 
-	public void setOrientation(int orientation){
-		this.orientation = orientation;
-	}
 
-	public int getOrientation(){
-		return this.orientation;
 	}
 
 	/**
@@ -98,40 +92,61 @@ public class Anchor extends EllipseAnchor{
 	 * Lets A and B 2 figures. We want to draw a connection between this 2 objects.
 	 * A is the source, and B is the target.
 	 * So you must do : 
-	 *     A.getAnchor().useRelativePosition(PositionConstant);
-	 *     B.getAnchor().useRelativePosition(PositionConstant);
-	 * @param position The target position (a field of PositionConstants)
+	 *     A.getAnchor().useRelativePosition(Position);
+	 *     B.getAnchor().useRelativePosition(Position);
+	 * @param position The target position
 	 */
-	public void useRelativePosition(int position){
-		if(position == PositionConstants.NORTH)// Target is in the north of Source
-			this.orientation = PositionConstants.EAST;
-		else if(position == PositionConstants.SOUTH)// Target is in the south of Source
-			this.orientation = PositionConstants.WEST;
-		else if (position == PositionConstants.EAST)
-			this.orientation = PositionConstants.NORTH;
-		else if	(position == PositionConstants.WEST)
-			this.orientation = PositionConstants.SOUTH;
-		else this.orientation = position;
+	public void useRelativePosition(Position positionOfTheTarget){
+		switch (positionOfTheTarget) {
+		case NORTH:
+			this.orientation = Position.EAST;
+			break;
+		case SOUTH:
+			this.orientation = Position.WEST;
+			break;
+		case EAST:
+			this.orientation = Position.NORTH;
+			break;
+		case WEST:
+			this.orientation = Position.SOUTH;
+			break;
+		case SAME:
+			this.orientation = Position.SAME;
+			break;
+		default://Position.UNKNOWN
+			this.orientation = Position.UNKNOWN;
+		break;
+		}
 	}
-
 	
 	/**
-	 * This is used to calculate the anchor position.
+	 * This method is used to calculate the anchor position.
 	 */
+	@Override
 	public Point getReferencePoint(){
 		if (getOwner() == null)
 			return null;
 		else {
 			Rectangle rect = getOwner().getBounds();
 			Point ref = rect.getCenter();
-			if(orientation == PositionConstants.EAST)
+			switch (orientation) {
+			case EAST:
 				ref = ref.translate(rect.width/2, 0);
-			else if(orientation == PositionConstants.WEST)
+				break;
+			case SAME:
+			case WEST:
 				ref = ref.translate(-rect.width/2, 0);
-			else if(orientation == PositionConstants.NORTH)
+				break;
+			case NORTH:
 				ref = ref.translate(0, -rect.height/2);
-			else if(orientation == PositionConstants.SOUTH)
+				break;
+			case SOUTH:
 				ref = ref.translate(0, rect.height/2);
+				break;
+			default:
+				ref = super.getReferencePoint();
+				break;
+			}
 			getOwner().translateToAbsolute(ref);
 			return ref;
 		}
