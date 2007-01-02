@@ -1110,5 +1110,41 @@
 			<fileset dir="${base}/descriptors/examples" />
 		</copy>
 	</target>
+	
+	<target name="jdepend_core" description="JDepend report (core only)" depends="clean, core" >
+		<jdepend format="xml" outputfile="jdepend_core.xml">	
+			<classespath>
+				<pathelement location="${classes.dir}/${proactive.core.dir}" />
+			</classespath>
+		</jdepend>
+
+		<style destdir="${base}"
+		    includes="jdepend_core.xml" 
+		      style="${ant.home}/etc/jdepend.xsl" />
+		
+		<delete>
+			<fileset dir="${base}">
+			    <include name="jdepend_core.xml"/>
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="jdepend_all" description="JDepend report (all classes)" depends="clean, compile" >
+		<jdepend format="xml" outputfile="jdepend_all.xml">	
+			<classespath>
+				<pathelement location="${classes.dir}" />
+			</classespath>
+		</jdepend>
+
+		<style destdir="${base}"
+		    includes="jdepend_all.xml" 
+		      style="${ant.home}/etc/jdepend.xsl" />
+		
+		<delete>
+			<fileset dir="${base}">
+			    <include name="jdepend_all.xml"/>
+			</fileset>
+		</delete>
+	</target>
 
 </project>
