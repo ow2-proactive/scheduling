@@ -54,7 +54,7 @@ public class WSConstants {
     public static final String DOCUMENTATION = "ProActive Active Object";
     public static final String COMPONENT_INTERFACE = "Compoment Interface";
     public static final String URL_PUBLICATION = "URL";
-    public static final Vector disallowedMethods = new Vector();
+    public static final Vector<String> disallowedMethods = new Vector<String>();
 
     static {
         disallowedMethods.addElement("equals");
@@ -83,7 +83,7 @@ public class WSConstants {
     }
 
     /* A vector containing all supported types by Apache Soap */
-    protected static Vector supportedTypes = new Vector();
+    protected static Vector<Class> supportedTypes = new Vector<Class>();
 
     static {
         supportedTypes.addElement(String.class);
