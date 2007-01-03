@@ -787,6 +787,8 @@
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
 			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j" />
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml" />
+			<jvmarg value="-Xdebug" />
+			<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8888"/>
 		</java>
 	</target>
 
@@ -1111,7 +1113,7 @@
 		</copy>
 	</target>
 	
-	<target name="jdepend_core" description="JDepend report (core only)" depends="clean, core" >
+	<target name="jdepend_core" description="JDepend report (core only)" depends="core" >
 		<jdepend format="xml" outputfile="jdepend_core.xml">	
 			<classespath>
 				<pathelement location="${classes.dir}/${proactive.core.dir}" />
@@ -1129,7 +1131,7 @@
 		</delete>
 	</target>
 	
-	<target name="jdepend_all" description="JDepend report (all classes)" depends="clean, compile" >
+	<target name="jdepend_all" description="JDepend report (all classes)" depends="compile" >
 		<jdepend format="xml" outputfile="jdepend_all.xml">	
 			<classespath>
 				<pathelement location="${classes.dir}" />
@@ -1147,4 +1149,5 @@
 		</delete>
 	</target>
 
+	<target name="jdepend" description="JDepend reports" depends="jdepend_all,jdepend_core" />
 </project>
