@@ -1,5 +1,0 @@
-#for linux
-gcc -shared -I/usr/local/jdk1.3/include/ -I/usr/local/jdk1.3/include/linux/ -o Util_timer_MicroTimer.o  util_timer_MicroTimer.cc; ld  -G Util_timer_MicroTimer.o -o libUtil_timer_MicroTimer.so
-
-#for solaris
-gcc -G -I/usr/local/jdk1.3/include -I/usr/local/jdk1.3/include/solaris -o Util_timer_MicroTimer.o  util_timer_MicroTimer.cc ; ld -G Util_timer_MicroTimer.o -o  libUtil_timer_MicroTimer.so
