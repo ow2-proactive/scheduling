@@ -7,8 +7,8 @@
   contain active as well as passive instances of a given class. In the
   remaining part of this section, we will consider that we want to create an
   active instance of class <literal>example.A</literal>. Although almost any
-  object can be turned in an Active Object, there are some restrictions that
-  we will detail below.</para>
+  object can be turned into an Active Object, there are some restrictions that
+  will be detailed below.</para>
 
   <para>Any method call <emphasis>m</emphasis> done on a given instance
   <emphasis>a</emphasis> of <literal>A</literal> would result in the
@@ -16,14 +16,14 @@
   the caller thread. By contrast, the same call done on the active object
   <emphasis>aa</emphasis> created from <literal>A</literal> would result into
   placing a request embedding the method call for <emphasis>m</emphasis> in
-  
-  <indexterm><primary>Request Queue</primary></indexterm>
-
-  the request queue of the active object <emphasis>aa</emphasis>. Then, later
-  on, the active thread of <emphasis>aa</emphasis> would eventually pick-up
-  and serve the request for the method <emphasis>m</emphasis>. That would
-  result in the invocation of <emphasis>m</emphasis> on the reified object
-  <emphasis>a</emphasis> by the active thread.</para>
+  <indexterm>
+      <primary>Request Queue</primary>
+    </indexterm> the request queue of the active object
+  <emphasis>aa</emphasis>. Then, later on, the active thread of
+  <emphasis>aa</emphasis> would eventually pick-up and serve the request for
+  the method <emphasis>m</emphasis>. That would result in the invocation of
+  <emphasis>m</emphasis> on the reified object <emphasis>a</emphasis> by the
+  active thread.</para>
 
   <para>The code for creating a passive instance of <literal>A</literal> could
   be:</para>
@@ -36,27 +36,33 @@
   a new object, the other is to use <literal>ProActive.turnActive</literal>
   and is based on the use of an existing object.</para>
 
-  <sect1 >
+  <sect1>
     <title>Instantiation-Based Creation</title>
 
-    <indexterm><primary>newActive</primary></indexterm>
-   
-    <indexterm><primary>Constructor</primary><secondary>empty no-args</secondary></indexterm>
-   
-   <para>When using instantiation based creation, any argument passed to the
+    <indexterm>
+      <primary>newActive</primary>
+    </indexterm>
+
+    <indexterm>
+      <primary>Constructor</primary>
+
+      <secondary>empty no-args</secondary>
+    </indexterm>
+
+    <para>When using instantiation-based creation, any argument passed to the
     constructor of the reified object through
     <literal>ProActive.newActive</literal> is serialized and passed by copy to
-    the object. This is because the model behind <emphasis
+    the object. That's because the model behind <emphasis
     role="bold">ProActive</emphasis> is uniform whether the active object is
     instantiated locally or remotely. The parameters are therefore guaranteed
     to be passed by copy to the constructor. When using
-    <literal>ProActive.newActive</literal> you must make sure that the
-    arguments of the constructor are <literal>Serializable</literal>. On the
-    other hand, the class used to create the active object <emphasis
-    role="bold">does not need to be</emphasis><literal>Serializable</literal>
-    even in the case of remotely created active objects. Remind also that to
-    be created properly, the reified object must have a declared empty no-args
-    constructor.</para>
+    <literal>ProActive.newActive</literal>, one needs to make sure that the
+    constructor arguments are <literal>Serializable</literal>. On the other
+    hand, the class used to create the active object <emphasis
+    role="bold">does not need to be</emphasis><literal> Serializable</literal>
+    even in the case of remotely-created Active Objects. Bear in mind also
+    that a reified object must have a declared empty no-args constructor in
+    order to be properly created.</para>
 
     <programlisting lang="java">    A a;
     Object[] params = new Object[] { new Integer (26), "astring" };
@@ -77,7 +83,7 @@
     <literal>newActive</literal> returns, the active object has been created
     and its active thread is started.</para>
 
-    <sect2 >
+    <sect2>
       <title>Possible ambiguities on the constructor</title>
 
       <para>The first parameter of newActive is a string containing the
@@ -89,10 +95,13 @@
       because:</para>
 
       <itemizedlist>
-        
-       <indexterm><primary>Constructor</primary><secondary>newActive Arguments</secondary></indexterm>
-       
-       <listitem>
+        <indexterm>
+          <primary>Constructor</primary>
+
+          <secondary>newActive Arguments</secondary>
+        </indexterm>
+
+        <listitem>
           <para>As the arguments of the constructor are stored in an array of
           type <literal>Object[]</literal>, primitive types have to be
           represented by their wrappers object type. In the example above, we
@@ -127,7 +136,7 @@
     }</programlisting>
     </sect2>
 
-    <sect2  id="Active_Object_On_Node">
+    <sect2 id="Active_Object_On_Node">
       <title>Using a Node</title>
 
       <para>It is possible to pass a third parameter to the call to
@@ -153,9 +162,8 @@
     </sect2>
   </sect1>
 
-  <sect1 >
-    <title>Object-Based
-    Creation</title>
+  <sect1>
+    <title>Object-Based Creation</title>
 
     <para>Object-based creation is used for turning an existing passive object
     instance into an active one. It has been introduced in ProActive as an
@@ -200,11 +208,15 @@
     more be guaranteed.</para>
   </sect1>
 
-  <sect1  id="ActiveObjectCreation_html_activity">
+  <sect1 id="ActiveObjectCreation_html_activity">
     <title>Specifying the activity of an active object</title>
 
-    <indexterm><primary>Activity</primary><secondary>FIFO</secondary></indexterm>
-    
+    <indexterm>
+      <primary>Activity</primary>
+
+      <secondary>FIFO</secondary>
+    </indexterm>
+
     <para>Customizing the activity of the active object is at the core of
     ProActive because it allows to specify fully the behavior of an active
     object. By default, an object turned into an active object serves its
@@ -234,17 +246,20 @@
     <para>Three interfaces are used to define and implement each step:</para>
 
     <itemizedlist>
-     <listitem>
-      <para>InitActive (see code in <xref role="javaFileSrc" linkend="InitActive.java"/>)</para>
-     </listitem>
-     
-     <listitem>
-      <para>RunActive (see code in <xref role="javaFileSrc" linkend="RunActive.java"/>)</para>
-     </listitem>
-     
-     <listitem>
-      <para>EndActive (see code in <xref role="javaFileSrc" linkend="EndActive.java"/>)</para>
-     </listitem>
+      <listitem>
+        <para>InitActive (see code in <xref linkend="InitActive.java"
+        role="javaFileSrc" />)</para>
+      </listitem>
+
+      <listitem>
+        <para>RunActive (see code in <xref linkend="RunActive.java"
+        role="javaFileSrc" />)</para>
+      </listitem>
+
+      <listitem>
+        <para>EndActive (see code in <xref linkend="EndActive.java"
+        role="javaFileSrc" />)</para>
+      </listitem>
     </itemizedlist>
 
     <para>In case of a migration, an active object stops and restarts its
@@ -271,17 +286,21 @@
     <para>Note that the methods defined by those 3 interfaces are guaranted to
     be called by the active thread of the active object.</para>
 
-    <sect2 >
-      <title>Algorithms for deciding what activity to invoke</title>
+    <sect2>
+      <title>Algorithms deciding which activity to invoke</title>
 
       <para>The algorithms that decide for each phase what to do are the
       following (<literal>activity</literal> is the eventual object passed as
       a parameter to <literal>newActive</literal> or
       <literal>turnActive</literal>):</para>
 
-     <indexterm  significance="preferred"><primary>InitActive</primary><secondary>interface</secondary></indexterm>
- 
-     <para><emphasis role="bold">InitActive</emphasis></para>
+      <indexterm significance="preferred">
+        <primary>InitActive</primary>
+
+        <secondary>interface</secondary>
+      </indexterm>
+
+      <para><emphasis role="bold">InitActive</emphasis></para>
 
       <screen>if activity is non null and implements InitActive
   we invoke the method initActivity defined in the object activity
@@ -290,9 +309,13 @@ else if the class of the reified object implements InitActive
 else
   we don't do any initialization</screen>
 
- <indexterm  significance="preferred"><primary>RunActive</primary><secondary>interface</secondary></indexterm>
-      
-   <para><emphasis role="bold">RunActive</emphasis></para>
+      <indexterm significance="preferred">
+        <primary>RunActive</primary>
+
+        <secondary>interface</secondary>
+      </indexterm>
+
+      <para><emphasis role="bold">RunActive</emphasis></para>
 
       <screen>if activity is non null and implements RunActive
   we invoke the method runActivity defined in the object activity
@@ -301,10 +324,13 @@ else if the class of the reified object implements RunActive
 else
   we run the standard FIFO activity</screen>
 
-      
- <indexterm  significance="preferred"><primary>EndActive</primary><secondary>interface</secondary></indexterm>
+      <indexterm significance="preferred">
+        <primary>EndActive</primary>
 
- <para><emphasis role="bold">EndActive</emphasis></para>
+        <secondary>interface</secondary>
+      </indexterm>
+
+      <para><emphasis role="bold">EndActive</emphasis></para>
 
       <screen>if activity is non null and implements EndActive
   we invoke the method endActivity defined in the object activity
@@ -314,12 +340,12 @@ else
   we don't do any cleanup</screen>
     </sect2>
 
-    <sect2 >
-     <title>Implementing the interfaces directly in the class</title>
+    <sect2>
+      <title>Implementing the interfaces directly in the class</title>
 
-      <para> Implementing the interfaces directly in the class used to create
-      the active object is the easiest solution when you control the class that
-      you make active. Depending on which phase in the life of the active
+      <para>Implementing the interfaces directly in the class used to create
+      the active object is the easiest solution when you control the class
+      that you make active. Depending on which phase in the life of the active
       object you want to customize, you implement the corresponding interface
       (one or more) amongst <literal>InitActive</literal>,
       <literal>RunActive</literal> and <literal>EndActive</literal>. Here is
@@ -353,7 +379,8 @@ else
       </example>
 
       <para><example>
-          <title>Start, stop, suspend, restart a simulation algorithm in runActivity method</title>
+          <title>Start, stop, suspend, restart a simulation algorithm in
+          runActivity method</title>
 
           <para><programlisting lang="java">import org.objectweb.proactive.*;
 public class Simulation implements RunActive {
@@ -422,14 +449,15 @@ public void terminate (){ hasToTerminate=true;}
       reactivity is up to the length of going around the loop.</para>
     </sect2>
 
-    <sect2 >
-      <title>Passing an object implementing the interfaces at creation-time</title>
+    <sect2>
+      <title>Passing an object implementing the interfaces at
+      creation-time</title>
 
       <para>Passing an object implementing the interfaces when creating the
-      active object is the solution to use when you do not control the class that
-      you make active or when you want to write generic activities policy and
-      reused them with several active objects. Depending on which phase in the
-      life of the active object you want to customize, you implement the
+      active object is the solution to use when you do not control the class
+      that you make active or when you want to write generic activities policy
+      and reused them with several active objects. Depending on which phase in
+      the life of the active object you want to customize, you implement the
       corresponding interface (one or more) amongst
       <literal>InitActive</literal>, <literal>RunActive</literal> and
       <literal>EndActive</literal>. Following is an example that has a custom
@@ -472,7 +500,7 @@ public void terminate (){ hasToTerminate=true;}
     </sect2>
   </sect1>
 
-  <sect1  id="ActiveObjectCreation_html_restrictions">
+  <sect1 id="ActiveObjectCreation_html_restrictions">
     <title>Restrictions on reifiable objects</title>
 
     <para>Not all classes can give birth to active objects. There exist some
@@ -513,8 +541,8 @@ public void terminate (){ hasToTerminate=true;}
     </itemizedlist>
   </sect1>
 
-  <sect1  id="ActiveObjectCreation_html_factory" >
-    <title> Using the Factory Method Design Pattern</title>
+  <sect1 id="ActiveObjectCreation_html_factory">
+    <title>Using the Factory Method Design Pattern</title>
 
     <para>Creating an active object using ProActive might be a little bit
     cumbersome and requires more lines of code that for creating a regular
@@ -544,12 +572,14 @@ public void terminate (){ hasToTerminate=true;}
     object have to be dealt with somewhere in the code.</para>
   </sect1>
 
-  <sect1  id="ActiveObjectCreation_html_customize" >
+  <sect1 id="ActiveObjectCreation_html_customize">
     <title>Advanced: Customizing the Body of an Active Object</title>
 
-    <indexterm><primary>Body</primary></indexterm>
-    
-    <sect2 >
+    <indexterm>
+      <primary>Body</primary>
+    </indexterm>
+
+    <sect2>
       <title>Motivations</title>
 
       <para>There are many cases where you may want to customize the body used
@@ -560,22 +590,25 @@ public void terminate (){ hasToTerminate=true;}
       already used by default in ProActive but one can easily replace any of
       those MetaObjects by a custom one.</para>
 
-      <para>We have defined the <literal>MetaObjectFactory</literal> interface 
-       (see code in <xref role="javaFileSrc" linkend="core/body/MetaObjectFactory.java"/>)
-       able to create factories for each of those MetaObjects. This
-       interface is implemented by <literal>ProActiveMetaObjectFactory</literal>
-       (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)
-      which provides all the default factories used in ProActive.</para>
+      <para>We have defined the <literal>MetaObjectFactory</literal> interface
+      (see code in <xref linkend="core/body/MetaObjectFactory.java"
+      role="javaFileSrc" />) able to create factories for each of those
+      MetaObjects. This interface is implemented by
+      <literal>ProActiveMetaObjectFactory</literal> (see code in <xref
+      linkend="core/body/ProActiveMetaObjectFactory.java"
+      role="javaFileSrc" />) which provides all the default factories used in
+      ProActive.</para>
 
       <para>When creating an active object, as we saw above, it is possible to
       specify which <literal>MetaObjectFactory</literal> to use for that
-      particular instance of active object being created. The class 
-      <literal>ProActive</literal>
-      (see code in <xref role="javaFileSrc" linkend="ProActive.java"/>)
-      provides extra newActive and turnActive methods for that:</para>
-      
-     <!-- Don't link theses complicated methods in PDF manual -->
-     <screen os="pdf">ProActive.newActive(
+      particular instance of active object being created. The class
+      <literal>ProActive</literal> (see code in <xref linkend="ProActive.java"
+      role="javaFileSrc" />) provides extra newActive and turnActive methods
+      for that:</para>
+
+      <!-- Don't link theses complicated methods in PDF manual -->
+
+      <screen os="pdf">ProActive.newActive(
   java.lang.String, 
   java.lang.Object[],
   org.objectweb.proactive.core.node.Node, 
@@ -587,34 +620,37 @@ ProActive.turnActive(
   org.objectweb.proactive.core.node.Node,
   org.objectweb.proactive.Active,
   org.objectweb.proactive.core.body.MetaObjectFactory)</screen>
-      
-     <!-- Create links for the HTML manual -->
-		 <screen><ulink os="html"  url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.newActive(
+
+      <!-- Create links for the HTML manual -->
+
+      <screen><ulink os="html"
+          url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.newActive(
   java.lang.String, 
   java.lang.Object[],
   org.objectweb.proactive.core.node.Node, 
   org.objectweb.proactive.Active,  
 	org.objectweb.proactive.core.body.MetaObjectFactory)</ulink></screen>
-               
-<screen><ulink os="html"  url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.turnActive(
+
+      <screen><ulink os="html"
+          url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.turnActive(
   java.lang.Object,
   org.objectweb.proactive.core.node.Node,
   org.objectweb.proactive.Active,
 	org.objectweb.proactive.core.body.MetaObjectFactory)</ulink></screen>
-
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>How to do it</title>
 
       <para>First you have to write a new MetaObject factory that inherits
-        from <literal>ProActiveMetaObjectFactory</literal>
-      (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)
-      or directly implements the <literal>MetaObjectFactory</literal> interface 
-      (see code in <xref role="javaFileSrc" linkend="core/body/MetaObjectFactory.java"/>), in
-      order to redefine everything. Inheriting from 
-      <literal>ProActiveMetaObjectFactory</literal> is a great time saver 
-      as you only redefine what you really need to. Here is an example:</para>
+      from <literal>ProActiveMetaObjectFactory</literal> (see code in <xref
+      linkend="core/body/ProActiveMetaObjectFactory.java"
+      role="javaFileSrc" />) or directly implements the
+      <literal>MetaObjectFactory</literal> interface (see code in <xref
+      linkend="core/body/MetaObjectFactory.java" role="javaFileSrc" />), in
+      order to redefine everything. Inheriting from
+      <literal>ProActiveMetaObjectFactory</literal> is a great time saver as
+      you only redefine what you really need to. Here is an example:</para>
 
       <para><programlisting lang="java">public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
   private static final MetaObjectFactory instance = new MyMetaObjectFactory();
@@ -645,16 +681,17 @@ ProActive.turnActive(
       <literal>RequestFactory</literal> in order to make the body use a new
       type of request. The method <literal>protected RequestFactory
       newRequestFactorySingleton()</literal> is one convenience method that
-      <literal>ProActiveMetaObjectFactory</literal>
-       (see code in <xref role="javaFileSrc" linkend="core/body/ProActiveMetaObjectFactory.java"/>)      
-      provides to simplify the creation of factories as singleton. More explanations
-      can be found in the 
-      <!-- This url can only work in the html generated files: in pdf there's no ".." -->
-      <ulink os="html" url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">javadoc of that class</ulink>
-      <phrase os="pdf"><literal>org.objectweb.proactive.core.body.ProActiveMetaObjectFactory</literal> javadoc</phrase>. 
-      The use of that factory  is fairly simple. All you have to do is to pass an instance of the
-      factory when creating a new active object. If we take the same example
-      as before we have:</para>
+      <literal>ProActiveMetaObjectFactory</literal> (see code in <xref
+      linkend="core/body/ProActiveMetaObjectFactory.java"
+      role="javaFileSrc" />) provides to simplify the creation of factories as
+      singleton. More explanations can be found in the <!-- This url can only work in the html generated files: in pdf there's no ".." -->
+      <ulink os="html"
+      url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">javadoc
+      of that class</ulink> <phrase
+      os="pdf"><literal>org.objectweb.proactive.core.body.ProActiveMetaObjectFactory</literal>
+      javadoc</phrase>. The use of that factory is fairly simple. All you have
+      to do is to pass an instance of the factory when creating a new active
+      object. If we take the same example as before we have:</para>
 
       <programlisting lang="java">  Object[] params = new Object[] {new Integer (26), "astring"};
   try {
@@ -672,7 +709,7 @@ ProActive.turnActive(
     </sect2>
   </sect1>
 
-  <sect1 id="ActiveObjectCreation_html_elementRole" >
+  <sect1 id="ActiveObjectCreation_html_elementRole">
     <title>Advanced: Role of the elements of an active object</title>
 
     <para>In this section, we'll have a very close look at what happens when
@@ -702,8 +739,9 @@ ProActive.turnActive(
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="images/activeObjectComponents.png"
-                       format="PNG" contentwidth="100" width="6in" />
+            <imagedata contentwidth="100"
+                       fileref="images/activeObjectComponents.png"
+                       format="PNG" width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
@@ -728,11 +766,13 @@ ProActive.turnActive(
       </listitem>
     </itemizedlist>
 
-    <sect2 >
+    <sect2>
       <title>Role of the stub</title>
 
-      <indexterm><primary>Stub</primary></indexterm>
-      
+      <indexterm>
+        <primary>Stub</primary>
+      </indexterm>
+
       <para>The role of the class <literal>Stub_B</literal> is to reify all
       method calls that can be performed through a reference of type
       <literal>B</literal>, and only these as calling a method declared in a
@@ -748,8 +788,8 @@ ProActive.turnActive(
       the language that are not normally objects (such as method calls,
       constructor calls, references, types,...) is what <emphasis>metaobject
       programming</emphasis> is all about. The metaobject protocol (MOP)
-     ProActive is built on is described in <xref linkend="MOP"/> but
-      it is not a prerequisite for understanding and using ProActive.</para>
+      ProActive is built on is described in <xref linkend="MOP" /> but it is
+      not a prerequisite for understanding and using ProActive.</para>
 
       <para>As one of our objectives is to provide transparent active objects,
       references to active objects of class <literal>B</literal> need to be of
@@ -819,7 +859,7 @@ ProActive.turnActive(
       </itemizedlist>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Role of the proxy</title>
 
       <para>The role of the proxy is to handle asynchronism in calls to active
@@ -831,7 +871,7 @@ ProActive.turnActive(
       method.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Role of the body</title>
 
       <para>The <literal>body</literal> is responsible for storing calls
@@ -842,7 +882,7 @@ ProActive.turnActive(
       pending ones and executes the associated call.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Role of the instance of class B</title>
 
       <para>This is a standard instance of class <literal>B</literal>. It may
@@ -859,10 +899,10 @@ ProActive.turnActive(
     </sect2>
   </sect1>
 
-  <sect1 id="FutureObjectCreation" >
+  <sect1 id="FutureObjectCreation">
     <title>Asynchronous calls and futures</title>
 
-    <sect2 >
+    <sect2>
       <title>Creation of a Future Object</title>
 
       <para>Whenever possible a method call on an active object is reified as
@@ -970,7 +1010,7 @@ ProActive.turnActive(
       current futures become available. An application can be found in the
       FutureList class.</para>
 
-      <sect3 >
+      <sect3>
         <title>HashCode and equals</title>
 
         <para>Any call to a future object is reified in order to be blocked if
@@ -982,7 +1022,7 @@ ProActive.turnActive(
         deadlocks if they are called on a not yet available object.</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>hashCode()</title>
 
         <para>Instead of returning the hashcode of the object, it returns the
@@ -990,7 +1030,7 @@ ProActive.turnActive(
         object, there is a unique equivalence between them.</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>equals()</title>
 
         <para>The default implementation of <literal>equals()</literal> in the
@@ -1005,7 +1045,7 @@ ProActive.turnActive(
         methods.</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>toString()</title>
 
         <para>The <literal>toString()</literal> method is most of the time
@@ -1019,10 +1059,10 @@ ProActive.turnActive(
       </sect3>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Asynchronous calls in details</title>
 
-      <sect3 >
+      <sect3>
         <title>The setup</title>
 
         <para>First, let's introduce the example we'll use throughout this
@@ -1035,7 +1075,7 @@ ProActive.turnActive(
         by the call to <literal>foo</literal>.</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>What would have happened in a sequential world</title>
 
         <para>In a sequential, single-threaded version of the same
@@ -1064,7 +1104,7 @@ ProActive.turnActive(
           </figure></para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Visualizing the graph of objects</title>
 
         <para>Let us first get an idea of what the graph of objects at
@@ -1089,8 +1129,9 @@ ProActive.turnActive(
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="images/activeObjectComponents.png"
-                               format="PNG" contentwidth="100" width="6in" />
+                    <imagedata contentwidth="100"
+                               fileref="images/activeObjectComponents.png"
+                               format="PNG" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1110,8 +1151,9 @@ ProActive.turnActive(
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="images/futureObjectComponents.png"
-                               format="PNG" contentwidth="100" width="6in" />
+                    <imagedata contentwidth="100"
+                               fileref="images/futureObjectComponents.png"
+                               format="PNG" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1129,8 +1171,9 @@ ProActive.turnActive(
 
                 <mediaobject>
                   <imageobject>
-                    <imagedata fileref="images/futureObjectAllComponents.png"
-                               format="PNG" contentwidth="100" width="6in" />
+                    <imagedata contentwidth="100"
+                               fileref="images/futureObjectAllComponents.png"
+                               format="PNG" width="6in" />
                   </imageobject>
                 </mediaobject>
               </figure></para>
@@ -1138,7 +1181,7 @@ ProActive.turnActive(
         </itemizedlist>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Sequence Diagram</title>
 
         <para>Let us now concentrate on how and when and by which thread the
@@ -1199,8 +1242,9 @@ ProActive.turnActive(
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG" contentwidth="100" width="6in" />
+                <imagedata contentwidth="100"
+                           fileref="images/usingFutureAfterGettingResultDiagram.png"
+                           format="PNG" width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>
@@ -1214,19 +1258,20 @@ ProActive.turnActive(
 
             <mediaobject>
               <imageobject>
-                <imagedata fileref="images/usingFutureBeforeGettingResultDiagram.png"
-                           format="PNG" contentwidth="100" width="6in" />
+                <imagedata contentwidth="100"
+                           fileref="images/usingFutureBeforeGettingResultDiagram.png"
+                           format="PNG" width="6in" />
               </imageobject>
             </mediaobject>
           </figure></para>
       </sect3>
     </sect2>
 
-    <sect2  id="FutureObjectCreation_commonerror" >
+    <sect2 id="FutureObjectCreation_commonerror">
       <title>Important Notes: Errors to avoid</title>
 
-      <para> There are few things to remember with asynchronous method calls and futures, in order
-      to avoid annoying debugging sessions:</para>
+      <para>There are few things to remember with asynchronous method calls
+      and futures, in order to avoid annoying debugging sessions:</para>
 
       <itemizedlist>
         <listitem>
@@ -1246,10 +1291,13 @@ ProActive.turnActive(
         </listitem>
 
         <listitem>
-          
-         <indexterm><primary>Wrappers</primary><secondary>Asynchronism</secondary></indexterm>
-         
-         <para>Think to use <emphasis role="bold">wrappers</emphasis> instead
+          <indexterm>
+            <primary>Wrappers</primary>
+
+            <secondary>Asynchronism</secondary>
+          </indexterm>
+
+          <para>Think to use <emphasis role="bold">wrappers</emphasis> instead
           of primitive types or final classes for methods result type
           otherwise you will loose the asynchronism capabilities. For instance
           if one of your object has a method</para>
@@ -1319,19 +1367,17 @@ if(result_from_method == null){
     </sect2>
   </sect1>
 
-  <sect1 id="AC" >
-   <title>Automatic Continuation in ProActive</title>
-   
- <indexterm significance="preferred">
-  <primary>Automatic Continuation</primary>
- </indexterm> 
-   
-    <sect2 >
+  <sect1 id="AC">
+    <title>Automatic Continuation in ProActive</title>
+
+    <indexterm significance="preferred">
+      <primary>Automatic Continuation</primary>
+    </indexterm>
+
+    <sect2>
       <title>Objectives</title>
 
-      <para>
-   
-       An Automatic Continuation is due to the propagation of a future
+      <para>An Automatic Continuation is due to the propagation of a future
       outside the activity that has sent the corresponding request.</para>
 
       <para>Automatic Continuations allow to pass in parameter or return as a
@@ -1341,7 +1387,7 @@ if(result_from_method == null){
       update the result in all objects to which it passed the future.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Principles</title>
 
       <itemizedlist>
@@ -1357,12 +1403,12 @@ if(result_from_method == null){
 
           <para>Outgoing futures are registered in the <emphasis
           role="bold">FuturePool</emphasis> of the Active Object sending this
-          future(request or reply). Registration for couple(Future,BodyDestination) as an 
-          Automatic Continuation occurs
+          future(request or reply). Registration for
+          couple(Future,BodyDestination) as an Automatic Continuation occurs
           when the future is serialized(indeed every request or reply are
           serialized before being sent, and the future is part of the request
-          or the reply). More precisely, a thread 
-          <emphasis role="bold">T</emphasis> sending the message(request or
+          or the reply). More precisely, a thread <emphasis
+          role="bold">T</emphasis> sending the message(request or
           reply)---therefore the thread doing the serialization---, keeps in a
           static table (<emphasis
           role="bold">FuturePool.bodyDestination</emphasis>) a reference of
@@ -1415,7 +1461,7 @@ if(result_from_method == null){
       </itemizedlist>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Example</title>
 
       <para>The following piece of code shows both cases: passing a future as
@@ -1437,17 +1483,17 @@ if(result_from_method == null){
 
       <para>where</para>
 
-<programlisting lang="java">class A {
+      <programlisting lang="java">class A {
   ...
         public Result foo(){
         ...
         }
   ...
-} //end of class A</programlisting> 
+} //end of class A</programlisting>
 
-<para>and</para>
+      <para>and</para>
 
-<programlisting lang="java">class B {
+      <programlisting lang="java">class B {
 ...
          public Result bar (Result r) {
         ...
@@ -1460,13 +1506,16 @@ if(result_from_method == null){
 } //end of class B</programlisting>
     </sect2>
 
-    <sect2 >
-     <title>Illustration of an Automatic Continuation  </title>
-     
-     <indexterm><primary>Automatic Continuation </primary></indexterm>
-      <para>We will illustrate here how a future is first created, 
-       then passed as parameter to a method later on.</para>
-      
+    <sect2>
+      <title>Illustration of an Automatic Continuation</title>
+
+      <indexterm>
+        <primary>Automatic Continuation</primary>
+      </indexterm>
+
+      <para>We will illustrate here how a future is first created, then passed
+      as parameter to a method later on.</para>
+
       <para><informalfigure>
           <mediaobject>
             <imageobject>
@@ -1531,7 +1580,8 @@ if(result_from_method == null){
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e6.png" format="PNG" contentwidth="100" width="6in" />
+              <imagedata contentwidth="100" fileref="images/e6.png"
+                         format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1542,7 +1592,8 @@ if(result_from_method == null){
       <para><informalfigure>
           <mediaobject>
             <imageobject>
-              <imagedata fileref="images/e7.png" format="PNG" contentwidth="100" width="6in" />
+              <imagedata contentwidth="100" fileref="images/e7.png"
+                         format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -1850,14 +1901,15 @@ if(result_from_method == null){
    -Dlog4j.configuration=file:scripts/proactive-log4j
    org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello &amp;</screen>
 
-  <screen>windows clientHost&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy
+        <screen>windows clientHost&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy
   -Dlog4j.configuration=file:scripts\proactive-log4j
   org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
-      
- <note><para>There is also a Guided Tour section on the Hello world example: 
-             <xref linkend="hands_on_programming"/></para></note>
 
-</sect3>
+        <note>
+          <para>There is also a Guided Tour section on the Hello world
+          example: <xref linkend="hands_on_programming" /></para>
+        </note>
+      </sect3>
     </sect2>
   </sect1>
 </chapter>

@@ -63,8 +63,7 @@
 
           <para>Include in your <literal>CLASSPATH</literal> the ProActive jar
           file (ProActive/ProActive.jar) along with
-          <literal>ProActive/lib/javassist.jar,
-          ProActive/lib/components/asm-2.2.1.jar, ProActive/lib/log4j.jar,
+          <literal>ProActive/lib/javassist.jar, ProActive/lib/log4j.jar,
           ProActive/lib/xercesImpl.jar, ProActive/lib/components/fractal.jar,
           ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
@@ -78,10 +77,9 @@
           <para>Don't forget to launch the JVM with a <ulink
           url="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">security
           policy file</ulink> using the option
-          -Djava.security.policy=pathToFile. A basic policy file called
-          proactive.java.policy can be found within proactive. You can also
-          specify a <ulink
-          url="http://logging.apache.org/log4j/docs/manual.html">log4j
+          -Djava.security.policy=pathToFile. A basic policy file can be found
+          at ProActive/scripts/proactive.java.policy. You can also specify a
+          <ulink url="http://logging.apache.org/log4j/docs/manual.html">log4j
           configuration file</ulink> with the property
           <literal>-Dlog4j.configuration=file:pathToFile</literal>. If not
           specified a default logger that logs on the console will be
@@ -327,14 +325,8 @@
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">lib/components/asm-2.2.1.jar</emphasis>
-        ASM the default bytecode manipulation framework used to dynamically
-        generate the java bytecode of the Stubs.</para>
-      </listitem>
-
-      <listitem>
         <para><emphasis role="bold">lib/javassist.jar</emphasis> in lib
-        directory: is also used to handle bytecode manipulation.</para>
+        directory. It is used to handle bytecode manipulation.</para>
       </listitem>
 
       <listitem>
@@ -425,7 +417,8 @@
   </sect1>
 
   <sect1>
-    <title>Create a java.policy file to set permissions</title>
+    <title id="Create_Java_Policy">Create a java.policy file to set
+    permissions</title>
 
     <para><emphasis>If you use the scripts provided with the distribution to
     run the examples an existing policy file named <emphasis
@@ -471,7 +464,7 @@
   <sect1>
     <title>ProActive and IDEs (Eclipse, ...)</title>
 
-    <para>We recommend you to use the Eclispe IDE to develop your ProActive
+    <para>We recommend you use the Eclispe IDE to develop your ProActive
     applications. You can get this tool on the <ulink
     url="http://www.eclipse.org">Eclipse website</ulink> Just unzip and launch
     the eclipse executable. In order to develop your own ProActive
@@ -576,8 +569,8 @@
     <para>All is now configured to create your ProActive application. Click on
     the <emphasis role="bold">Finish</emphasis> button.</para>
 
-    <para>We are currently developping an eclipse plugin that will help
-    developpers to create easily ProActive applications. Have a look at the
+    <para>We are currently developing an Eclipse plugin that will help
+    developers to easily create ProActive applications. Have a look at the
     plugin documentation page, <xref linkend="IC2D_EclipsePlugin" />.</para>
   </sect1>
 
@@ -610,7 +603,8 @@
       <listitem>
         <para><emphasis role="bold">Java complains about denial of
         access.</emphasis> If you get the following exceptions, you probably
-        didn't change the file java.policy as described in step 4.</para>
+        didn't change the file java.policy as described in <xref lang=""
+        linkend="Create_Java_Policy" />.</para>
 
         <screen>org.objectweb.proactive.NodeException:
 java.security.AccessControlException: access denied
@@ -655,7 +649,7 @@ java.security.AccessControlException: access denied
         those problems, the best thing to do is to install the jdk under a
         space-free directory and path (e.g. C:\java\j2sdk.... or
         D:\java\j2sdk... ) and then set the JAVA_HOME environment variable
-        accordingly. </para>
+        accordingly.</para>
       </listitem>
     </itemizedlist>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="StepByStepPi">
-  <title> PI (3.14...) - Step By Step</title>
+  <title>PI (3.14...) - Step By Step</title>
 
   <para>In this document we show how to create a distributed application to
   compute the number PI using the ProActive Grid Middleware. Distributed
@@ -17,8 +17,8 @@
       <itemizedlist>
         <listitem>
           <para>Download and install the <emphasis role="bold">JDK 5.0 Update
-          9</emphasis> from
-          http://java.sun.com/javase/downloads/index.jsp.</para>
+          9</emphasis> from <ulink
+          url="http://java.sun.com/javase/downloads/index_jdk5.jsp">here</ulink>.</para>
         </listitem>
 
         <listitem>
@@ -53,7 +53,7 @@ Results.java       &lt;-- The results returned by the workers
 <emphasis role="bold">MyPi.java          &lt;-- Base class to test Pi with ProActive</emphasis></screen></para>
 
     <para>In this step by step we will implement our own version of <emphasis
-    role="bold">PiBPP.java</emphasis>. </para>
+    role="bold">PiBPP.java</emphasis>.</para>
 
     <sect2>
       <title>MyPi.java</title>
@@ -83,7 +83,7 @@ public static void <emphasis role="bold">main</emphasis>(String args[]) throws E
     </sect2>
 
     <sect2>
-      <title> Add the Deployment Descriptor</title>
+      <title>Add the Deployment Descriptor</title>
 
       <para>Inside the main we add the code for acquiring the
       resources.</para>

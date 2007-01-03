@@ -10,17 +10,18 @@
 
     <para>Active objects are the basic units of activity and distribution used
     for building concurrent applications using ProActive. An active object
-    owns its own thread. This thread only executes the methods invoked on this
-    active object by other active objects and those of the passive objects of
-    the subsystem that belongs to this active object. With ProActive, the
-    programmer does not have to explicitly manipulate Thread objects, unlike
-    in standard Java.</para>
+    runs with its own thread. This thread only executes the methods invoked on
+    this active object by other active objects and those of the passive
+    objects of the subsystem that belongs to this active object. With
+    ProActive, the programmer does not have to explicitly manipulate Thread
+    objects, unlike in standard Java.</para>
 
     <para>Active objects can be created on any of the hosts involved in the
     computation. Once an active object is created, its activity (the fact that
-    it owns its own thread) and its location (local or remote) are perfectly
-    transparent. As a matter of fact, any active object can be manipulated
-    just like if it were a passive instance of the same class.</para>
+    it runs with its own thread) and its location (local or remote) are
+    perfectly transparent. As a matter of fact, any active object can be
+    manipulated just like if it were a passive instance of the same
+    class.</para>
 
     <para>ProActive is a library designed for developing applications in a
     model introduced by the Eiffel// language. Its main features are:</para>

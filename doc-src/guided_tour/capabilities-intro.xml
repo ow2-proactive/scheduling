@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="capabilities-intro">
-  <title>Introduction to some of the functionalities of ProActive</title>
+  <title id="Introduction_Proactive_Features">Introduction to ProActive
+  Features</title>
 
-  <para>This chapter will present some of the facilities offered by ProActive,
+  <para>This chapter will present some of the features offered by ProActive,
   namely:</para>
 
   <itemizedlist>
@@ -21,7 +22,7 @@
     </listitem>
   </itemizedlist>
 
-  <sect1 >
+  <sect1>
     <title>Parallel processing and collaborative application with
     ProActive</title>
 
@@ -31,11 +32,12 @@
     <para>A typical application is C3D.</para>
 
     <para>Note that parallelisation of programs can be facilitated with
-     ProActive, thanks to asynchronous method calls (see <xref linkend="FutureObjectCreation"/>), 
-     as well as group communications (see <xref linkend="TypedGroupCommunication"/>).</para>
+    ProActive, thanks to asynchronous method calls (see <xref
+    linkend="FutureObjectCreation" />), as well as group communications (see
+    <xref linkend="TypedGroupCommunication" />).</para>
   </sect1>
 
-  <sect1  id="C3D_example">
+  <sect1 id="C3D_example">
     <title>C3D: a parallel, distributed and collaborative 3D renderer</title>
 
     <para><ulink
@@ -56,18 +58,20 @@
 
       <mediaobject>
         <imageobject>
-          <imagedata fileref="guided_tour/pics/hello/c3d.png" format="PNG"
-                     contentwidth="100" width="6in" />
+          <imagedata contentwidth="100"
+                     fileref="guided_tour/pics/hello/c3d.png" format="PNG"
+                     width="6in" />
         </imageobject>
       </mediaobject>
     </figure>
 
-    <sect2 >
+    <sect2>
       <title>Start C3D</title>
 
-      <para>Using the script <literal>c3d_no_user</literal>, a "Dispatcher" 
-       object is launched (ie a centralized server) as well as 4 "Renderer" 
-       objects, which are active objects to be used for parallel rendering.</para>
+      <para>Using the script <literal>c3d_no_user</literal>, a "Dispatcher"
+      object is launched (ie a centralized server) as well as 4 "Renderer"
+      objects, which are active objects to be used for parallel
+      rendering.</para>
 
       <para><figure>
           <title>the dispatcher GUI is launched</title>
@@ -75,23 +79,24 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/c3d_dispatcher_app.png"
-                         format="PNG" width="4.5in"/>
+                         format="PNG" width="4.5in" />
             </imageobject>
           </mediaobject>
         </figure></para>
 
       <para>The bottom part of the window allows to choose which renderers
-       should participate in the rendering. You may want to stop using a given machine 
-       (because for instance it is overloaded), and thus remove it from the renderers
-       used in the current computation.</para>
+      should participate in the rendering. You may want to stop using a given
+      machine (because for instance it is overloaded), and thus remove it from
+      the renderers used in the current computation.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Start a user</title>
 
-      <para>Using <literal>c3d_add_user</literal>, </para>
+      <para>Using <literal>c3d_add_user</literal>,</para>
+
       <itemizedlist>
-       <listitem>
+        <listitem>
           <para>Connect on the current host (proposed by default) by just
           giving your name.</para>
         </listitem>
@@ -101,7 +106,7 @@
           <mediaobject>
             <imageobject>
               <imagedata fileref="guided_tour/pics/screenshots/c3d_user_alice.png"
-                         format="PNG"  width="4.5in"/>
+                         format="PNG" width="4.5in" />
             </imageobject>
           </mediaobject>
         </informalfigure></para>
@@ -124,16 +129,19 @@
 
       <para>Are you on a multi-processor machine?</para>
 
-      <note><para>You might not perceive the difference of the
-      performance. The difference is better seen with more distributed nodes
-      and objects (for example on a cluster) .</para></note>
+      <note>
+        <para>You might not perceive the difference of the performance. The
+        difference is better seen with more distributed nodes and objects (for
+        example on a cluster) .</para>
+      </note>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Start a user from another machine</title>
 
-      <para>Using the <literal>c3d_add_user</literal> script, and <emphasis>specifying the host</emphasis> 
-       (set to local host bydefault)</para>
+      <para>Using the <literal>c3d_add_user</literal> script, and
+      <emphasis>specifying the host</emphasis> (set to local host
+      bydefault)</para>
 
       <para><figure>
           <title>Specifying the host</title>
@@ -146,8 +154,8 @@
           </mediaobject>
         </figure></para>
 
-      <para>If you use rlogin, make sure the DISPLAY is properly set. 
-       You must use the same version of ProActive on both machines!</para>
+      <para>If you use rlogin, make sure the DISPLAY is properly set. You must
+      use the same version of ProActive on both machines!</para>
 
       <itemizedlist>
         <listitem>
@@ -160,11 +168,17 @@
       starting some actions (or that a timeout occured).</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Start IC2D to visualize the topology</title>
 
-      <para>To visualize all Active objects, you need to acquire ('monitoring'
-      menu):</para>
+      <para>You will need at first to start IC2D using either
+      ProActive/scripts/unix/ic2d.sh or ProActive/scripts/windows/ic2d.bat
+      depending on your environment.</para>
+
+      <para></para>
+
+      <para>In order to visualize all Active objects, you need to acquire
+      ('Monitoring/Monitor a new RMI host' menu):</para>
 
       <itemizedlist>
         <listitem>
@@ -173,16 +187,23 @@
 
         <listitem>
           <para>The machine on which you started the second user</para>
+
+          <para>You'll need to type in the edit field asking it <emphasis>the
+          name of each machine</emphasis> and the <emphasis>RMI
+          port</emphasis> being used separated by a
+          <emphasis>colon</emphasis>.</para>
         </listitem>
       </itemizedlist>
 
       <para><figure>
-          <title>The C3D application when a new user joins in, seen with IC2D</title>
+          <title>The C3D application when a new user joins in, seen with
+          IC2D</title>
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png"
-                         format="PNG" contentwidth="100" width="6in" />
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/c3d_topology_with_new_user.png"
+                         format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>
@@ -208,13 +229,16 @@
       </itemizedlist>
     </sect2>
 
-    <sect2 >
-      
-     <title>Drag-and-drop migration</title>
+    <sect2>
+      <title>Drag-and-drop migration</title>
 
-		 <indexterm><primary>Migration</primary><secondary>drag-and-drop</secondary></indexterm>
-      
-		 <para>From IC2D, you can drag-and-drop active objects from one JVM to
+      <indexterm>
+        <primary>Migration</primary>
+
+        <secondary>drag-and-drop</secondary>
+      </indexterm>
+
+      <para>From IC2D, you can drag-and-drop active objects from one JVM to
       another. Click the right button on a C3DRenderingEngine, and drag and
       drop it in another JVM. Observe the migration taking place.</para>
 
@@ -227,22 +251,25 @@
       it is communicating (for instance when a rendering action is in
       progress). Give it a try!</para>
 
-      <note><para>You can also migrate Active Objects which create a GUI. If you do that 
-        for the User, you will see the graphical window beiung destroyed, and rebuilt once more.</para></note>
+      <note>
+        <para>You can also migrate Active Objects which create a GUI. If you
+        do that for the User, you will see the graphical window beiung
+        destroyed, and rebuilt once more.</para>
+      </note>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Start a new JVM in a computation</title>
 
       <para>Manually you can start a new JVM - a 'Node' in the ProActive
       terminology - that will be used in a running system.</para>
 
-     <itemizedlist>
-      <listitem>
-      <para>On a different machine, or by remote login on another host,
-      start another Node, named for instance NodeZ</para>
-    </listitem>
-     </itemizedlist>
+      <itemizedlist>
+        <listitem>
+          <para>On a different machine, or by remote login on another host,
+          start another Node, named for instance NodeZ</para>
+        </listitem>
+      </itemizedlist>
 
       <screen>linux&gt; startNode.sh rmi://mymachine/NodeZ &amp;
 windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
@@ -267,10 +294,11 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
         </listitem>
       </itemizedlist>
 
-      <note><para>If you feel uncomfortable with the automatic layout,
-      switch to manual using the 'manual layout' option (right click on the
-      World panel). You can then reorganize the layout of the
-      machines.</para></note>
+      <note>
+        <para>If you feel uncomfortable with the automatic layout, switch to
+        manual using the 'manual layout' option (right click on the World
+        panel). You can then reorganize the layout of the machines.</para>
+      </note>
 
       <itemizedlist>
         <listitem>
@@ -283,39 +311,53 @@ windows&gt; startNode.bat rmi://mymachine/NodeZ </screen>
       look for the most efficient configuration.</para>
     </sect2>
 
-    <sect2 >
-     <title>Wrapping Active Objects in Components</title>
-     
-     <para>You can also write components with the Fractive API, which is an implementation of Fractal in ProActive. 
-      You should check the part on components for more information (<xref linkend="ProActiveComponents"/>).
-      There is a long explanation of the C3D component version (<xref linkend="C3D_component_example"/>).
-      The visual aspect is very similar to the standard Active Object C3D version. That's on purpose,
-      to show how easy it is to transform code into components. If you want to run a components version of c3d, try this:</para>
-     <screen>scripts/unix/components$ ./c3d.sh
+    <sect2>
+      <title>Wrapping Active Objects in Components</title>
+
+      <para>You can also write components with the Fractive API, which is an
+      implementation of Fractal in ProActive. You should check the section on
+      components for more information (<xref
+      linkend="ProActiveComponents" />). There is a long explanation of the
+      C3D component version (<xref linkend="C3D_component_example" />). The
+      visual aspect is very similar to the standard Active Object C3D version.
+      That's on purpose, to show how easy it is to transform code into
+      components. If you want to run a components version of c3d, try
+      this:</para>
+
+      <screen>scripts/unix/components$ ./c3d.sh
 scripts/windows/components$ c3d.bat</screen>
-     
-<para>The component binding is done through the Fractal ADL, which is a standard way of writing components 
- through an xml file. You can have a visual representation with IC2D 
- (start IC2D, menu->Components->Start the Fractal GUI). You should specify how to read the file. 
- You have to enter: </para>     
-<itemizedlist>
-	<listitem><para>File->Storeage: <literal>ProActive/src</literal>.</para></listitem>
-		<listitem><para>File->Open:<literal>ProActive/src/org/objectweb/proactive/examples/c3d/adl/userAndComposite.fractal</literal>.</para></listitem>
-</itemizedlist>
-<figure>
-      <title>IC2D component explorer with the C3D example</title>
-      <mediaobject>
-       <imageobject>
-        <imagedata contentwidth="100"
-                   fileref="components/pics/c3d_components.png"
-                   format="PNG" width="6in" />
-       </imageobject>
-      </mediaobject>
-        </figure>
+
+      <para>The component binding is done through the Fractal ADL, which is a
+      standard way of writing components through an xml file. You can have a
+      visual representation with IC2D (start IC2D,
+      menu-&gt;Components-&gt;Start the components GUI). You should specify
+      how to read the file. You have to enter:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>File-&gt;Storage: <literal>ProActive/src</literal>.</para>
+        </listitem>
+
+        <listitem>
+          <para>File-&gt;Open:<literal>ProActive/src/org/objectweb/proactive/examples/components/c3d/adl/userAndComposite.fractal</literal>.</para>
+        </listitem>
+      </itemizedlist>
+
+      <figure>
+        <title>IC2D component explorer with the C3D example</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="components/pics/c3d_components.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure>
     </sect2>
 
-    <sect2 >
-     <title>Look at the source code for the main classes</title>
+    <sect2>
+      <title>Look at the source code for the main classes</title>
 
       <para>The main classes of this application are:</para>
 
@@ -337,13 +379,13 @@ scripts/windows/components$ c3d.bat</screen>
         </listitem>
       </itemizedlist>
 
-      <para>In the Dispatcher, look at the method 
-       <literal>public void rotateScene(int i_user, Vec angle) </literal>
-       that handles election of the next action to undertake.</para>
+      <para>In the Dispatcher, look at the method <literal>public void
+      rotateScene(int i_user, String i_user_name, Vec angle) </literal> that
+      handles election of the next action to undertake.</para>
     </sect2>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Synchronization with ProActive</title>
 
     <para>ProActive provides an advanced synchronization mechanism that allows
@@ -362,7 +404,7 @@ scripts/windows/components$ c3d.bat</screen>
       </listitem>
     </itemizedlist>
 
-    <sect2 >
+    <sect2>
       <title>The readers-writers</title>
 
       <para>The readers and the writers want to access the same data. In order
@@ -376,7 +418,7 @@ scripts/windows/components$ c3d.bat</screen>
       with ProActive</ulink> uses 3 active objects: Reader, Writer, and the
       controller class (ReaderWriter).</para>
 
-      <sect3 >
+      <sect3>
         <title>Start the application</title>
 
         <para><figure>
@@ -407,32 +449,33 @@ scripts/windows/components$ c3d.bat</screen>
           </figure></para>
       </sect3>
 
-      <sect3 >
-        <title>Check the effect of different policies: even, writer
-        priority, reader priority</title>
+      <sect3>
+        <title>Check the effect of different policies: even, writer priority,
+        reader priority</title>
 
         <para>What happens when priority is set to 'reader priority'?</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Look at the code for programming such policies</title>
 
         <para>in
-        <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal>. 
+        <literal>org.objectweb.proactive.examples.readers.ReaderWriter.java</literal>.
         More specifically, look at the routines in:</para>
 
-       <screen>public void evenPolicy(org.objectweb.proactive.Service service)</screen>
+        <screen>public void evenPolicy(org.objectweb.proactive.Service service)</screen>
 
-       <screen>public void readerPolicy(org.objectweb.proactive.Service service)</screen>
+        <screen>public void readerPolicy(org.objectweb.proactive.Service service)</screen>
 
-       <screen>public void writerPolicy(org.objectweb.proactive.Service service)</screen>
+        <screen>public void writerPolicy(org.objectweb.proactive.Service service)</screen>
 
         <para>Look at the inner class <literal>MyRequestFilterm</literal> that
-        implements <literal>org.objectweb.proactive.core.body.request.RequestFilter</literal>. 
+        implements
+        <literal>org.objectweb.proactive.core.body.request.RequestFilter</literal>.
         How does it work?</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Introduce a bug in the Writer Priority policy</title>
 
         <para>For instance, let several writers go through at the same
@@ -466,12 +509,11 @@ scripts/windows/components$ c3d.bat</screen>
       </sect3>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>The dining philosophers</title>
 
-      <para>The 'dining philosophers' problem is a classical exercise in the
-      teaching of concurrent programming. The goal is to avoid
-      deadlocks.</para>
+      <para>The 'dining philosophers' problem is a classic exercise in
+      concurrent programming. The goal is to avoid deadlocks.</para>
 
       <para>We have provided <ulink
       url="http://www-sop.inria.fr/oasis/ProActive/apps/phil.html">an
@@ -479,7 +521,7 @@ scripts/windows/components$ c3d.bat</screen>
       philosophers are active objects, as well as the table (controller) and
       the dinner frame (user interface).</para>
 
-      <sect3 >
+      <sect3>
         <title>Start the philosophers application</title>
 
         <para><figure>
@@ -508,77 +550,72 @@ scripts/windows/components$ c3d.bat</screen>
           </figure></para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Understand the color codes</title>
 
-<para> The pictures represent the state of the philosophers. They can be:</para>
-<itemizedlist>
-<listitem>
-             <para>
-              <inlinemediaobject>
-               <imageobject>
-                <imagedata fileref="guided_tour/pics/think.png" format="PNG" />
-               </imageobject>
-              </inlinemediaobject> 
-              <emphasis role="bold">philosophing</emphasis>
-             </para>
-</listitem>
-<listitem>
-             <para>
-              <inlinemediaobject>
-               <imageobject>
-                <imagedata fileref="guided_tour/pics/wait.png" format="PNG" />
-               </imageobject>
-              </inlinemediaobject>
-              <emphasis role="bold">hungry, wants the fork!</emphasis>
-             </para>
-</listitem>
-<listitem>
-             <para>
-              <inlinemediaobject>
-               <imageobject>
-                <imagedata fileref="guided_tour/pics/eat.png" format="PNG" />
-               </imageobject>
-              </inlinemediaobject>
-              <emphasis role="bold">eating</emphasis>
-             </para>
-</listitem>
-</itemizedlist>
+        <para>The pictures represent the state of the philosophers. They can
+        be:</para>
 
-<para>The forks can have two states:</para>
-<itemizedlist>
-<listitem>
-         <para>
-              <inlinemediaobject>
-               <imageobject>
-                <imagedata fileref="guided_tour/pics/fork1.png" format="PNG" />
-               </imageobject>
-              </inlinemediaobject>
-              <emphasis role="bold">taken</emphasis>
-             </para>
-</listitem>
-<listitem>
-             <para>
-              <inlinemediaobject>
-               <imageobject>
-                <imagedata fileref="guided_tour/pics/fork0.png" format="PNG" />
-               </imageobject>
-              </inlinemediaobject>
-              <emphasis role="bold">free</emphasis>
-             </para>
-</listitem>
-</itemizedlist>
+        <itemizedlist>
+          <listitem>
+            <para><inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="guided_tour/pics/think.png" format="PNG" />
+                </imageobject>
+              </inlinemediaobject> <emphasis
+            role="bold">philosophing</emphasis></para>
+          </listitem>
 
+          <listitem>
+            <para><inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="guided_tour/pics/wait.png" format="PNG" />
+                </imageobject>
+              </inlinemediaobject> <emphasis role="bold">hungry, wants the
+            fork!</emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para><inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="guided_tour/pics/eat.png" format="PNG" />
+                </imageobject>
+              </inlinemediaobject> <emphasis
+            role="bold">eating</emphasis></para>
+          </listitem>
+        </itemizedlist>
+
+        <para>The forks can have two states:</para>
+
+        <itemizedlist>
+          <listitem>
+            <para><inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="guided_tour/pics/fork1.png" format="PNG" />
+                </imageobject>
+              </inlinemediaobject> <emphasis
+            role="bold">taken</emphasis></para>
+          </listitem>
+
+          <listitem>
+            <para><inlinemediaobject>
+                <imageobject>
+                  <imagedata fileref="guided_tour/pics/fork0.png" format="PNG" />
+                </imageobject>
+              </inlinemediaobject> <emphasis
+            role="bold">free</emphasis></para>
+          </listitem>
+        </itemizedlist>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Test the autopilot mode</title>
 
         <para>The application runs by itself without encountering a
         deadlock.</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Test the manual mode</title>
 
         <para>Click on the philosophers' heads to switch their modes</para>
@@ -589,18 +626,26 @@ scripts/windows/components$ c3d.bat</screen>
         others alternate eating and thinking while one never eats!)</para>
       </sect3>
 
-      <sect3 >
+      <sect3>
         <title>Start the IC2D application</title>
 
-        <indexterm><primary>IC2D</primary><secondary>example usage</secondary></indexterm>
+        <indexterm>
+          <primary>IC2D</primary>
+
+          <secondary>example usage</secondary>
+        </indexterm>
 
         <para><ulink
         url="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.html">IC2D</ulink>
         is a graphical environment for monitoring and steering of distributed
         and Grid Computing applications.</para>
 
-       <itemizedlist><listitem><para>Being in the autopilot mode, start the IC2D visualization
-          application (using ic2d.sh or ic2d.bat)</para></listitem></itemizedlist>
+        <itemizedlist>
+          <listitem>
+            <para>Being in the autopilot mode, start the IC2D visualization
+            application (using ic2d.sh or ic2d.bat)</para>
+          </listitem>
+        </itemizedlist>
 
         <para><informalfigure>
             <mediaobject>
@@ -614,8 +659,9 @@ scripts/windows/components$ c3d.bat</screen>
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/jc2d_main_panel.png"
-                           format="PNG" contentwidth="100" width="6in" />
+                <imagedata contentwidth="100"
+                           fileref="guided_tour/pics/screenshots/jc2d_main_panel.png"
+                           format="PNG" width="6in" />
               </imageobject>
             </mediaobject>
           </informalfigure></para>
@@ -623,8 +669,9 @@ scripts/windows/components$ c3d.bat</screen>
         <para><informalfigure>
             <mediaobject>
               <imageobject>
-                <imagedata fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png"
-                           format="PNG" contentwidth="100" width="6in" />
+                <imagedata contentwidth="100"
+                           fileref="guided_tour/pics/screenshots/ic2d_evt_listener_panel.png"
+                           format="PNG" width="6in" />
               </imageobject>
             </mediaobject>
           </informalfigure></para>
@@ -632,22 +679,28 @@ scripts/windows/components$ c3d.bat</screen>
         <para>The ic2d GUI is started. It is composed of 2 panels: the main
         panel and the request queue panel</para>
 
-       <itemizedlist><listitem><para>Acquire your current machine</para></listitem></itemizedlist>
+        <itemizedlist>
+          <listitem>
+            <para>Acquire your current machine</para>
+          </listitem>
+        </itemizedlist>
 
         <figure>
-         <title>Monitoring new RMI host with IC2D</title>
-				 <mediaobject>
-         <imageobject>
-             <imagedata fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png"
-                         format="PNG" contentwidth="100" width="4in" />
-         </imageobject>
-			   </mediaobject>
-        </figure> 
-        
-        <para>It is possible to visualize the
-        status of each active object (processing, waiting etc...), the
-        communications between active objects, and the topology of the system
-        (here all active objects are in the same node):</para>
+          <title>Monitoring new RMI host with IC2D</title>
+
+          <mediaobject>
+            <imageobject>
+              <imagedata contentwidth="100"
+                         fileref="guided_tour/pics/screenshots/monitor_new_rmi_host_menu.png"
+                         format="PNG" width="4in" />
+            </imageobject>
+          </mediaobject>
+        </figure>
+
+        <para>It is possible to visualize the status of each active object
+        (processing, waiting etc...), the communications between active
+        objects, and the topology of the system (here all active objects are
+        in the same node):</para>
 
         <para><informalfigure>
             <mediaobject>
@@ -670,14 +723,16 @@ scripts/windows/components$ c3d.bat</screen>
     </sect2>
   </sect1>
 
-  <sect1 >
-    
+  <sect1>
+    <title>Migration of active objects</title>
 
-   <title>Migration of active objects</title>
+    <indexterm>
+      <primary>Migration</primary>
 
-	 <indexterm><primary>Migration</primary><secondary>example</secondary></indexterm>
-     
-	 <para>ProActive allows the transparent migration of objects between
+      <secondary>example</secondary>
+    </indexterm>
+
+    <para>ProActive allows the transparent migration of objects between
     virtual machines.</para>
 
     <para>A nice visual example is the penguin's one.</para>
@@ -688,13 +743,13 @@ scripts/windows/components$ c3d.bat</screen>
     with each other. It also features the capability to move a swing window
     between screens while moving an agent from one JVM to the other.</para>
 
-    <sect2 >
+    <sect2>
       <title>Start the penguin application</title>
 
-      <para>Using the <literal>penguin</literal> script.</para>
+      <para>Using the <literal>migration/penguin</literal> script.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Start IC2D to see what is going on</title>
 
       <para>Using the <literal>ic2d</literal> script</para>
@@ -702,7 +757,7 @@ scripts/windows/components$ c3d.bat</screen>
       <para>Acquire the machines you have started nodes on</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Add an agent</title>
 
       <itemizedlist>
@@ -725,7 +780,7 @@ scripts/windows/components$ c3d.bat</screen>
 
       <itemizedlist>
         <listitem>
-          <para>Sselect it, and press button 'start'</para>
+          <para>Select it, and press button 'start'</para>
         </listitem>
 
         <listitem>
@@ -736,7 +791,7 @@ scripts/windows/components$ c3d.bat</screen>
       </itemizedlist>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Add several agents</title>
 
       <para>After selecting them, use the buttons to:</para>
@@ -747,7 +802,7 @@ scripts/windows/components$ c3d.bat</screen>
         </listitem>
 
         <listitem>
-          <para>Atart, stop, resume them</para>
+          <para>Start, stop, resume them</para>
         </listitem>
 
         <listitem>
@@ -757,13 +812,13 @@ scripts/windows/components$ c3d.bat</screen>
       </itemizedlist>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Move the control window to another user</title>
 
       <itemizedlist>
         <listitem>
-          <para>Start a node on a different computer, using another screen and
-          keyboard</para>
+          <para>Start the same script on a different computer, using another
+          screen and keyboard</para>
         </listitem>
 
         <listitem>

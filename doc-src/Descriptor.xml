@@ -682,9 +682,9 @@
     the ProActive property <emphasis role="bold">schema.validation</emphasis>
     is set to <emphasis role="bold">enable</emphasis> (see <xref
     linkend="Configuration" /> for more details). If a problem occurs during
-    the validation, an error message is displayed otherwise if the validation
-    is successful no message appear. An XML validation tool such as
-    XMLSPY5.0(windows) can also be used to validate XML descriptors.</para>
+    the validation, an error message is displayed. Otherwise, if the
+    validation is successful, no message appear. An XML validation tool such
+    as XMLSPY5.0(windows) can also be used to validate XML descriptors.</para>
   </sect1>
 
   <sect1>
@@ -2049,11 +2049,11 @@
 
     <para>The <emphasis role="bold">RMIRegistryLookup</emphasis> service needs
     only an <emphasis role="bold">url</emphasis> to perform the lookup. Many
-    options exists for the <emphasis role="bold">P2PService</emphasis>
-    service: <emphasis role="bold">nodesAsked</emphasis> represents the number
-    of JVMs to acquire, the <emphasis role="bold">peer</emphasis> element
-    represents an entry point in the P2P system, many peers can be specified.
-    Elements <emphasis role="bold">acq</emphasis> and <emphasis
+    options exist for the <emphasis role="bold">P2PService</emphasis> service:
+    <emphasis role="bold">nodesAsked</emphasis> represents the number of JVMs
+    to acquire, the <emphasis role="bold">peer</emphasis> element represents
+    an entry point in the P2P system, many peers can be specified. Elements
+    <emphasis role="bold">acq</emphasis> and <emphasis
     role="bold">port</emphasis> represent the communication protocol and the
     listening port for the P2P Service, if a P2P Service is already running
     with this configuration the descriptor will use this one else a new one is

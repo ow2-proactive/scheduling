@@ -90,7 +90,7 @@ $&gt;hostname -i
   </sect1>
 
   <sect1 id="dbdoclet.id.TroubleShooting_public_remote_method_calls">
-    <title>Public remote methods calls</title>
+    <title>Public remote method calls</title>
 
     <para>Methods that will be called remotely on an active object must be
     public. While java will impose this restriction between classes of

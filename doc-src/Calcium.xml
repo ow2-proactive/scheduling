@@ -13,7 +13,7 @@
       structured parallel and distributed applications. The framework provides
       a basic set of structured patterns (skeletons) that can be nested to
       represents more complex patterns. Skeletons are considered a high level
-      programming model because all the parallelisms detailes are hidden from
+      programming model because all the parallelisms details are hidden from
       the programmer. In Calcium, distributed programming is achieved by using
       ProActive deployment framework and active object model.</para>
     </sect2>

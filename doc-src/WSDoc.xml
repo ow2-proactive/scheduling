@@ -3,7 +3,7 @@
 <chapter id="WSDoc">
   <title>Exporting Active Objects and components as Web Services</title>
 
-  <sect1  id="WS_Overwiew">
+  <sect1 id="WS_Overwiew">
     <title>Overview</title>
 
     <para>This feature allows the call and monitoring of active objects and
@@ -17,7 +17,7 @@
     language.</para>
   </sect1>
 
-  <sect1 >
+  <sect1>
     <title>Principles</title>
 
     <para>A <emphasis role="bold">web service</emphasis> is a software entity,
@@ -30,9 +30,11 @@
       <listitem>
         <para><emphasis role="bold">The SOAP Message</emphasis></para>
 
-        <indexterm><primary>SOAP</primary></indexterm>
-        
-          <para>The SOAP message is used to exchange XML based data over the
+        <indexterm>
+          <primary>SOAP</primary>
+        </indexterm>
+
+        <para>The SOAP message is used to exchange XML based data over the
         internet. It can be sent via HTTP and provides a serialization format
         for communicating over a network.</para>
       </listitem>
@@ -72,21 +74,21 @@
 
         <mediaobject>
           <imageobject>
-            <imagedata fileref="webservices/provider_en.png" format="PNG"
-                       contentwidth="100" width="6in" />
+            <imagedata contentwidth="100"
+                       fileref="webservices/provider_en.png" format="PNG"
+                       width="6in" />
           </imageobject>
         </mediaobject>
       </figure></para>
   </sect1>
 
-  <sect1 >
-    <title>Pre-requisite: Installing the Web
-    Server and the SOAP engine</title>
+  <sect1>
+    <title>Pre-requisite: Installing the Web Server and the SOAP
+    engine</title>
 
     <para>First of all, you need to install the Jakarta Tomcat web server here
     and install it. You can find some documentation about it <ulink
-    url="http://apache.crihan.fr/dist/jakarta/tomcat-4/v4.1.31/bin/">here</ulink>
-    .</para>
+    url="http://tomcat.apache.org/">here</ulink> .</para>
 
     <para>You don't really have to do a lot of installation. Just uncompress
     the archive.</para>
@@ -105,7 +107,7 @@
 
     <para>The SOAP Engine is now installed ! You can verify, after starting
     the server that you access to the welcome page of Apache SOAP at: <ulink
-    url="http://localhost:8080/soap/index.html"/>.</para>
+    url="http://localhost:8080/soap/index.html"></ulink>.</para>
 
     <para>Now we have to install ProActive into this SOAP engine. For that,
     follow these steps:</para>
@@ -117,15 +119,15 @@
       </listitem>
 
       <listitem>
-        <para>Replace the $TOMCAT/webapps/soap/WEB-INF/web.xml by 
-         the one found in <xref linkend="miscFileSrc.webservices.web.xml"/>.</para>
+        <para>Replace the $TOMCAT/webapps/soap/WEB-INF/web.xml by the one
+        found in <xref linkend="miscFileSrc.webservices.web.xml" />.</para>
       </listitem>
     </itemizedlist>
   </sect1>
 
-  <sect1 >
-    <title>Steps to expose an active object
-    or a component as a web services</title>
+  <sect1>
+    <title>Steps to expose an active object or a component as a web
+    services</title>
 
     <para>The steps for exporting and using an active object as a web service
     are the following:</para>
@@ -208,8 +210,8 @@
     </itemizedlist>
   </sect1>
 
-  <sect1 >
-    <title> Undeploy the services</title>
+  <sect1>
+    <title>Undeploy the services</title>
 
     <para>To undeploy an active object as a service, use the ProActive static
     method:</para>
@@ -235,8 +237,8 @@
     <programlisting lang="java"><emphasis role="bold">ProActive.unExposeAsWebService ( String componentName , String url,  Component component);</emphasis></programlisting>
   </sect1>
 
-  <sect1 >
-    <title> Accessing the services</title>
+  <sect1>
+    <title>Accessing the services</title>
 
     <para>Once the active object or the interfaces component are deployed, you
     can access it via any web service enabled client (such as C#).</para>
@@ -245,8 +247,8 @@
     object. This WSDL file is the 'identity card' of the service. It contains
     the web service public interfaces and its location. Generally, WSDL files
     are used to generate a proxy to the service. For example, for a given
-    service, say 'compute', you can get the WSDL document at 
-    <ulink url="http://localhost:8080/servlet/wsdl?id=compute"/>.</para>
+    service, say 'compute', you can get the WSDL document at <ulink
+    url="http://localhost:8080/servlet/wsdl?id=compute"></ulink>.</para>
 
     <para>Now that this client knows what and where to call the service, it
     will send a SOAP message to the web server, the web server looks into the
@@ -254,8 +256,8 @@
     SOAP message to the client.</para>
   </sect1>
 
-  <sect1 >
-    <title> Limitations</title>
+  <sect1>
+    <title>Limitations</title>
 
     <para>Apache Soap supports all defined types in the SOAP 1.1
     specification. All Java primitive types are supported but it is not always
@@ -268,11 +270,10 @@
     <literal>$APACHE_SOAP_HOME/WEB_INF/classes</literal>.</para>
   </sect1>
 
-  <sect1 >
-    <title> A simple example: Hello
-    World</title>
+  <sect1>
+    <title>A simple example: Hello World</title>
 
-    <sect2 >
+    <sect2>
       <title>Hello World web service code</title>
 
       <para>Let's start with a simple example, an Hello world active object
@@ -307,7 +308,7 @@
       new client application in Visual Studio .NET.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Access with Visual Studio</title>
 
       <para></para>
@@ -322,8 +323,8 @@
 
         <listitem>
           <para>In the address box enter the WSDL service address, for
-          example: 
-          <ulink url="http://localhost:8080/soap/servlet/wsdl?id=helloWorld"/>
+          example: <ulink
+          url="http://localhost:8080/soap/servlet/wsdl?id=helloWorld"></ulink>
           .When clicking the 'add reference' button, this will get the
           service's WSDL and creates the specific proxy to the service.</para>
         </listitem>
@@ -341,11 +342,10 @@ string s = hw.helloWorld ();
     </sect2>
   </sect1>
 
-  <sect1 >
-    <title> C# interoperability: an example
-    with C3D</title>
+  <sect1>
+    <title>C# interoperability: an example with C3D</title>
 
-    <sect2 >
+    <sect2>
       <title>Overview</title>
 
       <para><ulink
@@ -370,11 +370,12 @@ string s = hw.helloWorld ();
                 });</programlisting>
 
       <para>Once the dispatcher is deployed as a web service, we have a WSDL
-      url: <ulink url="http://localhost:8080/soap/servlet/id=C3DDispactcher"/>.
-      It will be usefull to construct the dispatcher client.</para>
+      url: <ulink
+      url="http://localhost:8080/soap/servlet/id=C3DDispactcher"></ulink>. It
+      will be usefull to construct the dispatcher client.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Access with a C# client</title>
 
       <para>First of all, we have to generate the service proxy following the
@@ -386,14 +387,15 @@ string s = hw.helloWorld ();
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="webservices/dispatcher_en.png" format="PNG"
-                         contentwidth="100" width="6in" />
+              <imagedata contentwidth="100"
+                         fileref="webservices/dispatcher_en.png" format="PNG"
+                         width="6in" />
             </imageobject>
           </mediaobject>
         </figure></para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Dispatcher methods calls and callbacks</title>
 
       <para>C# client registers to the C3D dispatcher and then can send
@@ -417,8 +419,9 @@ string s = hw.helloWorld ();
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="webservices/scc3djava.png" format="PNG"
-                         contentwidth="100" width="6in" />
+              <imagedata contentwidth="100"
+                         fileref="webservices/scc3djava.png" format="PNG"
+                         width="6in" />
             </imageobject>
           </mediaobject>
         </figure> <figure>
@@ -426,15 +429,17 @@ string s = hw.helloWorld ();
 
           <mediaobject>
             <imageobject>
-              <imagedata fileref="webservices/scC3dcs.png" format="PNG"
-                         contentwidth="100" width="6in" />
+              <imagedata contentwidth="100" fileref="webservices/scC3dcs.png"
+                         format="PNG" width="6in" />
             </imageobject>
-            <caption><para>The application is using the same dispatcher the ProActive user uses.</para></caption>
+
+            <caption><para>The application is using the same dispatcher the
+            ProActive user uses.</para></caption>
           </mediaobject>
         </figure></para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Download the C# example</title>
 
       <para>You can find <ulink
