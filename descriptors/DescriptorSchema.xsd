@@ -1136,7 +1136,6 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:attribute name="virtualOrganisation" type="xs:string" use="required"/>
 		<xs:attribute name="JDLFileName" type="xs:string" use="required"/>
 		<xs:attribute name="Type" type="xs:string" default="job"/>
-        <xs:attribute name="jobType" type="gLiteJobType" default="normal"/>
         <xs:attribute name="executable" type="xs:string" default="/bin/sh"/>
 		<xs:attribute name="stdOutput" type="xs:string" default="output.log"/>
 		<xs:attribute name="stdInput" type="xs:string" default="input.log"/>
