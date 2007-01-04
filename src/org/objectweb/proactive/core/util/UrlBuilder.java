@@ -35,9 +35,9 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 /**
@@ -414,10 +414,10 @@ public class UrlBuilder {
             portNumber = Integer.parseInt(url.substring(index + 1, url.length()));
         }
 
-        //       System.out.println("*/** " + OsgiParameters.servletEnabled() + " -- " + index + " -- " + url );
+        //       System.out.println("*/** " + ProActiveConfiguration.osgiServletEnabled() + " -- " + index + " -- " + url );
         //                
         //        
-        if (OsgiParameters.servletEnabled()) {
+        if (ProActiveConfiguration.osgiServletEnabled()) {
             if (index != -1) {
                 String suite = url.substring(index);
 

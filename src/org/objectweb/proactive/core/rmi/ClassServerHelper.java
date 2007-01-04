@@ -30,8 +30,8 @@
  */ 
 package org.objectweb.proactive.core.rmi;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.SshParameters;
-import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 public class ClassServerHelper {
@@ -51,7 +51,7 @@ public class ClassServerHelper {
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
-        if (OsgiParameters.servletEnabled()) {
+        if (ProActiveConfiguration.osgiServletEnabled()) {
             this.shouldCreateClassServer = false;
         }
     }
@@ -85,7 +85,7 @@ public class ClassServerHelper {
     public synchronized String initializeClassServer()
         throws java.io.IOException {
 
-    	if (OsgiParameters.servletEnabled()) {
+    	if (ProActiveConfiguration.osgiServletEnabled()) {
     		return this.getCodebase();
     	}
     	
@@ -114,7 +114,7 @@ public class ClassServerHelper {
         if (SshParameters.getSshTunneling()) {
             codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
                 ClassServer.getServerSocketPort() + "/";
-        } else if (OsgiParameters.servletEnabled()) {
+        } else if (ProActiveConfiguration.osgiServletEnabled()) {
             codebase = ClassServerServlet.getUrl() + "doc";
         } else {
             codebase = "http://" + currentClassServer.getHostname() + ":" +

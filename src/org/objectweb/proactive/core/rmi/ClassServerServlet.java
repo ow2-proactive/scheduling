@@ -79,7 +79,7 @@ public class ClassServerServlet extends HttpServlet {
         //                System.getProperty("proactive.communication.protocol") + "\n");
         //
         //            out.println("servlet Enabled =  " +
-        //                OsgiParameters.servletEnabled());
+        //                ProActiveConfiguration.osgiServletEnabled());
         //            out.println("Servlet url = " + ClassServerServlet.getUrl());
         //        } catch (IOException e) {
         //            e.printStackTrace();

@@ -30,15 +30,13 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
 
-import org.objectweb.proactive.core.rmi.ClassServerServlet;
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.osgi.OsgiParameters;
-
-import java.net.UnknownHostException;
 
 
 public class ClassServer implements Runnable {
@@ -159,7 +157,7 @@ public class ClassServer implements Runnable {
     }
 
     public static int getServerSocketPort() {
-        if (OsgiParameters.servletEnabled()) {
+        if (ProActiveConfiguration.osgiServletEnabled()) {
             return ClassServerServlet.getPort();
         }
         return port;
@@ -171,7 +169,7 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            if (OsgiParameters.servletEnabled()) {
+            if (ProActiveConfiguration.osgiServletEnabled()) {
                 return ClassServerServlet.getUrl();
             } else {
                 return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(

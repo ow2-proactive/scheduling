@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -65,7 +66,6 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.securityentity.Entity;
-import org.objectweb.proactive.osgi.OsgiParameters;
 
 
 /**
@@ -91,7 +91,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         isLocal = true;
         this.localruntime = ProActiveRuntimeImpl.getProActiveRuntime();
 
-        if (OsgiParameters.servletEnabled()) {
+        if (ProActiveConfiguration.osgiServletEnabled()) {
             this.url = ClassServerServlet.getUrl();
         } else {
             this.url = ClassServer.getUrl();

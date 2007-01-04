@@ -30,23 +30,21 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.body.http.util.HttpUtils;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.osgi.OsgiParameters;
-
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.net.Socket;
 
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -174,7 +172,7 @@ public class HTTPRequestHandler extends Thread {
                 bytes = new byte[0];
             }
 
-            if (!OsgiParameters.servletEnabled()) {
+            if (!ProActiveConfiguration.osgiServletEnabled()) {
                 dOut.writeBytes(statusLine + "\r\n");
                 dOut.writeBytes("Content-Length: " + bytes.length + "\r\n");
                 dOut.writeBytes("Content-Type: " + contentType + "\r\n");
@@ -188,10 +186,10 @@ public class HTTPRequestHandler extends Thread {
             dOut.flush();
 
             if (reqInfo.getClassFileName() != null) {
-            	if (logger.isDebugEnabled()) {
-            		logger.info("ClassServer sent class " +
-            				reqInfo.getClassFileName() + " successfully");
-            	}
+                if (logger.isDebugEnabled()) {
+                    logger.info("ClassServer sent class " +
+                        reqInfo.getClassFileName() + " successfully");
+                }
             }
         } catch (IOException e) {
             // If there is an error when writing the reply,
