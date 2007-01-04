@@ -154,13 +154,16 @@ function get_cluster_from_hostname {
 		elif [ "$FQDN" = "tartopom-dev.irisa.fr" ] ; then echo tartopom ; 
 
 		# Nodes have a standard domain name eg. grid5000.fr
-		elif [ "$(expr $FQDN : '\(parasol[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(parasol[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
 		then
 			echo "parasol"
-		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
 		then
 			echo "paravent"
-		elif [ "$(expr $FQDN : '\(tartopom[0-9]\{0,3\}.rennes.grid5000.fr\)')"  == "$FQDN" ] ;
+		elif [ "$(expr $FQDN : '\(paravent[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
+		then
+			echo "paravent"
+		elif [ "$(expr $FQDN : '\(tartopom[0-9]\{0,3\}.\(rennes.grid5000\|irisa\).fr\)')"  == "$FQDN" ] ;
 		then
 			echo "tartopom"
 		else
