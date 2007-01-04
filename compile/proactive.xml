@@ -97,7 +97,7 @@
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
 	<!--  =============================================================== -->
-	<target name="compile" depends="ic2d, bnb, p2p,loadbalancing, scheduler, timit, examples, trywithcatch, stub_wrapper, scilab, osgi, mpi" description="build the class files" />
+	<target name="compile" depends="ic2d, bnb, p2p,loadbalancing, scheduler, timit, examples, trywithcatch, stub_wrapper, scilab, osgi,jmx, mpi" description="build the class files" />
 
 
 	<!-- ================================================================ -->
@@ -118,12 +118,7 @@
 		<copy todir="${base}/descriptors/examples" overwrite="yes" file="${base}/descriptors/DescriptorSchema.xsd"/>
 	</target>
 
-	<target name="osgi" depends="core" description="Compile osgi related stuff">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
-			<include name="${proactive.dir}/osgi/**/*.java" />
-		</javac>
-	</target>
+
 
 
 	<target name="core" depends="init, configurationCopy" description="Compile the ProActive core classes">
@@ -388,6 +383,23 @@
 	</target>
 
 
+	<!-- ================================================================ -->
+	<!--                      Compile JMX Connector                       -->
+	<!--  =============================================================== -->
+	<target name="jmx" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/jmx/**/**" deprecation="on" source="${source}" debug="${debug}" />
+	</target>
+	
+	<!-- ================================================================ -->
+	<!--                      Compile OSGi                       -->
+	<!--  =============================================================== -->
+	
+	<target name="osgi" depends="core" description="Compile osgi related stuff">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
+			<classpath refid="project.classpath" />
+			<include name="${proactive.dir}/osgi/**/*.java" />
+		</javac>
+	</target>
 	<!-- ================================================================ -->
 	<!--                      Compile TryWithCatch annotator              -->
 	<!--  =============================================================== -->
