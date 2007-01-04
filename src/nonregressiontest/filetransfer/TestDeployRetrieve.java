@@ -83,11 +83,18 @@ public class TestDeployRetrieve extends FunctionalTest {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
         
+        // We save the current state of the schema validation and set it to false for this example
+        String validatingProperyOld = System.getProperty("schema.validation");
+        System.setProperty("schema.validation", "false");
+        
         VariableContract vc = new VariableContract();
         vc.setVariableFromProgram("JVM_PROCESS", jvmProcess ,VariableContractType.DescriptorDefaultVariable);
         vc.setVariableFromProgram("HOST_NAME", hostName ,VariableContractType.DescriptorDefaultVariable);
     
         pad = ProActive.getProactiveDescriptor(XML_LOCATION, vc);
+        
+        // we restore the old state of the schema validation
+        System.setProperty("schema.validation", validatingProperyOld);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
         testVNode.setFileTransferParams(testblocksize,testflyingblocks);
