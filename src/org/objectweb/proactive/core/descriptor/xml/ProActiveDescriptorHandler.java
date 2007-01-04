@@ -137,27 +137,27 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 	//
 	// -- PUBLIC METHODS -----------------------------------------------
 	//
-	public static void main(String[] args) throws java.io.IOException, org.xml.sax.SAXException {
-		// String uri =
-		// "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
-		String uri = "/user/cjarjouh/home/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
-		InitialHandler h = new InitialHandler(uri, new VariableContract());
-
-		// String uri =
-		// "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
-		org.objectweb.proactive.core.xml.io.StreamReader sr;
-
-		if ("enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
-			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
-					new org.xml.sax.InputSource(uri), h, null,
-					new SAXParserErrorHandlerTerminating());
-		} else {
-			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
-					new org.xml.sax.InputSource(uri), h);
-		}
-
-		sr.read();
-	}
+//	public static void main(String[] args) throws java.io.IOException, org.xml.sax.SAXException {
+//		// String uri =
+//		// "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
+//		String uri = "/user/cjarjouh/home/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
+//		InitialHandler h = new InitialHandler(uri, new VariableContract());
+//
+//		// String uri =
+//		// "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
+//		org.objectweb.proactive.core.xml.io.StreamReader sr;
+//
+//		if ("enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
+//			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
+//					new org.xml.sax.InputSource(uri), h, null,
+//					new SAXParserErrorHandlerTerminating());
+//		} else {
+//			sr = new org.objectweb.proactive.core.xml.io.StreamReader(
+//					new org.xml.sax.InputSource(uri), h);
+//		}
+//
+//		sr.read();
+//	}
 
 	/**
 	 * Creates ProActiveDescriptor object from XML Descriptor
