@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.loadbalancing.LoadBalancing;
 import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTimeMillisMetricFactory;
 
+import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 
@@ -71,9 +72,9 @@ public class Test extends FunctionalTest {
         this.pad = ProActive.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN");
-        this.vn1.getNumberOfCreatedNodesAfterDeployment();
-        this.nodeOne = this.vn1.getNode(0);
-        this.nodeTwo = this.vn1.getNode(1);
+        Assertions.assertTrue(this.vn1.getMinNumberOfNodes() <= this.vn1.getNumberOfCreatedNodesAfterDeployment());
+        this.nodeOne = this.vn1.getNode();
+        this.nodeTwo = this.vn1.getNode();
 
         LoadBalancing.activateOn(new Node[] { nodeOne, nodeTwo },
             new CurrentTimeMillisMetricFactory());

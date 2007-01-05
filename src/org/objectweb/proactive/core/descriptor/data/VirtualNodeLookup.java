@@ -208,6 +208,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode(int)
      */
+    @Deprecated
     public Node getNode(int index) throws NodeException {
         if (!isActivated) {
             throw new NodeException(notActivatedMessage);

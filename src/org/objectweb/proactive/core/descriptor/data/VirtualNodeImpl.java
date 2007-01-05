@@ -749,6 +749,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
+    @Deprecated
     public Node getNode(int index) throws NodeException {
         Node node = createdNodes.get(index);
 

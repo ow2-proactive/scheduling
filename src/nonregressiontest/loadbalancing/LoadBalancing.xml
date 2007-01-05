@@ -3,7 +3,7 @@
 	<!-- <security file="../../descriptors/security/c3dPolicy.xml"></security> -->
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="VN" property="multiple"/>
+			<virtualNode name="VN" property="multiple" minNodeNumber="2"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>

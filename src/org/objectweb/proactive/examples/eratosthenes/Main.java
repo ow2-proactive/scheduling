@@ -213,37 +213,16 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             ex.printStackTrace();
         }
     }
-
+    
     public void exit() {
-        if (containersVirtualNode != null) {
-            logger.info("Killing nodes...");
-            logger.info(
-                "This may print out some exception messages, but that's OK.");
-            java.util.Vector<String> killedRTs = new java.util.Vector<String>();
-            for (int i = -2; i < containersVirtualNode.getNbMappedNodes(); i++) {
-                try {
-                    Node node;
-                    if (i == -2) {
-                        node = sourceNode;
-                    } else if (i == -1) {
-                        node = listenerNode;
-                    } else {
-                        node = containersVirtualNode.getNode(i);
-                    }
-                    if (!NodeFactory.isNodeLocal(node) &&
-                            !killedRTs.contains(node.getProActiveRuntime()
-                                                        .getURL())) {
-                        killedRTs.add(node.getProActiveRuntime().getURL());
+    	try {
+    		if (pad != null) {
+    			pad.killall(false);
+    		}
+    	} catch (ProActiveException e) {
+    		e.printStackTrace();
+    	}
 
-                        // this method will catch and print out an exception,
-                        // there is nothing we can do about it
-                        node.getProActiveRuntime().killRT(false);
-                    }
-                } catch (Throwable ex) {
-                }
-            }
-            logger.info("Killed nodes.");
-        }
         System.exit(0);
     }
 

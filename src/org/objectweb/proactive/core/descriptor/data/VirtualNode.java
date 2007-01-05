@@ -41,6 +41,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileVector;
 
+import com.pallas.unicore.requests.GetNewJobStatus;
+
 import java.io.IOException;
 
 
@@ -132,6 +134,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * the order in the xml descriptor and the order in the array.
      * @param index
      * @return Node the node at the specified index in the array of nodes mapped to this VirtualNode
+     * @deprecated use {@link #getNode()} or {@link #getNodes()} instead
      */
     public Node getNode(int index) throws NodeException;
 
