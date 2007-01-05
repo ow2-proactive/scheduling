@@ -110,7 +110,7 @@ function get_cluster_from_hostname {
 		if   [ "$FQDN" == "capricorne.lyon.grid5000.fr" ] ; then echo "capricorne" ; 
 		elif [ "$FQDN" == "sagittaire.lyon.grid5000.fr" ] ; then echo "sagittaire" ; 
 
-		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
+		elif [ "$(expr $FQDN : '\(node-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
 			echo "capricorne"
 		elif [ "$(expr $FQDN : '\(sagittaire-[0-9]\{1,2\}\(-[a-z]\)\?.lyon.grid5000.fr\)')" == "$FQDN" ] ; then
 			echo "sagittaire"
