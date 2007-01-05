@@ -30,8 +30,9 @@
  */ 
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -40,10 +41,6 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileVector;
-
-import com.pallas.unicore.requests.GetNewJobStatus;
-
-import java.io.IOException;
 
 
 /**
