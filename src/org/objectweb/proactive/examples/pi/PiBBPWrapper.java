@@ -27,7 +27,11 @@ import java.util.List;
 
 import org.objectweb.fractal.api.control.BindingController;
 
-
+/**
+ * This class contains code for managing the master component in the component version of the pi application.
+ * @author ProActive team
+ *
+ */
 public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {
     
     HashMap nameToComputer = new HashMap(); // map between binding names and Components 
@@ -35,12 +39,13 @@ public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingCon
     public PiBBPWrapper() {
     }
 
+
+  
+  public String[] listFc() {
+      return new String[] { "multicastDispatcher" };
+  }
+
    
-
-    public String[] listFc() {
-        return new String[] { "multicastDispatcher" };
-    }
-
     public Object lookupFc(final String cItf) {
     	if(cItf.compareTo("multicastDispatcher")==0)
     		return clientMultiCast;
@@ -53,22 +58,23 @@ public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingCon
            clientMultiCast=(PiCompMultiCast)sItf;
         }
     }
-
+ 
     public void unbindFc(final String cItf) {
     	if (cItf.startsWith("multicastDispatcher")) {
             clientMultiCast=null;
          }
     }
-
-	public void startComputation(List<Interval> params) {
+   
+	public boolean computePi(List<Interval> params) {
 			
 		long timeAtBeginningOfComputation = System.currentTimeMillis();
 		   
-		   
+		/*Call on the client multicast interface. 
+		 * Due to the dispatching policy of the client multicast interface, each item of the param list is sent to one "pi computer"*/   
 		List<Result> results=clientMultiCast.compute(params);
 		
 		System.out.println("Intervals sent to the computers...\n");
-
+		/*The different resluts are gathered to make the final result*/
         Result total = PiUtil.conquerPIList(results);
 
         
@@ -95,7 +101,7 @@ public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingCon
 		
 		
 		
-		
+		return true;
 		
 		
 		

@@ -20,7 +20,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 /**
  *
  * This program evaluates the PI number using the Bailey-Borwein-Plouffe
- * algorithm.
+ * algorithm. This is the main class, which we have to execute in order to run the pi computation
  *
  * @author Matthieu Morel
  *
@@ -36,18 +36,30 @@ public class PiBBP implements Serializable {
     private ProActiveDescriptor deploymentDescriptor_;
     private boolean ws_ = false;
     protected PiComp piComputer;
-
+    /**
+     * Empty constructor
+     *
+     */
     public PiBBP() {
     }
-  
+    /**
+     * Constructor
+     * @param args the string array containing the arguments which will initalize the computation
+     */
     public PiBBP(String[] args) {
         parseProgramArguments(args);
     }
-
+    /**
+     * Sets the  number of decimals to compute
+     * @param nbDecimals the number of decimals
+     */
     public void setNbDecimals(int nbDecimals) {
         this.nbDecimals_ = nbDecimals;
     }
-    
+    /**
+     *  Computes the value of PI on a local node, deployed on a local JVM
+     * @return The value of PI
+     */
     public String runSimple() {
         System.out.println(
             "No deployment : computation will take place on the current node.");
@@ -73,7 +85,10 @@ public class PiBBP implements Serializable {
             (timeAtEndOfComputation - timeAtBeginningOfComputation) + " ms");
         return result.getNumericalResult().toString();
     }
-
+    /**
+     * Computes the value of PI with a group of "pi computers", deployed on a local node
+     * @return the value of PI
+     */
     public String  runParallel() {
         try {
             // create a group of computers on the current host
@@ -88,7 +103,10 @@ public class PiBBP implements Serializable {
         }catch (Exception e ) {e.printStackTrace();}
         return null;
     }
-
+    /**
+     * Computes the value of PI with a group of "pi computers", deployed on remote nodes
+     * @return the value of PI
+     */
     public String runParallelDistributed() {
         
         try {
@@ -125,37 +143,42 @@ public class PiBBP implements Serializable {
                        try {
                         deploymentDescriptor_.killall(true);
                     } catch (ProActiveException e) {
-                        // TODO Auto-generated catch block
+                      
                         e.printStackTrace();
                     }
                    }
                    return "";
     }
-
+/**
+ * Computes PI value with the component version of the application
+ *
+ */
     public void runComponent() {
         try {
         String arg0 = "-fractal"; // using the fractal component model
         String arg1 = "org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper";
-//        String arg1 = "org.objectweb.proactive.examples.pi.fractal.bindings-local";
         String arg2 = "r";
         
         String arg3 ="../descriptors/" + deploymentDescriptorLocation_; // the deployment descriptor
         
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
+        /*Deploying runtimes*/
         ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(arg3);
         context.put("deployment-descriptor",deploymentDescriptor);
         deploymentDescriptor.activateMappings();
         int nbNodes=deploymentDescriptor.getVirtualNode("computers-vn").getNumberOfCreatedNodesAfterDeployment();
+        /*Determing intervals to send for computation*/
         List<Interval> intervals= PiUtil.dividePIList(nbNodes, nbDecimals_);
+        /*Master component creation*/
         Component master = (Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper",null);
        
-        
+        /*Creation of worker components, depending on the number of deployed nodes*/
         Component worker;
         List<Component> workers=new ArrayList<Component>();
         for(int i=0;i<nbNodes;i++){
         	worker=(Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiComputer",context);
-        	Fractal.getBindingController(master).bindFc("multicastDispatcher", worker.getFcInterface("computation"));
+        	Fractal.getBindingController(master).bindFc("multicastDispatcher", worker.getFcInterface("computation"));/*Master component is bound to each worker, with its client multicast interface*/
         	workers.add(worker);
         }
         
@@ -172,22 +195,28 @@ public class PiBBP implements Serializable {
    	
         Fractal.getLifeCycleController(master).startFc();
         MasterComputation m=(MasterComputation)master.getFcInterface("s");
-        m.startComputation(intervals);
+        m.computePi(intervals); /*Computing and displaying the value of PI(the call is synchronous)*/
         
+        /*Stopping all the components*/
+        /*Stopping master component*/
+        Fractal.getLifeCycleController(master).stopFc();
         
-        //deploymentDescriptor.killall(false);
+        /*Stopping workers components*/
+        for (int j=0;j<workers.size();j++){
+        	w=(Component)workers.get(j);
+        	Fractal.getLifeCycleController(w).stopFc();
+        }
         
-//        Fractal.getLifeCycleController(root).startFc();
-//        ((Runnable)root.getFcInterface("r")).run();
-
-        
-        // FIXME : how do I elegantly reference the tutorial/descriptors directory ?
-//            org.objectweb.proactive.core.component.adl.Launcher.main(new String[] { arg0, arg1, arg2, arg3 });
+        deploymentDescriptor.killall(true);/*Killing deployed runtimes*/
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+    /**
+     * Method called when the value of pi has to be computed with a group of "pi computers"
+     * @param piComputers the group of "pi computers" that will perform the computation
+     * @return the value of PI
+     */
     public String computeOnGroup(PiComp piComputers) { 
         int nbNodes = ProActiveGroup.getGroup(piComputers).size();
         System.out.println("\nUsing " + nbNodes +
@@ -242,7 +271,10 @@ public class PiBBP implements Serializable {
             timeAtBeginningOfComputation))) * 100) + " %");
         return total.getNumericalResult().toString();
     }
-
+    /**
+     * This method decides which version of pi application has to be launched
+     *
+     */
     public void start() {
         System.out.println("Evaluation of Pi will be performed with " +
             nbDecimals_ + " decimals");
@@ -296,26 +328,17 @@ public class PiBBP implements Serializable {
 
     
     
-    // distributes the computation data to the available computers
-    /*
-    private static Interval distributeIntervals(int length, int scale)
-        throws Exception {
-        int intervalSize = scale / length;
-        Interval intervals = (Interval) ProActiveGroup.newGroup(Interval.class.getName());
-        Group intervals_group = ProActiveGroup.getGroup(intervals);
-        for (int i = 0; i < length; i++) {
-            int beginning = i * intervalSize;
-            int end = ((i == (length - 1)) ? scale
-                                           : ((beginning + intervalSize) - 1));
-            intervals_group.add(new Interval(beginning, end));
-        }
-        return intervals;
-    }
+    /**
+     * Tests if the computation of PI has to de deployed as a web service
+     * @return true if the application has to be exposed as a web service, false if not
      */
     public boolean isWebService() {
         return ws_;
     }
-
+    /**
+     * Initializes the computation with the arguments found in the args array
+     * @param args The initialization arguments
+     */
     private void parseProgramArguments(String[] args) {
         if (args.length == 0) {
             ws_ = true;

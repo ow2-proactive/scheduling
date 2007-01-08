@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * 
- * 
+ * This class reprensents an interval sent to a worker. Thanks to this class, a worker knows from which to which decimal it has to perform  pi computation.
  * @author Matthieu Morel
  *
  */

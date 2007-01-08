@@ -7,7 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * This class handles a partial computation of PI.
+ * This class handles a partial computation of PI. It is also used for workers in the component version of the application.
  * 
  * @author Matthieu Morel
  *
@@ -27,9 +27,16 @@ public class PiComputer implements PiComp{
     private BigDecimal OPPOSITE_EIGHT = new BigDecimal("-8");
     private BigInteger SIXTEEN = new BigInteger("16");
 
+    /**
+     * Empty constructor
+     */
     public PiComputer() {
     }
 
+    /**
+     * Constructor with scale parameter
+     * @param scaleObject The scale parameter for the setScale method
+     */
     public PiComputer(Integer scaleObject) {
         try {
             System.out
@@ -54,11 +61,7 @@ public class PiComputer implements PiComp{
         OPPOSITE_EIGHT = OPPOSITE_EIGHT.setScale(scale);
     }
 
-    /**
-     * 
-     * @param interval
-     * @return
-     */
+
     public Result compute(Interval interval) {
         try {
             System.out
