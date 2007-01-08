@@ -1,37 +1,39 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.runtime.http;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.security.PublicKey;
@@ -144,7 +146,6 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         ProActiveSecurityManager securityManager, String vname, String jobId)
         throws NodeException, HTTPRemoteException, AlreadyBoundException {
         String nodeURL = null;
-
         try {
             nodeURL = buildNodeURL(nodeName);
         } catch (UnknownHostException e1) {
@@ -153,7 +154,6 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
 
         //      then take the name of the node
         String name = UrlBuilder.getNameFromUrl(nodeURL);
-
         if (isLocal) {
             localruntime.createLocalNode(name, replacePreviousBinding,
                 securityManager, vname, jobId);
@@ -251,7 +251,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) throws ProActiveException, HTTPRemoteException {
-        if (isLocal) {
+    	if (isLocal) {
             localruntime.register(proActiveRuntimeDist, proActiveRuntimeName,
                 creatorID, creationProtocol, vmName);
 
@@ -715,46 +715,53 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws java.net.UnknownHostException {
         int i = url.indexOf('/');
 
-        //    System.out.println("BUILD NODE URL = " + url);
-        if (i == -1) {
-            //it is an url given by a descriptor
+        if (i != -1) {
+            URL u_ = null;
+            int port = 0;
+            try {
+                u_ = new URL(url);
+                port = u_.getPort();
+                if ((port == 0) || (port == -1)) {
+                    port = ClassServer.getServerSocketPort();
+                    url = u_.getProtocol() + "://" + u_.getHost() + ":" + port +
+                        u_.getPath();
+                }
+            } catch (MalformedURLException e) {
+            }
+        } else {
             String host = null;
-
             try {
                 host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                       .getInetAddress());
             } catch (HTTPRemoteException e) {
                 e.printStackTrace();
             }
-
-            //        System.out.println("host = " + host);
-            int n = host.indexOf(":");
-            String u = "";
-
-            if (n == -1) {
-                int port = Integer.parseInt(System.getProperty(
-                            "proactive.http.port"));
-                u = UrlBuilder.buildUrl(host, url, "http:", port);
-
-                //            System.out.println("U = " + u + " -- " + port);
-            } else {
-                u = UrlBuilder.buildUrl(host, url, "http:");
-            }
-
-            return u;
-        } else {
-            i = url.indexOf('/', 7);
-
-            String computerName = url.substring(7, i);
-
-            if (computerName.indexOf(':') == -1) {
-                //no port
-                //            computerName = computerName ;
-                url = "http://" + computerName + url.substring(i);
-            }
-
-            return UrlBuilder.checkUrl(url);
+            //            int n = host.indexOf(":");
+            url = "http://" + host + ":" + ClassServer.getServerSocketPort() +
+                "/" + url;
+            //            if (n == -1) {
+            //                int port = Integer.parseInt(System.getProperty(
+            //                            "proactive.http.port"));
+            //                u = UrlBuilder.buildUrl(host, url, "http:", port);
+            //
+            //                //            System.out.println("U = " + u + " -- " + port);
+            //            } else {
+            //                u = UrlBuilder.buildUrl(host, url, "http:");
+            //            }
         }
+
+        //        } else {
+        //           i = url.indexOf('/', 7);
+        //
+        //            String computerName = url.substring(7, i);
+        //
+        //            if (computerName.indexOf(':') == -1) {
+        //                //no port
+        //                //            computerName = computerName ;
+        //                url = "http://" + computerName + url.substring(i);
+        //            }
+        url = UrlBuilder.checkUrl(url);
+        return url;
     }
 
     private void readObject(java.io.ObjectInputStream in)
