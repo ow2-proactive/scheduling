@@ -133,7 +133,8 @@ public class ProActiveConnector implements JMXConnector, Serializable, Notificat
             throw new IOException(e.getMessage());
         } catch (IOException e) {
         	this.emitter.sendConnectionNotificationFailed();
-            throw new IOException(e.getMessage());
+        	e.printStackTrace();
+        	throw new IOException(e.getMessage());
         }
         this.state = OPEN;
         emitter.sendConnectionNotificationOpened();
