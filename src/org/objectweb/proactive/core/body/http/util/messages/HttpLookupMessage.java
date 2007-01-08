@@ -54,6 +54,9 @@ public class HttpLookupMessage extends HttpMessage implements Serializable {
     public HttpLookupMessage(String urn, String url, int port) {
         super(url);
         this.urn = urn;
+        if (!this.urn.startsWith("/"))
+        	this.urn = "/" + urn;
+       
     }
 
     /**

@@ -1,36 +1,40 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.body.http;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.rmi.ConnectException;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -57,7 +61,7 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * an Hashtable containing all the http  adapters registered. They can be retrieved
      * thanks to the ProActive.lookupActive method
      */
-    protected static transient Hashtable<String,HttpBodyAdapter> urnBodys = new Hashtable<String,HttpBodyAdapter>();
+    protected static transient Hashtable<String, HttpBodyAdapter> urnBodys = new Hashtable<String, HttpBodyAdapter>();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -68,6 +72,8 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
     public HttpBodyAdapter(UniversalBody body) throws ProActiveException {
         RemoteBody remoteBody = new HttpRemoteBodyImpl(body);
         construct(remoteBody);
+        
+        
     }
 
     //
@@ -80,21 +86,27 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @exception java.io.IOException if the remote body cannot be registered
      */
     public void register(String urn) throws java.io.IOException {
-        int port = UrlBuilder.getPortFromUrl(urn);
 
-        //        System.out.println("port = " + port);
-        //        System.out.println("port config = " + ClassServer.getServerSocketPort());
-        if (port != ClassServer.getServerSocketPort()) {
-            throw new IOException(
-                "Bad registering port. You have to register on the same port as the runtime");
+        URL u = null;
+        String url = null;
+        int port = ClassServer.getServerSocketPort();
+        try {
+            u = new URL(urn);
+            port = u.getPort();
+            if (port != ClassServer.getServerSocketPort()) {
+                throw new IOException(
+                    "Bad registering port. You have to register on the same port as the runtime");
+            }
+            url = u.toString();
+            urn = u.getPath();
+        } catch (MalformedURLException e) {
+            url = ClassServer.getUrl() + urn;
+            
         }
-
-        urn = urn.substring(urn.lastIndexOf('/') + 1);
-
         urnBodys.put(urn, this);
-
+        //        urn = urn.substring(urn.lastIndexOf('/') + 1);
         if (bodyLogger.isInfoEnabled()) {
-            bodyLogger.info("register object  at " + urn);
+            bodyLogger.info("register object  at " + url);
             bodyLogger.info(urnBodys);
         }
     }
@@ -113,38 +125,59 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      * @return a UniversalBody
      */
     public UniversalBody lookup(String urn) throws java.io.IOException {
-        try {
-            String url;
-            int port = ClassServer.getServerSocketPort();
-            url = urn;
+//        try {
 
-            if (urn.lastIndexOf(":") > 4) {
-                port = UrlBuilder.getPortFromUrl(urn);
+        	URL u = null;
+        	int port = 0;
+        	try {         		
+        		u = new URL (urn);
+        		port = u.getPort();
+        		
+        	} catch (MalformedURLException e) {
+        		if (!urn.startsWith("http://")) {
+        			urn = "http://" + urn;
+        			return lookup(urn);
+        		}
+        		throw e;
+        	}
+        		if (port == 0) {
+        			throw new HTTPUnexpectedException("You have to specify a port where the runtime can be reached");
+        		}
+        		String url = u.toString();
+        		urn = u.getPath();
+                HttpLookupMessage message = new HttpLookupMessage(urn, url, port);        		
+                message.send();
+                UniversalBody result = message.getReturnedObject();
+                if (result == null) {
+                    throw new java.io.IOException("The url " + url +
+                        " is not bound to any known object");
+                } else {
+                    return result;
+                
+        	}
+        	
+//        	
+//        	String url;
+////            int port = ClassServer.getServerSocketPort();
+//            url = urn;
 
-                port = Integer.parseInt(urn.substring(urn.lastIndexOf(':') + 1,
-                            urn.lastIndexOf(':') + 5));
-            }
+            
 
-            urn = urn.substring(urn.lastIndexOf('/') + 1);
-
-            HttpLookupMessage message = new HttpLookupMessage(urn, url, port);
-            message.send();
-
-            //            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
-            //                    port, message, ProActiveXMLUtils.MESSAGE);
-            //UniversalBody result = (UniversalBody) message.processMessage();
-            UniversalBody result = message.getReturnedObject();
-
-            //System.out.println("result = " + result );
-            if (result == null) {
-                throw new java.io.IOException("The url " + url +
-                    " is not bound to any known object");
-            } else {
-                return result;
-            }
-        } catch (Exception e) {
-            throw new HTTPUnexpectedException("Unexpected exception", e);
-        }
+//            urn = urn.substring(urn.lastIndexOf('/') + 1);
+//
+//
+//       
+//
+//            //            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
+//            //                    port, message, ProActiveXMLUtils.MESSAGE);
+//            //UniversalBody result = (UniversalBody) message.processMessage();
+//
+//
+//            //System.out.println("result = " + result );
+//          
+//        } catch (Exception e) {
+//            throw new HTTPUnexpectedException("Unexpected exception", e);
+//        }
     }
 
     /**
@@ -154,5 +187,26 @@ public class HttpBodyAdapter extends BodyAdapterImpl {
      */
     public static synchronized UniversalBody getBodyFromUrn(String urn) {
         return (UniversalBody) urnBodys.get(urn);
+    }
+    
+    /**
+     * List all active object previously registered in the registry
+     * @param url the url of the host to scan, typically //machine_name 
+     * @return a list of Strings, representing the registered names, and {} if no registry 
+     * @exception java.io.IOException if scanning reported some problem (registry not found, or malformed Url) 
+     */
+    /* (non-Javadoc) 
+     * @see org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
+     */
+    public String [] list(String url) throws java.io.IOException {
+        String [] names = null;
+        names = new String [this.urnBodys.size()];
+        Enumeration<String> e = urnBodys.keys();
+        int i=0;
+        while (e.hasMoreElements()) {
+          		names[i++] = e.nextElement();
+        	}
+        
+        return names;
     }
 }

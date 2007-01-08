@@ -156,7 +156,7 @@ public class HttpRemoteBodyImpl implements RemoteBody {
      * @see org.objectweb.proactive.core.body.UniversalBody#getNodeURL()
      */
     public String getNodeURL() throws HTTPRemoteException {
-        if (isLocal) {
+    	if (isLocal) {
             return body.getNodeURL();
         } else {
             BodyRequest br = new BodyRequest("getNodeURL", new ArrayList<Object>(),
