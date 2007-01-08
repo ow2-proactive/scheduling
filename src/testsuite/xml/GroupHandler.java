@@ -143,7 +143,7 @@ public class GroupHandler {
             UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
             if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
                 AbstractTest test = (AbstractTest) activeHandler.getResultObject();
-                if (excludesTests.contains(test)) {
+                if (excludesTests.contains(test) && group.contains(test)) {
                     // Rmove the test
                     group.remove(group.indexOf(test));
                     return;
