@@ -21,8 +21,8 @@ import testsuite.test.FunctionalTest;
  */
 public class Test extends FunctionalTest {
     ProActiveDescriptor pad;
-    SAXParser parser = null;
-    Validator handler = null;
+    transient SAXParser parser = null;
+    transient Validator handler = null;
 
     /** ProActive compulsory no-args constructor */
     public Test() {
@@ -36,22 +36,35 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        // locates the descriptor directory
         URL baseurl = Test.class.getResource("/nonregressiontest/");
         URI baseuri = baseurl.toURI();
 
-        // FIXME if ever the classes are compiled to another location than PROACTIVE_DIR/CLASSES_DIR the descriptor folder could not be found
+        // locates the descriptor directory
+        // FIXME if ever the classes are compiled to a location other than a direct child of the PROACTIVE_DIR, the descriptor folder won't be found
         URI descriptorsuri = baseuri.resolve("../../descriptors");
         File descriptorsfolder = new File(descriptorsuri);
-        Assertions.assertTrue("\"descriptors\" directory could not be found",
-            descriptorsfolder.exists());
-        Assertions.assertTrue("\"descriptors\" is not a directory",
+        Assertions.assertTrue("\"" + descriptorsuri +
+            "\" directory could not be found", descriptorsfolder.exists());
+        Assertions.assertTrue("\"" + descriptorsuri + "\" is not a directory",
             descriptorsfolder.isDirectory());
-        Assertions.assertTrue("\"descriptors\" is read-protected",
+        Assertions.assertTrue("\"" + descriptorsuri + "\" is read-protected",
             descriptorsfolder.canRead());
 
         // recurse into directory tree to locate xml files
         checkValidationRecursive(descriptorsfolder);
+
+        // locates the examples directory
+        URI examplesuri = baseuri.resolve("../../src/org/objectweb/proactive/examples");
+        File examplesfolder = new File(examplesuri);
+        Assertions.assertTrue("\"" + examplesuri +
+            "\" directory could not be found", examplesfolder.exists());
+        Assertions.assertTrue("\"" + examplesuri + "\" is not a directory",
+            examplesfolder.isDirectory());
+        Assertions.assertTrue("\"" + examplesuri + "\" is read-protected",
+            examplesfolder.canRead());
+
+        // recurse into directory tree to locate xml files
+        checkValidationRecursive(examplesfolder);
     }
 
     private void checkValidationRecursive(File basedirectory)
@@ -104,7 +117,7 @@ public class Test extends FunctionalTest {
         parser = new SAXParser();
 
         //Set the validation feature to true to report validation errors. If the validation feature is set to true, the XML document should specify a XML schema or a DTD.
-        parser.setFeature("http://xml.org/sax/features/validation", true);
+        parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
 
         //Set the validation/schema feature to true to report validation errors against a schema.
         parser.setFeature("http://apache.org/xml/features/validation/schema",
