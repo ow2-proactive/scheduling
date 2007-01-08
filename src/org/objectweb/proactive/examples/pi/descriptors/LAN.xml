@@ -2,7 +2,7 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
 	<variables>
 		<descriptorVariable name="REMOTE_JARS_FOLDER" value="/user/pnaoumen/home/proactivefiles"/> <!--CHANGE ME!!!! -->
-		<descriptorVariable name="JAVA_HOME" value="/user/mmorel/home/NOSAVE/softs/jdk1.5.0-bis/jre/bin/java"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="JAVA_HOME" value="/user/pnaoumen/home/Java/jdk1.5.0_06/bin/java"/> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="PROACTIVE_POLICY_FILE" value="/user/mmorel/home/tutorial/config/proactive.java.policy"/> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="LOG4J_FILE" value="/user/pnaoumen/home/proactivefiles/proactive-log4j"/> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="PROACTIVE_FOLDER_FOR_COMPONENTS" value="/user/pnaoumen/home/ProActiveTrunk27oct2006/ProActive"/> <!--CHANGE ME!!!! -->
@@ -50,6 +50,9 @@
 		<processes>
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<jvmParameters>
+				   <parameter value="-Dproactive.rmi.port=6099" />
+				</jvmParameters>
 					<classpath>
 					    <absolutePath value="${REMOTE_JARS_FOLDER}/ProActive.jar"/>
 						<absolutePath value="${PROACTIVE_FOLDER_FOR_COMPONENTS}/classes"/>
@@ -67,7 +70,6 @@
                         <absolutePath value="${REMOTE_JARS_FOLDER}/julia-runtime.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/log4j.jar"/>
                         <absolutePath value="${REMOTE_JARS_FOLDER}/xercesImpl.jar"/>
-                        
 					</classpath>
 					<javaPath>
 				    	<absolutePath value="${JAVA_HOME}"/>
@@ -81,7 +83,7 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rsh-1">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="trinidad">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sea">
 					<processReference refid="localJVM"/>
 				</rshProcess>
 			</processDefinition>
@@ -91,12 +93,12 @@
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rsh-3">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="nahuel">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="anaconda">
 					<processReference refid="localJVM"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rsh-4">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="trinidad">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
 					<processReference refid="localJVM"/>
 				</rshProcess>
 			</processDefinition>
