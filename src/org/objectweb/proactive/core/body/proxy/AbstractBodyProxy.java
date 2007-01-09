@@ -144,7 +144,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 return reifyAsAsynchronous(methodCall);
             }
             if (!isToString(methodCall) &&
-                    syncCallLogger.isEnabledFor(Level.WARN)) {
+                    syncCallLogger.isEnabledFor(Level.DEBUG)) {
                 String msg = "[WARNING: synchronous call] All calls to the method below are synchronous "
                 		+ "(not an error, but may lead to performance issues or deadlocks):" 
                     + System.getProperty("line.separator") +
@@ -153,7 +153,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                     "They are synchronous for the following reason: " + reason;
 ;
                 if (loggedSyncCalls.add(msg)) {
-                    syncCallLogger.warn(msg);
+                    syncCallLogger.debug(msg);
                 }
             }
             return reifyAsSynchronous(methodCall);
