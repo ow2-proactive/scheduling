@@ -26,8 +26,8 @@ public class Test extends FunctionalTest {
 
     /** ProActive compulsory no-args constructor */
     public Test() {
-        super("Deployment descriptors in \"descriptors\" validation.",
-            "Test service: validating every deployment descriptors in folder \"descriptors\"");
+        super("Deployment descriptors in \"descriptors\" and \"examples\" validation.",
+            "Test service: validating every deployment descriptors in folder \"descriptors\" and \"PROACTIVE/examples\"");
     }
 
     /*
