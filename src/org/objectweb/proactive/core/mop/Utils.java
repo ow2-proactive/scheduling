@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.mop;
 
 import java.lang.reflect.Field;
@@ -52,7 +52,8 @@ public abstract class Utils extends Object {
             "java.lang.Character");
     public static final Class<?> JAVA_LANG_BOOLEAN = silentForName(
             "java.lang.Boolean");
-    public static final Class<?> JAVA_LANG_VOID = silentForName("java.lang.Void");
+    public static final Class<?> JAVA_LANG_VOID = silentForName(
+            "java.lang.Void");
     public static final Class<?> JAVA_LANG_RUNTIMEEXCEPTION = silentForName(
             "java.lang.RuntimeException");
     public static final Class<?> JAVA_LANG_EXCEPTION = silentForName(
@@ -61,14 +62,17 @@ public abstract class Utils extends Object {
             "java.lang.Throwable");
     public static final String STUB_DEFAULT_PREFIX = "Stub_";
     public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
+
     // stub on generic types are generated in a different package
-    public static final String STUB_GENERICS_PACKAGE="parameterized.";
+    public static final String STUB_GENERICS_PACKAGE = "parameterized.";
+
     // stub on generic types are generated with a suffix that indicates the parameterizing types
-    public static final String STUB_GENERICS_SUFFIX="_Generics_";
+    public static final String STUB_GENERICS_SUFFIX = "_Generics_";
 
     /**
      * Static methods
      */
+
     /**
      * Removes the keyword 'native' from the String given as argument.
      *
@@ -437,18 +441,29 @@ public abstract class Utils extends Object {
         }
     }
 
-    public static String convertClassNameToStubClassName(String classname, Class[] genericParameters) {
+    public static String convertClassNameToStubClassName(String classname,
+        Class[] genericParameters) {
         if (classname.length() == 0) {
             return classname;
         }
         int n = classname.lastIndexOf('.');
-        String genericsDifferentiator = ((genericParameters==null || genericParameters.length==0) ?"":STUB_GENERICS_SUFFIX +Arrays.deepToString(genericParameters).replace('.', '_').replace("class ", "").replace(" ", "").replace(",","%") );
+        String genericsDifferentiator = (((genericParameters == null) ||
+            (genericParameters.length == 0)) ? ""
+                                             : (STUB_GENERICS_SUFFIX +
+            Arrays.deepToString(genericParameters).replace('.', '_')
+                  .replace("class ", "").replace(" ", "").replace(",", "%")));
         if (n == -1) {
             // no package
-            return STUB_DEFAULT_PACKAGE + ((genericParameters==null || genericParameters.length==0) ?"":STUB_GENERICS_PACKAGE) + STUB_DEFAULT_PREFIX + classname + genericsDifferentiator;
+            return STUB_DEFAULT_PACKAGE +
+            (((genericParameters == null) || (genericParameters.length == 0))
+            ? "" : STUB_GENERICS_PACKAGE) + STUB_DEFAULT_PREFIX + classname +
+            genericsDifferentiator;
         } else {
-            return STUB_DEFAULT_PACKAGE + ((genericParameters==null || genericParameters.length==0) ?"":STUB_GENERICS_PACKAGE) + classname.substring(0, n + 1) +
-            STUB_DEFAULT_PREFIX + classname.substring(n + 1) + genericsDifferentiator;
+            return STUB_DEFAULT_PACKAGE +
+            (((genericParameters == null) || (genericParameters.length == 0))
+            ? "" : STUB_GENERICS_PACKAGE) + classname.substring(0, n + 1) +
+            STUB_DEFAULT_PREFIX + classname.substring(n + 1) +
+            genericsDifferentiator;
         }
     }
 
@@ -457,7 +472,8 @@ public abstract class Utils extends Object {
             // Extracts the simple name from the fully-qualified class name
             int index = classname.lastIndexOf(".");
             if (index != -1) {
-                return classname.substring(index + 1).startsWith(Utils.STUB_DEFAULT_PREFIX);
+                return classname.substring(index + 1)
+                                .startsWith(Utils.STUB_DEFAULT_PREFIX);
             } else {
                 return classname.startsWith(Utils.STUB_DEFAULT_PREFIX);
             }
@@ -468,23 +484,26 @@ public abstract class Utils extends Object {
 
     public static String convertStubClassNameToClassName(String stubclassname) {
         if (isStubClassName(stubclassname)) {
-        	String temp ="";
-        	if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
+            String temp = "";
+            if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE +
+                        Utils.STUB_GENERICS_PACKAGE)) {
                 // remove generics stuff
-        		temp = stubclassname.substring((Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE).length());
-        	} else {
-        		temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
-        	}
+                temp = stubclassname.substring((Utils.STUB_DEFAULT_PACKAGE +
+                        Utils.STUB_GENERICS_PACKAGE).length());
+            } else {
+                temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
+            }
             String packageName = Utils.getPackageName(temp);
             String stubClassSimpleName = Utils.getSimpleName(temp);
 
             String classsimplename = stubClassSimpleName.substring(Utils.STUB_DEFAULT_PREFIX.length());
-            
+
             // remove generics stuff
-            if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
-            	classsimplename = classsimplename.substring(0, classsimplename.lastIndexOf(Utils.STUB_GENERICS_SUFFIX));
+            if (stubclassname.startsWith(Utils.STUB_DEFAULT_PACKAGE +
+                        Utils.STUB_GENERICS_PACKAGE)) {
+                classsimplename = classsimplename.substring(0,
+                        classsimplename.lastIndexOf(Utils.STUB_GENERICS_SUFFIX));
             }
-            	
 
             // consider the "no package" case
             String result;
@@ -501,24 +520,27 @@ public abstract class Utils extends Object {
             return stubclassname;
         }
     }
-    
+
     // TODO manage existing delimiters in user class names
-    public static String[] getNamesOfParameterizingTypesFromStubClassName(String stubClassName) {
-    	
-    	if (!isStubClassName(stubClassName)) {
-    		return new String[] {};
-    	}
-    	String temp ="";
-    	if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
+    public static String[] getNamesOfParameterizingTypesFromStubClassName(
+        String stubClassName) {
+        if (!isStubClassName(stubClassName)) {
+            return new String[] {  };
+        }
+        String temp = "";
+        if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE +
+                    Utils.STUB_GENERICS_PACKAGE)) {
             // remove generics prefix
-    		temp = stubClassName.substring(stubClassName.lastIndexOf(Utils.STUB_GENERICS_SUFFIX) + Utils.STUB_GENERICS_SUFFIX.length(),stubClassName.length());
-    	} else {
-    		// no generics
-    		return new String[] {};
-    	}
-    	
-    	// remove brackets and split
-    	return temp.replace("[", "").replace("]", "").split("%");
+            temp = stubClassName.substring(stubClassName.lastIndexOf(
+                        Utils.STUB_GENERICS_SUFFIX) +
+                    Utils.STUB_GENERICS_SUFFIX.length(), stubClassName.length());
+        } else {
+            // no generics
+            return new String[] {  };
+        }
+
+        // remove brackets and split
+        return temp.replace("[", "").replace("]", "").split("%");
     }
 
     /**
