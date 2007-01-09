@@ -511,17 +511,14 @@ public abstract class Utils extends Object {
     	String temp ="";
     	if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE)) {
             // remove generics prefix
-    		temp = stubClassName.substring((Utils.STUB_DEFAULT_PACKAGE+Utils.STUB_GENERICS_PACKAGE).length());
+    		temp = stubClassName.substring(stubClassName.lastIndexOf(Utils.STUB_GENERICS_SUFFIX) + Utils.STUB_GENERICS_SUFFIX.length(),stubClassName.length());
     	} else {
     		// no generics
     		return new String[] {};
     	}
     	
-    	
-    	// remove brackets
-    	temp.replace("[", "");
-    	temp.replace("]", "");
-    	return temp.split("%");
+    	// remove brackets and split
+    	return temp.replace("[", "").replace("]", "").split("%");
     }
 
     /**
