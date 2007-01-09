@@ -376,7 +376,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                         (Constants.COMPOSITE.equals(
                             controllerDesc.getHierarchicalType()))) {
                     factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
-                        new Boolean(Constants.SYNCHRONOUS));
+                            Constants.SYNCHRONOUS);
                 }
                 contentDesc.setFactory(new ProActiveMetaObjectFactory(
                         factory_params));
@@ -385,7 +385,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
             }
 
             // TODO_M : add controllers in the component metaobject factory?
-            Object ao = null;
+            Object ao = null ;
 
                 
             // 3 possibilities : either the component is created on a node (or
@@ -516,13 +516,6 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                                 componentsList, i, type, controllerDesc,
                                 original_component_name, contentDesc, nodes);
                         threadPool.execute(task);
-                        //                         change the name of each component (add a suffix)
-                        //                        String new_name = original_component_name +
-                        //                            Constants.CYCLIC_NODE_SUFFIX + i;
-                        //                        controllerDesc.setName(new_name);
-                        //                        // change location of each component
-                        //                        componentsList.add(newFcInstance(type, controllerDesc,
-                        //                                contentDesc[i], nodes[i % nodes.length]));
                     }
                     threadPool.shutdown();
                     try {
@@ -542,7 +535,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                         throw e;
                     }
                 } else {
-                    // component is a parallel or a composite : it will be
+                    // component is a composite : it will be
                     // created on the first node from this virtual node
                     componentsList.add(newFcInstance(type, controllerDesc,
                             contentDesc[0], nodes[0]));

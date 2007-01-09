@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.component.controller;
+package org.objectweb.proactive.core.component.collectiveitfs;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;

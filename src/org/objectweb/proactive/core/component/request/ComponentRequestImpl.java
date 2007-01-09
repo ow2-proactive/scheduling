@@ -62,7 +62,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Method calls to components are actually reified calls, and ComponentRequest
+ * Method calls to components are actually reified calls, and {@link ComponentRequest}
  * contains a reification of the call.
  * <p>
  * This class handles the tagging of the call (a component call), and the

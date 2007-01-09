@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Configuration parameters may be overriden according to the following priorities:</br>
- * > meaning "configuration parameters defined on the left override those defined on the right", we have: </br>
+ * ">" meaning "configuration parameters defined on the left override those defined on the right", we have: </br>
  * JVM > custom config file > default config file
  *
  */

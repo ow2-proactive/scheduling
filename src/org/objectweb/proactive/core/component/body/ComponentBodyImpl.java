@@ -56,10 +56,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     private ProActiveComponent componentIdentity = null;
-    private Map shortcutsOnThis = null; // key = functionalItfName, value = shortcut
+    private Map<String, Shortcut> shortcutsOnThis = null; // key = functionalItfName, value = shortcut
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
-    //    private RequestFilter filterOnNFRequests;
     private boolean insideFunctionalActivity = false;
 
     public ComponentBodyImpl() {
@@ -166,7 +165,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
 
     public void keepShortcut(Shortcut shortcut) {
         if (shortcutsOnThis == null) {
-            shortcutsOnThis = new HashMap();
+            shortcutsOnThis = new HashMap<String, Shortcut>();
         }
         shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }

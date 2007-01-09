@@ -143,30 +143,6 @@ public class Bindings implements Serializable {
         exportBindings.containsKey(clientItfName));
     }
 
-    //	/**
-    //	* returns all the bindings, including the bindings for the
-    //	* collective interfaces (meaning there can be several Binding objects
-    //	* with the same client interface)
-    //	* 
-    //	* @return all the bindings 
-   
-    //	public Binding[] getBindings() {
-    //		Vector list_of_bindings = new Vector();
-    //		Enumeration enum = clientInterfaceBindings.elements();
-    //		while (enum.hasMoreElements()) {
-    //			Object elem = enum.nextElement();
-    //			if (elem instanceof Collection) {
-    //				// a collective binding : add all the elements of the corresponding collection
-    //				list_of_bindings.addAll((Collection) elem);
-    //			} else {
-    //				list_of_bindings.addElement(elem);
-    //			}
-    //		}
-    //		
-    //		list_of_bindings.trimToSize();
-    //		return (Binding[]) (list_of_bindings.toArray(new Binding[list_of_bindings.size()]));
-    //	}
-
     /**
      * Returns the names of the external client bindings for this component.
      * In case of a collective interface, the names of each of its constituing interfaces are not returned ;

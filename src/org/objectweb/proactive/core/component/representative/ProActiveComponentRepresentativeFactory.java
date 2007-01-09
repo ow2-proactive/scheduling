@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 
 
 /**
- * This is a factory for component representatives.
+ * A factory for component representatives.
  *
  * @author Matthieu Morel
  *

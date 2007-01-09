@@ -42,7 +42,7 @@ import org.objectweb.proactive.Body;
  */
 public interface ComponentRunActive extends ComponentActive {
     /**
-     * See @see org.objectweb.proactive.RunActive#runActivity(Body)
+     * See {@link org.objectweb.proactive.RunActive#runActivity(Body)}
      * 
      * One should use a requests filter for separating component controller requests from
      * component functional requests, notably for managing the lifecycle of the component. 

@@ -93,12 +93,10 @@ public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
-    //private Interface[] interfaceReferences;
     private Map fcInterfaceReferences;
     private Map nfInterfaceReferences;
     private Proxy proxy;
 
-    //private ComponentParameters componentParameters;
     private ComponentType componentType = null; // immutable
     private StubObject stubOnBaseObject = null;
     private String hierarchicalType = null;

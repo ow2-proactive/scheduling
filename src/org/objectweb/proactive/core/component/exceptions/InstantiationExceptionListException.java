@@ -4,6 +4,14 @@ import java.util.List;
 
 import org.objectweb.fractal.api.factory.InstantiationException;
 
+/**
+ * An exception that is also a container for a list of exceptions generated when instantiating components.
+ * This exception may be thrown when instantiating several components simultaneously (using group communication
+ * for instance).
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class InstantiationExceptionListException extends InstantiationException {
 
 	
@@ -15,7 +23,6 @@ public class InstantiationExceptionListException extends InstantiationException 
 
 	public InstantiationExceptionListException(String msg) {
 		super(msg);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public InstantiationExceptionListException(List<InstantiationException> exceptions) {

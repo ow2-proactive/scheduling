@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Stores a binding between a client interface and a server interface.
  * Only composite components have their bindings stored in such manner.
  * Primitive component handle their bindings themselves.
+ * 
  * @author Matthieu Morel
  */
 public class Binding implements Serializable {

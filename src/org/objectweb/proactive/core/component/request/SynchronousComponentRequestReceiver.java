@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This is an extension of the RequestReceiverImpl class, which allows the
+ * This is an extension of the {@link RequestReceiverImpl} class, which allows the
  * shortcutting of functional requests : when crossing a composite component
  * that has such a request receiver, a shortcut notification is sent to the
  * emitter, and the request is directly transferred to the following linked

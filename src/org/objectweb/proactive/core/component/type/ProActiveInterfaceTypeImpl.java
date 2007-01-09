@@ -76,7 +76,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
      */
     public ProActiveInterfaceTypeImpl(final InterfaceType itfType) {
         this.name = itfType.getFcItfName();
-        this.signature = new String(itfType.getFcItfSignature());
+        this.signature = itfType.getFcItfSignature();
         this.isClient = itfType.isFcClientItf();
         this.isOptional = itfType.isFcOptionalItf();
         if(itfType.isFcCollectionItf()) {
@@ -118,22 +118,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         return true;
     }
 
-//    /**
-//     * Constructor for ProActiveInterfaceTypeImpl.
-//     */
-//    public ProActiveInterfaceTypeImpl(String name, String signature,
-//        boolean isClient, boolean isOptional, boolean isCollection) {
-//        this.name = name;
-//        this.signature = signature;
-//        this.isClient = isClient;
-//        this.isOptional = isOptional;
-//        this.isCollection = isCollection;
-//        if(isCollection) {
-//            cardinality = ProActiveInterfaceType.COLLECTION_CARDINALITY;
-//        } else {
-//            cardinality = ProActiveInterfaceType.SINGLE_CARDINALITY;
-//        }
-//    }
+
 
     // -------------------------------------------------------------------------
     // Implementation of the InterfaceType interface

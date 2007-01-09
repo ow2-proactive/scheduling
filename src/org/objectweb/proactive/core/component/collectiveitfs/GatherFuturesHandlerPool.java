@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.component.controller.util;
+package org.objectweb.proactive.core.component.collectiveitfs;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -9,7 +9,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeException;
 
 /**
- * A primitive non-optimized pool
+ * A primitive non-optimized pool for futures handlers. Indeed, in the current implementation,
+ * one futures handler is created for each invocation that returns a result...
  * 
  * @author Matthieu Morel
  *

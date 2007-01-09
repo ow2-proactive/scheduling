@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.component.type;
 
 
 /**
- * Dummy class, on top of which we build the membrane of a composite component
+ * Dummy class, on top of which is built the membrane of a composite component
  *
  * @author Matthieu Morel
  *

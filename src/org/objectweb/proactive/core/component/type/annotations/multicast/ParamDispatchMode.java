@@ -10,6 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
+
+/**
+ * <p>This enumeration defines the various dispatch modes available for parameters. </p>
+ * <p>It also provides an implementation of the "strategy" pattern: it implements the methods of
+ * the <code>ParamDispatch</code> interface depending on the selected mode.
+ *  
+ * @author Matthieu Morel
+ *
+ */
 public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST, ONE_TO_ONE, 
     ROUND_ROBIN, CUSTOM;
     /*

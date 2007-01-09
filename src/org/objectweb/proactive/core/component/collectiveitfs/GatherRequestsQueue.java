@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.objectweb.proactive.core.component.controller.util;
+package org.objectweb.proactive.core.component.collectiveitfs;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -27,19 +27,19 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class manages a queue of requests on a gather interface: a list of reified invocations from connected client interfaces.
+ * <p>This class manages a queue of requests on a gather interface: a list of reified invocations from connected client interfaces.</p>
  *
- * Asynchronicity is provided with a third-party active object and automatic continuations.
+ * <p>Asynchronicity is provided with a third-party active object and automatic continuations.</p>
  *
- * A timeout exception is thrown if some of the connected client interfaces fail to send a request before the timeout; the countdown
- * is triggered right after serving the first invocation on the gathercast interface.
+ * <p>A timeout exception is thrown if some of the connected client interfaces fail to send a request before the timeout; the countdown
+ * is triggered right after serving the first invocation on the gathercast interface.</p>
  *
  * @author Matthieu Morel
  *
  */
 public class GatherRequestsQueue implements Serializable {
     private ProActiveComponent owner;
-    private GatherFuturesHandler futuresHandler; // need a pool!
+    private GatherFuturesHandler futuresHandler; // primitive pooling
     private List<ItfID> connectedClientItfs; // consistency?
     private Map<ItfID, ComponentRequest> requests;
     private String serverItfName;
@@ -213,7 +213,7 @@ public class GatherRequestsQueue implements Serializable {
     }
 
     /**
-     * @return Returns the creationTime.
+     * @return the creationTime.
      */
     public long getCreationTime() {
         return creationTime;
@@ -259,11 +259,6 @@ public class GatherRequestsQueue implements Serializable {
                                                     .toGenericString() +
                                 " on gather interface " + serverItfName), null));
                 }
-            }
-            try {
-                //				requestsQueue.finalize();
-            } catch (Throwable e) {
-                e.printStackTrace();
             }
         }
     }

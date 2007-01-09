@@ -683,8 +683,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * Registers the specified body in the node with the nodeName key.
      * In fact it is the <code>UniqueID</code> of the body that is attached to the node.
-     * @param nodeName. The name where to attached the body in the <code>nodeMap</code>
-     * @param body. The body to register
+     * @param nodeName The name where to attached the body in the <code>nodeMap</code>
+     * @param body The body to register
      */
     private void registerBody(String nodeName, Body body) {
         UniqueID bodyID = body.getID();
@@ -701,8 +701,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * Unregisters the specified <code>UniqueID</code> from the node corresponding to the
      * nodeName key
-     * @param nodeName. The key where to remove the <code>UniqueID</code>
-     * @param bodyID. The <code>UniqueID</code> to remove
+     * @param nodeName The key where to remove the <code>UniqueID</code>
+     * @param bodyID The <code>UniqueID</code> to remove
      */
     private void unregisterBody(String nodeName, UniqueID bodyID) {
         //System.out.println("in remove id= "+ bodyID.toString());

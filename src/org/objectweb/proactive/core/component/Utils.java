@@ -20,9 +20,10 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  */
 public class Utils {
 
-    // returns null if clientItfName does not begin with the name of a
-    // collection interface
-    // returns the name of the collection interface otherwise
+    /**
+     * @return null if clientItfName does not begin with the name of a collection interface, 
+     *         the name of the collection interface otherwise 
+     */ 
     public static String pertainsToACollectionInterface(String clientItfName,
         Component owner) {
         InterfaceType[] itfTypes = (((ComponentType) owner.getFcType()).getFcInterfaceTypes());
@@ -81,13 +82,6 @@ public class Utils {
         return ((ProActiveInterfaceType) itf.getFcItfType()).isFcGathercastItf();
     }
 
-    //    public static boolean isCollectionItf(String itfName, Component owner) {
-    //        try {
-    //            return ProActiveTypeFactory.COLLECTION_CARDINALITY.equals(getCardinality(itfName, owner));
-    //        } catch (NoSuchInterfaceException e) {
-    //            return false;
-    //        }
-    //    }
     public static boolean isSingletonItf(String itfName, Component owner) {
         try {
             return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(getCardinality(

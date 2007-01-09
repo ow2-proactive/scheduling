@@ -89,8 +89,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private transient ProActiveComponent representativeOnMyself = null;
 
-    // private ComponentParameters componentParameters;
-    //    private Interface[] interfaceReferences;
     private Map<String, Interface> functionalItfs = new HashMap<String, Interface>();
     private Map<String, ProActiveController> controlItfs = new HashMap<String, ProActiveController>();
     private Map<String, Interface> collectionItfsMembers = new HashMap<String, Interface>();
@@ -149,8 +147,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
     /**
      * @param componentParameters
      * @param component_is_primitive
-     * @param interface_references_list
-     * @param current_component_is_primitive
      */
     private void addFunctionalInterfaces(
         ComponentParameters componentParameters, boolean component_is_primitive) {
@@ -179,14 +175,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                     // components
                     if (!(interface_types[i].isFcClientItf() &&
                             component_is_primitive)) {
-                        // TODO_M multicast
 
-                        //                        // if we have a COLLECTION CLIENT interface, we should see
-                        //                        // the delegatee ("impl" field) as a group
-                        //                        if (interface_types[i].isFcClientItf() &&
-                        //                                interface_types[i].isFcCollectionItf()) {
-                        //                            itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
-                        //                        }
                         itf_ref = MetaObjectInterfaceClassGenerator.instance()
                                                                    .generateFunctionalInterface(interface_types[i].getFcItfName(),
                                 this, interface_types[i]);
@@ -196,7 +185,6 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
                         // set delegation link
                         if (componentParameters.getHierarchicalType()
                                                    .equals(Constants.PRIMITIVE)) {
-                            // TODO_M no group case
                             if (!interface_types[i].isFcCollectionItf()) {
                                 if (!interface_types[i].isFcClientItf()) {
                                     (itf_ref).setFcItfImpl(getReferenceOnBaseObject());
@@ -302,23 +290,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
 
                     continue;
                 }
-
-                //             else {
-                //                Class baseClass = getBody().getReifiedObject().getClass();
-                //                // get all fields (including inherited and private/protected ones)
-                //                List<Field> fields = Arrays.asList(baseClass.getFields());
-                //                fields.addAll(Arrays.asList(baseClass.getDeclaredFields()));
-                //                // check if has annotations
-                //                for (Iterator iter = fields.iterator(); iter.hasNext();) {
-                //                    Field field = (Field) iter.next();
-                //                    FractalBC bindingAnnotation = field.getAnnotation(FractalBC.class);
-                //                    if (bindingAnnotation == null) {
-                //                        continue;
-                //                    }
-                //                    // add to list in binding controller class
-                //                    ((ProActiveBindingControllerImpl)currentController).addClientItf(field.getName(), field);
-                //                }
-                //             }
+ 
             }
 
             if (ContentController.class.isAssignableFrom(controllerClass)) {

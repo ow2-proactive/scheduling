@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.component.controller.util;
+package org.objectweb.proactive.core.component.collectiveitfs;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -34,27 +34,25 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
- * This class orders requests arriving to gathercast interfaces into queues.
+ * <p>This class orders requests arriving to gathercast interfaces into queues.</p>
  * 
- * When a request on a gathercast interface arrives, it is put into a dedicated queue.
+ * <p>When a request on a gathercast interface arrives, it is put into a dedicated queue.</p>
  * 
- * There is one list of queues (lazily created) for each method of each gathercast interface.
+ * <p>There is one list of queues (lazily created) for each method of each gathercast interface.</p>
  * 
- *  Two requests originating from the same interface and addressed to the same method on the same gathercast interface
- *  are put into separate queues.
+ *  <p>Two requests originating from the same interface and addressed to the same method on the same gathercast interface
+ *  are put into separate queues.</p>
  *  
- *  Once all clients of a gathercast interface have sent a request, and if the timeout is not reached, a new request is created, which
- *  gathers the invocation parameters from the individual requests, and it is served on the 
+ *  <p>Once all clients of a gathercast interface have sent a request, and if the timeout is not reached, a new request is created, which
+ *  gathers the invocation parameters from the individual requests. This new request is served on the current component. 
  *   
  * @author Matthieu Morel
  *
  */
 public class GatherRequestsQueues implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
-    // Map <serverItfName, map<signatureOfInvokedMethod, list<queuedRequests>>>
     Map<String, Map<SerializableMethod, List<GatherRequestsQueue>>> queues = new HashMap<String, Map<SerializableMethod, List<GatherRequestsQueue>>>();
     ProActiveComponent owner;
-//    List<GatherFuturesHandler> futuresHandlers = new ArrayList<GatherFuturesHandler>();
     List<ItfID> gatherItfs = new ArrayList<ItfID>();
     ProActiveInterfaceType[] itfTypes;
     
@@ -268,8 +266,7 @@ public class GatherRequestsQueues implements Serializable {
                 }
 
                 // remove the list that was just used
-                GatherRequestsQueue queue = requestQueues.remove(0);
-                queue= null;
+                requestQueues.remove(0);
             }
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
@@ -291,62 +288,4 @@ public class GatherRequestsQueues implements Serializable {
         return null;
     }
     
-//    protected Object reifyAsAsynchronous(MethodCall methodCall)
-//    throws Exception, RenegotiateSessionException {
-//    StubObject futureobject = null;
-//
-//    // Creates a stub + FutureProxy for representing the result
-//    try {
-//        Class returnType = methodCall.getReifiedMethod().getReturnType();
-//
-//        if (returnType.equals(java.lang.Void.TYPE)) {
-//
-//            /* A future for a void call is used to put the potential exception inside */
-//            futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
-//                    null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
-//        } else {
-//            futureobject = (StubObject) MOP.newInstance(returnType, null,
-//                    Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
-//        }
-//    } catch (MOPException e) {
-//        // Create a non functional exception encapsulating the network exception
-//        ProxyNonFunctionalException nfe = new FutureCreationException(
-//                "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-//                methodCall.getName(), e);
-//        e.printStackTrace();
-////        NFEManager.fireNFE(nfe, ProActive.getBodyOnThis().getRemoteAdapter());
-//    } catch (ClassNotFoundException e) {
-//        // Create a non functional exception encapsulating the network exception
-//        ProxyNonFunctionalException nfe = new FutureCreationException(
-//                "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-//                methodCall.getName(), e);
-//        e.printStackTrace();
-////        NFEManager.fireNFE(nfe, this);
-//    }
-//
-//    // Set the id of the body creator in the created future
-//    FutureProxy fp = (FutureProxy) (futureobject.getProxy());
-//    fp.setCreatorID(owner.getID());
-//    fp.setOriginatingProxy((AbstractProxy)ProActive.getStubOnThis().getProxy());
-//
-//    try {
-//        ProActive.getBodyOnThis().sendRequest(methodCall, fp, );
-//    } catch (java.io.IOException e) {
-//        // old stuff
-//        // throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for methodcall ="+methodCall.getName(), e);
-//        // Create a non functional exception encapsulating the network exception
-//        ProxyNonFunctionalException nfe = new SendRequestCommunicationException(
-//                "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
-//                methodCall.getName(), e);
-//
-//        NFEManager.fireNFE(nfe, this);
-//    }
-//
-//    // And return the future object
-//    return futureobject;
-//}
-
-
-    
- 
 }

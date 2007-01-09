@@ -12,7 +12,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.component.controller.util.MulticastHelper;
+import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
@@ -136,21 +136,6 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
             return null;
         }
     }
-
-    //    public synchronized Object reify(MethodCall mc) throws InvocationTargetException {
-    //        if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective() && (delegatee != null)) {
-    //            try {
-    //                Object result = delegateInvocation(mc);
-    //                result = ProActiveGroup.getGroup(result);
-    //                return result;
-    //                //                return delegateInvocation(mc);
-    //            } catch (Throwable e) {
-    //                throw new InvocationTargetException(e);
-    //            }
-    //        } else {
-    //            return super.reify(mc);
-    //        }
-    //    }
 
     /*
      * @see org.objectweb.proactive.core.group.ProxyForGroup#asynchronousCallOnGroup(org.objectweb.proactive.core.mop.MethodCall)

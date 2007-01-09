@@ -20,22 +20,18 @@ public class GathercastTimeoutException extends ProActiveRuntimeException {
 
 	public GathercastTimeoutException() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	public GathercastTimeoutException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	public GathercastTimeoutException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	public GathercastTimeoutException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 
 
 /**
- * Abstract implementation of the Interface interface of the Fractal api.
+ * Abstract implementation of the {@link Interface} interface of the Fractal api.
  * As functional interfaces are specified for each component, they are generated at
  * instantiation time (bytecode generation), by subclassing this class.
  *

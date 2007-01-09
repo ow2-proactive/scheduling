@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.component.controller.util;
+package org.objectweb.proactive.core.component.collectiveitfs;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -12,18 +12,23 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 
+/**
+ * Utility class for gathercast interfaces.
+ * @author Matthieu Morel
+ *
+ */
 public class GatherBindingChecker implements Serializable {
 
     /**
-     * client method B foo (A) throws E;
-     * must be matched by
-     *  server method List<B> foo(List&lst;A&gt;) throws E;
-     * @param clientSideMethod
-     * @param serverSideMethods
-     * @param clientItfIsMulticast TODO
+     * client method <code>B foo (A) throws E;<code><br>
+     * must be matched by <br>
+     *  server method <code><pre>List<B> foo(List&lst;A&gt;) throws E;</pre></code>
+     * @param clientSideMethod method of the client interface
+     * @param serverSideMethods method of the gathercast server interface
+     * @param clientItfIsMulticast flags a multicast client interface
      * @return the method found if any. Throws an exception, otherwise.
-     * @throws ParameterDispatchException
-     * @throws NoSuchMethodException
+     * @throws ParameterDispatchException in case of a problem in the dispatch of parameters
+     * @throws NoSuchMethodException if no corresponding method was found
      */
     public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods, boolean clientItfIsMulticast) throws ParameterDispatchException, NoSuchMethodException {
         

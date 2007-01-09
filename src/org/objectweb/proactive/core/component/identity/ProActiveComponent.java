@@ -55,8 +55,8 @@ public interface ProActiveComponent extends Component, Serializable {
 
     /**
      * provides a reference to the current component
-     * @return a component representative on the current component
-     * - If called from the representative, it returns this representative
+     * @return a component representative on the current component<br>
+     * - If called from the representative, it returns this representative<br>
      * - if called from the meta-object, it returns a representative on itself
      */
     public ProActiveComponent getRepresentativeOnThis();
