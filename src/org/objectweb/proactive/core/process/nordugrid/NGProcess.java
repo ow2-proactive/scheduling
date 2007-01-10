@@ -261,7 +261,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         int index = executable_path.lastIndexOf("/");
         String executable = executable_path.substring(index + 1);
         this.tmp_executable = "tmp_" + executable + random.nextInt();
-        String tmp_executable_path = executable_path.replaceAll(executable,
+        String tmp_executable_path = executable_path.replace(executable,
                 tmp_executable);
 
         //first we build the temporary execuable, that will be sent

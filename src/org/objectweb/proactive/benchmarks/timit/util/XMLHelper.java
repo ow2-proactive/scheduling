@@ -177,7 +177,7 @@ public class XMLHelper {
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
-            attr.setValue(attr.getValue().replaceAll(old, value));
+            attr.setValue(attr.getValue().replace(old, value));
         }
     }
 

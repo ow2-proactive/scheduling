@@ -126,7 +126,7 @@ public class Test extends FunctionalTest {
                 if (oldLine == null) {
                     break;
                 }
-                String newLine = oldLine.replaceAll(oldString, newString);
+                String newLine = oldLine.replace(oldString, newString);
                 writer.write(newLine);
                 writer.newLine();
             }
