@@ -136,21 +136,21 @@ public class ClassServer implements Runnable {
 
     private void printMessage() {
         if (logger.isDebugEnabled()) {
-            logger.debug(
+            logger.info(
                 "To use this ClassFileServer set the property java.rmi.server.codebase to http://" +
                 hostname + ":" + port + "/");
         }
 
         if (this.paths == null) {
-            logger.debug(
+            logger.info(
                 " --> This ClassFileServer is reading resources from classpath " +
                 port);
         } else {
-            logger.debug(
+            logger.info(
                 " --> This ClassFileServer is reading resources from the following paths");
 
             //for (int i = 0; i < codebases.length; i++) {
-            logger.debug(paths);
+            logger.info(paths);
 
             //codebases[i].getAbsolutePath());
         }
