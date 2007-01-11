@@ -1162,4 +1162,15 @@
 	</target>
 
 	<target name="jdepend" description="JDepend reports" depends="jdepend_all,jdepend_core" />
+	
+	<!-- ==================================================================== -->
+	<!-- Compile native MicroTimer                                                    -->
+	<!-- ==================================================================== -->
+	<target name="microTimer" depends="testsuite">
+		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="g++" os="Linux">
+			<arg line=" -shared -o libMicroTimer.so  MicroTimer.cc" />
+		</exec>
+		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${lib}" />
+	</target>
+	
 </project>
