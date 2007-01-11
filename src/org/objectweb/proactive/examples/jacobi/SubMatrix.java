@@ -131,7 +131,6 @@ public class SubMatrix implements Serializable {
         this.resultFile = resultFile;
         this.jacobi = jacobi;
         
-        NDC.push(name);
     }
 
     /**
@@ -581,7 +580,5 @@ public class SubMatrix implements Serializable {
             // Send the terminate signal to the main program
             this.jacobi.terminateAll();
         }
-        NDC.pop();
-        NDC.remove();
     }
 }
