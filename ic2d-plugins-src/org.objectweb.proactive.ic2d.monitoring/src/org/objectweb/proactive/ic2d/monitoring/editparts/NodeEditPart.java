@@ -72,24 +72,19 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
-		//System.out.println("NodeEditPart.update()");
 		final Object param = arg;
-//		final NodeEditPart nodeEditPart = this;
 
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
 				if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					deactivate();
-//					((AbstractIC2DEditPart)getParent()).removeChildVisual(nodeEditPart);
 				}
 				else if(param instanceof State) {
 					((NodeFigure)getFigure()).setHighlight(getMonitoringView().getVirtualNodesGroup().getColor(((NodeObject)getModel()).getVNParent()));
 					refresh();
-					//getWorldEditPart().getGUIRefresher().refresh(this);
 				}
 				else {
 					refresh();
-					//getWorldEditPart().getGUIRefresher().refresh(this);
 				}
 			}
 		});
@@ -121,27 +116,9 @@ public class NodeEditPart extends AbstractMonitoringEditPart{
 		return getCastedModel().getMonitoredChildren();
 	}
 
-
-	/**
-	 * Fills the view with data extracted from the model object 
-	 * associated with the EditPart.
-	 * This method will be called just after the creation of 
-	 * the figure, and may also be called in response to 
-	 * notifications from the model. 
-	 */
-	/*	protected void refreshVisuals(){ 
-		//TODO
-	}
-	 */
-
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
-	protected void createEditPolicies() {
-		// TODO Auto-generated method stub
-
-	}
-
-
+	protected void createEditPolicies() {/* Do nothing */}
 
 }

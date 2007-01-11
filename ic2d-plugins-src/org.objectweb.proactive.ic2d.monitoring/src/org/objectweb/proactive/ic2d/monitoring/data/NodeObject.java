@@ -71,11 +71,10 @@ public class NodeObject extends AbstractDataObject{
 
 	/** The url of the node */
 	private String url;
-	
+
 	/** The node job ID */
 	private String jobID;
-	
-	
+
 	static {
 		String currentHost;
 		try {
@@ -103,15 +102,15 @@ public class NodeObject extends AbstractDataObject{
 	 */
 	public NodeObject(VMObject parent, Node node){
 		super(parent);
-		
+
 		Comparator<String> comparator = new AOObject.AOComparator();
 		monitoredChildren = new TreeMap<String , AbstractDataObject>(comparator);
 		this.node = node;
 		this.url = node.getNodeInformation().getURL();
 		this.key = node.getNodeInformation().getName();
 		this.jobID = node.getNodeInformation().getJobID();
-		
-		this.allMonitoredObjects.put(getKey(), this);
+
+		getWorld().addToMonitoredObject(this);
 	}
 
 	//
@@ -131,34 +130,33 @@ public class NodeObject extends AbstractDataObject{
 			notResponding();
 			Console.getInstance(Activator.CONSOLE_NAME).debug(e);
 		}
-		if(activeObjects==null)
-			System.out.println("NodeObject.explore() activeObjects is null!!!!!!!");
-		handleActiveObjects(activeObjects);
+		if(activeObjects!=null)
+			handleActiveObjects(activeObjects);
 	}
 
 	@Override
 	public String getKey() {
 		return this.key;
 	}
-	
+
 	public String getURL(){
-        return this.url;
+		return this.url;
 	}
 
 	@Override
 	public String getFullName() {
 		return "Node "+this.key;
 	}
-	
+
 	/**
 	 * Returns the protocol used by the virtual machine containing this node.
 	 * @return The protocol
 	 */
 	public Protocol getParentProtocol() {
-    	VMObject vm = (VMObject)getParent();
-    	String url = vm.getProActiveRuntime().getURL();
-    	String protocol = UrlBuilder.getProtocol(url);
-    	return Protocol.getProtocolFromString(protocol);
+		VMObject vm = (VMObject)getParent();
+		String url = vm.getProActiveRuntime().getURL();
+		String protocol = UrlBuilder.getProtocol(url);
+		return Protocol.getProtocolFromString(protocol);
 	}
 
 	@Override
@@ -178,11 +176,6 @@ public class NodeObject extends AbstractDataObject{
 	public String getJobID() {
 		return this.jobID;
 	}
-	
-// @Override
-// public synchronized AOObject findActiveObjectById(UniqueID id) {
-// return (AOObject) monitoredChildren.get(id.toString());
-// }
 
 	/**
 	 * Used to highlight this node, in a virtual node.
@@ -234,16 +227,9 @@ public class NodeObject extends AbstractDataObject{
 		}
 	}
 
-	/**
-	 * Gets the system property indicated by the specified key.
-	 * @param key
-	 * @return The system property
-	 */
-	public String getSystemProperty(String key){
-            return spy.getSystemProperty(key);
+	public void enableMonitoring(boolean enable){
+		activeSpyListener.enableMonitoring(enable);
 	}
-
-	
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
 	//
@@ -271,7 +257,10 @@ public class NodeObject extends AbstractDataObject{
 	 */
 	protected synchronized void destroySpy(){
 		if ((this.spy != null) && (this.activeSpyListener != null)) {
-			this.spy.terminate();
+			try {
+				this.spy.terminate();
+			}
+			catch(Exception e){ /* Do noting */}
 			this.activeSpyListener.terminate();
 			this.spy = null;
 			this.activeSpyListener = null;
@@ -282,7 +271,18 @@ public class NodeObject extends AbstractDataObject{
 	protected void foundForTheFirstTime() {
 		Console.getInstance(Activator.CONSOLE_NAME).log("NodeObject created based on node "+key);
 		this.addSpy();
-
+		HostObject host = (HostObject) getParent().getParent();
+		String os = host.getOperatingSystem();
+		if(os==null){
+			if(host==null)
+				System.out.println("NodeObject.foundForTheFirstTime() host is null");
+			else if(spy==null)
+				System.out.println("NodeObject.foundForTheFirstTime() spy is null");
+			else if(this.spy.getSystemProperty(HostObject.OS_PROPERTY)==null)
+				System.out.println("NodeObject.foundForTheFirstTime() system property is null");
+			else 
+				host.setOperatingSystem(this.spy.getSystemProperty(HostObject.OS_PROPERTY));
+		}
 		try {
 			// Add a RequestQueueEventListener to the spy
 			this.spy.sendEventsForAllActiveObjects();
@@ -357,24 +357,12 @@ public class NodeObject extends AbstractDataObject{
 			List<Object> aoWrapper = activeObjects.get(i);
 			UniversalBody ub = (UniversalBody)aoWrapper.get(0);
 			String className = (String) aoWrapper.get(1);
-			
+
 			AOObject ao = null;
-			
-			if (! allMonitoredObjects.containsKey(ub.getID().toString())) {
-			  ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
-			
-			/*if ((! monitoredChildren.containsKey(ub.getID().toString()))
-					&&
-				(! skippedChildren.containsKey(ub.getID().toString()))){
-				  ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
-			*/
-			
-//			if (FilterProcess.getInstance().filter(ao)) {
-//				AOObject.cancelCreation();
-//				return;
-//			}
-			
-			exploreChild(ao);
+
+			if (! getAllMonitoredObjects().containsKey(ub.getID().toString())) {
+				ao = new AOObject(this,className.substring(className.lastIndexOf(".")+1), ub.getID(), ub.getJobID());
+				exploreChild(ao);
 			}
 		}
 	}

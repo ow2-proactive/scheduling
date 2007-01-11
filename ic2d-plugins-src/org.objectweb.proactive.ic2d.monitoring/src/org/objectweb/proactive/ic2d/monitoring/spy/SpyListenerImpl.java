@@ -67,6 +67,10 @@ public class SpyListenerImpl implements SpyListener{
         }
     }
 
+	public void enableMonitoring(boolean enable){
+		spyEventListener.enableMonitoring(enable);
+	}
+    
     //
     // -- implements SpyListener -----------------------------------------------
     //

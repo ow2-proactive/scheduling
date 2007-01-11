@@ -40,23 +40,23 @@ import org.objectweb.proactive.ic2d.monitoring.data.State;
 public class SpyEventListenerImpl implements SpyEventListener, Serializable{
 
 	public final static boolean DEFAULT_IS_MONITORING = true;
-	private static boolean isMonitoring = DEFAULT_IS_MONITORING;
+	private boolean isMonitoring = DEFAULT_IS_MONITORING;
 	
 	private NodeObject nodeObject;
 
 	public SpyEventListenerImpl(){
-
+		
 	}
 
 	public SpyEventListenerImpl(NodeObject nodeObject){
 		this.nodeObject = nodeObject;
 	}
 
-	public static void SetMonitoring(boolean monitoring){
+	public void enableMonitoring(boolean monitoring){
 		isMonitoring = monitoring;
 	}
 	
-	public static boolean isMonitoring(){
+	public boolean isMonitoring(){
 		return isMonitoring;
 	}
 

@@ -55,7 +55,6 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 	// -- PUBLICS METHODS -----------------------------------------------
 	//
 
-
 	/**
 	 * Convert the result of EditPart.getModel()
 	 * to HostObject (the real type of the model).
@@ -68,21 +67,15 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		//System.out.println("HostEditPart.update()");
 		final Object param = arg;
-//		final HostEditPart hostEditPart = this;
 
-		/*Display.getDefault().asyncExec(new Runnable() {
-			public void run () {*/
 		if(param instanceof State && (State)param == State.NOT_MONITORED) {
 			deactivate();
-//			((AbstractIC2DEditPart)getParent()).removeChildVisual(hostEditPart);
 		}
-		/*refresh();
-				//getWorldEditPart().getGUIRefresher().refresh(this);
-			}
-		});*/
-		
+		// OS have been updated
+		else if((param instanceof String) && (o instanceof HostObject)){
+			((HostFigure)getFigure()).changeTitle((String)param);
+		}
 		Display.getDefault().asyncExec(this);
 	}
 
@@ -115,24 +108,8 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 		return getCastedModel().getMonitoredChildren();
 	}
 
-
-	/**
-	 * Fills the view with data extracted from the model object 
-	 * associated with the EditPart.
-	 * This method will be called just after the creation of 
-	 * the figure, and may also be called in response to 
-	 * notifications from the model. 
-	 */
-	/*	protected void refreshVisuals(){ 
-		//TODO
-	}
-	 */
-
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
-	protected void createEditPolicies() {
-		// TODO Auto-generated method stub
-
-	}
+	protected void createEditPolicies() {/* Do nothing */}
 }

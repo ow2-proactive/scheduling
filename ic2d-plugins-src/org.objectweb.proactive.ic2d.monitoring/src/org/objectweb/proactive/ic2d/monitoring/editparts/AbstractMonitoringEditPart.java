@@ -47,8 +47,6 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 		if (isActive()) {
 			((AbstractDataObject)getModel()).deleteObserver(this);
 			((Figure)getFigure()).removeAll();
-//			if(getFigure().getParent() != null)
-//				getFigure().getParent().remove(getFigure());
 		}
 		super.deactivate();
 	}
@@ -60,14 +58,6 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 * @param arg an argument passed to the notifyObservers  method.
 	 */
 	public void update(Observable o, Object arg) {
-		//System.out.println("AbstractMonitoringEditPart.update()");
-//		Display.getDefault().asyncExec(new Runnable() {
-//			public void run () {
-//				//System.out.println("AbstractMonitoringEditPart ---- refresh()");
-//				refresh();
-//				//getWorldEditPart().getGUIRefresher().refresh(this);		
-//			}
-//		});
 		Display.getDefault().asyncExec(this);
 	}
 	
@@ -75,11 +65,7 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	public IFigure getContentPane() {
 		return ((AbstractFigure)getFigure()).getContentPane();
 	}
-
-//	public void removeChildVisual(EditPart childEditPart) {
-//		super.removeChildVisual(childEditPart);
-//	}
-
+	
 	/**
 	 * Returns the monitoring view. Or null if the parent of this object is null,
 	 * or if its parent isn't an instance of AbstractMonitoringEditPart.
@@ -98,10 +84,6 @@ public abstract class AbstractMonitoringEditPart extends AbstractGraphicalEditPa
 	 */
 	public WorldEditPart getWorldEditPart(){
 		return ((AbstractMonitoringEditPart)getParent()).getWorldEditPart();
-	}
-	
-	public void test(){
-		System.out.println("AbstractMonitoringEditPart.test()");
 	}
 	
 	public void run(){

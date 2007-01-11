@@ -49,6 +49,19 @@ public class WorldObject extends AbstractDataObject {
 	
 	private static WorldObject instance;
 	
+	public static boolean DEFAULT_ENABLE_AUTO_RESET = false;
+	
+	// 60 s
+	public static int MAX_AUTO_RESET_TIME = 60;
+	// 1 s
+	public static int MIN_AUTO_RESET_TIME = 1;
+	// 7 s
+	public static int DEFAULT_AUTO_RESET_TIME = 7;
+	
+	private int currentAutoResetTime = DEFAULT_AUTO_RESET_TIME;
+	private boolean enableAutoReset = DEFAULT_ENABLE_AUTO_RESET;
+	
+	
 	/** The name of this world */
 	private String name;
 	
@@ -61,6 +74,10 @@ public class WorldObject extends AbstractDataObject {
 	
 	/** Set of all the active object names */
 	private Map<String, String> recorededFullNames = new Hashtable<String, String>();
+	
+	// This collection is used to optimize the research of an object.
+	/** A collection of all the monitored objects */
+	private Map<String, AbstractDataObject> allMonitoredObjects;
 		
 	//
     // -- CONSTRUCTORS -----------------------------------------------
@@ -79,7 +96,8 @@ public class WorldObject extends AbstractDataObject {
         // Record the model
         this.name = ModelRecorder.getInstance().addModel(this);
         
-        this.allMonitoredObjects.put(getKey(), this);
+        this.allMonitoredObjects = new ConcurrentHashMap<String, AbstractDataObject>();
+        addToMonitoredObject(this);
     }
 	
 	
@@ -150,6 +168,27 @@ public class WorldObject extends AbstractDataObject {
 		return this;
 	}
 	
+	@Override
+	public Map<String, AbstractDataObject> getAllMonitoredObjects(){
+		return this.allMonitoredObjects;
+	}
+	
+	/**
+	 * Add an object to the collection of monitored objects
+	 * @param object 
+	 */
+	public void addToMonitoredObject(AbstractDataObject object){
+		this.allMonitoredObjects.put(object.getKey(), object);
+	}
+	
+	/**
+	 * Remove from the collection of monitored objects an object
+	 * @param object
+	 */
+	public void removeFromMonitoredObjects(AbstractDataObject object){
+		this.allMonitoredObjects.remove(object.getKey());
+	}
+	
 	/**
 	 * Returns the MonitorThread associated to this object.
 	 * @return The MonitorThread associated to this object.
@@ -169,6 +208,44 @@ public class WorldObject extends AbstractDataObject {
 		if(monitoredChildren.size() == 0)
 			notifyObservers(methodName.REMOVE_CHILD);
 		notifyObservers();
+	}
+	
+	/**
+	 * Change the current auto reset time
+	 * @param time The new time
+	 */
+	public void setAutoResetTime(int time){
+		currentAutoResetTime = time;
+	}
+	
+	/**
+	 * Returns the current auto reset time
+	 * @return The current auto reset time
+	 */
+	public int getAutoResetTime(){
+		return this.currentAutoResetTime;
+	}
+	
+	/**
+	 * Enables the auto reset action
+	 * @param enable
+	 */
+	public void setEnableAutoResetTime(boolean enable){
+		enableAutoReset = enable;
+	}
+	
+	/**
+	 * Returns true if the auto reset time is enabled, false otherwise
+	 * @return true if the auto reset time is enabled, false otherwise
+	 */
+	public boolean enableAutoResetTime(){
+		return enableAutoReset;
+	}
+	
+	public void enableMonitoring(boolean enable){
+		List<AbstractDataObject> childrenList = new ArrayList<AbstractDataObject>(monitoredChildren.values());
+		for(int i=0, size=childrenList.size(); i<size; i++)
+			((HostObject)childrenList.get(i)).enableMonitoring(enable);
 	}
 	
     //

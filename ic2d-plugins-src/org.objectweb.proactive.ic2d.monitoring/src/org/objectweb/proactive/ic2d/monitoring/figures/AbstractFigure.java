@@ -86,7 +86,6 @@ public abstract class AbstractFigure extends Figure implements Runnable{
 	public abstract ConnectionAnchor getAnchor();
 	
 	public void paintFigure(Graphics graphics){
-		//System.out.println("AbstractFigure.paintFigure()");
 		graphics.setAntialias(SWT.ON);
 		super.paintFigure(graphics);
 		paintIC2DFigure(graphics);
@@ -133,7 +132,6 @@ public abstract class AbstractFigure extends Figure implements Runnable{
 	protected abstract Color getDefaultBorderColor();
 	
 	public void run(){
-		//System.out.println("###run run#####===##"+ this.getTitle() );
 		repaint();
 	}
 	

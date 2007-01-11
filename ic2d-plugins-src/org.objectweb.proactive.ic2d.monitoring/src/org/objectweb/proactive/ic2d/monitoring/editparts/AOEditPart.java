@@ -46,7 +46,7 @@ import org.objectweb.proactive.ic2d.monitoring.figures.listeners.AOListener;
 public class AOEditPart extends AbstractMonitoringEditPart{
 
 	private Integer length;
-	
+
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -70,12 +70,9 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	 */
 	@Override
 	public void update(Observable o, Object arg) {
-		//System.out.println("AOEditPart.update()");
 		if(arg != null){
 			// State updated
 			if(arg instanceof State){
-				// System.out.println("AOEditPart.update() --> State
-				// ="+((AOObject)o).getFullName());
 				final State state = (State)arg;
 				final IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
 				Display.getDefault().asyncExec(new Runnable() {
@@ -90,11 +87,9 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 			}
 			// Add communication
 			else if(arg instanceof java.util.HashSet) {
-				
+
 				final java.util.HashSet<AOObject> communications = (java.util.HashSet<AOObject>) arg;
 				final AOFigure source = getCastedFigure();
-				// System.out.println("AOEditPart.update() --> Communications
-				// ="+((AOObject)o).getFullName());
 
 				final IFigure panel = ((WorldEditPart)getParent().getParent().getParent().getParent()).getFigure().getParent();
 
@@ -104,31 +99,23 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 							source.removeConnections(panel);
 						for (java.util.Iterator<AOObject> it = communications.iterator(); it.hasNext(); )
 						{
-						AOFigure target = (AOFigure)((AbstractGraphicalEditPart)getViewer().getEditPartRegistry().get(it.next())).getFigure();
-						source.addConnection(target, panel, getArrowColor());
+							AOFigure target = (AOFigure)((AbstractGraphicalEditPart)getViewer().getEditPartRegistry().get(it.next())).getFigure();
+							source.addConnection(target, panel, getArrowColor());
 						}
 					}});
 			}
 			// Request queue length has changed
 			else if(arg instanceof Integer) {
-				// System.out.println("AOEditPart.update() --> Request queue
-				// ="+((AOObject)o).getFullName());
-				// final int
-					length  = (Integer) arg;
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run () {
-							getCastedFigure().setRequestQueueLength(length);
-						//refresh();
-						}
-					});
-//					 Display.getDefault().asyncExec(this);
+				length  = (Integer) arg;
+				Display.getDefault().asyncExec(new Runnable() {
+					public void run () {
+						getCastedFigure().setRequestQueueLength(length);
+					}
+				});
 			}
-				
-			
 		}
 		else
 			super.update(o, arg);
-		
 	}
 
 
@@ -139,7 +126,6 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	/**
 	 * Returns a new view associated with the type of model object the EditPart
 	 * is associated with. So here, it returns a new NodeFigure.
-	 * 
 	 * @return a new NodeFigure view associated with the NodeObject model.
 	 */
 	protected IFigure createFigure() {
@@ -154,17 +140,14 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 
 	/**
 	 * Returns a List containing the children model objects.
-	 * 
 	 * @return the List of children
 	 */
 	protected List<AbstractDataObject> getModelChildren() {
 		return getCastedModel().getMonitoredChildren();
 	}
 
-	protected void createEditPolicies() {
-		// TODO Auto-generated method stub
-
-	}
+	@Override
+	protected void createEditPolicies() {/* Do nothing */}
 
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
@@ -173,7 +156,6 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	/**
 	 * Convert the result of EditPart.getModel() to AOObject (the real type of
 	 * the model).
-	 * 
 	 * @return the casted model
 	 */
 	public AOObject getCastedModel(){
@@ -183,16 +165,9 @@ public class AOEditPart extends AbstractMonitoringEditPart{
 	/**
 	 * Convert the result of EditPart.getFigure() to AOFigure (the real type of
 	 * the figure).
-	 * 
 	 * @return the casted figure
 	 */
 	public AOFigure getCastedFigure(){
 		return (AOFigure)getFigure();
 	}
-
-	@Override
-	public void test(){
-		System.out.println("AOEditPart.test()");
-	}
-
 }

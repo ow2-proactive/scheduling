@@ -107,8 +107,6 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 		layout.setMajorAlignment(FlowLayout.ALIGN_CENTER);
 		layout.setMajorSpacing(50);
 		layout.setMinorSpacing(50);
-//		layout.setSpacing(50);
-//		layout.setMinorAlignment(MonitoringLayout.ALIGN_CENTER_CENTER);
 		layer.setLayoutManager(layout);
 		
 		layer.addMouseListener(new WorldListener(monitoringView));
@@ -128,23 +126,11 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
-	protected void createEditPolicies() {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*@Override
-	public Object getAdapter(Class adapter) {
-		if(adapter == MouseWheelHelper.class) {
-			return new ViewportMouseWheelHelper(this) { // Classe disponible dans GEF exprès pour cela
-				public void handleMouseWheelScrolled(Event event) {
-					System.out.println("MouseWheel WorldEditPart");
-					super.handleMouseWheelScrolled(event);
-				}
-			};
-		}
-		return super.getAdapter(adapter);
-	}*/
+	protected void createEditPolicies() {/* Do nothing */}
+	
+	//
+	// -- INNER CLASS -----------------------------------------------
+	//
 	
 	private class MonitoringLayout extends FlowLayout {
 		

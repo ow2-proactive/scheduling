@@ -67,9 +67,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		//System.out.println("VMEditPart.update()");
 		final Object param = arg;
-//		final VMEditPart vmEditPart = this;
 		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run () {
@@ -77,14 +75,10 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 					((VMFigure)getFigure()).notResponding();
 				else if(param instanceof State && (State)param == State.NOT_MONITORED) {
 					deactivate();
-//					((AbstractIC2DEditPart)getParent()).removeChildVisual(vmEditPart);
 				}
 				refresh();
 			}
 		});
-		
-		
-		//getWorldEditPart().getGUIRefresher().refresh(this);	
 	}
 
 	//
@@ -112,24 +106,9 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 		return getCastedModel().getMonitoredChildren();
 	}
 
-
-	/**
-	 * Fills the view with data extracted from the model object 
-	 * associated with the EditPart.
-	 * This method will be called just after the creation of 
-	 * the figure, and may also be called in response to 
-	 * notifications from the model. 
-	 */
-	/*	protected void refreshVisuals(){ 
-		//TODO
-	}
-	 */
-
 	/**
 	 * Creates the initial EditPolicies and/or reserves slots for dynamic ones.
 	 */
-	protected void createEditPolicies() {
-		// TODO Auto-generated method stub
-	}
+	protected void createEditPolicies() {/* Do nothing */}
 }
 

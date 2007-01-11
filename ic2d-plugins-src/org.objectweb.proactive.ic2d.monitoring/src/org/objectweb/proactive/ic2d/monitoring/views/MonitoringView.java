@@ -43,6 +43,10 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -54,7 +58,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.part.ViewPart;
+import org.objectweb.proactive.ic2d.monitoring.actions.EnableDisableMonitoringAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.monitoring.actions.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.monitoring.actions.NewHostAction;
@@ -73,7 +80,6 @@ import org.objectweb.proactive.ic2d.monitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.monitoring.editparts.MonitoringEditPartFactory;
 import org.objectweb.proactive.ic2d.monitoring.figures.RoundedLine;
 import org.objectweb.proactive.ic2d.monitoring.figures.listeners.WorldListener;
-import org.objectweb.proactive.ic2d.monitoring.spy.SpyEventListenerImpl;
 
 
 public class MonitoringView extends ViewPart {
@@ -90,13 +96,13 @@ public class MonitoringView extends ViewPart {
 
 	private Button bProportional;
 	private Button bRatio;
-	private Button bFilaire;
+	private Button bFixed;
 
 	/** The World */
 	private WorldObject world;
 
 	private DragAndDrop dnd = new DragAndDrop();
-	
+
 	/** The graphical set of virtual nodes */
 	private VirtualNodesGroup virtualNodesGroup;
 
@@ -108,9 +114,6 @@ public class MonitoringView extends ViewPart {
 		super();
 		world = new WorldObject();
 		title = world.getName();
-		
-		// We add the Graphical Refresher to the Graphical Thread of SWT
-		//Display.getDefault().asyncExec(Refresher.getInstance());
 	}
 
 	//
@@ -120,14 +123,14 @@ public class MonitoringView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent){
-		
+
 		// To identify each Monitoring view.
 		setPartName(title);
-		
+
 		FormLayout form = new FormLayout ();
 		parent.setLayout (form);
 
-		final int limit = 50;
+		final int limit = 62;
 
 		virtualNodesGroup = new VirtualNodesGroup(parent);
 		world.addObserver(virtualNodesGroup);
@@ -156,48 +159,110 @@ public class MonitoringView extends ViewPart {
 		drawingStyleData.bottom = new FormAttachment (100, 0);
 		Group groupD = new Group(parent, SWT.NONE);
 
-
 		RowLayout rowLayout = new RowLayout();
 		rowLayout.wrap = false;
 		rowLayout.pack = true;
 		rowLayout.justify = false;
-		rowLayout.marginLeft = 100;
-		rowLayout.marginTop = 8;
+		rowLayout.marginLeft = 140;
+		rowLayout.marginTop = 1;
 		rowLayout.marginRight = 5;
-		rowLayout.marginBottom = 0;
+		rowLayout.marginBottom = 5;
 		rowLayout.spacing = 5;
 		groupD.setLayout(rowLayout);
 		groupD.setLayoutData(drawingStyleData);
 
+		Group autoResetGroup = new Group(groupD, SWT.NONE);
+		autoResetGroup.setText("Auto Reset");
+		RowLayout autoResetLayout = new RowLayout();
+		autoResetGroup.setLayout(autoResetLayout);
 
-		Button topology = new Button(groupD, SWT.CHECK);
-		topology.setText("Display topology");
-		topology.setSelection(RoundedLine.DEFAULT_DISPLAY_TOPOLOGY);
-		topology.addSelectionListener(new DisplayTopologyListener(parent));
+		final Button autoResetEnable = new Button(autoResetGroup, SWT.TOGGLE);
+		autoResetEnable.setText("Enable");
+		autoResetEnable.setToolTipText("Enable or Disable the Auto Reset");
+		autoResetEnable.setSelection(WorldObject.DEFAULT_ENABLE_AUTO_RESET);
+		autoResetEnable.addSelectionListener(new SelectionAdapter(){
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				boolean selected = autoResetEnable.getSelection();
+				world.setEnableAutoResetTime(selected);
+			}
+		});
+		
+		final Spinner autoReset = new Spinner(autoResetGroup, SWT.NONE);
+		// Allow 0 decimal places
+		autoReset.setDigits(0);
+		// Set the minimum value to 1 s
+		autoReset.setMinimum(WorldObject.MIN_AUTO_RESET_TIME);
+		// Set the maximum value to 60 s
+		autoReset.setMaximum(WorldObject.MAX_AUTO_RESET_TIME);
+		// Set the increment value to 1 s
+		autoReset.setIncrement(1);
+		// Set the seletion to 0.800 s
+		autoReset.setSelection(WorldObject.DEFAULT_AUTO_RESET_TIME);
+		autoReset.setToolTipText("Auto reset time of the arrows");
+		autoReset.addMouseListener(new MouseAdapter(){
+			@Override
+			public void mouseUp(MouseEvent e) {
+				int selection = autoReset.getSelection();
+				world.setAutoResetTime(selection);
+			}
+		});
 
-		bProportional = new Button(groupD, SWT.RADIO);
+		autoReset.addKeyListener(new KeyAdapter(){
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if((e.keyCode==SWT.KEYPAD_CR)||
+						(e.keyCode==SWT.CR)||
+						(e.keyCode==SWT.UP)||
+						(e.keyCode==SWT.DOWN)||
+						(e.keyCode==SWT.ARROW_UP)||
+						(e.keyCode==SWT.ARROW_DOWN)||
+						(e.keyCode==SWT.PAGE_UP)||
+						(e.keyCode==SWT.PAGE_DOWN)){
+					int selection = autoReset.getSelection();
+					world.setAutoResetTime(selection);
+				}
+			}
+		});
+
+		Label titleLabel = new Label(autoResetGroup, SWT.NONE);
+		titleLabel.setText("seconds");
+
+		Group drawingStyleGroup = new Group(groupD, SWT.NONE);
+		drawingStyleGroup.setText("Drawing style");
+		RowLayout drawingStyleLayout = new RowLayout();
+		drawingStyleGroup.setLayout(drawingStyleLayout);
+
+		bProportional = new Button(drawingStyleGroup, SWT.RADIO);
 		bProportional.setText("Proportional");
 		bProportional.addSelectionListener(new DrawingStyleButtonListener(parent));
 
-		bRatio = new Button(groupD, SWT.RADIO);
+		bRatio = new Button(drawingStyleGroup, SWT.RADIO);
 		bRatio.setText("Ratio");
 		bRatio.addSelectionListener(new DrawingStyleButtonListener(parent));
 
-		bFilaire = new Button(groupD, SWT.RADIO);
-		bFilaire.setText("Filaire");
-		bFilaire.addSelectionListener(new DrawingStyleButtonListener(parent));
+		bFixed = new Button(drawingStyleGroup, SWT.RADIO);
+		bFixed.setText("Fixed");
+		bFixed.addSelectionListener(new DrawingStyleButtonListener(parent));
 
 		initStateRadioButtons();
 
-		Button resetTopology = new Button(groupD, SWT.NONE);
-		resetTopology.setText("Reset Topology");
+		Group topologyGroup = new Group(groupD, SWT.NONE);
+		topologyGroup.setText("Topology");
+		RowLayout topologyLayout = new RowLayout();
+		topologyGroup.setLayout(topologyLayout);
+
+		Button topology = new Button(topologyGroup, SWT.TOGGLE);
+		topology.setText("Display");
+		topology.setToolTipText("Display or not the topology");
+		topology.setSelection(RoundedLine.DEFAULT_DISPLAY_TOPOLOGY);
+		topology.addSelectionListener(new DisplayTopologyListener(parent));
+
+		Button resetTopology = new Button(topologyGroup, SWT.NONE);
+		resetTopology.setText("Reset");
+		resetTopology.setToolTipText("Reset the topology");
+		resetTopology.setSize(3, 3);
 		resetTopology.addSelectionListener(new ResetTopologyListener());
-
-		Button monitoringEnable = new Button(groupD, SWT.CHECK);
-		monitoringEnable.setText("Monitoring enable");
-		monitoringEnable.setSelection(SpyEventListenerImpl.DEFAULT_IS_MONITORING);
-		monitoringEnable.addSelectionListener(new EnableMonitoringListener());
-
 
 		// --------------------
 
@@ -221,6 +286,9 @@ public class MonitoringView extends ViewPart {
 		RefreshAction toolBarRefresh = new RefreshAction(world.getMonitorThread());
 		toolBarManager.add(toolBarRefresh);
 
+		EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(world);
+		toolBarManager.add(toolBarEnableDisableMonitoring);
+		
 		toolBarManager.add(new Separator());
 
 		// Adds Zoom-in and Zoom-out actions to the view's toolbar
@@ -242,59 +310,6 @@ public class MonitoringView extends ViewPart {
 		// Adds "New Monitoring view" action to the view's toolbar
 		NewViewAction toolBarNewView = new NewViewAction();
 		toolBarManager.add(toolBarNewView);
-
-
-		//graphicalViewer.setProperty(MouseWheelHandler.KeyGenerator.getKey(SWT.NONE), MouseWheelZoomHandler.SINGLETON);
-
-//		FigureCanvas fc = (FigureCanvas)graphicalViewer/*root.getViewer()*/.getControl();
-
-//		if(fc != null) {
-//		fc.addListener(SWT.MouseWheel, new Listener() {
-//		public void handleEvent(Event event) {
-//		ActionRegistry registry = getActionRegistry();
-//		IAction action = registry.getAction((event.count > 0) ? 
-//		GEFActionConstants.ZOOM_IN :
-//		GEFActionConstants.ZOOM_OUT);
-
-//		action.run();
-//		}
-//		});
-//		}
-
-//		Create the drag source on the tree
-		/*		DragSource ds = new DragSource(getGraphicalViewer().getControl(), DND.DROP_MOVE);
-		ds.setTransfer(new Transfer[] {TextTransfer.getInstance()});
-		ds.addDragListener(new DragSourceAdapter() {
-
-			public void dragStart(DragSourceEvent event){
-				System.out.println(".dragStart()");
-				//event.doit = false;
-			}
-
-			public void dragFinished(DragSourceEvent event){
-				System.out.println(".dragFinished()");
-			}
-
-			public void dragSetData(DragSourceEvent event) {
-				// Set the data to be the first selected item's text
-				//event.data = tree.getSelection()[0].getText();
-				event.data = "Essai";
-				System.out.println(".dragSetData()");
-			}
-		});
-
-
-		// Create the drop target on the text field
-		DropTarget dt = new DropTarget(getGraphicalViewer().getControl(), DND.DROP_MOVE);
-		dt.setTransfer(new Transfer[] {TextTransfer.getInstance()});
-		dt.addDropListener(new DropTargetAdapter() {
-			public void drop(DropTargetEvent event) {
-				// Set the text field's text to the text being dropped
-				//text.setText((String)event.data);
-				System.out.println(".drop()");
-			}
-		});
-		 */
 	}
 
 
@@ -305,10 +320,8 @@ public class MonitoringView extends ViewPart {
 	public MonitoringViewer getGraphicalViewer() {
 		return graphicalViewer;
 	}
-	
-	public void setFocus() {
-		// TODO Auto-generated method stub
-	}
+
+	public void setFocus() {/* Do nothing */}
 
 	public VirtualNodesGroup getVirtualNodesGroup(){
 		return virtualNodesGroup;
@@ -317,11 +330,11 @@ public class MonitoringView extends ViewPart {
 	public WorldObject getWorld() {
 		return world;
 	}
-	
+
 	public DragAndDrop getDragAndDrop(){
 		return this.dnd;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
 	 */
@@ -339,10 +352,10 @@ public class MonitoringView extends ViewPart {
 	//
 
 	/**
-	* Returns the <code>EditPartFactory</code> that the
-	* <code>GraphicalViewer</code> will use.
-	* @return the <code>EditPartFactory</code>
-	*/
+	 * Returns the <code>EditPartFactory</code> that the
+	 * <code>GraphicalViewer</code> will use.
+	 * @return the <code>EditPartFactory</code>
+	 */
 	protected EditPartFactory getEditPartFactory(){
 		return new MonitoringEditPartFactory(this);
 	}
@@ -385,7 +398,6 @@ public class MonitoringView extends ViewPart {
 
 		// initialize the viewer with input
 		graphicalViewer.setEditPartFactory(getEditPartFactory());
-//		world.addObserver(MonitorThread.getInstance());
 		graphicalViewer.setContents(world);
 
 		createActions(parent.getDisplay());
@@ -412,8 +424,8 @@ public class MonitoringView extends ViewPart {
 
 	private void initStateRadioButtons(){
 		switch (RoundedLine.DEFAULT_STYLE) {
-		case FILAIRE:
-			bFilaire.setSelection(true);
+		case FIXED:
+			bFixed.setSelection(true);
 			break;
 		case PROPORTIONAL:
 			bProportional.setSelection(true);
@@ -423,13 +435,10 @@ public class MonitoringView extends ViewPart {
 			break;
 		}
 	}
-
-
-
+	
 	//
 	// -- INNER CLASSES -------------------------------------------
 	//
-
 
 	public class MonitoringViewer extends ScrollingGraphicalViewer {
 
@@ -459,7 +468,7 @@ public class MonitoringView extends ViewPart {
 				else if(e.widget.equals(bRatio))
 					RoundedLine.setDrawingStyle(RoundedLine.DrawingStyle.RATIO);
 				else
-					RoundedLine.setDrawingStyle(RoundedLine.DrawingStyle.FILAIRE);
+					RoundedLine.setDrawingStyle(RoundedLine.DrawingStyle.FIXED);
 				// We need to have the monitoring panel in order to update the display.
 				// Warning : If the order of the graphics objects change then
 				// it is also necessary to change the index of the table.
@@ -492,13 +501,6 @@ public class MonitoringView extends ViewPart {
 			Control[] children = this.globalcontainer.getChildren();
 			if(children.length>=2 && children[1]!=null)
 				children[1].redraw();
-		}
-	}
-
-	private class EnableMonitoringListener extends SelectionAdapter {
-
-		public void widgetSelected(SelectionEvent e) {
-			SpyEventListenerImpl.SetMonitoring(((Button) e.widget).getSelection());
 		}
 	}
 

@@ -49,14 +49,10 @@ public class AOObject extends AbstractDataObject {
 
 	private java.util.Set<AOObject> communications;
 
-	//private java.util.Set<AOObject> communicationsOld;
-
 	private Thread dispatchThread;
 
 	/** Time To Sleep (in seconds) */
-	private float tts = 0.2f;
-
-	//private float comm_fade = 3.0f;
+	private long tts = 5;
 
 	/** State of the object (ex: WAITING_BY_NECESSITY) */
 	private State state = State.UNKNOWN;
@@ -101,17 +97,21 @@ public class AOObject extends AbstractDataObject {
 		Map<String, String> fullNames = getWorld().getRecordedFullNames();
 		String recordedName = fullNames.get(id.toString());
 
-		communications = java.util.Collections
-		.synchronizedSet(new java.util.HashSet<AOObject>());
-		//communicationsOld = new java.util.HashSet<AOObject>();
+		communications = java.util.Collections.synchronizedSet(new java.util.HashSet<AOObject>());
 
 		// If a name is already associated to this object
 		if (recordedName != null) {
 			this.fullName = recordedName;
 		} else {
 			// We shouldn't display this object, therefore we don't associate a number
-			if (!FilterProcess.getInstance().filter(this))
+			if (!FilterProcess.getInstance().filter(this)){
 				this.fullName = name + "#" + counter();
+
+				/* For the communication thread */
+				this.dispatchThread = new Thread(new AOObjectRefresher());
+				this.dispatchThread.setName(this.fullName);
+				this.dispatchThread.start();
+			}
 			else
 				this.fullName = name;
 			fullNames.put(id.toString(), fullName);
@@ -120,13 +120,8 @@ public class AOObject extends AbstractDataObject {
 		this.jobID = jobID;
 		this.requestQueueLength = -1;
 
-		this.allMonitoredObjects.put(getKey(), this);
-
-		/* For the communication thread */
-		this.dispatchThread = new Thread(new AOObjectRefresher());
-		this.dispatchThread.setName(this.fullName);
-		this.dispatchThread.start();
-
+		getAllMonitoredObjects().put(getKey(), this);
+		getWorld().addToMonitoredObject(this);
 	}
 
 	//
@@ -183,8 +178,6 @@ public class AOObject extends AbstractDataObject {
 	 */
 	public void setState(State newState) {
 		this.state = newState;
-		// setChanged();
-		// notifyObservers(this.state);
 	}
 
 	public State getState() {
@@ -194,6 +187,7 @@ public class AOObject extends AbstractDataObject {
 	/**
 	 * Add a communication between this active object and the active object
 	 * destination.
+	 * The communications are buffered
 	 * @param destination The destination active object
 	 */
 	public void addCommunication(AOObject destination) {
@@ -202,8 +196,6 @@ public class AOObject extends AbstractDataObject {
 				communications.add(destination);
 			}
 		}
-		// setChanged();
-		// notifyObservers(destination);
 	}
 
 	@Override
@@ -269,38 +261,6 @@ public class AOObject extends AbstractDataObject {
 		communications.clear();
 		setChanged();
 		notifyObservers(new java.util.HashSet<AOObject>(communications));
-		// notifyObservers(State.NOT_MONITORED);
-	}
-
-	/**
-	 * TODO
-	 */
-	public synchronized void dispatch() {
-
-		if (super.isAlive) {
-
-			java.util.HashSet<AOObject> communicationsNew = new java.util.HashSet<AOObject>(
-					communications);
-			communications.clear();
-
-			// communicationsNew.removeAll(communicationsOld);
-
-			if (!communicationsNew.isEmpty()) {
-				setChanged();
-				notifyObservers(communicationsNew);
-				// communicationsOld = communicationsNew;
-			}
-			if (!state.equals(stateOld)) {
-				setChanged();
-				notifyObservers(state);
-				stateOld = state;
-			}
-			if (requestQueueLength != requestQueueLengthOld) {
-				setChanged();
-				notifyObservers(requestQueueLength);
-				requestQueueLengthOld = requestQueueLength;
-			}
-		}
 	}
 
 	//
@@ -311,7 +271,7 @@ public class AOObject extends AbstractDataObject {
 	protected void finalize() {
 		this.dispatchThread.stop();
 	}
-	
+
 	@Override
 	protected void foundForTheFirstTime() {
 		// Add a MessageEventListener to the spy
@@ -345,7 +305,33 @@ public class AOObject extends AbstractDataObject {
 		return ++counter;
 	}
 
+	/**
+	 * Performs the buffered communications
+	 */
+	private synchronized void performCommunications() {
+		if (super.isAlive) {
+			java.util.HashSet<AOObject> communicationsNew = new java.util.HashSet<AOObject>(communications);
+			communications.clear();
+			if (!communicationsNew.isEmpty()) {
+				setChanged();
+				notifyObservers(communicationsNew);
+			}
+			if (!state.equals(stateOld)) {
+				setChanged();
+				notifyObservers(state);
+				stateOld = state;
+			}
+			if (requestQueueLength != requestQueueLengthOld) {
+				setChanged();
+				notifyObservers(requestQueueLength);
+				requestQueueLengthOld = requestQueueLength;
+			}
+		}
+	}
+	
+	//
 	// -- INNER CLASS -----------------------------------------------
+	//
 	
 	public static class AOComparator implements Comparator<String> {
 
@@ -363,24 +349,29 @@ public class AOObject extends AbstractDataObject {
 		}
 	}
 
+	/**
+	 * This class is used to buffered and reset the communications.
+	 */
 	private class AOObjectRefresher implements Runnable {
-
-		public void run() {
-			Long oldtime = System.currentTimeMillis();
-			Long newtime = oldtime;
-			while (true) {
-				newtime = System.currentTimeMillis();
-				if (newtime - oldtime > tts * 1000) {
-					dispatch();
-					oldtime = System.currentTimeMillis();
-				} else {
+		public void run(){
+			long newTime = System.currentTimeMillis();
+			long oldTime = newTime;
+			while(true){
+				newTime = System.currentTimeMillis();
+				// Used for the auto reset time
+				if((getWorld().enableAutoResetTime())&&
+					(newTime - oldTime > (getWorld().getAutoResetTime() * 1000))){
+					resetCommunications();
+					oldTime = System.currentTimeMillis();
+				}
+				else {
+					performCommunications();
 					try {
-						Thread.sleep(50);
-					} catch (InterruptedException e) {
-					}
+						Thread.sleep(tts);
+					} catch (InterruptedException e) {/* Do nothing */}
 					Thread.yield();
 				}
-			}
+			}	
 		}
 	}
 }

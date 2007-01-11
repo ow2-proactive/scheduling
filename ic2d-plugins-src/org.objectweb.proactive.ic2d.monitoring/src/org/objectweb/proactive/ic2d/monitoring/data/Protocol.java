@@ -56,6 +56,6 @@ public enum Protocol {
 		else if((s.compareToIgnoreCase("http") == 0)||(s.compareToIgnoreCase("http:") == 0))
 			return HTTP;
 		else//Unknown protocol
-			return UNKNOWN; // !!!
+			return UNKNOWN;
 	}
 }

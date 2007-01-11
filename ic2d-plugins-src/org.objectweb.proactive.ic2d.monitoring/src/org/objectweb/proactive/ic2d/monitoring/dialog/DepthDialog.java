@@ -115,6 +115,11 @@ public class DepthDialog extends Dialog {
 		}
 	}
 	
+	
+	//
+	// -- INNER CLASS -----------------------------------------------
+	//
+	
 	private class DepthListener extends SelectionAdapter {
 		
 		public void widgetSelected(SelectionEvent e) {

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.monitoring.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -54,10 +55,12 @@ public class HostObject extends AbstractDataObject {
 	private int port;
 
 	/** Name of Operating System */
-	private String os;// = "OS undefined";
+	private String os;
 
 	/** Host's protocol */
 	private Protocol protocol;
+
+	public static String OS_PROPERTY = "os.name";
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -73,7 +76,7 @@ public class HostObject extends AbstractDataObject {
 	 */
 	public HostObject(String hostname, int port, Protocol protocol, WorldObject world) throws HostAlreadyExistsException{
 		super(world);
-		
+
 		this.hostname = hostname;
 		this.port = port;
 		this.protocol = protocol;
@@ -81,10 +84,10 @@ public class HostObject extends AbstractDataObject {
 		HostObject hostAlreadyExists = (HostObject) this.parent.monitoredChildren.get(this.getKey());
 		if(hostAlreadyExists != null)
 			throw new HostAlreadyExistsException(hostAlreadyExists);
-		
+
 		this.parent.putChild(this);
-		
-		this.allMonitoredObjects.put(getKey(), this);
+
+		getWorld().addToMonitoredObject(this);
 	}
 
 	//
@@ -109,22 +112,6 @@ public class HostObject extends AbstractDataObject {
 		}
 	}
 
-	/*@Override
-	public void stopMonitoring(boolean log) {
-		if(log)
-			Console.getInstance(Activator.CONSOLE_NAME).log("Stop monitoring the " + getType() + " " + getFullName());
-		((WorldObject)(this.parent)).removeChild(this);
-
-		setChanged();
-		notifyObservers(State.NOT_MONITORED);
-
-		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-		while (iterator.hasNext()) {
-			AbstractDataObject child = iterator.next();
-			child.stopMonitoring(false);
-		}
-	}*/
-
 	@Override
 	public String getKey() {
 		return hostname+":"+port;
@@ -137,7 +124,6 @@ public class HostObject extends AbstractDataObject {
 		else
 			return hostname+":"+port+":"+os;
 	}
-
 
 	/**
 	 * Returns the name of this host
@@ -163,13 +149,17 @@ public class HostObject extends AbstractDataObject {
 		return os;
 	}
 
-//	protected void setOperatingSystem(String os){
-//		this.os = os;
-//		System.out.println("HostObject.setOperatingSystem()====>Os="+os);
-//		setChanged();
-//		notifyObservers(this.os);
-//	}
-	
+
+	/**
+	 * Changes the operating system
+	 * @param os
+	 */
+	protected void setOperatingSystem(String os){
+		this.os = os;
+		setChanged();
+		notifyObservers(getFullName());
+	}
+
 	/**
 	 * Returns the host's protocol
 	 * @return The host's protocol
@@ -190,6 +180,11 @@ public class HostObject extends AbstractDataObject {
 		return "host";
 	}
 
+	public void enableMonitoring(boolean enable){
+		List<AbstractDataObject> childrenList = new ArrayList<AbstractDataObject>(monitoredChildren.values());
+		for(int i=0, size=childrenList.size(); i<size; i++)
+			((VMObject)childrenList.get(i)).enableMonitoring(enable);
+	}
 
 	//
 	// -- PROTECTED METHOD -----------------------------------------------
@@ -202,7 +197,7 @@ public class HostObject extends AbstractDataObject {
 	protected WorldObject getTypedParent() {
 		return (WorldObject) parent;
 	}
-	
+
 	@Override
 	protected void alreadyMonitored() {/* Do nothing */}
 
@@ -212,7 +207,7 @@ public class HostObject extends AbstractDataObject {
 	//
 	// -- PRIVATE METHOD -----------------------------------------------
 	//
-
+	
 	/**
 	 * Handles a ProActive Runtime in order to create a VMObject associated to this one.
 	 * And explore this object.
@@ -221,22 +216,18 @@ public class HostObject extends AbstractDataObject {
 	 */
 	private void handleProActiveRuntime(ProActiveRuntime runtime, int depth){
 		VMObject vm = null;
-		
+
 		String key = runtime.getVMInformation().getName();
 
 		if ((! monitoredChildren.containsKey(key))
-			&&
-		    (! skippedChildren.containsKey(key))){
+				&&
+				(! skippedChildren.containsKey(key))){
 			vm = new VMObject(this, runtime);
 		}
 		else{
 			vm = (VMObject)getChildInAllChildren(key);
 		}
-		
-		/*if (os == null) {
-			os = vm.getParent().getSystemProperty("os.name");
-			}
-		 */
+
 		exploreChild(vm);
 
 		if(depth > 0) {

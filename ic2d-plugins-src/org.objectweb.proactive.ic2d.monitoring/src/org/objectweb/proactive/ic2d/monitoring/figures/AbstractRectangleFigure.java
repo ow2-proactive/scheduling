@@ -101,8 +101,8 @@ public abstract class AbstractRectangleFigure extends AbstractFigure{
 	 * @param text
 	 * @return
 	 */
-	private String getTextResized(String text){
-		if(text.length() > getDefaultWidth())
+	protected String getTextResized(String text){
+		if(text!=null && text.length() > (getDefaultWidth()+3))
 			return (text.substring(0, getDefaultWidth())+"...");
 		return text;
 	}

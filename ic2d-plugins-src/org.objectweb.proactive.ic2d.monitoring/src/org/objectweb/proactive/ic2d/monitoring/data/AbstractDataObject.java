@@ -53,12 +53,12 @@ public abstract class AbstractDataObject extends Observable {
 	protected Map<String, AbstractDataObject> monitoredChildren;
 	/** the object's children which are NOT monitored (HashMap<String, AbstractDataObject>) */
 	protected Map<String, AbstractDataObject> skippedChildren;
-	/** a collection of all the monitored objects */
-	protected static Map<String, AbstractDataObject> allMonitoredObjects = new ConcurrentHashMap<String, AbstractDataObject>();
 
 	protected boolean isAlive;
 
-
+	/** the world object */
+	private WorldObject world;
+	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
 	//
@@ -160,6 +160,7 @@ public abstract class AbstractDataObject extends Observable {
 		for(int i=0, size=children.length ; i<size ; i++)
 			children[i].stopMonitoring(false);
 		this.parent.removeChild(this);
+		getWorld().removeFromMonitoredObjects(this);
 		setChanged();
 		notifyObservers(State.NOT_MONITORED);
 	}
@@ -186,17 +187,8 @@ public abstract class AbstractDataObject extends Observable {
 	 */
 	public AOObject findActiveObjectById(UniqueID id) {
 		// We search in the monitored objects.
-		return (AOObject) allMonitoredObjects.get(id.toString());
+		return (AOObject) getAllMonitoredObjects().get(id.toString());
 		
-//		Iterator<AbstractDataObject> iterator = monitoredChildren.values().iterator();
-//		while (iterator.hasNext()) {
-//			AbstractDataObject object = iterator.next();
-//			AOObject activeObject = object.findActiveObjectById(id);
-//			if (activeObject != null) {
-//				return activeObject;
-//			}
-//		}
-//		return null;
 	}
 
 
@@ -243,7 +235,18 @@ public abstract class AbstractDataObject extends Observable {
 	 * @return The World, or null if the parent of this object is null.
 	 */
 	public WorldObject getWorld(){
-		return parent.getWorld();
+		if(world==null)
+			world = parent.getWorld();
+		return world;
+	}
+	
+	
+	/**
+	 * Returns all monitored objects recorded in the world
+	 * @return All monitored objects
+	 */
+	public Map<String, AbstractDataObject> getAllMonitoredObjects(){
+		return getWorld().getAllMonitoredObjects();
 	}
 	
 	/**

@@ -67,7 +67,7 @@ public class VMObject extends AbstractDataObject {
 		this.runtime = runtime;
 		this.jobID = runtime.getJobID();
 
-		this.allMonitoredObjects.put(getKey(), this);
+		getWorld().addToMonitoredObject(this);
 	}
 
 	//
@@ -88,7 +88,6 @@ public class VMObject extends AbstractDataObject {
 		try {
 			namesOfNodes = runtime.getLocalNodeNames();
 		} catch (ProActiveException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		for (int i = 0; i < namesOfNodes.length; ++i) {
@@ -111,7 +110,7 @@ public class VMObject extends AbstractDataObject {
 
 	@Override
 	public String getFullName() {
-		return /*"JVM " + */key;
+		return key;
 	}
 
 	@Override
@@ -131,7 +130,7 @@ public class VMObject extends AbstractDataObject {
 	public ProActiveRuntime getRuntime() {
 		return this.runtime;
 	}
-	
+
 	/**
 	 * Retuns the job id
 	 * @return the job id
@@ -146,6 +145,12 @@ public class VMObject extends AbstractDataObject {
 			Console.getInstance(Activator.CONSOLE_NAME).warn(getFullName()+" is not responding");
 		}
 		super.notResponding();
+	}
+
+	public void enableMonitoring(boolean enable){
+		List<AbstractDataObject> childrenList = new ArrayList<AbstractDataObject>(monitoredChildren.values());
+		for(int i=0, size=childrenList.size(); i<size; i++)
+			((NodeObject)childrenList.get(i)).enableMonitoring(enable);
 	}
 
 	//
@@ -218,16 +223,10 @@ public class VMObject extends AbstractDataObject {
 
 		String key = node.getNodeInformation().getName();
 		if ((! monitoredChildren.containsKey(key))
-			&&
-		    (! skippedChildren.containsKey(key))){
+				&&
+				(! skippedChildren.containsKey(key))){
 			nodeObject = new NodeObject(this, node);
 		}
-
 		this.exploreChild(nodeObject);
-
-//		String os = parent.getOperatingSystem();
-//		if(os==null){
-//		parent.setOperatingSystem(nodeObject.getSystemProperty("os.name"));
-//		}
 	}
 }

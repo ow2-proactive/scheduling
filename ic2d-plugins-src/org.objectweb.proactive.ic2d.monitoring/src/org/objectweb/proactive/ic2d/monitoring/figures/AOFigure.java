@@ -145,7 +145,6 @@ public class AOFigure extends AbstractFigure{
 	 */
 	@Override
 	public void paintIC2DFigure(Graphics graphics){
-		//System.out.println("****AOFigure.paintIC2DFigure()****");
 		
 		// Inits
 		Rectangle bounds = this.getBounds().getCopy().resize(-1, -2);
@@ -202,7 +201,6 @@ public class AOFigure extends AbstractFigure{
 	 * @return
 	 */
 	public IFigure getContentPane() {
-		//System.out.println("AOFigure : getContentPane");
 		return this;
 	}
 
@@ -211,7 +209,6 @@ public class AOFigure extends AbstractFigure{
 	 * @param state
 	 */
 	public void setState(State state){
-		//System.out.println("AOFigure.setState("+state+")");
 		switch (state) {
 		// busy
 		case SERVING_REQUEST:
@@ -242,11 +239,7 @@ public class AOFigure extends AbstractFigure{
 		default:
 			break;
 		}
-		//this.repaint();
-		//if(this.manager!=null) this.manager.repaint();
-		//Refresher.getInstance().repaint(this);
 		Display.getDefault().asyncExec(this);
-		//repaint();
 	}
 
 	/**
@@ -255,10 +248,7 @@ public class AOFigure extends AbstractFigure{
 	 */
 	public void setRequestQueueLength(int length) {
 		this.requestQueueLength = length;
-		//if(this.manager!=null) this.manager.repaint();
-		//Refresher.getInstance().repaint(this);
 		Display.getDefault().asyncExec(this);
-		//repaint();
 	}
 
 	/**
@@ -300,22 +290,7 @@ public class AOFigure extends AbstractFigure{
 	}
 
 	@Override
-	public void repaint() {
-		//System.out.println("AOFigure.repaint()");
-		super.repaint();
-	}
-
-	@Override
 	public void refresh(){
-		//System.out.println("AOFigure.refresh()");
-		/*if(Display.getDefault()!=null){
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run () {
-					repaint();
-					///Refresher.getInstance().repaint(this);
-				}});
-		}*/
-		//Refresher.getInstance().repaint(this);
 		Display.getDefault().asyncExec(this);
 	}
 

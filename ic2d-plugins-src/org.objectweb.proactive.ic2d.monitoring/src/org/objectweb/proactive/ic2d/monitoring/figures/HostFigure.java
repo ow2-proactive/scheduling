@@ -46,6 +46,8 @@ public class HostFigure extends AbstractRectangleFigure{
 
 	private IFigure contentPane;
 
+	protected  String  title = "";
+	
 	private final static Color DEFAULT_BORDER_COLOR;
 
 	static {
@@ -80,15 +82,15 @@ public class HostFigure extends AbstractRectangleFigure{
 	public boolean isVerticalLayout() {
 		return contentPane.getLayoutManager() instanceof HostVerticalLayout;
 	}
-	
+
 	public void setVerticalLayout() {
 		contentPane.setLayoutManager(new HostVerticalLayout());
 	}
-	
+
 	public void setHorizontalLayout() {
 		contentPane.setLayoutManager(new HostHorizontalLayout());
 	}
-	
+
 	//
 	// -- PROTECTED METHODS --------------------------------------------
 	//
@@ -101,8 +103,6 @@ public class HostFigure extends AbstractRectangleFigure{
 
 	protected void initFigure() {
 		BorderLayout layout = new HostBorderLayout();
-		//layout.setHorizontalSpacing(10);
-		//layout.setVerticalSpacing(5);
 		setLayoutManager(layout);
 		add(label, BorderLayout.TOP);
 
@@ -110,7 +110,6 @@ public class HostFigure extends AbstractRectangleFigure{
 		ToolbarLayout contentPaneLayout = new HostHorizontalLayout();
 		contentPaneLayout.setSpacing(5);
 		contentPaneLayout.setMinorAlignment(ToolbarLayout.ALIGN_CENTER);
-		//contentPaneLayout.setStretchMinorAxis(false);
 		contentPane.setLayoutManager(contentPaneLayout);
 
 		add(contentPane, BorderLayout.CENTER);
@@ -123,10 +122,24 @@ public class HostFigure extends AbstractRectangleFigure{
 
 	@Override
 	protected Color getDefaultBorderColor() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
+	
+	
+	public void changeTitle(String newTitle){
+		String text = getTextResized(newTitle);
+		this.title = text;
+		setToolTip(new ToolTipFigure(newTitle));
+		Display.getDefault().asyncExec(this);
+	}
+
+	@Override
+	public void run(){
+		setTitle(title);
+		repaint();
+	}
+	
 	//
 	// -- INNER CLASS --------------------------------------------
 	//
@@ -136,10 +149,8 @@ public class HostFigure extends AbstractRectangleFigure{
 		protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint){
 			if(legend)
 				return super.calculatePreferredSize(container, wHint, hHint).expand(/*100*/50, /*10*/0);
-
 			return super.calculatePreferredSize(container, wHint, hHint).expand(10,0);
 		}
-
 	}
 
 	private class HostHorizontalLayout extends ToolbarLayout {

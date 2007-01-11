@@ -89,7 +89,6 @@ public class MonitorNewHostDialog extends Dialog {
 		try {
 			initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
 		} catch (UnknownHostException e) {
-			// TODO catch this exception, and do something
 			e.printStackTrace();
 		}
 

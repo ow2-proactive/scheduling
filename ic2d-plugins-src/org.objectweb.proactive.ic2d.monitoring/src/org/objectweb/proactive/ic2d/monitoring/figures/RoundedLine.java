@@ -42,7 +42,7 @@ import org.eclipse.swt.SWT;
  */
 public class RoundedLine extends Polyline {
 
-	public static final DrawingStyle DEFAULT_STYLE = DrawingStyle.FILAIRE;
+	public static final DrawingStyle DEFAULT_STYLE = DrawingStyle.FIXED;
 	public static final boolean DEFAULT_DISPLAY_TOPOLOGY = true;
 	
     private static final int MAX_STROKE_WIDTH_RATIO = 12;
@@ -76,7 +76,7 @@ public class RoundedLine extends Polyline {
 		communicationCounter++;
 		if(communicationCounter > maxCommunicationCounter)
 			maxCommunicationCounter = communicationCounter;
-		if(drawingStyle!=DrawingStyle.FILAIRE)
+		if(drawingStyle!=DrawingStyle.FIXED)
 			getParent().repaint();
 	}
 	
@@ -106,7 +106,7 @@ public class RoundedLine extends Polyline {
 
 	protected int drawingStyleSize(){       
 		switch (drawingStyle) {
-		case FILAIRE:
+		case FIXED:
 			return 1;
 		case PROPORTIONAL:
 			if (maxCommunicationCounter > MAX_STROKE_WIDTH_PROPORTIONAL)
@@ -176,6 +176,6 @@ public class RoundedLine extends Polyline {
 	public enum DrawingStyle {
 		PROPORTIONAL,
 		RATIO,
-		FILAIRE,
+		FIXED,
 	}
 }
