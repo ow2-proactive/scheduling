@@ -142,15 +142,15 @@ public class ClassServer implements Runnable {
         }
 
         if (this.paths == null) {
-            logger.info(
+            logger.debug(
                 " --> This ClassFileServer is reading resources from classpath " +
                 port);
         } else {
-            logger.info(
+            logger.debug(
                 " --> This ClassFileServer is reading resources from the following paths");
 
             //for (int i = 0; i < codebases.length; i++) {
-            logger.info(paths);
+            logger.debug(paths);
 
             //codebases[i].getAbsolutePath());
         }
