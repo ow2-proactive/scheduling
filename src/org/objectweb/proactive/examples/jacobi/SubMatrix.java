@@ -1,37 +1,45 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2006 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.examples.jacobi;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.NDC;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -39,15 +47,18 @@ import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class SubMatrix implements Serializable{
+public class SubMatrix implements Serializable {
 
     /** Default width value of a submatrix */
     private static final int DEFAULT_WIDTH = 100;
 
     /** Default height value of a submatrix */
     private static final int DEFAULT_HEIGHT = 50;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** Step */
     private int iterationsToStop = Jacobi.ITERATIONS;
@@ -91,6 +102,12 @@ public class SubMatrix implements Serializable{
     /** The whole matrix */
     private SubMatrix matrix;
 
+    /** The resultFile * */
+    private File resultFile;
+
+    /** A reference to the main program **/
+    private Jacobi jacobi;
+
     /** Border of the north submatrix neighbor */
     private double[] northNeighborBorder;
 
@@ -108,15 +125,22 @@ public class SubMatrix implements Serializable{
         this(SubMatrix.DEFAULT_WIDTH, SubMatrix.DEFAULT_HEIGHT);
     }
 
-    public SubMatrix(String name) {
+    public SubMatrix(String name, File resultFile, Jacobi jacobi) {
         this();
         this.name = name;
+        this.resultFile = resultFile;
+        this.jacobi = jacobi;
+        
+        NDC.push(name);
     }
 
     /**
      * Constructor
-     * @param x the width of the submatrix
-     * @param y the height of the matrix
+     *
+     * @param x
+     *            the width of the submatrix
+     * @param y
+     *            the height of the matrix
      */
     public SubMatrix(int x, int y) {
         this.width = x;
@@ -130,8 +154,11 @@ public class SubMatrix implements Serializable{
 
     /**
      * Returns the value at the specified position
-     * @param x the column of the value
-     * @param y the line of the value
+     *
+     * @param x
+     *            the column of the value
+     * @param y
+     *            the line of the value
      * @return the value at the specified position
      */
     public double get(int x, int y) {
@@ -143,29 +170,29 @@ public class SubMatrix implements Serializable{
      * communication with other submatrix
      */
     public void internalCompute() {
-		int index = this.width + 1;
-		double current;
-		double diff = Jacobi.MINDIFF + 1;
-		double west;
-		double center; 
-		double east;
-		for (int y = 1; y < (this.height - 1); y++) {
-		    for (int x = 1; x < (this.width - 1); x++) {
-				center = old[index];
-				west = old[index - 1];
-				east = old[index + 1];
-				current = (west + east + this.old[index - this.width] +
-				        this.old[index + this.width]) / 4;
-				this.current[index] = current;
-				diff = Math.abs(current - center);
-				if (diff < this.minDiff ) {
-					this.minDiff = diff;
-				}
-				
-				index++;
-		     }
-		    index += 2;
-		}
+        int index = this.width + 1;
+        double current;
+        double diff = Jacobi.MINDIFF + 1;
+        double west;
+        double center;
+        double east;
+        for (int y = 1; y < (this.height - 1); y++) {
+            for (int x = 1; x < (this.width - 1); x++) {
+                center = old[index];
+                west = old[index - 1];
+                east = old[index + 1];
+                current = (west + east + this.old[index - this.width] +
+                    this.old[index + this.width]) / 4;
+                this.current[index] = current;
+                diff = Math.abs(current - center);
+                if (diff < this.minDiff) {
+                    this.minDiff = diff;
+                }
+
+                index++;
+            }
+            index += 2;
+        }
     }
 
     /**
@@ -293,8 +320,8 @@ public class SubMatrix implements Serializable{
         try {
             topology = new Plan(allSubMatrix, Jacobi.HEIGHT, Jacobi.WIDTH);
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            System.err.println(
-                "** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
+            logger.error(
+                "[JACOBI] ** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
             e.printStackTrace();
         }
 
@@ -307,12 +334,12 @@ public class SubMatrix implements Serializable{
         try {
             this.neighbors = (SubMatrix) ProActiveGroup.newGroup(SubMatrix.class.getName());
         } catch (ClassNotReifiableException e) {
-            System.err.println(
-                "** ClassNotReifiableException ** - Unable to build the neighbors group");
+            logger.error(
+                "[JACOBI] ** ClassNotReifiableException ** - Unable to build the neighbors group");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            System.err.println(
-                "** ClassNotFoundException ** - Unable to build the neighbors group");
+            logger.error(
+                "[JACOBI] ** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
         Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors);
@@ -345,9 +372,11 @@ public class SubMatrix implements Serializable{
     }
 
     /**
-     * Builds a "fake border" for the external submatrix
-     * filled with DEFAULT_BORDER_VALUE
-     * @param size - the size of the border
+     * Builds a "fake border" for the external submatrix filled with
+     * DEFAULT_BORDER_VALUE
+     *
+     * @param size -
+     *            the size of the border
      * @return a "fake border" for the external submatrix
      */
     private double[] buildFakeBorder(int size) {
@@ -360,6 +389,7 @@ public class SubMatrix implements Serializable{
 
     /**
      * Returns the north border of the submatrix
+     *
      * @return the north border of the submatrix
      */
     private double[] buildNorthBorder() {
@@ -372,6 +402,7 @@ public class SubMatrix implements Serializable{
 
     /**
      * Returns the south border of the submatrix
+     *
      * @return the south border of the submatrix
      */
     private double[] buildSouthBorder() {
@@ -385,6 +416,7 @@ public class SubMatrix implements Serializable{
 
     /**
      * Returns the west border of the submatrix
+     *
      * @return the west border of the submatrix
      */
     private double[] buildWestBorder() {
@@ -399,6 +431,7 @@ public class SubMatrix implements Serializable{
 
     /**
      * Returns the west border of the submatrix
+     *
      * @return the west border of the submatrix
      */
     private double[] buildEastBorder() {
@@ -431,7 +464,9 @@ public class SubMatrix implements Serializable{
 
     /**
      * Set the north border
-     * @param border - the north border
+     *
+     * @param border -
+     *            the north border
      */
     public void setNorthBorder(double[] border) {
         this.northNeighborBorder = border;
@@ -439,7 +474,9 @@ public class SubMatrix implements Serializable{
 
     /**
      * Set the south border
-     * @param border - the south border
+     *
+     * @param border -
+     *            the south border
      */
     public void setSouthBorder(double[] border) {
         this.southNeighborBorder = border;
@@ -447,7 +484,9 @@ public class SubMatrix implements Serializable{
 
     /**
      * Set the west border
-     * @param border - the west border
+     *
+     * @param border -
+     *            the west border
      */
     public void setWestBorder(double[] border) {
         this.westNeighborBorder = border;
@@ -455,7 +494,9 @@ public class SubMatrix implements Serializable{
 
     /**
      * Set the east border
-     * @param border - the east border
+     *
+     * @param border -
+     *            the east border
      */
     public void setEastBorder(double[] border) {
         this.eastNeighborBorder = border;
@@ -467,6 +508,7 @@ public class SubMatrix implements Serializable{
     public void compute() {
         this.buildNeighborhood();
         ProSPMD.barrier("InitDone");
+
         this.asyncRefToMe.loop();
     }
 
@@ -474,7 +516,9 @@ public class SubMatrix implements Serializable{
      * Launch the main loop
      */
     public void loop() {
-        // System.out.println("iterations : " + this.iterationsToStop);
+    	logger.debug("[JACOBI] [" + this.name +
+                "] Iteration : " + iterationsToStop);
+    	
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
@@ -491,14 +535,13 @@ public class SubMatrix implements Serializable{
             this.asyncRefToMe.exchange();
             this.asyncRefToMe.loop();
         } else {
-            System.out.println("[" + this.name +
+            logger.info("[JACOBI] [" + this.name +
                 "] Computation over :\n      " + this.minDiff +
                 " (asked less than " + Jacobi.MINDIFF + ")");
-            if (this.minDiff < Jacobi.MINDIFF) {
-                System.out.println("[" + this.name +
-                    "] sent the \"end signal\"");
-                this.matrix.stop();
-            }
+        }
+        if (this.minDiff < Jacobi.MINDIFF) {
+            System.out.println("[" + this.name + "] sent the \"end signal\"");
+            this.matrix.stop();
         }
     }
 
@@ -507,5 +550,38 @@ public class SubMatrix implements Serializable{
      */
     public void stop() {
         this.iterationsToStop = 0;
+        logger.debug("[JACOBI] [" + this.name +
+                "] Stop Message Received, waiting for others.");
+        ProSPMD.barrier("stop");
+        if ((north != null) && (east != null) && (west != null) &&
+                (south != null)) {
+            PrintWriter pw = null;
+            try {
+                pw = new PrintWriter(new FileOutputStream(resultFile), true);
+
+                DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                
+                
+                for (int i = 0; i < height; i++) {
+                    String line = "[";
+                    for (int j = 0; j < (width - 1); j++) {
+                        line += (decimalFormat.format(current[(i * width) + j]) + " ");
+                    }
+                    line += decimalFormat.format(current[((i * width) + width) - 1]);
+                    line += "] ";
+                    pw.println(line);
+                }
+                logger.info("CALCULATION COMPLETE, plese find results in: "+resultFile.getAbsolutePath());
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } finally {
+            	pw.close();
+            }
+            // Send the terminate signal to the main program
+            this.jacobi.terminateAll();
+        }
+        NDC.pop();
+        NDC.remove();
     }
 }
