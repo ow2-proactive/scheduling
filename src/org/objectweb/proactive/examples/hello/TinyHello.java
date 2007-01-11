@@ -80,6 +80,9 @@ public class TinyHello implements java.io.Serializable {
 
         // get and display a value 
         StringMutableWrapper received = tiny.sayHello(); // possibly remote call
-        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity 
+        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity
+        // quitting
+        
+        ProActive.exitSuccess();
     }
 }

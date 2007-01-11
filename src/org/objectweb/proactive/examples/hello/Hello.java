@@ -89,5 +89,7 @@ public class Hello implements java.io.Serializable {
         StringMutableWrapper received = hello.sayHello(); // possibly remote call
         logger.info("On " + getHostName() + ", a message was received: " +
             received); // potential wait-by-necessity 
+        descriptorPad.killall(true);
+        ProActive.exitSuccess();
     }
 }
