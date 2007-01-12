@@ -30,19 +30,17 @@
  */
 package nonregressiontest.stub.stubgeneration;
 
+import java.util.Arrays;
+
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.Utils;
 
+import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 
 /**
  * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
  */
 public class Test extends FunctionalTest {
     String stubClassName;
@@ -57,14 +55,77 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
+        //empty String
+        Assertions.assertEquals(Utils.convertClassNameToStubClassName("", null),
+            "");
+
+        //not a stub
+        String notAStubClassName = "nonregressiontest.stub.stubgeneration.A";
+        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+                notAStubClassName), notAStubClassName);
+
+        // Class not in a package 
+        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+                "pa.stub._StubA"), "A");
+
+        //tests with a simple name
         String baseclassName = "nonregressiontest.stub.stubgeneration.A";
-//        if ("ASM".equals(System.getProperty("byteCodeManipulator"))) {
-//        ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(baseclassName);
-//        data = bsb.create();
-//        } else if ("javassist".equals(System.getProperty("byteCodeManipulator"))) {
-            data = JavassistByteCodeStubBuilder.create(baseclassName, null);
-//        }
-        stubClassName = Utils.convertClassNameToStubClassName(baseclassName, null);
+        data = JavassistByteCodeStubBuilder.create(baseclassName, null);
+        Assertions.assertNotNull(data);
+        Class stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.nonregressiontest.stub.stubgeneration._StubA",
+                data);
+        Assertions.assertTrue("A isn't parent of its Stub!",
+            A.class.isAssignableFrom(stubClass));
+        stubClassName = Utils.convertClassNameToStubClassName(baseclassName,
+                null);
+        Assertions.assertEquals(stubClassName +
+            " not equals pa.stub.nonregressiontest.stub.stubgeneration._StubA",
+            stubClassName,
+            "pa.stub.nonregressiontest.stub.stubgeneration._StubA");
+        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+                stubClassName), baseclassName);
+        Assertions.assertTrue(Arrays.equals(
+                Utils.getNamesOfParameterizingTypesFromStubClassName(
+                    stubClassName), new String[0]));
+
+        //tests with a more complicated name, test char escaping
+        baseclassName = "nonregressiontest.stub.stubgeneration._StubA_PTy_Dpe_Generics";
+        data = JavassistByteCodeStubBuilder.create(baseclassName,
+                new Class[] { My_PFirst_PType.class, My_DSecond_PType.class });
+        Assertions.assertNotNull(data);
+        stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.parameterized.nonregressiontest.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_Genericsnonregressiontest_Pstub_Pstubgeneration_PMy__PFirst__PType_Dnonregressiontest_Pstub_Pstubgeneration_PMy__DSecond__PType",
+                data);
+        Assertions.assertTrue("_StubA_PTy_Dpe_Generics isn't parent of its Stub!",
+            _StubA_PTy_Dpe_Generics.class.isAssignableFrom(stubClass));
+        stubClassName = Utils.convertClassNameToStubClassName(baseclassName,
+                new Class[] { My_PFirst_PType.class, My_DSecond_PType.class });
+        Assertions.assertEquals(stubClassName +
+            " not equals pa.stub.nonregressiontest.stub.stubgeneration._StubA",
+            stubClassName,
+            "pa.stub.parameterized.nonregressiontest.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_Genericsnonregressiontest_Pstub_Pstubgeneration_PMy__PFirst__PType_Dnonregressiontest_Pstub_Pstubgeneration_PMy__DSecond__PType");
+        Assertions.assertEquals(Utils.convertStubClassNameToClassName(
+                stubClassName), baseclassName);
+        Assertions.assertTrue(Arrays.equals(
+                Utils.getNamesOfParameterizingTypesFromStubClassName(
+                    stubClassName),
+                new String[] {
+                    My_PFirst_PType.class.getName(),
+                    My_DSecond_PType.class.getName()
+                }));
+
+        //BENCH
+        //        long begin = System.currentTimeMillis();
+        //        for (int i = 0; i < 1000000; i++) {
+        //            Utils.convertClassNameToStubClassName(baseclassName, null);
+        //        }
+        //        System.out.println("convertClassNameToStubClassName " +
+        //            (System.currentTimeMillis() - begin));
+        //        begin = System.currentTimeMillis();
+        //        for (int i = 0; i < 1000000; i++) {
+        //            Utils.convertStubClassNameToClassName(stubClassName);
+        //        }
+        //        System.out.println("convertStubClassNameToClassName " +
+        //            (System.currentTimeMillis() - begin));
     }
 
     /**
@@ -80,8 +141,28 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        return ((data != null) &&
-        (stubClassName.equals(
-            "pa.stub.nonregressiontest.stub.stubgeneration.Stub_A")));
+        return (data != null);
+    }
+
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.initTest();
+            test.action();
+            if (test.postConditions()) {
+                System.out.println("TEST SUCCEEDED");
+            } else {
+                System.out.println("TEST FAILED");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                test.endTest();
+                System.exit(0);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 }

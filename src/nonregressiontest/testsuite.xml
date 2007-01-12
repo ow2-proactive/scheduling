@@ -73,7 +73,8 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnActivated" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestVnNotActivated" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.parallel.TestArrayOfArray" />
-			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.generation.Test"/>
+			<unitTest exclude="yes" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.binding.local.collective.Test"/>
