@@ -36,6 +36,7 @@
 <!ENTITY Security SYSTEM "Security.xml">
 <!ENTITY WSDoc SYSTEM "WSDoc.xml">
 <!ENTITY OSGi SYSTEM "OSGi.xml">
+<!ENTITY JMX SYSTEM "Jmx.xml">
 <!ENTITY mpi SYSTEM "mpi.xml">
 <!ENTITY IC2D SYSTEM "IC2D.xml">
 <!ENTITY plugin SYSTEM "development/plugin.xml">
@@ -129,6 +130,7 @@
     &Security;
     &WSDoc;
     &OSGi;
+    &JMX;
     &mpi;
    </part>
 
