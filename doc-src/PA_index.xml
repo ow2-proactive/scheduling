@@ -115,10 +115,9 @@
     <title>Composing</title>
     &intro;
     &implementation;
-    &conformance;
     &Compconfiguration;
-    &adl;
     &collective-interfaces;
+    &adl;
     &examples;
     &perspectives;
    </part>

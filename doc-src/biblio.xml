@@ -364,5 +364,25 @@
 			</publisher>
 		</biblioset>
 	</biblioentry>
+	
+	<biblioentry role="thesis" id="M06">
+		<abbrev id="PhD-thesis-Morel.abbrev">PhD-Morel</abbrev>
+		<biblioset role="thesis">
+			<authorgroup>
+				<author>
+					<firstname>Matthieu</firstname>
+					<surname>Morel</surname>
+				</author>
+			</authorgroup>
+			<title>
+				Components for Grid Computing
+			</title>
+		</biblioset>
+		<bibliosource class="uri">http://www-sop.inria.fr/oasis/personnel/Matthieu.Morel/publis/phd_thesis_matthieu_morel.pdf</bibliosource>
+    <bibliomisc role="type">PhD thesis</bibliomisc>
+    
+    <orgname>University of Nice Sophia-Antipolis</orgname>
+    <pubdate>2006</pubdate>
+    </biblioentry>
   
 </bibliography>

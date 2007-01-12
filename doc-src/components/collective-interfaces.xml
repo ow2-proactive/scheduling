@@ -3,12 +3,12 @@
 <chapter id="collective-interfaces">
   <title>Collective interfaces</title>
 
-  <para>In this chapter, we target multiway communications - communications to
-  or from several interfaces - and notably parallel communications, which are
-  common in Grid computing. Our objective is to simplify the design of
-  distributed Grid applications, and we address multiway communications
-  between Fractal components through the specification of collective
-  interfaces. The driving idea is to manage the semantics and behavior of
+  <para>In this chapter, we consider multiway communications - communications
+  to or from several interfaces - and notably parallel communications, which
+  are common in Grid computing.</para>
+  <para>Our objective is to simplify the design of
+  distributed Grid applications with multiway interactions.</para>
+  <para>The driving idea is to manage the semantics and behavior of
   collective communications at the level of the interfaces.</para>
 
   <sect1>
@@ -189,11 +189,10 @@ public void bar();</programlisting>
 
     <sect2>
       <title>Configuration through annotations</title>
-      
+
       <para>Note that our implementation of collective interfaces extensively
       uses new features of the Java language introduced in Java 5, such as
       generics and annotations.</para>
-      
 
       <para>The distribution of parameters in our framework is specified in
       the definition of the multicast interface, using annotations.</para>
@@ -217,14 +216,12 @@ public void bar();</programlisting>
 
         <para>and is used as follows:</para>
 
-        <para>
-          <programlisting lang="java">@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
+        <para><programlisting lang="java">@ClassDispatchMetadata(mode=@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST))
 interface MyMulticastItf {
 
   public void foo(List&lt;T&gt; parameters);
 
-}</programlisting>
-        </para>
+}</programlisting></para>
       </sect3>
 
       <sect3>
@@ -240,10 +237,8 @@ interface MyMulticastItf {
 
         <para>and is used as follows:</para>
 
-        <para>
-          <programlisting lang="java">@MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode =ParamDispatchMode.BROADCAST))
-public void foo(List&lt;T&gt; parameters);</programlisting>
-        </para>
+        <para><programlisting lang="java">@MethodDispatchMetadata(mode = @ParamDispatchMetadata(mode =ParamDispatchMode.BROADCAST))
+public void foo(List&lt;T&gt; parameters);</programlisting></para>
       </sect3>
 
       <sect3>
@@ -255,24 +250,23 @@ public void foo(List&lt;T&gt; parameters);</programlisting>
 
         <para>and is used as follows:</para>
 
-        <para>
-          <programlisting lang="java">public void foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST) List&lt;T&gt; parameters);</programlisting>
-        </para>
+        <para><programlisting lang="java">public void foo(@ParamDispatchMetadata(mode=ParamDispatchMode.BROADCAST) List&lt;T&gt; parameters);</programlisting></para>
       </sect3>
 
-	<sect3><title>Automatic type conversion</title>
+      <sect3>
+        <title>Automatic type conversion</title>
 
-      <para>For each method invoked and returning a result of type
-      <literal>T</literal>, a multicast invocation returns an aggregation of
-      the results: a <literal>List&lt;T&gt;</literal>.</para>
+        <para>For each method invoked and returning a result of type
+        <literal>T</literal>, a multicast invocation returns an aggregation of
+        the results: a <literal>List&lt;T&gt;</literal>.</para>
 
-      <para>There is a type conversion, from return type <literal>T</literal>
-      in a method of the server interface, to return type
-      <literal>List&lt;T&gt;</literal> in the corresponding method of the
-      multicast interface. The framework transparently handles the type
-      conversion between return types, which is just an aggregation of
-      elements of type <literal>T</literal> into a structure of type
-      <literal>list&lt;T&gt;</literal>.</para>
+        <para>There is a type conversion, from return type
+        <literal>T</literal> in a method of the server interface, to return
+        type <literal>List&lt;T&gt;</literal> in the corresponding method of
+        the multicast interface. The framework transparently handles the type
+        conversion between return types, which is just an aggregation of
+        elements of type <literal>T</literal> into a structure of type
+        <literal>list&lt;T&gt;</literal>.</para>
       </sect3>
     </sect2>
 

@@ -154,7 +154,14 @@ exportedVirtualNodes
     </sect1>
     <sect1  id="adl_html_usage"  >
       <title> Usage</title>
-      <para>The launcher, which parses the ADL, creates a corresponding component factory, and
+      <para>ADL definitions correspond to component factories. ADL definition can be used directly:
+      <screen>
+      Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+      Map context = new HashMap();
+      Component c = (Component) factory.newComponent("myADLDefinition",context);
+      </screen>
+      </para>  
+      <para>It is also possible to use the launcher tool, which parses the ADL, creates a corresponding component factory, and
  instantiates and assembles the components as defined in the ADL, is started from the <literal>org.objectweb.proactive.core.component.adl.Launcher</literal> class:</para>
 <screen> Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descriptor])  </screen>
       <para>where [-java|-fractal] comes from the Fractal ADL Launcher (put -fractal for ProActive
